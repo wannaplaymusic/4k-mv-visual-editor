@@ -1,0 +1,18 @@
+{
+    "name": "StrangeVibrations",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n// inspired by https://twitter.com/beesandbombs/status/1343221449218285570?s=09\n\nlet points = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n  \n  for (let r = 12; r < 200; r += 12) {\n    for (let i = 0; i < r/2; i++) {\n      let theta = map(i, 0, r/2, 0, TWO_PI);\n      points.push({\n        r: r,\n        theta: theta\n      });\n    }\n  }\n}\n\nfunction draw() {\n  let f = frameCount/25;\n  blendMode(BLEND);\n  background(0);\n  blendMode(ADD);\n  translate(width/2, height/2);\n  rotate(PI/2);\n  for (let p of points) {\n    let disp = map(p.r, 100, 192, 70, 0);\n    if (p.r < 100) {\n      disp = map(p.r, 12, 100, 0, 70);\n    }\n    let cost = cos(p.theta);\n    let sint = sin(p.theta);\n    let t = f + p.r/70;\n    \n    fill(255, 0, 0);\n    let val = cos(t)/2+0.5;\n    let r = p.r + val*disp;\n    circle(r*cost, r*sint, 5);\n    fill(0, 255, 0);\n    val = cos(t + 0.05)/2+0.5;\n    r = p.r + val*disp;\n    circle(r*cost, r*sint, 5);\n    fill(0, 0, 255);\n    val = cos(t + 0.1)/2+0.5;\n    r = p.r + val*disp;\n    circle(r*cost, r*sint, 5);\n  }\n}\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            return createGraphics(10, 10);\n        }\n        return window._origGet.apply(this, args);\n    };\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Roni Kaufman",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@ronikaufman/1051702",
+    "date_added": "2026-07-06 22:19:29"
+}

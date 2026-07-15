@@ -1,0 +1,14 @@
+PyQt6==6.11.0
+PyQt6-WebEngine==6.11.0
+Pillow==12.2.0
+numpy==2.2.6
+sounddevice==0.5.5
+scipy==1.15.3
+requests==2.34.2
+librosa==0.11.0
+yt-dlp==2026.3.17
+soundfile==0.13.1
+numba==0.62.1
+llvmlite==0.45.1
+psutil>=5.9.0
+opencv-python==4.11.0.86

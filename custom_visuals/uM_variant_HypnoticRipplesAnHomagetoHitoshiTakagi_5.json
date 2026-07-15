@@ -1,0 +1,21 @@
+{
+    "name": "Uncler M - HypnoticRipplesAnHomagetoHitoshiTakagi_var5",
+    "code": "\n// --- Safety Guardrails for Thumbnail and Sandbox ---\nif (typeof width === 'undefined') { var width = 1280; }\nif (typeof height === 'undefined') { var height = 720; }\n\n\n// --- Global Variables for Uncler M Variants ---\nvar uM_colors = [\"#f97316\", \"#ef4444\", \"#ec4899\", \"#8b5cf6\", \"#facc15\"];\nvar speedMult = 1.0;\nvar lineScale = 1.0;\nvar dynamicShift = 0;\nvar scalePulse = 1.0;\nvar rotAngle = 0;\nvar gridOffset = 0;\nvar uM_rot = 0;\n\n// === Inspired by 'HypnoticRipplesAnHomagetoHitoshiTakagi' by 'Kazoops' ===\n// Created as variant #5 by Uncler M\n// Infused with creative algorithmic modifications.\n\n// === Tab: mySketch ===\ndraw=()=>{f=frameCount;f<2&&(createCanvas(W=innerWidth,H=innerHeight),noFill(),stroke(uM_colors[1]),strokeWeight(.1));background(0,10);for(x=0;x<W;x+=60)for(y=0;y<H;y+=60)circle(x,y,abs(200*sin(f*.01)-mag(x-W/2,y-H/2)));for(r=0;r<300;r+=30)circle(r*cos(r*f)+W/2,r*sin(r*f)+H/2,10)}\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            return createGraphics(10, 10);\n        }\n        return window._origGet.apply(this, args);\n    };\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Uncler M",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "Uncler M",
+        "generative",
+        "variant",
+        "starred_HypnoticRipplesAnHomagetoHitoshiTakagi"
+    ],
+    "url": "https://openprocessing.org/@Kazoops/2962993",
+    "date_added": "2026-07-08 23:13:00",
+    "is_starred": false
+}

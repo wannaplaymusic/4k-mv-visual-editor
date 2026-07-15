@@ -1,0 +1,18 @@
+{
+    "name": "MoireGrid",
+    "code": "// === Tab: mySketch ===\n// For genuary2026, day 19, theme: \"16x16\". \n\nlet turn = 0;\nlet num = 20;\nlet bg = 255;\nlet tbg = 255;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n}\n\nfunction draw() {\n\tbg = lerp(bg, tbg, 0.1)\n\tturn = lerp(turn,map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), width/12,11*width/12,-PI*2.5,PI*2.5, true),0.1)\n\tbackground(bg);\n\ttranslate(width / 2, height / 2);\n\tscale(height/628);\n\tfor (let div = 1; div < 9; div += 1) {\n\t\tpush();\n\t\trotate(turn / 5*(div));\n\t\tdrawGrid();\n\t\tpop();\n\t}\n}\n\nfunction drawGrid() {\n\tstroke(255-bg)\n\tnum = lerp(num, map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),height/12, 11*height/12, 16, 64, true), 0.01)\n\tfor (let i = 0; i < floor(num); i++) {\n\t\tlet x = -250 + (500/num) * i;\n\t\tstrokeWeight(0.5 + 0.75*(i%2));\n\t\tline(x, -250, x, 250);\n\t}\n}\n\nfunction mousePressed(){\n\ttbg = 255-tbg;\n}\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            return createGraphics(10, 10);\n        }\n        return window._origGet.apply(this, args);\n    };\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Ivan Rudnicki",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@u110137/2852799",
+    "date_added": "2026-07-06 21:02:12"
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="35.3mm" height="35.3mm" version="1.1" viewBox="0 0 100.1 100.1">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #0d43a3;
+      }
+
+      .cls-2 {
+        fill: #87878a;
+      }
+    </style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 28.7.8, SVG Export Plug-In . SVG Version: 1.2.0 Build 200)  -->
+  <g>
+    <g id="_レイヤー_1" data-name="レイヤー_1">
+      <g id="_レイヤー_1-2" data-name="_レイヤー_1">
+        <g id="_レイヤー_1-2">
+          <path class="cls-2" d="M95.8,4.3v91.6H4.3V4.3h91.6M100.1,0H0v100.1h100.1V0h0Z"/>
+        </g>
+      </g>
+      <polyline class="cls-1" points="95.8 4.3 95.8 95.9 4.3 95.9 4.3 4.3 95.9 4.3"/>
+    </g>
+  </g>
+</svg>

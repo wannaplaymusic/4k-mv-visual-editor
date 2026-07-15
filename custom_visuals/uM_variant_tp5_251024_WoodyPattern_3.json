@@ -1,0 +1,21 @@
+{
+    "name": "Uncler M - tp5_251024_WoodyPattern_var3",
+    "code": "\n// --- Safety Guardrails for Thumbnail and Sandbox ---\nif (typeof width === 'undefined') { var width = 1280; }\nif (typeof height === 'undefined') { var height = 720; }\n\n\n// --- Global Variables for Uncler M Variants ---\nvar uM_colors = [\"#1aff00\", \"#00ffff\", \"#ffff00\", \"#ff00ff\", \"#18181b\"];\nvar speedMult = 1.0;\nvar lineScale = 1.0;\nvar dynamicShift = 0;\nvar scalePulse = 1.0;\nvar rotAngle = 0;\nvar gridOffset = 0;\nvar uM_rot = 0;\n\n// === Inspired by 'tp5_251024_WoodyPattern' by 'はぅ君' ===\n// Created as variant #3 by Uncler M\n// Infused with creative algorithmic modifications.\n\n// === Tab: mySketch.js ===\nt=0\ndraw=_=>{t++||createCanvas(W=720,W)\ncolorMode(HSB)\nfor(y=0;y<800;y+=7)for(x=y/7%2?-49:-42;x<W;x+=42)fill(H=noise((X=x-int(t/42)*42)/540,y/99)*W%360,N=noise(X,y/180)*99,B=99-N)+stroke(H,N,B/2)+push()+translate(x+t%42,y)+rotate(-PI/4)+square(0,0,30)+pop()}\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            return createGraphics(10, 10);\n        }\n        return window._origGet.apply(this, args);\n    };\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
+    "custom_css": "html, body {\n  margin: 0;\n  padding: 0;\n  overflow: hidden;\n  background-image: linear-gradient(45deg, #777, #999);\n  background-size: 20px 20px;\n}\n\ncanvas {\n  display: block;\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: auto;\n  border:ridge 10px #842;\n  background-color:#FFF;\n}\n@media screen and (max-width: 480px) {\n  canvas {\n    max-height: 360px;\n    max-width: 360px;\n  }\n}\n\n",
+    "inline_assets": {},
+    "author": "Uncler M",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "Uncler M",
+        "generative",
+        "variant",
+        "starred_tp5_251024_WoodyPattern"
+    ],
+    "url": "https://openprocessing.org/@Haukun/2754213",
+    "date_added": "2026-07-08 23:13:00",
+    "is_starred": false
+}

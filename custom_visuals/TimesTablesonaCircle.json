@@ -1,0 +1,19 @@
+{
+    "name": "TimesTablesonaCircle",
+    "code": "// === Tab: mySketch ===\nlet factor = 0;\n\nfunction setup() {\n  createCanvas(800, 800);\n  angleMode(DEGREES); // Change the angle mode to DEGREES\n  colorMode(HSB);\n}\n\nfunction draw() {\n  background(0);\n  translate(width / 2, height / 2);\n  stroke(255);\n  \n  let totalPoints = 200;\n  let radius = width / 2 - 50;\n  \n  // Draw the points on the circle\n  for (let i = 0; i < totalPoints; i++) {\n    let angle = map(i, 0, totalPoints, 0, 360);\n    let x = radius * cos(angle);\n    let y = radius * sin(angle);\n    point(x, y);\n  }\n  \n  // Draw the lines between the points\n  for (let i = 0; i < totalPoints; i++) {\n    let startAngle = map(i, 0, totalPoints, 0, 360);\n    let endAngle = map((i * factor) % totalPoints, 0, totalPoints, 0, 360);\n    \n    let startX = radius * cos(startAngle);\n    let startY = radius * sin(startAngle);\n    \n    let endX = radius * cos(endAngle);\n    let endY = radius * sin(endAngle);\n    \n    stroke(i, 255, 255);\n    line(startX, startY, endX, endY);\n  }\n  \n  factor += 0.005;\n}\n\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            return createGraphics(10, 10);\n        }\n        return window._origGet.apply(this, args);\n    };\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Gonçalo Perdigão",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@goncaloperdigao/1975225",
+    "date_added": "2026-07-06 21:33:03",
+    "used_count": 1
+}

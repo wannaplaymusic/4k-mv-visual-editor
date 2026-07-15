@@ -1,0 +1,19 @@
+{
+    "name": "TinyWaterCrests2",
+    "code": "// === Tab: mySketch ===\nH=200\nf=l=0\n\nsetup=_=>{\ncreateCanvas(w=windowWidth,windowWidth*.75)\nbackground(255)\n}\n\t\ndraw=_=>{\nstroke(w)\ns=0\nfor(y=-H;y<w+H;y+=d){\nr=0\nbeginShape()\nfor(x=-H;x<w;x+=d){\nn=noise(r/50,s/25,f*.004)\nfill(d=10,60+n*H,w)\nvertex(x,y+(n-.5)*2*H)\nr++\n}\nendShape()\ns++\n}\nf++\n}\n\nmousePressed=()=>{if (millis()-l>400){save('pix.jpg');l=millis();}}\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            return createGraphics(10, 10);\n        }\n        return window._origGet.apply(this, args);\n    };\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@bourneidentity/2414361",
+    "date_added": "2026-07-06 22:19:56",
+    "used_count": 1
+}

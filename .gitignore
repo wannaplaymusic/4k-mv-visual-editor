@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Project Specific Caches and Temp files
+temp_audio/
+js_cache/
+app_debug.log
+op_import_errors.txt
+batch_test_progress.json
+last_batch_run_code.js
+missing_libraries.json
+
+# Scratch files and outputs
+scratch/
+test_out.html
+test_out_*.html
+scratch_*.html
+test_p5_load.html
+
+# OS files
+.DS_Store
+Thumbs.db

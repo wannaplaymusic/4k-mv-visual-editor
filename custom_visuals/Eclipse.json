@@ -1,0 +1,18 @@
+{
+    "name": "Eclipse",
+    "code": "// === Tab: mySketch ===\n/*\nEclipse\nRefresh to get a new output :)\n#WCCChallenge topic \"Eclipse 🌑\" 2024.4.14 by TKt | 陳建中 Tân Kiàn-tiong（rainsr7235）\n*/\n\nlet y\nfunction setup() {\n\tdescribe(`A grayscale generative art image featuring a total solar eclipse in the sky,\n\twith a desert-like texture below and glowing particle bands generated based on Perlin Noise graphics.`)\n\tcreateCanvas(500, 700);\n\tbackground(30);\n\t\n\t// pixelDensity(10)\n\t\n\ty = random(300,400)\n\t\n\tlet sunX = random(100,width-100)\n\tlet sunY = random(50,150)\n\t\n\tlet sunD = random(30,50)\n\t\n\tpush()\n\ttranslate(sunX,sunY)\n\tfor(let i=0;i<4000;i++){\n\t\tlet r = sunD+random(random())*15\n\t\tlet theta = random(2*PI)\n\t\tlet x = cos(theta)*r\n\t\tlet y = sin(theta)*r\n\t\tfill(255,30)\n\t\tnoStroke()\n\t\tcircle(x,y,random(2))\n\t}\n\tpop()\n}\n\nfunction draw() {\n\t\n\tfor(let x=0;x<width;x++){\n\t\t\n\t\tlet n1 = noise(x*0.002, y*0.008)\n\t\tlet n2 = noise(x*0.01+1000000, y*0.01+1000000)\n\t\tlet n3 = noise(x*0.002+10000, y*0.01+10000)\n\t\t\n\t\tlet h = 10 + n1 * 150\n\t\t\n\t\tnoStroke()\n\t\tfill(n1*255 + random(-5,5))\n\t\trect(x,y,3,-h)\n\t\t \n\t\tif(random()<0.01 && n2<0.4){\n\t\t\tfill(0,5)\n\t\t\trect(x,y-h,randomGaussian(5,3),-randomGaussian(300,10))\n\t\t}\n\t\t\n\t\tif(n3>0.5 && n3<0.51){\n\t\t\t// fill(\"red\")\n\t\t\t// circle(x,y-h,2)\n\t\t\tfor(let j=0;j<100;j++){\n\t\t\t\tlet dotX = x\n\t\t\t\tlet dotY = y-h - (random(random())*200)\n\t\t\t\tfill(255,5)\n\t\t\t\tcircle(dotX,dotY,random(2))\n\t\t\t}\n\t\t}\n\t}\n\t\n\ty++\n\t\n\tif(y>height+200){\n\t\tnoLoop()\n\t}\n}\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            return createGraphics(10, 10);\n        }\n        return window._origGet.apply(this, args);\n    };\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "TKt | 陳建中 Tân Kiàn-tiong（rainsr7235）",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@kiantiong/2239516",
+    "date_added": "2026-07-06 21:01:50"
+}

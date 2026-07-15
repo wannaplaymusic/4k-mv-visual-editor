@@ -1,0 +1,25 @@
+{
+    "name": "Uncler M - noisewave_var4",
+    "code": "\n// --- Safety Guardrails for Thumbnail and Sandbox ---\nif (typeof width === 'undefined') { var width = 1280; }\nif (typeof height === 'undefined') { var height = 720; }\n\n\n// --- Global Variables for Uncler M Variants ---\nvar uM_colors = [\"#1e3a8a\", \"#d97706\", \"#f59e0b\", \"#3b82f6\", \"#172554\"];\nvar speedMult = 1.0;\nvar lineScale = 1.0;\nvar dynamicShift = 0;\nvar scalePulse = 1.0;\nvar rotAngle = 0;\nvar gridOffset = 0;\nvar uM_rot = 0;\n\n// === Inspired by 'noisewave' by 'reona396' ===\n// Created as variant #4 by Uncler M\n// Infused with creative algorithmic modifications.\n\n// === Tab: mySketch ===\nlet objs = [];\nlet objsNum = 100;\n\nconst palette = [\n  \"#FF00D8\",\n  \"#FFB201\",\n  \"#98FF00\",\n  \"#00FFC4\",\n  \"#0082FE\",\n  \"#B733FF\",\n];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  rectMode(CENTER);\n  angleMode(DEGREES);\n  frameRate(60);\n  noFill();\n\n  background(10, 10, 15, 6);\n\n  for (let i = 0; i < objsNum; i++) {\n    objs.push(new Obj(i));\n  }\n}\n\nfunction draw() {\n  // === Variant 4: Dynamic Feedback Trail ===\n  // Lower background clear to force deep visual echoing\n\n  blendMode(BLEND);\n  background(\"#111111\");\n\n  blendMode(SCREEN);\n\n  for (let i = 0; i < objs.length; i++) {\n    objs[i].move();\n    objs[i].display();\n  }\n}\n\nclass Obj {\n  constructor(tmpIndex) {\n    this.index = tmpIndex;\n    this.startX = random(width);\n    this.init();\n    this.goalX = this.startX + this.rangeX;\n  }\n\n  init() {\n    this.rangeX = random([\n      5, 5, 5, 5, 5, 5, 10, 10, 10, 20, 20, 100, 100, 100, 100, 200, 300\n    ]);\n    this.step = map(this.rangeX, 5, 200, 5, 30); //random(1, 20);\n    this.strWeight = random(3, 30);\n    this.c = color(random(palette));\n    if (this.rangeX < 100) {\n      this.c.setAlpha(150);\n    }\n    this.isOut = random(100) < 10 ? true : false;\n  }\n\n  move() {\n    this.startX += this.step;\n    this.goalX = this.startX + this.rangeX;\n\n    if (this.startX > width) {\n      this.init();\n      this.startX = -this.rangeX;\n      this.goalX = this.startX + this.rangeX;\n    }\n  }\n\n  display() {\n    strokeWeight(this.strWeight);\n    stroke(this.c);\n    noFill();\n    beginShape();\n    for (let x = this.startX; x <= this.goalX; x++) {\n      let y = map(\n        noise(\n          x * 0.001,\n          this.isOut ? this.index * 0.025 : this.index * 0.005,\n          frameCount * 0.003\n        ),\n        0,\n        1,\n        -height * 0.25,\n        height * 1.25\n      );\n      vertex(x, y);\n    }\n    endShape();\n  }\n}\n\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            return createGraphics(10, 10);\n        }\n        return window._origGet.apply(this, args);\n    };\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Uncler M",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "Uncler M",
+        "generative",
+        "variant",
+        "starred_noisewave"
+    ],
+    "url": "https://openprocessing.org/@reona396/2750462",
+    "date_added": "2026-07-08 23:13:00",
+    "is_starred": false,
+    "used_in_videos": [
+        "Misty Dark Throb-2.mp4"
+    ],
+    "used_count": 1
+}
