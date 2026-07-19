@@ -1,6 +1,6 @@
 # 4K MV Visual Integration Editor 🎬✨
 
-[![GitHub Release](https://img.shields.io/badge/Release-v1.0.0-blue.svg)](https://github.com/wannaplaymusic/4k-mv-visual-editor)
+[![GitHub Release](https://img.shields.io/badge/Release-v1.1.0-blue.svg)](https://github.com/wannaplaymusic/4k-mv-visual-editor)
 [![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11-green.svg)](https://python.org)
 [![GUI Framework](https://img.shields.io/badge/GUI-PyQt6-orange.svg)](https://www.riverbankcomputing.com/software/pyqt/)
 [![Aesthetic Layout](https://img.shields.io/badge/Aesthetic-Glassmorphic%20VJ%20System-purple.svg)]()
@@ -106,3 +106,19 @@ graph TD
     ```bash
     python3 main.py
     ```
+
+---
+
+### 📅 更新日誌 (Changelog)
+
+#### [v1.1.0] - 2026-07-19
+*   **🎨 程序化色彩調色盤生成器**：基於音訊檔名雜湊生成確定性隨機種子，自適應選擇 10 種風格之一（Vaporwave, Cyberpunk, Morandi 等），並透過五度圈進行和弦情緒映射，解決大量歌曲視覺重複問題。
+*   **🌀 工業級 VJ 素材過渡效果**：引進 5 種基於 OpenCV/NumPy 的高效率過渡演算法（位移、縮放模糊、亮度擦除、通道故障與滑動推移）。
+*   **🎬 情緒自適應導演系統**：整合分鏡段落（Intro, Verse, Chorus, Bridge, Build-up）與音訊能量，自動調配最佳過渡時長與效果。
+*   **🛡️ 全域光敏健康防護**：預設並強制啟用光敏感健康保護與防癲癇機制，限制高頻閃爍、劇烈色彩翻轉與全螢幕高光刺激。
+
+#### [v1.1.0] - 2026-07-19 (English)
+*   **🎨 Procedural Color Palette Generator**: Dynamically generates unique, deterministic HSL color palettes based on audio filename hash, choosing from 10 distinct themes (Vaporwave, Cyberpunk, Morandi, etc.) to ensure complete visual uniqueness for 3000+ songs.
+*   **🌀 Advanced VJ Transitions**: Implements 5 high-performance OpenCV/NumPy transitions (Displacement, Zoom Blur, Luma Wipe, Glitch Channel Split, Slide Push with motion blur).
+*   **🎬 Emotional Adaptive Director System**: Automatically maps transition types and durations to song structure sections (Intro, Verse, Chorus, Bridge, Build-up) and beat energy.
+*   **🛡️ Mandatory Photosensitive Safety**: Hardcoded global photosensitive safety filters to cap strobe, flash, and RGB splitting to protect viewers.
