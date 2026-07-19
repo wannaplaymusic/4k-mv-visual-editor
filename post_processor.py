@@ -6,7 +6,7 @@ import logging
 import numpy as np
 from PIL import Image, ImageDraw, ImageEnhance, ImageChops, ImageFilter
 
-logger = logging.getLogger("PostProcessor")
+logger = logging.getLogger("StandaloneInjector.PostProcessor")
 
 # 全域 cv2 導入：統一入口，避免各方法分散 import 的 overhead
 try:
@@ -232,7 +232,7 @@ class FluidSimulator:
 
 class PostProcessor:
     """工業級 4K VJ 多通道音視互動後製特效矩陣引擎 (高性能優化重構版)"""
-    def __init__(self, seed_string=None):
+    def __init__(self, seed_string=None, genre='generic', used_themes=None):
         self.time_displacement_buffer = TimeDisplacementBuffer(max_size=30)
         self.feedback_system = FeedbackSystem()
         self.fluid_simulator = FluidSimulator()
@@ -251,6 +251,11 @@ class PostProcessor:
         self._sediment_buffer = None   # 質地沉澱專用環形畫布
         self._mosh_vector = None       # Data-moshing 向量快取
         self._fluid_scale = 1.0        # 流體模擬半徑動態縮放
+        
+        self.scanner_y = 0.0
+        self.scanner_x = 0.0
+        self._section_sig_cache = {}
+        self._fx_cooldown = {}
 
         self.fx_active_states = {
             'spatial_warping': 0.0, 'fluid_noise': 0.0, 'temporal_feedback': 0.0,
@@ -263,7 +268,9 @@ class PostProcessor:
             # 自訂擴充特效
             'thermal_vision': 0.0, 'scanline_glitch': 0.0, 'frame_drop': 0.0,
             'dynamic_mosaic': 0.0, 'pixel_art': 0.0, 'handheld_camera': 0.0,
-            'stylized_fade': 0.0, 'zoom_pulse': 0.0
+            'stylized_fade': 0.0, 'zoom_pulse': 0.0,
+            # 新增創意濾鏡
+            'photocopy_smear': 0.0, 'collage_cutout': 0.0
         }
         self._effect_variants = {}
         
@@ -280,6 +287,7 @@ class PostProcessor:
 
         # 歌曲專屬隨機引擎初始化
         import hashlib
+        self.seed_string = seed_string
         if seed_string:
             hash_val = int(hashlib.md5(seed_string.encode('utf-8')).hexdigest(), 16)
             self.rng = random.Random(hash_val)
@@ -288,25 +296,46 @@ class PostProcessor:
             self.rng = random.Random()
             logger.info("Initialized PostProcessor without seed string (non-deterministic mode)")
 
-        # 從重度 VJ 特效池中決定本首歌的「招牌特效」
-        self.signature_pool = [
-            'spatial_warping', 'fluid_noise', 'temporal_feedback', 'color_spectral',
-            'glow_illumination', 'retro_degradation', 'pixel_sort', 'kaleidoscope',
-            'data_mosh', 'sedimentation', 'vector_scan', 'temporal_fractal',
-            'phase_slit', 'centroid_glitch',
-            'kuwahara_paint', 'matrix_ascii', 'reaction_diffusion',
-            # 自訂擴充特效
-            'thermal_vision', 'scanline_glitch', 'frame_drop', 'dynamic_mosaic',
-            'pixel_art', 'handheld_camera', 'stylized_fade', 'zoom_pulse'
-        ]
-        num_sig = self.rng.randint(4, 6)
+        # 五大視覺美學主題風格包
+        self.theme_pools = {
+            'CyberGlitch': ['data_mosh', 'pixel_sort', 'scanline_glitch', 'matrix_ascii', 'phase_slit', 'centroid_glitch'],
+            'RetroAnalog': ['retro_degradation', 'vector_scan', 'frame_drop', 'handheld_camera', 'stylized_fade', 'photocopy_smear'],
+            'DreamyArtistic': ['glow_illumination', 'kuwahara_paint', 'temporal_feedback', 'sedimentation', 'fluid_noise', 'collage_cutout'],
+            'Psychedelic': ['color_spectral', 'thermal_vision', 'kaleidoscope', 'reaction_diffusion', 'spatial_warping'],
+            'DigitalPixel': ['dynamic_mosaic', 'pixel_art', 'zoom_pulse', 'temporal_fractal']
+        }
+        
+        # 建立跨主題全域特效集合（用於 is_sig 門控判斷）
+        self._all_pool_effects = set()
+        for pool in self.theme_pools.values():
+            self._all_pool_effects.update(pool)
+
+        # 根據 genre 篩選主題範圍
+        genre_clean = genre.lower().strip() if isinstance(genre, str) else 'generic'
+        if genre_clean in ('lo-fi', 'ambient', 'jazz', 'classical'):
+            allowed_themes = ['DreamyArtistic', 'RetroAnalog']
+        elif genre_clean in ('rock', 'metal', 'punk', 'electronic', 'dance', 'techno'):
+            allowed_themes = ['CyberGlitch', 'Psychedelic', 'DigitalPixel']
+        else:
+            allowed_themes = list(self.theme_pools.keys())
+
+        # 跨曲目主題去重：優先選擇批次中頻率最低的主題，確保 12 首歌均勻分佈
+        if used_themes:
+            counts = {t: used_themes.count(t) for t in allowed_themes}
+            min_count = min(counts.values())
+            allowed_themes = [t for t, c in counts.items() if counts[t] == min_count]
+            
+        self.selected_theme = self.rng.choice(allowed_themes)
+        self.signature_pool = self.theme_pools[self.selected_theme]
+        
+        # 選擇 2 ~ 3 個招牌特效，限制在主題包內以降低跨曲目重複率
+        num_sig = self.rng.randint(2, 3)
         self.signature_effects = set(self.rng.sample(self.signature_pool, num_sig))
-        logger.info(f"Selected signature effects for this song: {sorted(list(self.signature_effects))}")
+        logger.info(f"Selected Theme: {self.selected_theme} | Signature effects: {sorted(list(self.signature_effects))}")
 
         # Generate a distinct color palette for data mosh blocks based on the song seed
         self.mosh_palette = []
         base_hue = self.rng.randint(0, 360)
-        # Create 5 analogous/harmonious colors
         for i in range(5):
             hue = (base_hue + i * 24) % 360
             r, g, b = self._hue_to_rgb(hue)
@@ -314,17 +343,39 @@ class PostProcessor:
 
         # Generate song-specific effect modifiers based on self.rng (seeded per song)
         self.effect_modifiers = {}
-        for fx in self.signature_pool:
-            # We sample a subset of allowed variants (2 to 4 out of 5 total variants)
-            # This ensures that two songs using the same effect will render different types of glitches!
-            num_variants = self.rng.randint(2, 4)
-            allowed_vars = self.rng.sample(range(5), num_variants)
-            
-            self.effect_modifiers[fx] = {
-                'speed': self.rng.uniform(0.65, 1.45),      # Speed of variant switching
-                'intensity': self.rng.uniform(0.75, 1.35),  # Strength modifier
-                'variants': allowed_vars                    # Allowed variants subset
-            }
+        # Make sure all signature pool effects have modifiers
+        for theme_fxs in self.theme_pools.values():
+            for fx in theme_fxs:
+                # 預設隨機選擇變種
+                num_variants = self.rng.randint(2, 4)
+                allowed_vars = self.rng.sample(range(5), num_variants)
+                
+                # 對高特徵/偏綠等特效進行特定限制，提升每首歌的獨特性
+                if fx == 'pixel_art':
+                    # 防止綠色 CRT(4) 和 GameBoy(0) 在同一首歌頻繁交替出現，且限制變種數為 2
+                    allowed_vars = [1, 2, 3] # 非綠色基礎變種
+                    green_var = self.rng.choice([0, 4])
+                    if self.rng.random() < 0.4:
+                        allowed_vars.append(green_var)
+                    self.rng.shuffle(allowed_vars)
+                    allowed_vars = allowed_vars[:2]
+                elif fx == 'color_spectral':
+                    # 熱成像(2)是強烈的 Psychedelic 風格，非此主題或 CyberGlitch 時避免出現
+                    allowed_vars = [0, 1, 3, 4]
+                    if self.selected_theme in ('Psychedelic', 'CyberGlitch'):
+                        allowed_vars.append(2)
+                    self.rng.shuffle(allowed_vars)
+                    allowed_vars = allowed_vars[:self.rng.randint(2, 3)]
+                elif fx in ('glow_illumination', 'handheld_camera'):
+                    # 限制變種數為 2，使單首曲目的動態/發光風格更加聚焦且與其他曲目區隔
+                    self.rng.shuffle(allowed_vars)
+                    allowed_vars = allowed_vars[:2]
+
+                self.effect_modifiers[fx] = {
+                    'speed': self.rng.uniform(0.65, 1.45),      # Speed of variant switching
+                    'intensity': self.rng.uniform(0.75, 1.35),  # Strength modifier
+                    'variants': allowed_vars                    # Allowed variants subset
+                }
 
 
     def get_variant_index(self, key, t, is_beat):
@@ -460,12 +511,13 @@ class PostProcessor:
             return np.ones((h, w), dtype=np.float32) * 0.5
 
     def process(self, img, t, is_beat, beat_energy, audio_feats, fx_flags, fx_prob=0.25, fx_intensity=0.5, adaptive_modulation=True, section_name='Verse', section_progress=0.0, genre='Generic'):
-        self.photosensitive_safe = fx_flags.get('photosensitive_safe', False) if fx_flags else False
+        self.photosensitive_safe = True  # Mandatory full song photosensitive protection
         original_size = img.size
         w, h = original_size
         genre_clean = genre.lower().strip() if isinstance(genre, str) else 'generic'
         is_scaled = False
-        if w > 1920:
+        bypass_downscale = fx_flags.get('bypass_downscale', False) if fx_flags else False
+        if w > 1920 and not bypass_downscale:
             scale_ratio = 1920.0 / w
             w_target = 1920
             h_target = int(h * scale_ratio)
@@ -477,19 +529,68 @@ class PostProcessor:
         if dt <= 0 or dt > 0.2: dt = 1.0 / 30.0
         self.last_t = t
 
+        # 1. 取得或生成本分鏡的招牌特效
+        if section_name not in self._section_sig_cache:
+            section_seed = f"{self.seed_string or ''}_{section_name}"
+            import hashlib
+            hash_val = int(hashlib.md5(section_seed.encode('utf-8')).hexdigest(), 16)
+            sect_rng = random.Random(hash_val)
+            # 每個分鏡從本歌的主題包內挑選 2 ~ 3 個特效作為招牌
+            num_sig = sect_rng.randint(2, 3)
+            sect_sigs = set(sect_rng.sample(self.signature_pool, min(len(self.signature_pool), num_sig)))
+            self._section_sig_cache[section_name] = sect_sigs
+            logger.info(f"[PostProcessor] Song Theme: {self.selected_theme} | Section '{section_name}' effects: {sorted(list(sect_sigs))}")
+            
+        current_sig_effects = self._section_sig_cache[section_name]
+
         # 狀態閘門（Gating）：計算環境 persistent 特效水平
         base_level = max(0.0, (fx_prob - 0.25) / 0.75) if fx_prob > 0.25 else 0.0
+        base_level = min(0.15, base_level)  # 限制常駐特效基線最大為 0.15
+        
+        # 瞬態特效（重度特效），完全不套用基線
+        transient_only_effects = {
+            'data_mosh', 'pixel_sort', 'matrix_ascii', 'reaction_diffusion', 
+            'centroid_glitch', 'phase_slit', 'temporal_fractal', 'scanline_glitch', 
+            'dynamic_mosaic', 'pixel_art', 'spatial_warping', 'fluid_noise', 
+            'temporal_feedback', 'kaleidoscope', 'vector_scan', 'photocopy_smear', 'collage_cutout'
+        }
 
         for fx_name in self.fx_active_states:
-            is_sig = fx_name in self.signature_effects or fx_name not in self.signature_pool
-            eff_base = base_level if is_sig else 0.0
+            # 嚴格門控：屬於任何主題池的特效，若不在當前分鏡簽名中，則完全抑制
+            # 只有不屬於任何主題池的公用特效 (如 ambient_dsp) 才免門控
+            is_sig = fx_name in current_sig_effects or fx_name not in self._all_pool_effects
+            if fx_name in transient_only_effects:
+                eff_base = 0.0
+            else:
+                eff_base = base_level if is_sig else 0.0
             self.fx_active_states[fx_name] = max(eff_base, self.fx_active_states[fx_name] - dt * 1.5)
 
+        # 2. 拍點冷卻處理
+        for k in list(self._fx_cooldown.keys()):
+            if self._fx_cooldown[k] > 0:
+                self._fx_cooldown[k] -= 1
+
         if is_beat:
-            for fx_name in self.fx_active_states:
-                # 只有當該特效被選為本首歌的「招牌特效」時，重拍才會有機率激活它
-                if fx_name in self.signature_effects and self.rng.random() < fx_prob:
-                    self.fx_active_states[fx_name] = max(self.fx_active_states[fx_name], min(1.0, 0.4 + 0.6 * beat_energy))
+            if self.rng.random() < fx_prob:
+                # 75% 機率選擇當前分鏡招牌，25% 選擇主題包 Wildcard
+                pool_to_choose = current_sig_effects
+                if self.rng.random() < 0.25:
+                    pool_to_choose = self.signature_pool
+                
+                # 排除冷卻中特效
+                available_fxs = [fx for fx in pool_to_choose if fx in self.fx_active_states and self._fx_cooldown.get(fx, 0) == 0]
+                if not available_fxs:
+                    available_fxs = [fx for fx in pool_to_choose if fx in self.fx_active_states]
+                    
+                if available_fxs:
+                    num_to_trigger = 1 if self.rng.random() < 0.85 else 2
+                    triggered_fxs = self.rng.sample(available_fxs, min(len(available_fxs), num_to_trigger))
+                    for fx_name in triggered_fxs:
+                        self.fx_active_states[fx_name] = max(
+                            self.fx_active_states[fx_name],
+                            min(1.0, 0.4 + 0.6 * beat_energy)
+                        )
+                        self._fx_cooldown[fx_name] = 3  # 設定 3 次拍點冷卻
 
         # 聲學特徵提取與基線自適應
         sub_bass = self.get_normalized_val('sub_bass', audio_feats.get('sub_bass', 0.0))
@@ -543,13 +644,13 @@ class PostProcessor:
         self.percussive_history.append(audio_feats.get('percussive', 0.0))
         if len(self.percussive_history) > 3: self.percussive_history.pop(0)
 
-        # 瞬態色彩閃爍觸發
+        # 瞬態色彩閃爍觸發 — 限定 CyberGlitch / Psychedelic 主題以降低跨曲目同質化
         if delta_percussive > 0.45 and genre_clean not in ('lo-fi', 'ambient', 'jazz'):
-            if not self.photosensitive_safe:
+            if not self.photosensitive_safe and self.selected_theme in ('CyberGlitch', 'Psychedelic'):
                 self.invert_frame_timer = 2
 
-        # 搖滾樂特徵震鏡（Screen Shake）- 使用 self.rng 確保確定性
-        if (genre_clean in ('rock', 'metal', 'punk')) and fx_flags.get('spatial_warping', True) and is_beat and beat_energy > 0.4:
+        # 搖滾樂特徵震鏡（Screen Shake）- 限定 CyberGlitch 主題，其他主題交由 handheld_camera 處理
+        if (genre_clean in ('rock', 'metal', 'punk')) and self.selected_theme == 'CyberGlitch' and fx_flags.get('spatial_warping', True) and is_beat and beat_energy > 0.4:
             shake = int(12 * fx_intensity * beat_energy)
             if shake > 0: img = ImageChops.offset(img, self.rng.randint(-shake, shake), self.rng.randint(-shake, shake))
 
@@ -701,15 +802,19 @@ class PostProcessor:
             m_handheld = base_mult * (arousal * 0.9 + smoothed_roughness * 0.4)
             m_stylizedfade = base_mult * silence_fade
             m_zoompulse = base_mult * (smoothed_sub_bass * 1.2 + beat_energy * 0.8)
+            
+            # 新增影印掃描與拼貼濾鏡乘數
+            m_photocopy = base_mult * (smoothed_percussive * 1.1 + smoothed_roughness * 0.5)
+            m_collage = base_mult * (ethereal_ambience * 1.3 + (1.0 - beat_phase) * 0.6)
         else:
             m_dist = m_fluid = m_feed = m_color = m_glow = m_retro = m_pixel = base_mult
             m_mosh = m_sediment = m_vscan = m_fractal = base_mult
             m_kaleidoscope = base_mult
             m_kuwahara = m_matrix = m_reaction = base_mult
             m_thermal = m_scanglitch = m_framedrop = m_mosaic = m_pixelart = m_handheld = m_stylizedfade = m_zoompulse = base_mult
+            m_photocopy = m_collage = base_mult
             self._k_cx_offset = int((stereo_width - 0.5) * 200.0 * base_mult)
 
-        # 影片結構分鏡權重優化
         # 影片結構分鏡權重優化
         if section_name in ('Intro', 'Outro'):
             m_dist *= 0.15; m_fluid *= 0.5; m_feed *= 0.4; m_color *= 0.3; m_glow *= 1.1; m_retro *= 0.3; m_pixel *= 0.0
@@ -717,12 +822,14 @@ class PostProcessor:
             m_kaleidoscope *= 0.1
             m_kuwahara *= 1.2; m_matrix *= 0.1; m_reaction *= 0.3
             m_thermal *= 0.2; m_scanglitch *= 0.1; m_framedrop *= 1.2; m_mosaic *= 0.1; m_pixelart *= 0.3; m_handheld *= 0.4; m_zoompulse *= 0.2
+            m_photocopy *= 0.1; m_collage *= 0.4
         elif section_name == 'Build-up':
             pf = 0.4 + 1.2 * section_progress
             m_dist *= 0.7*pf; m_fluid *= 0.6*pf; m_feed *= 0.8*pf; m_color *= 1.2*pf; m_glow *= 1.3*pf; m_retro *= 0.8*pf; m_pixel *= 0.7*pf
             m_mosh *= 0.5*pf; m_sediment *= 0.8*pf; m_vscan *= 1.0*pf; m_fractal *= 0.6*pf; m_kaleidoscope *= 0.8*pf
             m_kuwahara *= 0.7*pf; m_matrix *= 1.2*pf; m_reaction *= 1.1*pf
             m_thermal *= 0.8*pf; m_scanglitch *= 1.0*pf; m_framedrop *= 0.6*pf; m_mosaic *= 0.8*pf; m_pixelart *= 0.9*pf; m_handheld *= 0.9*pf; m_zoompulse *= 1.1*pf
+            m_photocopy *= 0.9*pf; m_collage *= 0.8*pf
         elif section_name in ('Drop', 'Chorus'):
             ef = 1.3 + 0.6 * arousal
             m_dist *= 1.5*ef; m_fluid *= (0.8 + 0.6*smoothed_percussive); m_feed *= (0.7 + 0.6*smoothed_ethereal)
@@ -731,12 +838,14 @@ class PostProcessor:
             m_kaleidoscope *= 1.4*ef
             m_kuwahara *= 0.5*ef; m_matrix *= 1.4*ef; m_reaction *= 1.5*ef
             m_thermal *= 1.3*ef; m_scanglitch *= (1.2 + 0.6*smoothed_roughness); m_framedrop *= (0.5 + 0.3*arousal); m_mosaic *= (1.4 + 0.8*smoothed_sub_bass); m_pixelart *= 1.1*ef; m_handheld *= (1.2 + 0.6*smoothed_roughness); m_zoompulse *= 1.5*ef
+            m_photocopy *= (1.2 + 0.6*smoothed_percussive); m_collage *= (1.1 + 0.5*smoothed_ethereal)
 
         if genre_clean in ('lo-fi', 'ambient', 'jazz'):
             m_dist = 0.0; m_fluid = base_mult*0.7; m_feed = base_mult*0.8; m_color = base_mult*0.1; m_glow = base_mult*1.1; m_pixel = 0.0
             m_mosh = 0.0; m_sediment = base_mult*1.0; m_vscan = base_mult*0.4; m_fractal = base_mult*0.9; m_kaleidoscope = base_mult*0.5
             m_kuwahara *= 1.3; m_matrix *= 0.3; m_reaction *= 0.5
             m_thermal *= 0.4; m_scanglitch *= 0.2; m_framedrop *= 1.3; m_mosaic *= 0.2; m_pixelart *= 0.8; m_handheld *= 0.5; m_zoompulse *= 0.4
+            m_photocopy *= 0.3; m_collage *= 0.8
 
         # 機率閘門動態相乘
         m_dist *= self.fx_active_states['spatial_warping']
@@ -762,6 +871,8 @@ class PostProcessor:
         m_pixelart *= self.fx_active_states['pixel_art']
         m_handheld *= self.fx_active_states['handheld_camera']
         m_zoompulse *= self.fx_active_states['zoom_pulse']
+        m_photocopy *= self.fx_active_states['photocopy_smear']
+        m_collage *= self.fx_active_states['collage_cutout']
 
         # Apply song-specific dynamic intensity modifier adjustments
         modifiers = getattr(self, 'effect_modifiers', {})
@@ -790,6 +901,8 @@ class PostProcessor:
             m_handheld *= modifiers.get('handheld_camera', {}).get('intensity', 1.0)
             m_stylizedfade *= modifiers.get('stylized_fade', {}).get('intensity', 1.0)
             m_zoompulse *= modifiers.get('zoom_pulse', {}).get('intensity', 1.0)
+            m_photocopy *= modifiers.get('photocopy_smear', {}).get('intensity', 1.0)
+            m_collage *= modifiers.get('collage_cutout', {}).get('intensity', 1.0)
 
         # ═══════════════════════════════════════════════════════════
         # 統一 NumPy 流水線入口：盡早轉入 ndarray，最大幅度減少 PIL↔NumPy 轉型
@@ -868,6 +981,11 @@ class PostProcessor:
                 img_np, t, m_retro, smoothed_roughness, audio_feats, is_beat, beat_energy, genre_clean, var_idx
             )
 
+        # Pass 6.5: Photocopy Smear 影印機掃描器拖移故障 (ndarray 通路)
+        if fx_flags.get('photocopy_smear', True) and m_photocopy > 0.01:
+            var_idx = self.get_variant_index('photocopy_smear', t, is_beat)
+            img_np = self.apply_photocopy_smear_custom(img_np, t, m_photocopy, var_idx)
+
         # [自訂新增 2]: 掃描故障 (Scanline Glitch) (ndarray 通路)
         if fx_flags.get('scanline_glitch', True) and m_scanglitch > 0.01:
             var_idx = self.get_variant_index('scanline_glitch', t, is_beat)
@@ -932,6 +1050,11 @@ class PostProcessor:
         if fx_flags.get('frame_drop', True) and m_framedrop > 0.01:
             var_idx = self.get_variant_index('frame_drop', t, is_beat)
             img_np = self.apply_frame_drop_custom(img_np, m_framedrop, arousal, beat_phase, var_idx)
+
+        # Pass 8.5: Collage Cutout 創意拼貼濾鏡 (ndarray 通路)
+        if fx_flags.get('collage_cutout', True) and m_collage > 0.01:
+            var_idx = self.get_variant_index('collage_cutout', t, is_beat)
+            img_np = self.apply_collage_cutout_custom(img_np, m_collage, var_idx)
 
         # ═══════════════════════════════════════════════════════════
         # 電影級音樂情感調色與純色過渡 (Cinematic Mood Adaptation)
@@ -1001,22 +1124,29 @@ class PostProcessor:
             var_idx = self.get_variant_index('ambient_dsp', t, is_beat)
             img_np = self.apply_ambient_dsp_custom(img_np, t, fx_intensity * self.fx_active_states['ambient_dsp'], smoothed_ethereal, smoothed_percussive, var_idx)
 
-        # 重拍閃白 / 溫和輝光
+        # 重拍閃白 / 溫和輝光 — 硬白閃僅限 glow_illumination 為本主題招牌特效
         glow_active = self.fx_active_states.get('glow_illumination', 0.0)
+        is_glow_theme = 'glow_illumination' in self.signature_pool
         if fx_flags.get('glow_illumination', True) and cv2 is not None:
             if self.photosensitive_safe:
                 if glow_active > 0.05:
-                    alpha = min(0.08, glow_active * 0.08 * base_mult)
+                    alpha = min(0.05, glow_active * 0.05 * base_mult)
                     flash_canvas = np.zeros_like(img_np)
                     flash_canvas[:, :] = (150, 140, 130)  # 溫馨環境微光
                     img_np = cv2.addWeighted(img_np, 1.0 - alpha, flash_canvas, alpha, 0)
-            else:
-                if is_beat and beat_energy > 0.1 and genre_clean not in ('lo-fi', 'ambient', 'jazz'):
-                    flash_color = (255, 255, 255) if int(t * audio_feats.get('bpm', 120.0) / 60.0) % 2 == 0 else (0, 0, 0)
-                    flash_canvas = np.zeros_like(img_np)
-                    flash_canvas[:, :] = flash_color
-                    alpha = min(0.35, beat_energy * 0.25 * base_mult * glow_active)
-                    img_np = cv2.addWeighted(img_np, 1.0 - alpha, flash_canvas, alpha, 0)
+            elif is_glow_theme and is_beat and beat_energy > 0.15 and genre_clean not in ('lo-fi', 'ambient', 'jazz'):
+                # 硬白閃：僅 DreamyArtistic 主題歌曲觸發，alpha 上限降至 0.2
+                flash_color = (255, 255, 255) if int(t * audio_feats.get('bpm', 120.0) / 60.0) % 2 == 0 else (0, 0, 0)
+                flash_canvas = np.zeros_like(img_np)
+                flash_canvas[:, :] = flash_color
+                alpha = min(0.20, beat_energy * 0.18 * base_mult * glow_active)
+                img_np = cv2.addWeighted(img_np, 1.0 - alpha, flash_canvas, alpha, 0)
+            elif not is_glow_theme and glow_active > 0.05:
+                # 非 glow 主題：超柔和環境微光，不產生明顯閃爍
+                alpha = min(0.04, glow_active * 0.03 * base_mult)
+                flash_canvas = np.zeros_like(img_np)
+                flash_canvas[:, :] = (140, 135, 128)
+                img_np = cv2.addWeighted(img_np, 1.0 - alpha, flash_canvas, alpha, 0)
 
         # 瞬態反轉色彩
         if self.invert_frame_timer > 0:
@@ -1288,7 +1418,11 @@ class PostProcessor:
             bar_h = int(25 * intensity + 8)
             if 0 <= bar_y < h:
                 h_slice = min(h, bar_y + bar_h) - bar_y
-                # 隨機擷取靜態噪點層的一部分，不開闢新內存
+                # 隨機擷取靜態噪點層的一部分，不開闢新內存 (具備動態調整維度自愈功能)
+                if self._noise_buffer.shape[0] < h_slice or self._noise_buffer.shape[1] < w:
+                    new_h = max(self._noise_buffer.shape[0], h_slice)
+                    new_w = max(self._noise_buffer.shape[1], w)
+                    self._noise_buffer = np.random.randint(-25, 25, (new_h, new_w, 1), dtype=np.int16)
                 noise_slice = self._noise_buffer[:h_slice, :w, :]
                 if hasattr(self, 'feature_mask') and self.feature_mask is not None:
                     # 使用音訊特徵遮罩動態調製噪點干擾程度
@@ -3119,7 +3253,7 @@ class PostProcessor:
                 quant_big[edges_big > 0] = [0, 0, 0]
                 return cv2.addWeighted(img_np, 1.0 - intensity, quant_big, intensity, 0)
                 
-            else:
+            elif variant == 2:
                 # 霓虹賽博朋克像素
                 div = 85
                 quant = (small // div) * div
@@ -3128,6 +3262,38 @@ class PostProcessor:
                 cym[:, :, 1] = np.where(quant[:, :, 1] > 120, 255, 0)
                 cym[:, :, 2] = np.where(quant[:, :, 2] > 120, 255, 0)
                 restored = cv2.resize(cym, (w, h), interpolation=cv2.INTER_NEAREST)
+                return cv2.addWeighted(img_np, 1.0 - intensity, restored, intensity, 0)
+                
+            elif variant == 3:
+                # 復古 8-bit NES 經典色彩像素化
+                nes_palette = np.array([
+                    [240, 240, 240], [0, 120, 248], [0, 0, 252], [104, 0, 252],
+                    [216, 0, 204], [228, 0, 88], [248, 120, 88], [228, 88, 16],
+                    [200, 110, 0], [0, 168, 0], [0, 144, 0], [0, 136, 136],
+                    [0, 0, 0], [255, 255, 0], [255, 0, 255]
+                ], dtype=np.uint8)
+                nes_img = np.zeros_like(small)
+                for y in range(sh):
+                    for x in range(sw):
+                        color = small[y, x]
+                        dists = np.sum((nes_palette.astype(np.int32) - color.astype(np.int32))**2, axis=1)
+                        nes_img[y, x] = nes_palette[np.argmin(dists)]
+                restored = cv2.resize(nes_img, (w, h), interpolation=cv2.INTER_NEAREST)
+                return cv2.addWeighted(img_np, 1.0 - intensity, restored, intensity, 0)
+                
+            else:
+                # 懷舊黑白/綠色磷光 CRT 像素 (Monochrome Green CRT)
+                gray_small = (small[:, :, 0] * 0.299 + small[:, :, 1] * 0.587 + small[:, :, 2] * 0.114).astype(np.uint8)
+                green_phosphor = np.zeros_like(small)
+                green_phosphor[:, :, 1] = gray_small
+                green_phosphor[:, :, 0] = (gray_small.astype(np.uint16) * 15 // 100).astype(np.uint8)
+                green_phosphor[:, :, 2] = (gray_small.astype(np.uint16) * 10 // 100).astype(np.uint8)
+                restored = cv2.resize(green_phosphor, (w, h), interpolation=cv2.INTER_NEAREST)
+                
+                # 疊加橫向掃描線
+                y_grid, x_grid = np.mgrid[0:h, 0:w]
+                mask = y_grid % factor == 0
+                restored[mask] = 0
                 return cv2.addWeighted(img_np, 1.0 - intensity, restored, intensity, 0)
         except Exception as e:
             logger.error(f"Pixel Art error: {e}")
@@ -3188,7 +3354,7 @@ class PostProcessor:
                 
                 return cv2.addWeighted(img_np, 1.0 - intensity, overlay, intensity, 0)
                 
-            else:
+            elif variant == 2:
                 # 魚眼廣角 + 強烈震鏡
                 k1 = -0.15 * intensity
                 distorted = self.apply_barrel_distortion(img_np, k1, 0.0)
@@ -3198,6 +3364,51 @@ class PostProcessor:
                     shifted = ImageChops.offset(Image.fromarray(distorted), dx_strong, dy_strong)
                     return np.array(shifted)
                 return distorted
+                
+            elif variant == 3:
+                # 錄影機自動對焦框 (AutoFocus View Finder)
+                overlay = img_np.copy()
+                cx, cy = w // 2, h // 2
+                box_sz = int(80 + 30 * math.sin(t * 5.0))
+                
+                # 4 corners of focus box
+                cv2.line(overlay, (cx - box_sz, cy - box_sz), (cx - box_sz + 20, cy - box_sz), (0, 255, 0), 2)
+                cv2.line(overlay, (cx - box_sz, cy - box_sz), (cx - box_sz, cy - box_sz + 20), (0, 255, 0), 2)
+                cv2.line(overlay, (cx + box_sz, cy - box_sz), (cx + box_sz - 20, cy - box_sz), (0, 255, 0), 2)
+                cv2.line(overlay, (cx + box_sz, cy - box_sz), (cx + box_sz, cy - box_sz + 20), (0, 255, 0), 2)
+                cv2.line(overlay, (cx - box_sz, cy + box_sz), (cx - box_sz + 20, cy + box_sz), (0, 255, 0), 2)
+                cv2.line(overlay, (cx - box_sz, cy + box_sz), (cx - box_sz, cy + box_sz - 20), (0, 255, 0), 2)
+                cv2.line(overlay, (cx + box_sz, cy + box_sz), (cx + box_sz - 20, cy + box_sz), (0, 255, 0), 2)
+                cv2.line(overlay, (cx + box_sz, cy + box_sz), (cx + box_sz, cy + box_sz - 20), (0, 255, 0), 2)
+                
+                # Blinking green dot in center
+                dot_color = (0, 255, 0) if int(t * 3) % 2 == 0 else (0, 80, 0)
+                cv2.circle(overlay, (cx, cy), 4, dot_color, -1)
+                
+                # AF status text
+                cv2.putText(overlay, "AF-C", (cx - 30, cy + box_sz + 30), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+                
+                # Apply organic drift on top of autofocus overlay
+                if abs(dx) > 0 or abs(dy) > 0:
+                    overlay = np.array(ImageChops.offset(Image.fromarray(overlay), dx, dy))
+                return cv2.addWeighted(img_np, 1.0 - intensity, overlay, intensity, 0)
+                
+            else:
+                # 電影級 2.35:1 遮幅漂移與鏡頭傾角 (Cinematic Crop & Roll)
+                angle = 1.6 * intensity * math.sin(t * 0.8)  # 鏡頭傾斜角度
+                center = (w // 2, h // 2)
+                M = cv2.getRotationMatrix2D(center, angle, 1.02)  # 微幅放大防黑邊
+                rotated = cv2.warpAffine(img_np, M, (w, h), borderMode=cv2.BORDER_REFLECT)
+                
+                # 相機抖動
+                if abs(dx) > 0 or abs(dy) > 0:
+                    rotated = np.array(ImageChops.offset(Image.fromarray(rotated), dx, dy))
+                
+                # 疊加電影遮幅
+                bar_h = int(h * 0.12)
+                rotated[0:bar_h, :, :] = 0
+                rotated[h-bar_h:h, :, :] = 0
+                return cv2.addWeighted(img_np, 1.0 - intensity, rotated, intensity, 0)
         except Exception as e:
             logger.error(f"Handheld Camera error: {e}")
             return img_np
@@ -3302,3 +3513,342 @@ class PostProcessor:
         except Exception as e:
             logger.error(f"Zoom Pulse error: {e}")
             return img_np
+
+    # ════════════════════════════════════════════════════════════════
+    # 10. 影印機掃描器拖移故障 (Photocopy Smear) 5變種
+    # ════════════════════════════════════════════════════════════════
+    def apply_photocopy_smear_custom(self, img_np, t, intensity, variant):
+        if intensity < 0.01: return img_np
+        try:
+            h, w = img_np.shape[:2]
+            out = img_np.copy()
+            
+            # Update scanner position
+            dt = t - getattr(self, '_scanner_last_t', t - 1.0/30.0)
+            self._scanner_last_t = t
+            if dt <= 0 or dt > 0.2: dt = 1.0 / 30.0
+            
+            speed = 220.0 * (1.0 + intensity)
+            self.scanner_y = (self.scanner_y + speed * dt) % h
+            self.scanner_x = (self.scanner_x + speed * dt) % w
+            
+            scan_y = int(self.scanner_y)
+            scan_x = int(self.scanner_x)
+            
+            if variant == 0:
+                # 橫向向下拖移故障 (Horizontal Smear Down)
+                smear_h = int(180 * intensity)
+                if smear_h > 0:
+                    row = img_np[scan_y, :, :]
+                    out[scan_y:min(h, scan_y + smear_h), :, :] = row
+                    
+                # 掃描器亮線 (Glow line)
+                if 0 <= scan_y < h:
+                    out[scan_y:min(h, scan_y+3), :, :] = np.clip(out[scan_y:min(h, scan_y+3), :, :].astype(np.int16) + 120, 0, 255).astype(np.uint8)
+                    
+            elif variant == 1:
+                # 縱向向右拖移故障 (Vertical Smear Right)
+                smear_w = int(240 * intensity)
+                if smear_w > 0:
+                    col = img_np[:, scan_x, :]
+                    for dx in range(smear_w):
+                        out[:, min(w - 1, scan_x + dx), :] = col
+                        
+                # 縱向亮線
+                if 0 <= scan_x < w:
+                    out[:, scan_x:min(w, scan_x+3), :] = np.clip(out[:, scan_x:min(w, scan_x+3), :].astype(np.int16) + 120, 0, 255).astype(np.uint8)
+                    
+            elif variant == 2:
+                # 雙向十字掃描拖移 (Cross Smear)
+                smear_h = int(100 * intensity)
+                smear_w = int(120 * intensity)
+                
+                # 橫向拖移
+                row = img_np[scan_y, :, :]
+                out[scan_y:min(h, scan_y + smear_h), :, :] = row
+                
+                # 縱向拖移
+                col = img_np[:, scan_x, :]
+                for dx in range(smear_w):
+                    out[:, min(w - 1, scan_x + dx), :] = col
+                    
+            elif variant == 3:
+                # 隨機拍點行凍結 (Glitchy Beat Smear)
+                if not hasattr(self, '_scanner_frozen_rows'):
+                    self._scanner_frozen_rows = []
+                
+                # On beat, select 2 random rows to freeze and smear
+                if int(t * 10) % 3 == 0:
+                    self._scanner_frozen_rows = []
+                    for _ in range(self.rng.randint(2, 4)):
+                        self._scanner_frozen_rows.append((self.rng.randint(0, h - 30), self.rng.randint(10, int(80 * intensity) + 10)))
+                
+                for start_y, height_smear in self._scanner_frozen_rows:
+                    if start_y < h:
+                        row = img_np[start_y, :, :]
+                        out[start_y:min(h, start_y + height_smear), :, :] = row
+                        
+            else:
+                # 掃描器 RGB 色彩分離拖移 (RGB Split Smear)
+                smear_h = int(150 * intensity)
+                row_r = img_np[scan_y, :, 0]
+                row_g = img_np[(scan_y + 30) % h, :, 1]
+                row_b = img_np[(scan_y + 60) % h, :, 2]
+                
+                out[scan_y:min(h, scan_y + smear_h), :, 0] = row_r
+                out[((scan_y + 30) % h):min(h, ((scan_y + 30) % h) + smear_h), :, 1] = row_g
+                out[((scan_y + 60) % h):min(h, ((scan_y + 60) % h) + smear_h), :, 2] = row_b
+                
+            return out
+        except Exception as e:
+            logger.error(f"Photocopy Smear error: {e}")
+            return img_np
+
+    # ════════════════════════════════════════════════════════════════
+    # 11. 創意拼貼濾鏡 (Collage Cutout) 5變種
+    # ════════════════════════════════════════════════════════════════
+    def apply_collage_cutout_custom(self, img_np, intensity, variant):
+        if intensity < 0.01: return img_np
+        try:
+            h, w = img_np.shape[:2]
+            out = img_np.copy()
+            
+            # We need past frames in the displacement buffer
+            buf = self.time_displacement_buffer.buffer
+            if len(buf) < 5 or cv2 is None:
+                return img_np
+                
+            if variant == 0:
+                # 經典報紙剪貼風格 (Classic Paper Cutouts)
+                num_pieces = int(3 * intensity) + 1
+                for _ in range(num_pieces):
+                    past_img = self.rng.choice(buf)
+                    pw = self.rng.randint(int(w * 0.18), int(w * 0.38))
+                    ph = self.rng.randint(int(h * 0.18), int(h * 0.38))
+                    
+                    src_x = self.rng.randint(0, w - pw)
+                    src_y = self.rng.randint(0, h - ph)
+                    dst_x = self.rng.randint(0, w - pw)
+                    dst_y = self.rng.randint(0, h - ph)
+                    
+                    patch = past_img[src_y:src_y+ph, src_x:src_x+pw].copy()
+                    
+                    # Add warm paper margin
+                    border = max(2, int(w * 0.006))
+                    cv2.copyMakeBorder(patch, border, border, border, border, cv2.BORDER_CONSTANT, value=(245, 243, 235))
+                    
+                    bpw, bph = pw + 2*border, ph + 2*border
+                    ex = min(w, dst_x + bpw)
+                    ey = min(h, dst_y + bph)
+                    
+                    patch_resized = cv2.resize(patch, (ex - dst_x, ey - dst_y))
+                    out[dst_y:ey, dst_x:ex] = patch_resized
+                    
+            elif variant == 1:
+                # 2x2 波普藝術格拼貼 (2x2 Pop-Art Grid Split)
+                q_w, q_h = w // 2, h // 2
+                idx1 = min(len(buf) - 1, 5)
+                idx2 = min(len(buf) - 1, 15)
+                idx3 = min(len(buf) - 1, 25)
+                
+                out[0:q_h, q_w:w] = buf[-idx1-1][0:q_h, q_w:w]
+                out[q_h:h, 0:q_w] = buf[-idx2-1][q_h:h, 0:q_w]
+                out[q_h:h, q_w:w] = buf[-idx3-1][q_h:h, q_w:w]
+                
+                # Add thick white margins
+                border_color = (250, 248, 240)
+                thickness = max(2, int(w * 0.008))
+                cv2.line(out, (q_w, 0), (q_w, h), border_color, thickness)
+                cv2.line(out, (0, q_h), (w, q_h), border_color, thickness)
+                
+            elif variant == 2:
+                # 撕裂紙條拼貼 (Torn Paper Strips)
+                num_strips = int(2 * intensity) + 1
+                for _ in range(num_strips):
+                    past_img = self.rng.choice(buf)
+                    
+                    strip_h = self.rng.randint(int(h * 0.08), int(h * 0.22))
+                    src_y = self.rng.randint(0, h - strip_h)
+                    dst_y = self.rng.randint(0, h - strip_h) if h - strip_h > 0 else 0
+                    
+                    strip = past_img[src_y:src_y+strip_h, :, :].copy()
+                    
+                    border = max(1, int(h * 0.005))
+                    cv2.copyMakeBorder(strip, border, border, 0, 0, cv2.BORDER_CONSTANT, value=(245, 245, 240))
+                    
+                    ey = min(h, dst_y + strip_h + 2*border)
+                    strip_resized = cv2.resize(strip, (w, ey - dst_y))
+                    out[dst_y:ey, :, :] = strip_resized
+                    
+            elif variant == 3:
+                # 偏心圓環切片拼貼 (Circular Lens Collage)
+                past_img = self.rng.choice(buf)
+                mask = np.zeros((h, w), dtype=np.uint8)
+                
+                for _ in range(self.rng.randint(2, 3)):
+                    cx = self.rng.randint(int(w * 0.2), int(w * 0.8))
+                    cy = self.rng.randint(int(h * 0.2), int(h * 0.8))
+                    r = self.rng.randint(int(w * 0.1), int(w * 0.25))
+                    cv2.circle(mask, (cx, cy), r, 255, -1)
+                    cv2.circle(out, (cx, cy), r, (245, 243, 235), max(2, int(w * 0.004)))
+                    
+                idx = np.where(mask > 0)
+                out[idx] = past_img[idx]
+                
+            else:
+                # 動態時間壁畫 (Multi-Split Wall)
+                col_w = w // 3
+                idx_left = min(len(buf) - 1, 20)
+                idx_right = min(len(buf) - 1, 10)
+                
+                out[:, 0:col_w] = buf[-idx_left-1][:, 0:col_w]
+                out[:, 2*col_w:w] = buf[-idx_right-1][:, 2*col_w:w]
+                
+                border_color = (245, 243, 235)
+                thickness = max(2, int(w * 0.005))
+                cv2.line(out, (col_w, 0), (col_w, h), border_color, thickness)
+                cv2.line(out, (2*col_w, 0), (2*col_w, h), border_color, thickness)
+                
+            return out
+        except Exception as e:
+            logger.error(f"Collage Cutout error: {e}")
+            return img_np
+
+def apply_advanced_transition(pil_a, pil_b, progress, trans_type='displacement', intensity=0.5, is_beat=False, beat_energy=0.0):
+    """
+    Apply advanced OpenCV/NumPy transition blending between two PIL Images.
+    progress: 0.0 -> pil_a; 1.0 -> pil_b
+    """
+    # Safeguard bounds
+    progress = float(np.clip(progress, 0.0, 1.0))
+    if progress <= 0.001:
+        return pil_a
+    if progress >= 0.999:
+        return pil_b
+        
+    # Convert to NumPy RGB arrays
+    img_a = np.array(pil_a.convert("RGB"))
+    img_b = np.array(pil_b.convert("RGB"))
+    
+    h, w = img_a.shape[:2]
+    out_np = None
+    
+    try:
+        if trans_type == 'displacement':
+            # 1. Displacement (liquid warp)
+            y_grid, x_grid = np.mgrid[0:h, 0:w].astype(np.float32)
+            
+            wave_len = w * 0.15
+            wave_amp = intensity * 40.0
+            disp_strength = float(np.sin(progress * np.pi) * wave_amp)
+            
+            dx = np.sin(y_grid / wave_len * 2.0 * np.pi) * disp_strength
+            dy = np.cos(x_grid / wave_len * 2.0 * np.pi) * disp_strength
+            
+            map_x_a = (x_grid + dx * (1.0 - progress)).astype(np.float32)
+            map_y_a = (y_grid + dy * (1.0 - progress)).astype(np.float32)
+            warped_a = cv2.remap(img_a, map_x_a, map_y_a, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            
+            map_x_b = (x_grid - dx * progress).astype(np.float32)
+            map_y_b = (y_grid - dy * progress).astype(np.float32)
+            warped_b = cv2.remap(img_b, map_x_b, map_y_b, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            
+            out_np = cv2.addWeighted(warped_a, 1.0 - progress, warped_b, progress, 0.0)
+            
+        elif trans_type == 'zoom_blur':
+            # 2. Zoom & Radial Blur
+            scale_amp = intensity * 0.3
+            p_scale = float(np.sin(progress * np.pi) * scale_amp)
+            
+            scale_a = 1.0 + p_scale * (1.0 - progress)
+            M_a = cv2.getRotationMatrix2D((w / 2.0, h / 2.0), 0, scale_a)
+            zoomed_a = cv2.warpAffine(img_a, M_a, (w, h), borderMode=cv2.BORDER_REFLECT)
+            
+            scale_b = 1.0 + p_scale * progress
+            M_b = cv2.getRotationMatrix2D((w / 2.0, h / 2.0), 0, scale_b)
+            zoomed_b = cv2.warpAffine(img_b, M_b, (w, h), borderMode=cv2.BORDER_REFLECT)
+            
+            steps = [0.98, 1.0, 1.02]
+            blur_a = np.zeros_like(zoomed_a, dtype=np.float32)
+            blur_b = np.zeros_like(zoomed_b, dtype=np.float32)
+            
+            for s in steps:
+                M_sa = cv2.getRotationMatrix2D((w / 2.0, h / 2.0), 0, s)
+                M_sb = cv2.getRotationMatrix2D((w / 2.0, h / 2.0), 0, s)
+                blur_a += cv2.warpAffine(zoomed_a, M_sa, (w, h), borderMode=cv2.BORDER_REFLECT).astype(np.float32)
+                blur_b += cv2.warpAffine(zoomed_b, M_sb, (w, h), borderMode=cv2.BORDER_REFLECT).astype(np.float32)
+                
+            zoomed_a = (blur_a / len(steps)).astype(np.uint8)
+            zoomed_b = (blur_b / len(steps)).astype(np.uint8)
+            
+            out_np = cv2.addWeighted(zoomed_a, 1.0 - progress, zoomed_b, progress, 0.0)
+            
+        elif trans_type == 'luma_wipe':
+            # 3. Luma Matte Wipe
+            y_grid, x_grid = np.mgrid[0:h, 0:w]
+            matte = ((x_grid / w + y_grid / h) / 2.0 * 255.0).astype(np.float32)
+            
+            feather = 30.0
+            threshold = progress * (255.0 + feather) - feather / 2.0
+            
+            mask = np.clip((matte - threshold) / feather + 0.5, 0.0, 1.0)
+            mask = np.expand_dims(mask, axis=2)
+            
+            out_np = (img_a * mask + img_b * (1.0 - mask)).astype(np.uint8)
+            
+        elif trans_type == 'glitch':
+            # 4. Glitch & Channel Split
+            max_shift = 10.0 * intensity
+            shift_a = int(np.sin(progress * np.pi) * max_shift * 0.8)
+            shift_b = int(np.sin(progress * np.pi) * max_shift * 0.8)
+            
+            out_a = img_a.copy()
+            out_b = img_b.copy()
+            
+            if abs(shift_a) > 0:
+                out_a[:, :, 0] = np.roll(img_a[:, :, 0], shift_a, axis=1)
+                out_a[:, :, 2] = np.roll(img_a[:, :, 2], -shift_a, axis=1)
+            if abs(shift_b) > 0:
+                out_b[:, :, 0] = np.roll(img_b[:, :, 0], -shift_b, axis=1)
+                out_b[:, :, 2] = np.roll(img_b[:, :, 2], shift_b, axis=1)
+                
+            rng_seed = int(progress * 100)
+            import random
+            local_rng = random.Random(rng_seed)
+            
+            num_slices = local_rng.randint(3, 8)
+            for _ in range(num_slices):
+                y_start = local_rng.randint(0, h - 20)
+                slice_h = local_rng.randint(5, 20)
+                h_offset = local_rng.randint(-int(max_shift), int(max_shift))
+                
+                out_a[y_start:y_start+slice_h, :] = np.roll(out_a[y_start:y_start+slice_h, :], h_offset, axis=1)
+                out_b[y_start:y_start+slice_h, :] = np.roll(out_b[y_start:y_start+slice_h, :], -h_offset, axis=1)
+                
+            out_np = cv2.addWeighted(out_a, 1.0 - progress, out_b, progress, 0.0)
+            
+        elif trans_type == 'slide_push':
+            # 5. Slide Push
+            dx = int(progress * w)
+            
+            out_np = np.zeros_like(img_a)
+            out_np[:, :w - dx] = img_a[:, dx:]
+            out_np[:, w - dx:] = img_b[:, :dx]
+            
+            blur_size = int(np.sin(progress * np.pi) * w * 0.04 * intensity)
+            if blur_size > 1:
+                if blur_size % 2 == 0:
+                    blur_size += 1
+                blur_size = min(31, blur_size)
+                out_np = cv2.blur(out_np, (blur_size, 1))
+                
+        else:
+            out_np = cv2.addWeighted(img_a, 1.0 - progress, img_b, progress, 0.0)
+            
+    except Exception as e:
+        import logging
+        logging.error(f"Advanced transition error: {e}")
+        out_np = cv2.addWeighted(img_a, 1.0 - progress, img_b, progress, 0.0)
+        
+    pil_out = Image.fromarray(out_np.astype(np.uint8), "RGB").convert("RGBA")
+    return pil_out

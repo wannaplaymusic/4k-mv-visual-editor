@@ -8,7 +8,7 @@ import requests
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit,
     QLabel, QListWidget, QListWidgetItem, QProgressBar, QTextEdit,
-    QSplitter, QMessageBox, QWidget, QApplication, QCheckBox
+    QSplitter, QMessageBox, QWidget, QApplication, QCheckBox, QComboBox
 )
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineSettings
@@ -207,6 +207,13 @@ def adapt_and_repair_code_text(code, sketch_id=None):
     adapted = adapted.replace("___MOUSE_X_PLACEHOLDER___", audio_reactive_mouseX)
     adapted = adapted.replace("___MOUSE_Y_PLACEHOLDER___", audio_reactive_mouseY)
     adapted = adapted.replace("___MOUSE_PRESSED_PLACEHOLDER___", audio_reactive_pressed)
+
+    # 4.5. p5.js v2 alpha/red/green/blue/... compatibility by wrapping arguments in window.color() to avoid local variable shadowing
+    adapted = re.sub(
+        r'\b(alpha|red|green|blue|hue|saturation|brightness|lightness)\s*\(\s*(?!window\.color\()((?:[^()]+|\([^()]*\))+)\)',
+        r'\1(window.color(\2))',
+        adapted
+    )
 
     # 5. WebGL 3D 畫布模式智能自動判定
     has_3d_keywords = any(re.search(kw, adapted) for kw in [
@@ -515,8 +522,8 @@ if (typeof p5 !== 'undefined') {
 if (typeof p5 !== 'undefined' && p5.prototype) {
     if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }
     p5.prototype.loadImage = function(path, successCallback, failureCallback) {
-        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {
-            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖
+        if (typeof path !== 'string' || path.startsWith('http') || (path.startsWith('data:') === false && path.indexOf('.') === -1)) {
+            // 當發現是遠端 URL、相對路徑或格式無副檔名時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖與 CORS 錯誤
             const dummyPath = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
             return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);
         }
@@ -1117,6 +1124,35 @@ class TestRunDialog(QDialog):
         self.web_view.setMinimumHeight(450)
         layout.addWidget(self.web_view)
         
+        # 智慧型滿版縮放模式選取器
+        self.scaling_layout = QHBoxLayout()
+        self.scaling_label = QLabel("🔍 滿版縮放模式：", self)
+        self.scaling_label.setStyleSheet("color: #a1a1aa; font-weight: bold; font-size: 13px;")
+        self.scaling_layout.addWidget(self.scaling_label)
+        
+        self.scaling_combo = QComboBox(self)
+        self.scaling_combo.addItems([
+            "自動偵測比例 (預設)",
+            "高度適應 (Contain Height) - 適合正方形",
+            "寬度適應 (Contain Width) - 適合高窄型",
+            "滿版裁切 (Cover) - 強制裁切滿版",
+            "拉伸滿版 (Stretch) - 忽略比例拉滿"
+        ])
+        self.scaling_combo.setStyleSheet("""
+            QComboBox {
+                background-color: #1c1c1e; color: #f4f4f5; border: 1px solid #3a3a3c;
+                border-radius: 4px; padding: 6px 12px; min-width: 250px; font-size: 13px;
+            }
+            QComboBox QAbstractItemView {
+                background-color: #1c1c1e; color: #f4f4f5; selection-background-color: #3a3a3c;
+            }
+        """)
+        self.scaling_combo.currentIndexChanged.connect(self.on_scaling_changed)
+        self.scaling_layout.addWidget(self.scaling_combo)
+        self.scaling_layout.addStretch()
+        
+        layout.addLayout(self.scaling_layout)
+        
         # Bottom Buttons
         self.btn_layout = QHBoxLayout()
         self.btn_keep = QPushButton("🟢 保留此視覺模組", self)
@@ -1176,7 +1212,7 @@ class TestRunDialog(QDialog):
             return
         if "[preloadguard]" in msg_lower or "[object event]" in msg_lower:
             return
-        if "p5.sound" in msg_lower or "p5.min.js" in msg_lower:
+        if ("p5.sound" in msg_lower or "p5.min.js" in msg_lower) and not ("error" in msg_lower or "stack" in msg_lower or "uncaught" in msg_lower):
             return
         if "opentype" in msg_lower or "unsupported opentype" in msg_lower or ".ttf" in msg_lower or ".otf" in msg_lower or ".woff" in msg_lower:
             return
@@ -1213,8 +1249,11 @@ class TestRunDialog(QDialog):
             return
             
         is_err = (level == QWebEnginePage.JavaScriptConsoleMessageLevel.ErrorMessageLevel)
-        if is_err or "uncaught" in msg_lower or "is not defined" in msg_lower or "unexpected token" in msg_lower or "cannot read properties" in msg_lower:
+        if is_err or "uncaught" in msg_lower or "is not defined" in msg_lower or "unexpected token" in msg_lower or "cannot read properties" in msg_lower or "constructor color" in msg_lower:
             err_line = f"Line {lineNumber}: {message}"
+            import sys
+            print(f"[JS_ERROR] {err_line}")
+            sys.stdout.flush()
             if err_line not in self.errors:
                 self.errors.append(err_line)
 
@@ -1260,16 +1299,52 @@ class TestRunDialog(QDialog):
         self.btn_discard.setEnabled(True)
         self.cb_star.setChecked(False)
         
+        # 初始化下拉選單狀態
+        self.scaling_combo.blockSignals(True)
+        saved_mode = self.current_item.get("scaling_mode", "auto")
+        modes = ["auto", "contain_height", "contain_width", "cover", "stretch"]
+        if saved_mode in modes:
+            self.scaling_combo.setCurrentIndex(modes.index(saved_mode))
+        else:
+            self.scaling_combo.setCurrentIndex(0)
+        self.scaling_combo.blockSignals(False)
+        
         # Generate Sandbox HTML
         html_content = self.generate_sandbox_html(self.current_item)
         import random
         unique_url = QUrl.fromLocalFile(os.path.join(workspace_dir, f"dummy_test_batch_{self.current_idx}_{random.randint(0, 1000000)}.html"))
         self.web_view.setHtml(html_content, unique_url)
-        
         self.timer.start(1000)
+        
+    def on_scaling_changed(self, index):
+        modes = ["auto", "contain_height", "contain_width", "cover", "stretch"]
+        if not (0 <= index < len(modes)):
+            return
+        mode = modes[index]
+        self.current_item["scaling_mode"] = mode
+        
+        # 重新生成 sandbox HTML 以便 100% 正確重新繪製（相容 setup() 靜態與非迴圈模組）
+        html_content = self.generate_sandbox_html(self.current_item)
+        import random
+        unique_url = QUrl.fromLocalFile(os.path.join(workspace_dir, f"dummy_test_batch_{self.current_idx}_{random.randint(0, 1000000)}.html"))
+        self.web_view.setHtml(html_content, unique_url)
+        
+        # 重置倒數計時為 15 秒，給予使用者充裕時間預覽新模式
+        self.countdown = 15
+        self.status_label.setText(f"正在試運行中... 剩餘 {self.countdown} 秒")
         
     def tick(self):
         self.countdown -= 1
+        
+        # 查詢並輸出 canvas 的 computed styles 至 stdout
+        def style_callback(res):
+            import sys
+            print(f"[STYLE_DEBUG] Canvas computed style: {res}")
+            sys.stdout.flush()
+        self.web_view.page().runJavaScript(
+            "(() => { const c = document.querySelector('canvas'); const b = document.body; const de = document.documentElement; return {canvasWidth: c ? getComputedStyle(c).width : null, canvasHeight: c ? getComputedStyle(c).height : null, bodyWidth: b ? getComputedStyle(b).width : null, bodyHeight: b ? getComputedStyle(b).height : null, viewWidth: de ? de.clientWidth : null, viewHeight: de ? de.clientHeight : null}; })()",
+            style_callback
+        )
         
         # 保證每次 tick 時即時刷新 UI 上的秒數
         if self.countdown > 0:
@@ -1359,20 +1434,29 @@ class TestRunDialog(QDialog):
             
     def keep_current(self):
         self.timer.stop()
-        if self.cb_star.isChecked():
-            filepath = self.current_item.get("filepath")
-            if filepath and os.path.exists(filepath):
-                try:
-                    with open(filepath, "r", encoding="utf-8") as f:
-                        data = json.load(f)
+        filepath = self.current_item.get("filepath")
+        if filepath and os.path.exists(filepath):
+            try:
+                with open(filepath, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                
+                # 寫入指定的縮放模式
+                modes = ["auto", "contain_height", "contain_width", "cover", "stretch"]
+                idx = self.scaling_combo.currentIndex()
+                if 0 <= idx < len(modes):
+                    data["scaling_mode"] = modes[idx]
+                    
+                if self.cb_star.isChecked():
                     data["is_starred"] = True
-                    with open(filepath, "w", encoding="utf-8") as f:
-                        json.dump(data, f, indent=4, ensure_ascii=False)
-                    # 即時通知主視窗更新 UI 狀態
-                    if self.parent_app and hasattr(self.parent_app, 'refresh_presets_list'):
-                        self.parent_app.refresh_presets_list()
-                except Exception as e:
-                    print("Failed to save star status:", e)
+                    
+                with open(filepath, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=4, ensure_ascii=False)
+                    
+                # 即時通知主視窗更新 UI 狀態
+                if self.parent_app and hasattr(self.parent_app, 'refresh_presets_list'):
+                    self.parent_app.refresh_presets_list()
+            except Exception as e:
+                print("Failed to save preset metadata:", e)
         self.next_item()
         
     def discard_current(self):
@@ -1567,8 +1651,14 @@ class TestRunDialog(QDialog):
         code = code.replace("displayHeight", "windowHeight")
         
         # 1c.2 修正 private 欄位標記造成的 SyntaxError (如 #DBE7FF 或 #D1313D 被誤讀為 private class variables)
-        # 例如將 "#DBE7FF" 或 "#D1313D" 改為正常的字串（如果它們不是寫在類別大括號中，或是用作 16 進位顏色）
-        code = re.sub(r'(?<![\w\'"])(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3})\b', r'"\1"', code)
+        # 僅針對未加引號的 hex 顏色進行包裹，排除已在雙引號/單引號/模板字串內的 hex 顏色
+        def replace_hex(match):
+            if match.group(1):
+                return match.group(1)
+            return f'"{match.group(2)}"'
+        
+        pattern = r'("[^"\n\\]*(?:\\.[^"\n\\]*)*"|' + r"'[^'\n\\]*(?:\\.[^'\n\\]*)*'" + r'|`[^`\\]*(?:\\.[^`\\]*)*`)|(?<![\w])(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3})\b'
+        code = re.sub(pattern, replace_hex, code)
         
         # 1c.3 修正未定義或順序錯誤的區塊變數 (如 Cannot access 'ballNum' / 'sh' / 'SIDES' / 'GRIDBOX' / 'Ship' / 'Mover' before initialization)
         # 將 let/const 提升至 setup/class 頂層全域，以 var 代替 const/let 來解決 TDZ 暫時死區問題
@@ -1614,24 +1704,27 @@ class TestRunDialog(QDialog):
             code = code.replace("for (let k =0; k<aPoints.length-1; k++)", "let k;\n  for(k =0; k<aPoints.length-1; k++)")
             code = code.replace("for(let k=0; k<aPoints.length-1; k++)", "let k;\n  for(k=0; k<aPoints.length-1; k++)")
 
-        # 1i. 修復特例：若使用自定義 w, h 常數/變數定義畫布尺寸，需在 createCanvas 後同步為真實的 width/height 避免縮在左上角
+        # 1i. 修復特例：若使用自定義 w, h 常數/變數定義畫布尺寸，且確實在 createCanvas 中被呼叫，需在 createCanvas 後同步為真實的 width/height 避免縮在左上角
         if "createCanvas(" in code and ("w =" in code or "h =" in code or "w=" in code or "h=" in code):
-            setup_match = re.search(r'function\s+setup\s*\([^)]*\)\s*\{(.*?)\}', code, re.DOTALL)
-            setup_body = setup_match.group(1) if setup_match else ""
-            has_local_w = re.search(r'\b(const|let|var)\s+w\b', setup_body) is not None
-            has_local_h = re.search(r'\b(const|let|var)\s+h\b', setup_body) is not None
-            
-            code = re.sub(r'\bconst\s+w\s*=\s*', 'let w = ', code)
-            code = re.sub(r'\bconst\s+h\s*=\s*', 'let h = ', code)
-            
-            append_lines = []
-            if not has_local_w:
-                append_lines.append("    w = width;")
-            if not has_local_h:
-                append_lines.append("    h = height;")
-            if append_lines:
-                append_str = "\n" + "\n".join(append_lines)
-                code = re.sub(r'^(\s*createCanvas\s*\(.+?\);?\s*)$', r'\1' + append_str, code, flags=re.MULTILINE)
+            uses_w_in_canvas = re.search(r'createCanvas\s*\(\s*w\s*,', code) is not None
+            uses_h_in_canvas = re.search(r'createCanvas\s*\(\s*[^,]+\s*,\s*h\s*[),]', code) is not None
+            if uses_w_in_canvas or uses_h_in_canvas:
+                setup_match = re.search(r'function\s+setup\s*\([^)]*\)\s*\{(.*?)\}', code, re.DOTALL)
+                setup_body = setup_match.group(1) if setup_match else ""
+                has_local_w = re.search(r'\b(const|let|var)\s+w\b', setup_body) is not None
+                has_local_h = re.search(r'\b(const|let|var)\s+h\b', setup_body) is not None
+                
+                code = re.sub(r'\bconst\s+w\s*=\s*', 'let w = ', code)
+                code = re.sub(r'\bconst\s+h\s*=\s*', 'let h = ', code)
+                
+                append_lines = []
+                if uses_w_in_canvas and not has_local_w:
+                    append_lines.append("    w = width;")
+                if uses_h_in_canvas and not has_local_h:
+                    append_lines.append("    h = height;")
+                if append_lines:
+                    append_str = "\n" + "\n".join(append_lines)
+                    code = re.sub(r'^(\s*createCanvas\s*\(.+?\);?\s*)$', r'\1' + append_str, code, flags=re.MULTILINE)
 
         # 1j. 修復特例：若使用未定義的 randomColor()，補上其實作
         if "randomColor(" in code and "function randomColor" not in code:
@@ -1877,7 +1970,7 @@ function initTextures() {
         code = re.sub(r'^(\s*)(?:int|float|double|boolean|color|char|byte|short|long|String|[A-Z]\w*)\[\]\s+(\w+)\s*;', r'\1let \2;', code, flags=re.MULTILINE)
         code = re.sub(r'^(\s*)(?:int|float|double|boolean|color|char|byte|short|long|String|[A-Z]\w*)\[\]\s+(\w+)\s*=', r'\1let \2 =', code, flags=re.MULTILINE)
         # 函數參數中的陣列型別: "function foo(double[] arr)" → "function foo(arr)"
-        code = re.sub(r'\b(?:int|float|double|boolean|color|char|byte|short|long|String|[A-Z]\w*)\[\]\s+(\w+)', r'\1', code)
+        code = re.sub(r'\b(?:int|float|double|boolean|color|char|byte|short|long|String|[A-Z]\w*)\[\][ \t]+(\w+)', r'\1', code)
         
         # 1d. 轉換 Java for-each 迴圈
         # 例如: "for (Particle particle : particles)" → "for (let particle of particles)"
@@ -1909,22 +2002,31 @@ function initTextures() {
         
         # ── 2. 逐行修復（需要追蹤 class 範圍）──
         
+        def strip_comments_and_strings(code_str):
+            pattern = r'(/\*([^*]|\*[^/])*\*/)|(//[^\n]*)|("[^"\\]*(?:\\.[^"\\]*)*")|(\'[^\'\\]*(?:\\.[^\'\\]*)*\')|(`[^`\\]*(?:\\.[`\\]*)*`)'
+            def replacer(match):
+                text = match.group(0)
+                return re.sub(r'[^\n]', ' ', text)
+            return re.sub(pattern, replacer, code_str)
+
+        clean_code = strip_comments_and_strings(code)
         lines = code.split("\n")
+        clean_lines = clean_code.split("\n")
         new_lines = []
         in_class = False
         brace_depth = 0
         
-        for line in lines:
-            class_match = re.search(r'\bclass\s+\w+', line)
+        for line, clean_line in zip(lines, clean_lines):
+            class_match = re.search(r'\bclass\s+\w+', clean_line)
             if class_match and not in_class:
                 in_class = True
                 brace_depth = 0
-                brace_depth += line.count('{') - line.count('}')
+                brace_depth += clean_line.count('{') - clean_line.count('}')
                 new_lines.append(line)
                 continue
             
             if in_class:
-                brace_depth += line.count('{') - line.count('}')
+                brace_depth += clean_line.count('{') - clean_line.count('}')
                 if brace_depth <= 0:
                     in_class = False
                 
@@ -1932,7 +2034,7 @@ function initTextures() {
                 line = re.sub(r'^(\s*)function\s+(\w+)\s*\(', r'\1\2(', line)
                 
                 # 移除 class 內部欄位宣告的 let/var/const（僅在 brace_depth == 1，即 class 頂層欄位宣告時）
-                stripped = line.strip()
+                stripped = clean_line.strip()
                 if brace_depth == 1 and re.match(r'^(let|var|const)\s+\w+', stripped):
                     if not re.match(r'^(let|var|const)\s+\w+\s*\(', stripped):
                         line = re.sub(r'^(\s*)(let|var|const)\s+', r'\1', line)
@@ -1988,6 +2090,13 @@ function initTextures() {
             code = code.replace("v.setMag(250);", "v.setMag(250);\n      flowField[index] = v;")
         # Repair dark particle color on dark backgrounds on-the-fly
         code = code.replace("stroke(0,50);", "stroke(255, 50);").replace("stroke(0, 50);", "stroke(255, 50);")
+        
+        # Repair p5.js v2 alpha/red/green/blue/... compatibility by wrapping arguments in window.color() to avoid local variable shadowing
+        code = re.sub(
+            r'\b(alpha|red|green|blue|hue|saturation|brightness|lightness)\s*\(\s*(?!window\.color\()((?:[^()]+|\([^()]*\))+)\)',
+            r'\1(window.color(\2))',
+            code
+        )
         
         try:
             with open(os.path.join(workspace_dir, "last_batch_run_code.js"), "w", encoding="utf-8") as f_dump:
@@ -2088,7 +2197,7 @@ function initTextures() {
           <meta charset="utf-8">
           <style>
             html, body {{ margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000000 !important; display: flex; justify-content: center; align-items: center; }}
-            canvas {{ display: block !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; width: 100vw !important; height: 100vh !important; max-width: 100% !important; max-height: 100% !important; object-fit: contain !important; background-color: #000000 !important; }}
+            canvas {{ display: block !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; object-fit: cover !important; background-color: transparent !important; }}
             /*CUSTOM_CSS_PLACEHOLDER*/
             /* Enforce final centering in case custom_css overwrote canvas positioning */
             body canvas {{
@@ -2098,12 +2207,26 @@ function initTextures() {
               transform: translate(-50%, -50%) !important;
               width: 100vw !important;
               height: 100vh !important;
-              max-width: 100% !important;
-              max-height: 100% !important;
-              object-fit: contain !important;
+              max-width: none !important;
+              max-height: none !important;
+              object-fit: cover !important;
             }}
           </style>
           <script>
+            window.addEventListener('unhandledrejection', function(event) {{
+              const reason = event.reason;
+              if (reason && reason.stack) {{
+                console.error("Unhandled Rejection Stack:\\n" + reason.stack);
+              }} else {{
+                console.error("Unhandled Rejection: " + reason);
+              }}
+            }});
+            window.onerror = function(message, source, lineno, colno, error) {{
+              if (error && error.stack) {{
+                console.error("Window Error Stack:\\n" + error.stack);
+              }}
+            }};
+
             Object.defineProperty(window, 'innerWidth', {{ get: function() {{ return 1280; }}, set: function(val) {{}}, configurable: true }});
             Object.defineProperty(window, 'innerHeight', {{ get: function() {{ return 720; }}, set: function(val) {{}}, configurable: true }});
             Object.defineProperty(window, 'windowWidth', {{ get: function() {{ return 1280; }}, set: function(val) {{}}, configurable: true }});
@@ -2205,6 +2328,7 @@ function initTextures() {
           <script>
             {interceptor_js}
             {asset_override_js}
+            window.customScalingMode = "{item.get('scaling_mode', 'auto')}";
             {main.OVERRIDE_16_9_JS}
             {main.MOCK_P5_JS}
             window.frequency = 50;

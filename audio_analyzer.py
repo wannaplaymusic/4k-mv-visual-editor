@@ -53,7 +53,115 @@ def _get_chord_templates():
 
 CHORD_TEMPLATES = _get_chord_templates()
 
-def parse_chord_name(chord_name):
+class ProceduralPaletteGenerator:
+    def __init__(self, seed_string):
+        import hashlib
+        import random
+        # 1. 產生確定性的隨機種子
+        if seed_string:
+            hash_val = int(hashlib.md5(seed_string.encode('utf-8')).hexdigest(), 16)
+            self.rng = random.Random(hash_val)
+        else:
+            self.rng = random.Random()
+            
+        # 2. 決定調色盤風格
+        self.style = self.rng.choice([
+            'Vaporwave', 'Cyberpunk', 'Morandi', 'DeepOcean', 'Forest',
+            'Complementary', 'Triadic', 'Tetradic', 'Analogous', 'GoldenLava'
+        ])
+        
+        # 3. 產生主色相 (Base Hue) 與色相擴散步長 (Hue Step)
+        self.base_hue = self.rng.uniform(0.0, 360.0)
+        self.hue_step = self.rng.choice([15.0, 30.0, 45.0, 60.0, 90.0, 120.0, 150.0])
+        self.direction = self.rng.choice([1, -1])
+        
+        # 4. 產生飽和度與亮度偏移基準
+        self.sat_base = self.rng.uniform(0.5, 0.9)
+        self.bright_base = self.rng.uniform(0.4, 0.7)
+        
+        # 預先生成 12 個半音的色彩值，以保證同一首歌內對應關係是固定且協調的
+        self.chroma_colors = {}
+        self._generate_chroma_colors()
+        
+    def _generate_chroma_colors(self):
+        # 針對 12 個半音 (0-11) 對應至五度圈位置 (fifths_pos)
+        # fifths_pos = (root_idx * 7) % 12
+        for root_idx in range(12):
+            fifths_pos = (root_idx * 7) % 12
+            
+            if self.style == 'Vaporwave':
+                h = (240.0 + fifths_pos * 8.33 + self.base_hue) % 360.0
+                s = self.rng.uniform(0.65, 0.85)
+                q_fac = 0.7
+            elif self.style == 'Cyberpunk':
+                if fifths_pos % 3 == 0:
+                    h = self.rng.uniform(180.0, 200.0)
+                elif fifths_pos % 3 == 1:
+                    h = self.rng.uniform(300.0, 330.0)
+                else:
+                    h = self.rng.uniform(50.0, 65.0)
+                s = self.rng.uniform(0.85, 1.0)
+                q_fac = 0.9
+            elif self.style == 'Morandi':
+                h = (self.base_hue + fifths_pos * self.hue_step * self.direction) % 360.0
+                s = self.rng.uniform(0.25, 0.40)
+                q_fac = 0.5
+            elif self.style == 'DeepOcean':
+                h = (190.0 + fifths_pos * 10.0 + self.base_hue) % 360.0
+                s = self.rng.uniform(0.55, 0.75)
+                q_fac = 0.6
+            elif self.style == 'Forest':
+                h = (80.0 + fifths_pos * 8.0 + self.base_hue) % 360.0
+                s = self.rng.uniform(0.45, 0.70)
+                q_fac = 0.65
+            elif self.style == 'GoldenLava':
+                h = (10.0 + fifths_pos * 5.0 + self.base_hue) % 360.0
+                s = self.rng.uniform(0.75, 0.95)
+                q_fac = 0.8
+            elif self.style == 'Complementary':
+                if fifths_pos % 2 == 0:
+                    h = self.base_hue % 360.0
+                else:
+                    h = (self.base_hue + 180.0) % 360.0
+                s = self.sat_base
+                q_fac = 0.75
+            elif self.style == 'Triadic':
+                h = (self.base_hue + (fifths_pos % 3) * 120.0) % 360.0
+                s = self.sat_base
+                q_fac = 0.75
+            elif self.style == 'Tetradic':
+                h = (self.base_hue + (fifths_pos % 4) * 90.0) % 360.0
+                s = self.sat_base
+                q_fac = 0.8
+            else: # Analogous
+                h = (self.base_hue + fifths_pos * 4.0 * self.direction) % 360.0
+                s = self.sat_base
+                q_fac = 0.7
+                
+            self.chroma_colors[root_idx] = (float(h), float(s), float(q_fac))
+
+    def get_chord_color(self, root_idx, quality_type):
+        h, s, q_fac = self.chroma_colors.get(root_idx, (0.0, 0.0, 0.5))
+        if quality_type == 'major':
+            s_adj = min(1.0, s * 1.1)
+            q_fac_adj = min(1.0, q_fac * 1.0)
+        elif quality_type == 'minor':
+            s_adj = s * 0.75
+            q_fac_adj = q_fac * 0.7
+        elif quality_type == 'augmented':
+            h = (h + 30.0) % 360.0
+            s_adj = 1.0
+            q_fac_adj = min(1.0, q_fac * 1.2)
+        elif quality_type == 'diminished':
+            h = (h - 30.0) % 360.0
+            s_adj = max(0.2, s * 0.5)
+            q_fac_adj = q_fac * 0.5
+        else:
+            s_adj = s
+            q_fac_adj = q_fac
+        return h, s_adj, q_fac_adj
+
+def parse_chord_name(chord_name, palette_gen=None):
     if chord_name == "N.C.":
         return 0, 'major', 0.0, 0.0, 0.5
     
@@ -72,29 +180,34 @@ def parse_chord_name(chord_name):
     except ValueError:
         return 0, 'major', 0.0, 0.0, 0.5
     
-    fifths_pos = (root_idx * 7) % 12
-    hue = fifths_pos * 30
-    
     if quality == '':
         quality_type = 'major'
-        saturation = 0.95
-        quality_factor = 0.8
+        default_saturation = 0.95
+        default_quality_factor = 0.8
     elif quality == 'm':
         quality_type = 'minor'
-        saturation = 0.45
-        quality_factor = 0.5
+        default_saturation = 0.45
+        default_quality_factor = 0.5
     elif quality == 'aug':
         quality_type = 'augmented'
-        saturation = 1.0
-        quality_factor = 0.95
+        default_saturation = 1.0
+        default_quality_factor = 0.95
     elif quality == 'dim':
         quality_type = 'diminished'
-        saturation = 0.30
-        quality_factor = 0.35
+        default_saturation = 0.30
+        default_quality_factor = 0.35
     else:
         quality_type = 'major'
-        saturation = 0.95
-        quality_factor = 0.8
+        default_saturation = 0.95
+        default_quality_factor = 0.8
+
+    if palette_gen is not None:
+        hue, saturation, quality_factor = palette_gen.get_chord_color(root_idx, quality_type)
+    else:
+        fifths_pos = (root_idx * 7) % 12
+        hue = fifths_pos * 30
+        saturation = default_saturation
+        quality_factor = default_quality_factor
         
     return root_idx, quality_type, float(hue), float(saturation), float(quality_factor)
 
@@ -166,6 +279,11 @@ class AudioBeatDetector:
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
             
         logger.info(f"Analyzing audio: {audio_path} under genre mode: {genre}")
+        
+        # Initialize procedural palette generator based on filename hash seed
+        filename = os.path.basename(audio_path)
+        palette_gen = ProceduralPaletteGenerator(filename)
+        logger.info(f"Generated song procedural palette: {palette_gen.style} (base_hue: {palette_gen.base_hue:.2f})")
         
         try:
             y, sr = librosa.load(audio_path, sr=22050)
@@ -322,7 +440,7 @@ class AudioBeatDetector:
                     chord_names.append("N.C."); chord_hues.append(0.0); chord_saturations.append(0.0); chord_brightnesses.append(0.1); chord_colors_hex.append("#0a0a0c")
                 else:
                     best_chord = max(CHORD_TEMPLATES, key=lambda name: np.dot(chroma_vec / vec_norm, CHORD_TEMPLATES[name]))
-                    root_idx, q_type, hue, sat, q_factor = parse_chord_name(best_chord)
+                    root_idx, q_type, hue, sat, q_factor = parse_chord_name(best_chord, palette_gen)
                     c_bright = float(np.clip(0.6 * q_factor + 0.4 * centroid_norm[f], 0.1, 1.0))
                     
                     chord_names.append(best_chord)
@@ -346,7 +464,8 @@ class AudioBeatDetector:
                 'mid_energy': [float(v) for v in np.convolve((np.sum(S[23:186, :], axis=0) / np.max(np.sum(S[23:186, :], axis=0) + 1e-8)), box, mode='same')],
                 'high_energy': [float(v) for v in np.convolve((np.sum(S[186:, :], axis=0) / np.max(np.sum(S[186:, :], axis=0) + 1e-8)), box, mode='same')],
                 'total_energy': [float(v) for v in total_energy_smooth],
-                'chord_name': chord_names, 'chord_hue': chord_hues, 'chord_saturation': chord_saturations, 'chord_brightness': chord_brightnesses, 'chord_color_hex': chord_colors_hex
+                'chord_name': chord_names, 'chord_hue': chord_hues, 'chord_saturation': chord_saturations, 'chord_brightness': chord_brightnesses, 'chord_color_hex': chord_colors_hex,
+                'palette_style': palette_gen.style, 'palette_base_hue': palette_gen.base_hue
             }
             
             resolved_genre = self.detect_genre(bpm, filter_dynamics) if genre in ('Auto (自動偵測)', 'auto') else genre.lower().replace(' ', '_').replace('pop', 'pop')
@@ -381,7 +500,8 @@ class AudioBeatDetector:
             return {
                 'audio_path': audio_path, 'bpm': bpm, 'beat_timestamps': beat_timestamps, 'duration': duration, 'filter_dynamics': filter_dynamics,
                 'spectrum': S_smooth.tolist(), 'storyboard': storyboard, 'genre': resolved_genre.capitalize(),
-                'rms_mean': float(np.mean(rms_full)), 'rms_std': float(np.std(rms_full)), 'transient_timestamps': transient_timestamps
+                'rms_mean': float(np.mean(rms_full)), 'rms_std': float(np.std(rms_full)), 'transient_timestamps': transient_timestamps,
+                'palette_style': palette_gen.style, 'palette_base_hue': palette_gen.base_hue
             }
         except Exception as e:
             logger.error(f"Error analyzing audio: {e}"); raise

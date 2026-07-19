@@ -3,7 +3,8 @@ import sys
 import gc
 
 # Disable web security (CORS/SOP bypass) for QtWebEngine globally
-os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-web-security --enable-gpu --ignore-gpu-blocklist --enable-webgl --use-gl=desktop --enable-accelerated-2d-canvas --disable-gpu-vsync"
+if "QTWEBENGINE_CHROMIUM_FLAGS" not in os.environ:
+    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-web-security --enable-gpu --ignore-gpu-blocklist --enable-webgl --use-gl=desktop --enable-accelerated-2d-canvas --disable-gpu-vsync --disable-renderer-backgrounding --disable-backgrounding-occluded-windows --disable-background-timer-throttling"
 import json
 import shutil
 import logging
@@ -401,10 +402,15 @@ if (typeof p5 !== 'undefined') {
       }
     } catch(e) {}
   }
-  // 5. Expose all p5.prototype functions and properties globally to window
-  // This solves ReferenceErrors when legacy scripts reference global p5 functions (like curveVertex, line, etc.) in modular contexts.
+  const skipGlobals = [
+    'setup', 'draw', 'preload', 'windowResized', 'deviceMoved', 'deviceTurned', 'deviceShaken',
+    'keyPressed', 'keyReleased', 'keyTyped', 'keyIsDown', 'mouseMoved', 'mouseDragged',
+    'mousePressed', 'mouseReleased', 'mouseClicked', 'doubleClicked', 'mouseWheel',
+    'touchStarted', 'touchMoved', 'touchEnded'
+  ];
   for (var prop in p5.prototype) {
     if (typeof p5.prototype[prop] === 'function') {
+      if (skipGlobals.indexOf(prop) !== -1) continue;
       (function(pName) {
         // Expose as actual configurable window property getter/setter
         try {
@@ -515,6 +521,397 @@ if (typeof p5 !== 'undefined') {
       return g;
     };
   }
+  
+  // 6. 確保 textFont 傳入未加載完成的字型、undefined 或結構不完整之字型時不發生 Uncaught TypeError 崩潰
+  if (p5.prototype && p5.prototype.textFont) {
+    const originalTextFont = p5.prototype.textFont;
+    p5.prototype.textFont = function(font, size) {
+      if (arguments.length > 0) {
+        if (!font) {
+          console.warn("[P5_COMPAT] textFont received undefined/null font, skipping to prevent crash");
+          return this;
+        }
+        if (typeof font === 'object') {
+          if (font.hasOwnProperty('font') && !font.font) {
+            console.warn("[P5_COMPAT] textFont: p5.Font.font is not loaded yet, skipping");
+            return this;
+          }
+          if (font.font && !font.font.data && !font.font.tables) {
+            console.warn("[P5_COMPAT] textFont: opentype font data is missing, skipping");
+            return this;
+          }
+        }
+      }
+      try {
+        return originalTextFont.apply(this, arguments);
+      } catch (e) {
+        console.warn("[P5_COMPAT] Ignored textFont error:", e);
+        return this;
+      }
+    };
+  }
+  
+  // 7. 攔截並 Mock loadSound 以及 p5.SoundFile，防止遠端音訊加載發生 CORS 錯誤與未加載完成的 .play() 崩潰
+  const createMockSoundFile = function() {
+    return {
+      _isMockSound: true,
+      play: function() { return this; },
+      stop: function() { return this; },
+      pause: function() { return this; },
+      loop: function() { return this; },
+      isPlaying: function() { return false; },
+      setVolume: function() { return this; },
+      pan: function() { return this; },
+      rate: function() { return this; },
+      disconnect: function() { return this; },
+      connect: function() { return this; },
+      onended: function() {},
+      duration: function() { return 180.0; },
+      currentTime: function() { return 0.0; },
+      then: function(resolve) {
+        if (resolve) {
+          setTimeout(() => resolve(this), 0);
+        }
+        return this;
+      }
+    };
+  };
+
+  if (p5.prototype) {
+    p5.prototype.loadSound = function(path, successCallback, failureCallback) {
+      console.log("[P5_COMPAT] loadSound hijacked for: " + path);
+      const mockSound = createMockSoundFile();
+      if (successCallback) {
+        setTimeout(() => {
+          try { successCallback(mockSound); } catch(e) {}
+        }, 0);
+      }
+      return mockSound;
+    };
+  }
+  const createMockSoundClass = function(name, methods = []) {
+    return function() {
+      console.log("[P5_COMPAT] Mock " + name + " instantiated");
+      const obj = { _isMock: true };
+      methods.forEach(m => {
+        obj[m] = function() { return this; };
+      });
+      if (name === 'FFT') {
+        obj.setInput = function() { return this; };
+        obj.analyze = function() { return new Array(1024).fill(0).map(() => Math.random() * 50); };
+        obj.getEnergy = function() { return 20; };
+      }
+      if (name === 'Amplitude') {
+        obj.setInput = function() { return this; };
+        obj.getLevel = function() { return 0.5; };
+      }
+      if (name === 'AudioIn') {
+        obj.start = function() { return this; };
+        obj.stop = function() { return this; };
+        obj.getLevel = function() { return 0.5; };
+      }
+      return obj;
+    };
+  };
+
+  p5.SoundFile = function() {
+    return createMockSoundFile();
+  };
+  p5.Oscillator = createMockSoundClass('Oscillator', ['start', 'stop', 'setType', 'freq', 'amp', 'disconnect', 'connect', 'pan', 'add', 'mult', 'scale']);
+  p5.TriOsc = p5.Oscillator;
+  p5.SinOsc = p5.Oscillator;
+  p5.SqrOsc = p5.Oscillator;
+  p5.SawOsc = p5.Oscillator;
+  p5.Envelope = createMockSoundClass('Envelope', ['play', 'triggerAttack', 'triggerRelease', 'setRange', 'setADSR', 'setInput']);
+  p5.FFT = createMockSoundClass('FFT');
+  p5.Amplitude = createMockSoundClass('Amplitude');
+  p5.AudioIn = createMockSoundClass('AudioIn');
+
+  // 8. 攔截並 Mock loadFont，防止遠端字型加載發生 CORS 錯誤與未加載完成的 .textToPoints() 崩潰
+  const createMockFont = function() {
+    return {
+      _isMockFont: true,
+      textToPoints: function() { return []; },
+      getPath: function() { return { commands: [] }; },
+      getOutline: function() { return []; },
+      then: function(resolve) {
+        if (resolve) {
+          setTimeout(() => resolve(this), 0);
+        }
+        return this;
+      }
+    };
+  };
+
+  if (p5.prototype) {
+    p5.prototype.loadFont = function(path, successCallback, failureCallback) {
+      console.log("[P5_COMPAT] loadFont hijacked for: " + path);
+      const mockFont = createMockFont();
+      if (successCallback) {
+        setTimeout(() => {
+          try { successCallback(mockFont); } catch(e) {}
+        }, 0);
+      }
+      return mockFont;
+    };
+  }
+  
+  // 9. 補全 PVector 類別（為相容於舊版 Processing 轉譯的作品，防止全域變數宣告時 Temporal Dead Zone 崩潰）
+  if (typeof window.PVector === 'undefined') {
+    window.PVector = class PVector {
+      constructor(x, y, z) {
+        this.x = x || 0;
+        this.y = y || 0;
+        this.z = z || 0;
+      }
+      static dist(v1, v2) {
+        return Math.sqrt((v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2 + (v1.z - v2.z) ** 2);
+      }
+      static random2D() {
+        const angle = Math.random() * Math.PI * 2;
+        return new PVector(Math.cos(angle), Math.sin(angle));
+      }
+      set(x, y, z) {
+        if (x instanceof PVector) {
+          this.x = x.x || 0;
+          this.y = x.y || 0;
+          this.z = x.z || 0;
+        } else {
+          this.x = x || 0;
+          this.y = y || 0;
+          this.z = z || 0;
+        }
+        return this;
+      }
+      copy() {
+        return new PVector(this.x, this.y, this.z);
+      }
+      add(v) {
+        if (v instanceof PVector) {
+          this.x += v.x;
+          this.y += v.y;
+          this.z += v.z;
+        } else {
+          this.x += arguments[0] || 0;
+          this.y += arguments[1] || 0;
+          this.z += arguments[2] || 0;
+        }
+        return this;
+      }
+      sub(v) {
+        if (v instanceof PVector) {
+          this.x -= v.x;
+          this.y -= v.y;
+          this.z -= v.z;
+        } else {
+          this.x -= arguments[0] || 0;
+          this.y -= arguments[1] || 0;
+          this.z -= arguments[2] || 0;
+        }
+        return this;
+      }
+      mult(n) {
+        this.x *= n;
+        this.y *= n;
+        this.z *= n;
+        return this;
+      }
+      div(n) {
+        this.x /= n;
+        this.y /= n;
+        this.z /= n;
+        return this;
+      }
+      mag() {
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+      }
+      normalize() {
+        const m = this.mag();
+        if (m !== 0 && m !== 1) {
+          this.div(m);
+        }
+        return this;
+      }
+      limit(max) {
+        if (this.mag() > max) {
+          this.normalize();
+          this.mult(max);
+        }
+        return this;
+      }
+      heading() {
+        return Math.atan2(this.y, this.x);
+      }
+    };
+  }
+
+  // 10. 攔截 HTMLInputElement.prototype.size 的寫入，防止 p5.js createInput() 預設傳入 0 或無參數時引發 IndexSizeError 崩潰
+  if (typeof HTMLInputElement !== 'undefined') {
+    try {
+      let originalSet = null;
+      let desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'size');
+      if (desc && desc.set) {
+        originalSet = desc.set;
+      } else {
+        desc = Object.getOwnPropertyDescriptor(Element.prototype, 'size');
+        if (desc && desc.set) originalSet = desc.set;
+      }
+      
+      Object.defineProperty(HTMLInputElement.prototype, 'size', {
+        get: function() {
+          const val = this.getAttribute('size');
+          return val !== null ? parseInt(val, 10) : 20;
+        },
+        set: function(val) {
+          let intVal = parseInt(val, 10);
+          if (isNaN(intVal) || intVal <= 0) {
+            intVal = 20;
+          }
+          if (originalSet) {
+            try {
+              originalSet.call(this, intVal);
+            } catch (e) {
+              this.setAttribute('size', intVal);
+            }
+          } else {
+            this.setAttribute('size', intVal);
+          }
+        },
+        configurable: true,
+        enumerable: true
+      });
+      console.log("[P5_COMPAT] HTMLInputElement.prototype.size override applied successfully");
+    } catch (e) {
+      console.warn("[P5_COMPAT] Failed to override HTMLInputElement.prototype.size:", e);
+    }
+  }
+
+  // 11. 全域 chroma 攔截與自癒代理，防止 chroma(val) 拋出格式錯誤或回傳之 color 物件缺失 .css() 方法引發崩潰
+  (function() {
+    let internalChroma = undefined;
+    
+    // 定義動態包裝函數，可隨時就地執行
+    window.ensureChromaWrapped = function() {
+      if (typeof internalChroma === 'function' && !internalChroma._wrapped) {
+        console.log("[P5_COMPAT] chroma function wrapped dynamically");
+        const originalChroma = internalChroma;
+        
+        const wrapped = function(...args) {
+          try {
+            let res = originalChroma.apply(this, args);
+            if (res && typeof res === 'object') {
+              return wrapChromaColor(res);
+            }
+            return res;
+          } catch (e) {
+            console.warn("[P5_COMPAT] chroma invocation failed, returning mock:", e);
+            return createMockChromaColor();
+          }
+        };
+        
+        Object.assign(wrapped, originalChroma);
+        wrapped.prototype = originalChroma.prototype;
+        wrapped._wrapped = true;
+        
+        // 直接賦值給 internalChroma，setter 也會同步更新
+        internalChroma = wrapped;
+      }
+    };
+
+    let chromaGetterActive = false;
+    Object.defineProperty(window, 'chroma', {
+      get: function() {
+        if (!chromaGetterActive && internalChroma && typeof internalChroma === 'function' && !internalChroma._wrapped) {
+          chromaGetterActive = true;
+          try { window.ensureChromaWrapped(); } catch(e) {}
+          chromaGetterActive = false;
+        }
+        return internalChroma;
+      },
+      set: function(val) {
+        internalChroma = val;
+      },
+      configurable: true
+    });
+
+    // 額外 Hook setup/preload/draw，在執行任何 p5 生命週期前，二度強制包裝 chroma！
+    if (p5.prototype) {
+      const hookP5Lifecycle = function(methodName) {
+        if (p5.prototype[methodName]) {
+          const original = p5.prototype[methodName];
+          p5.prototype[methodName] = function() {
+            try { window.ensureChromaWrapped(); } catch(e) {}
+            return original.apply(this, arguments);
+          };
+        } else {
+          // 如果尚未定義，使用 getter/setter 等待被定義時進行包裹
+          let stored = null;
+          Object.defineProperty(p5.prototype, methodName, {
+            get: function() { return stored; },
+            set: function(val) {
+              if (typeof val === 'function') {
+                stored = function() {
+                  try { window.ensureChromaWrapped(); } catch(e) {}
+                  return val.apply(this, arguments);
+                };
+              } else {
+                stored = val;
+              }
+            },
+            configurable: true
+          });
+        }
+      };
+      
+      hookP5Lifecycle('setup');
+      hookP5Lifecycle('preload');
+      hookP5Lifecycle('draw');
+    }
+
+    function wrapChromaColor(colorObj) {
+      if (!colorObj.css) {
+        colorObj.css = function(format) {
+          if (typeof colorObj.hex === 'function') return colorObj.hex();
+          if (typeof colorObj.toString === 'function') return colorObj.toString();
+          return "rgba(0,0,0,1)";
+        };
+      }
+      const chainMethods = ['alpha', 'darken', 'brighten', 'saturate', 'desaturate', 'set'];
+      chainMethods.forEach(method => {
+        if (typeof colorObj[method] === 'function' && !colorObj[method]._wrapped) {
+          const orig = colorObj[method];
+          colorObj[method] = function(...args) {
+            try {
+              let next = orig.apply(this, args);
+              if (next && typeof next === 'object') {
+                return wrapChromaColor(next);
+              }
+              return next;
+            } catch (e) {
+              return colorObj;
+            }
+          };
+          colorObj[method]._wrapped = true;
+        }
+      });
+      return colorObj;
+    }
+
+    function createMockChromaColor() {
+      return {
+        _isMock: true,
+        css: function() { return "rgba(0,0,0,1)"; },
+        hex: function() { return "#000000"; },
+        alpha: function() { return this; },
+        darken: function() { return this; },
+        brighten: function() { return this; },
+        saturate: function() { return this; },
+        desaturate: function() { return this; },
+        set: function() { return this; },
+        get: function() { return 0; }
+      };
+    }
+  })();
 }
 // Double check and explicitly define key p5 drawing functions directly on window in case prototype enumeration missed them
 (function() {
@@ -548,6 +945,22 @@ if (typeof p5 !== 'undefined') {
       });
     }
   });
+  
+  // 12. 為 WebGLRenderingContext / WebGL2RenderingContext 補上非標準 uniform1..4 的相容 alias 護欄
+  if (typeof WebGLRenderingContext !== 'undefined') {
+    const glProto = WebGLRenderingContext.prototype;
+    if (!glProto.uniform1) glProto.uniform1 = function(loc, v0) { return this.uniform1f(loc, v0); };
+    if (!glProto.uniform2) glProto.uniform2 = function(loc, v0, v1) { return this.uniform2f(loc, v0, v1); };
+    if (!glProto.uniform3) glProto.uniform3 = function(loc, v0, v1, v2) { return this.uniform3f(loc, v0, v1, v2); };
+    if (!glProto.uniform4) glProto.uniform4 = function(loc, v0, v1, v2, v3) { return this.uniform4f(loc, v0, v1, v2, v3); };
+  }
+  if (typeof WebGL2RenderingContext !== 'undefined') {
+    const glProto = WebGL2RenderingContext.prototype;
+    if (!glProto.uniform1) glProto.uniform1 = function(loc, v0) { return this.uniform1f(loc, v0); };
+    if (!glProto.uniform2) glProto.uniform2 = function(loc, v0, v1) { return this.uniform2f(loc, v0, v1); };
+    if (!glProto.uniform3) glProto.uniform3 = function(loc, v0, v1, v2) { return this.uniform3f(loc, v0, v1, v2); };
+    if (!glProto.uniform4) glProto.uniform4 = function(loc, v0, v1, v2, v3) { return this.uniform4f(loc, v0, v1, v2, v3); };
+  }
 })();
 """
 
@@ -697,11 +1110,38 @@ if (typeof p5 !== 'undefined') {
     
     // Add stub methods to emulate p5.Element
     dummyEl.class = function() { return this; };
-    dummyEl.id = function() { return this; };
+    Object.defineProperty(dummyEl, 'id', {
+      value: function(val) {
+        if (val === undefined) return this.getAttribute('id');
+        this.setAttribute('id', val);
+        return this;
+      },
+      writable: true,
+      configurable: true
+    });
     dummyEl.parent = function() { return this; };
     dummyEl.position = function() { return this; };
     dummyEl.size = function() { return this; };
-    dummyEl.style = function() { return this; };
+    
+    const originalStyle = dummyEl.style;
+    Object.defineProperty(dummyEl, 'style', {
+      value: function(prop, val) {
+        if (arguments.length === 0) return originalStyle;
+        if (arguments.length === 1 && typeof prop === 'string') {
+          return originalStyle[prop] || originalStyle.getPropertyValue(prop);
+        }
+        if (prop && typeof prop === 'object') {
+          for (let k in prop) {
+            originalStyle.setProperty(k, prop[k]);
+          }
+        } else if (typeof prop === 'string' && val !== undefined) {
+          originalStyle.setProperty(prop, val);
+        }
+        return this;
+      },
+      writable: true,
+      configurable: true
+    });
     dummyEl.show = function() { return this; };
     dummyEl.hide = function() { return this; };
     dummyEl.html = function() { return this; };
@@ -731,7 +1171,14 @@ if (typeof p5 !== 'undefined') {
         configurable: true
       });
     } else {
-      dummyEl.value = function() { return 0.5; };
+      Object.defineProperty(dummyEl, 'value', {
+        value: function(val) {
+          if (val === undefined) return "0.5";
+          return this;
+        },
+        writable: true,
+        configurable: true
+      });
     }
     
     dummyEl.input = function(callback) {
@@ -859,6 +1306,48 @@ if (typeof p5 !== 'undefined') {
   // 1. Safe Property Redefine Guard to prevent 'Cannot redefine property' errors
   const origDefineProperty = Object.defineProperty;
   Object.defineProperty = function(obj, prop, descriptor) {
+    if (obj === window && (prop === 'setup' || prop === 'draw')) {
+      if (descriptor && descriptor.get && !descriptor.set) {
+        let existingVal = window[prop];
+        let valStore = typeof existingVal === 'function' ? existingVal : undefined;
+        
+        const getP5Instance = () => {
+          if (window._p5Instance) return window._p5Instance;
+          if (window.p5 && window.p5.instance) return window.p5.instance;
+          if (typeof OriginalP5 !== 'undefined' && OriginalP5.instance) return OriginalP5.instance;
+          return null;
+        };
+        
+        const inst = getP5Instance();
+        if (inst && valStore) {
+          inst[prop] = valStore;
+        }
+        
+        const customDescriptor = {
+          configurable: true,
+          enumerable: true,
+          get: function() {
+            return valStore !== undefined ? valStore : descriptor.get();
+          },
+          set: function(val) {
+            valStore = val;
+            const inst2 = getP5Instance();
+            if (inst2) {
+              inst2[prop] = val;
+            }
+          }
+        };
+        try {
+          return origDefineProperty(obj, prop, customDescriptor);
+        } catch (e) {
+          const inst3 = getP5Instance();
+          if (inst3 && valStore) {
+            inst3[prop] = valStore;
+          }
+          return obj;
+        }
+      }
+    }
     try {
       return origDefineProperty(obj, prop, descriptor);
     } catch (e) {
@@ -936,7 +1425,13 @@ if (typeof p5 !== 'undefined') {
     font: 'sans-serif',
     d: 0,
     Pause: false,
-    textureOverlay: typeof window.textureOverlay !== 'undefined' ? window.textureOverlay : createGraphics(100, 100)
+    get textureOverlay() {
+      if (typeof window.textureOverlay !== 'undefined') return window.textureOverlay;
+      if (typeof createGraphics === 'function') {
+        try { return createGraphics(100, 100); } catch(e) {}
+      }
+      return null;
+    }
   };
 
   // Mock THREE.AudioLoader specifically even if THREE is defined
@@ -1500,6 +1995,18 @@ class SpringFilter:
         return self.x
 
 OVERRIDE_16_9_JS = """
+// Force WebGL to preserve drawing buffer for offscreen grab
+if (typeof HTMLCanvasElement !== 'undefined') {
+  const originalGetContext = HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext = function(type, attributes) {
+    if (type === 'webgl' || type === 'webgl2') {
+      attributes = attributes || {};
+      attributes.preserveDrawingBuffer = true;
+    }
+    return originalGetContext.call(this, type, attributes);
+  };
+}
+
 if (typeof p5 !== 'undefined') {
   // Force window dimensions to 1280x720 to bypass iframe size constraints
   Object.defineProperty(window, 'innerWidth', { get: function() { return 1280; }, set: function(val) {}, configurable: true });
@@ -1512,16 +2019,123 @@ if (typeof p5 !== 'undefined') {
     let targetWidth = 1280;
     let targetHeight = 720;
     
+    // 依據 window.customScalingMode 所設定的模式進行智慧縮放
+    let scale = 1.0;
+    let dx = 0;
+    let dy = 0;
+    let mode = window.customScalingMode || "auto";
+    if (w && h && w > 0 && h > 0) {
+      if (mode === "contain_height") {
+        scale = targetHeight / h;
+        dx = (targetWidth - w * scale) / 2;
+        dy = 0;
+      } else if (mode === "contain_width") {
+        scale = targetWidth / w;
+        dx = 0;
+        dy = (targetHeight - h * scale) / 2;
+      } else if (mode === "cover") {
+        scale = Math.max(targetWidth / w, targetHeight / h);
+        dx = (targetWidth / 2) - (w / 2 * scale);
+        dy = (targetHeight / 2) - (h / 2 * scale);
+      } else if (mode === "stretch") {
+        scale = null;
+        dx = 0;
+        dy = 0;
+        this._customScaleX = targetWidth / w;
+        this._customScaleY = targetHeight / h;
+      } else { // "auto"
+        let aspect = w / h;
+        if (aspect < 1.5) {
+          scale = targetHeight / h;
+          dx = (targetWidth - w * scale) / 2;
+          dy = 0;
+        } else {
+          scale = Math.max(targetWidth / w, targetHeight / h);
+          dx = (targetWidth / 2) - (w / 2 * scale);
+          dy = (targetHeight / 2) - (h / 2 * scale);
+        }
+      }
+    }
+    this._customScale = scale;
+    this._customDx = dx;
+    this._customDy = dy;
+    
+    let isGL = (val === 'webgl' || val === 'webgl2' || (typeof WEBGL !== 'undefined' && val === WEBGL));
+    this._isGL = isGL;
+    
     window.windowWidth = targetWidth;
     window.windowHeight = targetHeight;
     let canvas = originalCreateCanvas.call(this, targetWidth, targetHeight, val);
-    this.width = targetWidth;
-    this.height = targetHeight;
+    
+    // 覆寫 p5 實例與全域的寬高屬性，讓 sketch 的邊界計算代碼讀取到原始虛擬尺寸
+    this.width = w;
+    this.height = h;
     if (typeof window !== 'undefined') {
-      window.width = targetWidth;
-      window.height = targetHeight;
+      Object.defineProperty(window, 'width', { get: function() { return w; }, set: function(val) {}, configurable: true });
+      Object.defineProperty(window, 'height', { get: function() { return h; }, set: function(val) {}, configurable: true });
     }
     this.pixelDensity(1);
+    
+    // 立即對繪圖上下文套用縮放與平移，使 setup 內發生的繪圖操作亦能正確滿版與居中 (僅限非 WebGL)
+    if (!isGL) {
+      if (scale !== null) {
+        this.translate(dx, dy);
+        this.scale(scale);
+      } else {
+        this.scale(this._customScaleX || 1.0, this._customScaleY || 1.0);
+      }
+    }
+    
+    // 注入動態滿版矩陣縮放 (Dynamic Coordinates Scaling)
+    const pInst = this;
+    const wrapDraw = function() {
+      if (window.draw && !window._isDrawWrapped) {
+        const originalDraw = window.draw;
+        window.draw = function(...args) {
+          if (!isGL) {
+            pInst.push();
+            pInst.resetMatrix();
+            if (pInst._customScale !== undefined && pInst._customScale !== null) {
+              pInst.translate(pInst._customDx || 0, pInst._customDy || 0);
+              pInst.scale(pInst._customScale);
+            } else {
+              pInst.scale(pInst._customScaleX || 1.0, pInst._customScaleY || 1.0);
+            }
+          }
+          let res = originalDraw.apply(this, args);
+          if (!isGL) {
+            pInst.pop();
+          }
+          return res;
+        };
+        window._isDrawWrapped = true;
+      }
+      
+      if (pInst.draw && !pInst._isDrawWrapped) {
+        const originalDraw = pInst.draw;
+        pInst.draw = function(...args) {
+          if (!isGL) {
+            pInst.push();
+            pInst.resetMatrix();
+            if (pInst._customScale !== undefined && pInst._customScale !== null) {
+              pInst.translate(pInst._customDx || 0, pInst._customDy || 0);
+              pInst.scale(pInst._customScale);
+            } else {
+              pInst.scale(pInst._customScaleX || 1.0, pInst._customScaleY || 1.0);
+            }
+          }
+          let res = originalDraw.apply(this, args);
+          if (!isGL) {
+            pInst.pop();
+          }
+          return res;
+        };
+        pInst._isDrawWrapped = true;
+      }
+    };
+    wrapDraw();
+    setTimeout(wrapDraw, 0);
+    
     if (canvas && canvas.elt) {
       canvas.elt.style.setProperty('position', 'absolute', 'important');
       canvas.elt.style.setProperty('left', '50%', 'important');
@@ -1532,10 +2146,9 @@ if (typeof p5 !== 'undefined') {
       
       canvas.elt.style.setProperty('width', '100vw', 'important');
       canvas.elt.style.setProperty('height', '100vh', 'important');
-      canvas.elt.style.setProperty('max-width', '100%', 'important');
-      canvas.elt.style.setProperty('max-height', '100%', 'important');
-      canvas.elt.style.setProperty('object-fit', 'contain', 'important');
-      canvas.elt.style.setProperty('aspect-ratio', '16/9', 'important');
+      canvas.elt.style.setProperty('max-width', 'none', 'important');
+      canvas.elt.style.setProperty('max-height', 'none', 'important');
+      canvas.elt.style.setProperty('object-fit', 'cover', 'important');
       canvas.elt.style.setProperty('margin', '0', 'important');
     }
     return canvas;
@@ -1572,10 +2185,9 @@ if (typeof p5 !== 'undefined') {
       canvas.elt.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
       canvas.elt.style.setProperty('width', '100vw', 'important');
       canvas.elt.style.setProperty('height', '100vh', 'important');
-      canvas.elt.style.setProperty('max-width', '100%', 'important');
-      canvas.elt.style.setProperty('max-height', '100%', 'important');
-      canvas.elt.style.setProperty('object-fit', 'contain', 'important');
-      canvas.elt.style.setProperty('aspect-ratio', '16/9', 'important');
+      canvas.elt.style.setProperty('max-width', 'none', 'important');
+      canvas.elt.style.setProperty('max-height', 'none', 'important');
+      canvas.elt.style.setProperty('object-fit', 'cover', 'important');
       canvas.elt.style.setProperty('margin', '0', 'important');
     }
     return canvas;
@@ -1665,10 +2277,50 @@ if (typeof p5 !== 'undefined') {
     };
   }
 
+  // Intercept the p5 start sequence to bind active instance before setup or preload runs
+  if (p5.prototype._start) {
+    const originalStart = p5.prototype._start;
+    p5.prototype._start = function(...args) {
+      window._p5Instance = this;
+      return originalStart.apply(this, args);
+    };
+  }
+
+  // Intercept the p5 background function to dynamically update the canvas CSS background color
+  const originalBackground = p5.prototype.background;
+  p5.prototype.background = function(...args) {
+    let res = originalBackground.apply(this, args);
+    if (this.canvas) {
+      try {
+        let col = this.color(...args);
+        if (col && col.levels) {
+          let r = col.levels[0];
+          let g = col.levels[1];
+          let b = col.levels[2];
+          let a = col.levels[3] / 255;
+          let colorStr = `rgba(${r}, ${g}, ${b}, ${a})`;
+          this.canvas.style.setProperty('background-color', colorStr, 'important');
+        }
+      } catch(e) {}
+    }
+    return res;
+  };
+
   // Intercept the p5 constructor to capture the current active p5 instance
   const OriginalP5 = window.p5;
-  const WrappedP5 = function(...args) {
-    const inst = new OriginalP5(...args);
+  const WrappedP5 = function(sketch, node, ...args) {
+    let targetNode = node;
+    if (typeof node === 'string') {
+      let el = document.getElementById(node);
+      if (!el) {
+        console.log(`[P5_COMPAT] Target container ID "${node}" not found, creating a dummy div in body.`);
+        el = document.createElement('div');
+        el.id = node;
+        document.body.appendChild(el);
+      }
+      targetNode = el;
+    }
+    const inst = new OriginalP5(sketch, targetNode, ...args);
     window._p5Instance = inst;
     return inst;
   };
@@ -2923,6 +3575,11 @@ class StandaloneInjectorApp(QMainWindow):
         config_box.addWidget(fps_lbl)
         config_box.addWidget(self.fps_select)
 
+        self.native_4k_cb = QCheckBox("原生 4K 畫質 (關閉 1080p 降採樣)", tab)
+        self.native_4k_cb.setChecked(False)
+        self.native_4k_cb.setToolTip("啟用後將關閉內部的 1080p 渲染與後製降採樣限制，使用原生 4K (3840x2160) 進行渲染與 VJ 特效處理，畫面將極度銳利與清晰，但對 GPU 和記憶體效能要求極高。")
+        config_box.addWidget(self.native_4k_cb)
+
         layout.addLayout(config_box)
 
         # CPU Performance mode selector
@@ -3058,7 +3715,7 @@ class StandaloneInjectorApp(QMainWindow):
         self.fx_cb_tension_overlay.setToolTip("衍生通道 4: 張力互斥 (Tension Overlay) — 不協和和弦與畫面產生數學互斥 (Exclusion) 撞色翻轉")
 
         self.fx_cb_photosensitive_safe = QCheckBox("光敏健康防護", tab)
-        self.fx_cb_photosensitive_safe.setChecked(False)
+        self.fx_cb_photosensitive_safe.setChecked(True)
         self.fx_cb_photosensitive_safe.setToolTip("光敏健康保護與防癲癇機制 — 限制高頻閃爍、劇烈色彩翻轉與全螢幕高光刺激，提供兼顧畫面美學與醫療安全的視覺感受")
 
         for cb in [self.fx_cb_data_mosh, self.fx_cb_sedimentation, self.fx_cb_vector_scan, self.fx_cb_temporal_fractal, self.fx_cb_phase_slit, self.fx_cb_centroid_glitch, self.fx_cb_vignette_pulse, self.fx_cb_tension_overlay, self.fx_cb_photosensitive_safe]:
@@ -3435,7 +4092,101 @@ class StandaloneInjectorApp(QMainWindow):
             self.checked_presets.discard(name)
 
 
-    def get_html_content(self, code, custom_css="", custom_html="", inline_assets=None, for_thumbnail=False, sketch_id=None):
+    def get_html_content(self, code, custom_css="", custom_html="", inline_assets=None, for_thumbnail=False, sketch_id=None, scaling_mode="auto", for_rendering=False):
+        noloop_js = ""
+        if for_rendering or for_thumbnail:
+            noloop_js = """
+                (function() {
+                  let proto = null;
+                  if (typeof OriginalP5 !== 'undefined' && OriginalP5.prototype && OriginalP5.prototype._runLifecycleHook) {
+                    proto = OriginalP5.prototype;
+                  } else if (typeof p5 !== 'undefined' && p5.prototype && p5.prototype._runLifecycleHook) {
+                    proto = p5.prototype;
+                  }
+                  
+                  if (proto) {
+                    if (window.jsLogs) window.jsLogs.push("[DEBUG_NOLOOP] Hooking proto._runLifecycleHook");
+                    const originalHook = proto._runLifecycleHook;
+                    proto._runLifecycleHook = function(name) {
+                      if (window.jsLogs) {
+                        window.jsLogs.push("[DEBUG_NOLOOP] _runLifecycleHook called: " + name + 
+                                            ", window.setup type: " + typeof window.setup + 
+                                            ", this.setup type: " + typeof this.setup + 
+                                            ", window.draw type: " + typeof window.draw + 
+                                            ", this.draw type: " + typeof this.draw);
+                      }
+                      if (name === 'presetup') {
+                        const setupFunc = this.setup || window.setup;
+                        if (typeof setupFunc === 'function') {
+                          const originalSetup = setupFunc;
+                          const inst = this;
+                          const wrappedSetup = function() {
+                            if (window.jsLogs) window.jsLogs.push("[DEBUG_NOLOOP] instance setup started via lifecycle hook.");
+                            originalSetup.call(inst);
+                            if (window.jsLogs) window.jsLogs.push("[DEBUG_NOLOOP] instance setup originalSetup finished via lifecycle hook.");
+                            if (typeof noLoop === 'function') {
+                              noLoop();
+                              if (window.jsLogs) window.jsLogs.push("[DEBUG_NOLOOP] noLoop() called globally.");
+                            } else if (typeof inst.noLoop === 'function') {
+                              inst.noLoop();
+                              if (window.jsLogs) window.jsLogs.push("[DEBUG_NOLOOP] noLoop() called on instance.");
+                            }
+                          };
+                          if (typeof this.setup === 'function') {
+                            this.setup = wrappedSetup;
+                          }
+                          if (typeof window.setup === 'function') {
+                            window.setup = wrappedSetup;
+                          }
+                        }
+                      }
+                      return originalHook.call(this, name);
+                    };
+                  } else {
+                    if (window.jsLogs) window.jsLogs.push("[DEBUG_NOLOOP] Fallback: proto._runLifecycleHook not found, wrapping window.setup directly.");
+                    // Fallback to global wrapping
+                    const wrapGlobalSetup = () => {
+                      if (typeof window.setup === 'function') {
+                        const originalSetup = window.setup;
+                        window.setup = function() {
+                          originalSetup();
+                          if (typeof noLoop === 'function') {
+                            noLoop();
+                          }
+                        };
+                      }
+                    };
+                    if (document.readyState === 'loading') {
+                      document.addEventListener('DOMContentLoaded', wrapGlobalSetup);
+                    } else {
+                      wrapGlobalSetup();
+                    }
+                  }
+
+                  // Restore readyState and trigger synthetic load event to initialize p5.js
+                  const triggerLoad = () => {
+                    try {
+                      delete Document.prototype.readyState;
+                    } catch(e) {}
+                    try {
+                      delete document.readyState;
+                    } catch(e) {}
+                    
+                    if (window.jsLogs) {
+                      window.jsLogs.push("[DEBUG_NOLOOP] Inside triggerLoad.");
+                    }
+                    window.dispatchEvent(new Event('load'));
+                  };
+
+                  if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                      setTimeout(triggerLoad, 50);
+                    });
+                  } else {
+                    setTimeout(triggerLoad, 50);
+                  }
+                })();
+            """
         custom_html = self.cache_and_localize_scripts(custom_html or "")
         if not sketch_id:
             sketch_id = getattr(self, "current_preset_id", None)
@@ -3491,10 +4242,37 @@ class StandaloneInjectorApp(QMainWindow):
 
         script_tag = f'<script type="module">{code}\n{BIND_MODULE_CALLBACKS_JS}</script>' if is_module else f'<script>{code}</script>'
 
+        early_error_js = """
+              <script>
+                window.jsErrors = [];
+                window.onerror = function(message, source, lineno) {
+                  window.jsErrors.push({message: String(message), source: String(source), lineno: Number(lineno)});
+                  return false;
+                };
+                window.addEventListener('unhandledrejection', function(event) {
+                  window.jsErrors.push({message: "Unhandled Rejection: " + String(event.reason), source: "promise", lineno: 0});
+                });
+                window.jsLogs = [];
+                window.originalLog = console.log;
+                console.log = function(...args) {
+                  if (typeof window.originalLog !== 'undefined') {
+                    window.originalLog.apply(console, args);
+                  }
+                  window.jsLogs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+                };
+                // Prevent p5.js from auto-starting early due to QWebEngineView readyState reuse
+                Object.defineProperty(Document.prototype, 'readyState', {
+                  get: function() { return 'loading'; },
+                  configurable: true
+                });
+              </script>
+        """
+
         if for_thumbnail:
             html_template = f"""<!DOCTYPE html>
             <html>
             <head>
+              {early_error_js}
               <meta charset="utf-8">
               <style>
                 body {{ margin: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; }}
@@ -3576,6 +4354,7 @@ class StandaloneInjectorApp(QMainWindow):
               <script src="custom_visuals/libs/rampensau.js"></script>
               <script src="custom_visuals/libs/chroma.min.js"></script>
               <script>
+                window.customScalingMode = "{scaling_mode}";
                 {OVERRIDE_16_9_JS}
                 {MOCK_P5_JS}
               </script>
@@ -3589,6 +4368,7 @@ class StandaloneInjectorApp(QMainWindow):
             html_template = f"""<!DOCTYPE html>
             <html>
             <head>
+              {early_error_js}
               <meta charset="utf-8">
               <style>
                 body {{ margin: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; }}
@@ -3670,6 +4450,7 @@ class StandaloneInjectorApp(QMainWindow):
               <script src="custom_visuals/libs/rampensau.js"></script>
               <script src="custom_visuals/libs/chroma.min.js"></script>
               <script>
+                window.customScalingMode = "{scaling_mode}";
                 {OVERRIDE_16_9_JS}
                 
                 // Inject CSS to hard-hide any leftover GUI containers
@@ -3855,12 +4636,7 @@ class StandaloneInjectorApp(QMainWindow):
 
                 {MOCK_P5_JS}
                 {asset_override_js}
-                if (typeof setup === 'function') {{
-                  const originalSetup = setup;
-                  setup = function() {{ originalSetup(); noLoop(); }};
-                }} else {{
-                  setup = function() {{ noLoop(); }};
-                }}
+                {noloop_js}
               </script>
             </head>
             <body>
@@ -3915,6 +4691,21 @@ class StandaloneInjectorApp(QMainWindow):
             new QWebChannel(qt.webChannelTransport, function (channel) {
                 window.pyBridge = channel.objects.pyBridge;
                 
+                // Report any cached errors
+                if (window.jsErrors) {
+                    window.jsErrors.forEach(function(err) {
+                        window.pyBridge.report_js_error(err.message, err.source, err.lineno);
+                    });
+                    window.jsErrors = [];
+                }
+                // Report any cached logs
+                if (window.jsLogs) {
+                    window.jsLogs.forEach(function(msg) {
+                        window.pyBridge.report_js_log(msg);
+                    });
+                    window.jsLogs = [];
+                }
+                
                 window.onerror = function(message, source, lineno) {
                     if (window.pyBridge) {
                         window.pyBridge.report_js_error(String(message), String(source), Number(lineno));
@@ -3922,9 +4713,10 @@ class StandaloneInjectorApp(QMainWindow):
                     return false;
                 };
                 
-                const originalLog = console.log;
                 console.log = function(...args) {
-                    originalLog.apply(console, args);
+                    if (typeof window.originalLog !== 'undefined') {
+                        window.originalLog.apply(console, args);
+                    }
                     if (window.pyBridge) {
                         window.pyBridge.report_js_log(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
                     }
@@ -4187,8 +4979,10 @@ class StandaloneInjectorApp(QMainWindow):
         w, h = 300, 300
         clipper = QWidget(None)
         clipper.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowTransparentForInput)
-        clipper.setGeometry(-9999, -9999, w, h)
+        clipper.setGeometry(0, 0, w, h)
+        clipper.setWindowOpacity(0.01)
         clipper.show()
+        clipper.lower()
         
         view = QWebEngineView(clipper)
         def log_thumb_msg(level, message, line_num):
@@ -4858,9 +5652,41 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
     if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }
     p5.prototype.get = function(...args) {
         if (this.width === 0 || this.height === 0) {
-            return createGraphics(10, 10);
+            try {
+                if (typeof this.createGraphics === 'function') {
+                    return this.createGraphics(10, 10);
+                } else if (typeof createGraphics === 'function') {
+                    return createGraphics(10, 10);
+                }
+            } catch(e) {}
+            try {
+                if (typeof this.createImage === 'function') {
+                    return this.createImage(1, 1);
+                }
+            } catch(e) {}
+            return {
+                width: 1,
+                height: 1,
+                pixels: [0, 0, 0, 0],
+                loadPixels: function() {},
+                updatePixels: function() {},
+                get: function() { return [0, 0, 0, 255]; },
+                vertices: []
+            };
         }
-        return window._origGet.apply(this, args);
+        try {
+            return window._origGet.apply(this, args);
+        } catch(e) {
+            return {
+                width: 1,
+                height: 1,
+                pixels: [0, 0, 0, 0],
+                loadPixels: function() {},
+                updatePixels: function() {},
+                get: function() { return [0, 0, 0, 255]; },
+                vertices: []
+            };
+        }
     };
 }
 """
@@ -4900,8 +5726,8 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
         <head>
           <meta charset="utf-8">
           <style>
-            html, body {{ margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }}
-            canvas {{ display: block; }}
+            html, body {{ margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; }}
+            canvas {{ display: block !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; object-fit: cover !important; }}
             /*CUSTOM_CSS_PLACEHOLDER*/
           </style>
           <script>
@@ -4961,6 +5787,7 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
           <script src="https://cdn.jsdelivr.net/npm/polybooljs@1.2.2/dist/polybool.min.js"></script>
           <script>
             /*ASSET_INTERCEPTOR_PLACEHOLDER*/
+            window.customScalingMode = "{getattr(self, 'current_scaling_mode', 'auto')}";
             {OVERRIDE_16_9_JS}
             {MOCK_P5_JS}
             
@@ -5463,6 +6290,7 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
             self.custom_css = data.get("custom_css", "")
             self.custom_html = data.get("custom_html", "")
             self.inline_assets = data.get("inline_assets", {})
+            self.current_scaling_mode = data.get("scaling_mode", "auto")
             
             self.cb_confirm.setEnabled(True)
             self.cb_confirm.setChecked(True)
@@ -5575,7 +6403,11 @@ function draw() {
             vis_w = vis.get("storyboard_weight", 50)
             energy_diff = abs(vis_w - target_w)
             
-            return tag_match_count * 10.0 - (energy_diff / 1.5)
+            # 引入隨機微調值 (Random Wobble) 以增加候選多樣性，避免完全相同的模組總是被優先選中
+            import random
+            wobble = random.uniform(-12.0, 12.0)
+            
+            return tag_match_count * 10.0 - (energy_diff / 1.5) + wobble
 
         selected_keys = set()
         for sec_name in section_types:
@@ -5584,12 +6416,16 @@ function draw() {
                 score = get_suitability_score(vis, sec_name)
                 scored.append((score, vis.get("used_count", 0), vis["_filename_key"]))
                 
-            # High suitability, low used_count
-            scored.sort(key=lambda x: (x[0], -x[1]), reverse=True)
+            # 1. 首先依適合度分數由高到低進行初步排序
+            scored.sort(key=lambda x: x[0], reverse=True)
             
-            top_n = max(3, len(scored) // 4)
-            candidates = scored[:top_n]
-            candidates.sort(key=lambda x: x[1]) # Sort by used_count ascending
+            # 2. 保留高契合度的模組候選池（過濾掉最不契合的 25% 模組）
+            keep_n = max(6, int(len(scored) * 0.75))
+            keep_n = min(keep_n, len(scored))
+            candidates = scored[:keep_n]
+            
+            # 3. 在契合的候選池中，以「使用次數最少」優先排序；使用次數相同時，以「適合度分數最高」優先
+            candidates.sort(key=lambda x: (x[1], -x[0]))
             
             num_picks = min(2, len(candidates))
             for k in range(num_picks):
@@ -5659,7 +6495,15 @@ function draw() {
         failed_files = []
         
         total_songs = len(audio_files)
+        import time
+        self.is_batch_rendering = True
+        self.batch_total_songs = total_songs
+        self.batch_start_time = time.time()
+        self.batch_completed_frames = 0
+        self._batch_used_themes = []  # 追蹤已使用的視覺主題以確保跨曲目多樣性
+        
         for index, audio_path in enumerate(audio_files):
+            self.batch_current_idx = index
             if self.render_aborted:
                 self.log_to_console("批次渲染被使用者中止。", is_err=True)
                 break
@@ -5711,6 +6555,30 @@ function draw() {
             name, _ = os.path.splitext(filename)
             output_file = os.path.join(out_dir, f"{name}.mp4")
             
+            # If the video already exists and is valid (> 1MB), verify duration consistency
+            if os.path.exists(output_file) and os.path.getsize(output_file) > 1024 * 1024:
+                import subprocess
+                def get_duration(file_path):
+                    try:
+                        cmd = [
+                            'ffprobe', '-v', 'error', '-show_entries', 'format=duration',
+                            '-of', 'default=noprint_wrappers=1:nokey=1', file_path
+                        ]
+                        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                        return float(res.stdout.strip())
+                    except Exception:
+                        return 0.0
+                
+                video_dur = get_duration(output_file)
+                audio_dur = get_duration(audio_path)
+                
+                if video_dur > 0 and audio_dur > 0 and abs(video_dur - audio_dur) <= 1.0:
+                    self.log_to_console(f"【跳過】偵測到已完成的影片檔案（長度一致：{video_dur:.1f}秒 / {audio_dur:.1f}秒），自動跳過: {filename}")
+                    success_count += 1
+                    continue
+                else:
+                    self.log_to_console(f"⚠️ 偵測到影片檔案，但長度不一致（影片 {video_dur:.1f}秒 vs 音訊 {audio_dur:.1f}秒），將重新渲染: {filename}", is_err=True)
+            
             # Increment used count
             video_id = f"{name}.mp4"
             for vp in selected_presets:
@@ -5760,23 +6628,31 @@ function draw() {
                 'pixel_art': self.fx_cb_pixel_art.isChecked(),
                 'handheld_camera': self.fx_cb_handheld_camera.isChecked(),
                 'stylized_fade': self.fx_cb_stylized_fade.isChecked(),
-                'zoom_pulse': self.fx_cb_zoom_pulse.isChecked()
+                'zoom_pulse': self.fx_cb_zoom_pulse.isChecked(),
+                'bypass_downscale': self.native_4k_cb.isChecked()
             }
             
             # Step 2: Trigger frame-by-frame rendering with show_popups=False and is_batch=True
             success = self.render_mv_frame_by_frame(
                 audio_path, genre, visuals_data, output_file, w, h, fps, trans_sec, fx_prob, fx_flags,
-                show_popups=False, is_batch=True
+                show_popups=False, is_batch=True,
+                used_themes=getattr(self, '_batch_used_themes', None)
             )
             
             if success:
                 success_count += 1
+                # 追蹤已使用的視覺主題以確保跨曲目多樣性
+                if hasattr(self, '_last_post_processor') and self._last_post_processor:
+                    used_t = self._last_post_processor.selected_theme
+                    self._batch_used_themes.append(used_t)
+                    self.log_to_console(f"◆ 視覺主題: {used_t} | 累計已用: {self._batch_used_themes}")
                 self.log_to_console(f"批次處理成功: {filename} -> {output_file}")
             else:
                 self.log_to_console(f"批次處理失敗或被中止: {filename}", is_err=True)
                 failed_files.append((filename, "渲染失敗或被使用者中止"))
                 
         # Batch Completed
+        self.is_batch_rendering = False
         self.set_render_buttons_enabled(True)
         self.btn_cancel_render.setEnabled(False)
         self.status_lbl.setText("批次渲染結束")
@@ -5847,6 +6723,10 @@ function draw() {
         self.progress_bar.setValue(0)
         self.status_lbl.setText("正在分析音軌特徵與進行分鏡排程...")
         
+        import time
+        self.is_batch_rendering = False
+        self.single_start_time = time.time()
+        
         # Increment used_count for selected presets
         save_dir = os.path.join(workspace_dir, "custom_visuals")
         video_id = os.path.basename(output_file) if output_file else "unknown_single.mp4"
@@ -5898,7 +6778,8 @@ function draw() {
                 'pixel_art': self.fx_cb_pixel_art.isChecked(),
                 'handheld_camera': self.fx_cb_handheld_camera.isChecked(),
                 'stylized_fade': self.fx_cb_stylized_fade.isChecked(),
-                'zoom_pulse': self.fx_cb_zoom_pulse.isChecked()
+                'zoom_pulse': self.fx_cb_zoom_pulse.isChecked(),
+                'bypass_downscale': self.native_4k_cb.isChecked()
             }
         
         # We will do audio analysis on worker thread, then perform frame captures on main loop
@@ -5907,7 +6788,7 @@ function draw() {
     def cancel_mv_rendering(self):
         self.render_aborted = True
 
-    def render_mv_frame_by_frame(self, audio_path, genre, visuals_data, output_file, w, h, fps, trans_sec, fx_prob=1.0, fx_flags=None, show_popups=True, is_batch=False):
+    def render_mv_frame_by_frame(self, audio_path, genre, visuals_data, output_file, w, h, fps, trans_sec, fx_prob=1.0, fx_flags=None, show_popups=True, is_batch=False, used_themes=None):
         if fx_flags is None:
             fx_flags = {
                 'spatial_warping': True,
@@ -5928,7 +6809,7 @@ function draw() {
                 'centroid_glitch': True,
                 'vignette_pulse': True,
                 'tension_overlay': True,
-                'photosensitive_safe': False,
+                'photosensitive_safe': True,
                 # 自訂擴充特效
                 'thermal_vision': True,
                 'scanline_glitch': True,
@@ -5937,7 +6818,8 @@ function draw() {
                 'pixel_art': True,
                 'handheld_camera': True,
                 'stylized_fade': True,
-                'zoom_pulse': True
+                'zoom_pulse': True,
+                'bypass_downscale': getattr(self, 'native_4k_cb', None).isChecked() if getattr(self, 'native_4k_cb', None) is not None else False
             }
         # Step 1: Analyze audio
         try:
@@ -5962,7 +6844,7 @@ function draw() {
         # Cap internal rendering resolution to 1080p to prevent GPU driver/VRAM crashes
         # and hardware thermal reboots on high-res output (e.g. 4K).
         render_w, render_h = w, h
-        if w > 1920 or h > 1080:
+        if (w > 1920 or h > 1080) and not self.native_4k_cb.isChecked():
             aspect_ratio = w / h
             if aspect_ratio >= 1.0:
                 render_w = 1920
@@ -6143,8 +7025,9 @@ function draw() {
         _fx_active_on_this_beat = [True]  # State variable for beat-locked probability gating
 
         # === Post-processing pipeline using new shared PostProcessor ===
-        from post_processor import PostProcessor
-        _post_processor = PostProcessor(seed_string=audio_path)
+        from post_processor import PostProcessor, apply_advanced_transition
+        _post_processor = PostProcessor(seed_string=audio_path, genre=resolved_genre, used_themes=used_themes)
+        self._last_post_processor = _post_processor  # 暴露給批次迴圈以追蹤已使用主題
         _post_fx_enabled = [True]  # Mutable for memory-based auto-disable
 
         # Fix 6: Crash logging — write to file alongside output video
@@ -6215,8 +7098,10 @@ function draw() {
             # to prevent macOS CALayer culling (black grab frames), while remaining invisible behind other widgets.
             clipper = QWidget(None)
             clipper.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowTransparentForInput)
-            clipper.setGeometry(-9999, -9999, render_w, render_h)
+            clipper.setGeometry(0, 0, render_w, render_h)
+            clipper.setWindowOpacity(0.01)
             clipper.show()
+            clipper.lower()
             _current_clipper[0] = clipper
 
             # Force 1x scale factor to eliminate Retina resize overhead
@@ -6262,8 +7147,8 @@ function draw() {
         loadedA = None
         loadedB = None
 
-        def get_html_content(code, custom_css="", custom_html="", inline_assets=None):
-            return self.get_html_content(code, custom_css, custom_html, inline_assets)
+        def get_html_content(code, custom_css="", custom_html="", inline_assets=None, scaling_mode="auto"):
+            return self.get_html_content(code, custom_css, custom_html, inline_assets, scaling_mode=scaling_mode, for_rendering=True)
 
         def run_js_safely(view, js_code, is_first_frame=False):
             attempts = 15 if is_first_frame else 3
@@ -6492,6 +7377,67 @@ function draw() {
         else:
             self.log_to_console("🌡️ CPU 控溫模式：啟用過熱保護機制，每 100 幀自動偵測系統溫度。")
         
+        def update_render_status_label(frame_idx):
+            import time
+            p_curr = (frame_idx + 1) / total_frames
+            percent = int(p_curr * 100)
+            
+            if getattr(self, 'is_batch_rendering', False):
+                batch_idx = getattr(self, 'batch_current_idx', 0)
+                total_songs = getattr(self, 'batch_total_songs', 1)
+                batch_start = getattr(self, 'batch_start_time', None)
+                completed_frames = getattr(self, 'batch_completed_frames', 0)
+                
+                eta_str = ""
+                speed_str = ""
+                if batch_start is not None:
+                    elapsed = time.time() - batch_start
+                    completed_songs_equivalent = batch_idx + p_curr
+                    if completed_songs_equivalent > 0.01 and elapsed > 2.0:
+                        eta_sec = ((total_songs - completed_songs_equivalent) / completed_songs_equivalent) * elapsed
+                        if eta_sec > 3600:
+                            h_val = int(eta_sec // 3600)
+                            m_val = int((eta_sec % 3600) // 60)
+                            s_val = int(eta_sec % 60)
+                            eta_str = f" | 預估剩餘: {h_val}小時{m_val}分{s_val}秒"
+                        else:
+                            m_val = int(eta_sec // 60)
+                            s_val = int(eta_sec % 60)
+                            eta_str = f" | 預估剩餘: {m_val}分{s_val}秒"
+                        
+                        total_rendered = completed_frames + (frame_idx + 1)
+                        fps_rate = total_rendered / elapsed
+                        speed_str = f" ({fps_rate:.1f} 幀/秒)"
+                
+                song_name = os.path.basename(audio_path)
+                status_text = (
+                    f"批次渲染 ({batch_idx + 1}/{total_songs}) - {song_name} | "
+                    f"當前進度: {percent}% ({frame_idx + 1}/{total_frames} 幀){speed_str}{eta_str}"
+                )
+            else:
+                single_start = getattr(self, 'single_start_time', None)
+                eta_str = ""
+                speed_str = ""
+                if single_start is not None:
+                    elapsed = time.time() - single_start
+                    if p_curr > 0.01 and elapsed > 2.0:
+                        eta_sec = ((1.0 - p_curr) / p_curr) * elapsed
+                        if eta_sec > 3600:
+                            h_val = int(eta_sec // 3600)
+                            m_val = int((eta_sec % 3600) // 60)
+                            s_val = int(eta_sec % 60)
+                            eta_str = f" | 預估剩餘: {h_val}小時{m_val}分{s_val}秒"
+                        else:
+                            m_val = int(eta_sec // 60)
+                            s_val = int(eta_sec % 60)
+                            eta_str = f" | 預估剩餘: {m_val}分{s_val}秒"
+                        
+                        fps_rate = (frame_idx + 1) / elapsed
+                        speed_str = f" ({fps_rate:.1f} 幀/秒)"
+                status_text = f"影片實時串流編碼中: {percent}% ({frame_idx + 1}/{total_frames} 幀){speed_str}{eta_str}"
+                
+            self.status_lbl.setText(status_text)
+
         just_loaded_a = True
         just_loaded_b = True
         
@@ -6655,10 +7601,17 @@ function draw() {
                 # Rotate to next candidate visual for this section
                 candidates = candidates_by_sec.get(sec_name, sorted_visuals)
                 if len(candidates) > 1:
+                    import random
                     if sec_name not in rotation_visual_idx:
-                        rotation_visual_idx[sec_name] = 0
-                    rotation_visual_idx[sec_name] = (rotation_visual_idx[sec_name] + 1) % len(candidates)
-                    new_vis = candidates[rotation_visual_idx[sec_name]]
+                        rotation_visual_idx[sec_name] = random.randint(0, len(candidates) - 1)
+                    
+                    prev_idx = rotation_visual_idx[sec_name]
+                    next_idx = prev_idx
+                    # 隨機挑選下一個視覺模組，且不與當前重複
+                    while next_idx == prev_idx:
+                        next_idx = random.randint(0, len(candidates) - 1)
+                    rotation_visual_idx[sec_name] = next_idx
+                    new_vis = candidates[next_idx]
                     if current_rotation_vis is None or new_vis['name'] != current_rotation_vis['name']:
                         prev_rotation_vis = current_rotation_vis
                         current_rotation_vis = new_vis
@@ -6700,7 +7653,8 @@ function draw() {
                     active_vis['code'],
                     custom_css=active_vis.get('custom_css', ''),
                     custom_html=active_vis.get('custom_html', ''),
-                    inline_assets=active_vis.get('inline_assets', {})
+                    inline_assets=active_vis.get('inline_assets', {}),
+                    scaling_mode=active_vis.get('scaling_mode', 'auto')
                 ), get_local_base_url())
                 ev = QEventLoop()
                 
@@ -6740,7 +7694,8 @@ function draw() {
                     other_vis['code'],
                     custom_css=other_vis.get('custom_css', ''),
                     custom_html=other_vis.get('custom_html', ''),
-                    inline_assets=other_vis.get('inline_assets', {})
+                    inline_assets=other_vis.get('inline_assets', {}),
+                    scaling_mode=other_vis.get('scaling_mode', 'auto')
                 ), get_local_base_url())
                 ev = QEventLoop()
                 
@@ -6781,7 +7736,7 @@ function draw() {
             audio_feats = get_full_telemetry_at_time(t)
             chord_hex = audio_feats.get('chord_color_hex', '#0a0a0c')
             
-            ps_safe = str(fx_flags.get('photosensitive_safe', False)).lower()
+            ps_safe = "true"  # Mandatory photosensitive protection
             js = f"window.sectionName='{sec_name}';window.sectionProgress={sec_progress:.4f};window.currentChordColor='{chord_hex}';window.photosensitiveSafe={ps_safe};window.setFrameParams({t}, {str(is_beat).lower()}, {beat_energy}, {a_low}, {a_mid}, {a_high})"
             
             # Draw A
@@ -6826,7 +7781,31 @@ function draw() {
                 if img_w_b != render_w or img_h_b != render_h:
                     pilB = pilB.resize((render_w, render_h), Image.Resampling.BILINEAR)
                 
-                img_to_stream = Image.blend(pilB, pilA, trans_progress)
+                # Determine transition type dynamically based on the section and energy
+                norm_sec = sec_name.lower().strip()
+                if 'intro' in norm_sec or 'outro' in norm_sec:
+                    chosen_trans = 'luma_wipe'
+                elif 'verse' in norm_sec:
+                    chosen_trans = 'displacement'
+                elif 'chorus' in norm_sec or 'drop' in norm_sec:
+                    chosen_trans = 'zoom_blur' if (is_beat or beat_energy > 0.4) else 'glitch'
+                elif 'build' in norm_sec:
+                    chosen_trans = 'glitch'
+                elif 'bridge' in norm_sec:
+                    chosen_trans = 'slide_push'
+                else:
+                    chosen_trans = 'displacement'
+
+                # Intensity of the transition is modulated by beat energy
+                trans_intensity = 0.4 + 0.6 * beat_energy
+
+                img_to_stream = apply_advanced_transition(
+                    pilB, pilA, trans_progress,
+                    trans_type=chosen_trans,
+                    intensity=trans_intensity,
+                    is_beat=is_beat,
+                    beat_energy=beat_energy
+                )
                 del pixB, imgB, bufferB, pilB  # Fix 2: Explicit cleanup
             else:
                 img_to_stream = pilA
@@ -6902,7 +7881,7 @@ function draw() {
                     self.log_to_console("⚠️ 偵測到 macOS 系統高溫警告！進入過熱保護模式，強制暫停 10 秒冷卻...", is_err=True)
                     self.status_lbl.setText("⚠️ CPU 過熱保護中，強制冷卻 10 秒...")
                     _time_mod.sleep(10.0)
-                    self.status_lbl.setText(f"影片實時串流編碼中: {int((i+1)/total_frames*100)}% ({i+1} / {total_frames} 幀)")
+                    update_render_status_label(i)
                     render_delay = 0.100  # 冷卻後仍保持較慢的渲染速度
                 elif thermal_speed_limit < 80:
                     self.log_to_console(f"⚠️ 偵測到 CPU 受到熱降頻限制 ({thermal_speed_limit}%)！將影格間距調大至 50ms 防止過熱...", is_err=True)
@@ -6942,11 +7921,14 @@ function draw() {
                     gc.collect()
 
             self.progress_bar.setValue(i + 1)
-            self.status_lbl.setText(f"影片實時串流編碼中: {int((i+1)/total_frames*100)}% ({i+1} / {total_frames} 幀)")
+            update_render_status_label(i)
             if i % 20 == 0:
                 self.log_to_console(f"已發送 {i+1} / {total_frames} 影格到編碼器...")
 
         # Step 3: Close pipeline and finalize
+        if getattr(self, 'is_batch_rendering', False):
+            self.batch_completed_frames += total_frames
+            
         self.status_lbl.setText("影格發送完畢，正在等待編碼器完成...")
         self.log_to_console("正在等待 FFmpeg 寫入佇列清空...")
         
@@ -7474,6 +8456,10 @@ function draw() {
             dialog.exec()
         elif mode_dlg.mode == "manual":
             self.start_manual_cleanup()
+        elif mode_dlg.mode == "black_screen":
+            from black_screen_detector import BlackScreenDetectorDialog
+            dialog = BlackScreenDetectorDialog(self)
+            dialog.exec()
 
     def start_manual_cleanup(self):
         progress_path = os.path.join(workspace_dir, "batch_test_progress.json")
@@ -7933,7 +8919,7 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
       <meta charset="utf-8">
       <style>
         body { margin: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; }
-        canvas { display: block !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; width: 100vw !important; height: 100vh !important; max-width: 100% !important; max-height: 100% !important; object-fit: contain !important; }
+        canvas { display: block !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; object-fit: cover !important; }
         CUSTOM_CSS_PLACEHOLDER
         /* Enforce final centering in case custom_css overwrote canvas positioning */
         body canvas {
@@ -7943,9 +8929,9 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
           transform: translate(-50%, -50%) !important;
           width: 100vw !important;
           height: 100vh !important;
-          max-width: 100% !important;
-          max-height: 100% !important;
-          object-fit: contain !important;
+          max-width: 100vw !important;
+          max-height: 100vh !important;
+          object-fit: cover !important;
         }
       </style>
       <script>
@@ -8134,7 +9120,8 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
     return html_template.replace("CUSTOM_CSS_PLACEHOLDER", custom_css)\
                         .replace("CUSTOM_HTML_PLACEHOLDER", custom_html)\
                         .replace("SCRIPT_TAG_PLACEHOLDER", f"<script>{OVERRIDE_16_9_JS}</script>\n" + script_tag)\
-                        .replace("AUDIO_MOCK_PLACEHOLDER", MOCK_NATIVE_AUDIO_JS + "\n" + MOCK_P5_JS)
+                        .replace("AUDIO_MOCK_PLACEHOLDER", MOCK_NATIVE_AUDIO_JS + "\n" + MOCK_P5_JS)\
+                        .replace("{P5_V2_COMPAT_SHIM}", P5_V2_COMPAT_SHIM)
 
 
 class DependencyDownloaderThread(QThread):
@@ -9161,8 +10148,8 @@ class CleanupModeDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("選擇試運行與篩選模式")
-        self.resize(500, 220)
-        self.mode = None # 'auto', 'manual', or None
+        self.resize(500, 290)
+        self.mode = None # 'auto', 'manual', 'black_screen', or None
         
         self.setStyleSheet("""
             QDialog { background-color: #09090b; color: #f4f4f5; }
@@ -9175,6 +10162,7 @@ class CleanupModeDialog(QDialog):
             QPushButton:hover { background-color: #27272a; border-color: #3f3f46; }
             QPushButton#btn_auto { border-left: 4px solid #7c3aed; }
             QPushButton#btn_manual { border-left: 4px solid #10b981; }
+            QPushButton#btn_black { border-left: 4px solid #a855f7; }
             QPushButton#btn_cancel { background-color: #09090b; text-align: center; font-weight: normal; }
         """)
         
@@ -9188,6 +10176,11 @@ class CleanupModeDialog(QDialog):
         self.btn_auto.clicked.connect(self.select_auto)
         layout.addWidget(self.btn_auto)
         
+        self.btn_black = QPushButton("🎬 畫布黑屏與純色自檢自測清理\n   (執行 15 秒實時畫布像素分析，自動隱藏並備份黑屏或純色畫布)", self)
+        self.btn_black.setObjectName("btn_black")
+        self.btn_black.clicked.connect(self.select_black_screen)
+        layout.addWidget(self.btn_black)
+        
         self.btn_manual = QPushButton("👀 手動逐一審查\n   (如同收錄後的工作區，展示預覽畫面與日誌，手動決定保留與否)", self)
         self.btn_manual.setObjectName("btn_manual")
         self.btn_manual.clicked.connect(self.select_manual)
@@ -9200,6 +10193,10 @@ class CleanupModeDialog(QDialog):
         
     def select_auto(self):
         self.mode = "auto"
+        self.accept()
+        
+    def select_black_screen(self):
+        self.mode = "black_screen"
         self.accept()
         
     def select_manual(self):
