@@ -1,6 +1,6 @@
 # 4K MV Visual Integration Editor 🎬✨
 
-[![GitHub Release](https://img.shields.io/badge/Release-v1.1.0-blue.svg)](https://github.com/wannaplaymusic/4k-mv-visual-editor)
+[![GitHub Release](https://img.shields.io/badge/Release-v1.2.0-blue.svg)](https://github.com/wannaplaymusic/4k-mv-visual-editor)
 [![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11-green.svg)](https://python.org)
 [![GUI Framework](https://img.shields.io/badge/GUI-PyQt6-orange.svg)](https://www.riverbankcomputing.com/software/pyqt/)
 [![Aesthetic Layout](https://img.shields.io/badge/Aesthetic-Glassmorphic%20VJ%20System-purple.svg)]()
@@ -110,6 +110,18 @@ graph TD
 ---
 
 ### 📅 更新日誌 (Changelog)
+
+#### [v1.2.0] - 2026-07-28
+* **🤖 YAMNet 音樂特徵識別與 LLM 導演整合**：新增 `models/yamnet.onnx` 及音訊分析組件，支援即時樂器與音樂風格分類，並結合 `llm_director.py` 提供智慧分鏡與導演指示。
+* **⚡ 極速修復與模組驗證引擎**：新增 `fast_repair_engine.py`、`superfast_repair.py` 與 `reverify_restored_modules.py`，支援視覺模組自動化故障檢測與即時修復。
+* **📊 實時 Watchdog 監控儀表板**：提供 `realtime_watchdog.log` 及 HTML 互動儀表板 (`realtime_watchdog_dashboard.html`)，隨時掌握 VJ 渲染與音訊同步品質。
+* **🖼️ 大規模 4K 視覺縮圖庫與樣式優化**：新增數百組 `custom_visuals` 預覽縮圖與設定檔，並優化 OKLCH 程序化調色盤 (`procedural_palette_oklch.py`) 演算法。
+
+#### [v1.2.0] - 2026-07-28 (English)
+* **🤖 YAMNet Audio Recognition & LLM Director Integration**: Integrated `models/yamnet.onnx` for real-time instrument and genre classification, paired with `llm_director.py` for automated scene-director prompts.
+* **⚡ Ultra-Fast Repair & Module Reverification Engine**: Added `fast_repair_engine.py`, `superfast_repair.py`, and `reverify_restored_modules.py` for instant diagnostic and automated hot-fixes for visual modules.
+* **📊 Realtime Watchdog Dashboard**: Added real-time log monitoring with interactive HTML visualization (`realtime_watchdog_dashboard.html`) for live VJ rendering performance and audio sync.
+* **🖼️ Extended 4K Visual Thumbnails Library & Palette Upgrades**: Added hundreds of newly generated visual preset thumbnails and JSON configs in `custom_visuals`, along with OKLCH color space optimizations (`procedural_palette_oklch.py`).
 
 #### [v1.1.0] - 2026-07-19
 *   **🎨 程序化色彩調色盤生成器**：基於音訊檔名雜湊生成確定性隨機種子，自適應選擇 10 種風格之一（Vaporwave, Cyberpunk, Morandi 等），並透過五度圈進行和弦情緒映射，解決大量歌曲視覺重複問題。
