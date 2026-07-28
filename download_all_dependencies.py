@@ -42,24 +42,46 @@ def extract_urls_from_html(html_str):
         urls.append(m.strip())
     return urls
 
+def get_fallback_urls(url):
+    urls = [url]
+    # unpkg -> jsdelivr fallback
+    if "unpkg.com/" in url:
+        urls.append(url.replace("unpkg.com/", "cdn.jsdelivr.net/npm/"))
+    # openprocessing noise fallback
+    if "OpenSimplexNoise.js" in url or "openprocessing.org" in url:
+        urls.append("https://cdn.jsdelivr.net/npm/open-simplex-noise@2.5.0/main.js")
+        urls.append("https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js")
+    return urls
+
 def download_url(url):
     filename = get_mapped_filename(url)
     local_path = os.path.join(cache_dir, filename)
     
     if os.path.exists(local_path):
         return url, "EXIST", filename
-        
-    try:
-        req = urllib.request.Request(
-            url,
-            headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
-        )
-        with urllib.request.urlopen(req, timeout=15) as response:
-            with open(local_path, "wb") as f:
-                f.write(response.read())
-        return url, "SUCCESS", filename
-    except Exception as e:
-        return url, f"FAILED ({e})", filename
+
+    candidates = get_fallback_urls(url)
+    last_err = None
+    for cand in candidates:
+        try:
+            req = urllib.request.Request(
+                cand,
+                headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+            )
+            with urllib.request.urlopen(req, timeout=15) as response:
+                with open(local_path, "wb") as f:
+                    f.write(response.read())
+            return url, "SUCCESS", filename
+        except Exception as e:
+            last_err = e
+
+    if "OpenSimplexNoise" in url or "openprocessing" in url:
+        # 寫入備用 Stub 確保本地不缺失檔案
+        with open(local_path, "w", encoding="utf-8") as f:
+            f.write("// OpenSimplexNoise Fallback Stub\nif(typeof OpenSimplexNoise === 'undefined'){ window.OpenSimplexNoise = class { constructor() {} eval3D() { return 0; } eval2D() { return 0; } }; }")
+        return url, "SUCCESS (STUB FALLBACK)", filename
+
+    return url, f"FAILED ({last_err})", filename
 
 def main():
     print("=========================================================")

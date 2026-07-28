@@ -558,7 +558,33 @@ if (typeof p5 !== 'undefined' && p5.Table) {
     if (!p5.Table.prototype.getRowCount) { p5.Table.prototype.getRowCount = function() { return 0; }; }
 }
 
-// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失
+// 3. VJ Aesthetic Engine - 全域 AI 審美調色與緩動防死板輔助庫
+if (typeof window.VJ_AESTHETIC_ENGINE === 'undefined') {
+    window.VJ_AESTHETIC_ENGINE = {
+        getHarmonicColor: function(pitchClass, energy, isMinor) {
+            var pc = (typeof pitchClass === 'number') ? pitchClass : 0;
+            var e = (typeof energy === 'number') ? energy : 0.5;
+            var baseHue = (pc * 30 + 15) % 360;
+            var sat = isMinor ? Math.round(35 + e * 25) : Math.round(65 + e * 25);
+            var light = isMinor ? Math.round(25 + e * 30) : Math.round(45 + e * 30);
+            return 'hsl(' + Math.round(baseHue) + ', ' + sat + '%, ' + light + '%)';
+        },
+        applyAestheticEasing: function(current, target, factor) {
+            var f = (typeof factor === 'number') ? factor : 0.15;
+            return current + (target - current) * f;
+        },
+        PRESETS: {
+            CYBERPUNK: { primary: '#00F0FF', secondary: '#FF0055', bg: '#0B0E14' },
+            SYNTHWAVE: { primary: '#7928CA', secondary: '#FF0080', bg: '#0F051D' },
+            FLUID: { primary: '#00DF89', secondary: '#0369A1', bg: '#1E293B' },
+            MONOCHROME: { primary: '#F59E0B', secondary: '#71717A', bg: '#09090B' }
+        }
+    };
+    window.getHarmonicColor = window.VJ_AESTHETIC_ENGINE.getHarmonicColor;
+    window.applyAestheticEasing = window.VJ_AESTHETIC_ENGINE.applyAestheticEasing;
+}
+
+// 3.1 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失
 if (typeof p5 !== 'undefined' && p5.prototype) {
     if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }
     p5.prototype.get = function(...args) {

@@ -1,0 +1,371 @@
+======================================================================
+   🎬 音畫互動模組庫 - 黑屏與純色異常模組專屬自檢報告 (TXT 版本)   
+   時間: 2026-07-24 19:26:07
+   總計隱藏模組數: 1 個
+======================================================================
+
+[1] 模組名稱: 0001
+    Sketch ID: 1261264
+    原始網址: https://openprocessing.org/@u281256/1261264
+    排除時間: 2026-07-24 19:25:52
+    異常原因: 畫面異常 (15秒運行後仍為: black - Canvas is completely black)
+    --- 原始程式碼 ---
+// === Tab: mySketch.js ===
+/**
+Shortened code:
+t=0,draw=(o=>{for(t||createCanvas(W=600,W),background(0,10),a=1;a<1e3;a+=2.215)x=a*cos(t)**3,y=a*sin(t)**3,strokeWeight((500-a)/250),stroke((1e3-a)/100*150),point(x+W/2,y+W/2),point(x,y),point(x,y+W),point(x+W,y),point(x+W,y+W),t+=.2});
+---
+Tweet:
+https://twitter.com/KomaTebe/status/1437505582542606338?s=20
+*/
+
+document.querySelector("body").style.backgroundColor="#000";
+
+function setup() {
+  createCanvas(600, 600);
+  t = 0.1;
+}
+
+function draw() {
+  background(0,10);
+
+  for (a = 1; a < 1000; a += 2.215) { // 2.222
+    x = a * (cos(t)**3);
+    y = a * (sin(t)**3);
+
+    strokeWeight((500 - a) / 250); // 700
+    stroke(((1000 - a) / 100) * 150);
+
+    point(x + 300, y + 300);
+    point(x, y);
+    point(x, y + 600);
+    point(x + 600, y);
+    point(x + 600, y + 600);
+
+    t += 0.2;
+  }
+}
+
+
+// 1. 免疫 DOM 元素建立與樣式操作導致的看門狗攔截
+// 建立一個既能當函數呼叫 (如 style())，又是具有各屬性的 Proxy 物件，防止任何 .style、.style()、.position 錯誤
+(function() {
+  const handler = {
+    get: function(target, prop) {
+      if (prop === 'style') {
+        const styleFunc = function() { return styleProxy; };
+        Object.setPrototypeOf(styleFunc, styleProxy);
+        return styleFunc;
+      }
+      if (typeof target[prop] === 'function') {
+        return target[prop].bind(target);
+      }
+      return styleProxy;
+    }
+  };
+  const dummyObject = function() {};
+  dummyObject.position = function() { return dummyObject; };
+  dummyObject.style = function() { return dummyObject; };
+  dummyObject.size = function() { return dummyObject; };
+  dummyObject.parent = function() { return dummyObject; };
+  dummyObject.id = function() { return ""; };
+  dummyObject.class = function() { return dummyObject; };
+  dummyObject.mousePressed = function() { return dummyObject; };
+  dummyObject.mouseOver = function() { return dummyObject; };
+  dummyObject.changed = function() { return dummyObject; };
+  dummyObject.html = function() { return dummyObject; };
+  dummyObject.value = function() { return 0; };
+  
+  const styleProxy = new Proxy(dummyObject, handler);
+  
+  if (typeof createP === 'undefined') { window.createP = function() { return styleProxy; }; }
+  if (typeof createDiv === 'undefined') { window.createDiv = function() { return styleProxy; }; }
+  if (typeof createButton === 'undefined') { window.createButton = function() { return styleProxy; }; }
+  if (typeof createSlider === 'undefined') { window.createSlider = function() { return styleProxy; }; }
+  if (typeof select === 'undefined') { window.select = function() { return styleProxy; }; }
+  if (typeof selectAll === 'undefined') { window.selectAll = function() { return [styleProxy]; }; }
+})();
+
+// 1.2 免疫 HTML 屬性與 Element.prototype.style 崩潰 (確保 style 與 checked 既可以當物件又可以當函數呼叫)
+try {
+  if (typeof Element !== 'undefined') {
+    const dummyObj = function() { return dummyObj; };
+    const p = new Proxy(dummyObj, {
+      get: function(target, prop) {
+        if (typeof target[prop] === 'function') return target[prop];
+        return p;
+      }
+    });
+    
+    // 用屬性定義防止被覆寫
+    Object.defineProperty(Element.prototype, 'style', {
+      get: function() {
+        const styleFunc = function() { return p; };
+        Object.setPrototypeOf(styleFunc, p);
+        return styleFunc;
+      },
+      set: function() {},
+      configurable: true
+    });
+    
+    Object.defineProperty(Element.prototype, 'checked', {
+      get: function() {
+        const checkedFunc = function() { return false; };
+        return checkedFunc;
+      },
+      set: function() {},
+      configurable: true
+    });
+  }
+} catch(e) {}
+
+// 1.3 免疫 HTMLInputElement.size = 0 或非法負數導致的瀏覽器拋錯
+try {
+  if (typeof HTMLInputElement !== 'undefined') {
+    const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'size');
+    if (desc && desc.set) {
+      const originalSet = desc.set;
+      Object.defineProperty(HTMLInputElement.prototype, 'size', {
+        set: function(val) {
+          if (val <= 0) val = 20; // 設為預設合規大小
+          originalSet.call(this, val);
+        },
+        configurable: true
+      });
+    }
+  }
+} catch(e) {}
+
+// 1.5 免疫 PVector 與 beginGeometry 缺失導致的崩潰
+if (typeof PVector === 'undefined') {
+    window.PVector = class PVector {
+        constructor(x, y, z) {
+            this.x = x || 0;
+            this.y = y || 0;
+            this.z = z || 0;
+        }
+        static dist(v1, v2) {
+            return Math.sqrt((v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2 + (v1.z - v2.z) ** 2);
+        }
+        set(x, y, z) {
+            this.x = x || 0;
+            this.y = y || 0;
+            this.z = z || 0;
+        }
+    };
+}
+if (typeof beginGeometry === 'undefined') { window.beginGeometry = function() {}; }
+if (typeof endGeometry === 'undefined') { window.endGeometry = function() { return { draw: function() {} }; }; }
+
+// 1.6 修正舊版 Processing/Canvas 內建函數缺失 (如 createFont, concat, append, _renderer 缺失)
+if (typeof createFont === 'undefined') { window.createFont = function(name, size) { return name; }; }
+if (typeof concat === 'undefined') { window.concat = function(a, b) { return (a || []).concat(b || []); }; }
+if (typeof append === 'undefined') { window.append = function(array, value) { if(array) { array.push(value); } return array; }; }
+if (typeof _renderer === 'undefined') { window._renderer = { _setAttributes: function() {} }; }
+
+// 1.7 免疫機器學習與人臉偵測 (ml5.js, clmtrackr, aiptag, lime) 缺失與內部指標 null 導致的崩潰 (修復 ml5.js .features of null 報錯)
+if (typeof window.clm === 'undefined') {
+    window.clm = {
+        tracker: class {
+            init() {}
+            start() {}
+            track() { return []; }
+            getCurrentPosition() { return []; }
+            getScore() { return 0; }
+        }
+    };
+}
+if (typeof window.ml5 === 'undefined') {
+    const ml5MockObj = {
+        detectStart: function() {},
+        features: { get: function() { return []; } },
+        on: function() {},
+        ready: Promise.resolve(),
+        loadModel: Promise.resolve()
+    };
+    window.ml5 = {
+        bodypix: function() { return ml5MockObj; },
+        faceapi: function() { return ml5MockObj; },
+        handpose: function() { return ml5MockObj; },
+        poseNet: function() { return ml5MockObj; },
+        objectDetector: function() { return ml5MockObj; }
+    };
+}
+if (typeof window.aiptag === 'undefined') { window.aiptag = {}; }
+if (typeof window.lime === 'undefined') { window.lime = {}; }
+
+// 1.8 免疫 3D 物理引擎與高階渲染 (THREE.Group, Tone.js, p5.asciify, REGL, Voronoi, PolyK, qrcode, P5Capture) 缺失導致的崩潰
+if (typeof window.THREE === 'undefined') {
+    window.THREE = {
+        Group: class {},
+        Scene: class {},
+        PerspectiveCamera: class {},
+        WebGLRenderer: class { setSize() {} },
+        Mesh: class {},
+        BoxGeometry: class {}
+    };
+}
+if (typeof window.Tone === 'undefined') {
+    window.Tone = {
+        Player: class { play() {} start() {} stop() {} connect() {} toDestination() {} },
+        Players: class { play() {} start() {} stop() {} connect() {} toDestination() {} },
+        Sampler: class { triggerAttackRelease() {} connect() {} toDestination() {} },
+        Sequence: class { start() {} stop() {} },
+        Transport: { start: function() {}, stop: function() {}, bpm: { value: 120 } }
+    };
+}
+if (typeof window.createREGL === 'undefined') {
+    window.createREGL = function() {
+        const regl = function() {};
+        regl.texture = function() { return { resize: function() {} }; };
+        regl.buffer = function() { return { subdata: function() {} }; };
+        regl.framebuffer = function() { return { use: function(cb) { cb(); } }; };
+        return regl;
+    };
+}
+if (typeof window.Voronoi === 'undefined') {
+    window.Voronoi = class {
+        compute() { return { cells: [], edges: [] }; }
+    };
+}
+if (typeof window.qrcode === 'undefined') {
+    window.qrcode = function(data) {
+        return {
+            createImgTag: function() { return ""; },
+            createTableTag: function() { return ""; },
+            createSvgTag: function() { return ""; }
+        };
+    };
+    window.qrcode.stringToBytes = function(s) { return []; };
+}
+if (typeof window.PolyK === 'undefined') {
+    window.PolyK = {
+        Slice: function() { return []; },
+        Triangulate: function() { return []; },
+        getArea: function() { return 0; }
+    };
+}
+if (typeof window.P5Capture === 'undefined') {
+    window.P5Capture = {
+        getInstance: function() {
+            return { start: function() {}, stop: function() {}, setFormat: function() {} };
+        },
+        setDefaultOptions: function() {}
+    };
+}
+
+// 1.9 免疫 OPC (OpenProcessing Controller) 與 WebGL 內部 setUniform 崩潰
+if (typeof window.OPC === 'undefined') {
+    window.OPC = {
+        title: function() {},
+        slider: function() {},
+        button: function() {},
+        toggle: function() {},
+        color: function() {}
+    };
+}
+if (typeof p5 !== 'undefined' && p5.Shader) {
+    const origSetUniform = p5.Shader.prototype.setUniform;
+    p5.Shader.prototype.setUniform = function(name, val) {
+        if (!this) return this;
+        try {
+            return origSetUniform.call(this, name, val);
+        } catch(e) {
+            return this;
+        }
+    };
+}
+
+// 1.95 免疫某些特定遊戲模組對 parent / maeExportApis_ 或是唯讀屬性的寫入崩潰
+try {
+  if (typeof window.parent !== 'undefined') {
+    if (!window.parent.maeExportApis_) {
+      try {
+        window.parent.maeExportApis_ = function() {};
+      } catch(e) {}
+    }
+  }
+} catch(e) {}
+
+// 1.96 免疫 textmode 缺失以及 loadSVG / p5.SVG 插件型別拋錯
+if (typeof textmode === 'undefined') { window.textmode = function() {}; }
+if (typeof MAT === 'undefined') { window.MAT = []; }
+if (typeof SIDES === 'undefined') { window.SIDES = 4; }
+if (typeof GRIDBOX === 'undefined') { window.GRIDBOX = 10; }
+if (typeof COLUMNS === 'undefined') { window.COLUMNS = 5; }
+if (typeof tileSize === 'undefined') { window.tileSize = 30; }
+if (typeof mouseTileX === 'undefined') { window.mouseTileX = 0; }
+if (typeof p5 !== 'undefined') {
+  if (!p5.prototype.loadSVG) {
+    p5.prototype.loadSVG = function(path, success, failure) {
+      if (success) success({});
+      return {};
+    };
+  }
+  // 免疫 window.VERSION 唯讀寫入錯誤
+  try {
+    Object.defineProperty(window, 'VERSION', {
+      value: "p5-stub",
+      writable: true,
+      configurable: true
+    });
+  } catch(e) {}
+}
+
+// 2. 圖片與非同步資產載入後備自癒護欄
+if (typeof p5 !== 'undefined' && p5.prototype) {
+    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }
+    p5.prototype.loadImage = function(path, successCallback, failureCallback) {
+        if (typeof path !== 'string' || path.startsWith('http') || (path.startsWith('data:') === false && path.indexOf('.') === -1)) {
+            // 當發現是遠端 URL、相對路徑或格式無副檔名時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖與 CORS 錯誤
+            const dummyPath = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);
+        }
+        return window._origLoadImage.call(this, path, successCallback, failureCallback);
+    };
+    
+    // 修正 img.loadPixels / img.resize 缺失與未非同步載入完成呼叫
+    if (!p5.Image.prototype.loadPixels) { p5.Image.prototype.loadPixels = function() { return this; }; }
+    if (!p5.Image.prototype.resize) { p5.Image.prototype.resize = function() { return this; }; }
+    if (!p5.Image.prototype.get) { p5.Image.prototype.get = function() { return [0,0,0,255]; }; }
+    if (!p5.Image.prototype.width) {
+        Object.defineProperty(p5.Image.prototype, 'width', {
+            get: function() { return this._width || 1280; },
+            set: function(v) { this._width = v; }
+        });
+    }
+    if (!p5.Image.prototype.height) {
+        Object.defineProperty(p5.Image.prototype, 'height', {
+            get: function() { return this._height || 720; },
+            set: function(v) { this._height = v; }
+        });
+    }
+    
+    // 修正 p5.Graphics / p5.Renderer / Element.prototype.style
+    if (p5.Graphics && p5.Graphics.prototype) {
+        if (!p5.Graphics.prototype.loadPixels) { p5.Graphics.prototype.loadPixels = function() { return this; }; }
+    }
+}
+
+// 2.2 修正 p5.Table / loadTable / getRowCount 缺失與錯誤
+if (typeof p5 !== 'undefined' && p5.Table) {
+    if (!p5.Table.prototype.getRowCount) { p5.Table.prototype.getRowCount = function() { return 0; }; }
+}
+
+// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失
+if (typeof p5 !== 'undefined' && p5.prototype) {
+    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }
+    p5.prototype.get = function(...args) {
+        if (!this || this.width === 0 || this.height === 0) {
+            return [0,0,0,255];
+        }
+        try {
+            return window._origGet.apply(this, args);
+        } catch(e) {
+            return [0,0,0,255];
+        }
+    };
+}
+
+======================================================================
+

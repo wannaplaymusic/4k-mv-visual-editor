@@ -1,0 +1,27 @@
+{
+    "name": "Uncler M - op_2699124_var1",
+    "code": "let palette = [\n  \"#009dff\", \"#ff4500\", \"#ffc400\", \"#8bc34a\", \"#0051ff\", \"#926eff\",\n  \"#e75397\", \"#01b2e8\", \"#e8441f\", \"#ff6a00\", \"#f7a000\", \"#f4cd00\",\n  \"#54ab1d\", \"#1b82e6\", \"#6d5acf\", \"#dddddd\", \"#ff437f\", \"#f48c06\",\n  \"#4dc268\", \"#647582\", \"#f6f6f6\", \"#028ff5\", \"#ff99cc\", \"#22d3ee\",\n  \"#15ad03\", \"#ff6347\", \"#ffec99\", \"#7fff00\", \"#0077b6\", \"#b983ff\",\n  \"#fafafa\", \"#ffcc00\", \"#3ddc84\", \"#004c6d\", \"#e6a6f5\", \"#ffdab9\",\n  \"#4a90e2\", \"#9c27b0\", \"#ffead0\", \"#d72638\", \"#ffeb3b\", \"#2196f3\",\n  \"#ff595e\", \"#ff924c\", \"#ffca3a\", \"#8ac926\", \"#1982c4\", \"#6a4c93\",\n  \"#f72585\", \"#7209b7\", \"#3a0ca3\", \"#4361ee\", \"#4cc9f0\", \"#00bbf9\",\n  \"#00f5d4\", \"#9ef01a\", \"#faff00\", \"#ff9f1c\", \"#ff4040\", \"#cdb4db\",\n  \"#a2d2ff\", \"#b5ead7\", \"#caffbf\", \"#e0fbfc\", \"#f1c0e8\", \"#e8eddf\",\n  \"#ffe66d\", \"#06d6a0\", \"#118ab2\", \"#ef476f\", \"#ffd6e0\", \"#ff99c8\"\n];\n\nconst n = 600;\nconst maxH = 1000;\nconst minH = 100;\nconst maxW = 500;\nconst minW = 100;\n\nlet seed;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  palette = palette.map((c) => color(c));\n  seed = random(10000);\n  noStroke();\n\t\n  let bEnergy = (window.beatEnergy || 0.0);\n  let bassE = (window.bassEnergy || 0.0);\n  let midE = (window.midEnergy || 0.0);\n  let highE = (window.highEnergy || 0.0);\n  let t = millis() * 0.001 * (1.0 + bEnergy * 0.5);\n  let r = width * 1.2;\n  let angle = t * 0.05;\n\tlet camX = cos(angle) * r;\n  let camZ = sin(angle) * r - width * 2;\n  camera(camX, 0, camZ, 0, 0, -width * 2, 0, 1, 0);\n}\n\nfunction draw() {\n  background(\"#34495e\");\n\t\n  let bEnergy = (window.beatEnergy || 0.0);\n  let bassE = (window.bassEnergy || 0.0);\n  let midE = (window.midEnergy || 0.0);\n  let highE = (window.highEnergy || 0.0);\n  let t = millis() * 0.001 * (1.0 + bEnergy * 0.5);\n  let r = width * 1.2;\n  let angle = t * 0.05;\n \n\torbitControl(1, 1, 0.3);\n\n  ambientLight(120);\n  directionalLight(200, 200, 200, -0.5, -1, -0.3);\n  pointLight(150, 150, 255, 0, 0, 300);\n\t\n  randomSeed(seed);\n  noiseSeed(seed);\n\n  for (let i = 0; i < n; i++) {\n    push();\n\n    let c = color(palette[i % palette.length]);\n    c.setAlpha(map(sin(t + i * 0.1), -1, 1, 60, 160) + bEnergy * 60);\n    fill(c);\n    ambientMaterial(c);\n    shininess(20);\n\n    let w = map(sin(i * 0.1), -1, 1, minW, maxW);\n    let h = map(cos(i * 0.15), -1, 1, minH, maxH);\n\n    let nx = noise(i * 0.01, t * 0.1);\n    let ny = noise(i * 0.01 + 500, t * 0.1 + 10);\n    let nz = noise(i * 0.01 + 1000, t * 0.1 - 10);\n\t\tlet ox = (noise(i * 5) - 0.5) * 1000;\n\t\tlet oy = (noise(i * 5 + 1000) - 0.5) * 1000;\n\t\tlet oz = (noise(i * 5 + 2000) - 0.5) * 1000;\n\n\t\tlet x = map(noise(i * 0.02 + ox, t * 0.1, 10), 0, 1, -width * 2, width * 2);\n\t\tlet y = map(noise(i * 0.03 + oy + 100, t * 0.1, 20), 0, 1, -height * 1.5, height * 1.5);\n\t\tlet z = map(noise(i * 0.01 + oz + 200, t * 0.1, 30), 0, 1, -width * 4, -200);\n\n    translate(x, y, z);\n    rotateX(t * 0.1 + i * 0.03);\n    rotateY(t * 0.05 + i * 0.015);\n\n    plane(w, h);\n    pop();\n  }\n}\n\n\n// --- Immunity Guardrails ---\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "html, body { margin: 0; padding: 0; overflow: hidden; background: #34495e; }\n/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5DomElement {\n    display: none !important;\n    visibility: hidden !important;\n    opacity: 0 !important;\n    pointer-events: none !important;\n    position: absolute !important;\n    left: -9999px !important;\n    top: -9999px !important;\n    width: 0px !important;\n    height: 0px !important;\n}",
+    "inline_assets": {},
+    "author": "Uncler M",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "Uncler M",
+        "generative",
+        "variant",
+        "cyberpunk",
+        "spectrum",
+        "planes",
+        "beat_pulse",
+        "audio_reactive",
+        "op_2699124"
+    ],
+    "url": "https://openprocessing.org/@leedoughty/2699124",
+    "date_added": "2026-07-22 20:36:00",
+    "is_starred": false,
+    "scaling_mode": "auto"
+}

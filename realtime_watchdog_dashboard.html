@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>🛡️ 手動試運行即時自癒監聽器 (Real-Time Watchdog Dashboard)</title>
+    <meta http-equiv="refresh" content="2">
+    <style>
+        body { background:#141414; color:#ffffff; font-family:system-ui, -apple-system, sans-serif; padding:24px; max-width:900px; margin:0 auto; }
+        h1 { display:flex; align-items:center; gap:12px; font-size:22px; margin-bottom:8px; }
+        .status { color:#52c41a; font-size:14px; margin-bottom:20px; display:flex; align-items:center; gap:6px; }
+        .dot { width:10px; height:10px; background:#52c41a; border-radius:50%; display:inline-block; box-shadow:0 0 8px #52c41a; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ 手動試運行即時自癒監視器 (Real-Time Watchdog Dashboard)</h1>
+    <div class="status"><span class="dot"></span> 監聽器運作中 (Watchdog Daemon Active) — 監視器每 2 秒自動刷新</div>
+    <div id="events-container">
+        
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] p5patternwebcam_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:19:09</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] p5PatternBeta_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:19:01</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    ReferenceError: applyPattern is not defined
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 P5_V2_COMPAT_SHIM 注入 window.applyPattern 相容性 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] p5Librariesposter</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:18:49</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    ReferenceError: applyPattern is not defined
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 P5_V2_COMPAT_SHIM 注入 window.applyPattern 相容性 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] p5190Demo</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:18:44</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    Timestamp: 2026-07-25 02:18:34
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] p5JSDelaunayJS_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:18:41</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] op_2900399</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:18:34</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    ReferenceError: yz is not defined
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 P5_V2_COMPAT_SHIM 注入 window.yz 相容性 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] op_2971896</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:17:44</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] op_2960706</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:16:58</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] op_2533918</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:16:21</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    ReferenceError: yz is not defined
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 P5_V2_COMPAT_SHIM 注入 window.yz 相容性 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] op_2787595</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:16:05</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] n15</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:15:23</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    URL: https://openprocessing.org/@u95836/534484
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] op_2478473</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:15:17</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] op_1956506</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:14:54</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] op_1776353</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:14:47</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] noisycircles</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:14:21</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] networking3</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:13:58</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] mpNoise_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:13:51</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    TypeError: this._renderer.textures.push is not a function
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 main.py 注入 this._renderer 方法防禦 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] myMandelbrotset</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:13:48</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] microbiome_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:13:34</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    TypeError: this._renderer.textures.push is not a function
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 main.py 注入 this._renderer 方法防禦 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] modules_index</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:13:06</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] modernartpainter</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:12:58</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] kandinskyallegedly_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:12:53</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    TypeError: this._renderer.textures.push is not a function
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 main.py 注入 this._renderer 方法防禦 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] linewaves</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:12:11</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] lichen_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:12:00</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] levels</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:11:53</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] interactiveNoiseLines_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:11:40</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                        at window.draw (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1576_892814.html:2266:34)
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] it_raymarching_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:11:23</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] infinitesadness_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:11:07</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] hyperspace_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:11:04</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    Errors:
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] headsortails</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:11:00</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    TypeError: PVector.mult is not a function
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 main.py 注入 PVector.mult 方法防禦 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] horse</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:10:56</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] heaven_777_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:10:29</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] hairLineToroid_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:10:21</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    TypeError: PVector.mult is not a function
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 main.py 注入 PVector.mult 方法防禦 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] haikuwithoutwords</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:10:16</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    TypeError: PVector.mult is not a function
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 main.py 注入 PVector.mult 方法防禦 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] gsynthstep_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:09:57</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    Title: gsynthstep_1
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] growingline</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:09:54</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    Title: growingline
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] fractalishThing_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:09:45</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    TypeError: PVector.sub is not a function
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 main.py 注入 PVector.sub 方法防禦 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] glitch</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:09:39</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] geometricsubdivision1updated</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:09:27</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] fallsun</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:08:33</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    TypeError: PVector.sub is not a function
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 main.py 注入 PVector.sub 方法防禦 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] forkofPHKaleidoscope</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:08:27</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] folkrecursion_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:08:16</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] fireflies_4</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:07:55</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] fillstroke_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:07:49</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] electricStormbr</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:07:31</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    ReferenceError: font2 is not defined
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 P5_V2_COMPAT_SHIM 注入 window.font2 相容性 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] eggphabet_1</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:06:59</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    ReferenceError: font2 is not defined
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 P5_V2_COMPAT_SHIM 注入 window.font2 相容性 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] dropscanpaintthiscanvas</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:06:56</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    ReferenceError: d3 is not defined
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 P5_V2_COMPAT_SHIM 注入 window.d3 相容性 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] divergentboundaries</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:06:52</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    ReferenceError: topojson is not defined
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 P5_V2_COMPAT_SHIM 注入 window.topojson 相容性 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #ff4d4f; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[JS報錯捕捉] d3jsmapsinclass</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:06:46</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    ReferenceError: topojson is not defined
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：自動於 P5_V2_COMPAT_SHIM 注入 window.topojson 相容性 Stub
+                </div>
+            </div>
+            
+            <div style="background:#1f1f1f; border-left:4px solid #faad14; margin-bottom:12px; padding:12px 16px; border-radius:6px; font-family:sans-serif; color:#e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#ffffff; font-size:15px;">[黑屏不保留捕捉] deposited</span>
+                    <span style="color:#8c8c8c; font-size:12px;">2026-07-25 02:06:38</span>
+                </div>
+                <div style="color:#ff7875; font-family:monospace; font-size:13px; background:#141414; padding:6px 10px; border-radius:4px; margin-bottom:6px;">
+                    使用者手動標記黑屏/純色棄用
+                </div>
+                <div style="color:#73d13d; font-size:13px; font-weight:bold;">
+                    ⚡ 自癒處置：掃描無須修正
+                </div>
+            </div>
+            
+    </div>
+</body>
+</html>

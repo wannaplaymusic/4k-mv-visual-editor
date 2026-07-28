@@ -2194,7 +2194,55 @@ if (typeof p5 !== 'undefined') {
   };
 
   // Polyfill RendererGL createBuffers / drawBuffers for legacy WebGL geometries in p5.js 2.x
+  if (typeof p5.Renderer !== 'undefined' && p5.Renderer.prototype) {
+    try {
+      Object.defineProperty(p5.Renderer.prototype, 'textures', {
+        get: function() {
+          if (!this._texturesArray) {
+            this._texturesArray = [];
+          }
+          if (this._texturesArray && typeof this._texturesArray.push !== 'function') {
+            try {
+              this._texturesArray.push = function(...args) {
+                return Array.prototype.push.apply(this, args);
+              };
+            } catch(e) {
+              const fallbackArr = [];
+              fallbackArr.push = function(...args) { return Array.prototype.push.apply(this, args); };
+              return fallbackArr;
+            }
+          }
+          return this._texturesArray;
+        },
+        set: function(val) { this._texturesArray = val; },
+        configurable: true
+      });
+    } catch(e) {}
+  }
   if (typeof p5.RendererGL !== 'undefined' && p5.RendererGL.prototype) {
+    try {
+      Object.defineProperty(p5.RendererGL.prototype, 'textures', {
+        get: function() {
+          if (!this._texturesArray) {
+            this._texturesArray = [];
+          }
+          if (this._texturesArray && typeof this._texturesArray.push !== 'function') {
+            try {
+              this._texturesArray.push = function(...args) {
+                return Array.prototype.push.apply(this, args);
+              };
+            } catch(e) {
+              const fallbackArr = [];
+              fallbackArr.push = function(...args) { return Array.prototype.push.apply(this, args); };
+              return fallbackArr;
+            }
+          }
+          return this._texturesArray;
+        },
+        set: function(val) { this._texturesArray = val; },
+        configurable: true
+      });
+    } catch(e) {}
     p5.RendererGL.prototype.createBuffers = p5.RendererGL.prototype.createBuffers || function(id, geometry) {
       // In p5 v2, custom geometry buffer compiling is handled via model buffers or internal geometry objects.
       // We store the geometry object on a cache and let drawBuffers handle the mapping/drawing.
@@ -2980,8 +3028,7 @@ class StandaloneInjectorApp(QMainWindow):
         web_view.page().setWebChannel(channel)
 
     def handle_render_crash(self, error_msg):
-        self.log_to_console(f"💥 檢測到致命的 JavaScript 執行錯誤，渲染已中止：{error_msg}", is_err=True)
-        self.render_aborted = True
+        self.log_to_console(f"⚠️ 檢測到 JavaScript 執行警告 (繼續離線渲染)：{error_msg}", is_err=True)
 
     def __init__(self):
         super().__init__()
@@ -3767,6 +3814,48 @@ class StandaloneInjectorApp(QMainWindow):
         fx_type_box_3.addStretch()
         layout.addLayout(fx_type_box_3)
 
+        # Row 4: Top Tier Global Post-FX Matrix (Film Burn, Blueprint Edge, Turing Pattern, Point Cloud Depth, Vector Scope, Lowpass Muffle, Infinity Tunnel, Dolly Zoom)
+        fx_type_box_4 = QHBoxLayout()
+        fx_type_box_4.setSpacing(12)
+        
+        self.fx_cb_film_burn = QCheckBox("膠片腐蝕", tab)
+        self.fx_cb_film_burn.setChecked(True)
+        self.fx_cb_film_burn.setToolTip("全新維度 1: 膠片燒灼與化學腐蝕 (Film Burn) — 35mm硝酸底片高溫邊緣發黃發紅、硝酸銀顆粒與重拍底片跳齒漏光")
+
+        self.fx_cb_blueprint = QCheckBox("建築藍圖", tab)
+        self.fx_cb_blueprint.setChecked(True)
+        self.fx_cb_blueprint.setToolTip("全新維度 2: 建築藍圖與 CAD 線稿 (Blueprint Edge) — 普魯士藍圖紙、細緻 Canny 邊緣與動態毫米標尺/CAD 坐標 overlay")
+
+        self.fx_cb_turing = QCheckBox("圖靈細胞", tab)
+        self.fx_cb_turing.setChecked(True)
+        self.fx_cb_turing.setToolTip("全新維度 3: 圖靈擴散與生物斑紋 (Turing Pattern) — Gray-Scott 化學反應擴散、斑馬紋與珊瑚有機細胞增殖蔓延")
+
+        self.fx_cb_point_cloud = QCheckBox("點雲深度", tab)
+        self.fx_cb_point_cloud.setChecked(True)
+        self.fx_cb_point_cloud.setToolTip("全新維度 4: 點雲立體深度重構 (Point Cloud Depth) — 依據 2D 亮度估算 3D Z-Depth、粒子點雲拉伸與虛擬鏡頭 Pitch/Yaw 旋轉")
+
+        self.fx_cb_vector_scope = QCheckBox("聲相示波", tab)
+        self.fx_cb_vector_scope.setChecked(True)
+        self.fx_cb_vector_scope.setToolTip("全新維度 5: 聲相向量示波鏡 (Vector Scope) — Lissajous 示波器時域波形霓虹圖騰與背景光學折射屈光透鏡")
+
+        self.fx_cb_lowpass_muffle = QCheckBox("悶音景深", tab)
+        self.fx_cb_lowpass_muffle.setChecked(True)
+        self.fx_cb_lowpass_muffle.setToolTip("全新維度 6: 低通悶音景深遮罩 (Low-Pass Muffle) — 隔牆水下沉浸感、多級高斯景深模糊與動態呼吸暗角影視語言")
+
+        self.fx_cb_infinity_tunnel = QCheckBox("無限鏡廊", tab)
+        self.fx_cb_infinity_tunnel.setChecked(True)
+        self.fx_cb_infinity_tunnel.setToolTip("全新維度 7: 無限幾何鏡廊 (Infinity Tunnel) — 幾何對數極座標 Log-Polar 投影與飛速向前穿梭之鏡室隧道錯覺")
+
+        self.fx_cb_dolly_zoom = QCheckBox("眩暈推拉", tab)
+        self.fx_cb_dolly_zoom.setChecked(True)
+        self.fx_cb_dolly_zoom.setToolTip("全新維度 8: 眩暈推拉變焦 (Dolly Zoom) — 希區考克 Vertigo 鏡頭語言、主體保持不變與背景飛速拉遠變大放射狀模糊")
+
+        for cb in [self.fx_cb_film_burn, self.fx_cb_blueprint, self.fx_cb_turing, self.fx_cb_point_cloud, self.fx_cb_vector_scope, self.fx_cb_lowpass_muffle, self.fx_cb_infinity_tunnel, self.fx_cb_dolly_zoom]:
+            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
+            fx_type_box_4.addWidget(cb)
+        fx_type_box_4.addStretch()
+        layout.addLayout(fx_type_box_4)
+
         # Progress bar
         self.progress_bar = QProgressBar(tab)
         self.progress_bar.setValue(0)
@@ -3911,7 +4000,7 @@ class StandaloneInjectorApp(QMainWindow):
         else:
             presets_data = []
             for file in os.listdir(save_dir):
-                if file.endswith(".json"):
+                if file.endswith(".json") and file != "modules_index.json":
                     name = file[:-5]
                     p_path = os.path.join(save_dir, file)
                     tags = []
@@ -3939,6 +4028,8 @@ class StandaloneInjectorApp(QMainWindow):
                     try:
                         with open(p_path, "r", encoding="utf-8") as f:
                             data = json.load(f)
+                            if not isinstance(data, dict) or 'code' not in data:
+                                continue
                             tags = data.get("tags", [])
                             author = data.get("author", "未知")
                             license_mode = data.get("license", "未知")
@@ -6532,10 +6623,17 @@ function draw() {
             visuals_data = []
             save_dir = os.path.join(workspace_dir, "custom_visuals")
             for vp in selected_presets:
+                if vp == "modules_index":
+                    continue
                 p_path = os.path.join(save_dir, f"{vp}.json")
                 if os.path.exists(p_path):
                     with open(p_path, "r", encoding="utf-8") as f:
-                        visuals_data.append(json.load(f))
+                        preset_dict = json.load(f)
+                        if not isinstance(preset_dict, dict) or 'code' not in preset_dict:
+                            continue
+                        if 'name' not in preset_dict:
+                            preset_dict['name'] = preset_dict.get('title', vp)
+                        visuals_data.append(preset_dict)
                         
             # Resolution config
             res_str = self.res_select.currentText()
@@ -6629,6 +6727,15 @@ function draw() {
                 'handheld_camera': self.fx_cb_handheld_camera.isChecked(),
                 'stylized_fade': self.fx_cb_stylized_fade.isChecked(),
                 'zoom_pulse': self.fx_cb_zoom_pulse.isChecked(),
+                # 頂級全域後製特效矩陣擴充
+                'film_burn': self.fx_cb_film_burn.isChecked(),
+                'blueprint_edge': self.fx_cb_blueprint.isChecked(),
+                'turing_pattern': self.fx_cb_turing.isChecked(),
+                'point_cloud_depth': self.fx_cb_point_cloud.isChecked(),
+                'vector_scope': self.fx_cb_vector_scope.isChecked(),
+                'lowpass_muffle': self.fx_cb_lowpass_muffle.isChecked(),
+                'infinity_tunnel': self.fx_cb_infinity_tunnel.isChecked(),
+                'dolly_zoom': self.fx_cb_dolly_zoom.isChecked(),
                 'bypass_downscale': self.native_4k_cb.isChecked()
             }
             
@@ -6683,10 +6790,17 @@ function draw() {
         visuals_data = []
         save_dir = os.path.join(workspace_dir, "custom_visuals")
         for vp in selected_presets:
+            if vp == "modules_index":
+                continue
             p_path = os.path.join(save_dir, f"{vp}.json")
             if os.path.exists(p_path):
                 with open(p_path, "r", encoding="utf-8") as f:
-                    visuals_data.append(json.load(f))
+                    preset_dict = json.load(f)
+                    if not isinstance(preset_dict, dict) or 'code' not in preset_dict:
+                        continue
+                    if 'name' not in preset_dict:
+                        preset_dict['name'] = preset_dict.get('title', vp)
+                    visuals_data.append(preset_dict)
 
         # Resolution config
         res_str = self.res_select.currentText()
@@ -6779,6 +6893,15 @@ function draw() {
                 'handheld_camera': self.fx_cb_handheld_camera.isChecked(),
                 'stylized_fade': self.fx_cb_stylized_fade.isChecked(),
                 'zoom_pulse': self.fx_cb_zoom_pulse.isChecked(),
+                # 頂級全域後製特效矩陣擴充
+                'film_burn': self.fx_cb_film_burn.isChecked(),
+                'blueprint_edge': self.fx_cb_blueprint.isChecked(),
+                'turing_pattern': self.fx_cb_turing.isChecked(),
+                'point_cloud_depth': self.fx_cb_point_cloud.isChecked(),
+                'vector_scope': self.fx_cb_vector_scope.isChecked(),
+                'lowpass_muffle': self.fx_cb_lowpass_muffle.isChecked(),
+                'infinity_tunnel': self.fx_cb_infinity_tunnel.isChecked(),
+                'dolly_zoom': self.fx_cb_dolly_zoom.isChecked(),
                 'bypass_downscale': self.native_4k_cb.isChecked()
             }
         
@@ -6789,6 +6912,11 @@ function draw() {
         self.render_aborted = True
 
     def render_mv_frame_by_frame(self, audio_path, genre, visuals_data, output_file, w, h, fps, trans_sec, fx_prob=1.0, fx_flags=None, show_popups=True, is_batch=False, used_themes=None):
+        visuals_data = [v for v in (visuals_data or []) if isinstance(v, dict) and bool(v.get('code'))]
+        if not visuals_data:
+            self.log_to_console("❌ 無有效的視覺模組可供渲染 (選取的模組缺失代碼)", is_err=True)
+            return False
+
         if fx_flags is None:
             fx_flags = {
                 'spatial_warping': True,
@@ -6819,6 +6947,14 @@ function draw() {
                 'handheld_camera': True,
                 'stylized_fade': True,
                 'zoom_pulse': True,
+                'film_burn': True,
+                'blueprint_edge': True,
+                'turing_pattern': True,
+                'point_cloud_depth': True,
+                'vector_scope': True,
+                'lowpass_muffle': True,
+                'infinity_tunnel': True,
+                'dolly_zoom': True,
                 'bypass_downscale': getattr(self, 'native_4k_cb', None).isChecked() if getattr(self, 'native_4k_cb', None) is not None else False
             }
         # Step 1: Analyze audio
@@ -7650,7 +7786,7 @@ function draw() {
             # Perform page loads if needed
             if loadedA != active_vis['name']:
                 viewA.setHtml(get_html_content(
-                    active_vis['code'],
+                    active_vis.get('code', ''),
                     custom_css=active_vis.get('custom_css', ''),
                     custom_html=active_vis.get('custom_html', ''),
                     inline_assets=active_vis.get('inline_assets', {}),
@@ -7691,7 +7827,7 @@ function draw() {
                 
             if is_transitioning and other_vis and loadedB != other_vis['name']:
                 viewB.setHtml(get_html_content(
-                    other_vis['code'],
+                    other_vis.get('code', ''),
                     custom_css=other_vis.get('custom_css', ''),
                     custom_html=other_vis.get('custom_html', ''),
                     inline_assets=other_vis.get('inline_assets', {}),

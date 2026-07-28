@@ -1,0 +1,24 @@
+{
+    "name": "Uncler M - 渾天儀 · 二十八星宿星圖 (Astronomical Armillary Sphere)",
+    "code": "// === Tab: mySketch.js ===\n// ----------------------------------------------------\n// 視覺創作與程式開發: Uncler M\n// 視覺主題: 中國古文明 · 天文渾天儀雙軸金屬環與二十八星宿星網 (Armillary Sphere & 28 Constellations)\n// 授權條款: Creative Commons BY-NC-SA 4.0 (姓名標示-非商業性-相同方式分享)\n// ----------------------------------------------------\n\nif (typeof width === 'undefined') { var width = 1280; }\nif (typeof height === 'undefined') { var height = 720; }\n\nvar stars = [];\nvar numStars = 28 * 4;\n\nfunction setup() {\n    createCanvas(windowWidth, windowHeight, WEBGL);\n    for (var i = 0; i < numStars; i++) {\n        var theta = random(TWO_PI);\n        var phi = random(-HALF_PI, HALF_PI);\n        var r = 400;\n        var x = r * cos(phi) * cos(theta);\n        var y = r * cos(phi) * sin(theta);\n        var z = r * sin(phi);\n        stars.push(createVector(x, y, z));\n    }\n}\n\nfunction draw() {\n    background(5, 6, 12);\n\n    var beat = (window.beatEnergy || 0.0);\n    var low = (window.audioLow || 0.5);\n    var t = frameCount * 0.008;\n\n    rotateX(t * 0.5);\n    rotateY(t * 0.7);\n\n    stroke('#d4af37');\n    strokeWeight(3 + low * 3);\n    noFill();\n\n    push();\n    rotateX(HALF_PI);\n    torus(220, 2);\n    pop();\n\n    push();\n    rotateX(0.41);\n    stroke('#ffb703');\n    torus(240, 2);\n    pop();\n\n    push();\n    rotateY(HALF_PI);\n    stroke('#2a9d8f');\n    torus(260, 2);\n    pop();\n\n    push();\n    stroke(255, 255, 255);\n    strokeWeight(1);\n    for (var i = 0; i < stars.length; i++) {\n        var s = stars[i];\n        point(s.x, s.y, s.z);\n        if (i % 4 !== 0) {\n            var prev = stars[i - 1];\n            line(s.x, s.y, s.z, prev.x, prev.y, prev.z);\n        }\n    }\n    pop();\n}\n\nfunction windowResized() {\n    resizeCanvas(windowWidth, windowHeight);\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "",
+    "author": "Uncler M",
+    "license": "CC BY-NC-SA 4.0",
+    "tags": [
+        "Uncler M",
+        "Chinese Civilisation",
+        "Astronomy",
+        "Armillary Sphere",
+        "Constellations"
+    ],
+    "date_added": "2026-07-21 17:56:00",
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Switchbacks in Crescendo.mp4"
+    ],
+    "used_count": 1
+}

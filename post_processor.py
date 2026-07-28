@@ -162,6 +162,42 @@ class FeedbackSystem:
             return img_np
 
 
+class VJAestheticEngine:
+    """4K MV 全域 VJ 審美引擎 (整合 HSL 色調諧振、電影級暗角與色燈後處理)"""
+    PRESETS = {
+        'CYBERPUNK': {'primary_rgb': (0, 240, 255), 'secondary_rgb': (255, 0, 85), 'bg_rgb': (11, 14, 20)},
+        'SYNTHWAVE': {'primary_rgb': (121, 40, 202), 'secondary_rgb': (255, 0, 128), 'bg_rgb': (15, 5, 29)},
+        'FLUID': {'primary_rgb': (0, 223, 137), 'secondary_rgb': (3, 105, 161), 'bg_rgb': (30, 41, 59)},
+        'MONOCHROME': {'primary_rgb': (245, 158, 11), 'secondary_rgb': (113, 113, 122), 'bg_rgb': (9, 9, 11)}
+    }
+
+    @staticmethod
+    def get_harmonic_color(pitch_class=0, energy=0.5, is_minor=False):
+        """計算符合音樂調性與能量的 HSL 諧和 RGB 向量 (0.0~1.0)"""
+        base_hue = (pitch_class * 30 + 15) % 360
+        sat = (0.35 + energy * 0.25) if is_minor else (0.65 + energy * 0.25)
+        light = (0.25 + energy * 0.30) if is_minor else (0.45 + energy * 0.30)
+        
+        c = (1.0 - abs(2.0 * light - 1.0)) * sat
+        x = c * (1.0 - abs((base_hue / 60.0) % 2 - 1.0))
+        m = light - c / 2.0
+        
+        if base_hue < 60:
+            r, g, b = c, x, 0.0
+        elif base_hue < 120:
+            r, g, b = x, c, 0.0
+        elif base_hue < 180:
+            r, g, b = 0.0, c, x
+        elif base_hue < 240:
+            r, g, b = 0.0, x, c
+        elif base_hue < 300:
+            r, g, b = x, 0.0, c
+        else:
+            r, g, b = c, 0.0, x
+            
+        return (float(r + m), float(g + m), float(b + m))
+
+
 class FluidSimulator:
     """基於渦流場（Vortex Field）的即時流體平流平滑模擬器"""
     def __init__(self):
@@ -270,7 +306,11 @@ class PostProcessor:
             'dynamic_mosaic': 0.0, 'pixel_art': 0.0, 'handheld_camera': 0.0,
             'stylized_fade': 0.0, 'zoom_pulse': 0.0,
             # 新增創意濾鏡
-            'photocopy_smear': 0.0, 'collage_cutout': 0.0
+            'photocopy_smear': 0.0, 'collage_cutout': 0.0,
+            # 頂級全域後製特效擴充 (Global Post-FX Matrix)
+            'film_burn': 0.0, 'blueprint_edge': 0.0, 'turing_pattern': 0.0,
+            'point_cloud_depth': 0.0, 'vector_scope': 0.0, 'lowpass_muffle': 0.0,
+            'infinity_tunnel': 0.0, 'dolly_zoom': 0.0
         }
         self._effect_variants = {}
         
@@ -279,6 +319,8 @@ class PostProcessor:
         self._frame_drop_last_t = 0.0
         self._cam_drift_x = 0.0
         self._cam_drift_y = 0.0
+        self._turing_A = None
+        self._turing_B = None
 
         # Time-Vessel Matrix (走馬燈時間卷軸矩陣，滾動歷史緩衝區，預設 2 秒 @ 30fps，16 個特徵維度)
         self.time_vessel_size = 60
@@ -298,11 +340,11 @@ class PostProcessor:
 
         # 五大視覺美學主題風格包
         self.theme_pools = {
-            'CyberGlitch': ['data_mosh', 'pixel_sort', 'scanline_glitch', 'matrix_ascii', 'phase_slit', 'centroid_glitch'],
-            'RetroAnalog': ['retro_degradation', 'vector_scan', 'frame_drop', 'handheld_camera', 'stylized_fade', 'photocopy_smear'],
-            'DreamyArtistic': ['glow_illumination', 'kuwahara_paint', 'temporal_feedback', 'sedimentation', 'fluid_noise', 'collage_cutout'],
-            'Psychedelic': ['color_spectral', 'thermal_vision', 'kaleidoscope', 'reaction_diffusion', 'spatial_warping'],
-            'DigitalPixel': ['dynamic_mosaic', 'pixel_art', 'zoom_pulse', 'temporal_fractal']
+            'CyberGlitch': ['data_mosh', 'pixel_sort', 'scanline_glitch', 'matrix_ascii', 'phase_slit', 'centroid_glitch', 'film_burn', 'vector_scope'],
+            'RetroAnalog': ['retro_degradation', 'vector_scan', 'frame_drop', 'handheld_camera', 'stylized_fade', 'photocopy_smear', 'blueprint_edge', 'lowpass_muffle'],
+            'DreamyArtistic': ['glow_illumination', 'kuwahara_paint', 'temporal_feedback', 'sedimentation', 'fluid_noise', 'collage_cutout', 'turing_pattern', 'point_cloud_depth'],
+            'Psychedelic': ['color_spectral', 'thermal_vision', 'kaleidoscope', 'reaction_diffusion', 'spatial_warping', 'infinity_tunnel'],
+            'DigitalPixel': ['dynamic_mosaic', 'pixel_art', 'zoom_pulse', 'temporal_fractal', 'dolly_zoom']
         }
         
         # 建立跨主題全域特效集合（用於 is_sig 門控判斷）
@@ -552,7 +594,9 @@ class PostProcessor:
             'data_mosh', 'pixel_sort', 'matrix_ascii', 'reaction_diffusion', 
             'centroid_glitch', 'phase_slit', 'temporal_fractal', 'scanline_glitch', 
             'dynamic_mosaic', 'pixel_art', 'spatial_warping', 'fluid_noise', 
-            'temporal_feedback', 'kaleidoscope', 'vector_scan', 'photocopy_smear', 'collage_cutout'
+            'temporal_feedback', 'kaleidoscope', 'vector_scan', 'photocopy_smear', 'collage_cutout',
+            'film_burn', 'blueprint_edge', 'turing_pattern', 'point_cloud_depth', 'vector_scope',
+            'lowpass_muffle', 'infinity_tunnel', 'dolly_zoom'
         }
 
         for fx_name in self.fx_active_states:
@@ -806,6 +850,16 @@ class PostProcessor:
             # 新增影印掃描與拼貼濾鏡乘數
             m_photocopy = base_mult * (smoothed_percussive * 1.1 + smoothed_roughness * 0.5)
             m_collage = base_mult * (ethereal_ambience * 1.3 + (1.0 - beat_phase) * 0.6)
+
+            # 頂級全域後製特效矩陣擴充乘數 (Global Post-FX Matrix)
+            m_filmburn = base_mult * (smoothed_sub_bass * 1.2 + smoothed_roughness * 0.8)
+            m_blueprint = base_mult * (harmonic * 1.1 + chord_brightness * 0.6)
+            m_turing = base_mult * (smoothed_ethereal * 1.2 + smoothed_percussive * 0.6)
+            m_pointcloud = base_mult * (smoothed_sub_bass * 1.1 + stereo_width * 0.7)
+            m_vectorscope = base_mult * (stereo_width * 1.2 + chord_brightness * 0.5)
+            m_lowpass = base_mult * (audio_feats.get('lowpass', 0.0) * 1.5)
+            m_infinity = base_mult * (beat_energy * 1.2 + section_progress * 0.5)
+            m_dollyzoom = base_mult * (anticipation_factor * 1.4 + beat_energy * 0.6)
         else:
             m_dist = m_fluid = m_feed = m_color = m_glow = m_retro = m_pixel = base_mult
             m_mosh = m_sediment = m_vscan = m_fractal = base_mult
@@ -813,6 +867,7 @@ class PostProcessor:
             m_kuwahara = m_matrix = m_reaction = base_mult
             m_thermal = m_scanglitch = m_framedrop = m_mosaic = m_pixelart = m_handheld = m_stylizedfade = m_zoompulse = base_mult
             m_photocopy = m_collage = base_mult
+            m_filmburn = m_blueprint = m_turing = m_pointcloud = m_vectorscope = m_lowpass = m_infinity = m_dollyzoom = base_mult
             self._k_cx_offset = int((stereo_width - 0.5) * 200.0 * base_mult)
 
         # 影片結構分鏡權重優化
@@ -823,6 +878,7 @@ class PostProcessor:
             m_kuwahara *= 1.2; m_matrix *= 0.1; m_reaction *= 0.3
             m_thermal *= 0.2; m_scanglitch *= 0.1; m_framedrop *= 1.2; m_mosaic *= 0.1; m_pixelart *= 0.3; m_handheld *= 0.4; m_zoompulse *= 0.2
             m_photocopy *= 0.1; m_collage *= 0.4
+            m_filmburn *= 0.3; m_blueprint *= 0.8; m_turing *= 0.5; m_pointcloud *= 0.4; m_vectorscope *= 0.2; m_lowpass *= 1.2; m_infinity *= 0.3; m_dollyzoom *= 0.2
         elif section_name == 'Build-up':
             pf = 0.4 + 1.2 * section_progress
             m_dist *= 0.7*pf; m_fluid *= 0.6*pf; m_feed *= 0.8*pf; m_color *= 1.2*pf; m_glow *= 1.3*pf; m_retro *= 0.8*pf; m_pixel *= 0.7*pf
@@ -830,6 +886,7 @@ class PostProcessor:
             m_kuwahara *= 0.7*pf; m_matrix *= 1.2*pf; m_reaction *= 1.1*pf
             m_thermal *= 0.8*pf; m_scanglitch *= 1.0*pf; m_framedrop *= 0.6*pf; m_mosaic *= 0.8*pf; m_pixelart *= 0.9*pf; m_handheld *= 0.9*pf; m_zoompulse *= 1.1*pf
             m_photocopy *= 0.9*pf; m_collage *= 0.8*pf
+            m_filmburn *= 0.8*pf; m_blueprint *= 0.9*pf; m_turing *= 0.7*pf; m_pointcloud *= 0.9*pf; m_vectorscope *= 1.1*pf; m_lowpass *= 0.5*pf; m_infinity *= 1.0*pf; m_dollyzoom *= (1.0 + 0.8*anticipation_factor)
         elif section_name in ('Drop', 'Chorus'):
             ef = 1.3 + 0.6 * arousal
             m_dist *= 1.5*ef; m_fluid *= (0.8 + 0.6*smoothed_percussive); m_feed *= (0.7 + 0.6*smoothed_ethereal)
@@ -839,6 +896,7 @@ class PostProcessor:
             m_kuwahara *= 0.5*ef; m_matrix *= 1.4*ef; m_reaction *= 1.5*ef
             m_thermal *= 1.3*ef; m_scanglitch *= (1.2 + 0.6*smoothed_roughness); m_framedrop *= (0.5 + 0.3*arousal); m_mosaic *= (1.4 + 0.8*smoothed_sub_bass); m_pixelart *= 1.1*ef; m_handheld *= (1.2 + 0.6*smoothed_roughness); m_zoompulse *= 1.5*ef
             m_photocopy *= (1.2 + 0.6*smoothed_percussive); m_collage *= (1.1 + 0.5*smoothed_ethereal)
+            m_filmburn *= 1.4*ef; m_blueprint *= 0.6*ef; m_turing *= 1.2*ef; m_pointcloud *= 1.5*ef; m_vectorscope *= 1.4*ef; m_lowpass *= 0.2*ef; m_infinity *= 1.5*ef; m_dollyzoom *= 1.3*ef
 
         if genre_clean in ('lo-fi', 'ambient', 'jazz'):
             m_dist = 0.0; m_fluid = base_mult*0.7; m_feed = base_mult*0.8; m_color = base_mult*0.1; m_glow = base_mult*1.1; m_pixel = 0.0
@@ -846,6 +904,7 @@ class PostProcessor:
             m_kuwahara *= 1.3; m_matrix *= 0.3; m_reaction *= 0.5
             m_thermal *= 0.4; m_scanglitch *= 0.2; m_framedrop *= 1.3; m_mosaic *= 0.2; m_pixelart *= 0.8; m_handheld *= 0.5; m_zoompulse *= 0.4
             m_photocopy *= 0.3; m_collage *= 0.8
+            m_filmburn *= 0.6; m_blueprint *= 1.1; m_turing *= 1.2; m_pointcloud *= 0.7; m_vectorscope *= 0.3; m_lowpass *= 1.4; m_infinity *= 0.6; m_dollyzoom *= 0.4
 
         # 機率閘門動態相乘
         m_dist *= self.fx_active_states['spatial_warping']
@@ -873,6 +932,14 @@ class PostProcessor:
         m_zoompulse *= self.fx_active_states['zoom_pulse']
         m_photocopy *= self.fx_active_states['photocopy_smear']
         m_collage *= self.fx_active_states['collage_cutout']
+        m_filmburn *= self.fx_active_states['film_burn']
+        m_blueprint *= self.fx_active_states['blueprint_edge']
+        m_turing *= self.fx_active_states['turing_pattern']
+        m_pointcloud *= self.fx_active_states['point_cloud_depth']
+        m_vectorscope *= self.fx_active_states['vector_scope']
+        m_lowpass *= self.fx_active_states['lowpass_muffle']
+        m_infinity *= self.fx_active_states['infinity_tunnel']
+        m_dollyzoom *= self.fx_active_states['dolly_zoom']
 
         # Apply song-specific dynamic intensity modifier adjustments
         modifiers = getattr(self, 'effect_modifiers', {})
@@ -903,6 +970,14 @@ class PostProcessor:
             m_zoompulse *= modifiers.get('zoom_pulse', {}).get('intensity', 1.0)
             m_photocopy *= modifiers.get('photocopy_smear', {}).get('intensity', 1.0)
             m_collage *= modifiers.get('collage_cutout', {}).get('intensity', 1.0)
+            m_filmburn *= modifiers.get('film_burn', {}).get('intensity', 1.0)
+            m_blueprint *= modifiers.get('blueprint_edge', {}).get('intensity', 1.0)
+            m_turing *= modifiers.get('turing_pattern', {}).get('intensity', 1.0)
+            m_pointcloud *= modifiers.get('point_cloud_depth', {}).get('intensity', 1.0)
+            m_vectorscope *= modifiers.get('vector_scope', {}).get('intensity', 1.0)
+            m_lowpass *= modifiers.get('lowpass_muffle', {}).get('intensity', 1.0)
+            m_infinity *= modifiers.get('infinity_tunnel', {}).get('intensity', 1.0)
+            m_dollyzoom *= modifiers.get('dolly_zoom', {}).get('intensity', 1.0)
 
         # ═══════════════════════════════════════════════════════════
         # 統一 NumPy 流水線入口：盡早轉入 ndarray，最大幅度減少 PIL↔NumPy 轉型
@@ -1055,6 +1130,51 @@ class PostProcessor:
         if fx_flags.get('collage_cutout', True) and m_collage > 0.01:
             var_idx = self.get_variant_index('collage_cutout', t, is_beat)
             img_np = self.apply_collage_cutout_custom(img_np, m_collage, var_idx)
+
+        # ═══════════════════════════════════════════════════════════
+        # 全新維度全域後製特效矩陣 (Global Post-FX Matrix 8 大頂級特效)
+        # ═══════════════════════════════════════════════════════════
+        # Pass 9.1: Film Burn & Chemical Bleed (膠片腐蝕)
+        if fx_flags.get('film_burn', True) and m_filmburn > 0.01:
+            var_idx = self.get_variant_index('film_burn', t, is_beat)
+            img_np = self.apply_film_burn_custom(img_np, t, m_filmburn, smoothed_sub_bass, smoothed_roughness, is_beat, var_idx)
+
+        # Pass 9.2: Blueprint & CAD Wireframe (建築藍圖)
+        if fx_flags.get('blueprint_edge', True) and m_blueprint > 0.01:
+            var_idx = self.get_variant_index('blueprint_edge', t, is_beat)
+            img_np = self.apply_blueprint_edge_custom(img_np, m_blueprint, harmonic, smoothed_roughness, var_idx)
+
+        # Pass 9.3: Turing Pattern Reaction Diffusion (圖靈細胞)
+        if fx_flags.get('turing_pattern', True) and m_turing > 0.01:
+            var_idx = self.get_variant_index('turing_pattern', t, is_beat)
+            img_np = self.apply_turing_pattern_custom(img_np, t, m_turing, smoothed_ethereal, is_beat, var_idx)
+
+        # Pass 9.4: Depth-Map Point Cloud Projection (點雲深度)
+        if fx_flags.get('point_cloud_depth', True) and m_pointcloud > 0.01:
+            var_idx = self.get_variant_index('point_cloud_depth', t, is_beat)
+            img_np = self.apply_point_cloud_depth_custom(img_np, m_pointcloud, smoothed_sub_bass, stereo_width, var_idx)
+
+        # Pass 9.5: Stereo Phase Vector-Scope (聲相示波)
+        if fx_flags.get('vector_scope', True) and m_vectorscope > 0.01:
+            var_idx = self.get_variant_index('vector_scope', t, is_beat)
+            audio_samples = audio_feats.get('audio_samples', None)
+            img_np = self.apply_vector_scope_custom(img_np, t, m_vectorscope, stereo_width, chord_hue, audio_samples, var_idx)
+
+        # Pass 9.6: Low-Pass Muffle & DoF Blur (悶音景深)
+        if fx_flags.get('lowpass_muffle', True) and m_lowpass > 0.01:
+            var_idx = self.get_variant_index('lowpass_muffle', t, is_beat)
+            lowpass_val = audio_feats.get('lowpass', 0.0)
+            img_np = self.apply_lowpass_muffle_custom(img_np, m_lowpass, lowpass_val, var_idx)
+
+        # Pass 9.7: Anamorphic Infinity Tunnel (無限鏡廊)
+        if fx_flags.get('infinity_tunnel', True) and m_infinity > 0.01:
+            var_idx = self.get_variant_index('infinity_tunnel', t, is_beat)
+            img_np = self.apply_infinity_tunnel_custom(img_np, t, m_infinity, beat_phase, beat_energy, var_idx)
+
+        # Pass 9.8: Vertigo Dolly Zoom (眩暈推拉)
+        if fx_flags.get('dolly_zoom', True) and m_dollyzoom > 0.01:
+            var_idx = self.get_variant_index('dolly_zoom', t, is_beat)
+            img_np = self.apply_dolly_zoom_custom(img_np, m_dollyzoom, anticipation_factor, is_beat, var_idx)
 
         # ═══════════════════════════════════════════════════════════
         # 電影級音樂情感調色與純色過渡 (Cinematic Mood Adaptation)
@@ -1973,9 +2093,7 @@ class PostProcessor:
             h, w = img_np.shape[:2]
             if variant == 0:
                 img_np = self.time_displacement_buffer.apply(img_np, 0.7 * intensity)
-                img_pil = Image.fromarray(img_np)
-                img_pil = self.feedback_system.apply(img_pil, intensity * (ethereal + 0.1), chord_name=chord_name, reverb_decay=(0.05 if ethereal > 0.5 else 0.15))
-                return np.array(img_pil.convert('RGB'))
+                return self.feedback_system.apply(img_np, intensity * (ethereal + 0.1), chord_name=chord_name, reverb_decay=(0.05 if ethereal > 0.5 else 0.15))
             elif variant == 1:
                 if len(self.time_displacement_buffer.buffer) < 5: return img_np
                 buf = self.time_displacement_buffer.buffer
@@ -1987,9 +2105,7 @@ class PostProcessor:
                     out_np[y_start:y_end, :, :] = buf[-(i + 1)][y_start:y_end, :, :]
                 return out_np
             elif variant == 2:
-                img_pil = Image.fromarray(img_np)
-                img_pil = self.feedback_system.apply(img_pil, intensity * 1.5, chord_name=chord_name, reverb_decay=0.4)
-                return np.array(img_pil.convert('RGB'))
+                return self.feedback_system.apply(img_np, intensity * 1.5, chord_name=chord_name, reverb_decay=0.4)
             elif variant == 3:
                 if len(self.time_displacement_buffer.buffer) < 5: return img_np
                 past = self.time_displacement_buffer.buffer[-3]
@@ -3712,6 +3828,475 @@ class PostProcessor:
             return out
         except Exception as e:
             logger.error(f"Collage Cutout error: {e}")
+            return img_np
+
+    # ════════════════════════════════════════════════════════════════
+    # 全新維度全域後製特效矩陣 (Global Post-FX Matrix 8 大頂級特效演算法)
+    # ════════════════════════════════════════════════════════════════
+
+    # 2.1 膠片燒灼與化學腐蝕 (Film Burn & Chemical Bleed) 5 變種
+    def apply_film_burn_custom(self, img_np, t, intensity, sub_bass, roughness, is_beat, variant):
+        if intensity < 0.01 or cv2 is None: return img_np
+        try:
+            h, w = img_np.shape[:2]
+            gray = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
+            out = img_np.copy()
+            
+            # 高光遮罩
+            _, high_mask = cv2.threshold(gray, 185, 255, cv2.THRESH_BINARY)
+            
+            # 邊緣燒灼擴散圖騰
+            y_indices, x_indices = np.mgrid[0:h, 0:w]
+            dist_edge = np.minimum(np.minimum(x_indices, w - 1 - x_indices),
+                                   np.minimum(y_indices, h - 1 - y_indices)).astype(np.float32)
+            edge_norm = 1.0 - np.clip(dist_edge / (min(w, h) * 0.35 * (1.0 + sub_bass)), 0.0, 1.0)
+            
+            burn_noise = np.sin(x_indices * 0.03 + t * 4.0) * np.cos(y_indices * 0.03 - t * 3.0) * 0.5 + 0.5
+            burn_mask = np.clip(edge_norm * 1.2 + burn_noise * 0.3 * sub_bass, 0.0, 1.0) * intensity
+
+            if variant == 0:
+                # 35mm 暖色硝酸高光漏光 (Warm Amber Leak)
+                burn_color = np.array([245, 120, 25], dtype=np.float32)
+                boost = (high_mask.astype(np.float32) / 255.0)[:, :, None] * 1.5 * intensity
+                burned = out.astype(np.float32) * (1.0 + burn_mask[:, :, None] * 0.6) + burn_color * burn_mask[:, :, None] * 0.8 + boost * 50.0
+                out = np.clip(burned, 0, 255).astype(np.uint8)
+                
+            elif variant == 1:
+                # 鹼蝕反轉邊緣 (Chemical Bleed Acid Wash)
+                acid_color = np.array([20, 230, 180], dtype=np.float32)
+                inv = 255 - out
+                out = cv2.addWeighted(out, 1.0 - burn_mask.mean(), inv, burn_mask.mean() * intensity, 0)
+                out = cv2.addWeighted(out, 0.8, (acid_color * burn_mask[:, :, None]).astype(np.uint8), 0.5 * intensity, 0)
+                
+            elif variant == 2:
+                # 放映機光門過熱消融 (Projector Gate Melt)
+                cx, cy = w // 2, h // 2
+                dist_center = np.sqrt((x_indices - cx)**2 + (y_indices - cy)**2) / (min(w, h) * 0.5)
+                center_burn = np.clip(1.0 - dist_center + sub_bass * 0.4, 0.0, 1.0) * intensity
+                overexp = np.clip(out.astype(np.float32) * (1.0 + center_burn[:, :, None] * 2.0), 0, 255).astype(np.uint8)
+                out = cv2.addWeighted(out, 1.0 - center_burn.mean(), overexp, center_burn.mean(), 0)
+                
+            elif variant == 3:
+                # 側邊膠片齒孔漏光 (Super 8 Edge Sprocket Burn)
+                sprocket_mask = np.zeros((h, w), dtype=np.float32)
+                sprocket_mask[:, :int(w * 0.12)] = 1.0
+                sprocket_mask[:, int(w * 0.88):] = 1.0
+                leak_pulse = (np.sin(t * 12.0) * 0.5 + 0.5) * intensity
+                out = cv2.addWeighted(out, 1.0, (np.ones_like(out) * np.array([255, 140, 40], dtype=np.uint8)), sprocket_mask.mean() * leak_pulse * 0.7, 0)
+                
+            else:
+                # 硝酸銀極限曝光對比 (Solarized Nitrate Flare)
+                solarized = np.where(out > 128, 255 - out, out * 2)
+                out = cv2.addWeighted(out, 1.0 - intensity * 0.7, solarized, intensity * 0.7, 0)
+
+            # 正拍底片跳齒與閃白漏光
+            if is_beat and (sub_bass > 0.6 or roughness > 0.5):
+                shift_y = int(h * 0.04 * (1.0 if t % 2 > 1 else -1.0))
+                out = np.roll(out, shift_y, axis=0)
+                flash = np.full_like(out, (255, 240, 210), dtype=np.uint8)
+                out = cv2.addWeighted(out, 0.75, flash, 0.25 * intensity, 0)
+                
+            return out
+        except Exception as e:
+            logger.error(f"Film Burn error: {e}")
+            return img_np
+
+    # 2.2 建築藍圖與 CAD 線稿 (Cyanotype & Architectural Blueprint) 5 變種
+    def apply_blueprint_edge_custom(self, img_np, intensity, harmonic, roughness, variant):
+        if intensity < 0.01 or cv2 is None: return img_np
+        try:
+            h, w = img_np.shape[:2]
+            gray = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
+            
+            # 精細 Canny 邊緣提取 (由 harmonic 調製線條精細度)
+            t1 = int(30 + 40 * (1.0 - harmonic))
+            t2 = int(100 + 80 * harmonic)
+            edges = cv2.Canny(gray, t1, t2)
+            
+            out = img_np.copy()
+            
+            if variant == 0:
+                # 普魯士日光藍印 (Prussian Cyanotype Classic)
+                bg = np.full((h, w, 3), [10, 35, 90], dtype=np.uint8)
+                edge_img = np.full((h, w, 3), [210, 240, 255], dtype=np.uint8)
+                blueprint = np.where(edges[:, :, None] > 0, edge_img, bg)
+                out = cv2.addWeighted(out, 1.0 - intensity, blueprint, intensity, 0)
+                
+            elif variant == 1:
+                # 漆黑科技 CAD 線稿 (Dark Mode CAD Wireframe)
+                bg = np.full((h, w, 3), [15, 18, 24], dtype=np.uint8)
+                edge_img = np.full((h, w, 3), [0, 240, 200], dtype=np.uint8)
+                blueprint = np.where(edges[:, :, None] > 0, edge_img, bg)
+                out = cv2.addWeighted(out, 1.0 - intensity, blueprint, intensity, 0)
+                
+            elif variant == 2:
+                # 羊皮紙工程草圖 (Parchment Engineering Draft)
+                bg = np.full((h, w, 3), [230, 215, 180], dtype=np.uint8)
+                edge_img = np.full((h, w, 3), [60, 40, 20], dtype=np.uint8)
+                blueprint = np.where(edges[:, :, None] > 0, edge_img, bg)
+                out = cv2.addWeighted(out, 1.0 - intensity, blueprint, intensity, 0)
+                
+            elif variant == 3:
+                # 全息霓虹網格 (Holographic Neon Grid)
+                bg = np.full((h, w, 3), [40, 10, 50], dtype=np.uint8)
+                edge_img = np.full((h, w, 3), [50, 250, 240], dtype=np.uint8)
+                blueprint = np.where(edges[:, :, None] > 0, edge_img, bg)
+                out = cv2.addWeighted(out, 1.0 - intensity, blueprint, intensity, 0)
+                
+            else:
+                # 結構應力黃變位移 (Dynamic Structural Strain)
+                yellow_bg = np.full((h, w, 3), [200, 180, 50], dtype=np.uint8) if roughness > 0.4 else np.full((h, w, 3), [10, 35, 90], dtype=np.uint8)
+                edge_img = np.full((h, w, 3), [255, 255, 255], dtype=np.uint8)
+                blueprint = np.where(edges[:, :, None] > 0, edge_img, yellow_bg)
+                out = cv2.addWeighted(out, 1.0 - intensity, blueprint, intensity, 0)
+
+            # 動態 CAD 網格與坐標標尺繪製
+            grid_step = 80
+            line_color = (180, 220, 255) if variant != 2 else (100, 80, 50)
+            
+            # 十字線與座標文字
+            cv2.line(out, (w // 2, 0), (w // 2, h), line_color, 1)
+            cv2.line(out, (0, h // 2), (w, h // 2), line_color, 1)
+            
+            # 刻度尺
+            for x in range(0, w, grid_step):
+                cv2.line(out, (x, 0), (x, 10), line_color, 1)
+            for y in range(0, h, grid_step):
+                cv2.line(out, (0, y), (10, y), line_color, 1)
+                
+            cad_info = f"CAD_REV: 4.2 | HARMONIC: {harmonic:.2f} | ROUGH: {roughness:.2f}"
+            cv2.putText(out, cad_info, (20, h - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.45, line_color, 1, cv2.LINE_AA)
+            
+            return out
+        except Exception as e:
+            logger.error(f"Blueprint Edge error: {e}")
+            return img_np
+
+    # 2.3 圖靈擴散與生物斑紋 (Turing Pattern / Reaction-Diffusion) 5 變種
+    def apply_turing_pattern_custom(self, img_np, t, intensity, ethereal, is_beat, variant):
+        if intensity < 0.01 or cv2 is None: return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dh, dw = max(64, h // 4), max(64, w // 4)
+            
+            # 初始化 A/B 濃度陣列
+            if self._turing_A is None or self._turing_A.shape != (dh, dw):
+                self._turing_A = np.ones((dh, dw), dtype=np.float32)
+                self._turing_B = np.zeros((dh, dw), dtype=np.float32)
+                # 注入初始亂數種子
+                self._turing_B[dh//4:3*dh//4, dw//4:3*dw//4] = np.random.rand(dh//2, dw//2) * 0.5
+
+            # 拍點觸發突變核注入 B 物質
+            if is_beat:
+                rx = random.randint(10, dw - 20)
+                ry = random.randint(10, dh - 20)
+                rw = random.randint(5, 15)
+                self._turing_B[ry:ry+rw, rx:rx+rw] = 0.9
+
+            # 拉普拉斯擴散迭代 Step (Gray-Scott 模型)
+            Da = 0.16 + 0.04 * ethereal
+            Db = 0.08
+            f, k = 0.055, 0.062
+            
+            A = self._turing_A
+            B = self._turing_B
+            
+            lap_A = cv2.boxFilter(A, -1, (3, 3)) - A
+            lap_B = cv2.boxFilter(B, -1, (3, 3)) - B
+            
+            abb = A * B * B
+            self._turing_A = np.clip(A + (Da * lap_A - abb + f * (1.0 - A)) * 0.8, 0.0, 1.0)
+            self._turing_B = np.clip(B + (Db * lap_B + abb - (k + f) * B) * 0.8, 0.0, 1.0)
+            
+            # 升頻放大至原圖尺寸
+            turing_mask = cv2.resize(self._turing_B, (w, h), interpolation=cv2.INTER_LINEAR)
+            turing_mask = np.clip(turing_mask * 2.5, 0.0, 1.0)
+            
+            out = img_np.copy()
+            
+            if variant == 0:
+                # 珊瑚斑塊 (Coral Reef Growth)
+                coral_color = np.array([230, 80, 120], dtype=np.uint8)
+                blend = cv2.addWeighted(out, 1.0, np.full_like(out, coral_color), 0.6, 0)
+                out = np.where(turing_mask[:, :, None] > 0.4, blend, out)
+                
+            elif variant == 1:
+                # 斑馬分裂紋理 (Leopard Spot Cell Division)
+                spots = (turing_mask[:, :, None] * 255).astype(np.uint8)
+                out = cv2.subtract(out, spots)
+                
+            elif variant == 2:
+                # 迷宮生物波紋 (Labyrinthine Bio-Maze)
+                maze = cv2.applyColorMap((turing_mask * 255).astype(np.uint8), cv2.COLORMAP_OCEAN)
+                out = cv2.addWeighted(out, 1.0 - intensity * 0.6, maze, intensity * 0.6, 0)
+                
+            elif variant == 3:
+                # 暗黑寄生脈絡 (Alien Parasite Veins)
+                dark_veins = (1.0 - turing_mask[:, :, None] * 0.8) * out.astype(np.float32)
+                out = np.clip(dark_veins, 0, 255).astype(np.uint8)
+                
+            else:
+                # 螢光浮游生物 (Bioluminescent Plankton Swarm)
+                glow_color = np.array([30, 240, 220], dtype=np.float32)
+                glow_layer = (glow_color * turing_mask[:, :, None] * intensity).astype(np.uint8)
+                out = cv2.add(out, glow_layer)
+                
+            return out
+        except Exception as e:
+            logger.error(f"Turing Pattern error: {e}")
+            return img_np
+
+    # 2.4 點雲立體深度重構 (Depth-Map Point Cloud Projection) 5 變種
+    def apply_point_cloud_depth_custom(self, img_np, intensity, bass_ratio, stereo_width, variant):
+        if intensity < 0.01 or cv2 is None: return img_np
+        try:
+            h, w = img_np.shape[:2]
+            gray = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
+            
+            # Z 軸深度圖拉伸
+            depth = (gray.astype(np.float32) / 255.0) * 40.0 * bass_ratio * intensity
+            
+            y, x = np.mgrid[0:h:8, 0:w:8]
+            depth_sampled = depth[::8, ::8]
+            
+            # 視角微幅 Pitch/Yaw 旋轉點雲位移
+            yaw_angle = (stereo_width - 0.5) * 0.4
+            shift_x = depth_sampled * np.sin(yaw_angle)
+            shift_y = depth_sampled * np.cos(yaw_angle) * 0.3
+            
+            pts_x = np.clip(x + shift_x, 0, w - 1).astype(np.int32)
+            pts_y = np.clip(y + shift_y, 0, h - 1).astype(np.int32)
+            
+            out = img_np.copy()
+            canvas = np.zeros_like(img_np)
+            
+            if variant == 0:
+                # 賽博綠光點雲 (Cyberpunk Particle Matrix)
+                canvas[pts_y, pts_x] = [0, 255, 120]
+            elif variant == 1:
+                # 光達體積掃描 (Volumetric Lidar Scanner)
+                canvas[pts_y, pts_x] = [0, 200, 255]
+                cv2.line(canvas, (0, int(h * (self.last_t % 1.0))), (w, int(h * (self.last_t % 1.0))), (0, 255, 255), 2)
+            elif variant == 2:
+                # 琥珀星塵粒子 (Celestial Dust Constellation)
+                canvas[pts_y, pts_x] = [255, 180, 40]
+            elif variant == 3:
+                # 等高梯形 Voxels (Void Topographic Voxels)
+                canvas[pts_y, pts_x] = [220, 100, 250]
+            else:
+                # 超光速穿梭點陣 (Hyperdrive Warp Particles)
+                canvas[pts_y, pts_x] = [255, 255, 255]
+
+            canvas = cv2.GaussianBlur(canvas, (3, 3), 0)
+            return cv2.addWeighted(out, 1.0 - intensity * 0.7, canvas, intensity * 0.8, 0)
+        except Exception as e:
+            logger.error(f"Point Cloud Depth error: {e}")
+            return img_np
+
+    # 2.5 聲相向量示波鏡 (Stereo Phase Vector-Scope) 5 變種
+    def apply_vector_scope_custom(self, img_np, t, intensity, stereo_width, chord_hue, audio_samples, variant):
+        if intensity < 0.01 or cv2 is None: return img_np
+        try:
+            h, w = img_np.shape[:2]
+            cx, cy = w // 2, h // 2
+            r_c, g_c, b_c = self._hue_to_rgb(chord_hue)
+            
+            # 生成 Lissajous 示波軌跡點
+            if audio_samples is not None and len(audio_samples) >= 128:
+                samples = audio_samples[:128]
+                x_pts = (cx + samples * (w * 0.25 * stereo_width)).astype(np.int32)
+                y_pts = (cy + np.roll(samples, 32) * (h * 0.25 * stereo_width)).astype(np.int32)
+            else:
+                pts_n = 100
+                theta = np.linspace(0, 2 * np.pi, pts_n)
+                x_pts = (cx + np.sin(2 * theta + t * 4.0) * (w * 0.2 * stereo_width)).astype(np.int32)
+                y_pts = (cy + np.cos(3 * theta + t * 3.0) * (h * 0.2 * stereo_width)).astype(np.int32)
+                
+            pts = np.vstack((x_pts, y_pts)).T.reshape((-1, 1, 2))
+            
+            # 在發光 overlay 上繪製示波幾何
+            scope_canvas = np.zeros_like(img_np)
+            color = (r_c, g_c, b_c)
+            cv2.polylines(scope_canvas, [pts], isClosed=True, color=color, thickness=2)
+            glow = cv2.GaussianBlur(scope_canvas, (11, 11), 0)
+            scope_canvas = cv2.addWeighted(scope_canvas, 1.0, glow, 0.8, 0)
+            
+            # 利用示波線條空間梯度對背景進行光學折射 (Refraction Distortion)
+            gray_scope = cv2.cvtColor(scope_canvas, cv2.COLOR_RGB2GRAY)
+            grad_x = cv2.Sobel(gray_scope, cv2.CV_32F, 1, 0, ksize=3)
+            grad_y = cv2.Sobel(gray_scope, cv2.CV_32F, 0, 1, ksize=3)
+            
+            grid_y, grid_x = np.mgrid[0:h, 0:w].astype(np.float32)
+            map_x = np.clip(grid_x + grad_x * 0.05 * intensity, 0, w - 1)
+            map_y = np.clip(grid_y + grad_y * 0.05 * intensity, 0, h - 1)
+            
+            refracted = cv2.remap(img_np, map_x, map_y, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            
+            if variant == 0:
+                # 霓虹陰極 Lissajous (Neon Cathode Lissajous)
+                return cv2.addWeighted(refracted, 1.0, scope_canvas, intensity, 0)
+            elif variant == 1:
+                # 量子向量雷達 (Quantum Vector Radar)
+                cv2.circle(scope_canvas, (cx, cy), int(h * 0.3 * stereo_width), color, 1)
+                return cv2.addWeighted(refracted, 1.0, scope_canvas, intensity, 0)
+            elif variant == 2:
+                # 等離子電弧光譜 (Plasma Arc Spectrogram)
+                plasma = cv2.applyColorMap(gray_scope, cv2.COLORMAP_MAGMA)
+                return cv2.addWeighted(refracted, 1.0 - intensity * 0.5, plasma, intensity * 0.7, 0)
+            elif variant == 3:
+                # 賽博標尺 Target (Cyber-Grid Vector Target)
+                cv2.line(scope_canvas, (cx - 40, cy), (cx + 40, cy), (255, 255, 255), 1)
+                cv2.line(scope_canvas, (cx, cy - 40), (cx, cy + 40), (255, 255, 255), 1)
+                return cv2.addWeighted(refracted, 1.0, scope_canvas, intensity, 0)
+            else:
+                # 立體聲色散萬花筒 (Chromatic Stereo Kaleidoscope)
+                split_r = np.roll(scope_canvas[:, :, 0], 5, axis=1)
+                split_b = np.roll(scope_canvas[:, :, 2], -5, axis=1)
+                scope_canvas[:, :, 0] = split_r
+                scope_canvas[:, :, 2] = split_b
+                return cv2.addWeighted(refracted, 1.0, scope_canvas, intensity, 0)
+        except Exception as e:
+            logger.error(f"Vector Scope error: {e}")
+            return img_np
+
+    # 2.6 低通悶音景深遮罩 (Low-Pass Muffle & DoF Blur) 5 變種
+    def apply_lowpass_muffle_custom(self, img_np, intensity, lowpass_val, variant):
+        if intensity < 0.01 or cv2 is None: return img_np
+        try:
+            h, w = img_np.shape[:2]
+            eff = intensity * max(0.2, lowpass_val)
+            
+            # 多級景深高斯模糊 Kernel
+            ksize = int(15 * eff) | 1
+            ksize = max(3, min(51, ksize))
+            blurred = cv2.GaussianBlur(img_np, (ksize, ksize), 0)
+            
+            # 呼吸暗角 Vignette Mask
+            y, x = np.mgrid[0:h, 0:w].astype(np.float32)
+            cx, cy = w / 2.0, h / 2.0
+            dist = np.sqrt((x - cx)**2 + (y - cy)**2) / np.sqrt(cx**2 + cy**2)
+            vignette = np.clip(1.0 - dist * eff * 1.2, 0.0, 1.0)[:, :, None]
+            
+            out = (blurred.astype(np.float32) * vignette).astype(np.uint8)
+            
+            if variant == 0:
+                # 水下沉浸深藍 (Deep Underwater Submersion)
+                tint = np.full_like(out, [10, 40, 80], dtype=np.uint8)
+                return cv2.addWeighted(out, 0.7, tint, 0.3 * eff, 0)
+            elif variant == 1:
+                # 隔牆派對悶音 (Behind-The-Wall Club Muffle)
+                tint = np.full_like(out, [50, 30, 20], dtype=np.uint8)
+                return cv2.addWeighted(out, 0.75, tint, 0.25 * eff, 0)
+            elif variant == 2:
+                # 麻醉夢境白霧 (Anesthetic Dream Fog)
+                fog = np.full_like(out, [220, 230, 240], dtype=np.uint8)
+                return cv2.addWeighted(out, 1.0 - eff * 0.4, fog, eff * 0.4, 0)
+            elif variant == 3:
+                # 徑向隧道視角 (Temporal Tunnel Vision)
+                rad_blur = cv2.blur(img_np, (ksize, ksize))
+                return cv2.addWeighted(rad_blur, 0.8, out, 0.2, 0)
+            else:
+                # 真空高對比 (Vacuum Space Isolation)
+                gray = cv2.cvtColor(out, cv2.COLOR_RGB2GRAY)
+                mono = cv2.merge([gray, gray, gray])
+                return cv2.addWeighted(out, 1.0 - eff, mono, eff, 0)
+        except Exception as e:
+            logger.error(f"Lowpass Muffle error: {e}")
+            return img_np
+
+    # 2.7 無限幾何鏡廊 (Anamorphic Infinity Tunnel) 5 變種
+    def apply_infinity_tunnel_custom(self, img_np, t, intensity, beat_phase, beat_energy, variant):
+        if intensity < 0.01 or cv2 is None: return img_np
+        try:
+            h, w = img_np.shape[:2]
+            out = img_np.copy()
+            
+            # N 階遞迴縮放複製 (Repeated Scale-Down)
+            levels = int(3 + 3 * intensity)
+            scale_step = 0.75 - 0.1 * beat_energy
+            
+            for i in range(1, levels + 1):
+                s = scale_step ** i
+                sw, sh = max(10, int(w * s)), max(10, int(h * s))
+                scaled = cv2.resize(img_np, (sw, sh), interpolation=cv2.INTER_LINEAR)
+                
+                lx = (w - sw) // 2
+                ly = (h - sh) // 2
+                
+                if variant == 1:
+                    # 六角幾何稜鏡 (Hexagonal Cyber Prism)
+                    rot_mat = cv2.getRotationMatrix2D((sw // 2, sh // 2), i * 15.0 * (1.0 if i % 2 == 0 else -1.0), 1.0)
+                    scaled = cv2.warpAffine(scaled, rot_mat, (sw, sh))
+                elif variant == 2:
+                    # 對數漩渦黑洞 (Circular Wormhole Warp)
+                    rot_mat = cv2.getRotationMatrix2D((sw // 2, sh // 2), t * 30.0 + i * 10, 1.0)
+                    scaled = cv2.warpAffine(scaled, rot_mat, (sw, sh))
+                elif variant == 3:
+                    # 三角鏡像對稱 (Triangular Kaleidoscope Tunnel)
+                    scaled = cv2.flip(scaled, 1)
+                elif variant == 4:
+                    # 無限殘影長廊 (Endless Corridor Echo)
+                    scaled = cv2.addWeighted(scaled, 0.8, np.full_like(scaled, [255, 0, 120]), 0.2, 0)
+                    
+                out[ly:ly+sh, lx:lx+sw] = cv2.addWeighted(out[ly:ly+sh, lx:lx+sw], 0.3, scaled, 0.7, 0)
+                
+            return cv2.addWeighted(img_np, 1.0 - intensity, out, intensity, 0)
+        except Exception as e:
+            logger.error(f"Infinity Tunnel error: {e}")
+            return img_np
+
+    # 2.8 眩暈推拉變焦 (Vertigo Dolly Zoom / Hitchcock Effect) 5 變種
+    def apply_dolly_zoom_custom(self, img_np, intensity, anticipation, is_beat, variant):
+        if intensity < 0.01 or cv2 is None: return img_np
+        try:
+            h, w = img_np.shape[:2]
+            cx, cy = w // 2, h // 2
+            
+            # 主體保護與背景徑向縮放
+            scale_bg = 1.0 + 0.35 * intensity * (1.0 + anticipation)
+            if variant == 1:
+                scale_bg = 1.0 / scale_bg
+                
+            sw, sh = int(w * scale_bg), int(h * scale_bg)
+            scaled = cv2.resize(img_np, (sw, sh), interpolation=cv2.INTER_LINEAR)
+            
+            lx = (sw - w) // 2
+            ly = (sh - h) // 2
+            bg_cropped = scaled[ly:ly+h, lx:lx+w]
+            if bg_cropped.shape[:2] != (h, w):
+                bg_cropped = cv2.resize(bg_cropped, (w, h))
+
+            # 中心主體保護 Mask (橢圓形)
+            mask = np.zeros((h, w), dtype=np.float32)
+            cv2.ellipse(mask, (cx, cy), (int(w * 0.25), int(h * 0.35)), 0, 0, 360, 1.0, -1)
+            mask = cv2.GaussianBlur(mask, (51, 51), 0)[:, :, None]
+            
+            # 外圍徑向模糊 (Radial Motion Blur)
+            blur_size = int(15 * intensity * (1.0 + anticipation)) | 1
+            blur_size = max(3, min(31, blur_size))
+            bg_blurred = cv2.GaussianBlur(bg_cropped, (blur_size, blur_size), 0)
+            
+            if variant == 2:
+                # 拍點邊緣色散 (Pulsating Focal Snap)
+                bg_blurred[:, :, 0] = np.roll(bg_blurred[:, :, 0], 8, axis=1)
+                bg_blurred[:, :, 2] = np.roll(bg_blurred[:, :, 2], -8, axis=1)
+            elif variant == 3:
+                # 螺旋扭轉眩暈 (Spiral Vertigo Warp)
+                rot_mat = cv2.getRotationMatrix2D((cx, cy), 8.0 * intensity, 1.0)
+                bg_blurred = cv2.warpAffine(bg_blurred, rot_mat, (w, h))
+            elif variant == 4:
+                # 極限放射線 (Hyper-Speed Warp Zoom)
+                bg_blurred = cv2.addWeighted(bg_blurred, 0.8, np.full_like(bg_blurred, [255, 255, 255]), 0.2, 0)
+                
+            out = (img_np.astype(np.float32) * mask + bg_blurred.astype(np.float32) * (1.0 - mask)).astype(np.uint8)
+            
+            if is_beat:
+                # Snap back animation boost
+                out = cv2.addWeighted(out, 0.85, img_np, 0.15, 0)
+                
+            return cv2.addWeighted(img_np, 1.0 - intensity, out, intensity, 0)
+        except Exception as e:
+            logger.error(f"Dolly Zoom error: {e}")
             return img_np
 
 def apply_advanced_transition(pil_a, pil_b, progress, trans_type='displacement', intensity=0.5, is_beat=False, beat_energy=0.0):

@@ -1,0 +1,29 @@
+{
+    "name": "op_2693378",
+    "code": "let palette = [\n  \"#009dff\", \"#ff4500\", \"#ffc400\", \"#8bc34a\", \"#0051ff\", \"#926eff\",\n  \"#e75397\", \"#01b2e8\", \"#e8441f\", \"#ff6a00\", \"#f7a000\", \"#f4cd00\",\n  \"#54ab1d\", \"#1b82e6\", \"#6d5acf\", \"#dddddd\", \"#ff437f\", \"#ff8f35\",\n  \"#4dc268\", \"#647582\", \"#f6f6f6\", \"#028ff5\", \"#ff99cc\", \"#22d3ee\",\n  \"#15ad03\", \"#ff6347\", \"#ffec99\", \"#7fff00\", \"#0077b6\", \"#b983ff\",\n  \"#fafafa\", \"#ffcc00\", \"#3ddc84\", \"#004c6d\", \"#e6a6f5\", \"#ffdab9\",\n  \"#4a90e2\", \"#9c27b0\", \"#ffead0\", \"#d72638\", \"#ffeb3b\", \"#2196f3\",\n];\n\nconst n = 500;\nconst maxH = 500;\nconst minH = 100;\nconst maxW = 1000;\nconst minW = 200;\n\nlet seed;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  palette = palette.map((c) => color(c));\n  seed = random(10000);\n}\n\nfunction draw() {\n  background(\"#d4d2d5\");\n  randomSeed(seed);\n\n  let radius = width * 1.2;\n  let angle = millis() * 0.0001;\n  let centerX = 0;\n  let centerY = 0;\n  let centerZ = -width * 2;\n  let camX = cos(angle) * radius;\n  let camZ = sin(angle) * radius + centerZ;\n  camera(camX, centerY, camZ, centerX, centerY, centerZ, 0, 1, 0);\n\n  ambientLight(80);\n  directionalLight(255, 255, 255, -0.5, -1, -0.3);\n  pointLight(255, 255, 255, 0, 0, 500);\n\n  noStroke();\n\n  for (let i = 0; i < n; i++) {\n    const c = color(random(palette));\n    c.setAlpha(map(sin(millis() / 4000 + i), -1, 1, 30, 200));\n\n    fill(c);\n    specularMaterial(c);\n    shininess(50);\n    ambientMaterial(c);\n\n    const rnd = random() > 0.5 ? 1 : -1;\n    const w = random(minW, maxW);\n    const h = random(minH, maxH);\n\n    push();\n    rotateY((rnd * PI) / 3);\n\n    const timeOffset = millis() / 10;\n    const x = ((random(width * 4) + timeOffset) % (width * 4)) - w / 2;\n\n    if (w / 2 - x < 0) {\n      translate(rnd * x, random(-height, height), -random(width * 4));\n      plane(w, h);\n    } else {\n      translate(\n        rnd * (x / 2 + w / 4),\n        random(-height, height),\n        -random(width * 4)\n      );\n      plane(w / 2 + x, h);\n    }\n\n    pop();\n  }\n}\n\n\n\n// --- Immunity Guardrails ---\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "html, body { margin: 0; padding: 0; overflow: hidden; background: #d4d2d5; }\n/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5DomElement {\n    display: none !important;\n    visibility: hidden !important;\n    opacity: 0 !important;\n    pointer-events: none !important;\n    position: absolute !important;\n    left: -9999px !important;\n    top: -9999px !important;\n    width: 0px !important;\n    height: 0px !important;\n}",
+    "inline_assets": {},
+    "author": "leedoughty",
+    "license": "by-nc-sa",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "leedoughty",
+        "3d",
+        "drifting",
+        "planes",
+        "webgl"
+    ],
+    "url": "https://openprocessing.org/@leedoughty/2693378",
+    "date_added": "2026-07-22 20:38:00",
+    "is_starred": false,
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Cyberpunk Informant Double-cross.mp4"
+    ],
+    "used_count": 1
+}

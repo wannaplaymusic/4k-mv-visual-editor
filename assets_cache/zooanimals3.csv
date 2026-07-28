@@ -1,0 +1,121 @@
+Hex,Rank,Emoji,Year,Category,Subcategory,Name,Catrank,Grouped
+\x{1F438},283,🐸,2010,Animals & Nature,animal-amphibian,frog,27,1
+\x{1F425},246,🐥,2010,Animals & Nature,animal-bird,front-facing baby chick,21,2
+\x{1F423},256,🐣,2010,Animals & Nature,animal-bird,hatching chick,23,3
+\x{1F414},314,🐔,2010,Animals & Nature,animal-bird,chicken,33,4
+\x{1F54A FE0F},320,🕊️,2014,Animals & Nature,animal-bird,dove,34,5
+\x{1F985},322,🦅,2016,Animals & Nature,animal-bird,eagle,35,6
+\x{1F986},324,🦆,2016,Animals & Nature,animal-bird,duck,36,7
+\x{1F426},396,🐦,2010,Animals & Nature,animal-bird,bird,47,8
+\x{1F99C},409,🦜,2018,Animals & Nature,animal-bird,parrot,49,9
+\x{1F413},452,🐓,2015,Animals & Nature,animal-bird,rooster,56,10
+\x{1F983},519,🦃,2015,Animals & Nature,animal-bird,turkey,67,11
+\x{1F427},526,🐧,2010,Animals & Nature,animal-bird,penguin,70,12
+\x{1F424},547,🐤,2010,Animals & Nature,animal-bird,baby chick,74,13
+\x{1F989},602,🦉,2016,Animals & Nature,animal-bird,owl,84,14
+\x{1F99A},757,🦚,2018,Animals & Nature,animal-bird,peacock,103,15
+\x{1F9A2},922,🦢,2018,Animals & Nature,animal-bird,swan,117,16
+\x{1F98B},128,🦋,2016,Animals & Nature,animal-bug,butterfly,6,17
+\x{1F41D},284,🐝,2010,Animals & Nature,animal-bug,honeybee,28,18
+\x{1F9A0},477,🦠,2018,Animals & Nature,animal-bug,microbe,60,19
+\x{1F41B},544,🐛,2010,Animals & Nature,animal-bug,bug,73,20
+\x{1F41E},552,🐞,2010,Animals & Nature,animal-bug,lady beetle,75,21
+\x{1F577 FE0F},578,🕷️,2014,Animals & Nature,animal-bug,spider,77,22
+\x{1F997},591,🦗,2017,Animals & Nature,animal-bug,cricket,80,23
+\x{1F41C},632,🐜,2010,Animals & Nature,animal-bug,ant,88,24
+\x{1F40C},643,🐌,2010,Animals & Nature,animal-bug,snail,91,25
+\x{1F99F},735,🦟,2018,Animals & Nature,animal-bug,mosquito,100,26
+\x{1F982},815,🦂,2015,Animals & Nature,animal-bug,scorpion,111,27
+\x{1F578 FE0F},876,🕸️,2014,Animals & Nature,animal-bug,spider web,115,28
+\x{1F430},137,🐰,2010,Animals & Nature,animal-mammal,rabbit face,9,29
+\x{1F436},169,🐶,2010,Animals & Nature,animal-mammal,dog face,11,30
+\x{1F43E},198,🐾,2010,Animals & Nature,animal-mammal,paw prints,15,31
+\x{1F407},211,🐇,2015,Animals & Nature,animal-mammal,rabbit,16,32
+\x{1F415},216,🐕,2014,Animals & Nature,animal-mammal,dog,17,33
+\x{1F437},245,🐷,2010,Animals & Nature,animal-mammal,pig face,20,34
+\x{1F431},255,🐱,2010,Animals & Nature,animal-mammal,cat face,22,35
+\x{1F43B},274,🐻,2010,Animals & Nature,animal-mammal,bear,25,36
+\x{1F408},285,🐈,2014,Animals & Nature,animal-mammal,cat,29,37
+\x{1F984},306,🦄,2015,Animals & Nature,animal-mammal,unicorn,32,38
+\x{1F412},358,🐒,2010,Animals & Nature,animal-mammal,monkey,40,39
+\x{1F410},366,🐐,2015,Animals & Nature,animal-mammal,goat,42,40
+\x{1F981},368,🦁,2015,Animals & Nature,animal-mammal,lion,43,41
+\x{1F43C},400,🐼,2010,Animals & Nature,animal-mammal,panda,48,42
+\x{1F411},410,🐑,2010,Animals & Nature,animal-mammal,ewe,50,43
+\x{1F98D},412,🦍,2016,Animals & Nature,animal-mammal,gorilla,52,44
+\x{1F416},424,🐖,2015,Animals & Nature,animal-mammal,pig,53,45
+\x{1F40E},437,🐎,2010,Animals & Nature,animal-mammal,horse,54,46
+\x{1F98A},470,🦊,2016,Animals & Nature,animal-mammal,fox,57,47
+\x{1F434},473,🐴,2010,Animals & Nature,animal-mammal,horse face,59,48
+\x{1F43F FE0F},486,🐿️,2014,Animals & Nature,animal-mammal,chipmunk,61,49
+\x{1F43A},502,🐺,2010,Animals & Nature,animal-mammal,wolf,63,50
+\x{1F43D},503,🐽,2010,Animals & Nature,animal-mammal,pig nose,64,51
+\x{1F404},507,🐄,2015,Animals & Nature,animal-mammal,cow,65,52
+\x{1F400},522,🐀,2015,Animals & Nature,animal-mammal,rat,68,53
+\x{1F42F},537,🐯,2010,Animals & Nature,animal-mammal,tiger face,72,54
+\x{1F435},553,🐵,2010,Animals & Nature,animal-mammal,monkey face,76,55
+\x{1F987},587,🦇,2016,Animals & Nature,animal-mammal,bat,79,56
+\x{1F42E},595,🐮,2010,Animals & Nature,animal-mammal,cow face,82,57
+\x{1F402},603,🐂,2015,Animals & Nature,animal-mammal,ox,85,58
+\x{1F418},606,🐘,2010,Animals & Nature,animal-mammal,elephant,86,59
+\x{1F98C},628,🦌,2016,Animals & Nature,animal-mammal,deer,87,60
+\x{1F401},641,🐁,2015,Animals & Nature,animal-mammal,mouse,90,61
+\x{1F405},675,🐅,2015,Animals & Nature,animal-mammal,tiger,93,62
+\x{1F99D},677,🦝,2018,Animals & Nature,animal-mammal,raccoon,94,63
+\x{1F428},691,🐨,2010,Animals & Nature,animal-mammal,koala,95,64
+\x{1F429},698,🐩,2010,Animals & Nature,animal-mammal,poodle,96,65
+\x{1F998},705,🦘,2018,Animals & Nature,animal-mammal,kangaroo,97,66
+\x{1F42D},719,🐭,2010,Animals & Nature,animal-mammal,mouse face,98,67
+\x{1F999},733,🦙,2018,Animals & Nature,animal-mammal,llama,99,68
+\x{1F406},741,🐆,2015,Animals & Nature,animal-mammal,leopard,101,69
+\x{1F42A},745,🐪,2015,Animals & Nature,animal-mammal,camel,102,70
+\x{1F403},764,🐃,2015,Animals & Nature,animal-mammal,water buffalo,104,71
+\x{1F40F},775,🐏,2015,Animals & Nature,animal-mammal,ram,105,72
+\x{1F992},785,🦒,2017,Animals & Nature,animal-mammal,giraffe,108,73
+\x{1F42B},805,🐫,2010,Animals & Nature,animal-mammal,two-hump camel,109,74
+\x{1F439},813,🐹,2010,Animals & Nature,animal-mammal,hamster,110,75
+\x{1F994},835,🦔,2017,Animals & Nature,animal-mammal,hedgehog,112,76
+\x{1F99B},874,🦛,2018,Animals & Nature,animal-mammal,hippopotamus,114,77
+\x{1F993},891,🦓,2017,Animals & Nature,animal-mammal,zebra,116,78
+\x{1F417},960,🐗,2010,Animals & Nature,animal-mammal,boar,118,79
+\x{1F98F},1044,🦏,2016,Animals & Nature,animal-mammal,rhinoceros,119,80
+\x{1F9A1},1102,🦡,2018,Animals & Nature,animal-mammal,badger,120,81
+\x{1F41F},282,🐟,2010,Animals & Nature,animal-marine,fish,26,82
+\x{1F419},411,🐙,2010,Animals & Nature,animal-marine,octopus,51,83
+\x{1F420},448,🐠,2010,Animals & Nature,animal-marine,tropical fish,55,84
+\x{1F433},515,🐳,2010,Animals & Nature,animal-marine,spouting whale,66,85
+\x{1F42C},523,🐬,2010,Animals & Nature,animal-marine,dolphin,69,86
+\x{1F988},527,🦈,2016,Animals & Nature,animal-marine,shark,71,87
+\x{1F41A},580,🐚,2010,Animals & Nature,animal-marine,spiral shell,78,88
+\x{1F40B},778,🐋,2015,Animals & Nature,animal-marine,whale,106,89
+\x{1F421},856,🐡,2010,Animals & Nature,animal-marine,blowfish,113,90
+\x{1F422},297,🐢,2010,Animals & Nature,animal-reptile,turtle,31,91
+\x{1F40D},373,🐍,2010,Animals & Nature,animal-reptile,snake,44,92
+\x{1F996},472,🦖,2017,Animals & Nature,animal-reptile,T-Rex,58,93
+\x{1F40A},500,🐊,2015,Animals & Nature,animal-reptile,crocodile,62,94
+\x{1F995},593,🦕,2017,Animals & Nature,animal-reptile,sauropod,81,95
+\x{1F98E},601,🦎,2016,Animals & Nature,animal-reptile,lizard,83,96
+\x{1F409},648,🐉,2015,Animals & Nature,animal-reptile,dragon,92,97
+\x{1F432},780,🐲,2010,Animals & Nature,animal-reptile,dragon face,107,98
+\x{1F339},46,🌹,2010,Animals & Nature,plant-flower,rose,1,99
+\x{1F490},52,💐,2010,Animals & Nature,plant-flower,bouquet,2,100
+\x{1F338},78,🌸,2010,Animals & Nature,plant-flower,cherry blossom,3,101
+\x{1F33B},115,🌻,2010,Animals & Nature,plant-flower,sunflower,4,102
+\x{1F33A},130,🌺,2010,Animals & Nature,plant-flower,hibiscus,7,103
+\x{1F337},133,🌷,2010,Animals & Nature,plant-flower,tulip,8,104
+\x{1F33C},154,🌼,2010,Animals & Nature,plant-flower,blossom,10,105
+\x{1F940},221,🥀,2016,Animals & Nature,plant-flower,wilted flower,18,106
+\x{1F3F5 FE0F},340,🏵️,2014,Animals & Nature,plant-flower,rosette,37,107
+\x{1F4AE},638,💮,2010,Animals & Nature,plant-flower,white flower,89,108
+\x{1F340},125,🍀,2010,Animals & Nature,plant-other,four leaf clover,5,109
+\x{1F33F},174,🌿,2010,Animals & Nature,plant-other,herb,12,110
+\x{1F343},180,🍃,2010,Animals & Nature,plant-other,leaf fluttering in wind,13,111
+\x{1F331},184,🌱,2010,Animals & Nature,plant-other,seedling,14,112
+\x{1F341},225,🍁,2010,Animals & Nature,plant-other,maple leaf,19,113
+\x{2618 FE0F},271,☘️,2015,Animals & Nature,plant-other,shamrock,24,114
+\x{1F334},296,🌴,2010,Animals & Nature,plant-other,palm tree,30,115
+\x{1F333},346,🌳,2015,Animals & Nature,plant-other,deciduous tree,38,116
+\x{1F342},357,🍂,2010,Animals & Nature,plant-other,fallen leaf,39,117
+\x{1F335},364,🌵,2010,Animals & Nature,plant-other,cactus,41,118
+\x{1F33E},379,🌾,2010,Animals & Nature,plant-other,sheaf of rice,45,119
+\x{1F332},393,🌲,2015,Animals & Nature,plant-other,evergreen tree,46,120

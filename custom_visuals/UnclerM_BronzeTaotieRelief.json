@@ -1,0 +1,21 @@
+{
+    "name": "Uncler M - 青銅饕餮紋 · 浮雕潑濺 (Bronze Taotie Relief Splatter)",
+    "code": "// === Tab: mySketch.js ===\n// ----------------------------------------------------\n// 視覺創作與程式開發: Uncler M\n// 視覺主題: 中國古文明 · 商周青銅器饕餮雙目紋飾與銅綠潑濺 (Bronze Taotie Motif & Verdigris Splatter)\n// 授權條款: Creative Commons BY-NC-SA 4.0 (姓名標示-非商業性-相同方式分享)\n// ----------------------------------------------------\n\nif (typeof width === 'undefined') { var width = 1280; }\nif (typeof height === 'undefined') { var height = 720; }\n\nvar verdigrisSplatters = [];\nvar numSplatters = 120;\nvar verdigrisPalette = ['#2a9d8f', '#264653', '#cd7f32', '#e76f51', '#1d3557'];\n\nfunction setup() {\n    createCanvas(windowWidth, windowHeight);\n    background(18, 20, 22);\n    for (var i = 0; i < numSplatters; i++) {\n        verdigrisSplatters.push({\n            x: random(width),\n            y: random(height),\n            r: random(4, 30),\n            colStr: verdigrisPalette[floor(random(verdigrisPalette.length))]\n        });\n    }\n}\n\nfunction draw() {\n    fill(18, 20, 22, 40);\n    rect(0, 0, width, height);\n\n    var beat = (window.beatEnergy || 0.0);\n    var low = (window.audioLow || 0.5);\n    var t = frameCount * 0.015;\n\n    noStroke();\n    for (var i = 0; i < verdigrisSplatters.length; i++) {\n        var s = verdigrisSplatters[i];\n        fill(s.colStr);\n        circle(s.x + sin(t) * 5, s.y + cos(t) * 5, s.r * (1.0 + low * 0.4));\n    }\n\n    push();\n    translate(width / 2, height / 2);\n    var scaleVal = 1.0 + beat * 0.25;\n    scale(scaleVal);\n\n    stroke('#cd7f32');\n    strokeWeight(4 + low * 3);\n    noFill();\n\n    var eyeDist = 140;\n    var eyeSize = 70 + low * 30;\n    ellipse(-eyeDist, -20, eyeSize * 1.3, eyeSize);\n    fill('#ffb703');\n    circle(-eyeDist, -20, 24);\n    noFill();\n\n    ellipse(eyeDist, -20, eyeSize * 1.3, eyeSize);\n    fill('#ffb703');\n    circle(eyeDist, -20, 24);\n    noFill();\n\n    stroke('#2a9d8f');\n    strokeWeight(5);\n    bezier(-eyeDist, -eyeSize, -eyeDist - 80, -eyeSize - 100, -eyeDist + 40, -eyeSize - 160, -eyeDist - 30, -eyeSize - 200);\n\n    bezier(eyeDist, -eyeSize, eyeDist + 80, -eyeSize - 100, eyeDist - 40, -eyeSize - 160, eyeDist + 30, -eyeSize - 200);\n\n    stroke('#cd7f32');\n    strokeWeight(3);\n    rectMode(CENTER);\n    rect(0, 30, 60, 100);\n    line(-160, 110, 160, 110);\n    line(-120, 140, 120, 140);\n    pop();\n}\n\nfunction windowResized() {\n    resizeCanvas(windowWidth, windowHeight);\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "",
+    "author": "Uncler M",
+    "license": "CC BY-NC-SA 4.0",
+    "tags": [
+        "Uncler M",
+        "Chinese Civilisation",
+        "Bronze",
+        "Taotie Motif",
+        "Relief",
+        "Verdigris"
+    ],
+    "date_added": "2026-07-21 17:56:00",
+    "scaling_mode": "contain_height"
+}

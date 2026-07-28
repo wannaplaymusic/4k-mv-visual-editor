@@ -1,0 +1,26 @@
+{
+    "name": "op_2981937",
+    "code": "let colors = [\"#ff0000\", \"#feb30f\", \"#0aa4f7\", \"#ffffff\", \"#000000\"];\n\nlet border = 0;\n\nlet circles = [];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tcolorMode(HSB, 360, 100, 100, 100);\n\trectMode(CENTER);\n\tpixelDensity(2);\n\tfill(10);\n\tsquare(width / 2, height / 2, max(width, height));\n\n\tlet mySize = min(width, height) / 8;\n\n\tfor (let xx = border; xx <= width - border; xx += (Math.max(0.001, Math.abs(mySize / 2)) || 1)) {\n\t\tfor (let yy = border; yy <= height - border; yy += (Math.max(0.001, Math.abs(mySize / 2)) || 1)) {\n\t\t\t//if (random(0, 1) > 0.5) \n\t\t\t{\n\t\t\t\tcircles.push(new TCircle(xx, yy, random([mySize/8,mySize/4,mySize/2,mySize])));\n\t\t\t\tcircles.push(new TCircle(xx, yy, random([mySize/8,mySize/4,mySize/2,mySize])));\n\t\t\t\tcircles.push(new TCircle(xx, yy, random([mySize/8,mySize/4,mySize/2,mySize])));\n\t\t\t}\n\t\t}\n\t}\n}\n\nfunction draw() {\n\n\tfill(10);\n\tsquare(width / 2, height / 2, max(width, height));\n\n\tpush();\n\t//translate(width/10,height/10);\n\t//rotate(0.001*frameCount);\n\tfor (let i = 0; i < circles.length; i++) {\n\t\tcircles[i].display();\n\t}\n\tpop();\n\n}\n\nclass TCircle {\n\n\tconstructor(xc, yc, mySize) {\n\t\tthis.xc = xc;\n\t\tthis.yc = yc;\n\t\tthis.size = mySize;\n\t\tthis.color = random(colors);\n\t\tthis.transp = 40 + 50 * randomGaussian();\n\t\tthis.freq = random(0.05,0.01);\n\t\t//this.freq = map(this.xc,border,width-border,0.05,0.02);\n\t\tthis.dir = random([-1,1]);\n\t\tthis.crad = this.size/2;\n\t\tthis.weight = random(0,0.5);\n\t\tthis.phase = random(0,2*PI);\n\t\tthis.count = floor(random(1,50));\n\t}\n\n\tdisplay() {\n\t\tcrystalMaterial(this.color, this.transp,this.weight);\n\t\tpush();\n\t\ttranslate(this.xc,this.yc);\n\t\trotate(this.freq*this.dir*frameCount);\n\t\tlet myScale = 1 + cos(this.freq*frameCount + this.phase);\n\t\tif (myScale < 0.01)\n\t\t{\n\t\t\tthis.color = random(colors);\n\t\t}\n\t\tscale(myScale);\n\t\tstroke(this.color);\n\t\tfor(let ang = 0;ang <= TWO_PI;ang += (Math.max(0.001, Math.abs((TWO_PI)) || 1))/this.count)\n\t\t{\n\t\t  //if (random(0,1) > 0.5)\n\t\t  {\n\t\t\t  line(this.size/5*cos(ang),this.size/5*sin(ang),this.size/2*cos(ang),this.size/2*sin(ang));\n\t\t  }\n\t\t}\n\t\t//rotate(PI/2*floor(random(1,10)));\n\n\t\tcircle(0,0, this.size);\n\t\tcircle(0,0, this.size/2.5);\n\t\t\n\t\tpop();\n\t}\n\n\n}\n\nfunction crystalMaterial(col, transp,ww) {\n\tmyColor = color(col);\n\tmyColor.setAlpha(transp);\n\tfill(myColor);\n\tnoStroke();\n\tstroke(100, 50);\n\tstrokeWeight(ww);\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}\n\n\n// --- Immunity Guardrails ---\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "html, body { margin: 0; padding: 0; overflow: hidden; background: #0a0a0a; }\n/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5DomElement {\n    display: none !important;\n    visibility: hidden !important;\n    opacity: 0 !important;\n    pointer-events: none !important;\n    position: absolute !important;\n    left: -9999px !important;\n    top: -9999px !important;\n    width: 0px !important;\n    height: 0px !important;\n}",
+    "inline_assets": {},
+    "author": "garabatospr",
+    "license": "by-nc-sa",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "garabatospr",
+        "ruedas",
+        "wheels",
+        "radial",
+        "hsb",
+        "2d"
+    ],
+    "url": "https://openprocessing.org/@garabatospr/2981937",
+    "date_added": "2026-07-22 20:51:00",
+    "is_starred": false,
+    "scaling_mode": "auto"
+}

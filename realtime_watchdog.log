@@ -1,0 +1,1303 @@
+[2026-07-24 20:57:58] [系統啟動] 【試運行監視器初始化】 即時試運行守護進程開始常駐運行 --> 100% 背景監視中
+[2026-07-24 20:59:58] [黑屏不保留捕捉] 【200418a_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 21:00:08] [JS報錯捕捉] 【200316_1】 TypeError: Class constructor vn cannot be invoked without 'new' --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:00:21] [JS報錯捕捉] 【200316_1】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:00:27] [JS報錯捕捉] 【200423CrowdedCity】     at async #L (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405353) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:01:21] [系統啟動] 【試運行監視器初始化】 即時試運行守護進程開始常駐運行 --> 100% 背景監視中，隨時記錄詳細處理過程與代碼 Proof
+[2026-07-24 21:01:49] [JS報錯捕捉] 【200426LolipopMountain_1】 SyntaxError: Unexpected token '}' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:01:50] [JS報錯捕捉] 【200426LolipopMountain_1】 Line 45: Window Error Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:02:04] [黑屏不保留捕捉] 【200510】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 21:02:21] [JS報錯捕捉] 【200509AquaPlanet】 Line 3102: Uncaught SyntaxError: Unexpected token '}' --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:02:22] [JS報錯捕捉] 【200509AquaPlanet】 SyntaxError: Unexpected token '}' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:02:46] [JS報錯捕捉] 【200520_3】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:02:46] [JS報錯捕捉] 【200520_3】 Line 1529: [P5_V2_COMPAT_SHIM] Absorbed runtime exception: Uncaught TypeError: Cannot read properties of undefined (reading 'width') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:02:50] [JS報錯捕捉] 【200520_3】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:02:51] [JS報錯捕捉] 【200520_3】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:02:54] [JS報錯捕捉] 【200524QuantumUnstable_1】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:02:54] [JS報錯捕捉] 【200524QuantumUnstable_1】     at e.mouseClicked (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_84_822431.html:3342:2) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:03:16] [JS報錯捕捉] 【200610CircularSystem_1】 SyntaxError: Unexpected token '}' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:03:16] [JS報錯捕捉] 【200610CircularSystem_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:03:20] [JS報錯捕捉] 【200613_3】 TypeError: Cannot read properties of undefined (reading 'textBounds') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:03:21] [JS報錯捕捉] 【200613_3】 Timestamp: 2026-07-24 21:03:16 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:03:24] [JS報錯捕捉] 【200617_1】 TypeError: font.textBounds is not a function --> 自動於 main.py 注入 font.textBounds 方法防禦 Stub
+[2026-07-24 21:03:24] [JS報錯捕捉] 【200617_1】 TypeError: font.textBounds is not a function --> 成功注入 font.textBounds 方法防禦 Stub 至 main.py！
+[2026-07-24 21:03:31] [JS報錯捕捉] 【200621_1】 TypeError: font.textBounds is not a function --> 自動於 main.py 注入 font.textBounds 方法防禦 Stub
+[2026-07-24 21:03:31] [JS報錯捕捉] 【200621_1】 TypeError: font.textBounds is not a function --> 成功注入 font.textBounds 方法防禦 Stub 至 main.py！
+[2026-07-24 21:03:47] [JS報錯捕捉] 【200718_1】 TypeError: font.textBounds is not a function --> 自動於 main.py 注入 font.textBounds 方法防禦 Stub
+[2026-07-24 21:03:48] [JS報錯捕捉] 【200718_1】 TypeError: font.textBounds is not a function --> 成功注入 font.textBounds 方法防禦 Stub 至 main.py！
+[2026-07-24 21:04:05] [JS報錯捕捉] 【200804SuperstringTheory】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:04:05] [JS報錯捕捉] 【200804SuperstringTheory】     at Ge.t.redraw (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:4684) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:05:31] [JS報錯捕捉] 【200811】     at #P (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405684) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:05:31] [JS報錯捕捉] 【200811】 TypeError: Cannot read properties of undefined (reading 'pixels') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:05:34] [JS報錯捕捉] 【200819_1】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:05:35] [JS報錯捕捉] 【200819_1】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:05:39] [JS報錯捕捉] 【200831_1】     at #P (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405684) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:05:39] [JS報錯捕捉] 【200831_1】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:06:07] [JS報錯捕捉] 【200902Limbo】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:06:07] [JS報錯捕捉] 【200902Limbo】 TypeError: Cannot read properties of undefined (reading '0') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:06:24] [JS報錯捕捉] 【200902Limbo】 ReferenceError: emotionClassifier is not defined --> 成功注入 window.emotionClassifier 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 21:06:24] [JS報錯捕捉] 【200902Limbo】 ReferenceError: emotionClassifier is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.emotionClassifier 相容性 Stub
+[2026-07-24 21:06:36] [黑屏不保留捕捉] 【201110_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 21:06:48] [JS報錯捕捉] 【201107】 ReferenceError: emotionClassifier is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.emotionClassifier 相容性 Stub
+[2026-07-24 21:06:48] [JS報錯捕捉] 【201107】 ReferenceError: emotionClassifier is not defined --> 成功注入 window.emotionClassifier 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 21:07:00] [JS報錯捕捉] 【201209】 Title: 201209 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:07:00] [JS報錯捕捉] 【201209】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:07:06] [JS報錯捕捉] 【20200501_spin】 URL: https://openprocessing.org/@jhorikawa/871810 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:07:06] [JS報錯捕捉] 【20200501_spin】 TypeError: Cannot read properties of undefined (reading 'kind') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:07:10] [JS報錯捕捉] 【20200501_spin】 Line 1534: [P5_V2_COMPAT_SHIM] Absorbed unhandled rejection: TypeError: Cannot read properties of undefined (reading 'kind') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:07:10] [JS報錯捕捉] 【20200501_spin】 TypeError: Cannot read properties of undefined (reading 'kind') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:07:14] [JS報錯捕捉] 【20200504_eyeball】 TypeError: Cannot read properties of undefined (reading 'setUniform') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:07:14] [JS報錯捕捉] 【20200504_eyeball】 Line 1534: [P5_V2_COMPAT_SHIM] Absorbed unhandled rejection: TypeError: Cannot read properties of undefined (reading 'setUniform') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:07:30] [JS報錯捕捉] 【20200506_orochi】 TypeError: Cannot read properties of undefined (reading 'setUniform') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:07:31] [JS報錯捕捉] 【20200506_orochi】 TypeError: Cannot read properties of undefined (reading 'setUniform') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:08:15] [黑屏不保留捕捉] 【210124】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 21:08:30] [JS報錯捕捉] 【20220331SoulFish】 TypeError: Cannot read properties of undefined (reading 'setUniform') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:08:31] [JS報錯捕捉] 【20220331SoulFish】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:08:40] [JS報錯捕捉] 【20220331SoulFish】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:08:40] [JS報錯捕捉] 【20220331SoulFish】 SyntaxError: Unexpected token '}' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:09:05] [JS報錯捕捉] 【210305】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:09:05] [JS報錯捕捉] 【210305】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:09:23] [JS報錯捕捉] 【210516_1】 TypeError: Cannot read properties of undefined (reading 'height') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:09:23] [JS報錯捕捉] 【210516_1】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:09:27] [JS報錯捕捉] 【210519】 Line 3409: Uncaught TypeError: Cannot read properties of undefined (reading 'height') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:09:28] [JS報錯捕捉] 【210519】 TypeError: Cannot read properties of undefined (reading 'height') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:11:41] [JS報錯捕捉] 【211002a】 TypeError: Cannot read properties of undefined (reading 'height') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:11:41] [JS報錯捕捉] 【211002a】 Line 45: Window Error Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:11:45] [JS報錯捕捉] 【211002a】 TypeError: Cannot read properties of undefined (reading 'x') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:11:45] [JS報錯捕捉] 【211002a】 Timestamp: 2026-07-24 21:11:41 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:11:48] [JS報錯捕捉] 【211004electrization_1】 TypeError: pattern.patternColors is not a function --> 自動於 main.py 注入 pattern.patternColors 方法防禦 Stub
+[2026-07-24 21:11:48] [JS報錯捕捉] 【211004electrization_1】 TypeError: pattern.patternColors is not a function --> 成功注入 pattern.patternColors 方法防禦 Stub 至 main.py！
+[2026-07-24 21:12:15] [JS報錯捕捉] 【211005a】 TypeError: pattern.patternColors is not a function --> 自動於 main.py 注入 pattern.patternColors 方法防禦 Stub
+[2026-07-24 21:12:15] [JS報錯捕捉] 【211005a】 TypeError: pattern.patternColors is not a function --> 成功注入 pattern.patternColors 方法防禦 Stub 至 main.py！
+[2026-07-24 21:12:24] [JS報錯捕捉] 【211112】 TypeError: pattern.patternColors is not a function --> 成功注入 pattern.patternColors 方法防禦 Stub 至 main.py！
+[2026-07-24 21:12:24] [JS報錯捕捉] 【211112】 TypeError: pattern.patternColors is not a function --> 自動於 main.py 注入 pattern.patternColors 方法防禦 Stub
+[2026-07-24 21:14:15] [JS報錯捕捉] 【211118】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:14:15] [JS報錯捕捉] 【211118】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:14:34] [JS報錯捕捉] 【230314SonarReaction2】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 21:14:34] [JS報錯捕捉] 【230314SonarReaction2】 URL: https://openprocessing.org/@u159668/1359041 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:15:24] [JS報錯捕捉] 【230314SonarReaction2】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 21:15:24] [JS報錯捕捉] 【230314SonarReaction2】 SyntaxError: Unexpected token '}' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:14:41] [JS報錯捕捉] 【231121UrbanContour_1】 TypeError: Cannot set properties of undefined (setting '0') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:14:41] [JS報錯捕捉] 【231121UrbanContour_1】     at #P (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405684) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:15:58] [JS報錯捕捉] 【3DPickAndMoveUpdate2】 URL: https://openprocessing.org/@michelleinspace/2671282 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:15:58] [JS報錯捕捉] 【3DPickAndMoveUpdate2】 TypeError: Cannot read properties of undefined (reading 'noFill') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:16:07] [JS報錯捕捉] 【3DPickAndMoveUpdate2】 TypeError: Cannot read properties of undefined (reading 'noFill') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:16:07] [JS報錯捕捉] 【3DPickAndMoveUpdate2】 Line 3182: Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'noFill') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:16:17] [JS報錯捕捉] 【3paintings】 ReferenceError: c is not defined --> 成功注入 window.c 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:16:17] [JS報錯捕捉] 【3paintings】 ReferenceError: c is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.c 相容性 Stub
+[2026-07-24 22:16:40] [JS報錯捕捉] 【4Strokeengine】 ReferenceError: c is not defined --> 成功注入 window.c 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:16:40] [JS報錯捕捉] 【4Strokeengine】 ReferenceError: c is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.c 相容性 Stub
+[2026-07-24 22:16:44] [JS報錯捕捉] 【AV23fxstdio】 ReferenceError: c is not defined --> 成功注入 window.c 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:16:44] [JS報錯捕捉] 【AV23fxstdio】 ReferenceError: c is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.c 相容性 Stub
+[2026-07-24 22:16:50] [黑屏不保留捕捉] 【Abstract7inJava】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 22:17:21] [JS報錯捕捉] 【AWigglyWormOfLight_1】 TypeError: stdio.random is not a function --> 自動於 main.py 注入 stdio.random 方法防禦 Stub
+[2026-07-24 22:17:21] [JS報錯捕捉] 【AWigglyWormOfLight_1】 TypeError: stdio.random is not a function --> 成功注入 stdio.random 方法防禦 Stub 至 main.py！
+[2026-07-24 22:17:31] [JS報錯捕捉] 【AniMappedView_1】 TypeError: n.size is not a function --> 成功注入 n.size 方法防禦 Stub 至 main.py！
+[2026-07-24 22:17:31] [JS報錯捕捉] 【AniMappedView_1】 TypeError: n.size is not a function --> 自動於 main.py 注入 n.size 方法防禦 Stub
+[2026-07-24 22:17:37] [JS報錯捕捉] 【AnimatedFractalShader_1】 TypeError: n.size is not a function --> 成功注入 n.size 方法防禦 Stub 至 main.py！
+[2026-07-24 22:17:37] [JS報錯捕捉] 【AnimatedFractalShader_1】 TypeError: n.size is not a function --> 自動於 main.py 注入 n.size 方法防禦 Stub
+[2026-07-24 22:17:44] [JS報錯捕捉] 【AnimatedRingsStippling】 TypeError: n.size is not a function --> 自動於 main.py 注入 n.size 方法防禦 Stub
+[2026-07-24 22:17:45] [JS報錯捕捉] 【AnimatedRingsStippling】 TypeError: n.size is not a function --> 成功注入 n.size 方法防禦 Stub 至 main.py！
+[2026-07-24 22:17:54] [JS報錯捕捉] 【Apollo8Earthrise】 TypeError: Cannot read properties of undefined (reading 'hide') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:17:54] [JS報錯捕捉] 【Apollo8Earthrise】     at async #L (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405353) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:17:57] [JS報錯捕捉] 【Aquamarine_1】 TypeError: Cannot set property canvas of #<qa> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:17:57] [JS報錯捕捉] 【Aquamarine_1】 Title: Aquamarine_1 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:18:26] [JS報錯捕捉] 【ArcticIce_1】 TypeError: Cannot set property canvas of #<qa> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:18:26] [JS報錯捕捉] 【ArcticIce_1】 Line 1: Uncaught (in promise) TypeError: Cannot set property canvas of #<qa> which has only a getter --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:18:37] [JS報錯捕捉] 【ArcticIce_1】 TypeError: font.textBounds is not a function --> 成功注入 font.textBounds 方法防禦 Stub 至 main.py！
+[2026-07-24 22:18:38] [JS報錯捕捉] 【ArcticIce_1】 TypeError: font.textBounds is not a function --> 自動於 main.py 注入 font.textBounds 方法防禦 Stub
+[2026-07-24 22:18:41] [JS報錯捕捉] 【ArtedeCdigoAbertoRecord_1】 TypeError: font.textBounds is not a function --> 成功注入 font.textBounds 方法防禦 Stub 至 main.py！
+[2026-07-24 22:18:41] [JS報錯捕捉] 【ArtedeCdigoAbertoRecord_1】 TypeError: font.textBounds is not a function --> 自動於 main.py 注入 font.textBounds 方法防禦 Stub
+[2026-07-24 22:18:51] [黑屏不保留捕捉] 【AtomicusAnimatus_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 22:19:06] [JS報錯捕捉] 【Artgallerypainter_1】 TypeError: font.textBounds is not a function --> 成功注入 font.textBounds 方法防禦 Stub 至 main.py！
+[2026-07-24 22:19:06] [JS報錯捕捉] 【Artgallerypainter_1】 TypeError: font.textBounds is not a function --> 自動於 main.py 注入 font.textBounds 方法防禦 Stub
+[2026-07-24 22:19:33] [JS報錯捕捉] 【BachCollage_1】 TypeError: instruct.style is not a function --> 成功注入 instruct.style 方法防禦 Stub 至 main.py！
+[2026-07-24 22:19:33] [JS報錯捕捉] 【BachCollage_1】 TypeError: instruct.style is not a function --> 自動於 main.py 注入 instruct.style 方法防禦 Stub
+[2026-07-24 22:19:37] [JS報錯捕捉] 【BackgroundStackedshadersnoisecontours】 TypeError: instruct.style is not a function --> 成功注入 instruct.style 方法防禦 Stub 至 main.py！
+[2026-07-24 22:19:37] [JS報錯捕捉] 【BackgroundStackedshadersnoisecontours】 TypeError: instruct.style is not a function --> 自動於 main.py 注入 instruct.style 方法防禦 Stub
+[2026-07-24 22:19:40] [JS報錯捕捉] 【BananaPacking_1】 TypeError: instruct.style is not a function --> 成功注入 instruct.style 方法防禦 Stub 至 main.py！
+[2026-07-24 22:19:41] [JS報錯捕捉] 【BananaPacking_1】 TypeError: instruct.style is not a function --> 自動於 main.py 注入 instruct.style 方法防禦 Stub
+[2026-07-24 22:20:35] [JS報錯捕捉] 【BananaPacking_1】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:20:35] [JS報錯捕捉] 【BananaPacking_1】 Timestamp: 2026-07-24 22:19:40 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:20:46] [黑屏不保留捕捉] 【BitmapHemisphere】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 22:20:58] [JS報錯捕捉] 【Binarygoldenratio】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:20:58] [JS報錯捕捉] 【Binarygoldenratio】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:21:08] [JS報錯捕捉] 【BlackoutPoetry_1】 TypeError: height is not a function --> 成功注入 height 全域方法 Stub 至 main.py！
+[2026-07-24 22:21:08] [JS報錯捕捉] 【BlackoutPoetry_1】 TypeError: height is not a function --> 自動於 main.py 注入 height 全域方法 Stub
+[2026-07-24 22:21:18] [JS報錯捕捉] 【Blue】 TypeError: height is not a function --> 成功注入 height 全域方法 Stub 至 main.py！
+[2026-07-24 22:21:18] [JS報錯捕捉] 【Blue】 TypeError: height is not a function --> 自動於 main.py 注入 height 全域方法 Stub
+[2026-07-24 22:21:43] [JS報錯捕捉] 【BouncingSoundBallWCCChallenge030224_1】 ReferenceError: texture_layer is not defined --> 成功注入 window.texture_layer 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:21:43] [JS報錯捕捉] 【BouncingSoundBallWCCChallenge030224_1】 ReferenceError: texture_layer is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.texture_layer 相容性 Stub
+[2026-07-24 22:21:50] [JS報錯捕捉] 【BrokenAndTransformed】 ReferenceError: texture_layer is not defined --> 成功注入 window.texture_layer 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:21:50] [JS報錯捕捉] 【BrokenAndTransformed】 ReferenceError: texture_layer is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.texture_layer 相容性 Stub
+[2026-07-24 22:22:06] [JS報錯捕捉] 【BubbleBlower】 ReferenceError: texture_layer is not defined --> 成功注入 window.texture_layer 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:22:06] [JS報錯捕捉] 【BubbleBlower】 ReferenceError: texture_layer is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.texture_layer 相容性 Stub
+[2026-07-24 22:22:26] [JS報錯捕捉] 【CCAPoetryIdea_1】 TypeError: this.context.getConstant(...).chain is not a function --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:22:27] [JS報錯捕捉] 【CCAPoetryIdea_1】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:22:57] [JS報錯捕捉] 【CV_flow_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 22:22:57] [JS報錯捕捉] 【CV_flow_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 22:23:00] [JS報錯捕捉] 【CarbonTube】 ReferenceError: back is not defined --> 成功注入 window.back 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:23:00] [JS報錯捕捉] 【CarbonTube】 ReferenceError: back is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.back 相容性 Stub
+[2026-07-24 22:23:21] [JS報錯捕捉] 【CardTricks】 ReferenceError: back is not defined --> 成功注入 window.back 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:23:21] [JS報錯捕捉] 【CardTricks】 ReferenceError: back is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.back 相容性 Stub
+[2026-07-24 22:23:41] [JS報錯捕捉] 【CardTricks】 ReferenceError: back is not defined --> 成功注入 window.back 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:23:41] [JS報錯捕捉] 【CardTricks】 ReferenceError: back is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.back 相容性 Stub
+[2026-07-24 22:23:59] [JS報錯捕捉] 【Cartoonconepacking】 ReferenceError: back is not defined --> 成功注入 window.back 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:23:59] [JS報錯捕捉] 【Cartoonconepacking】 ReferenceError: back is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.back 相容性 Stub
+[2026-07-24 22:24:17] [JS報錯捕捉] 【Cartoonconepacking】 ReferenceError: back is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.back 相容性 Stub
+[2026-07-24 22:24:17] [JS報錯捕捉] 【Cartoonconepacking】 ReferenceError: back is not defined --> 成功注入 window.back 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 22:24:35] [JS報錯捕捉] 【Carv2】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:24:35] [JS報錯捕捉] 【Carv2】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:24:53] [JS報錯捕捉] 【CassetteTapes】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:24:53] [JS報錯捕捉] 【CassetteTapes】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:25:10] [JS報錯捕捉] 【CatPattern】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:25:11] [JS報錯捕捉] 【CatPattern】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:25:28] [JS報錯捕捉] 【CatharticAfternoon_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:25:28] [JS報錯捕捉] 【CatharticAfternoon_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:25:46] [JS報錯捕捉] 【CatlloweenParade_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:25:47] [JS報錯捕捉] 【CatlloweenParade_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:26:04] [JS報錯捕捉] 【CatsTail_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:26:04] [JS報錯捕捉] 【CatsTail_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:26:21] [JS報錯捕捉] 【Cats_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:26:22] [JS報錯捕捉] 【Cats_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:26:43] [JS報錯捕捉] 【CellularAutomatonRudyRuckersHGlass】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:26:43] [JS報錯捕捉] 【CellularAutomatonRudyRuckersHGlass】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:27:01] [JS報錯捕捉] 【Cellularwierdness】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:27:01] [JS報錯捕捉] 【Cellularwierdness】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:27:18] [JS報錯捕捉] 【CelticKnots】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:27:18] [JS報錯捕捉] 【CelticKnots】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:27:37] [JS報錯捕捉] 【ChainDrive_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:27:37] [JS報錯捕捉] 【ChainDrive_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:27:54] [JS報錯捕捉] 【ChainReaction_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:27:55] [JS報錯捕捉] 【ChainReaction_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:28:12] [JS報錯捕捉] 【ChalchiuhtlicueorMesoamericandesignWCCChallenge】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:28:12] [JS報錯捕捉] 【ChalchiuhtlicueorMesoamericandesignWCCChallenge】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:28:29] [JS報錯捕捉] 【ChalkboardCatsTessellation_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:28:30] [JS報錯捕捉] 【ChalkboardCatsTessellation_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:28:47] [JS報錯捕捉] 【ChangeMaker】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:28:47] [JS報錯捕捉] 【ChangeMaker】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:29:05] [JS報錯捕捉] 【ChaosandOrder_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:29:05] [JS報錯捕捉] 【ChaosandOrder_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:29:22] [JS報錯捕捉] 【ChaostoorderWCCChallengeRewind24824_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:29:22] [JS報錯捕捉] 【ChaostoorderWCCChallengeRewind24824_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:29:39] [JS報錯捕捉] 【ChasingFish_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:29:40] [JS報錯捕捉] 【ChasingFish_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:29:57] [JS報錯捕捉] 【Che_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:29:57] [JS報錯捕捉] 【Che_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:30:14] [JS報錯捕捉] 【CheckerStripes_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:30:15] [JS報錯捕捉] 【CheckerStripes_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:30:33] [JS報錯捕捉] 【Checkergeology】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:30:33] [JS報錯捕捉] 【Checkergeology】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:30:50] [JS報錯捕捉] 【ChessBoard】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:30:51] [JS報錯捕捉] 【ChessBoard】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:31:09] [JS報錯捕捉] 【ChessboardWCCChallengeClassicBoardGames22524_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:31:09] [JS報錯捕捉] 【ChessboardWCCChallengeClassicBoardGames22524_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:31:27] [JS報錯捕捉] 【ChineseAbacus】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:31:27] [JS報錯捕捉] 【ChineseAbacus】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:31:45] [JS報錯捕捉] 【ChladniPlate】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:31:45] [JS報錯捕捉] 【ChladniPlate】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:32:02] [JS報錯捕捉] 【ChladniPlates】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:32:02] [JS報錯捕捉] 【ChladniPlates】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:32:21] [JS報錯捕捉] 【Chromakinetica_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:32:21] [JS報錯捕捉] 【Chromakinetica_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:32:38] [JS報錯捕捉] 【ChromaticBlurTemplatealphablur】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:32:39] [JS報錯捕捉] 【ChromaticBlurTemplatealphablur】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:32:56] [JS報錯捕捉] 【ChromaticColors_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:32:56] [JS報錯捕捉] 【ChromaticColors_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:33:14] [JS報錯捕捉] 【ChromaticCubicTranscendence】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:33:14] [JS報錯捕捉] 【ChromaticCubicTranscendence】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:33:32] [JS報錯捕捉] 【ChromaticJellyfish_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:33:32] [JS報錯捕捉] 【ChromaticJellyfish_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:33:51] [JS報錯捕捉] 【ChromaticVoronoi_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:33:51] [JS報錯捕捉] 【ChromaticVoronoi_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:34:30] [JS報錯捕捉] 【CircleBlanket】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:34:30] [JS報錯捕捉] 【CircleBlanket】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:34:51] [JS報錯捕捉] 【CircleCore_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:34:51] [JS報錯捕捉] 【CircleCore_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:35:15] [JS報錯捕捉] 【CircleFillFasterWorkers】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:35:15] [JS報錯捕捉] 【CircleFillFasterWorkers】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:35:33] [JS報錯捕捉] 【CirclePacking_2】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:35:33] [JS報錯捕捉] 【CirclePacking_2】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:36:04] [JS報錯捕捉] 【CircleShiftCOLORFILL】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:36:04] [JS報錯捕捉] 【CircleShiftCOLORFILL】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:36:31] [JS報錯捕捉] 【CircleStuff_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:36:31] [JS報錯捕捉] 【CircleStuff_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:36:48] [JS報錯捕捉] 【Circlecrosspoints】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:36:48] [JS報錯捕捉] 【Circlecrosspoints】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:37:06] [JS報錯捕捉] 【Circlesbetweencircles】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:37:06] [JS報錯捕捉] 【Circlesbetweencircles】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:37:28] [JS報錯捕捉] 【CircularHelloCurves_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:37:29] [JS報錯捕捉] 【CircularHelloCurves_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:37:47] [JS報錯捕捉] 【CircularRandomWalker_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:37:47] [JS報錯捕捉] 【CircularRandomWalker_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:38:28] [JS報錯捕捉] 【CircularTreeCircularRandomWalker_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:38:28] [JS報錯捕捉] 【CircularTreeCircularRandomWalker_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:39:00] [JS報錯捕捉] 【Cirque】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:39:00] [JS報錯捕捉] 【Cirque】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:39:25] [JS報錯捕捉] 【CityMapWCCChallenge160724】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:39:25] [JS報錯捕捉] 【CityMapWCCChallenge160724】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:40:14] [JS報錯捕捉] 【Cliffsidedriving】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:40:14] [JS報錯捕捉] 【Cliffsidedriving】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:40:33] [JS報錯捕捉] 【ClimateWCCChallengePersonalHell27524_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:40:33] [JS報錯捕捉] 【ClimateWCCChallengePersonalHell27524_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:41:07] [JS報錯捕捉] 【ClothSimulation】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:41:07] [JS報錯捕捉] 【ClothSimulation】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:41:46] [JS報錯捕捉] 【ClothSimulation2】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:41:46] [JS報錯捕捉] 【ClothSimulation2】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:42:44] [JS報錯捕捉] 【ClothSimulation2】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:42:44] [JS報錯捕捉] 【ClothSimulation2】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:43:02] [JS報錯捕捉] 【ClothSimulation】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:43:02] [JS報錯捕捉] 【ClothSimulation】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:43:31] [JS報錯捕捉] 【CloudStudyII_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:43:31] [JS報錯捕捉] 【CloudStudyII_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:43:51] [JS報錯捕捉] 【CloudsinWater】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:43:51] [JS報錯捕捉] 【CloudsinWater】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:44:08] [JS報錯捕捉] 【CloverleafInterchange_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:44:08] [JS報錯捕捉] 【CloverleafInterchange_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:44:26] [JS報錯捕捉] 【Cmpsitin】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:44:26] [JS報錯捕捉] 【Cmpsitin】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:44:43] [JS報錯捕捉] 【CodeWallDrawing1_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:44:43] [JS報錯捕捉] 【CodeWallDrawing1_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:45:01] [JS報錯捕捉] 【Codeisinthebin】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:45:01] [JS報錯捕捉] 【Codeisinthebin】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:45:22] [JS報錯捕捉] 【Coding_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:45:22] [JS報錯捕捉] 【Coding_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:45:42] [JS報錯捕捉] 【CollectiveWalkersRouded_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:45:42] [JS報錯捕捉] 【CollectiveWalkersRouded_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:46:00] [JS報錯捕捉] 【ColorSmoke】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:46:00] [JS報錯捕捉] 【ColorSmoke】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:46:17] [JS報錯捕捉] 【ColorSwirl】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:46:17] [JS報錯捕捉] 【ColorSwirl】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:46:48] [JS報錯捕捉] 【Colorformula_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:46:48] [JS報錯捕捉] 【Colorformula_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:47:09] [JS報錯捕捉] 【ColorfulRingsNoise_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:47:09] [JS報錯捕捉] 【ColorfulRingsNoise_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:47:27] [JS報錯捕捉] 【ColorfulSmoke】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:47:27] [JS報錯捕捉] 【ColorfulSmoke】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:47:55] [JS報錯捕捉] 【ColorfulWaves_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:47:55] [JS報錯捕捉] 【ColorfulWaves_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:48:13] [JS報錯捕捉] 【Colorfullfaces】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:48:13] [JS報錯捕捉] 【Colorfullfaces】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:48:31] [JS報錯捕捉] 【Colorsmoke_3】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:48:31] [JS報錯捕捉] 【Colorsmoke_3】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:49:11] [JS報錯捕捉] 【Communications_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:49:11] [JS報錯捕捉] 【Communications_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:49:40] [JS報錯捕捉] 【CompositionADifferentscale】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:49:40] [JS報錯捕捉] 【CompositionADifferentscale】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:50:01] [JS報錯捕捉] 【CompositionA_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:50:01] [JS報錯捕捉] 【CompositionA_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:50:26] [JS報錯捕捉] 【ConcentricSoundWave】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:50:26] [JS報錯捕捉] 【ConcentricSoundWave】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:50:49] [JS報錯捕捉] 【ConcreteMemories】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:50:49] [JS報錯捕捉] 【ConcreteMemories】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:51:11] [JS報錯捕捉] 【ConformalMapping】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:51:11] [JS報錯捕捉] 【ConformalMapping】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:51:40] [JS報錯捕捉] 【ConscinciaNegra】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:51:40] [JS報錯捕捉] 【ConscinciaNegra】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:51:58] [JS報錯捕捉] 【Constellation】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:51:58] [JS報錯捕捉] 【Constellation】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:52:17] [JS報錯捕捉] 【ConstrainEmoji_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:52:17] [JS報錯捕捉] 【ConstrainEmoji_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:52:35] [JS報錯捕捉] 【ConstrainGame_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:52:35] [JS報錯捕捉] 【ConstrainGame_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:52:53] [JS報錯捕捉] 【ConstructionI】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:52:53] [JS報錯捕捉] 【ConstructionI】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:53:13] [JS報錯捕捉] 【Construction_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:53:13] [JS報錯捕捉] 【Construction_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:53:33] [JS報錯捕捉] 【Contour】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:53:33] [JS報錯捕捉] 【Contour】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:55:34] [JS報錯捕捉] 【Contours】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:55:34] [JS報錯捕捉] 【Contours】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:55:54] [JS報錯捕捉] 【ConvexConfigurations】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:55:54] [JS報錯捕捉] 【ConvexConfigurations】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:56:35] [JS報錯捕捉] 【CoreResonancetheInfinitePulse】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:56:35] [JS報錯捕捉] 【CoreResonancetheInfinitePulse】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:56:52] [JS報錯捕捉] 【CosmicNebulaEcho】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:56:53] [JS報錯捕捉] 【CosmicNebulaEcho】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:57:13] [JS報錯捕捉] 【Countercurrent】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:57:13] [JS報錯捕捉] 【Countercurrent】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:57:38] [JS報錯捕捉] 【Crall_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:57:38] [JS報錯捕捉] 【Crall_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:58:24] [JS報錯捕捉] 【CrayolaCrayons_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:58:24] [JS報錯捕捉] 【CrayolaCrayons_1】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:59:27] [JS報錯捕捉] 【CreativeCoding101withGeorgNees】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 22:59:27] [JS報錯捕捉] 【CreativeCoding101withGeorgNees】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:59:44] [JS報錯捕捉] 【CreativeSpacesSimplified】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 22:59:44] [JS報錯捕捉] 【CreativeSpacesSimplified】 Errors: --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:00:17] [JS報錯捕捉] 【未命名試運行模組】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:00:17] [JS報錯捕捉] 【未命名試運行模組】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:00:21] [JS報錯捕捉] 【CrystalBall】 TypeError: p5.prototype.registerPreloadMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:00:21] [JS報錯捕捉] 【CrystalBall】 TypeError: p5.prototype.registerPreloadMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:00:24] [JS報錯捕捉] 【CrystalBall_2】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:00:24] [JS報錯捕捉] 【CrystalBall_2】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:00:29] [JS報錯捕捉] 【Crystalinaspotlight】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:00:29] [JS報錯捕捉] 【Crystalinaspotlight】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:00:32] [JS報錯捕捉] 【Crystalinaspotlight】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:00:32] [JS報錯捕捉] 【Crystalinaspotlight】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:00:38] [JS報錯捕捉] 【Crystalsucculent】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:00:38] [JS報錯捕捉] 【Crystalsucculent】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:00:42] [JS報錯捕捉] 【Cuadradosangulares_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:00:42] [JS報錯捕捉] 【Cuadradosangulares_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:01:36] [JS報錯捕捉] 【Cuadradosangulares_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:01:36] [JS報錯捕捉] 【Cuadradosangulares_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:01:40] [JS報錯捕捉] 【Cubecity_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:01:40] [JS報錯捕捉] 【Cubecity_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:02:49] [JS報錯捕捉] 【Cubed】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:02:49] [JS報錯捕捉] 【Cubed】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:02:52] [JS報錯捕捉] 【Cubeflux】 ReferenceError: size is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.size 相容性 Stub
+[2026-07-24 23:02:52] [JS報錯捕捉] 【Cubeflux】 ReferenceError: size is not defined --> 成功注入 window.size 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:02:56] [JS報錯捕捉] 【Cubewalkers_1】 ReferenceError: size is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.size 相容性 Stub
+[2026-07-24 23:02:56] [JS報錯捕捉] 【Cubewalkers_1】 ReferenceError: size is not defined --> 成功注入 window.size 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:03:00] [JS報錯捕捉] 【未命名試運行模組】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:03:00] [JS報錯捕捉] 【未命名試運行模組】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:03:03] [JS報錯捕捉] 【未命名試運行模組】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:03:03] [JS報錯捕捉] 【未命名試運行模組】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:03:10] [JS報錯捕捉] 【Cubism1_1】 TypeError: p5.prototype.registerPreloadMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:03:10] [JS報錯捕捉] 【Cubism1_1】 TypeError: p5.prototype.registerPreloadMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:03:28] [JS報錯捕捉] 【CurbedCourbet_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:03:28] [JS報錯捕捉] 【CurbedCourbet_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:03:32] [JS報錯捕捉] 【CurbedCourbetbreakdown_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:03:32] [JS報錯捕捉] 【CurbedCourbetbreakdown_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:03:37] [JS報錯捕捉] 【CurlNoise】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:03:37] [JS報錯捕捉] 【CurlNoise】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:03:41] [JS報錯捕捉] 【CurlPaint】 ReferenceError: CirclePacker is not defined --> 成功注入 window.CirclePacker 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:03:41] [JS報錯捕捉] 【CurlPaint】 ReferenceError: CirclePacker is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.CirclePacker 相容性 Stub
+[2026-07-24 23:03:53] [JS報錯捕捉] 【CurlVoronoi_1】 ReferenceError: CirclePacker is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.CirclePacker 相容性 Stub
+[2026-07-24 23:03:53] [JS報錯捕捉] 【CurlVoronoi_1】 ReferenceError: CirclePacker is not defined --> 成功注入 window.CirclePacker 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:03:57] [JS報錯捕捉] 【CurlyImageMorphingTime_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:03:57] [JS報錯捕捉] 【CurlyImageMorphingTime_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:04:31] [JS報錯捕捉] 【CursedTriangle_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:04:31] [JS報錯捕捉] 【CursedTriangle_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:04:34] [JS報錯捕捉] 【Curtains】 ReferenceError: curvePoint is not defined --> 成功注入 window.curvePoint 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:04:34] [JS報錯捕捉] 【Curtains】 ReferenceError: curvePoint is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.curvePoint 相容性 Stub
+[2026-07-24 23:04:55] [JS報錯捕捉] 【CurveGarden_1】 ReferenceError: curvePoint is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.curvePoint 相容性 Stub
+[2026-07-24 23:04:55] [JS報錯捕捉] 【CurveGarden_1】 ReferenceError: curvePoint is not defined --> 成功注入 window.curvePoint 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:04:58] [JS報錯捕捉] 【CurveGarden_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:04:58] [JS報錯捕捉] 【CurveGarden_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:05:04] [JS報錯捕捉] 【CutandPaste】 ReferenceError: split is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.split 相容性 Stub
+[2026-07-24 23:05:04] [JS報錯捕捉] 【CutandPaste】 ReferenceError: split is not defined --> 成功注入 window.split 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:05:16] [JS報錯捕捉] 【CuteBubbles_1】 ReferenceError: split is not defined --> 成功注入 window.split 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:05:16] [JS報錯捕捉] 【CuteBubbles_1】 ReferenceError: split is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.split 相容性 Stub
+[2026-07-24 23:05:24] [JS報錯捕捉] 【CuteBubbles_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:05:24] [JS報錯捕捉] 【CuteBubbles_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:05:28] [JS報錯捕捉] 【Cuttingcorners】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:05:28] [JS報錯捕捉] 【Cuttingcorners】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:05:32] [JS報錯捕捉] 【CyberpunkFlowFieldLines】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:05:32] [JS報錯捕捉] 【CyberpunkFlowFieldLines】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:07:55] [JS報錯捕捉] 【DLAexperiment_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:07:55] [JS報錯捕捉] 【DLAexperiment_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:07:59] [JS報錯捕捉] 【DNA Cosmos】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:07:59] [JS報錯捕捉] 【DNA Cosmos】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:08:03] [JS報錯捕捉] 【DancingBoxes_1】 ReferenceError: size is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.size 相容性 Stub
+[2026-07-24 23:08:03] [JS報錯捕捉] 【DancingBoxes_1】 ReferenceError: size is not defined --> 成功注入 window.size 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:08:15] [JS報錯捕捉] 【DancingBzier】 ReferenceError: size is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.size 相容性 Stub
+[2026-07-24 23:08:15] [JS報錯捕捉] 【DancingBzier】 ReferenceError: size is not defined --> 成功注入 window.size 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:08:19] [JS報錯捕捉] 【DancingShapes_Tubes_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:08:19] [JS報錯捕捉] 【DancingShapes_Tubes_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:08:23] [JS報錯捕捉] 【DancingWave_1】 ReferenceError: curveVertex is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.curveVertex 相容性 Stub
+[2026-07-24 23:08:23] [JS報錯捕捉] 【DancingWave_1】 ReferenceError: curveVertex is not defined --> 成功注入 window.curveVertex 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:08:33] [JS報錯捕捉] 【DandelionSeeds】 ReferenceError: curveVertex is not defined --> 成功注入 window.curveVertex 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:08:33] [JS報錯捕捉] 【DandelionSeeds】 ReferenceError: curveVertex is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.curveVertex 相容性 Stub
+[2026-07-24 23:08:50] [JS報錯捕捉] 【DandelionSeeds】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:08:50] [JS報錯捕捉] 【DandelionSeeds】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:10:43] [JS報錯捕捉] 【Daniel】 ReferenceError: page is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.page 相容性 Stub
+[2026-07-24 23:10:43] [JS報錯捕捉] 【Daniel】 ReferenceError: page is not defined --> 成功注入 window.page 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:11:28] [黑屏不保留捕捉] 【Delaunay_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:11:50] [黑屏不保留捕捉] 【Delorean_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:12:05] [JS報錯捕捉] 【DeStijlPoster_1】 ReferenceError: page is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.page 相容性 Stub
+[2026-07-24 23:12:05] [JS報錯捕捉] 【DeStijlPoster_1】 ReferenceError: page is not defined --> 成功注入 window.page 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:12:36] [黑屏不保留捕捉] 【DifferentialGrowth_3】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:12:46] [JS報錯捕捉] 【Descendance6SoundSequencer_1】 ReferenceError: page is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.page 相容性 Stub
+[2026-07-24 23:12:46] [JS報錯捕捉] 【Descendance6SoundSequencer_1】 ReferenceError: page is not defined --> 成功注入 window.page 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:12:49] [JS報錯捕捉] 【DiscoBall_1】     at setup (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_598_468394.html:3615:14) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:12:49] [JS報錯捕捉] 【DiscoBall_1】 TypeError: this.context.getConstant(...).chain is not a function --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:13:29] [黑屏不保留捕捉] 【Diverge】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:13:31] [JS報錯捕捉] 【Disconnectwork】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:13:31] [JS報錯捕捉] 【Disconnectwork】 TypeError: Cannot read properties of undefined (reading 'onended') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:13:44] [JS報錯捕捉] 【DominoPyramidq5play_1】 TypeError: PVector.sub is not a function --> 自動於 main.py 注入 PVector.sub 方法防禦 Stub
+[2026-07-24 23:13:44] [JS報錯捕捉] 【DominoPyramidq5play_1】 TypeError: PVector.sub is not a function --> 成功注入 PVector.sub 方法防禦 Stub 至 main.py！
+[2026-07-24 23:13:48] [JS報錯捕捉] 【Doodlylines_1】 TypeError: PVector.sub is not a function --> 自動於 main.py 注入 PVector.sub 方法防禦 Stub
+[2026-07-24 23:13:48] [JS報錯捕捉] 【Doodlylines_1】 TypeError: PVector.sub is not a function --> 成功注入 PVector.sub 方法防禦 Stub 至 main.py！
+[2026-07-24 23:13:51] [JS報錯捕捉] 【Doodoodoodles_1】 ReferenceError: tlogo is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.tlogo 相容性 Stub
+[2026-07-24 23:13:51] [JS報錯捕捉] 【Doodoodoodles_1】 ReferenceError: tlogo is not defined --> 成功注入 window.tlogo 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:14:10] [JS報錯捕捉] 【DoomScroll】 ReferenceError: tlogo is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.tlogo 相容性 Stub
+[2026-07-24 23:14:10] [JS報錯捕捉] 【DoomScroll】 ReferenceError: tlogo is not defined --> 成功注入 window.tlogo 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:14:16] [JS報錯捕捉] 【DrawTerrain】 ReferenceError: tlogo is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.tlogo 相容性 Stub
+[2026-07-24 23:14:16] [JS報錯捕捉] 【DrawTerrain】 ReferenceError: tlogo is not defined --> 成功注入 window.tlogo 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:14:19] [JS報錯捕捉] 【Drawwalkeronpaper】 ReferenceError: BMWalker is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.BMWalker 相容性 Stub
+[2026-07-24 23:14:20] [JS報錯捕捉] 【Drawwalkeronpaper】 ReferenceError: BMWalker is not defined --> 成功注入 window.BMWalker 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:14:59] [黑屏不保留捕捉] 【Duality】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:15:12] [JS報錯捕捉] 【Drawwalkeronpaperver20_1】 ReferenceError: BMWalker is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.BMWalker 相容性 Stub
+[2026-07-24 23:15:12] [JS報錯捕捉] 【Drawwalkeronpaperver20_1】 ReferenceError: BMWalker is not defined --> 成功注入 window.BMWalker 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:16:43] [JS報錯捕捉] 【Dynamicropes】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:16:43] [JS報錯捕捉] 【Dynamicropes】 TypeError: Cannot read properties of undefined (reading '_removeSignal') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:16:54] [JS報錯捕捉] 【EVERYTHINGEVERYWHEREALLATONCE_1】 TypeError: pg.beginDraw is not a function --> 自動於 main.py 注入 pg.beginDraw 方法防禦 Stub
+[2026-07-24 23:16:54] [JS報錯捕捉] 【EVERYTHINGEVERYWHEREALLATONCE_1】 TypeError: pg.beginDraw is not a function --> 成功注入 pg.beginDraw 方法防禦 Stub 至 main.py！
+[2026-07-24 23:17:19] [黑屏不保留捕捉] 【EXP025Regrowth】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:17:32] [JS報錯捕捉] 【EXP012Separation】 ReferenceError: f2 is not defined --> 成功注入 window.f2 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:17:32] [JS報錯捕捉] 【EXP012Separation】 ReferenceError: f2 is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.f2 相容性 Stub
+[2026-07-24 23:17:35] [JS報錯捕捉] 【Easingfunctions】 ReferenceError: f2 is not defined --> 成功注入 window.f2 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:17:35] [JS報錯捕捉] 【Easingfunctions】 ReferenceError: f2 is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.f2 相容性 Stub
+[2026-07-24 23:17:39] [JS報錯捕捉] 【Easingreference_1】 ReferenceError: f2 is not defined --> 成功注入 window.f2 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:17:39] [JS報錯捕捉] 【Easingreference_1】 ReferenceError: f2 is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.f2 相容性 Stub
+[2026-07-24 23:17:42] [JS報錯捕捉] 【Easingreference_3】 TypeError: preview.parent is not a function --> 成功注入 preview.parent 方法防禦 Stub 至 main.py！
+[2026-07-24 23:17:42] [JS報錯捕捉] 【Easingreference_3】 TypeError: preview.parent is not a function --> 自動於 main.py 注入 preview.parent 方法防禦 Stub
+[2026-07-24 23:17:46] [JS報錯捕捉] 【EasyAbstractArt】 ReferenceError: Dw is not defined --> 成功注入 window.Dw 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:17:46] [JS報錯捕捉] 【EasyAbstractArt】 ReferenceError: Dw is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.Dw 相容性 Stub
+[2026-07-24 23:18:51] [黑屏不保留捕捉] 【Emission】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:18:57] [JS報錯捕捉] 【EasyCamPhongShadingPPL_1】 ReferenceError: Dw is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.Dw 相容性 Stub
+[2026-07-24 23:18:57] [JS報錯捕捉] 【EasyCamPhongShadingPPL_1】 ReferenceError: Dw is not defined --> 成功注入 window.Dw 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:19:23] [JS報錯捕捉] 【EmojiZoo_1】 ReferenceError: Dw is not defined --> 成功注入 window.Dw 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:19:23] [JS報錯捕捉] 【EmojiZoo_1】 ReferenceError: Dw is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.Dw 相容性 Stub
+[2026-07-24 23:19:53] [黑屏不保留捕捉] 【Endlesstunnel_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:20:09] [JS報錯捕捉] 【EncontrosDigitaisTeaser】 TypeError: table.getRowCount is not a function --> 成功注入 table.getRowCount 方法防禦 Stub 至 main.py！
+[2026-07-24 23:20:09] [JS報錯捕捉] 【EncontrosDigitaisTeaser】 TypeError: table.getRowCount is not a function --> 自動於 main.py 注入 table.getRowCount 方法防禦 Stub
+[2026-07-24 23:20:29] [黑屏不保留捕捉] 【Errors】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:20:35] [JS報錯捕捉] 【ErodedLetters】 TypeError: font.textToPoints is not a function --> 自動於 main.py 注入 font.textToPoints 方法防禦 Stub
+[2026-07-24 23:20:35] [JS報錯捕捉] 【ErodedLetters】 TypeError: font.textToPoints is not a function --> 成功注入 font.textToPoints 方法防禦 Stub 至 main.py！
+[2026-07-24 23:20:43] [JS報錯捕捉] 【Escheresque11】 TypeError: font.textToPoints is not a function --> 自動於 main.py 注入 font.textToPoints 方法防禦 Stub
+[2026-07-24 23:20:43] [JS報錯捕捉] 【Escheresque11】 TypeError: font.textToPoints is not a function --> 成功注入 font.textToPoints 方法防禦 Stub 至 main.py！
+[2026-07-24 23:21:04] [黑屏不保留捕捉] 【EstudoCristal4Reflector_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:21:07] [JS報錯捕捉] 【Escherinfinitebendedframe_1】 TypeError: Cannot read properties of undefined (reading 'getJSON') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:21:07] [JS報錯捕捉] 【Escherinfinitebendedframe_1】     at file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_659_114380.html:4437:13 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:21:37] [JS報錯捕捉] 【Escherinfinitebendedframe_1】 ReferenceError: masterVolume is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.masterVolume 相容性 Stub
+[2026-07-24 23:21:37] [JS報錯捕捉] 【Escherinfinitebendedframe_1】 ReferenceError: masterVolume is not defined --> 成功注入 window.masterVolume 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:21:41] [JS報錯捕捉] 【ExoticMelodyGenerator】 ReferenceError: masterVolume is not defined --> 成功注入 window.masterVolume 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:21:41] [JS報錯捕捉] 【ExoticMelodyGenerator】 ReferenceError: masterVolume is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.masterVolume 相容性 Stub
+[2026-07-24 23:22:02] [JS報錯捕捉] 【ExoticMelodyGenerator_2】 ReferenceError: masterVolume is not defined --> 成功注入 window.masterVolume 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:22:02] [JS報錯捕捉] 【ExoticMelodyGenerator_2】 ReferenceError: masterVolume is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.masterVolume 相容性 Stub
+[2026-07-24 23:22:05] [JS報錯捕捉] 【Faces】 ReferenceError: masterVolume is not defined --> 成功注入 window.masterVolume 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:22:05] [JS報錯捕捉] 【Faces】 ReferenceError: masterVolume is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.masterVolume 相容性 Stub
+[2026-07-24 23:22:14] [黑屏不保留捕捉] 【FacialRig】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:22:31] [黑屏不保留捕捉] 【Facialblendshapes_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:22:38] [黑屏不保留捕捉] 【Faintbrand】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:22:49] [JS報錯捕捉] 【FacialExpressions_1】 TypeError: portret5.get is not a function --> 自動於 main.py 注入 portret5.get 方法防禦 Stub
+[2026-07-24 23:22:49] [JS報錯捕捉] 【FacialExpressions_1】 TypeError: portret5.get is not a function --> 成功注入 portret5.get 方法防禦 Stub 至 main.py！
+[2026-07-24 23:23:11] [JS報錯捕捉] 【FakePerspective_1】 TypeError: bg.beginDraw is not a function --> 成功注入 bg.beginDraw 方法防禦 Stub 至 main.py！
+[2026-07-24 23:23:11] [JS報錯捕捉] 【FakePerspective_1】 TypeError: bg.beginDraw is not a function --> 自動於 main.py 注入 bg.beginDraw 方法防禦 Stub
+[2026-07-24 23:23:21] [JS報錯捕捉] 【Feather】 TypeError: bg.beginDraw is not a function --> 成功注入 bg.beginDraw 方法防禦 Stub 至 main.py！
+[2026-07-24 23:23:21] [JS報錯捕捉] 【Feather】 TypeError: bg.beginDraw is not a function --> 自動於 main.py 注入 bg.beginDraw 方法防禦 Stub
+[2026-07-24 23:23:32] [JS報錯捕捉] 【FeedbackWCCChallenge】 TypeError: bg.beginDraw is not a function --> 自動於 main.py 注入 bg.beginDraw 方法防禦 Stub
+[2026-07-24 23:23:32] [JS報錯捕捉] 【FeedbackWCCChallenge】 TypeError: bg.beginDraw is not a function --> 成功注入 bg.beginDraw 方法防禦 Stub 至 main.py！
+[2026-07-24 23:23:51] [黑屏不保留捕捉] 【FireSparklesShader_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:24:45] [JS報錯捕捉] 【FilmSlate_1】 TypeError: films.getRowCount is not a function --> 自動於 main.py 注入 films.getRowCount 方法防禦 Stub
+[2026-07-24 23:24:45] [JS報錯捕捉] 【FilmSlate_1】 TypeError: films.getRowCount is not a function --> 成功注入 films.getRowCount 方法防禦 Stub 至 main.py！
+[2026-07-24 23:24:48] [JS報錯捕捉] 【Firebrush】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:24:48] [JS報錯捕捉] 【Firebrush】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:24:52] [JS報錯捕捉] 【Fireflies】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:24:52] [JS報錯捕捉] 【Fireflies】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:24:57] [JS報錯捕捉] 【FishBowl】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:24:57] [JS報錯捕捉] 【FishBowl】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:25:36] [JS報錯捕捉] 【FishEye_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:25:36] [JS報錯捕捉] 【FishEye_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:25:40] [JS報錯捕捉] 【Fishface_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:25:40] [JS報錯捕捉] 【Fishface_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:25:43] [JS報錯捕捉] 【FlatRaph_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:25:43] [JS報錯捕捉] 【FlatRaph_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:25:55] [JS報錯捕捉] 【Flatten】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:25:55] [JS報錯捕捉] 【Flatten】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:26:05] [JS報錯捕捉] 【Flatten】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:26:05] [JS報錯捕捉] 【Flatten】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:26:15] [JS報錯捕捉] 【FleePrototype】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:26:15] [JS報錯捕捉] 【FleePrototype】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:26:26] [JS報錯捕捉] 【Floating】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:26:26] [JS報錯捕捉] 【Floating】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:26:29] [JS報錯捕捉] 【FloatinganIdea】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:26:29] [JS報錯捕捉] 【FloatinganIdea】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:26:34] [JS報錯捕捉] 【Floodfillpattern】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:26:34] [JS報錯捕捉] 【Floodfillpattern】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:26:39] [JS報錯捕捉] 【Floorplandrawer_1】 ReferenceError: curveVertex is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.curveVertex 相容性 Stub
+[2026-07-24 23:26:39] [JS報錯捕捉] 【Floorplandrawer_1】 ReferenceError: curveVertex is not defined --> 成功注入 window.curveVertex 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:26:49] [JS報錯捕捉] 【FloraSpline_1】 ReferenceError: curveVertex is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.curveVertex 相容性 Stub
+[2026-07-24 23:26:49] [JS報錯捕捉] 【FloraSpline_1】 ReferenceError: curveVertex is not defined --> 成功注入 window.curveVertex 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:28:04] [JS報錯捕捉] 【FloraSpline_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:28:04] [JS報錯捕捉] 【FloraSpline_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:28:08] [JS報錯捕捉] 【Flow Petal】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:28:08] [JS報錯捕捉] 【Flow Petal】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:28:22] [JS報錯捕捉] 【FlowerGeneratorv1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:28:22] [JS報錯捕捉] 【FlowerGeneratorv1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:28:28] [JS報錯捕捉] 【Flowers_quarticOut_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:28:28] [JS報錯捕捉] 【Flowers_quarticOut_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:28:37] [JS報錯捕捉] 【FlowofPride_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:28:37] [JS報錯捕捉] 【FlowofPride_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:28:49] [JS報錯捕捉] 【FlowofPride_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:28:49] [JS報錯捕捉] 【FlowofPride_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:28:54] [JS報錯捕捉] 【FluidStrataBlueMood_10_1】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:28:54] [JS報錯捕捉] 【FluidStrataBlueMood_10_1】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:28:57] [JS報錯捕捉] 【Fluvia】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:28:57] [JS報錯捕捉] 【Fluvia】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:31:15] [JS報錯捕捉] 【FluviaLite】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:31:16] [JS報錯捕捉] 【FluviaLite】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:31:19] [JS報錯捕捉] 【未命名試運行模組】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:31:19] [JS報錯捕捉] 【未命名試運行模組】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:31:26] [JS報錯捕捉] 【FoldingPinwheel_1】 TypeError: p5.prototype.registerPreloadMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:31:26] [JS報錯捕捉] 【FoldingPinwheel_1】 TypeError: p5.prototype.registerPreloadMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:35:19] [黑屏不保留捕捉] 【FootGenerator_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:35:21] [JS報錯捕捉] 【FoldingPinwheel_1】 TypeError: this._incrementPreload is not a function --> 自動於 main.py 注入 this._incrementPreload 方法防禦 Stub
+[2026-07-24 23:35:21] [JS報錯捕捉] 【FoldingPinwheel_1】 TypeError: this._incrementPreload is not a function --> 成功注入 this._incrementPreload 方法防禦 Stub 至 main.py！
+[2026-07-24 23:35:46] [JS報錯捕捉] 【ForRowan】 TypeError: p5.prototype.registerMethod is not a function --> 成功注入 p5.prototype 方法防禦 Stub 至 main.py！
+[2026-07-24 23:35:46] [JS報錯捕捉] 【ForRowan】 TypeError: p5.prototype.registerMethod is not a function --> 自動於 main.py 注入 p5.prototype 方法防禦 Stub
+[2026-07-24 23:35:55] [JS報錯捕捉] 【FourMorph】 TypeError: spinner.addClass is not a function --> 自動於 main.py 注入 spinner.addClass 方法防禦 Stub
+[2026-07-24 23:35:56] [JS報錯捕捉] 【FourMorph】 TypeError: spinner.addClass is not a function --> 成功注入 spinner.addClass 方法防禦 Stub 至 main.py！
+[2026-07-24 23:36:26] [黑屏不保留捕捉] 【FractalLines】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:36:29] [JS報錯捕捉] 【FractalTower】 TypeError: spinner.addClass is not a function --> 自動於 main.py 注入 spinner.addClass 方法防禦 Stub
+[2026-07-24 23:36:29] [JS報錯捕捉] 【FractalTower】 TypeError: spinner.addClass is not a function --> 成功注入 spinner.addClass 方法防禦 Stub 至 main.py！
+[2026-07-24 23:36:38] [JS報錯捕捉] 【Fragmentos】 TypeError: Cannot read properties of undefined (reading 'x') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:36:38] [JS報錯捕捉] 【Fragmentos】 URL: https://openprocessing.org/@u307138/2123663 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:36:46] [JS報錯捕捉] 【Fragmentos】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:36:46] [JS報錯捕捉] 【Fragmentos】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:36:49] [JS報錯捕捉] 【Froipren】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:36:49] [JS報錯捕捉] 【Froipren】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:37:19] [黑屏不保留捕捉] 【From0to1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:38:58] [JS報錯捕捉] 【FruitNinja3D】 TypeError: o is not a function --> 成功注入 o 全域方法 Stub 至 main.py！
+[2026-07-24 23:38:59] [JS報錯捕捉] 【FruitNinja3D】 TypeError: o is not a function --> 自動於 main.py 注入 o 全域方法 Stub
+[2026-07-24 23:39:02] [JS報錯捕捉] 【FullMoonWebcam】 TypeError: o is not a function --> 成功注入 o 全域方法 Stub 至 main.py！
+[2026-07-24 23:39:02] [JS報錯捕捉] 【FullMoonWebcam】 TypeError: o is not a function --> 自動於 main.py 注入 o 全域方法 Stub
+[2026-07-24 23:39:05] [JS報錯捕捉] 【FullMoonWebcam】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:39:05] [JS報錯捕捉] 【FullMoonWebcam】 TypeError: Class constructor vn cannot be invoked without 'new' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:39:13] [JS報錯捕捉] 【GALLOP】 Line 1: Uncaught (in promise) TypeError: Class constructor vn cannot be invoked without 'new' --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:39:13] [JS報錯捕捉] 【GALLOP】 TypeError: Class constructor vn cannot be invoked without 'new' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:39:17] [JS報錯捕捉] 【GPGPU_TEST_1】 TypeError: Cannot read properties of undefined (reading '0') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:39:17] [JS報錯捕捉] 【GPGPU_TEST_1】     at ra.multiplyVec4 (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:181762) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:39:20] [JS報錯捕捉] 【GPUParticles】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:39:20] [JS報錯捕捉] 【GPUParticles】 URL: https://openprocessing.org/@u161812/1361028 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:39:26] [JS報錯捕捉] 【GPUParticles】 SyntaxError: Unexpected token ')' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:39:26] [JS報錯捕捉] 【GPUParticles】 Title: GPUParticles --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:39:34] [JS報錯捕捉] 【Gen256SunsetCloudWind】 TypeError: img.get is not a function --> 成功注入 img.get 方法防禦 Stub 至 main.py！
+[2026-07-24 23:39:34] [JS報錯捕捉] 【Gen256SunsetCloudWind】 TypeError: img.get is not a function --> 自動於 main.py 注入 img.get 方法防禦 Stub
+[2026-07-24 23:39:46] [JS報錯捕捉] 【GenerativeArtMurakami】 TypeError: img.get is not a function --> 成功注入 img.get 方法防禦 Stub 至 main.py！
+[2026-07-24 23:39:46] [JS報錯捕捉] 【GenerativeArtMurakami】 TypeError: img.get is not a function --> 自動於 main.py 注入 img.get 方法防禦 Stub
+[2026-07-24 23:40:24] [黑屏不保留捕捉] 【GenerativeLandscapes_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:40:27] [JS報錯捕捉] 【GenerativeFlower】 TypeError: img.get is not a function --> 成功注入 img.get 方法防禦 Stub 至 main.py！
+[2026-07-24 23:40:27] [JS報錯捕捉] 【GenerativeFlower】 TypeError: img.get is not a function --> 自動於 main.py 注入 img.get 方法防禦 Stub
+[2026-07-24 23:40:39] [JS報錯捕捉] 【GenerativeMusicString】 Line 3243: Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'width') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:40:39] [JS報錯捕捉] 【GenerativeMusicString】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:40:43] [JS報錯捕捉] 【GenerativeTypographyinMotion_1】 TypeError: this.context.getConstant(...).chain is not a function --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:40:43] [JS報錯捕捉] 【GenerativeTypographyinMotion_1】     at async #L (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405353) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:41:14] [黑屏不保留捕捉] 【Genuary10YoucanonlyuseTAUinyourcode_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:41:36] [JS報錯捕捉] 【Generativeflowers】 TypeError: Cannot read properties of undefined (reading 'length') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:41:36] [JS報錯捕捉] 【Generativeflowers】 Timestamp: 2026-07-24 23:40:43 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:41:47] [JS報錯捕捉] 【Genuary19Animorphs_1】     at draw (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_755_179590.html:3262:22) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:41:47] [JS報錯捕捉] 【Genuary19Animorphs_1】 TypeError: Cannot read properties of undefined (reading 'x') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:42:48] [黑屏不保留捕捉] 【Genuary2025_02_Layersuponlayersuponlayers】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:43:22] [JS報錯捕捉] 【Genuary20SeaofShapes_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:43:22] [JS報錯捕捉] 【Genuary20SeaofShapes_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:43:29] [JS報錯捕捉] 【Genuary20SeaofShapes_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:43:29] [JS報錯捕捉] 【Genuary20SeaofShapes_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:43:41] [黑屏不保留捕捉] 【Genuary22PointLinePlane_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:43:48] [JS報錯捕捉] 【Genuary22Dapple】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:43:49] [JS報錯捕捉] 【Genuary22Dapple】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:44:07] [JS報錯捕捉] 【Genuary25Day18WCCChallengeWhatdoeswindlooklike】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:44:07] [JS報錯捕捉] 【Genuary25Day18WCCChallengeWhatdoeswindlooklike】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:44:22] [JS報錯捕捉] 【Genuary27ColorScheme_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:44:23] [JS報錯捕捉] 【Genuary27ColorScheme_1】 TypeError: Cannot read properties of undefined (reading 'loop') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:44:27] [JS報錯捕捉] 【Genuary29Isometric】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:44:27] [JS報錯捕捉] 【Genuary29Isometric】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:48:36] [JS報錯捕捉] 【Genuary31NegativeSpace_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:48:36] [JS報錯捕捉] 【Genuary31NegativeSpace_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:49:44] [JS報錯捕捉] 【Genuary8Generativemetropolis】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:49:44] [JS報錯捕捉] 【Genuary8Generativemetropolis】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:50:01] [黑屏不保留捕捉] 【GlitchBrushbr_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:50:21] [黑屏不保留捕捉] 【GlitchFX】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:50:24] [JS報錯捕捉] 【GlassDome】 TypeError: ctx.createLinearGradient is not a function --> 成功注入 ctx.createLinearGradient 方法防禦 Stub 至 main.py！
+[2026-07-24 23:50:24] [JS報錯捕捉] 【GlassDome】 TypeError: ctx.createLinearGradient is not a function --> 自動於 main.py 注入 ctx.createLinearGradient 方法防禦 Stub
+[2026-07-24 23:50:28] [JS報錯捕捉] 【GlitchStreaks_1】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:50:28] [JS報錯捕捉] 【GlitchStreaks_1】 TypeError: Cannot read properties of undefined (reading 'resize') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:50:33] [JS報錯捕捉] 【GlitchTime_1】 ReferenceError: c is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.c 相容性 Stub
+[2026-07-24 23:50:33] [JS報錯捕捉] 【GlitchTime_1】 ReferenceError: c is not defined --> 成功注入 window.c 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:50:42] [JS報錯捕捉] 【Glitchart_1】 ReferenceError: c is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.c 相容性 Stub
+[2026-07-24 23:50:42] [JS報錯捕捉] 【Glitchart_1】 ReferenceError: c is not defined --> 成功注入 window.c 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:51:03] [黑屏不保留捕捉] 【Glow】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:51:25] [黑屏不保留捕捉] 【GoldFractal_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:51:43] [黑屏不保留捕捉] 【GoldenMagma_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:52:03] [黑屏不保留捕捉] 【Goldrivers_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:52:18] [黑屏不保留捕捉] 【GradientandTextures】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:52:24] [JS報錯捕捉] 【GlitchyStairs_1】 ReferenceError: c is not defined --> 成功注入 window.c 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:52:24] [JS報錯捕捉] 【GlitchyStairs_1】 ReferenceError: c is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.c 相容性 Stub
+[2026-07-24 23:52:28] [JS報錯捕捉] 【GraffitiPainter_1】 TypeError: font.textBounds is not a function --> 自動於 main.py 注入 font.textBounds 方法防禦 Stub
+[2026-07-24 23:52:28] [JS報錯捕捉] 【GraffitiPainter_1】 TypeError: font.textBounds is not a function --> 成功注入 font.textBounds 方法防禦 Stub 至 main.py！
+[2026-07-24 23:52:46] [JS報錯捕捉] 【Green】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:52:46] [JS報錯捕捉] 【Green】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:53:03] [JS報錯捕捉] 【Green】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:53:03] [JS報錯捕捉] 【Green】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:53:35] [黑屏不保留捕捉] 【Growingintoit_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:53:50] [JS報錯捕捉] 【GridTangle_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-24 23:53:50] [JS報錯捕捉] 【GridTangle_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-24 23:54:15] [JS報錯捕捉] 【GridTangle_1】 ReferenceError: eyePic is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.eyePic 相容性 Stub
+[2026-07-24 23:54:15] [JS報錯捕捉] 【GridTangle_1】 ReferenceError: eyePic is not defined --> 成功注入 window.eyePic 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:55:10] [黑屏不保留捕捉] 【Hexcellent】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:55:24] [JS報錯捕捉] 【HannahHch】 ReferenceError: eyePic is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.eyePic 相容性 Stub
+[2026-07-24 23:55:24] [JS報錯捕捉] 【HannahHch】 ReferenceError: eyePic is not defined --> 成功注入 window.eyePic 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:55:28] [黑屏不保留捕捉] 【HoldStillbacteriophage_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:55:34] [JS報錯捕捉] 【HolidayCard_1】 ReferenceError: shorten is not defined --> 成功注入 window.shorten 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:55:34] [JS報錯捕捉] 【HolidayCard_1】 ReferenceError: shorten is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.shorten 相容性 Stub
+[2026-07-24 23:55:46] [黑屏不保留捕捉] 【HollerithPunchedCard】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:56:04] [黑屏不保留捕捉] 【Homework1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:56:19] [黑屏不保留捕捉] 【HorizonShader】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:56:27] [黑屏不保留捕捉] 【HorizonShader】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:56:31] [JS報錯捕捉] 【HotAirBalloon】 ReferenceError: snd is not defined --> 成功注入 window.snd 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:56:31] [JS報錯捕捉] 【HotAirBalloon】 ReferenceError: snd is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.snd 相容性 Stub
+[2026-07-24 23:56:34] [JS報錯捕捉] 【HotAirBalloon】 ReferenceError: snd is not defined --> 成功注入 window.snd 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:56:34] [JS報錯捕捉] 【HotAirBalloon】 ReferenceError: snd is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.snd 相容性 Stub
+[2026-07-24 23:56:53] [JS報錯捕捉] 【HotOrColdGame】 ReferenceError: snd is not defined --> 成功注入 window.snd 相容性 Stub 至 main.py 全域護欄！
+[2026-07-24 23:56:53] [JS報錯捕捉] 【HotOrColdGame】 ReferenceError: snd is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.snd 相容性 Stub
+[2026-07-24 23:57:45] [黑屏不保留捕捉] 【IguessImalreadythere】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:58:06] [黑屏不保留捕捉] 【ImageCircularRandomWalker_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:58:29] [黑屏不保留捕捉] 【Infiniteroom_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:58:36] [黑屏不保留捕捉] 【Infinitespace】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-24 23:58:54] [JS報錯捕捉] 【Hyperspaceorigins_1】 TypeError: Cannot read properties of undefined (reading 'get') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:58:54] [JS報錯捕捉] 【Hyperspaceorigins_1】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:59:09] [JS報錯捕捉] 【Ink_5】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-24 23:59:09] [JS報錯捕捉] 【Ink_5】 Timestamp: 2026-07-24 23:58:54 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-24 23:59:40] [黑屏不保留捕捉] 【InteractiveBlob】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:00:17] [黑屏不保留捕捉] 【Interactive_210614_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:00:24] [JS報錯捕捉] 【Insidetheweb】 Timestamp: 2026-07-24 23:59:09 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:00:25] [JS報錯捕捉] 【Insidetheweb】 TypeError: Cannot read properties of undefined (reading '_removeSignal') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:00:28] [JS報錯捕捉] 【InterestingLinesTutorial】 TypeError: Cannot read properties of undefined (reading '_removeSignal') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:00:28] [JS報錯捕捉] 【InterestingLinesTutorial】     at setup (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_878_359126.html:3389:15) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:00:32] [JS報錯捕捉] 【IntersectingEllipses】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:00:32] [JS報錯捕捉] 【IntersectingEllipses】     at setup (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_881_525669.html:3399:2) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:00:41] [黑屏不保留捕捉] 【Inversion_100_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:00:50] [JS報錯捕捉] 【Islands】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:00:50] [JS報錯捕捉] 【Islands】 URL: https://openprocessing.org/@chubas/2342272 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:00:59] [JS報錯捕捉] 【Islands】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:00:59] [JS報錯捕捉] 【Islands】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:01:21] [黑屏不保留捕捉] 【Itendtogetinmyownway_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:01:23] [JS報錯捕捉] 【Isle_1】 ReferenceError: getPalette is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.getPalette 相容性 Stub
+[2026-07-25 00:01:23] [JS報錯捕捉] 【Isle_1】 ReferenceError: getPalette is not defined --> 成功注入 window.getPalette 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:01:26] [JS報錯捕捉] 【Iterations】 ReferenceError: getPalette is not defined --> 成功注入 window.getPalette 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:01:27] [JS報錯捕捉] 【Iterations】 ReferenceError: getPalette is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.getPalette 相容性 Stub
+[2026-07-25 00:01:43] [JS報錯捕捉] 【IterativeFlower1】 ReferenceError: collidePolyPoly is not defined --> 成功注入 window.collidePolyPoly 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:01:43] [JS報錯捕捉] 【IterativeFlower1】 ReferenceError: collidePolyPoly is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.collidePolyPoly 相容性 Stub
+[2026-07-25 00:02:04] [JS報錯捕捉] 【JasperJohnsstraw】 ReferenceError: collidePolyPoly is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.collidePolyPoly 相容性 Stub
+[2026-07-25 00:02:04] [JS報錯捕捉] 【JasperJohnsstraw】 ReferenceError: collidePolyPoly is not defined --> 成功注入 window.collidePolyPoly 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:02:10] [JS報錯捕捉] 【KUMALEONCodingChallenge】 ReferenceError: kumaleon is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.kumaleon 相容性 Stub
+[2026-07-25 00:02:10] [JS報錯捕捉] 【KUMALEONCodingChallenge】 ReferenceError: kumaleon is not defined --> 成功注入 window.kumaleon 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:02:18] [JS報錯捕捉] 【KaleidoFractalIridescence】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:02:18] [JS報錯捕捉] 【KaleidoFractalIridescence】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:02:24] [JS報錯捕捉] 【KaleidoscopeView】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:02:24] [JS報錯捕捉] 【KaleidoscopeView】 TypeError: Cannot read properties of undefined (reading 'get') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:02:28] [JS報錯捕捉] 【KaleidoscopicShaderCubese】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:02:28] [JS報錯捕捉] 【KaleidoscopicShaderCubese】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:02:41] [JS報錯捕捉] 【Koch3Dsphericalfracal】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:02:41] [JS報錯捕捉] 【Koch3Dsphericalfracal】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:02:48] [JS報錯捕捉] 【LEGOLion】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:02:48] [JS報錯捕捉] 【LEGOLion】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:02:59] [JS報錯捕捉] 【Labyrinth】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:02:59] [JS報錯捕捉] 【Labyrinth】 URL: https://openprocessing.org/@u240456/1292325 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:03:02] [JS報錯捕捉] 【Labyrinthmoveinit_1】 URL: https://openprocessing.org/@chubas/2122715 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:03:02] [JS報錯捕捉] 【Labyrinthmoveinit_1】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:03:37] [JS報錯捕捉] 【Labyrinthmoveinit_1】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:03:37] [JS報錯捕捉] 【Labyrinthmoveinit_1】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:03:55] [黑屏不保留捕捉] 【LightPainting_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:03:58] [JS報錯捕捉] 【Legomasterpiece】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:03:58] [JS報錯捕捉] 【Legomasterpiece】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:04:01] [JS報錯捕捉] 【Lightningcorrosiongravity_1】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:04:01] [JS報錯捕捉] 【Lightningcorrosiongravity_1】 URL: https://openprocessing.org/@marzinp/501244 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:04:05] [JS報錯捕捉] 【Lightningcorrosiongravity_1】 TypeError: finalLayer.patternColors is not a function --> 成功注入 finalLayer.patternColors 方法防禦 Stub 至 main.py！
+[2026-07-25 00:04:05] [JS報錯捕捉] 【Lightningcorrosiongravity_1】 TypeError: finalLayer.patternColors is not a function --> 自動於 main.py 注入 finalLayer.patternColors 方法防禦 Stub
+[2026-07-25 00:04:31] [JS報錯捕捉] 【Lightup_1】 TypeError: finalLayer.patternColors is not a function --> 自動於 main.py 注入 finalLayer.patternColors 方法防禦 Stub
+[2026-07-25 00:04:31] [JS報錯捕捉] 【Lightup_1】 TypeError: finalLayer.patternColors is not a function --> 成功注入 finalLayer.patternColors 方法防禦 Stub 至 main.py！
+[2026-07-25 00:04:38] [JS報錯捕捉] 【Linesbw_1】 TypeError: PVector.fromAngle is not a function --> 自動於 main.py 注入 PVector.fromAngle 方法防禦 Stub
+[2026-07-25 00:04:38] [JS報錯捕捉] 【Linesbw_1】 TypeError: PVector.fromAngle is not a function --> 成功注入 PVector.fromAngle 方法防禦 Stub 至 main.py！
+[2026-07-25 00:04:41] [JS報錯捕捉] 【Liquid_1】 ReferenceError: println is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.println 相容性 Stub
+[2026-07-25 00:04:41] [JS報錯捕捉] 【Liquid_1】 ReferenceError: println is not defined --> 成功注入 window.println 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:04:44] [JS報錯捕捉] 【LissajousGlow_1】 ReferenceError: println is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.println 相容性 Stub
+[2026-07-25 00:04:44] [JS報錯捕捉] 【LissajousGlow_1】 ReferenceError: println is not defined --> 成功注入 window.println 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:04:58] [JS報錯捕捉] 【LissajousSpecimen】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:04:59] [JS報錯捕捉] 【LissajousSpecimen】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:05:02] [JS報錯捕捉] 【LittleWarlings_1】 ReferenceError: i is not defined --> 成功注入 window.i 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:05:03] [JS報錯捕捉] 【LittleWarlings_1】 ReferenceError: i is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.i 相容性 Stub
+[2026-07-25 00:05:40] [JS報錯捕捉] 【LogicGates】 ReferenceError: i is not defined --> 成功注入 window.i 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:05:40] [JS報錯捕捉] 【LogicGates】 ReferenceError: i is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.i 相容性 Stub
+[2026-07-25 00:05:44] [JS報錯捕捉] 【Lunacy】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:05:44] [JS報錯捕捉] 【Lunacy】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:05:50] [JS報錯捕捉] 【Lunacy_1】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:05:50] [JS報錯捕捉] 【Lunacy_1】 URL: https://openprocessing.org/@RobA/1902246 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:05:59] [JS報錯捕捉] 【Lunacy_1】 ReferenceError: B_font is not defined --> 成功注入 window.B_font 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:05:59] [JS報錯捕捉] 【Lunacy_1】 ReferenceError: B_font is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.B_font 相容性 Stub
+[2026-07-25 00:06:02] [JS報錯捕捉] 【METAMEREPoster】 ReferenceError: B_font is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.B_font 相容性 Stub
+[2026-07-25 00:06:02] [JS報錯捕捉] 【METAMEREPoster】 ReferenceError: B_font is not defined --> 成功注入 window.B_font 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:06:05] [JS報錯捕捉] 【ML5StyleTransfer_1】 ReferenceError: B_font is not defined --> 成功注入 window.B_font 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:06:06] [JS報錯捕捉] 【ML5StyleTransfer_1】 ReferenceError: B_font is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.B_font 相容性 Stub
+[2026-07-25 00:06:08] [JS報錯捕捉] 【MLKSpeech_1】 TypeError: sel.option is not a function --> 自動於 main.py 注入 sel.option 方法防禦 Stub
+[2026-07-25 00:06:08] [JS報錯捕捉] 【MLKSpeech_1】 TypeError: sel.option is not a function --> 成功注入 sel.option 方法防禦 Stub 至 main.py！
+[2026-07-25 00:06:16] [JS報錯捕捉] 【MagicCube_1】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:06:16] [JS報錯捕捉] 【MagicCube_1】 URL: https://openprocessing.org/@u110137/1991811 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:06:24] [JS報錯捕捉] 【Makeyourowndankchess】 URL: https://openprocessing.org/@u110137/2138092 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:06:24] [JS報錯捕捉] 【Makeyourowndankchess】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:06:31] [JS報錯捕捉] 【ManualTypewriter】 URL: https://openprocessing.org/@davepagurek/2282544 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:06:31] [JS報錯捕捉] 【ManualTypewriter】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:06:46] [黑屏不保留捕捉] 【Marimekko】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:06:49] [JS報錯捕捉] 【MatingRitual】 URL: https://openprocessing.org/@u110137/1043293 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:06:49] [JS報錯捕捉] 【MatingRitual】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:07:06] [JS報錯捕捉] 【MbiusRoll】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:07:07] [JS報錯捕捉] 【MbiusRoll】 URL: https://openprocessing.org/@u110137/2196043 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:07:09] [JS報錯捕捉] 【MecanumRobot】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:07:10] [JS報錯捕捉] 【MecanumRobot】 URL: https://openprocessing.org/@noel/2930303 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:07:13] [JS報錯捕捉] 【MechanicalHand_1】 URL: https://openprocessing.org/@u110137/1551867 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:07:13] [JS報錯捕捉] 【MechanicalHand_1】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:07:16] [JS報錯捕捉] 【MedusaCreature】 URL: https://openprocessing.org/@u110137/1022520 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:07:16] [JS報錯捕捉] 【MedusaCreature】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:07:24] [JS報錯捕捉] 【Melting】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:07:25] [JS報錯捕捉] 【Melting】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:07:28] [JS報錯捕捉] 【MengerJourneybySyntopia】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:07:28] [JS報錯捕捉] 【MengerJourneybySyntopia】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:07:31] [JS報錯捕捉] 【MessyCurveDraw_1】     at setup (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_969_499027.html:3349:14) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:07:31] [JS報錯捕捉] 【MessyCurveDraw_1】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:07:41] [JS報錯捕捉] 【MetaballShader】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:07:41] [JS報錯捕捉] 【MetaballShader】 Line 45: Window Error Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:08:07] [JS報錯捕捉] 【Micin】 URL: https://openprocessing.org/@u141528/781343 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:08:07] [JS報錯捕捉] 【Micin】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:08:26] [黑屏不保留捕捉] 【MicrophonetoPiano】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:08:33] [JS報錯捕捉] 【Mime_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:08:33] [JS報錯捕捉] 【Mime_1】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:08:37] [JS報錯捕捉] 【MinecraftCampfire_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:08:37] [JS報錯捕捉] 【MinecraftCampfire_1】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:08:45] [黑屏不保留捕捉] 【MistyForest_2】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:08:50] [JS報錯捕捉] 【ModelHead】 URL: https://openprocessing.org/@u110137/2760369 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:08:50] [JS報錯捕捉] 【ModelHead】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:09:21] [JS報錯捕捉] 【MooMooio10】 ReferenceError: player is not defined --> 成功注入 window.player 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:09:22] [JS報錯捕捉] 【MooMooio10】 ReferenceError: player is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.player 相容性 Stub
+[2026-07-25 00:09:26] [JS報錯捕捉] 【Mood_01】 ReferenceError: player is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.player 相容性 Stub
+[2026-07-25 00:09:26] [JS報錯捕捉] 【Mood_01】 ReferenceError: player is not defined --> 成功注入 window.player 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:09:37] [JS報錯捕捉] 【MooninaMoon】 ReferenceError: player is not defined --> 成功注入 window.player 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:09:37] [JS報錯捕捉] 【MooninaMoon】 ReferenceError: player is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.player 相容性 Stub
+[2026-07-25 00:09:54] [黑屏不保留捕捉] 【Morningglorymadeofwire】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:09:57] [JS報錯捕捉] 【MorphMaker】 URL: https://openprocessing.org/@jdenavas/1994296 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:09:57] [JS報錯捕捉] 【MorphMaker】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:10:02] [黑屏不保留捕捉] 【Morphing】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:10:10] [JS報錯捕捉] 【MorphingChromaticGrid】 URL: https://openprocessing.org/@davepagurek/1966515 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:10:11] [JS報錯捕捉] 【MorphingChromaticGrid】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:10:14] [JS報錯捕捉] 【MorphingParade_1】 TypeError: Cannot set property GL of #<bl> which has only a getter --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:10:14] [JS報錯捕捉] 【MorphingParade_1】 URL: https://openprocessing.org/@Kazoops/2910057 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:10:17] [JS報錯捕捉] 【MorphingParade_1】 TypeError: font.textToPoints is not a function --> 成功注入 font.textToPoints 方法防禦 Stub 至 main.py！
+[2026-07-25 00:10:17] [JS報錯捕捉] 【MorphingParade_1】 TypeError: font.textToPoints is not a function --> 自動於 main.py 注入 font.textToPoints 方法防禦 Stub
+[2026-07-25 00:10:25] [黑屏不保留捕捉] 【MostlyHarmless_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:10:30] [JS報錯捕捉] 【MorphingType】 TypeError: font.textToPoints is not a function --> 自動於 main.py 注入 font.textToPoints 方法防禦 Stub
+[2026-07-25 00:10:30] [JS報錯捕捉] 【MorphingType】 TypeError: font.textToPoints is not a function --> 成功注入 font.textToPoints 方法防禦 Stub 至 main.py！
+[2026-07-25 00:10:42] [黑屏不保留捕捉] 【Mulholland】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:10:50] [黑屏不保留捕捉] 【Mulhollandcolors】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:10:56] [黑屏不保留捕捉] 【MultiCircleMaze】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:01] [黑屏不保留捕捉] 【MultiProjectionLattice】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:06] [黑屏不保留捕捉] 【Multifaces】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:10] [黑屏不保留捕捉] 【MultiplayerGameswithSocketio_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:13] [黑屏不保留捕捉] 【Multiplechoice】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:16] [黑屏不保留捕捉] 【MultiscaleTuringPatterns】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:20] [黑屏不保留捕捉] 【MultiscalesquareTruchet】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:25] [黑屏不保留捕捉] 【MultisizeTruchetComposition2】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:28] [黑屏不保留捕捉] 【MultitapText】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:30] [黑屏不保留捕捉] 【MuseumVisit】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:34] [黑屏不保留捕捉] 【MusicMakesYouTravel_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:36] [黑屏不保留捕捉] 【MusicVisualizer】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:39] [黑屏不保留捕捉] 【Musicnotesgenuary2022_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:42] [黑屏不保留捕捉] 【Mutableripples】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:11:44] [黑屏不保留捕捉] 【MutedReflections_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:12:42] [黑屏不保留捕捉] 【MyHeaderImage】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:12:46] [黑屏不保留捕捉] 【MyRoom_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:12:54] [黑屏不保留捕捉] 【MySketch】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:12:59] [黑屏不保留捕捉] 【MySketch036】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:13:07] [黑屏不保留捕捉] 【MySketch_13】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:13:27] [黑屏不保留捕捉] 【MySketch_15】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:13:33] [黑屏不保留捕捉] 【MySketch_19】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:13:51] [黑屏不保留捕捉] 【MySketch】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:14:11] [黑屏不保留捕捉] 【MySketch】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:14:34] [黑屏不保留捕捉] 【MySketch_22】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:14:43] [黑屏不保留捕捉] 【MySketch】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:14:49] [黑屏不保留捕捉] 【MySketch】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:14:56] [黑屏不保留捕捉] 【MySketch_26】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:15:05] [黑屏不保留捕捉] 【MySketch】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:15:14] [黑屏不保留捕捉] 【MySketch_29】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:15:24] [黑屏不保留捕捉] 【MySketch_30】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:15:32] [黑屏不保留捕捉] 【MySketch_32】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:15:48] [黑屏不保留捕捉] 【MySketch】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:17:01] [JS報錯捕捉] 【Mountain20220111_1】 TypeError: font.textToPoints is not a function --> 自動於 main.py 注入 font.textToPoints 方法防禦 Stub
+[2026-07-25 00:17:01] [JS報錯捕捉] 【Mountain20220111_1】 TypeError: font.textToPoints is not a function --> 成功注入 font.textToPoints 方法防禦 Stub 至 main.py！
+[2026-07-25 00:17:07] [JS報錯捕捉] 【NCQLayout】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:17:07] [JS報錯捕捉] 【NCQLayout】 TypeError: Cannot read properties of null (reading 'canvas') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:17:10] [JS報錯捕捉] 【Nautilusshells_1】     at async #L (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405353) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:17:10] [JS報錯捕捉] 【Nautilusshells_1】 TypeError: Cannot read properties of null (reading 'canvas') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:17:22] [黑屏不保留捕捉] 【NeonOrbs_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:17:34] [黑屏不保留捕捉] 【NervousWaves】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:18:02] [JS報錯捕捉] 【Neon】 TypeError: Cannot read properties of undefined (reading 'height') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:18:03] [JS報錯捕捉] 【Neon】     at Ge.t.redraw (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:4684) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:18:08] [JS報錯捕捉] 【NoiseMapping_1】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:18:08] [JS報錯捕捉] 【NoiseMapping_1】 TypeError: Cannot read properties of undefined (reading 'textToPoints') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:18:11] [JS報錯捕捉] 【NoiseMapping_1】 TypeError: Cannot read properties of undefined (reading '0') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:18:11] [JS報錯捕捉] 【NoiseMapping_1】 Title: NoiseMapping_1 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:18:23] [JS報錯捕捉] 【NoisePlanet_MountainStone】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:18:23] [JS報錯捕捉] 【NoisePlanet_MountainStone】 SyntaxError: Unexpected token ')' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:18:26] [JS報錯捕捉] 【Noiseflowfieldpainter】 SyntaxError: Unexpected token ')' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:18:26] [JS報錯捕捉] 【Noiseflowfieldpainter】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:18:37] [JS報錯捕捉] 【Noiserosettes2_1】     at changeImage (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1033_112020.html:3430:17) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:18:37] [JS報錯捕捉] 【Noiserosettes2_1】 TypeError: Cannot read properties of undefined (reading 'loadPixels') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:18:40] [JS報錯捕捉] 【Noiserosettes_1】 TypeError: int(...) is not a function --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:18:40] [JS報錯捕捉] 【Noiserosettes_1】 TypeError: int(...) is not a function --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:18:44] [黑屏不保留捕捉] 【Noisestudy】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:18:51] [黑屏不保留捕捉] 【Noisestudy2】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:19:07] [JS報錯捕捉] 【NoisyCanvasp5pattern_1】 TypeError: int(...) is not a function --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:19:07] [JS報錯捕捉] 【NoisyCanvasp5pattern_1】     at initMe (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1037_554845.html:3376:27) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:19:27] [JS報錯捕捉] 【NoisyCanvasp5pattern_1】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:19:27] [JS報錯捕捉] 【NoisyCanvasp5pattern_1】 TypeError: Cannot read properties of undefined (reading 'buffers') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:19:32] [黑屏不保留捕捉] 【Noisyrainbow】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:29:38] [JS報錯捕捉] 【NoisyTube】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:29:38] [JS報錯捕捉] 【NoisyTube】 TypeError: Cannot convert object to primitive value --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:29:55] [黑屏不保留捕捉] 【Noper】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:30:08] [JS報錯捕捉] 【Noisyrainbowvisualizer_1】 TypeError: Cannot convert object to primitive value --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:30:08] [JS報錯捕捉] 【Noisyrainbowvisualizer_1】     at t.rotateZ (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:3347) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:30:13] [黑屏不保留捕捉] 【Nothingeverhappenswithoutareason】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:30:38] [黑屏不保留捕捉] 【Nov08connections】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:30:58] [黑屏不保留捕捉] 【OPDrawer01】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:31:25] [黑屏不保留捕捉] 【Octagonaltunnel】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:31:36] [JS報錯捕捉] 【NotebookPaper】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:31:37] [JS報錯捕捉] 【NotebookPaper】 TypeError: Cannot read properties of undefined (reading 'jump') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:31:40] [JS報錯捕捉] 【NotebookPaper】 TypeError: Cannot read properties of undefined (reading 'resize') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:31:40] [JS報錯捕捉] 【NotebookPaper】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:31:59] [黑屏不保留捕捉] 【Oldpostcard_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:32:24] [黑屏不保留捕捉] 【OopsAllDaves_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:32:32] [JS報錯捕捉] 【OffsetPress_1】 ReferenceError: RiTa is not defined --> 成功注入 window.RiTa 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:32:32] [JS報錯捕捉] 【OffsetPress_1】 ReferenceError: RiTa is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.RiTa 相容性 Stub
+[2026-07-25 00:32:36] [JS報錯捕捉] 【OgresAreLikeOnions_1】 ReferenceError: RiTa is not defined --> 成功注入 window.RiTa 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:32:36] [JS報錯捕捉] 【OgresAreLikeOnions_1】 ReferenceError: RiTa is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.RiTa 相容性 Stub
+[2026-07-25 00:32:59] [黑屏不保留捕捉] 【Organificial2_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:33:30] [黑屏不保留捕捉] 【OverandAgain_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:33:48] [黑屏不保留捕捉] 【P5Monjori】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:34:12] [JS報錯捕捉] 【OpenProcessingAdventure】 ReferenceError: RiTa is not defined --> 成功注入 window.RiTa 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:34:12] [JS報錯捕捉] 【OpenProcessingAdventure】 ReferenceError: RiTa is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.RiTa 相容性 Stub
+[2026-07-25 00:34:23] [JS報錯捕捉] 【OpenProcessingNetwork_1】 Timestamp: 2026-07-25 00:32:36 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:34:23] [JS報錯捕捉] 【OpenProcessingNetwork_1】 SyntaxError: Invalid Unicode escape sequence --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:34:31] [JS報錯捕捉] 【PaintingwithCircleNoise】 TypeError: selector.selected is not a function --> 自動於 main.py 注入 selector.selected 方法防禦 Stub
+[2026-07-25 00:34:31] [JS報錯捕捉] 【PaintingwithCircleNoise】 TypeError: selector.selected is not a function --> 成功注入 selector.selected 方法防禦 Stub 至 main.py！
+[2026-07-25 00:34:36] [JS報錯捕捉] 【PaletteCollectionv25_1】 TypeError: selector.selected is not a function --> 自動於 main.py 注入 selector.selected 方法防禦 Stub
+[2026-07-25 00:34:36] [JS報錯捕捉] 【PaletteCollectionv25_1】 TypeError: selector.selected is not a function --> 成功注入 selector.selected 方法防禦 Stub 至 main.py！
+[2026-07-25 00:34:39] [JS報錯捕捉] 【PaletteWidget_1】 TypeError: selector.selected is not a function --> 成功注入 selector.selected 方法防禦 Stub 至 main.py！
+[2026-07-25 00:34:39] [JS報錯捕捉] 【PaletteWidget_1】 TypeError: selector.selected is not a function --> 自動於 main.py 注入 selector.selected 方法防禦 Stub
+[2026-07-25 00:34:42] [JS報錯捕捉] 【PandorasBox_1】 TypeError: Cannot read properties of undefined (reading 'map') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:34:42] [JS報錯捕捉] 【PandorasBox_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:34:45] [JS報錯捕捉] 【PandorasBox_1】 TypeError: Cannot read properties of undefined (reading 'get') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:34:45] [JS報錯捕捉] 【PandorasBox_1】 Timestamp: 2026-07-25 00:34:39 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:35:00] [JS報錯捕捉] 【PaperGarden】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:35:00] [JS報錯捕捉] 【PaperGarden】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:35:27] [黑屏不保留捕捉] 【ParticleLeniasimulation】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:35:44] [黑屏不保留捕捉] 【ParticlePlotter_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:35:47] [JS報錯捕捉] 【ParticleRaysSDF】 TypeError: Cannot read properties of undefined (reading '0') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:35:47] [JS報錯捕捉] 【ParticleRaysSDF】 TypeError: Cannot read properties of undefined (reading '0') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:36:36] [黑屏不保留捕捉] 【Pebbles2_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:36:39] [JS報錯捕捉] 【ParticleRaysSDF】 TypeError: font.textToPoints is not a function --> 成功注入 font.textToPoints 方法防禦 Stub 至 main.py！
+[2026-07-25 00:36:39] [JS報錯捕捉] 【ParticleRaysSDF】 TypeError: font.textToPoints is not a function --> 自動於 main.py 注入 font.textToPoints 方法防禦 Stub
+[2026-07-25 00:36:58] [JS報錯捕捉] 【PenPlotter】 TypeError: font.textToPoints is not a function --> 自動於 main.py 注入 font.textToPoints 方法防禦 Stub
+[2026-07-25 00:36:58] [JS報錯捕捉] 【PenPlotter】 TypeError: font.textToPoints is not a function --> 成功注入 font.textToPoints 方法防禦 Stub 至 main.py！
+[2026-07-25 00:37:01] [JS報錯捕捉] 【PeriodicTable】 ReferenceError: ix is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.ix 相容性 Stub
+[2026-07-25 00:37:01] [JS報錯捕捉] 【PeriodicTable】 ReferenceError: ix is not defined --> 成功注入 window.ix 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:37:24] [JS報錯捕捉] 【PerlinPeakContours_1】 ReferenceError: ix is not defined --> 成功注入 window.ix 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:37:24] [JS報錯捕捉] 【PerlinPeakContours_1】 ReferenceError: ix is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.ix 相容性 Stub
+[2026-07-25 00:37:35] [黑屏不保留捕捉] 【PhotoFragments】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:37:38] [JS報錯捕捉] 【PhageMatch_1】 ReferenceError: ix is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.ix 相容性 Stub
+[2026-07-25 00:37:38] [JS報錯捕捉] 【PhageMatch_1】 ReferenceError: ix is not defined --> 成功注入 window.ix 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:38:16] [黑屏不保留捕捉] 【Physarum】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:38:18] [JS報錯捕捉] 【PhageMatch_1】 Title: PhageMatch_1 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:38:18] [JS報錯捕捉] 【PhageMatch_1】 TypeError: p5.Vector.fromAngle is not a constructor --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:38:26] [JS報錯捕捉] 【PhysarumGPUIOv2_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:38:26] [JS報錯捕捉] 【PhysarumGPUIOv2_1】 TypeError: Cannot read properties of undefined (reading 'resize') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:38:29] [JS報錯捕捉] 【PhysarumLetters】 SyntaxError: Unexpected token '{' --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:38:29] [JS報錯捕捉] 【PhysarumLetters】 SyntaxError: Unexpected token '{' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:38:36] [黑屏不保留捕捉] 【Physarumv13】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:38:51] [JS報錯捕捉] 【PhysarumLetters_2】     at setup (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1116_813172.html:3458:12) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:38:51] [JS報錯捕捉] 【PhysarumLetters_2】 TypeError: Cannot read properties of undefined (reading 'data') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:39:04] [黑屏不保留捕捉] 【Pieces】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:39:27] [黑屏不保留捕捉] 【PillarsII_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:39:41] [JS報錯捕捉] 【PictureCutLandscapeWCCChallengeGenerativeLandscapes】 TypeError: img.loadPixels is not a function --> 自動於 main.py 注入 img.loadPixels 方法防禦 Stub
+[2026-07-25 00:39:41] [JS報錯捕捉] 【PictureCutLandscapeWCCChallengeGenerativeLandscapes】 TypeError: img.loadPixels is not a function --> 成功注入 img.loadPixels 方法防禦 Stub 至 main.py！
+[2026-07-25 00:39:45] [JS報錯捕捉] 【PixelKnitting_1】 TypeError: img.loadPixels is not a function --> 成功注入 img.loadPixels 方法防禦 Stub 至 main.py！
+[2026-07-25 00:39:45] [JS報錯捕捉] 【PixelKnitting_1】 TypeError: img.loadPixels is not a function --> 自動於 main.py 注入 img.loadPixels 方法防禦 Stub
+[2026-07-25 00:39:48] [JS報錯捕捉] 【PixelSorting】 TypeError: img.loadPixels is not a function --> 成功注入 img.loadPixels 方法防禦 Stub 至 main.py！
+[2026-07-25 00:39:48] [JS報錯捕捉] 【PixelSorting】 TypeError: img.loadPixels is not a function --> 自動於 main.py 注入 img.loadPixels 方法防禦 Stub
+[2026-07-25 00:39:52] [JS報錯捕捉] 【Pixelfiller】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:39:52] [JS報錯捕捉] 【Pixelfiller】 Line 3387: Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'width') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:39:55] [JS報錯捕捉] 【Pixelsnail】 TypeError: Cannot read properties of undefined (reading '0') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:39:55] [JS報錯捕捉] 【Pixelsnail】     at e.mouseClicked (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1126_711986.html:3500:3) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:40:23] [JS報錯捕捉] 【PointLightsAnimation】 ReferenceError: Dw is not defined --> 成功注入 window.Dw 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:40:23] [JS報錯捕捉] 【PointLightsAnimation】 ReferenceError: Dw is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.Dw 相容性 Stub
+[2026-07-25 00:40:53] [JS報錯捕捉] 【PointLightsAnimation】 ReferenceError: Dw is not defined --> 成功注入 window.Dw 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:40:53] [JS報錯捕捉] 【PointLightsAnimation】 ReferenceError: Dw is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.Dw 相容性 Stub
+[2026-07-25 00:41:03] [黑屏不保留捕捉] 【PositiveNegativeMaze_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:41:13] [黑屏不保留捕捉] 【Posteffectwithshader】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:41:18] [JS報錯捕捉] 【PortraitPainter_1】 TypeError: img.loadPixels is not a function --> 自動於 main.py 注入 img.loadPixels 方法防禦 Stub
+[2026-07-25 00:41:18] [JS報錯捕捉] 【PortraitPainter_1】 TypeError: img.loadPixels is not a function --> 成功注入 img.loadPixels 方法防禦 Stub 至 main.py！
+[2026-07-25 00:41:26] [JS報錯捕捉] 【PotteryTessellation】 TypeError: Cannot read properties of undefined (reading 'data') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:41:26] [JS報錯捕捉] 【PotteryTessellation】 URL: https://openprocessing.org/@antoinettecreates/2211070 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:41:42] [JS報錯捕捉] 【PotteryTessellation】 TypeError: Cannot read properties of undefined (reading 'kind') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:41:42] [JS報錯捕捉] 【PotteryTessellation】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:41:45] [JS報錯捕捉] 【PrideParadeofPaws】 TypeError: Cannot read properties of undefined (reading 'kind') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:41:45] [JS報錯捕捉] 【PrideParadeofPaws】     at #P (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405684) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:42:12] [JS報錯捕捉] 【PrintDust_1】 TypeError: font.textBounds is not a function --> 自動於 main.py 注入 font.textBounds 方法防禦 Stub
+[2026-07-25 00:42:12] [JS報錯捕捉] 【PrintDust_1】 TypeError: font.textBounds is not a function --> 成功注入 font.textBounds 方法防禦 Stub 至 main.py！
+[2026-07-25 00:42:42] [黑屏不保留捕捉] 【PsychedelicNoise_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:42:45] [JS報錯捕捉] 【PsychedelicPoster_1】 TypeError: font.textBounds is not a function --> 自動於 main.py 注入 font.textBounds 方法防禦 Stub
+[2026-07-25 00:42:45] [JS報錯捕捉] 【PsychedelicPoster_1】 TypeError: font.textBounds is not a function --> 成功注入 font.textBounds 方法防禦 Stub 至 main.py！
+[2026-07-25 00:43:19] [JS報錯捕捉] 【PuzzlePieces_1】 TypeError: Cannot read properties of undefined (reading 'textToPoints') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:43:19] [JS報錯捕捉] 【PuzzlePieces_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:43:23] [JS報錯捕捉] 【PuzzlePieces_1】 TypeError: radio.selected is not a function --> 成功注入 radio.selected 方法防禦 Stub 至 main.py！
+[2026-07-25 00:43:23] [JS報錯捕捉] 【PuzzlePieces_1】 TypeError: radio.selected is not a function --> 自動於 main.py 注入 radio.selected 方法防禦 Stub
+[2026-07-25 00:43:36] [黑屏不保留捕捉] 【QuantumraysWCCChallengeIllusion250125】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:43:59] [JS報錯捕捉] 【PuzzlePieces_1】 TypeError: radio.selected is not a function --> 成功注入 radio.selected 方法防禦 Stub 至 main.py！
+[2026-07-25 00:43:59] [JS報錯捕捉] 【PuzzlePieces_1】 TypeError: radio.selected is not a function --> 自動於 main.py 注入 radio.selected 方法防禦 Stub
+[2026-07-25 00:44:02] [JS報錯捕捉] 【PythagoreanTheorem_000_1】 TypeError: radio.selected is not a function --> 成功注入 radio.selected 方法防禦 Stub 至 main.py！
+[2026-07-25 00:44:02] [JS報錯捕捉] 【PythagoreanTheorem_000_1】 TypeError: radio.selected is not a function --> 自動於 main.py 注入 radio.selected 方法防禦 Stub
+[2026-07-25 00:44:06] [JS報錯捕捉] 【REBubbleChamber_12】 TypeError: radio.selected is not a function --> 成功注入 radio.selected 方法防禦 Stub 至 main.py！
+[2026-07-25 00:44:06] [JS報錯捕捉] 【REBubbleChamber_12】 TypeError: radio.selected is not a function --> 自動於 main.py 注入 radio.selected 方法防禦 Stub
+[2026-07-25 00:44:09] [JS報錯捕捉] 【REBubbleChamber_3_1】 SyntaxError: Unexpected token ')' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:44:09] [JS報錯捕捉] 【REBubbleChamber_3_1】 Line 45: Window Error Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:44:12] [JS報錯捕捉] 【REBubbleChamber_4】 SyntaxError: Unexpected token ')' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:44:12] [JS報錯捕捉] 【REBubbleChamber_4】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:44:21] [黑屏不保留捕捉] 【RGBWaves_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:44:32] [黑屏不保留捕捉] 【RainbowBlur】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:45:00] [黑屏不保留捕捉] 【RainbowMetaballsShader_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:45:38] [JS報錯捕捉] 【REBubbleChamber_7_1】 ReferenceError: Dw is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.Dw 相容性 Stub
+[2026-07-25 00:45:38] [JS報錯捕捉] 【REBubbleChamber_7_1】 ReferenceError: Dw is not defined --> 成功注入 window.Dw 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:46:16] [JS報錯捕捉] 【RansomNoteGenerator】 ReferenceError: Dw is not defined --> 成功注入 window.Dw 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 00:46:16] [JS報錯捕捉] 【RansomNoteGenerator】 ReferenceError: Dw is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.Dw 相容性 Stub
+[2026-07-25 00:46:20] [JS報錯捕捉] 【RaphCollage_1】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:46:20] [JS報錯捕捉] 【RaphCollage_1】 TypeError: wordFonts[i].textBounds is not a function --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:46:32] [JS報錯捕捉] 【Raphcicle_1】 TypeError: wordFonts[i].textBounds is not a function --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 00:46:32] [JS報錯捕捉] 【Raphcicle_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 00:46:43] [黑屏不保留捕捉] 【Raphcursion】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:47:10] [黑屏不保留捕捉] 【Recursion_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 00:47:33] [黑屏不保留捕捉] 【ReflectIIICommunity】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:01:18] [黑屏不保留捕捉] 【Reflekton_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:01:21] [JS報錯捕捉] 【Raphcicle_1】 ======================================== --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:01:21] [JS報錯捕捉] 【Raphcicle_1】 TypeError: Cannot read properties of undefined (reading 'computeNormals') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:01:24] [JS報錯捕捉] 【Refractions】 TypeError: NYColor.newRandomColor is not a function --> 自動於 main.py 注入 NYColor.newRandomColor 方法防禦 Stub
+[2026-07-25 01:01:24] [JS報錯捕捉] 【Refractions】 TypeError: NYColor.newRandomColor is not a function --> 成功注入 NYColor.newRandomColor 方法防禦 Stub 至 main.py！
+[2026-07-25 01:01:33] [JS報錯捕捉] 【Refractions_3】 TypeError: NYColor.newRandomColor is not a function --> 自動於 main.py 注入 NYColor.newRandomColor 方法防禦 Stub
+[2026-07-25 01:01:33] [JS報錯捕捉] 【Refractions_3】 TypeError: NYColor.newRandomColor is not a function --> 成功注入 NYColor.newRandomColor 方法防禦 Stub 至 main.py！
+[2026-07-25 01:01:37] [JS報錯捕捉] 【Regularpolygonplayground】 ReferenceError: midPoint is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.midPoint 相容性 Stub
+[2026-07-25 01:01:37] [JS報錯捕捉] 【Regularpolygonplayground】 ReferenceError: midPoint is not defined --> 成功注入 window.midPoint 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:02:07] [黑屏不保留捕捉] 【Reproduction】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:02:22] [JS報錯捕捉] 【RemixPeaks】 ReferenceError: midPoint is not defined --> 成功注入 window.midPoint 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:02:22] [JS報錯捕捉] 【RemixPeaks】 ReferenceError: midPoint is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.midPoint 相容性 Stub
+[2026-07-25 01:02:40] [JS報錯捕捉] 【RestlessCube_1】 ReferenceError: midPoint is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.midPoint 相容性 Stub
+[2026-07-25 01:02:40] [JS報錯捕捉] 【RestlessCube_1】 ReferenceError: midPoint is not defined --> 成功注入 window.midPoint 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:03:10] [JS報錯捕捉] 【RestlessCube_1】 Title: RestlessCube_1 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:03:10] [JS報錯捕捉] 【RestlessCube_1】 TypeError: Cannot read properties of undefined (reading 'isPlaying') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:05:01] [JS報錯捕捉] 【RightsforAllLoveforAll】 ReferenceError: loopStep is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.loopStep 相容性 Stub
+[2026-07-25 01:05:01] [JS報錯捕捉] 【RightsforAllLoveforAll】 ReferenceError: loopStep is not defined --> 成功注入 window.loopStep 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:05:09] [JS報錯捕捉] 【RogerCoqartSquareSeriesAnimatedContrastLoop】 ReferenceError: loopStep is not defined --> 成功注入 window.loopStep 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:05:09] [JS報錯捕捉] 【RogerCoqartSquareSeriesAnimatedContrastLoop】 ReferenceError: loopStep is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.loopStep 相容性 Stub
+[2026-07-25 01:05:31] [黑屏不保留捕捉] 【Rose_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:05:39] [黑屏不保留捕捉] 【Rose_2】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:05:42] [JS報錯捕捉] 【RollingShutter_1】 ReferenceError: loopStep is not defined --> 成功注入 window.loopStep 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:05:42] [JS報錯捕捉] 【RollingShutter_1】 ReferenceError: loopStep is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.loopStep 相容性 Stub
+[2026-07-25 01:06:11] [黑屏不保留捕捉] 【Roughplants_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:06:31] [JS報錯捕捉] 【Rotatecats_1】 ReferenceError: animation is not defined --> 成功注入 window.animation 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:06:31] [JS報錯捕捉] 【Rotatecats_1】 ReferenceError: animation is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.animation 相容性 Stub
+[2026-07-25 01:06:51] [黑屏不保留捕捉] 【SIHAWTL_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:06:54] [JS報錯捕捉] 【RuinedPicnic】 ReferenceError: animation is not defined --> 成功注入 window.animation 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:06:54] [JS報錯捕捉] 【RuinedPicnic】 ReferenceError: animation is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.animation 相容性 Stub
+[2026-07-25 01:07:19] [JS報錯捕捉] 【SILENTSCREAMER_1】 TypeError: ml5.faceApi is not a function --> 自動於 main.py 注入 ml5.faceApi 方法防禦 Stub
+[2026-07-25 01:07:19] [JS報錯捕捉] 【SILENTSCREAMER_1】 TypeError: ml5.faceApi is not a function --> 成功注入 ml5.faceApi 方法防禦 Stub 至 main.py！
+[2026-07-25 01:07:31] [JS報錯捕捉] 【ScanPainting】 TypeError: ml5.faceApi is not a function --> 自動於 main.py 注入 ml5.faceApi 方法防禦 Stub
+[2026-07-25 01:07:31] [JS報錯捕捉] 【ScanPainting】 TypeError: ml5.faceApi is not a function --> 成功注入 ml5.faceApi 方法防禦 Stub 至 main.py！
+[2026-07-25 01:08:27] [黑屏不保留捕捉] 【SeaScape】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:15:45] [JS報錯捕捉] 【Scribble_10_christmastree_1】     at start (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1235_789765.html:3405:18) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:15:45] [JS報錯捕捉] 【Scribble_10_christmastree_1】 TypeError: photos[current].loadPixels is not a function --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:15:48] [JS報錯捕捉] 【SelfinDotsandLines】 ReferenceError: sort is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.sort 相容性 Stub
+[2026-07-25 01:15:48] [JS報錯捕捉] 【SelfinDotsandLines】 ReferenceError: sort is not defined --> 成功注入 window.sort 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:16:26] [JS報錯捕捉] 【Severalblobs】 ReferenceError: sort is not defined --> 成功注入 window.sort 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:16:26] [JS報錯捕捉] 【Severalblobs】 ReferenceError: sort is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.sort 相容性 Stub
+[2026-07-25 01:17:09] [黑屏不保留捕捉] 【Shade5_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:17:20] [黑屏不保留捕捉] 【ShaderPsychedelicSpiral_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:17:28] [黑屏不保留捕捉] 【Shader_240421】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:17:42] [黑屏不保留捕捉] 【Shader_2404256_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:17:53] [黑屏不保留捕捉] 【Shaders】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:18:05] [黑屏不保留捕捉] 【ShadersForkandFckwithit】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:18:16] [黑屏不保留捕捉] 【Shaders_002】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:18:49] [黑屏不保留捕捉] 【ShadertoyTemplate_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:19:10] [黑屏不保留捕捉] 【ShadowMapping_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:19:20] [黑屏不保留捕捉] 【ShadyBlobs_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:19:23] [JS報錯捕捉] 【Severalblobs】 SyntaxError: Unexpected token ')' --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:19:23] [JS報錯捕捉] 【Severalblobs】     at t._onclick (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:446757) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:19:27] [JS報錯捕捉] 【Shift】 TypeError: Cannot read properties of undefined (reading 'kind') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:19:27] [JS報錯捕捉] 【Shift】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:19:55] [黑屏不保留捕捉] 【ShimmeringMosaics_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:20:35] [黑屏不保留捕捉] 【ShowYourWork】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:22:09] [黑屏不保留捕捉] 【Simplegrass_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:22:44] [黑屏不保留捕捉] 【Sinevines】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:22:47] [JS報錯捕捉] 【Shift】 TypeError: Cannot read properties of undefined (reading 'kind') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:22:47] [JS報錯捕捉] 【Shift】 Line 1: Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'kind') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:23:11] [JS報錯捕捉] 【Sinuswaves】 TypeError: Cannot read properties of undefined (reading 'data') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:23:11] [JS報錯捕捉] 【Sinuswaves】     at textToPoints (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1253_217975.html:3508:15) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:23:38] [黑屏不保留捕捉] 【SliceDicePatterns_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:23:49] [JS報錯捕捉] 【SketchForkVizPB】 TypeError: int(...) is not a function --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:23:49] [JS報錯捕捉] 【SketchForkVizPB】     at #P (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405684) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:24:13] [黑屏不保留捕捉] 【Smoke_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:24:34] [黑屏不保留捕捉] 【Smoke_2】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:24:47] [黑屏不保留捕捉] 【Smokedemo】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:25:29] [JS報錯捕捉] 【SlideRule20】 TypeError: Cannot read properties of undefined (reading 'forks') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:25:29] [JS報錯捕捉] 【SlideRule20】     at #P (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405684) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:26:01] [JS報錯捕捉] 【SnowyLandscape】     at Fa.forEach.e.Graphics.<computed> [as textFont] (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:239785) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:26:01] [JS報錯捕捉] 【SnowyLandscape】 TypeError: Cannot read properties of undefined (reading 'data') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:26:20] [黑屏不保留捕捉] 【Space】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:26:23] [JS報錯捕捉] 【SnowyLandscape】 TypeError: THREE.OrbitControls is not a constructor --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:26:23] [JS報錯捕捉] 【SnowyLandscape】 Title: SnowyLandscape --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:26:55] [黑屏不保留捕捉] 【SparklesintheVoid】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:27:19] [JS報錯捕捉] 【SpaceColonization_1】 URL: https://openprocessing.org/@u110137/2753299 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:27:19] [JS報錯捕捉] 【SpaceColonization_1】 TypeError: Cannot read properties of undefined (reading 'get') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:27:39] [黑屏不保留捕捉] 【SpiralShader】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:27:49] [黑屏不保留捕捉] 【SpiralShader】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:28:14] [JS報錯捕捉] 【SplashDeconstructed_1】 TypeError: font.textToPoints is not a function --> 自動於 main.py 注入 font.textToPoints 方法防禦 Stub
+[2026-07-25 01:28:14] [JS報錯捕捉] 【SplashDeconstructed_1】 TypeError: font.textToPoints is not a function --> 成功注入 font.textToPoints 方法防禦 Stub 至 main.py！
+[2026-07-25 01:28:19] [JS報錯捕捉] 【Splash_3】 TypeError: font.textToPoints is not a function --> 自動於 main.py 注入 font.textToPoints 方法防禦 Stub
+[2026-07-25 01:28:19] [JS報錯捕捉] 【Splash_3】 TypeError: font.textToPoints is not a function --> 成功注入 font.textToPoints 方法防禦 Stub 至 main.py！
+[2026-07-25 01:28:42] [JS報錯捕捉] 【Splitword_1】 TypeError: font.textToPoints is not a function --> 自動於 main.py 注入 font.textToPoints 方法防禦 Stub
+[2026-07-25 01:28:43] [JS報錯捕捉] 【Splitword_1】 TypeError: font.textToPoints is not a function --> 成功注入 font.textToPoints 方法防禦 Stub 至 main.py！
+[2026-07-25 01:29:01] [JS報錯捕捉] 【Splitword_1】 TypeError: input.size is not a function --> 成功注入 input.size 方法防禦 Stub 至 main.py！
+[2026-07-25 01:29:02] [JS報錯捕捉] 【Splitword_1】 TypeError: input.size is not a function --> 自動於 main.py 注入 input.size 方法防禦 Stub
+[2026-07-25 01:30:19] [JS報錯捕捉] 【Spores_1】 TypeError: input.size is not a function --> 自動於 main.py 注入 input.size 方法防禦 Stub
+[2026-07-25 01:30:19] [JS報錯捕捉] 【Spores_1】 TypeError: input.size is not a function --> 成功注入 input.size 方法防禦 Stub 至 main.py！
+[2026-07-25 01:30:45] [JS報錯捕捉] 【Stackedshadersnoisecontours_1】     at aa.<anonymous> (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1316_231097.html:3520:26) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:30:45] [JS報錯捕捉] 【Stackedshadersnoisecontours_1】 TypeError: Cannot read properties of undefined (reading '0') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:30:57] [JS報錯捕捉] 【StainedGlass_4】 URL: https://openprocessing.org/@neill/1003996 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:30:57] [JS報錯捕捉] 【StainedGlass_4】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:31:40] [JS報錯捕捉] 【StarField】     at async e._draw (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:406468) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:31:40] [JS報錯捕捉] 【StarField】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:31:50] [JS報錯捕捉] 【StipplingVoronoisandTSPs】     at Ge.t.redraw (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:4684) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:31:50] [JS報錯捕捉] 【StipplingVoronoisandTSPs】 TypeError: Cannot read properties of undefined (reading 'setUniform') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:31:53] [JS報錯捕捉] 【StringArtAngel_1】 TypeError: Assignment to constant variable. --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:31:53] [JS報錯捕捉] 【StringArtAngel_1】     at setup (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1334_516590.html:4175:13) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:32:04] [黑屏不保留捕捉] 【SubscapesRemake】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:32:21] [黑屏不保留捕捉] 【SubscapesRemake_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:32:44] [JS報錯捕捉] 【StripedWaves】     at async #L (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405353) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:32:44] [JS報錯捕捉] 【StripedWaves】 TypeError: Cannot read properties of undefined (reading '0') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:33:50] [JS報錯捕捉] 【SundialSimulation】 TypeError: Cannot read properties of undefined (reading 'data') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:33:51] [JS報錯捕捉] 【SundialSimulation】 Timestamp: 2026-07-25 01:32:43 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:33:54] [JS報錯捕捉] 【SweaterFactory】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:33:54] [JS報錯捕捉] 【SweaterFactory】 TypeError: parameter 1 is not of type 'Function'. --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:33:57] [JS報錯捕捉] 【Swelter】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:33:57] [JS報錯捕捉] 【Swelter】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:34:37] [黑屏不保留捕捉] 【TalkingHeadsChristmasCard_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:34:40] [JS報錯捕捉] 【Tamagotchi】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:34:41] [JS報錯捕捉] 【Tamagotchi】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:34:53] [JS報錯捕捉] 【Tamagotchi】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:34:53] [JS報錯捕捉] 【Tamagotchi】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:34:57] [JS報錯捕捉] 【TarotDeck_1】 TypeError: colorsInput.size is not a function --> 自動於 main.py 注入 colorsInput.size 方法防禦 Stub
+[2026-07-25 01:34:57] [JS報錯捕捉] 【TarotDeck_1】 TypeError: colorsInput.size is not a function --> 成功注入 colorsInput.size 方法防禦 Stub 至 main.py！
+[2026-07-25 01:35:08] [JS報錯捕捉] 【TartanWeaver】 TypeError: colorsInput.size is not a function --> 自動於 main.py 注入 colorsInput.size 方法防禦 Stub
+[2026-07-25 01:35:08] [JS報錯捕捉] 【TartanWeaver】 TypeError: colorsInput.size is not a function --> 成功注入 colorsInput.size 方法防禦 Stub 至 main.py！
+[2026-07-25 01:35:19] [JS報錯捕捉] 【TextRepetition】 TypeError: colorsInput.size is not a function --> 自動於 main.py 注入 colorsInput.size 方法防禦 Stub
+[2026-07-25 01:35:19] [JS報錯捕捉] 【TextRepetition】 TypeError: colorsInput.size is not a function --> 成功注入 colorsInput.size 方法防禦 Stub 至 main.py！
+[2026-07-25 01:35:27] [黑屏不保留捕捉] 【TexturedClothSimulation_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:35:36] [黑屏不保留捕捉] 【TheAnnoyingPotato】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:35:40] [JS報錯捕捉] 【Textinflowers】 ReferenceError: mousePressed is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.mousePressed 相容性 Stub
+[2026-07-25 01:35:40] [JS報錯捕捉] 【Textinflowers】 ReferenceError: mousePressed is not defined --> 成功注入 window.mousePressed 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:35:55] [黑屏不保留捕捉] 【TheJitterySnails_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:36:05] [黑屏不保留捕捉] 【TheLight2_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:36:13] [黑屏不保留捕捉] 【TheLight_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:36:25] [黑屏不保留捕捉] 【ThePuddle_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:36:37] [JS報錯捕捉] 【TheArchitect_1】 ReferenceError: mousePressed is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.mousePressed 相容性 Stub
+[2026-07-25 01:36:37] [JS報錯捕捉] 【TheArchitect_1】 ReferenceError: mousePressed is not defined --> 成功注入 window.mousePressed 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:36:50] [黑屏不保留捕捉] 【Theworldisfallingapart】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:36:53] [JS報錯捕捉] 【Theend】 ReferenceError: mousePressed is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.mousePressed 相容性 Stub
+[2026-07-25 01:36:54] [JS報錯捕捉] 【Theend】 ReferenceError: mousePressed is not defined --> 成功注入 window.mousePressed 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:37:04] [JS報錯捕捉] 【Theend】 Title: Theend --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:37:04] [JS報錯捕捉] 【Theend】 TypeError: Cannot read properties of undefined (reading 'x') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:37:41] [JS報錯捕捉] 【Theyrewatching】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:37:41] [JS報錯捕捉] 【Theyrewatching】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:37:49] [JS報錯捕捉] 【ThreejsCityDriverainbowhuesWIP】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:37:49] [JS報錯捕捉] 【ThreejsCityDriverainbowhuesWIP】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:39:27] [JS報錯捕捉] 【Train_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:39:27] [JS報錯捕捉] 【Train_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:39:34] [JS報錯捕捉] 【TriangleSubdivision】 ReferenceError: c is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.c 相容性 Stub
+[2026-07-25 01:39:34] [JS報錯捕捉] 【TriangleSubdivision】 ReferenceError: c is not defined --> 成功注入 window.c 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:39:42] [黑屏不保留捕捉] 【TrippyRainbow】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:41:01] [黑屏不保留捕捉] 【Twilight】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:42:20] [JS報錯捕捉] 【Triangulation】 ReferenceError: c is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.c 相容性 Stub
+[2026-07-25 01:42:20] [JS報錯捕捉] 【Triangulation】 ReferenceError: c is not defined --> 成功注入 window.c 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:42:36] [黑屏不保留捕捉] 【UnpredictableFlower_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:43:01] [JS報錯捕捉] 【Unicorn】 ReferenceError: c is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.c 相容性 Stub
+[2026-07-25 01:43:01] [JS報錯捕捉] 【Unicorn】 ReferenceError: c is not defined --> 成功注入 window.c 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:43:08] [黑屏不保留捕捉] 【Valence_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:43:16] [JS報錯捕捉] 【Usingcamerawithprocessingjs】 ReferenceError: externals is not defined --> 成功注入 window.externals 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:43:16] [JS報錯捕捉] 【Usingcamerawithprocessingjs】 ReferenceError: externals is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.externals 相容性 Stub
+[2026-07-25 01:43:45] [黑屏不保留捕捉] 【Vectorfieldmorph】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:43:48] [JS報錯捕捉] 【VanGoghFieldsForever_1】 ReferenceError: externals is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.externals 相容性 Stub
+[2026-07-25 01:43:48] [JS報錯捕捉] 【VanGoghFieldsForever_1】 ReferenceError: externals is not defined --> 成功注入 window.externals 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:44:30] [黑屏不保留捕捉] 【VideoDiscs】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:44:32] [JS報錯捕捉] 【VeiledText_1】 ReferenceError: string is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.string 相容性 Stub
+[2026-07-25 01:44:32] [JS報錯捕捉] 【VeiledText_1】 ReferenceError: string is not defined --> 成功注入 window.string 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:44:44] [黑屏不保留捕捉] 【Void_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:44:46] [JS報錯捕捉] 【VisualMusicScatteredSunfork_1】 ReferenceError: string is not defined --> 成功注入 window.string 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:44:47] [JS報錯捕捉] 【VisualMusicScatteredSunfork_1】 ReferenceError: string is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.string 相容性 Stub
+[2026-07-25 01:45:00] [JS報錯捕捉] 【Volcaniccascades】     at #P (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:405684) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:45:00] [JS報錯捕捉] 【Volcaniccascades】 TypeError: Cannot read properties of undefined (reading 'loop') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:45:04] [JS報錯捕捉] 【VoronoiPainting】     at vn._adjustListener (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/js_cache/p5.min.js:1:77758) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:45:04] [JS報錯捕捉] 【VoronoiPainting】 TypeError: Cannot read properties of undefined (reading '_removeSignal') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:45:20] [黑屏不保留捕捉] 【WCCCHallengeIterations_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:45:46] [黑屏不保留捕捉] 【WCCChallenge25Wk24Pride_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:45:52] [JS報錯捕捉] 【Voronoiportrait_1】 TypeError: Cannot read properties of undefined (reading 'resize') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:45:52] [JS報錯捕捉] 【Voronoiportrait_1】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:45:55] [JS報錯捕捉] 【WCCChallengeBasedonaSong】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:45:55] [JS報錯捕捉] 【WCCChallengeBasedonaSong】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:45:59] [JS報錯捕捉] 【WCCChallengeBotanical_1】 TypeError: Cannot read properties of undefined (reading 'loop') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:45:59] [JS報錯捕捉] 【WCCChallengeBotanical_1】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:46:02] [JS報錯捕捉] 【WCCChallengeBranching】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:46:02] [JS報錯捕捉] 【WCCChallengeBranching】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:46:23] [JS報錯捕捉] 【WCCChallengeChalchiuhtlicueorMesoamericandesign_1】 TypeError: Cannot read properties of undefined (reading 'add') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:46:23] [JS報錯捕捉] 【WCCChallengeChalchiuhtlicueorMesoamericandesign_1】 TypeError: Cannot read properties of undefined (reading 'add') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:46:29] [黑屏不保留捕捉] 【WCCChallengeSymmetries】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:46:37] [黑屏不保留捕捉] 【WEBGLMetaballs】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:46:45] [JS報錯捕捉] 【WCCChallengeSimplify】 ReferenceError: spritesheet is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.spritesheet 相容性 Stub
+[2026-07-25 01:46:45] [JS報錯捕捉] 【WCCChallengeSimplify】 ReferenceError: spritesheet is not defined --> 成功注入 window.spritesheet 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:46:51] [JS報錯捕捉] 【WalkingCatScanimation】 ReferenceError: spritesheet is not defined --> 成功注入 window.spritesheet 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:46:51] [JS報錯捕捉] 【WalkingCatScanimation】 ReferenceError: spritesheet is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.spritesheet 相容性 Stub
+[2026-07-25 01:47:03] [黑屏不保留捕捉] 【WanderingParticles_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:47:05] [JS報錯捕捉] 【WaltzoftheCircles_1】 ReferenceError: spritesheet is not defined --> 成功注入 window.spritesheet 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:47:06] [JS報錯捕捉] 【WaltzoftheCircles_1】 ReferenceError: spritesheet is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.spritesheet 相容性 Stub
+[2026-07-25 01:47:13] [黑屏不保留捕捉] 【WaterDroplets】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:47:23] [黑屏不保留捕捉] 【Waterfall】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:47:26] [JS報錯捕捉] 【WaterColors】 TypeError: PVector.mult is not a function --> 成功注入 PVector.mult 方法防禦 Stub 至 main.py！
+[2026-07-25 01:47:26] [JS報錯捕捉] 【WaterColors】 TypeError: PVector.mult is not a function --> 自動於 main.py 注入 PVector.mult 方法防禦 Stub
+[2026-07-25 01:48:12] [JS報錯捕捉] 【Waterfallcascades】 TypeError: Cannot read properties of undefined (reading 'get') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:48:12] [JS報錯捕捉] 【Waterfallcascades】 Line 3539: Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'get') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:48:16] [JS報錯捕捉] 【Wavy_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:48:16] [JS報錯捕捉] 【Wavy_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:48:21] [黑屏不保留捕捉] 【WebGL2Raymarching_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:48:32] [黑屏不保留捕捉] 【WebcamFeedback_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:48:43] [黑屏不保留捕捉] 【WetPaint】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:48:46] [JS報錯捕捉] 【Whatsthis_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:48:46] [JS報錯捕捉] 【Whatsthis_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:48:56] [黑屏不保留捕捉] 【Wheel】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:48:59] [JS報錯捕捉] 【WhereILiveWCCChallenge】 TypeError: Cannot read properties of undefined (reading '0') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:48:59] [JS報錯捕捉] 【WhereILiveWCCChallenge】     at aa.<anonymous> (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1481_380634.html:3746:30) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:49:01] [JS報錯捕捉] 【Whitelinebehindreddots_1】 Line 3584: Uncaught TypeError: Cannot read properties of undefined (reading 'isPlaying') --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:49:01] [JS報錯捕捉] 【Whitelinebehindreddots_1】 TypeError: Cannot read properties of undefined (reading 'isPlaying') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:49:10] [黑屏不保留捕捉] 【Whoknowswherethetimegoes】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:49:14] [JS報錯捕捉] 【Whoyougonnacall】 TypeError: Cannot read properties of undefined (reading 'isPlaying') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:49:14] [JS報錯捕捉] 【Whoyougonnacall】     at e.mouseClicked (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1482_62019.html:3584:11) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:49:18] [JS報錯捕捉] 【Whoyougonnacall】 Line 38: Unhandled Rejection Stack: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:49:18] [JS報錯捕捉] 【Whoyougonnacall】 TypeError: Cannot read properties of undefined (reading 'textToPoints') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:49:41] [JS報錯捕捉] 【Whyistheskyblue】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:49:41] [JS報錯捕捉] 【Whyistheskyblue】 TypeError: Cannot read properties of undefined (reading 'canvas') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:49:55] [黑屏不保留捕捉] 【Winter】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:50:02] [JS報錯捕捉] 【WindReeds_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:50:02] [JS報錯捕捉] 【WindReeds_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:50:09] [黑屏不保留捕捉] 【WobblyEgg】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:50:28] [黑屏不保留捕捉] 【Wonderland_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:50:32] [黑屏不保留捕捉] 【WoodKnots】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:50:40] [黑屏不保留捕捉] 【Woodlandnatives】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:50:57] [黑屏不保留捕捉] 【Wooooop_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:51:04] [JS報錯捕捉] 【WizardPonderingOrbinText_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:51:04] [JS報錯捕捉] 【WizardPonderingOrbinText_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:51:18] [JS報錯捕捉] 【WordChain_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 01:51:18] [JS報錯捕捉] 【WordChain_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 01:51:22] [JS報錯捕捉] 【WorldClock_1】 ReferenceError: iy is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.iy 相容性 Stub
+[2026-07-25 01:51:22] [JS報錯捕捉] 【WorldClock_1】 ReferenceError: iy is not defined --> 成功注入 window.iy 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:51:39] [黑屏不保留捕捉] 【WovenFlag】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:51:48] [JS報錯捕捉] 【WorldSimOld_1】 ReferenceError: iy is not defined --> 成功注入 window.iy 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:51:48] [JS報錯捕捉] 【WorldSimOld_1】 ReferenceError: iy is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.iy 相容性 Stub
+[2026-07-25 01:52:02] [黑屏不保留捕捉] 【YinandYang_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:52:05] [JS報錯捕捉] 【Writing_01】 ReferenceError: iy is not defined --> 成功注入 window.iy 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:52:05] [JS報錯捕捉] 【Writing_01】 ReferenceError: iy is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.iy 相容性 Stub
+[2026-07-25 01:52:09] [JS報錯捕捉] 【YourmostlikedImproved】 TypeError: Cannot read properties of undefined (reading '_removeSignal') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 01:52:09] [JS報錯捕捉] 【YourmostlikedImproved】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 01:52:16] [JS報錯捕捉] 【Yourmostliked_1】 TypeError: img.loadPixels is not a function --> 成功注入 img.loadPixels 方法防禦 Stub 至 main.py！
+[2026-07-25 01:52:16] [JS報錯捕捉] 【Yourmostliked_1】 TypeError: img.loadPixels is not a function --> 自動於 main.py 注入 img.loadPixels 方法防禦 Stub
+[2026-07-25 01:52:38] [黑屏不保留捕捉] 【asciify01】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:52:47] [黑屏不保留捕捉] 【asciify02_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:52:56] [黑屏不保留捕捉] 【beginningwaves】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:53:24] [黑屏不保留捕捉] 【bloomScrolling】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:53:27] [JS報錯捕捉] 【Zoomin】 TypeError: img.loadPixels is not a function --> 成功注入 img.loadPixels 方法防禦 Stub 至 main.py！
+[2026-07-25 01:53:27] [JS報錯捕捉] 【Zoomin】 TypeError: img.loadPixels is not a function --> 自動於 main.py 注入 img.loadPixels 方法防禦 Stub
+[2026-07-25 01:53:42] [JS報錯捕捉] 【bloomSunrayFluid】 TypeError: img.loadPixels is not a function --> 自動於 main.py 注入 img.loadPixels 方法防禦 Stub
+[2026-07-25 01:53:42] [JS報錯捕捉] 【bloomSunrayFluid】 TypeError: img.loadPixels is not a function --> 成功注入 img.loadPixels 方法防禦 Stub 至 main.py！
+[2026-07-25 01:53:47] [JS報錯捕捉] 【breakingdown_1】 TypeError: this.curveVertex is not a function --> 成功注入 this.curveVertex 方法防禦 Stub 至 main.py！
+[2026-07-25 01:53:47] [JS報錯捕捉] 【breakingdown_1】 TypeError: this.curveVertex is not a function --> 自動於 main.py 注入 this.curveVertex 方法防禦 Stub
+[2026-07-25 01:54:00] [JS報錯捕捉] 【brokensunset】 TypeError: this.curveVertex is not a function --> 自動於 main.py 注入 this.curveVertex 方法防禦 Stub
+[2026-07-25 01:54:00] [JS報錯捕捉] 【brokensunset】 TypeError: this.curveVertex is not a function --> 成功注入 this.curveVertex 方法防禦 Stub 至 main.py！
+[2026-07-25 01:54:15] [JS報錯捕捉] 【camglitch_1】 ReferenceError: P5Asciify is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.P5Asciify 相容性 Stub
+[2026-07-25 01:54:15] [JS報錯捕捉] 【camglitch_1】 ReferenceError: P5Asciify is not defined --> 成功注入 window.P5Asciify 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:54:18] [JS報錯捕捉] 【cellularasciimata】 ReferenceError: P5Asciify is not defined --> 成功注入 window.P5Asciify 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:54:18] [JS報錯捕捉] 【cellularasciimata】 ReferenceError: P5Asciify is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.P5Asciify 相容性 Stub
+[2026-07-25 01:54:44] [黑屏不保留捕捉] 【cityontherooftop】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:54:47] [JS報錯捕捉] 【chords_1】 ReferenceError: P5Asciify is not defined --> 成功注入 window.P5Asciify 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:54:47] [JS報錯捕捉] 【chords_1】 ReferenceError: P5Asciify is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.P5Asciify 相容性 Stub
+[2026-07-25 01:55:18] [黑屏不保留捕捉] 【cracks】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:55:53] [黑屏不保留捕捉] 【curveonsphere160】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 01:55:56] [JS報錯捕捉] 【clowcard】 ReferenceError: topojson is not defined --> 成功注入 window.topojson 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 01:55:56] [JS報錯捕捉] 【clowcard】 ReferenceError: topojson is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.topojson 相容性 Stub
+[2026-07-25 02:06:19] [黑屏不保留捕捉] 【dayandnight_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:06:27] [黑屏不保留捕捉] 【definitelynotagrid_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:06:38] [黑屏不保留捕捉] 【deposited】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:06:46] [JS報錯捕捉] 【d3jsmapsinclass】 ReferenceError: topojson is not defined --> 成功注入 window.topojson 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 02:06:46] [JS報錯捕捉] 【d3jsmapsinclass】 ReferenceError: topojson is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.topojson 相容性 Stub
+[2026-07-25 02:06:52] [JS報錯捕捉] 【divergentboundaries】 ReferenceError: topojson is not defined --> 成功注入 window.topojson 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 02:06:52] [JS報錯捕捉] 【divergentboundaries】 ReferenceError: topojson is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.topojson 相容性 Stub
+[2026-07-25 02:06:56] [JS報錯捕捉] 【dropscanpaintthiscanvas】 ReferenceError: d3 is not defined --> 成功注入 window.d3 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 02:06:56] [JS報錯捕捉] 【dropscanpaintthiscanvas】 ReferenceError: d3 is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.d3 相容性 Stub
+[2026-07-25 02:06:59] [JS報錯捕捉] 【eggphabet_1】 ReferenceError: font2 is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.font2 相容性 Stub
+[2026-07-25 02:06:59] [JS報錯捕捉] 【eggphabet_1】 ReferenceError: font2 is not defined --> 成功注入 window.font2 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 02:07:31] [JS報錯捕捉] 【electricStormbr】 ReferenceError: font2 is not defined --> 成功注入 window.font2 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 02:07:31] [JS報錯捕捉] 【electricStormbr】 ReferenceError: font2 is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.font2 相容性 Stub
+[2026-07-25 02:07:49] [黑屏不保留捕捉] 【fillstroke_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:07:55] [黑屏不保留捕捉] 【fireflies_4】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:08:16] [黑屏不保留捕捉] 【folkrecursion_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:08:27] [黑屏不保留捕捉] 【forkofPHKaleidoscope】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:08:33] [JS報錯捕捉] 【fallsun】 TypeError: PVector.sub is not a function --> 自動於 main.py 注入 PVector.sub 方法防禦 Stub
+[2026-07-25 02:08:33] [JS報錯捕捉] 【fallsun】 TypeError: PVector.sub is not a function --> 成功注入 PVector.sub 方法防禦 Stub 至 main.py！
+[2026-07-25 02:09:27] [黑屏不保留捕捉] 【geometricsubdivision1updated】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:09:39] [黑屏不保留捕捉] 【glitch】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:09:45] [JS報錯捕捉] 【fractalishThing_1】 TypeError: PVector.sub is not a function --> 自動於 main.py 注入 PVector.sub 方法防禦 Stub
+[2026-07-25 02:09:45] [JS報錯捕捉] 【fractalishThing_1】 TypeError: PVector.sub is not a function --> 成功注入 PVector.sub 方法防禦 Stub 至 main.py！
+[2026-07-25 02:09:54] [JS報錯捕捉] 【growingline】 Title: growingline --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 02:09:54] [JS報錯捕捉] 【growingline】 TypeError: Cannot read properties of undefined (reading 'addPoint') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 02:09:57] [JS報錯捕捉] 【gsynthstep_1】 Title: gsynthstep_1 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 02:09:57] [JS報錯捕捉] 【gsynthstep_1】 TypeError: Cannot read properties of undefined (reading 'step') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 02:10:16] [JS報錯捕捉] 【haikuwithoutwords】 TypeError: PVector.mult is not a function --> 自動於 main.py 注入 PVector.mult 方法防禦 Stub
+[2026-07-25 02:10:16] [JS報錯捕捉] 【haikuwithoutwords】 TypeError: PVector.mult is not a function --> 成功注入 PVector.mult 方法防禦 Stub 至 main.py！
+[2026-07-25 02:10:21] [JS報錯捕捉] 【hairLineToroid_1】 TypeError: PVector.mult is not a function --> 自動於 main.py 注入 PVector.mult 方法防禦 Stub
+[2026-07-25 02:10:21] [JS報錯捕捉] 【hairLineToroid_1】 TypeError: PVector.mult is not a function --> 成功注入 PVector.mult 方法防禦 Stub 至 main.py！
+[2026-07-25 02:10:29] [黑屏不保留捕捉] 【heaven_777_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:10:56] [黑屏不保留捕捉] 【horse】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:11:00] [JS報錯捕捉] 【headsortails】 TypeError: PVector.mult is not a function --> 成功注入 PVector.mult 方法防禦 Stub 至 main.py！
+[2026-07-25 02:11:00] [JS報錯捕捉] 【headsortails】 TypeError: PVector.mult is not a function --> 自動於 main.py 注入 PVector.mult 方法防禦 Stub
+[2026-07-25 02:11:04] [JS報錯捕捉] 【hyperspace_1】 Errors: --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 02:11:04] [JS報錯捕捉] 【hyperspace_1】 TypeError: Cannot read properties of undefined (reading 'x') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 02:11:07] [JS報錯捕捉] 【infinitesadness_1】  --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 02:11:07] [JS報錯捕捉] 【infinitesadness_1】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 02:11:23] [黑屏不保留捕捉] 【it_raymarching_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:11:39] [JS報錯捕捉] 【interactiveNoiseLines_1】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 02:11:40] [JS報錯捕捉] 【interactiveNoiseLines_1】     at window.draw (file:///Users/unclerm/Vibe%20Coding/4K%20MV%20Visual%20Integration%20Editor/dummy_test_batch_1576_892814.html:2266:34) --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 02:11:53] [黑屏不保留捕捉] 【levels】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:12:00] [黑屏不保留捕捉] 【lichen_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:12:11] [黑屏不保留捕捉] 【linewaves】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:12:53] [JS報錯捕捉] 【kandinskyallegedly_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 02:12:53] [JS報錯捕捉] 【kandinskyallegedly_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 02:12:58] [黑屏不保留捕捉] 【modernartpainter】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:13:06] [黑屏不保留捕捉] 【modules_index】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:13:34] [JS報錯捕捉] 【microbiome_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 02:13:34] [JS報錯捕捉] 【microbiome_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 02:13:48] [黑屏不保留捕捉] 【myMandelbrotset】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:13:51] [JS報錯捕捉] 【mpNoise_1】 TypeError: this._renderer.textures.push is not a function --> 成功注入 this._renderer 方法防禦 Stub 至 main.py！
+[2026-07-25 02:13:51] [JS報錯捕捉] 【mpNoise_1】 TypeError: this._renderer.textures.push is not a function --> 自動於 main.py 注入 this._renderer 方法防禦 Stub
+[2026-07-25 02:13:58] [黑屏不保留捕捉] 【networking3】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:14:21] [黑屏不保留捕捉] 【noisycircles】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:14:47] [黑屏不保留捕捉] 【op_1776353】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:14:54] [黑屏不保留捕捉] 【op_1956506】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:15:17] [黑屏不保留捕捉] 【op_2478473】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:15:23] [JS報錯捕捉] 【n15】 URL: https://openprocessing.org/@u95836/534484 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 02:15:23] [JS報錯捕捉] 【n15】 TypeError: parameter 1 is not of type 'Function'. --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 02:16:05] [黑屏不保留捕捉] 【op_2787595】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:16:21] [JS報錯捕捉] 【op_2533918】 ReferenceError: yz is not defined --> 成功注入 window.yz 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 02:16:21] [JS報錯捕捉] 【op_2533918】 ReferenceError: yz is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.yz 相容性 Stub
+[2026-07-25 02:16:58] [黑屏不保留捕捉] 【op_2960706】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:17:44] [黑屏不保留捕捉] 【op_2971896】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:18:34] [JS報錯捕捉] 【op_2900399】 ReferenceError: yz is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.yz 相容性 Stub
+[2026-07-25 02:18:34] [JS報錯捕捉] 【op_2900399】 ReferenceError: yz is not defined --> 成功注入 window.yz 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 02:18:41] [黑屏不保留捕捉] 【p5JSDelaunayJS_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正
+[2026-07-25 02:18:44] [JS報錯捕捉] 【p5190Demo】 TypeError: Cannot read properties of undefined (reading 'width') --> 已由 P5_V2_COMPAT_SHIM 中的『動態非致命異常吸收網 (Dynamic Exception Mesh)』實時攔截吸收！
+[2026-07-25 02:18:44] [JS報錯捕捉] 【p5190Demo】 Timestamp: 2026-07-25 02:18:34 --> 已由動態非致命異常吸收網 (Dynamic Exception Mesh) 攔截保護
+[2026-07-25 02:18:49] [JS報錯捕捉] 【p5Librariesposter】 ReferenceError: applyPattern is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.applyPattern 相容性 Stub
+[2026-07-25 02:18:49] [JS報錯捕捉] 【p5Librariesposter】 ReferenceError: applyPattern is not defined --> 成功注入 window.applyPattern 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 02:19:01] [JS報錯捕捉] 【p5PatternBeta_1】 ReferenceError: applyPattern is not defined --> 成功注入 window.applyPattern 相容性 Stub 至 main.py 全域護欄！
+[2026-07-25 02:19:01] [JS報錯捕捉] 【p5PatternBeta_1】 ReferenceError: applyPattern is not defined --> 自動於 P5_V2_COMPAT_SHIM 注入 window.applyPattern 相容性 Stub
+[2026-07-25 02:19:09] [黑屏不保留捕捉] 【p5patternwebcam_1】 使用者手動標記黑屏/純色棄用 --> 掃描無須修正

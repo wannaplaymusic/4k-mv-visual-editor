@@ -1,0 +1,25 @@
+{
+    "name": "Uncler M - 敦煌壁畫 · 飛天帛帶與金箔雲紋 (Dunhuang Feitian Aura)",
+    "code": "// === Tab: mySketch.js ===\n// ----------------------------------------------------\n// 視覺創作與程式開發: Uncler M\n// 視覺主題: 中國古文明 · 敦煌莫高窟壁畫飛天帛帶與金箔祥雲潑濺 (Dunhuang Flying Apsaras Ribbons)\n// 授權條款: Creative Commons BY-NC-SA 4.0 (姓名標示-非商業性-相同方式分享)\n// ----------------------------------------------------\n\nif (typeof width === 'undefined') { var width = 1280; }\nif (typeof height === 'undefined') { var height = 720; }\n\nvar ribbons = [];\nvar numRibbons = 5;\nvar ribbonPalette = ['#e63946', '#2a9d8f', '#e76f51', '#ffb703', '#1d3557'];\nvar goldDust = [];\n\nfunction RibbonPath(idx) {\n    this.idx = idx;\n    this.colStr = ribbonPalette[idx % ribbonPalette.length];\n    this.pts = [];\n    this.reset();\n}\nRibbonPath.prototype.reset = function() {\n    this.pts = [];\n    var startY = height * 0.2 + this.idx * (height * 0.15);\n    for (var x = 0; x < width + 100; x += 20) {\n        this.pts.push(createVector(x, startY));\n    }\n};\nRibbonPath.prototype.update = function(beat, low) {\n    var t = frameCount * 0.015;\n    for (var i = 0; i < this.pts.length; i++) {\n        var pt = this.pts[i];\n        var waveY = sin(t * 2 + i * 0.15 + this.idx) * (30 + low * 40);\n        var waveX = cos(t * 1.5 + i * 0.1) * 15;\n        pt.y += waveY * 0.05;\n        pt.x += waveX * 0.02;\n    }\n};\nRibbonPath.prototype.draw = function(beat) {\n    stroke(this.colStr);\n    strokeWeight(6 + beat * 6);\n    noFill();\n    beginShape();\n    for (var i = 0; i < this.pts.length; i++) {\n        var pt = this.pts[i];\n        curveVertex(pt.x, pt.y);\n    }\n    endShape();\n};\n\nfunction setup() {\n    createCanvas(windowWidth, windowHeight);\n    background(15, 12, 16);\n    for (var i = 0; i < numRibbons; i++) {\n        ribbons.push(new RibbonPath(i));\n    }\n    for (var i = 0; i < 200; i++) {\n        goldDust.push({\n            x: random(width),\n            y: random(height),\n            r: random(1, 4),\n            speed: random(0.5, 2.0)\n        });\n    }\n}\n\nfunction draw() {\n    fill(15, 12, 16, 40);\n    rect(0, 0, width, height);\n\n    var beat = (window.beatEnergy || 0.0);\n    var low = (window.audioLow || 0.5);\n\n    noStroke();\n    fill('#ffd700');\n    for (var i = 0; i < goldDust.length; i++) {\n        var g = goldDust[i];\n        g.y -= g.speed;\n        if (g.y < 0) g.y = height;\n        circle(g.x, g.y, g.r * (1.0 + beat * 0.5));\n    }\n\n    for (var i = 0; i < ribbons.length; i++) {\n        var r = ribbons[i];\n        r.update(beat, low);\n        r.draw(beat);\n    }\n}\n\nfunction windowResized() {\n    resizeCanvas(windowWidth, windowHeight);\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "",
+    "author": "Uncler M",
+    "license": "CC BY-NC-SA 4.0",
+    "tags": [
+        "Uncler M",
+        "Chinese Civilisation",
+        "Dunhuang",
+        "Feitian",
+        "Ribbon",
+        "Gold Dust"
+    ],
+    "date_added": "2026-07-21 17:56:00",
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Luxury Vehicle Bombing.mp4"
+    ],
+    "used_count": 1
+}
