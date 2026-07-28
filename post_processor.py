@@ -338,13 +338,14 @@ class PostProcessor:
             self.rng = random.Random()
             logger.info("Initialized PostProcessor without seed string (non-deterministic mode)")
 
-        # 五大視覺美學主題風格包
+        # 六大視覺美學主題風格包
         self.theme_pools = {
             'CyberGlitch': ['data_mosh', 'pixel_sort', 'scanline_glitch', 'matrix_ascii', 'phase_slit', 'centroid_glitch', 'film_burn', 'vector_scope'],
             'RetroAnalog': ['retro_degradation', 'vector_scan', 'frame_drop', 'handheld_camera', 'stylized_fade', 'photocopy_smear', 'blueprint_edge', 'lowpass_muffle'],
             'DreamyArtistic': ['glow_illumination', 'kuwahara_paint', 'temporal_feedback', 'sedimentation', 'fluid_noise', 'collage_cutout', 'turing_pattern', 'point_cloud_depth'],
             'Psychedelic': ['color_spectral', 'thermal_vision', 'kaleidoscope', 'reaction_diffusion', 'spatial_warping', 'infinity_tunnel'],
-            'DigitalPixel': ['dynamic_mosaic', 'pixel_art', 'zoom_pulse', 'temporal_fractal', 'dolly_zoom']
+            'DigitalPixel': ['dynamic_mosaic', 'pixel_art', 'zoom_pulse', 'temporal_fractal', 'dolly_zoom'],
+            'AcidPsychedelic': ['reaction_diffusion', 'color_spectral', 'infinity_tunnel', 'turing_pattern', 'vector_scan', 'centroid_glitch', 'spatial_warping']
         }
         
         # 建立跨主題全域特效集合（用於 is_sig 門控判斷）
@@ -354,10 +355,12 @@ class PostProcessor:
 
         # 根據 genre 篩選主題範圍
         genre_clean = genre.lower().strip() if isinstance(genre, str) else 'generic'
-        if genre_clean in ('lo-fi', 'ambient', 'jazz', 'classical'):
+        if 'acid' in genre_clean:
+            allowed_themes = ['AcidPsychedelic', 'Psychedelic', 'CyberGlitch']
+        elif genre_clean in ('lo-fi', 'ambient', 'jazz', 'classical'):
             allowed_themes = ['DreamyArtistic', 'RetroAnalog']
-        elif genre_clean in ('rock', 'metal', 'punk', 'electronic', 'dance', 'techno'):
-            allowed_themes = ['CyberGlitch', 'Psychedelic', 'DigitalPixel']
+        elif genre_clean in ('rock', 'metal', 'punk', 'electronic', 'dance', 'techno', 'dark techno', 'industrial techno'):
+            allowed_themes = ['CyberGlitch', 'Psychedelic', 'DigitalPixel', 'AcidPsychedelic']
         else:
             allowed_themes = list(self.theme_pools.keys())
 
@@ -1220,6 +1223,16 @@ class PostProcessor:
             if timbre_density < 0.05:
                 solid_color_blend = (0.05 - timbre_density) / 0.05
 
+        # 畫布首要保護旁路 (Canvas-First Protection): 根據曲風與導演指示調節全域增益
+        canvas_fidelity = audio_feats.get('canvas_fidelity', 0.7)
+        if genre_clean in ('lo-fi', 'ambient', 'jazz', 'classical'):
+            contrast_mult = 1.0 + (contrast_mult - 1.0) * (1.0 - canvas_fidelity * 0.7)
+            saturation_mult = 1.0 + (saturation_mult - 1.0) * (1.0 - canvas_fidelity * 0.7)
+        elif 'acid' in genre_clean:
+            # Acid Techno: 增強彩度與高動態金屬對比
+            saturation_mult *= 1.15
+            contrast_mult *= 1.08
+
         # 1. 情感調色 (曝光、S曲線對比、彩度與灰階)
         if fx_flags.get('color_boost', True):
             img_np = self.apply_color_enhancement(img_np, contrast=contrast_mult, saturation=saturation_mult, exposure=exposure_mult, grayscale_blend=grayscale_blend)
@@ -1232,9 +1245,11 @@ class PostProcessor:
             solid_canvas[:, :] = solid_color
             img_np = cv2.addWeighted(img_np, 1.0 - solid_color_blend, solid_canvas, solid_color_blend, 0)
 
-        # 3. 畫面終端細節重建 (Unsharp Mask 銳化)
+        # 3. 畫面終端細節重建 (Unsharp Mask 銳化)：若畫布保真度高，自動降銳化強度防止失真
         if fx_flags.get('sharpen', True):
-            img_np = self.apply_sharpening(img_np, amount=0.75, radius=1.0)
+            sharpen_amount = 0.75 * (1.0 - canvas_fidelity * 0.5)
+            if sharpen_amount > 0.1:
+                img_np = self.apply_sharpening(img_np, amount=sharpen_amount, radius=1.0)
 
         # ═══════════════════════════════════════════════════════════
         # 全域混合特效與後處理 (ndarray 100% 直通)

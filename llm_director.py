@@ -35,9 +35,11 @@ class LLMDirectorAgent:
         except Exception as e:
             logger.info(f"LLM API unavailable ({e}), fallback rule-based script generated.")
 
-        # Heuristic Rule-Based Fallback Shot List
         genre = str(song_telemetry.get('genre', 'electronic')).lower()
-        if 'techno' in genre or 'cyber' in genre:
+        if 'acid' in genre:
+            theme = "AcidPsychedelic"
+            fx = ["reaction_diffusion", "color_spectral", "infinity_tunnel"]
+        elif 'techno' in genre or 'cyber' in genre:
             theme = "CyberGlitch"
             fx = ["data_mosh", "pixel_sort", "scanline_glitch"]
         elif 'ambient' in genre or 'chill' in genre:
@@ -50,7 +52,8 @@ class LLMDirectorAgent:
         return {
             "aesthetic_theme": theme,
             "signature_fx": fx,
-            "color_mood": f"Adaptive {theme} palette"
+            "color_mood": f"Adaptive {theme} palette",
+            "canvas_fidelity": 0.85 if 'acid' in genre else 0.70
         }
 
 
