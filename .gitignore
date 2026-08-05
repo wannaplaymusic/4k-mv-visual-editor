@@ -6,7 +6,16 @@ __pycache__/
 venv/
 ENV/
 
-# Project Specific Caches and Temp files
+# Dependencies & Models
+node_modules/
+models/
+assets_cache/
+
+# Logs & Temporary files
+*.log
+*.log.*
+*.txt
+*.json
 temp_audio/
 js_cache/
 app_debug.log
@@ -14,9 +23,19 @@ op_import_errors.txt
 batch_test_progress.json
 last_batch_run_code.js
 missing_libraries.json
+realtime_watchdog.log
 
-# Scratch files and outputs
+# Reports & Output directories
+render_output/
+*.html
+black_screen_report.*
+abnormal_previews.*
+repair_report.json
+
+# Test media & Scratch files
 scratch/
+*.mp3
+*.wav
 test_out.html
 test_out_*.html
 scratch_*.html
@@ -25,3 +44,4 @@ test_p5_load.html
 # OS files
 .DS_Store
 Thumbs.db
+
