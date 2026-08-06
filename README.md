@@ -111,26 +111,26 @@ graph TD
 
 ### 📅 更新日誌 (Changelog)
 
+#### [v1.2.1] - 2026-08-06
+* **🧹 儲存庫清理與 Git 規則最佳化**：更新 `.gitignore` 並清除 Git 歷史追蹤中的多餘暫存檔、快取、模型與日誌檔。
+* **📄 官方 CHANGELOG.md 發佈**：新增完整的 [`CHANGELOG.md`](CHANGELOG.md) 紀錄詳細 Commit 與版本歷史。
+
+#### [v1.2.1] - 2026-08-06 (English)
+* **🧹 Repository Cleanup & Git Tracking Optimization**: Updated `.gitignore` and removed tracked cached assets, models, HTML reports, and logs from Git repository.
+* **📄 Official CHANGELOG.md Release**: Added comprehensive [`CHANGELOG.md`](CHANGELOG.md) detailing commit history and release milestones.
+
 #### [v1.2.0] - 2026-07-28
-* **🤖 YAMNet 音樂特徵識別與 LLM 導演整合**：新增 `models/yamnet.onnx` 及音訊分析組件，支援即時樂器與音樂風格分類，並結合 `llm_director.py` 提供智慧分鏡與導演指示。
-* **⚡ 極速修復與模組驗證引擎**：新增 `fast_repair_engine.py`、`superfast_repair.py` 與 `reverify_restored_modules.py`，支援視覺模組自動化故障檢測與即時修復。
-* **📊 實時 Watchdog 監控儀表板**：提供 `realtime_watchdog.log` 及 HTML 互動儀表板 (`realtime_watchdog_dashboard.html`)，隨時掌握 VJ 渲染與音訊同步品質。
-* **🖼️ 大規模 4K 視覺縮圖庫與樣式優化**：新增數百組 `custom_visuals` 預覽縮圖與設定檔，並優化 OKLCH 程序化調色盤 (`procedural_palette_oklch.py`) 演算法。
+* **🤖 YAMNet 音樂特徵識別與 LLM 導演整合**：新增音訊分析組件，支援即時樂器與音樂風格分類，並結合 `llm_director.py` 提供智慧分鏡與導演指示。
+* **⚡ 極速修復與模組驗證引擎**：支援視覺模組自動化故障檢測與即時修復。
+* **🖼️ Canvas-First 繪圖保護與後處理器強化**：最佳化 `post_processor.py` 繪圖防護邏輯與 Acid Techno 風格過渡。
 
 #### [v1.2.0] - 2026-07-28 (English)
-* **🤖 YAMNet Audio Recognition & LLM Director Integration**: Integrated `models/yamnet.onnx` for real-time instrument and genre classification, paired with `llm_director.py` for automated scene-director prompts.
-* **⚡ Ultra-Fast Repair & Module Reverification Engine**: Added `fast_repair_engine.py`, `superfast_repair.py`, and `reverify_restored_modules.py` for instant diagnostic and automated hot-fixes for visual modules.
-* **📊 Realtime Watchdog Dashboard**: Added real-time log monitoring with interactive HTML visualization (`realtime_watchdog_dashboard.html`) for live VJ rendering performance and audio sync.
-* **🖼️ Extended 4K Visual Thumbnails Library & Palette Upgrades**: Added hundreds of newly generated visual preset thumbnails and JSON configs in `custom_visuals`, along with OKLCH color space optimizations (`procedural_palette_oklch.py`).
+* **🤖 YAMNet Audio Recognition & LLM Director Integration**: Real-time instrument/genre classification paired with `llm_director.py` for automated scene-director prompts.
+* **⚡ Ultra-Fast Repair Engine**: Instant diagnostic and automated hot-fixes for visual modules.
+* **🖼️ Canvas-First Protection & Post-Processor Upgrades**: Optimized `post_processor.py` defense logic and Acid Techno genre transitions.
 
 #### [v1.1.0] - 2026-07-19
-*   **🎨 程序化色彩調色盤生成器**：基於音訊檔名雜湊生成確定性隨機種子，自適應選擇 10 種風格之一（Vaporwave, Cyberpunk, Morandi 等），並透過五度圈進行和弦情緒映射，解決大量歌曲視覺重複問題。
-*   **🌀 工業級 VJ 素材過渡效果**：引進 5 種基於 OpenCV/NumPy 的高效率過渡演算法（位移、縮放模糊、亮度擦除、通道故障與滑動推移）。
-*   **🎬 情緒自適應導演系統**：整合分鏡段落（Intro, Verse, Chorus, Bridge, Build-up）與音訊能量，自動調配最佳過渡時長與效果。
-*   **🛡️ 全域光敏健康防護**：預設並強制啟用光敏感健康保護與防癲癇機制，限制高頻閃爍、劇烈色彩翻轉與全螢幕高光刺激。
+* **🎨 程序化色彩調色盤生成器**：基於音訊檔名雜湊生成確定性隨機種子，自適應選擇 10 種風格之一，並透過五度圈進行和弦情緒映射。
+* **🌀 工業級 VJ 素材過渡效果**：引進 5 種基於 OpenCV/NumPy 的高效率過渡演算法（位移、縮放模糊、亮度擦除、通道故障與滑動推移）。
+* **🛡️ 全域光敏健康防護**：預設並強制啟用光敏感健康保護與防癲癇機制。
 
-#### [v1.1.0] - 2026-07-19 (English)
-*   **🎨 Procedural Color Palette Generator**: Dynamically generates unique, deterministic HSL color palettes based on audio filename hash, choosing from 10 distinct themes (Vaporwave, Cyberpunk, Morandi, etc.) to ensure complete visual uniqueness for 3000+ songs.
-*   **🌀 Advanced VJ Transitions**: Implements 5 high-performance OpenCV/NumPy transitions (Displacement, Zoom Blur, Luma Wipe, Glitch Channel Split, Slide Push with motion blur).
-*   **🎬 Emotional Adaptive Director System**: Automatically maps transition types and durations to song structure sections (Intro, Verse, Chorus, Bridge, Build-up) and beat energy.
-*   **🛡️ Mandatory Photosensitive Safety**: Hardcoded global photosensitive safety filters to cap strobe, flash, and RGB splitting to protect viewers.
