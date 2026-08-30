@@ -1,0 +1,25 @@
+{
+    "name": "scalarfieldpolygonisation",
+    "author": "stgn",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:22:52",
+    "url": "https://openprocessing.org/@stgn/49742",
+    "code": "// === Tab: sketch49742 ===\nlet gridres = 32, oldgridres = 0;\nvar input = [];\nlet fill = true;\n\nfunction setup() {\n  createCanvas(512, 512);\n  frameRate(30);\n  \n  strokeJoin(BEVEL);\n  stroke(255,255,0);\n  noFill();\n}\n\nfunction draw() {\n  if(gridres != oldgridres) {\n    input = new Array(gridres)[gridres];\n    oldgridres = gridres;\n  }\n  \n  for(let k=0;k<gridres;k++)for(let j=0;j<gridres;j++)\n    input[j][k] = noise(float(j)/gridres*2,float(k)/gridres*2,frameCount/120);\n    \n  background(63);\n  scale(512/gridres);\n  translate(0.5,0.5);\n  strokeWeight(gridres/512);\n    \n  for(let k=0;k<gridres-1;k++)for(let j=0;j<gridres-1;j++){\n    let a = input[j][k], b = input[j+1][k],\n      c = input[j][k+1], d = input[j+1][k+1];\n      \n    if(a < 0.5 && b < 0.5 && c < 0.5 && d < 0.5 && fill) continue;\n    let ab = (0.5 - a) / (b - a),\n      cd = (0.5 - c) / (d - c),\n      ac = (0.5 - a) / (c - a),\n      bd = (0.5 - b) / (d - b);\n\n    beginShape();\n      if(a < 0.5) vertex(j,k);\n      if(ab > 0 && ab < 1) vertex(j+ab,k);\n      if(b < 0.5) vertex(j+1,k);\n      if(bd > 0 && bd < 1) vertex(j+1,k+bd);\n      if(d < 0.5) vertex(j+1,k+1);\n      if(cd > 0 && cd < 1) vertex(j+cd,k+1);\n      if(c < 0.5) vertex(j,k+1);\n      if(ac > 0 && ac < 1) vertex(j,k+ac);\n    endShape(CLOSE);\n  }\n}\n                \nfunction keyPressed() {\n  if(key == 'f') fill ^= true;\n  if(key == '-') gridres = max(gridres-1, 2);\n  if(key == '=') gridres++;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Time Stretch.mp4"
+    ]
+}

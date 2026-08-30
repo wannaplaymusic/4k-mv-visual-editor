@@ -1,0 +1,25 @@
+{
+    "name": "Galaxy",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:02:13",
+    "url": "https://openprocessing.org/@epi/2635896",
+    "code": "// === Tab: palettes ===\n\tconst palettes = [\n\t\t[\"#8386f5\", \"#3d43b4\", \"#04134b\", \"#083e12\", \"#1afe49\"],\n\t\t[\"#f887ff\", \"#de004e\", \"#860029\", \"#321450\", \"#29132e\"],\n\t\t[\"#e96d5e\", \"#ff9760\", \"#ffe69d\", \"#6a7e6a\", \"#393f5f\"],\n\t\t[\"#ff124f\", \"#ff00a0\", \"#fe75fe\", \"#7a04eb\", \"#120458\"],\n\t\t[\"#ff6e27\", \"#fbf665\", \"#73fffe\", \"#6287f8\", \"#383e65\"],\n\t\t[\"#7700a6\", \"#fe00fe\", \"#defe47\", \"#00b3fe\", \"#0016ee\"],\n\t\t[\"#63345e\", \"#ac61b9\", \"#b7c1de\", \"#0b468c\", \"#092047\"],\n\t\t[\"#af43be\", \"#fd8090\", \"#c4ffff\", \"#08deea\", \"#1261d1\"],\n\t\t[\"#a0ffe3\", \"#65dc98\", \"#8d8980\", \"#575267\", \"#222035\"],\n\t\t[\"#ff2a6d\", \"#d1f7ff\", \"#f5d9e8\", \"#005678\", \"#01012b\"],\n\t\t[\"#490109\", \"#d40011\", \"#fd7495\", \"#5e4ef8\", \"#14029a\"],\n\t\t[\"#8f704b\", \"#daae6d\", \"#89e3f6\", \"#4d9e9b\", \"#44786a\"],\n\t\t[\"#fff69f\", \"#fdd870\", \"#d0902f\", \"#a15501\", \"#351409\"],\n\t\t[\"#b0acb0\", \"#e2dddf\", \"#85ebd9\", \"#3d898d\", \"#2f404d\"],\n\t\t[\"#ff184c\", \"#ff577d\", \"#ffccdc\", \"#0a9cf5\", \"#003062\"]\n\t]\n\n// === Tab: mySketch ===\nvar DST = 9;\nvar a, da, s, r, pal;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"centered growing circles with dots of random colors from a palette\");\n\tnoStroke();\n\t\n\tr = 0;\n\ts = DST/2;\n\tpal = random(palettes);\n\tbackground(random(pal)); // background(\"navy\");\n\ta = TAU + 1;\n\t\n\tloop();\n}\n\nfunction draw() {\n\tif (a >= TAU - 0.001) {\n\t\ta = 0;\n\t\tr += DST;\n\t\tconst u = TAU * r;\n\t\tconst n = ~~(u / DST);\n\t\t// da = DST / u * TAU; // good for spirals\n\t\tda = TAU / n;\n\t}\n\tconst x = cos(a) * r + width/2;\n\tconst y = sin(a) * r + height/2;\n\ta += da;\n\n\tif (x < 0 && y < 0) setup();\n\t\n\tconst dst = dist(x, y, width/2, height/2);\n\tif (dst / (max(width, height)/2) > random()) return;\n\tif (x < s || y < s || x > width-s || y > height - s) return;\n\t\n\tfill(random(pal));\n\tcircle(x, y, s);\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > width*0.1 && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) < width*0.9) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Inner Sight.mp4"
+    ]
+}

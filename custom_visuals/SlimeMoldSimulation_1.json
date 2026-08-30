@@ -1,0 +1,22 @@
+{
+    "name": "SlimeMoldSimulation_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:02:04",
+    "url": "https://openprocessing.org/@ntsutae/1906894",
+    "code": "// === Tab: mySketch ===\n// Inspired by Jason\n// https://softologyblog.wordpress.com/2019/04/11/physarum-simulations/\n\nOPC.button(\"btoButton\", \"back to origin\");\nconst agentColor = new Uint8Array([0, 0, 0]);\nconst agentsNum = 1000;\nconst sensorOffset = 10;\nconst sensorAngle = Math.PI / 7;\nconst turnAngle = Math.PI / 5;\nlet agents;\n\nfunction setup() {\n  createCanvas(720, 720);\n  pixelDensity(1);\n  background(0);\n  agents = new Agents();\n}\n\nfunction buttonPressed() {\n  agents = new Agents();\n}\n\nfunction draw() {\n  background(255, 10);\n\n  stroke(\"blue\");\n  strokeWeight(3);\n  ((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)) && line((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\n  loadPixels();\n  for (let i = 10; i--; ) {\n    agents.update();\n  }\n  updatePixels();\n}\n\nclass Agent {\n  constructor() {\n    this.x = width / 2;\n    this.y = height / 2;\n    this.dir = random(TWO_PI);\n  }\n\n  updateDirection() {\n    const right = this.sense(+sensorAngle);\n    const center = this.sense(0);\n    const left = this.sense(-sensorAngle);\n\n\t\tconst threeWays = [left, center - 1 , right];\n\t\tconst minIndex = threeWays.indexOf(min(...threeWays));\n\t\tthis.dir += turnAngle * (minIndex - 1);\n  }\n  \n  sense(dirOffset) {\n    const angle = this.dir + dirOffset;\n    let x = floor(this.x + sensorOffset * cos(angle));\n    let y = floor(this.y + sensorOffset * sin(angle));\n    x = (x + width) % width;\n    y = (y + height) % height;\n\n    const index = (x + y * width) * 4;\n    return pixels[index];\n  }\n  \n  updatePosition() {\n    this.x += cos(this.dir);\n    this.y += sin(this.dir);\n    this.x = (this.x + width) % width;\n    this.y = (this.y + height) % height;\n\n    const index = floor(this.x) + floor(this.y) * width;\n    pixels.set(agentColor, index * 4);\n  }\n}\n\nclass Agents {\n  constructor() {\n    this.agents = Array(agentsNum)\n      .fill()\n      .map((e) => new Agent());\n  }\n  update() {\n    this.agents.forEach((e) => e.updateDirection());\n    this.agents.forEach((e) => e.updatePosition());\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/msawired/OPC@v0.2.3/opc.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset, form, nav,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5Dom {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

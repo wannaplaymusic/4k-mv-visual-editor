@@ -1,0 +1,22 @@
+{
+  "name": "PerlinNoiseWave",
+  "author": "u95921",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 03:10:07",
+  "url": "https://openprocessing.org/@u95921/576489",
+  "code": "// === Tab: mySketch ===\nfunction setup(){\n  createCanvas(1000, 500);\n  background(255);\n\n}\n\nlet ofs =0;\nlet ofs_v =1;\n\nfunction draw(){\n  translate(0,-200);\n  ofs+=ofs_v;\n if((ofs==offset) || (ofs==0))\n  {\n   ofs_v=0-ofs_v;\n  }\n  \n  strokeWeight(6);\n  drawLine(212+ofs,\"#DB028C\",\"#FFAE34\");\n  drawLine(215+ofs,\"#FF6A7E\",\"#FFFA6A\");//color\n  strokeWeight(1);\n  drawLine(210+ofs,100,100);\n\n}\n\nlet step = 80;\nlet noiseScale = 0.02;\nlet offset = 300;\n\n\nfunction drawLine(y0, to, from){\n \nfill(255,4);\n  beginShape();\n  curveVertex(-50,y0);\n  for (let i =0 ; i<width/step+3;i+=1){\n     let noiseVal = noise(i*noiseScale*(y0*0.06), frameCount*noiseScale); \n     stroke(lerpColor(from,to,noiseVal));\n     curveVertex(i*step-10,y0+noiseVal*offset);\n    \n  }\n curveVertex(width+10, height+200);\n curveVertex(0, height+210);\n curveVertex(0, height+210);\n endShape();\n  \n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

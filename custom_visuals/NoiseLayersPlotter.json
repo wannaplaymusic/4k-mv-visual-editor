@@ -1,0 +1,22 @@
+{
+    "name": "NoiseLayersPlotter",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:06:23",
+    "url": "https://openprocessing.org/@epi/2499749",
+    "code": "// === Tab: mySketch.js ===\n/*\n\tNoise Layers #genuary2 #genuary #genuary2502\n\tLayers upon layers upon layers\n\thttps://openprocessing.org/sketch/2498632\n\t#generativeart #creativecoding #p5js\n*/\n\nconst USE_SVG = true;\nconst NUM = 1;\nconst MAR = 0.3; // margin for non filled areas\nlet SZE = 14 * NUM, CLRS;\n\nfunction setup() {\n\tcreateCanvas(500, 800, USE_SVG ? SVG : P2D);\n\tif (!USE_SVG) describe(NUM + \" Layer(s) of noise fields\");\t\n\tframeRate(30);\n\t\n\tCLRS = []\n\tfor (let i = 0; i < NUM; i++) {\n\t\tCLRS[i] = lerpColor(color(\"steelblue\"), color(\"gold\"), random());\n\t}\n\tCLRS[NUM-1] = lerpColor(color(\"darkred\"), color(\"darkorange\"), random());\n\t\n\tstrokeWeight(2);\n\tnoiseSeed(~~random(999999));\n\t// noLoop() removed for animation\n}\n\nfunction draw() {\n\t// if (!USE_SVG) background(2, 2, 12);\n\t\n\tfor (let i = 0; i < NUM; i++) {\n\t\tstroke(32); // stroke(USE_SVG ? 32 : CLRS[i]);\n\t\tdrawLayer(SZE/(NUM-i+1)); // reverse order to draw smallest first\n\t}\n}\n\nfunction drawLayer(SZE) {\n\tlet grid = [];\n\tconst numY = ceil(height/SZE);\n\tconst numX = ceil(width/SZE);\n\t\n\tfor (let y = 0, j = 0; y < height; y += SZE, j++) {\n\t\tgrid[j] = [];\n\t\tfor (let x = 0, i = 0; x < width; x += SZE, i++) {\n\t\t\tconst n = noise(SZE + x/SZE/12, SZE + y/SZE/12, frameCount/231);\n\t\t\tgrid[j][i] = 0;\n\t\t\tif (n < MAR) {\n\t\t\t\t// nothing\n\t\t\t} else if (n < 0.5) {\n\t\t\t\tgrid[j][i] = 1; // horiz\n\t\t\t\t// line(x, y+SZE, x+SZE, y+SZE); // line(x, y+SZE/2, x+SZE, y+SZE/2);\n\t\t\t} else if (n < 1 - MAR) {\n\t\t\t\tgrid[j][i] = 2; // vert\n\t\t\t\t// line(x+SZE, y, x+SZE, y+SZE); // line(x+SZE/2, y, x+SZE/2, y+SZE);\n\t\t\t} else {\n\t\t\t\t// notinhg\n\t\t\t}\n\t\t}\n\t}\n\t// console.log(grid);\n\t\n\t// combine lines\n\tlet numLines = 0;\n\tfor (let j = 0; j < numY; j++) {\n\t\tfor (let i = 0; i < numX; i++) {\n\t\t\tif (grid[j][i] === 0) continue;\n\t\t\tlet currDir = grid[j][i], curX = i, curY = j;\n\t\t\tif (currDir === 1) {\n\t\t\t\t// horiz\n\t\t\t\twhile(curX < numX && grid[j][curX] == currDir) {\n\t\t\t\t\tgrid[j][curX] = 0;\n\t\t\t\t\tcurX++;\n\t\t\t\t\t// console.log(`__ ${curX}/${numX} ${grid[j][curX]}/${grid[j][i]}`);\n\t\t\t\t\t// if (grid[j][curX] != currDir) break;\n\t\t\t\t}\n\t\t\t\t// console.log(`x: ${i} - ${curX}, y: ${j} : '-' (${(curX-i)})`)\n\t\t\t\tline(i*SZE, j*SZE+SZE, curX*SZE, curY*SZE+SZE);\n\t\t\t\t\n\t\t\t} else {\n\t\t\t\t// vert\n\t\t\t\twhile(curY < numY && grid[curY][i] == currDir) {\n\t\t\t\t\tgrid[curY][i] = 0;\n\t\t\t\t\tcurY++;\n\t\t\t\t\t// console.log(`__ ${curY}/${numY} ${grid[curY][i]}/${grid[j][i]}`);\n\t\t\t\t\t// if (grid[curY][i] != currDir) break;\n\t\t\t\t}\n\t\t\t\t// console.log(`x: ${i}, y: ${j} - ${curY} : '|' (${(curY-j)})`)\n\t\t\t\tline(i*SZE+SZE, j*SZE, i*SZE+SZE, curY*SZE);\n\t\t\t\t\n\t\t\t}\n\t\t\tnumLines++;\n\t\t}\t\t\n\t}\n\tconsole.log(`numLines: ${numLines}`)\n\t// console.log(grid)\n}\n\nfunction mouseClicked() {\n\tif (mouseButton === LEFT) {\n\t\tsetup();\n\t}\n}\n\nfunction keyPressed() {\n\tif (key === 's' || key === 'S') {\n\t\tsave(\"epi_noise_field.svg\"); // Save the canvas as SVG\n\t}\n}",
+    "custom_html": "<script src=\"https://unpkg.com/p5.js-svg@1.5.1\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

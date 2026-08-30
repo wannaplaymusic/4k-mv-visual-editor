@@ -1,0 +1,22 @@
+{
+  "name": "windings_1",
+  "author": "sandorlevi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 03:23:08",
+  "url": "https://openprocessing.org/@sandorlevi/124855",
+  "code": "// === Tab: sketch124855 ===\nlet n = 0;\nlet nextChange = 0;\nlet angle = random(TWO_PI);\nlet angleIncr = 0.2;\nlet widthIncr = 0.3;\nlet lengthIncr = 0.3;\nlet x0, y0, x1, y1;\nlet maxWidth = 40;\nlet maxLength = 30;\nlet lineLength = maxLength;\nlet lineWidth = maxWidth;\n\nfunction setup() {\n  createCanvas(1000, 500);\n  background(255);\n  stroke(0);\n  smooth();\n  x0 = 0;\n  y0 = 0;\n}\n\nfunction draw() {\n  x1 = constrain(x0 + lineLength * cos(angle), -lineWidth, width + lineWidth);\n  y1 = constrain(y0 + lineLength * sin(angle), -lineWidth, height + lineWidth);\n\n  let x2 = constrain(x0 + 4 * cos(angle), -lineWidth, width + lineWidth);\n  let y2 = constrain(y0 + 4 * sin(angle), -lineWidth, height + lineWidth);\n\n  strokeWeight(lineWidth + 4);\n  stroke(255);\n  line(x2, y2, x1, y1);\n  strokeWeight(lineWidth);\n  stroke(0);\n  line(x0, y0, x1, y1);\n  x0 = x1;\n  y0 = y1;\n  lineWidth -= widthIncr;\n  lineLength -= lengthIncr;\n  angle += angleIncr;\n  \n  if (n == nextChange) {\n    angleIncr = -angleIncr;\n    n = 0;\n    nextChange = int(random(1, 50));\n    noStroke();\n    fill(255, 5);\n    rect(0, 0, width, height);    \n  }\n  \n  n++;\n  \n  if (lineWidth < 2 || lineWidth > maxWidth) {\n    widthIncr = -widthIncr;\n  }\n\n  if (lineLength < 5 || lineLength > maxLength) {\n    lengthIncr = -lengthIncr;\n  }\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

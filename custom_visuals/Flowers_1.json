@@ -1,0 +1,22 @@
+{
+    "name": "Flowers_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:31:27",
+    "url": "https://openprocessing.org/@ntsutae/1558921",
+    "code": "// === Tab: mySketch ===\nconst flowers = []\nconst flowers_num = 50\nconst bg_color = 'white'\nconst step = 12\n\nsetup = () => {\n  createCanvas(windowWidth, windowHeight)\n  background(bg_color)\n  colorMode(HSB, 360)\n  noFill()\n  for (let i = flowers_num; i--;)\n    flowers[i] = createVector(random(width * .1, width * .9), random(height * .1, height * .9))\n}\n\ndraw = () => {\n  const sec = frameCount / 30\n  stroke(map(sin(sec), -1, 1, 0, 360), 360, 360)\n  strokeWeight(1.5)\n  for (let {x, y} of flowers) {\n    beginShape()\n    for (let i = 200; i--;) {\n      let degree = sec\n      for (const b of flowers) degree += atan2(b.y - y, b.x - x) * 2\n      vertex(x += cos(degree) * step, y += sin(degree) * step)\n      if (flowers.some(e => (e.x - x) ** 2 + (e.y - y) ** 2 < step )) break\n    }\n    endShape()\n  }\n}\n\nmousePressed=()=>setup()",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

@@ -1,22 +1,29 @@
 {
-    "name": "kikagaku",
-    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(400,400);\n\tbackground(255);\n\tcolorMode(HSB);\n}\n\nfunction draw() {\n\t\tfill(40,40,100-(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/10);\n\t\trect(200,0,200);\n\trect(0,200,200);\n\tfor(let j=0;j<50;j++){\n\t\tfor(let i=0;i<100;i++){\n\t\t\tfill(176,(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),96,0.5);\n\t\t\tnoStroke();\n\t\t\trect(i*20+j*10-400,i*20-j*10+200,20);\n\t\t\tfill(270,36,100,0.5);\n\t\t\tellipse(20-i*20+j*10+200,i*20+j*10-400,20);\n\t\t}\n\t}\n}\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            try {\n                if (typeof this.createGraphics === 'function') {\n                    return this.createGraphics(10, 10);\n                } else if (typeof createGraphics === 'function') {\n                    return createGraphics(10, 10);\n                }\n            } catch(e) {}\n            try {\n                if (typeof this.createImage === 'function') {\n                    return this.createImage(1, 1);\n                }\n            } catch(e) {}\n            return {\n                width: 1,\n                height: 1,\n                pixels: [0, 0, 0, 0],\n                loadPixels: function() {},\n                updatePixels: function() {},\n                get: function() { return [0, 0, 0, 255]; },\n                vertices: []\n            };\n        }\n        try {\n            return window._origGet.apply(this, args);\n        } catch(e) {\n            return {\n                width: 1,\n                height: 1,\n                pixels: [0, 0, 0, 0],\n                loadPixels: function() {},\n                updatePixels: function() {},\n                get: function() { return [0, 0, 0, 255]; },\n                vertices: []\n            };\n        }\n    };\n}\n",
-    "frequency": 50,
-    "storyboard_weight": 50,
-    "post_fx_intensity": 50,
-    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-    "custom_css": "",
-    "inline_assets": {},
-    "author": "2025H2506",
-    "license": "CC BY-NC-SA",
-    "tags": [
-        "batch_import",
-        "audio_reactive"
-    ],
-    "url": "https://openprocessing.org/@u521692/2720400",
-    "date_added": "2026-07-06 22:16:02",
-    "used_in_videos": [
-        "Bare Relaxed Relaxed.mp4"
-    ],
-    "used_count": 1
+  "name": "kikagaku",
+  "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(400,400);\n\tbackground(255);\n\tcolorMode(HSB);\n}\n\nfunction draw() {\n\t\tfill(40,40,100-(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/10);\n\t\trect(200,0,200);\n\trect(0,200,200);\n\tfor(let j=0;j<50;j++){\n\t\tfor(let i=0;i<100;i++){\n\t\t\tfill(176,(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),96,0.5);\n\t\t\tnoStroke();\n\t\t\trect(i*20+j*10-400,i*20-j*10+200,20);\n\t\t\tfill(270,36,100,0.5);\n\t\t\tellipse(20-i*20+j*10+200,i*20+j*10-400,20);\n\t\t}\n\t}\n}",
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "author": "2025H2506",
+  "license": "CC BY-NC-SA",
+  "tags": [
+    "batch_import",
+    "audio_reactive"
+  ],
+  "url": "https://openprocessing.org/@u521692/2720400",
+  "date_added": "2026-07-06 22:16:02",
+  "used_in_videos": [
+    "Bare Relaxed Relaxed.mp4",
+    "Digital Haze.mp4",
+    "Kinetic Beat.mp4",
+    "Mental Drift.mp4",
+    "Monolithic Interval.mp4",
+    "Night Drive Core Roll.mp4",
+    "Ultimate Core Patterns.mp4"
+  ],
+  "used_count": 7,
+  "scaling_mode": "auto"
 }

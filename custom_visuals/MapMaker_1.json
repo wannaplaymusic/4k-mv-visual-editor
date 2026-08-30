@@ -1,0 +1,22 @@
+{
+  "name": "MapMaker_1",
+  "author": "ntsutae",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 04:25:39",
+  "url": "https://openprocessing.org/@ntsutae/2330360",
+  "code": "// === Tab: mySketch ===\nconst branchingFactor = 0.025;\nconst noiseFactor = 5;\nconst agentArray = [];\nconst agentSpeed = 100;\nlet world;\n\nfunction setup() {\n  init();\n}\n\nfunction init() {\n  createCanvas(windowWidth, windowHeight);\n\tnoiseSeed();\n  stroke(\"black\");\n  background(\"white\");\n  noFill();\n\n  world = array2d();\n  agentArray.length = 0;\n  agentArray.push(agent());\n}\n\nmouseClicked = () => init();\n\nfunction draw() {\n  for (let i = 0; i < agentSpeed; i++) {\n    agentArray.forEach((agent) => agent.next());\n  }\n}\n\nfunction* agent() {\n  const x = random(width);\n  const y = random(height);\n  const heading = 0;\n  const stack = [{ x, y, heading }];\n  world.set(x, y);\n\n  while (stack.length) {\n    let { x, y, heading } = stack.pop();\n\n    const num = random() < branchingFactor ? 2 : 1;\n    for (i = 0; i < num; i++, heading += PI / 2) {\n      let newX = x;\n      let newY = y;\n      do {\n        n = noise(newX / width, newY / height) * noiseFactor;\n        newX = (newX + cos(heading + n) + width) % width;\n        newY = (newY + sin(heading + n) + height) % height;\n      } while (floor(newX) === floor(x) && floor(newY) === floor(y));\n      if (!world.canMoveTo(newX, newY)) continue;\n      stack.push({ x: newX, y: newY, heading });\n      world.set(newX, newY);\n      yield;\n    }\n  }\n}\n\nfunction array2d() {\n  const array = Array.from({ length: width }, () => Array(height).fill(false));\n\n  return {\n    canMoveTo: (x, y) => {\n      return array[floor(x)][floor(y)] === false;\n    },\n    set: (x, y, colour) => {\n      array[floor(x)][floor(y)] = true;\n      rect(x, y, 1);\n    },\n  };\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

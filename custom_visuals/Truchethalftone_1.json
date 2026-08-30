@@ -1,0 +1,22 @@
+{
+    "name": "Truchethalftone_1",
+    "author": "blalmeida",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:26:43",
+    "url": "https://openprocessing.org/@blalmeida/202902",
+    "code": "// === Tab: truchet4 ===\nlet sTile = 19;\nvar m = [];\nlet c0, c1;\nlet pause = false;\n\n\n/*---------------------*/\n\n\nfunction setup()\n{\n  createCanvas(855, 570);\n  noStroke();\n  newColor();\n  newPattern();\n}\n\n\n/*---------------------*/\n\n\nfunction draw()\n{\n  if (pause) // noLoop() removed for animation\n  \n  drawPattern();  \n}\n\n\n/*---------------------*/\n\n\nfunction mouseReleased()\n{  \n  if (mouseButton == LEFT)  //change let and noiseSeed with left button\n  {\n    newColor();\n    noiseSeed();\n  }\n  \n  newPattern();  //both buttons change the truchet pattern\n  \n  if (pause)  redraw();  \n}\n\n\n/*---------------------*/\n\n\nfunction keyPressed()\n{\n  if (key == ' ') pause = !pause;  //pause/resume\n  if (key == 'S' || key == 's') saveFrame(\"truchet-######.png\");  //save image\n  \n  if (!pause) loop();\n}\n\n\n/*---------------------*/\n\n\nfunction newColor()  //choose a random color\n{\n  c0 = color(random(255), random(255), random(255));\n  c1 = color(random(255), random(255), random(255));\n}\n\n\n/*---------------------*/\n\n\nfunction newPattern()  //create a matrix for the truchet tiling\n{\n  m = new Array(width/sTile)[height/sTile];\n  \n  for (let x = 0; x < width; x += sTile)\n  {\n    for (let y = 0; y < height; y += sTile)\n    {\n      m[x/sTile][y/sTile] = int(random(2));\n    }\n  }\n}\n\n\n/*---------------------*/\n\n\nfunction drawPattern()\n{\n  //squares\n  for (let x = 0; x < width; x += sTile)\n  {\n    for (let y = 0; y < height; y += sTile)\n    {\n      if (m[x/sTile][y/sTile] == 0) fill(c0);\n      else fill(c1);\n      rect(x, y, sTile, sTile);\n    }\n  }\n  \n  \n  //circles\n  for (let x = 0; x < width + 1; x += sTile)\n  {\n    for (let y = 0; y < height + 1; y += sTile)\n    {    \n      let s = 0;\n      if ((x+y)%2 ==0)\n      {\n        fill(c0);\n        s = -1;\n      }\n      else\n      {\n        fill(c1);\n        s = 1;\n      }\n      let d = map(noise(x/320., y/320., frameCount/100.), 0.33, 0.66, -sTile/2, sTile/2);\n      ellipse(x, y, sTile + s*d, sTile + s*d);\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

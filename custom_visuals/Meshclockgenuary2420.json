@@ -1,0 +1,22 @@
+{
+    "name": "Meshclockgenuary2420",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:15:20",
+    "url": "https://openprocessing.org/@epi/2150410",
+    "code": "// === Tab: mySketch ===\n/* \n\tMesh Clock\n\t\n\thttps://openprocessing.org/sketch/2150410\n\t#genuary20 #genuary #creativecoding #generativeart\n\t\n\thttps://genuary.art/prompts#jan20\n*/\n\nlet S, BG;\nlet font, points1, points2, points3;\nlet ptsNumbers, maxBBox;\nconst FPS = 1;\n\nfunction preload() {\n  // Creates a p5.Font object.\n  font = loadFont('https://openprocessing.org/sketch/2150410/files/RubikBurned-Regular.ttf');\n}\n\nfunction setup() {\n  createCanvas(S = max(windowWidth, windowHeight), S);\n\tpixelDensity(1);\n  describe(\"mesh of points connected by distance forming current time\");\n  frameRate(FPS);\n\n\tBG = \"navy\";\n\tdrawBackground(BG)\n  \n\tnoFill()\n\tstroke(212) // 232\n\tstrokeWeight(1)\n\tstrokeCap(SQUARE);\n\t\n\tS/=3;\n\ttextFont(font);\n\t// textAlign(CENTER, CENTER);\n\t// textStyle(BOLD);\n\ttextSize(S)\t\n\t\n\tgetPts();\n\tgetPoints();\n}\n\nfunction drawBackground(bg) {\n\tbackground(bg);\n\t\n\tconst ctx = drawingContext;\n\tconst gradient = ctx.createRadialGradient(width/2, height/2, max(width, height)/4, width/2, height/2, max(width, height)*2);\n\n\t// Add three color stops\n\tgradient.addColorStop(0, \"navy\");\n\tgradient.addColorStop(1, \"cyan\");\n\n\t// Set the fill style and draw a rectangle\n\tctx.fillStyle = gradient;\n\tctx.fillRect(0, 0, width, height);\n}\n\nfunction getPts(sampleFactor = 0.1) {\n\tptsNumbers = [];\n\tmaxBBox = {x: 0, y:0, w: 0, h: 0};\n\tfor (let i = 0; i < 10; i++) {\n\t\tconst MSG = \"\" + i;\n\t\tconst bbox = font.textBounds(MSG, 0, 0);\n\t\tconst pts = font.textToPoints(MSG, 0, 0, S, { sampleFactor});\n\t\tptsNumbers.push({bbox, pts});\n\t}\n\tconsole.log(maxBBox)\n\tconsole.log(ptsNumbers)\n}\n\n\nfunction getPoints(sampleFactor = 0.1) {\n\tMSG1 = nf(hour(), 2);\n\tMSG2 = nf(minute(), 2);\n\tMSG3 = nf(second(), 2);\n\n\tbbox1 = font.textBounds(MSG1, 0, 0);\n\tbbox2 = font.textBounds(MSG2, 0, 0);\n\tbbox3 = font.textBounds(MSG3, 0, 0);\n\t/*\n\tconsole.log(bbox1)\n\tconsole.log(bbox2)\n\tconsole.log(bbox3)\n\t*/\n\t\n\tconst dy = (height-bbox1.h-bbox2.h-bbox3.h)/2;\n\tpoints1 = font.textToPoints(MSG1, 0, 0, S, { sampleFactor});\n\tpoints1.map((p) => {p.y -= bbox1.y - dy; p.x += -bbox1.x + (width-bbox1.w)/2});\n\tpoints2 = font.textToPoints(MSG2, 0, 0, S, { sampleFactor});\n\tpoints2.map((p) => {p.y -= bbox1.y + bbox2.y - dy; p.x += -bbox2.x + (width-bbox2.w)/2});\n\tpoints3 = font.textToPoints(MSG3, 0, 0, S, { sampleFactor});\n\tpoints3.map((p) => {p.y -= bbox1.y + bbox2.y + bbox3.y - dy; p.x += -bbox3.x + (width-bbox3.w)/2});\n\t// console.log(\"l: \" + points1.length + \", \" + points2.length + \", \" + points3.length)\n\n\t// points = points1.concat(points2, points3);\n\n}\n\nfunction draw() {\n\tlet strtTime = millis();\n\tif (frameCount % FPS === 0) getPoints();\n\tlet tmr1 = millis() - strtTime;\n\t\t\n\tdrawBackground(BG)\n\tshowMesh(points1, color(\"magenta\"));\n\tshowMesh(points2, color(\"cyan\"));\n\tshowMesh(points3, color(\"orange\"));\n\n\tlet tmr2 = millis() - strtTime - tmr1;\n\tconsole.log(\"t: \" + strtTime + \", \" + tmr1 + \", \" + tmr2)\n}\n\nfunction showMesh(points, clr) {\n\tconst maxd = S/10;\n\tpush()\n\tpoints.forEach(p =>  {\n\t\tpoints.forEach(o =>  {\n\t\t\tif (o!==p) {\n\t\t\t\tconst d = dist(o.x, o.y, p.x, p.y);\n\t\t\t\tif (d < maxd) {\t\t\t\t\n\t\t\t\t\tclr.setAlpha(255-d/maxd*255)\n\t\t\t\t\tstroke(clr)\n\t\t\t\t\tline(o.x, o.y, p.x, p.y);\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t\t// point(p.x, p.y)\n  });\n\tpop()\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": true
+}

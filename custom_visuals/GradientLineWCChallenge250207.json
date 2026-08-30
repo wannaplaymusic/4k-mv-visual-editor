@@ -1,0 +1,22 @@
+{
+    "name": "GradientLineWCChallenge250207",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:59:06",
+    "url": "https://openprocessing.org/@epi/2536247",
+    "code": "// === Tab: palettes ===\n\tconst palettes = [\n\t\t[\"#8386f5\", \"#3d43b4\", \"#04134b\", \"#083e12\", \"#1afe49\"],\n\t\t[\"#f887ff\", \"#de004e\", \"#860029\", \"#321450\", \"#29132e\"],\n\t\t[\"#e96d5e\", \"#ff9760\", \"#ffe69d\", \"#6a7e6a\", \"#393f5f\"],\n\t\t[\"#ff124f\", \"#ff00a0\", \"#fe75fe\", \"#7a04eb\", \"#120458\"],\n\t\t[\"#ff6e27\", \"#fbf665\", \"#73fffe\", \"#6287f8\", \"#383e65\"],\n\t\t[\"#7700a6\", \"#fe00fe\", \"#defe47\", \"#00b3fe\", \"#0016ee\"],\n\t\t[\"#63345e\", \"#ac61b9\", \"#b7c1de\", \"#0b468c\", \"#092047\"],\n\t\t[\"#af43be\", \"#fd8090\", \"#c4ffff\", \"#08deea\", \"#1261d1\"],\n\t\t[\"#a0ffe3\", \"#65dc98\", \"#8d8980\", \"#575267\", \"#222035\"],\n\t\t[\"#ff2a6d\", \"#d1f7ff\", \"#f5d9e8\", \"#005678\", \"#01012b\"],\n\t\t[\"#490109\", \"#d40011\", \"#fd7495\", \"#5e4ef8\", \"#14029a\"],\n\t\t[\"#8f704b\", \"#daae6d\", \"#89e3f6\", \"#4d9e9b\", \"#44786a\"],\n\t\t[\"#fff69f\", \"#fdd870\", \"#d0902f\", \"#a15501\", \"#351409\"],\n\t\t[\"#b0acb0\", \"#e2dddf\", \"#85ebd9\", \"#3d898d\", \"#2f404d\"],\n\t\t[\"#ff184c\", \"#ff577d\", \"#ffccdc\", \"#0a9cf5\", \"#003062\"]\n\t]\n\n// === Tab: mySketch ===\n/*\n\tGradient Line #WCCChallenge \"From 0 to 1\" 🪜 250207\n\thttps://openprocessing.org/sketch/2536247\n\t#generativeart #creativecoding #p5js\n\n  Dear Raph and creative coding community,\n\n\tanimated version of #genuary25 \"One line that may or may not intersect itself\" \n\thttps://openprocessing.org/sketch/2521656\n\t-drawing a line from 0 to 1, \n\t-choosing palette from 0 to 1,\n\t-using clrs from palette from 0 to 1,\n\t-lerping colors via gradient (from 0 to 1 internally i think as well)\n\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\nvar S, BG\nvar pal, palF;\n\nfunction setup() {\n  createCanvas(windowWidth, min(windowHeight, windowWidth * 0.5));\n\tframeRate(30);\n\tS = windowHeight;\n\tdescribe(\"overlapping gradient rectangles forming a line\");\n\t\n\trandomSeed(~~random(hour()+minute()+second()));\n\tnoiseSeed(random(1234567));\n\t\n\tpalF = random(); // 0..1\n\tBG = random(palettes[~~(palF * palettes.length)])\n\tnoStroke();\n\t\n\tloop();\n}\n\nfunction draw() {\n\tbackground(BG); // 8);\n\t\n\tpal = [...palettes[~~(palF * palettes.length)]];\n\tconst yLine = (noise(PI)/2+0.25) * height;\n\tlet fd = 1 / ((noise(0)/2+0.25) * 0.1 * S); \n\tfor (let f = 0, i = 0; f < 1; f += fd, i++) {\n\t\tconst s = (noise(f/123)/2+0.25) * 0.2 * S;\n\t\tconst x = map(f, 0, 1, 0.1, 0.9) * width;\n\t\tconst y = yLine + (noise(x/123, frameCount/128)-0.5) * height/4;\n\t\tconst d = 0.25;\n\t\tconst w = (noise(x/23, y/32, frameCount/80)+0.25) * 1.75*s;\n\t\tconst h = (noise(y/23, x/32, frameCount/96)+0.25) * 1.75*s;\n\t\t// grad fraction, every 2nd switch direction\n\t\tlet grF = fract(frameCount/100 % 100 + s); // fract(frameCount / 100);\n\t\tif (i % 2 == 1) grF = 1- grF;\n\t\tpal.push(pal.shift()); // shift colors for each box / gradient\n\t\tgradRect(x-w/2, y-h/2, w, h, pal, grF);\n\t}\n\t\n\t// // noLoop() removed for animation\n}\n\nfunction gradRect(x, y, w, h, pal, frAnim) {\n  const ctx = drawingContext;\n\n  // Create a Gradient\n  const grOffX = w/(pal.length-1);\n  const grOffY = h/(pal.length-1);\n  const fp = frAnim * pal.length;\n  const fc = fract(fp);\n  const grd = ctx.createLinearGradient(\n    x - grOffX*fc, \n    y - grOffY*fc,  \n    x + w + grOffX*(1-fc), \n    y + h + grOffY*(1-fc), \n  );\n  for (let i = 0; i <= pal.length; i++) {\n\t\tconst clr = color(pal[(i+~~fp)%pal.length]);\n\t\tclr.setAlpha(160);\n    grd.addColorStop(i/(pal.length-0), clr);\n  }\n\n  // Draw a filled Rectangle\n  ctx.fillStyle = grd;\n  ctx.fillRect(x, y, w, h);\n}\n\nfunction mouseClicked() {\n\tif (mouseButton != RIGHT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

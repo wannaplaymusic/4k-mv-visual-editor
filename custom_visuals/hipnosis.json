@@ -1,0 +1,22 @@
+{
+  "name": "hipnosis",
+  "author": "60rpm",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 17:41:53",
+  "url": "https://openprocessing.org/@60rpm/43704",
+  "code": "// === Tab: sketch43704 ===\nlet q=350,a,b,c,d,x,y,X,Y,u,v,U,V,f,g,ca,cb,sa,sb,qc;\n\nfunction setup() {\n  createCanvas(700, 700);background(\"#eeeeee\");stroke(0x15000000);noFill();smooth();\n  a=PI;b=a/2; f=a/random(18,180);g=a/random(18,180); c=1;\n}\nfunction draw() {\n  qc= q-(c+=.01);\n  x=q+(sb=sin(b+=g))*c; y=q+(cb=cos(b))*c; X=q-sb*qc; Y=q-cb*qc;\n  u=q+(sa=sin(a+=f))*c; v=q+(ca=cos(a))*c; U=q-sa*qc; V=q-ca*qc;\n  bezier(x,y,u,v,U,V,X,Y);\n}\nfunction mousePressed() {setup();}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

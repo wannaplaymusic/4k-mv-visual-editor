@@ -1,0 +1,22 @@
+{
+    "name": "Circlesegements2",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:31:17",
+    "url": "https://openprocessing.org/@epi/2362752",
+    "code": "// === Tab: palettes ===\nvar palettes = [\n\t[\"#ff2a6d\", \"#d1f7ff\", \"#f5d9e8\", \"#005678\", \"#01012b\"],\n\t[\"#b0acb0\", \"#e2dddf\", \"#85ebd9\", \"#3d898d\", \"#2f404d\"],\n\t[\"#ff6e27\", \"#fbf665\", \"#73fffe\", \"#6287f8\", \"#383e65\"],\n\t[\"#7700a6\", \"#fe00fe\", \"#defe47\", \"#00b3fe\", \"#0016ee\"],\n\t[\"#ff184c\", \"#ff577d\", \"#ffccdc\", \"#0a9cf5\", \"#003062\"],\n\n\t[\"#8386f5\", \"#3d43b4\", \"#04134b\", \"#083e12\", \"#1afe49\"],\n\t[\"#f887ff\", \"#de004e\", \"#860029\", \"#321450\", \"#29132e\"],\n\t[\"#e96d5e\", \"#ff9760\", \"#ffe69d\", \"#6a7e6a\", \"#393f5f\"],\n\t[\"#ff124f\", \"#ff00a0\", \"#fe75fe\", \"#7a04eb\", \"#120458\"],\n\t[\"#63345e\", \"#ac61b9\", \"#b7c1de\", \"#0b468c\", \"#092047\"],\n\t[\"#af43be\", \"#fd8090\", \"#c4ffff\", \"#08deea\", \"#1261d1\"],\n\t[\"#a0ffe3\", \"#65dc98\", \"#8d8980\", \"#575267\", \"#222035\"],\n\t[\"#490109\", \"#d40011\", \"#fd7495\", \"#5e4ef8\", \"#14029a\"],\n\t[\"#8f704b\", \"#daae6d\", \"#89e3f6\", \"#4d9e9b\", \"#44786a\"],\n\t[\"#fff69f\", \"#fdd870\", \"#d0902f\", \"#a15501\", \"#351409\"]\n];\n\n// === Tab: mySketch ===\nvar PAD_F = 0.9;\nvar circles, r;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"circle of random arc segments with varying stroke weights and colors from pallete\")\n\tbackground(32);\n\tcircles = [];\n\tr = max(width, height)*0.3;\n\tloop();\n}\n\nfunction draw() {\n\tif (r < 2)  {\n\t\t// noLoop() removed for animation\n\t\tconsole.log(circles);\n\t}\n\t\n\tfor (let tries = 0; tries < 1000; tries++) { // try 10 times before reducing radius\n\t\tconst x = ~~random(width);\n\t\tconst y = ~~random(height);\n\n\t\t// check of valid\n\t\tlet isValid = true;\n\t\tfor (let c of circles) {\n\t\t\tif (dist(c.x, c.y, x, y) < (c.r + r) * PAD_F) {\n\t\t\t\tisValid = false;\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t\tif (isValid) {\n\t\t\tcircles.push({x, y, r});\n\t\t\tdrawCircle(x, y, r);\n\t\t\treturn;\n\t\t}\n\t} // try x times\n\tr--;\n} \n\nfunction mousePressed() {\n\tif (mouseButton === LEFT) {\n\t\tsetup();\n\t}\n}\n\nfunction drawCircle(x, y, maxR) {\n\t// if (random()<0.15) return;\n\tnoFill();\n\tpalette = random(palettes);\n\tfor (let r = maxR; r > 0; r--) {\n\t\tconst stAng = random(TWO_PI);\n\t\tconst enAng = random(TWO_PI);\n\t\tstrokeWeight(random(maxR*0.1));\n\t\tstroke(random(palette))\n\t\tarc(x, y, r*2, r*2, stAng, enAng); // , [mode], [detail])\n\t\tr -= random(maxR * 0.1);\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

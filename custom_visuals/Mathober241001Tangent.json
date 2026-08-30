@@ -1,0 +1,25 @@
+{
+    "name": "Mathober241001Tangent",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:10:59",
+    "url": "https://openprocessing.org/@epi/2378849",
+    "code": "// === Tab: mySketch ===\n/*\nDay #1 Tangent\nhttps://openprocessing.org/sketch/2378849\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nlet sc1, sc2;\nconst FPS = 30; // frames per second\nconst FPT = 60; // frames per transition\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tframeRate(FPS);\n\tdescribe(\"tangent lines of two random bezier curves, colored in the corresponding angle\");\n\tcolorMode(HSB);\n\tbackground(\"rgb(0,0,12)\");\n\tnoFill();\n\t// if (frameCount === 0) // noLoop() removed for animation\n\tsc1 = genBezs(2);\n\tsc2 = genBezs(2);\n\tif (!isLooping()) redraw();\n}\n\nfunction genBezs(n = 1) {\n\tlet bezs = [];\n\tfor (let i = 0; i < n; i++) {\n\t\tconst p1 = {x: 0, y: ~~(random(0, 0.3) * height)};\n\t\tconst p2 = {x: ~~(random(0.25, 0.6)*width), y: ~~(random(1) * height)};\n\t\tconst p3 = {x: ~~(random(0.4, 0.75)*width), y: ~~(random(1) * height)};\n\t\tconst p4 = {x: width, y: ~~(random(0.7, 1)*height)};\n\t\tconst pts = [p1, p2, p3, p4];\n\t\tfor (const p of pts) {\n\t\t\tp.x = ~~random(width);\n\t\t\tp.y = ~~random(height);\n\t\t}\n\t\tbezs[i] = pts;\n\t}\n\treturn bezs;\n}\n\nfunction draw() {\n\tbackground(\"rgb(0,0,8)\");\n\tif (frameCount % FPT === 0) {\n\t\t[sc1,sc2] = [sc2, genBezs(2)];\n\t}\n\tconst t = fract(frameCount / FPT);\n\tconst bez = lerpBez(sc1, sc2, t);\n\tdrawTangents(bez);\n}\n\nfunction lerpBez(sc1, sc2, t) {\n\tvar bezs = [];\n\tfor (let i = 0; i < sc1.length; i++) {\n\t\tvar pts = [];\n\t\tfor (let j = 0; j < 4; j++) {\n\t\t\tconst p = {x: lerp(sc1[i][j].x, sc2[i][j].x, t), y: lerp(sc1[i][j].y, sc2[i][j].y, t)};\n\t\t\tpts[j] = p;\n\t\t}\n\t\tbezs.push(pts);\n\t}\n\treturn bezs;\n}\n\nfunction drawTangents(bezs) {\n\t// https://p5js.org/reference/p5/bezierTangent/\n\tfor (let bez of bezs) {\n\t\tvar p1, p2, p3, p4;\n\t\t[p1, p2, p3, p4] = bez;\n\n\t\tstrokeWeight(3);\n\t\tstroke(\"rgba(139,0,0,0.5)\");\n\t\t// bezier(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y)\n\n\t\tstrokeWeight(1);\n\t\tstroke(255, 96);\n\t\tfor (let f = 0; f <= 1; f += 0.004) {\n\t\t\tconst x = bezierPoint(p1.x, p2.x, p3.x, p4.x, f);\n\t\t\tconst y = bezierPoint(p1.y, p2.y, p3.y, p4.y, f);\n\n\t\t\t// Top-right tangent line.\n\t\t\t// Scale the tangent point to draw a shorter line.\n\t\t\tlet tx = 2 * bezierTangent(p1.x, p2.x, p3.x, p4.x, f);\n\t\t\tlet ty = 2 * bezierTangent(p1.y, p2.y, p3.y, p4.y, f);\n\t\t\tconst vec = createVector(tx, ty).normalize().mult(0.3*max(width, height)); // mult(2*max(width, height));\n\t\t\tconst ang = vec.heading();\n\t\t\tconst clrDevi = 60 * (noise((x+tx)/1234, (y+ty)/4321, frameCount/22)-0.5);\n\t\t\tstroke(~~(ang/TWO_PI*360 + clrDevi + 360) % 360, 75, 75, 0.25);\n\t\t\tline(x + vec.x, y + vec.y, x - vec.x, y - vec.y);\n\t\t}\n\t}\n}\n\nfunction windowResized() {\n\tresizeCanvas(windowWidth, windowHeight);\n}\nfunction doubleClicked() {\n\tif (mouseButton === LEFT) setup();\n}\nfunction mousePressed() {\n\tif (mouseButton !== LEFT) return;\n\t  if (isLooping()) {\n    // noLoop() removed for animation\n  } else {\n    loop();\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Infinite Loop.mp4"
+    ]
+}

@@ -1,0 +1,25 @@
+{
+    "name": "Cells_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:21:55",
+    "url": "https://openprocessing.org/@ntsutae/1495761",
+    "code": "// === Tab: mySketch ===\nvar rows\nvar colours=[]\nvar n=5 // n>=3\nvar detail=100\n\nsetup=()=> {\n  createCanvas(windowWidth, windowHeight)\n  rows=0\n  noiseSeed()\n}\n\ndraw=()=> {\n  for (let i=0; i<4; i++) {\n    drawOneRow()\n  }\n}\n\ndrawOneRow=()=> {\n  if (rows<height) {\n    for (let cols=0; cols<width; cols++) {\n      let x=cols/detail\n      let y=rows/detail\n      for (let i=0; i<n; i++) {\n        let newx=sin(2*x)*cos(3*y+noise(x, y)*24)\n        let newy=cos(3*x)*sin(2*y)\n        x=newx\n        y=newy\n        colours[i]=abs(y)*256 // abs(x-y)*256 , abs(x+y)*256\n      }\n      stroke(colours[n-3], colours[n-2], colours[n-1])\n      line(cols, rows, cols, rows+colours[n-1])\n    }\n    rows++\n  }\n}\n\nmousePressed=()=>setup()",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Road Lines.mp4"
+    ]
+}

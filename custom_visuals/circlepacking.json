@@ -1,0 +1,22 @@
+{
+  "name": "circlepacking",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:25:57",
+  "url": "https://openprocessing.org/@epi/2971668",
+  "code": "// === Tab: calcValues ===\nfunction calcValues() {\n\tconst s = ~~(S * 0.69);\n\tx[0] = random(width/2 - s/2, width/2 + s/2);\n\ty[0] = random(height/2 - s/2, height/2 + s/2);\n\trad[0] = random(10, 99);\n\n\tfor (let i = 1; i < NUM; i++) {\n\t\tfor (let r = 0; r < 99999; r++) {\n\t\t\tasd = 1;\n\n\t\t\tconst newX = random(width/2 - s/2, width/2 + s/2);\n\t\t\tconst newY = random(height/2 - s/2, height/2 + s/2);\n\n\t\t\tlet newR = 400;\n\n\t\t\tfor (let j = 0; j < i; j++) {\n\t\t\t\tconst dst = dist(x[j], y[j], newX, newY);\n\t\t\t\tif (dst <= rad[s]) { // rad[j]\n\t\t\t\t\tasd--;\n\t\t\t\t}\n\t\t\t\tconst ju = dst - rad[j];\n\t\t\t\tif (newR > ju) {\n\t\t\t\t\tnewR = ju;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tif (asd > 0) {\n\t\t\t\tx[i] = newX;\n\t\t\t\ty[i] = newY;\n\t\t\t\trad[i] = newR;\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\n\t}\n}\n\n// === Tab: mySketch ===\n// inner circles happy accident, see #18\n\nlet epiColors; // https://github.com/epibyte/p5-epi-colors\n\nlet NUM = 150, S;\nlet easing = 0.1;\n\nlet x = new Array(NUM).fill(0);\nlet y = new Array(NUM).fill(0);\nlet xxx = new Array(NUM).fill(0);\nlet yyy = new Array(NUM).fill(0);\nlet rade = new Array(NUM).fill(0);\nlet rad = new Array(NUM).fill(0);\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tS = max(width, height);\n\trectMode(CENTER);\n\tnoFill();\n\tnoStroke();\n\t\n\tconst { EpiColors } = EpiColorsPckg;\n\tepiColors = new EpiColors();\n\tepiColors.getRandomPalette();\n\t// console.log(epiColors.palette);\n\n\tfor (let i = 0; i < NUM; i++) {\n\t\trad[i] = 0;\n\t\tx[i] = width/2;\n\t\ty[i] = height/2;\n\t}\n\n\tcalcValues();\n}\n\nfunction mousePressed() {\n\tcalcValues();\n}\n\nfunction draw() {\n\tif (frameCount % 65 == 0) {\n\t\tcalcValues();\n\t}\n\n\tbackground(8);\n\n\t// scale(0.4);\n\t// translate(width/2, height/2);\n\n\tfor (let i = 0; i < NUM; i++) {\n\t\txxx[i] = xxx[i] + (x[i] - xxx[i]) * easing;\n\t\tyyy[i] = yyy[i] + (y[i] - yyy[i]) * easing;\n\t\trade[i] = rade[i] + (rad[i] - rade[i]) * easing;\n\n\t\tfill(epiColors.palette[i % epiColors.palette.length]);\n\t\tellipse(xxx[i], yyy[i], rade[i] * 2, rade[i] * 2);\n\t\t// ellipse(xxx[i] - rade[i] / 2.2, yyy[i] - rade[i] / 2.2, rade[i] / 4, rade[i] / 4);\n\t}\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

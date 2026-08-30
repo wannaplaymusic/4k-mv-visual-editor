@@ -1,0 +1,22 @@
+{
+    "name": "Equator",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:33:59",
+    "url": "https://openprocessing.org/@epi/2635893",
+    "code": "// === Tab: palettes ===\n\tconst palettes = [\n\t\t[\"#8386f5\", \"#3d43b4\", \"#04134b\", \"#083e12\", \"#1afe49\"],\n\t\t[\"#f887ff\", \"#de004e\", \"#860029\", \"#321450\", \"#29132e\"],\n\t\t[\"#e96d5e\", \"#ff9760\", \"#ffe69d\", \"#6a7e6a\", \"#393f5f\"],\n\t\t[\"#ff124f\", \"#ff00a0\", \"#fe75fe\", \"#7a04eb\", \"#120458\"],\n\t\t[\"#ff6e27\", \"#fbf665\", \"#73fffe\", \"#6287f8\", \"#383e65\"],\n\t\t[\"#7700a6\", \"#fe00fe\", \"#defe47\", \"#00b3fe\", \"#0016ee\"],\n\t\t[\"#63345e\", \"#ac61b9\", \"#b7c1de\", \"#0b468c\", \"#092047\"],\n\t\t[\"#af43be\", \"#fd8090\", \"#c4ffff\", \"#08deea\", \"#1261d1\"],\n\t\t[\"#a0ffe3\", \"#65dc98\", \"#8d8980\", \"#575267\", \"#222035\"],\n\t\t[\"#ff2a6d\", \"#d1f7ff\", \"#f5d9e8\", \"#005678\", \"#01012b\"],\n\t\t[\"#490109\", \"#d40011\", \"#fd7495\", \"#5e4ef8\", \"#14029a\"],\n\t\t[\"#8f704b\", \"#daae6d\", \"#89e3f6\", \"#4d9e9b\", \"#44786a\"],\n\t\t[\"#fff69f\", \"#fdd870\", \"#d0902f\", \"#a15501\", \"#351409\"],\n\t\t[\"#b0acb0\", \"#e2dddf\", \"#85ebd9\", \"#3d898d\", \"#2f404d\"],\n\t\t[\"#ff184c\", \"#ff577d\", \"#ffccdc\", \"#0a9cf5\", \"#003062\"]\n\t]\n\n// === Tab: mySketch ===\n// https://www.artsy.net/artist/karoly-keseru\n\nconst SZE = 24, NUM = 10;\nlet pal;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"grid of colored circles distributing around the equator\");\n\tframeRate(60);\n\tpixelDensity(1);\n\n\tpal = [...random(palettes)].map((x) => x+\"10\");\n\tbackground(random(pal));\n\tbackground(\"#fefefe\");\n\t// background(\"#101010\");\n\tnoStroke();\n\tellipseMode(CENTER); // https://p5js.org/reference/p5/ellipseMode/\n\t\n\tloop();\n}\n\nfunction draw() {\n\t// grid\n\tif (true) {\n\t\t// stroke(0);\n\t\tfor (let y = SZE/2; y < height; y+=SZE) {\n\t\t\tbeginShape();\n\t\t\tfor (let x = SZE/2; x < width; x+=SZE) {\n\t\t\t\tconst pos = getPos(x, y);\n\t\t\t\t// vertex(pos.x, pos.y);\n\t\t\t\t\n\t\t\t\tconst dst = abs((y/height - 0.5) * 2);\n\t\t\t\tif (dst < random()) {\n\t\t\t\t\tfill(random(pal));\n\t\t\t\t\tconst f = random(0.6, 0.9);\n\t\t\t\t\tmCircle(pos.x, pos.y, SZE * f);\n\t\t\t\t}\n\t\t\t}\n\t\t\tendShape();\n\t\t}\n\t\t// noLoop() removed for animation\n\t}\n\t\n\t// random positions, overdrawing positions with other colors possible\n\tif (false) {\n\t\tfor (let i = 0; i < NUM; i++) {\t\t\n\t\t\tconst x = ~~(random(width) / SZE) * SZE + SZE/2;\n\t\t\tconst y = ~~(random(height) / SZE) * SZE + SZE/2;\n\n\t\t\tvar dst = abs((y/height - 0.5) * 2);\n\t\t\tif (dst < random()) {\n\t\t\t\tfill(random(pal));\n\t\t\t\tvar pos = getPos(x, y);\n\t\t\t\tvar f = random(0.8, 1.1);\n\t\t\t\t// ellipse(pos.x, pos.y, SZE*f, SZE*f);\n\t\t\t\tmCircle(pos.x, pos.y, SZE * f);\n\t\t\t}\n\t\t}\n\t}\n}\n\nfunction mCircle(x, y, d) {\n\t// circle(x, y, d);\n\tconst dlt = d/10 * random(0.15, 1); // reduce bluriness per each randomly\n\tfor (let i = 0; i < 20; i++) {\n\t\tconst cx = x + random(-dlt, dlt);\n\t\tconst cy = y + random(-dlt, dlt);\n\t\tconst dx = d - random(dlt*2);\n\t\tconst dy = d - random(dlt*2);\n\t\t// ellipse(cx, cy, dx, dy);\n\t\tpush()\n\t\ttranslate(cx, cy);\n\t\trotate(random(PI));\n\t\tellipse(0, 0, dx, dy);\n\t\tpop()\n\t}\n}\n\nfunction getPos(x, y) {\n\tvar dx = (noise(x/SZE, y/SZE) - 0.5) * SZE;\n\tvar dy = (noise(y/SZE, x/SZE) - 0.5) * SZE;\n\treturn {x: x + dx, y: y + dy};\n}\n\nfunction mouseClicked() {\n\tif (mouseButton != RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > width*0.1 && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) < width*0.9) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

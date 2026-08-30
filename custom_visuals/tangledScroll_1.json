@@ -1,0 +1,22 @@
+{
+  "name": "tangledScroll_1",
+  "author": "robertd052",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 17:00:32",
+  "url": "https://openprocessing.org/@robertd052/379001",
+  "code": "// === Tab: tangledScroll ===\n// idea from: http://rectangleworld.com/blog/archives/733\n// PGraphics, line, Array, let PGraphics b1, b2;\nlet yPos1, yPos2;\nlet firstTime = true;\n\nlet palette = new Array(31);\n\nfunction setup() {\n  createCanvas(620, 560);\n  background(0);\n\n  for (let i = 1; i <= 30; i++) {\n    palette[i] = color(255, random(255), 255);\n  }\n  palette[15] = palette[16] = color(\"#0AEDFF\");\n\n  b1 = drawRows(28);\n  yPos1= 0;\n  yPos2 = 560;\n}\n\nfunction draw() {\n  frameRate(30);\n  background(0);\n  if (firstTime) {\n    b2 = drawRows(28);\n    firstTime = false;\n  }\n  \n  yPos1 -= 1;\n  yPos2 -= 1;\n  \n  image(b1, 0, yPos1);\n  image(b2, 0, yPos2);\n\n  if (yPos1 <= -560) {\n    b1 = drawRows(28);\n    yPos1 = 560;\n  }\n  if (yPos2 <= -560) {\n    b2 = drawRows(28);\n    yPos2 = 560;\n  }\n}\n\nfunction drawRows(numRows) {\n  let b = createGraphics(620, 560);\n  for (let i = 0; i < numRows; i++) {\n    drawRow(i, b);\n  } \n  return b;\n}\n\nfunction drawRow(rowNum, b) {\n  rowNum *= 20;\n  let colNum = 1;\n  while (colNum <= 30) {\n    if (random(1) < .5 || frameCount == 0) drawVertical(colNum * 20, rowNum, palette[colNum], b);\n    else {\n      let which ;\n      if (random(1) < .5) which = true;\n      else which = false;\n      if (colNum != 30) {\n        drawCrossing(colNum * 20, rowNum, which, palette[colNum], palette[colNum+1], b);\n        let hold = palette[colNum];\n        palette[colNum] = palette[colNum+1];\n        palette[colNum+1] = hold;\n      }\n      if (colNum == 30) drawVertical(colNum * 20, rowNum, palette[colNum], b);\n      colNum++;\n    }\n    colNum++;\n  }\n}\n\nfunction drawVertical(x, y, c, b) {\n  b.beginDraw();\n  b.stroke(c);\n  b.strokeWeight(5);\n  b.line(x, y, x, y+20);\n  b.endDraw();\n}\n\nfunction drawCrossing(x, y, positive, c1, c2, b) {\n  b.beginDraw();\n  if (positive) {\n    b.stroke(c1);\n    b.strokeWeight(5);\n    b.line(x, y, x+20, y+20);\n    b.stroke(c2);\n    b.line(x+20, y, x+15, y+5);\n    b.line(x+5, y+15, x, y+20);\n  } else {\n    b.stroke(c2);\n    b.strokeWeight(5);\n    b.line(x+20, y, x, y+20);\n    b.stroke(c1);\n    b.line(x, y, x+5, y+5);\n    b.line(x+15, y+15, x+20, y+20);\n  }\n  b.endDraw();\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

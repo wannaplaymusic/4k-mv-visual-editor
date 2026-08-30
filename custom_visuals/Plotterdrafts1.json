@@ -1,0 +1,22 @@
+{
+    "name": "Plotterdrafts1",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:32:39",
+    "url": "https://openprocessing.org/@epi/2492943",
+    "code": "// === Tab: mySketch ===\n// https://adamfuhrer.com/pen-plotting\n// https://idrawpenplotter.com/\n// SALE064\n\nfunction setup() {\n\tcreateCanvas(500, 800, true ? SVG : P2D); // createCanvas(windowWidth, windowHeight, SVG);\n\t// describe(\"different heighted rows of vertical lines with a random x position and further vertical lines with growing distance from each horizontal neigboars\")\n\tstroke(16);\n\tloop();\n}\n\nfunction draw() {\n\tbackground(222);\n\tconst m = ~~(max(width, height) * 0.05); // margin\n\tlet y = m;\n\twhile (y < height - m - m) {\n\t\tlet h = ~~random(m, height/7);\n\t\th = min(h, height-y-m)\n\t\t// if (h < m) break;\n\t\tlet x = randomGaussian(width/2, 65);\n\t\tline(x, y, x, y+h)\n\t\tlet d = 0.75;\n\t\tconst df = random(1.11, 1.25)\n\t\tlet lx = x;\n\t\tfor (let i = 0; i < 49; i++) {\n\t\t\tconst isInLeft = x-d > m;\n\t\t\tconst isInRight = x+d < width-m;\n\t\t\tif (true || x+d>=lx+1) {\n\t\t\t\tlx = x+d;\n\t\t\t\tif (isInLeft) line(x-d, y, x-d, y+h)\n\t\t\t\tif (isInRight) line(x+d, y, x+d, y+h)\n\t\t\t}\n\t\t\tif (!(isInLeft || isInRight)) break;\n\t\t\td *= df;\n\t\t}\n\t\ty += h * random(0.7, 1.1); // slightly overlapping\n\t}\n\t// noLoop() removed for animation\n}\n\nfunction mousePressed() {\n\tif (mouseButton === LEFT) redraw();\n}\n\nfunction keyPressed() {\n\tif (key === 's' || key === 'S') {\n\t\tsave(\"mySketch.svg\"); // Save the canvas as SVG\n\t}\n}",
+    "custom_html": "<script src=\"https://unpkg.com/p5.js-svg@1.5.1\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

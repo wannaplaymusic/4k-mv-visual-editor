@@ -1,0 +1,22 @@
+{
+    "name": "Rotatednedges",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:21:59",
+    "url": "https://openprocessing.org/@epi/2623957",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tframeRate(30);\n\tnoFill();\n\tstroke(\"silver\");\n\tloop();\n}\n\nfunction draw() {\n\tbackground(32);\n\t\n\tconst w2 = width/2;\n\tconst h2 = height/2;\n\tconst r1 = max(width, height) * 0.45;\n\tconst r2 = max(width, height) * 0.1;\n\tconst num = 33;\n\tfor (let i = 0; i < num; i++) {\n\t\tconst da = sin(map(i, 0, num-1, -PI, PI) + frameCount/12) / 8; // -QUARTER_PI, QUARTER_PI\n\t\tconst r = map(i, 0, num-1, r1, r2);\n\t\tdrawNEdge(w2, h2, r, 13, da);\n\t}\n\t\n\t// // noLoop() removed for animation\n}\n\nfunction drawNEdge(xc, yc, r, n, da) {\n\tbeginShape();\n\tfor (let a = 0; a <= TAU; a += TAU/n) {\n\t\tconst x = xc + cos(a+da) * r;\n\t\tconst y = yc + sin(a+da) * r;\n\t\tvertex(x, y);\n\t}\n\tendShape();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

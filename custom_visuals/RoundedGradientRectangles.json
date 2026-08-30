@@ -1,0 +1,22 @@
+{
+    "name": "RoundedGradientRectangles",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:09:18",
+    "url": "https://openprocessing.org/@epi/2751459",
+    "code": "// === Tab: mySketch ===\nconst DF = 0.9, N = 9, ANG = -2.1, FRMS = 150;\nlet startFrame, posArr, currPal;\n// const { Point, Line, Polygon } = EpiShapeSvg;\nconst { EpiColors } = EpiColorsPckg;\nlet epiColors;\n\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t// createCanvas(~~(windowHeight*2/3), windowHeight);\n\tnoFill();\n\tnoStroke();\n\tepiColors = new EpiColors();\n\trectMode(CENTER);\n\t// epiColors.BG = EpiColors.getAdjustedBrightness(EpiColors.getAdjustedSaturation(epiColors.BG, 2), 0.35);\n\t\n\tstartFrame = frameCount;\n\t\n\tepiColors.getRandomPalette(true);\n\tcurrPal = shuffle(epiColors.palette);\n\n\t// get position of clrs between 0..1\n\tposArr = [];\n\tfor (let i = 0; i <= N; i++) {\n\t\tposArr[i] = [];\n\t\tlet posSum = 0;\n\t\tfor (let j = 0; j < currPal.length; j++) {\n\t\t\tconst rndVal = random(0.3, 0.7); // keep min distance to next color\n\t\t\tposArr[i].push(rndVal);\n\t\t\tif (j < currPal.length-1) posSum += rndVal; \n\t\t}\n\t\tfor (let j = 0; j < currPal.length; j++) posArr[i][j] /= posSum; // normalize\n\t}\n\t\n\tloop();\n}\n\nfunction draw() {\n\tblendMode(BLEND);\n\tbackground(\"#ffeeff\"); // \"#ffeeff\"); // epiColors.getAverageClr()\n\t// blendMode(MULTIPLY);\n\tfill(\"grey\");\n\t\n\tconst ctx = drawingContext;\n\tconst x = width/2, y = height/2;\n\tconst d = height / 1.1;\n\t\n\tconst tf = 1-pow(1-min(1, (frameCount-startFrame)/FRMS), 2); // time f\n\n\t// draw ring\n\tfor (let i = 0; i <= N; i++) {\n\t\t// shuffle(epiColors.palette, true);\n\t\tpush();\n\t\t\tconst f = i/N;\n\t\t\tconst df = map(f, 0, 1, 1, 0.1)\n\t\t\tconst dx = d * df / 1.415;\n\t\t\tconst dy = d * df; // d * f + d * 0.5;\n\t\t\t// grad\n\t\t\tconst an = ANG * f * tf;\n\t\t  // rotated x y switched, due rect is rotated by -90 degrees \n\t\t\tconst ry = cos(an) * dy * 0.5;\n\t\t\tconst rx = sin(an) * dy * 0.5;\n\n\t\t\t// fill gradient\n\t\t\tconst linGrad1 = ctx.createLinearGradient(x+rx, y-ry, x-rx, y+ry);\n\t\t\tconst linGrad = ctx.createLinearGradient(rx, -ry, -rx, ry);\n\t\t\tconst clrA = lerpColor(currPal[0], currPal[1], f);\n\t\t\tconst clrB = lerpColor(currPal[2], currPal[3], f);\n\t\t\tlinGrad.addColorStop(0, clrA);\n\t\t\tlinGrad.addColorStop(1, clrB);\n\t\t\t/*\n\t\t\tfor (let j = 0, gradPos = 0; j < epiColors.palette.length; j++) {\n\t\t\t\tconst clr = EpiColors.getColor(epiColors.palette[(i+j)%epiColors.palette.length], 160);\n\t\t\t\tlinGrad.addColorStop(\n\t\t\t\t\tconstrain(gradPos + 0.1, 0, 1), // map(j, 0, epiColors.palette.length-1, 0, 1), \n\t\t\t\t\tclr\n\t\t\t\t);\n\t\t\t\tconsole.log(`${i}, ${j}, ${gradPos}, ${(i+j)%epiColors.palette.length}`); // noLoop() removed for animation\n\t\t\t\tgradPos += posArr[i][j];\n\t\t\t}\n\t\t\t*/\n\t\t\tctx.fillStyle = linGrad;\n\n\t\t\tpush()\n\t\t\ttranslate(x, y);\n\t\t\trotate(an);\n\t\t\trect(0, 0, dx, dy, dx/2);\n\t\t\tpop()\n\t\t\n\t\t\t// stroke(0); line(x+rx, y-ry, x-rx, y+ry); circle(x+rx, y-ry, 5);\n\t\tpop();\n\t}\n\t\n\tif (frameCount > startFrame + FRMS * 1.5) {\n\t\tsetup();\n\t}\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > width*0.1) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

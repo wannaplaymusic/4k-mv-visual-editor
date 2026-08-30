@@ -1,0 +1,22 @@
+{
+  "name": "HTML5LocalStorage",
+  "author": "60rpm",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 03:49:30",
+  "url": "https://openprocessing.org/@60rpm/87999",
+  "code": "// === Tab: sketch87999 ===\nparent.document.getElementById(\"appletAjaxContainer\").setAttribute(\"style\", \"border: 1px dashed #ccc;\");\n\nString lastIndex;\nint tmpIndex=0, eSize=90;\n\nsize (500, 500);\nfill (0x500090ff);\nnoStroke();\nbackground(#ffffff);\n\nif (check) {\n        String tmp = localStorage[\"index\"];\n        if (tmp != null) {\n                lastIndex = tmp;\n                tmpIndex = int(lastIndex);\n                for (int i=0; i<=tmpIndex; i++) {\n                        String[] values = split ( localStorage [str(i)], \"-\");\n                        ellipse ( int(values[0]), int(values[1]), eSize, eSize);\n                }   \n        } else {\n                lastIndex=\"0\";\n        }   \n}\n\n\nvoid mousePressed () {\n        ellipse ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), eSize, eSize);\n        if (check) {\n                String newIndex = str (tmpIndex++);\n                String pos = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) + \"-\" + (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n                localStorage[\"index\"] = newIndex;\n                localStorage[newIndex] = pos;\n        }   \n}\n\nvoid keyPressed () {\n    background (#ffffff);\n    localStorage.removeItem (\"index\");\n    for (int i=0; i<=tmpIndex;i++) {\n        localStorage.removeItem(str(i));\n    }\n}\n\nfunction check() { \n  try { \n    return 'localStorage' in window && window['localStorage'] !== null; \n  } catch (e) { \n    return false; \n  }   \n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

@@ -1,0 +1,25 @@
+{
+    "name": "CollisionfreePaths_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 16:36:22",
+    "url": "https://openprocessing.org/@ntsutae/1708062",
+    "code": "// === Tab: mySketch ===\nvar trails = [];\nvar currentPath = [];\nvar x, y, breadth;\n\nsetup = () => {\n  createCanvas(windowWidth, windowHeight);\n\tbackground('white');\n  rectMode(CENTER);\n  Init();\n};\n\ndraw = () => {\n  for (let i = 50; i--; ) Update();\n};\n\nmousePressed =()=>{\n\tbackground('white');\n\ttrails.length=0;\n\tcurrentPath.length=0;\n\tnoiseSeed();\n\tInit();\n};\n\nvar Init = () => {\n  if (currentPath.length > 0) {\n    trails = trails.concat(currentPath);\n  }\n  x = random(width);\n  y = random(height);\n  breadth = random(5, 50);\n\n  fill(color(random(256), random(256), random(256)));\n  currentPath.length = 0;\n};\n\nvar Update = () => {\n  const n = noise(x / width, y / height);\n  const angle = n * TWO_PI * 1.5;\n  x += cos(angle)*2;\n  y += sin(angle)*2;\n\n  if (x < 0 || y < 0 || x > width || y > height) {\n    Init();\n    return;\n  }\n\n  const collide = trails.some(\n    (t) => (t.x - x) ** 2 + (t.y - y) ** 2 < (t.breadth / 2 + breadth / 2) ** 2\n  );\n  if (collide) {\n    Init();\n    return;\n  }\n\n  currentPath.push({\n    x: x,\n    y: y,\n    breadth: breadth,\n  });\n\n  push();\n  translate(x, y);\n  rotate(angle);\n  noStroke();\n  rect(0, 0, 1, 0.8 * breadth);\n  stroke(\"black\");\n  rect(0, 0.4 * breadth ,1, 1);\n  pop();\n};",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Concrete Phase Lock.mp4"
+    ]
+}

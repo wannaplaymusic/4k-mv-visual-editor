@@ -1,0 +1,22 @@
+{
+    "name": "Horizontalbars",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:15:27",
+    "url": "https://openprocessing.org/@epi/2748081",
+    "code": "// === Tab: mySketch ===\nconst N = 24; // num of lines\n\n// const { Point, Line, Polygon } = EpiShapeSvg;\nconst { EpiColors } = EpiColorsPckg;\nlet epiColors;\n\n\nfunction setup() {\n\tcreateCanvas(S = max(windowWidth, windowHeight), S);\n\tnoFill();\n\tnoStroke();\n\tepiColors = new EpiColors();\n\t// epiColors.BG = EpiColors.getAdjustedBrightness(EpiColors.getAdjustedSaturation(epiColors.BG, 2), 0.35);\n\tloop();\n}\n\nfunction draw() {\n\tepiColors.getRandomPalette(true);\n\tbackground(\"#ffeeff\"); // epiColors.BG\n\tfill(random(epiColors.palette));\n\t\n\tlet mar, th, ww, hh;\n\t{\n\t\tmar = max(width, height) * 0.05;\n\t\tww = width -mar -mar;\n\t\thh = height -mar -mar;\n\t\tth = ~~(hh / N);\n\t}\n\tmar = (height - N*th)/2;\n\t\tww = width -mar -mar;\n\t\thh = height -mar -mar;\n\t\n\tlet clrArrBlocked = [], clrArrEntropy = [];\n\tfor (let i = 0; i < epiColors.palette.length; i++) clrArrEntropy.push(i);\n\tfor (let i = 0, y = mar; i < N; i++, y += th) {\n\t\t// just allow 2 colors per line, palette.length must be >= 4\n\t\tshuffle(clrArrEntropy, true);\n\t\tlet clrArrCurrLine = [];\n\t\tfor (let j = 0; j < 2; j++) {\n\t\t\tclrArrCurrLine.push(clrArrEntropy[0]);\n\t\t\tclrArrEntropy.splice(0, 1);\n\t\t}\n\t\tconst len = ~~(random(0.1, 0.9) * ww);\n\t\tfill(epiColors.palette[clrArrCurrLine[0]]);\n\t\trect(mar, y, len, th);\n\t\tfill(epiColors.palette[clrArrCurrLine[1]]);\n\t\trect(mar+len, y, ww-len, th);\n\t\t\n\t\t// freeing current blocked colors\n\t\tfor (const clrIdx of clrArrBlocked) clrArrEntropy.push(clrIdx);\n\t\t// blocking new colors for next line\n\t\tclrArrBlocked = clrArrCurrLine;\n\t\t\n\t\t/*\n\t\tfor (let x = mar; x < ww - mar;) {\n\t\t\tvar len = min(ww-x-mar, ~~(random(0.1, 0.9) * ww));\n\t\t\tfill(random(epiColors.palette));\n\t\t\trect(x, y, len, th);\n\t\t\tx += len;\n\t\t}\n\t\t*/\n\t}\n\t\n\t// noLoop() removed for animation\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > width*0.1) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

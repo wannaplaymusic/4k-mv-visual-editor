@@ -1,0 +1,22 @@
+{
+    "name": "Plotterdrafts3",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:06:52",
+    "url": "https://openprocessing.org/@epi/2493994",
+    "code": "// === Tab: mySketch ===\n// https://idrawpenplotter.com/\n// SALE064\n\nfunction setup() {\n  createCanvas(500, 700, SVG);\n  stroke(32);\n  // noLoop() removed for animation\n}\n\nfunction draw() {\n\tbackground(222);\n  const MAR = 50;\n\tconst ww = 100;\n\tstrokeWeight(3)\n\tnoFill()\n\tfor (let xx = 0; xx < ww; xx += 5) {\n\t\tstroke(random([\"black\", \"darkred\", \"navy\", \"darkorange\", \"darkgreen\", \"blue\"]))\n\t\tstroke(0); strokeWeight(2*(1-xx/ww))\n\t\tlet lx, ly;\n\t\tconst stps = 200;\n\t\tbeginShape();\n\t\tfor (let ys=0; ys < stps; ys++) {\t\t\n\t\t\tconst f = ys / stps;\n\t\t\tconst x = width/2;\n\t\t\tconst y = map(f, 0, 1, MAR, height-MAR);\n\t\t\tconst scl = map(xx, 0, ww, 0.01, 0.02);\n\t\t\tconst dx = (noise(1.23+x*scl, 3.21+y*scl, frameCount)-0.5) * width * 0.75 * sin(PI*(f*0.8+0.1));\n\t\t\t// if (ys > 0) line(lx, ly, x + dx, y);\n\t\t\tvertex(x + dx, y);\n\t\t\tlx = x + dx;\n\t\t\tly = y;\n\t\t}\n\t\tendShape();\n\t\tstrokeWeight(1)\n\t}  \n}\n\nfunction mousePressed() {\n\tif (mouseButton === LEFT) redraw();\n}\n\nfunction keyPressed() {\n\tif (key === 's' || key === 'S') {\n\t\tsave(\"mySketch.svg\"); // Save the canvas as SVG\n\t}\n}",
+    "custom_html": "<script src=\"https://unpkg.com/p5.js-svg@1.5.1\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

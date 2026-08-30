@@ -1,0 +1,25 @@
+{
+    "name": "SkeletonDistanceField",
+    "author": "u240456",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:04:49",
+    "url": "https://openprocessing.org/@u240456/1547364",
+    "code": "// === Tab: mySketch.js ===\n/**\n * BMWalker.js : https://github.com/tetunori/BMWalker.js\n */\nlet bmw = new BMWalker();\nlet azimuth = 0;\nlet elevation = 0;\n\nlet url = 'https://coolors.co/0b132b-1c2541-3a506b-5bc0be-6fffe9';\nlet palette = url.split('/')[3].split('-').map(c => '#' + c);\nlet vmin, vmax;\nlet gl, glsl;\n\nfunction preload() {\n  glsl = loadShader('https://openprocessing.org/sketch/1547364/files/shader.vert', 'shader.frag');\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  noStroke();\n  gl = drawingContext;\n  vmin = max(width, height);\n  vmax = max(width, height);\n}\n\nfunction draw() {\n  let sec = millis() / 1000;\n  \n  background(0);\n  \n  bmw.setCameraParam(-sec * PI * 0.1, 0, 0);\n  \n  let walkerHeight = vmin * 0.8;\n  let markers = bmw.getMarkers(walkerHeight);\n  \n  push();\n  {\n    shader(glsl);\n    glsl.setUniform('uResolution', [vmax, vmax]);\n    glsl.setUniform('uTime', sec);\n    markers.forEach((m, i) => {\n      glsl.setUniform(`uPos${ i.toString().padStart(2, '0') }`, [\n        m.x / vmax + 0.5,\n        m.y / vmax + 0.5\n      ]);\n    });\n    \n    plane(vmax);\n  }\n  pop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Night Vision.mp4"
+    ]
+}

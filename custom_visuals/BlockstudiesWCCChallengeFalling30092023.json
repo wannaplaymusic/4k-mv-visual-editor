@@ -1,0 +1,22 @@
+{
+    "name": "BlockstudiesWCCChallengeFalling30092023",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:07:57",
+    "url": "https://openprocessing.org/@epi/2023196",
+    "code": "// === Tab: mySketch ===\n/*\n\tBlock studies // #WCCChallenge \"Falling\" 27.09.2023\n\thttps://openprocessing.org/sketch/2023196\n\t#p5js #creativecoding #generativeart\n\thttps://www.twitch.tv/videos/1938878300\n\t\n\tDear Raph and dear creative coders,\n\t\n\thas dome issues in figuring out the correct trigger to add and delete blocks \n\tfrom the array. but finally made a movement of blocks falling down.\n\tdepending on random generated patterns, the visual effect can be also, that \n\tthe blocks are rising.\n\t\n\tVariable steps defines the speed of the movement, randomly initialized in setup();\n\t\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\nvar sze = 50;\nvar steps;\nvar numW, numH;\nvar blocks, pal;\n\nfunction setup() {\n\tnumW = floor(innerWidth / sze)\n\tnumH = floor(innerHeight / sze)\n\tcreateCanvas(numW * sze, numH * sze);\n\tpixelDensity(1);\n\tframeRate(10);\n\tdescribe(\"colored pixel blocks moving top right bottom left\");\n\n\tsteps = numW; // floor(random(2, 7));\n\tblocks = [];\n\t\n\tnoStroke();\n}\n\nfunction mousePressed() {\n\tif (mouseButton === LEFT) setup();\n}\n\nfunction addBlocks() {\n\tconst palettes = [\n\t\t[\"white\", \"#ff577d\",\"#ff184c\"],\n\t\t[\"#e2dddf\", \"#85ebd9\", \"#3d898d\", \"#2f404d\"],\n\t\t[\"#white\", \"#8318C7\", \"#A0183F\",]\n\t]\t\n\tconst pal = random(palettes)\n\tconst stps = floor(random(2, 7)); // steps\n\t\n\t// how many tiles\n\tconst numT = floor(random(2, 4 * stps));\n\ttiles = [];\n\tfor (let i = 0; i < numT; i++) {\n\t\ttiles.push(random(pal));\n\t}\n\n\t// how often we insert the tiles\n\tconst numR = floor(random(2 * stps, 4 * stps));\n\tfor (let i = 0; i < numR; i++) {\n\t\tblocks = blocks.concat(tiles)\n\t}\n}\n\nfunction draw() {\n\tbackground(32);\n\tlet x = 0, y = 0;\n\t\n\tsteps = numW // + floor(random(-1, 1)) // round mathimatically better, but looks to confusing\n\t\n\tconst numWH = numW * numH\n\tconst fcs = frameCount * steps;\n\t// console.log(`Status: len=${blocks.length}, num2=${numWH}, fc*s=${fcs}`);\n\t\n\t// add blocks\n\tif (blocks.length < numW * numH) {\n\t\taddBlocks(blocks)\t\n\t\t// console.log(\"blocks added\");\n\t}\n\t\n\t// display blocks\n\tconst startIdx = min([fcs, numWH, blocks.length]); // frameCount * steps + steps - 1,\n\t// for (let i = 0; i < blocks.length; i++) {\n\tfor (let i = startIdx - 1; i >= 0; i--) {\n\t\tfill(blocks[i]);\n\t\trect(x, y, sze, sze);\n\t\tx += sze;\n\t\tif (x >= width)  {\n\t\t\t// new line\n\t\t\tx = 0;\n\t\t\ty += sze\n\t\t}\n\t}\n\t\n\t// delete x blocks\n\tif (fcs > numW * numH + steps + 1) { // why ever this formula works ;)\n\t\tblocks.splice(0, steps);\n\t\t// console.log(\"blocks deleted\");\n\t}\n\t\n\t// // noLoop() removed for animation\n}\n\nfunction windowResized() {\n\tsetup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

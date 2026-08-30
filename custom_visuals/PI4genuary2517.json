@@ -1,0 +1,22 @@
+{
+    "name": "PI4genuary2517",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:20:34",
+    "url": "https://openprocessing.org/@epi/2515372",
+    "code": "// === Tab: mySketch ===\n/*\n\tpi=4 #genuary17 #genuary #genuary2516 \n\thttps://openprocessing.org/sketch/2515372\n\tWhat happens if pi=4?\n\t#p5js #creativecoding #generativeart \n*/\n\nlet S, shapes, CLRS;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"spiral looking shapes of diffwerent sizes and color combining lines from an inner points of a circle to outer points, where outer points are geenrated as pi=4\");\n\tS = max(width, height)/random(8, 18);\n\tstrokeWeight(3);\n\tnoFill();\n\n\tcolorMode(HSB, 1)\n\tCLRS = getRandPalette(~~random(6, 18));\n\n\tloop();\n}\n\nfunction draw() {\n\tfor (let i = 0; i < random(10, 30); i++) background(CLRS[0])\n\t// const ctx = drawingContext;\n\n\tconst shapes = []\n\tfor (let x = S/2; x < width - S/4; x += S) {\t\t\n\t\tfor (let y = S/2; y < height - S/4; y += S) {\n\t\t\tshapes.push({x: random(x-S/4, x+S/4), y: random(y-S/4, y+S/4)});\n\t\t}\n\t}\n\n\tshuffle(shapes, true); // to be drawn in chaos order (not only tl to br)\n\t\n\tfor (let sh of shapes) {\n\t\tpush()\n\t\ttranslate(sh.x, sh.y)\n\t\trotate(random(TAU))\n\t\tstroke(random(CLRS))\n\t\tconst scl = random(0.7, 2.8);\n\t\tstrokeWeight(2 * scl);\n\t\tdrawSpiral(0, 0, scl * S);\n\t\tpop()\n\t}\n\t\n\t// noLoop() removed for animation\n}\n\nfunction drawSpiral(cx, cy, r) {\n\tconst rf = random(0.5, 0.9);\n\t\n\tconst num = random(4, 50);\n\tfor (let  i = 0; i <= num; i++) {\n\t\tconst f = i / num;\n\t\t\n\t\tconst a = 2 * 4 * f; // outer radius: PI = 4\n\t\tconst x1 = cx + cos(a) * r;\n\t\tconst y1 = cy + sin(a) * r;\n\t\t// circle(x1, y1, 10)\n\n\t\tconst aa = 2 * PI * f; // inner radius: PI = 3.1415..\n\t\tconst rr = lerp(r, r * rf, f); // lerp inner radius to outer\n\t\tconst x2 = cx + cos(aa) * rr;\n\t\tconst y2 = cy + sin(aa) * rr;\n\t\t// circle(x2, y2, 10)\n\n\t\tline(x1, y1, x2, y2);\n\t}\n\t\n\t// noLoop() removed for animation\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT) setup();\n}\n\nfunction getRandPalette(num = 6) {\n\tlet arr = [];\n\t\n\tconst numGen = random(num, num * 1.5);\n\tconst clrHueStart = random();\n\tfor (let i = 0; i < numGen; i++) arr.push(color((clrHueStart + i/numGen)%1, random(0.2, 0.7), random(), random(0.4, 0.9)));\n\tfor (let  i = 0; i < random(arr.length); i++) arr.push(arr.shift());\n\twhile (arr.length > num) arr.shift();\n\t\n\treturn arr;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

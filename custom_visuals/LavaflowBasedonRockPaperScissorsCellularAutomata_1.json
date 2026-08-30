@@ -1,0 +1,25 @@
+{
+    "name": "LavaflowBasedonRockPaperScissorsCellularAutomata_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:42:30",
+    "url": "https://openprocessing.org/@ntsutae/1252009",
+    "code": "// === Tab: mySketch ===\n// Reference: Rock Paper Scissors Cellular Automata\n// https://softologyblog.wordpress.com/2018/03/23/rock-paper-scissors-cellular-automata/\n// https://josephpetitti.com/rps\n\nt=0\nm=100\np=[]\ncolours=['blue','purple','green']\n\nsetup=()=> {\n  createCanvas(600,600)\n  noStroke()\n  for(x=m;x--;){\n    p[x]=[]\n    for(y=m;y--;){\n      p[x][y]={\n        colour:int((x+y)/2)%3,\n        power:10\n      }\n    }\n  }\n}\n\ndraw=()=> {  \n  t++\n  for(dir=0;dir<8;dir++){\n    n=Array.from(p)\n    for(x=m;x--;){\n      for(y=m;y--;){   \n        [X,Y]=[\n          [(x+1)%m,y],\n          [(x-1+m)%m,y],\n          [x%m,(y-1+m)%m],\n          [x%m,(y+1)%m],\n          [(x-1+m)%m,(y-1+m)%m],\n          [(x+1)%m,(y-1+m)%m],\n          [(x-1+m)%m,(y+1)%m],\n          [(x+1)%m,(y+1)%m],\n        ][(t&dir)%8]\n    \n        neighbor=p[X][Y]\n\n        if((neighbor.colour-p[x][y].colour+3)%3==1){\n          n[x][y].power=n[x][y].power-1\n          if(n[x][y].power==0){\n            n[x][y].colour=neighbor.colour\n            n[x][y].power=10\n          }\n        }\n      }\n    }\n    p=n\n  }\n\n  loadPixels()\n  for(x=m;x--;){\n    for(y=m;y--;){\n      set(x,y,color(colours[p[x][y].colour]))\n    }\n  }\n  updatePixels()\n  copy(0,0,100,100,0,0,width,height)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Infinite Loop.mp4"
+    ]
+}

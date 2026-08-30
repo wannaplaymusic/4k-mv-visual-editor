@@ -1,0 +1,22 @@
+{
+    "name": "minacoding202426XHeaderImage",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:24:48",
+    "url": "https://openprocessing.org/@epi/2307323",
+    "code": "// === Tab: mySketch ===\n/*\nhttps://openprocessing.org/sketch/2307323\n#minacoding #generativeart #creativecoding #p5js\n*/\n\nconst FPS = 60;\nconst CLRS = \"6b2737-e08e45-f8f4a6-bdf7b7-3943b7\"\n  .split(\"-\")\n  .map((i) => \"#\" + i);\n\nconst boundary = {w: 300, h: 100}; // 3:1 scale\n\nfunction setup() {\n  createCanvas(400, 400);\n  // pixelDensity(1);\n  describe(\"x header image: suggesting to leave x #leavex\");\n  frameRate(FPS);\n  background(0, 0, 8);\n}\n\nfunction draw() {\n\tfill(CLRS[0]);\n\tconst x = (width-boundary.w)/2;\n\tconst y = (height-boundary.h)/2;\n\trect(x, y, boundary.w, boundary.h)\n  // // noLoop() removed for animation\n\n\t// --> lines\n\tstroke(CLRS[4])\n\tstrokeWeight(1);\n\tfor (let yy = y + 2, t = 0; yy < y + boundary.h; yy += 4, t += 0.15) {\n\t\tmLine(x + 1, yy, x + boundary.w - 2, yy, t);  \n\t}\n\t\n\t// --> text message\t\n\tconst s = 28;\n\tstroke(CLRS[2])\n\tstrokeWeight(2);\n\t// #\n\tmLine(x + s, y, x + s, y + boundary.h * 0.8, 1);                  // |\n\tmLine(x + 2*s, y + boundary.h * 0.2, x + 2*s, y + boundary.h, 2); // |\n\tmLine(x, y + boundary.h * 0.5 - s/2, x + 2.5*s, y + boundary.h * 0.5 - s/2, 3);     // -\n\tmLine(x + s/2, y + boundary.h * 0.5 + s/2, x + 6.25*s, y + boundary.h * 0.5 + s/2, 4, 8); // ------\n\t// L\n\tmLine(x + 3*s, y, x + 3*s, y + boundary.h * 0.5 + s/2, 5); // |\n\t// E\n\tmLine(x + 4*s, y + boundary.h * 0.5 - s/2, x + 4*s, y + boundary.h * 0.5 + 1.5*s, 6);\n\tmLine(x + 4*s, y + boundary.h * 0.5 - s/2, x + 5*s, y + boundary.h * 0.5 - s/2, 7);\n\tmLine(x + 4*s, y + boundary.h * 0.5 + 1.5*s, x + 5*s, y + boundary.h * 0.5 + 1.5*s, 8);\n\t// A\n\tmLine(x + 5*s, y + boundary.h * 0.5 + 1.5*s, x + 5.75*s, y + boundary.h * 0.5 - s, 9);\n\t// AV\n\tmLine(x + 5.75*s, y + boundary.h * 0.5 - s, x + 6.75*s, y + boundary.h * 0.5 + 2*s, 10);\n\t// V\n\tmLine(x + 6.75*s, y + boundary.h * 0.5 + 2*s, x + 7.5*s, y + boundary.h * 0.5 - s/2, 11);\n\t// E\n\tmLine(x + 7.5*s, y + boundary.h * 0.5 - s/2, x + 8.5*s, y + boundary.h * 0.5 - s/2, 12);     // -\n\tmLine(x + 7.5*s, y + boundary.h * 0.5 - s/2, x + 7.5*s, y + boundary.h * 0.5 + 1.5*s, 13);   // |\n\tmLine(x + 7.5*s, y + boundary.h * 0.5 + s/2, x + 8.5*s, y + boundary.h * 0.5 + s/2, 14);     // -\n\tmLine(x + 7.5*s, y + boundary.h * 0.5 + 1.5*s, x + 8.5*s, y + boundary.h * 0.5 + 1.5*s, 15); // -\n\t// X\n\tmLine(x + 8.5*s, y + boundary.h, x + 10.5*s, y, 16);   // /\n\tmLine(x + 8.5*s, y, x + 10.5*s, y + boundary.h, 17);   // /\n\t\n  showTitle(\"#minacoding 24/26 X Header Image: #leavex\")\n}\n\nfunction mLine(x1, y1, x2, y2, s, d = 1.5) {\n\tconst t = frameCount / FPS;\n\tif (t < s) return;\n\t\n\tlet xx = x2, yy = y2;\n\tif (t < s+d) {\n\t\t// lerp\n\t\tconst lf = myEasingFunction((t-s)/(d)); // fract(f); // TODO use d\n\t\txx = lerp(x1, x2, fract(lf))\n\t\tyy = lerp(y1, y2, fract(lf))\n\t}\n\tline(x1, y1, xx, yy);\n}\n\nfunction myEasingFunction(t) {\n    return t * t * t;\n}\n\nfunction showTitle(msg) {\n\tpush();\n  stroke(0);\n\tstrokeWeight(2);\n  fill(255);\n  text(msg, 2, 12);\n  pop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

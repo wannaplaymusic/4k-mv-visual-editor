@@ -1,0 +1,25 @@
+{
+    "name": "VerticalStripes",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:34:37",
+    "url": "https://openprocessing.org/@epi/2878004",
+    "code": "// === Tab: Bar ===\nclass Bar {\n\n\tconstructor(x, y, w, h, r, clr) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.w = w;\n\t\tthis.h = h;\n\t\tthis.r = r;\n\t\tthis.clr = clr;\n\t\tthis.eas = random([easeInOutBack, easeInOutElastic, easeInOutBounce]);\n\t}\n\n\tdraw(t) {\n\t\tconst f = this.eas(t);\n\t\tfill(this.clr);\n\t\trect(this.x, this.y, this.w, this.h * f, this.r);\n\t}\n\n}\n\nfunction easeInOutBack(x) {\n\tconst c1 = 1.70158;\n\tconst c2 = c1 * 1.525;\n\n\treturn x < 0.5 ?\n\t\t(Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2 :\n\t\t(Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;\n\n}\n\nfunction easeInOutElastic(x) {\n\tconst c5 = (2 * Math.PI) / 4.5;\n\n\treturn x === 0 ?\n\t\t0 :\n\t\tx === 1 ?\n\t\t1 :\n\t\tx < 0.5 ?\n\t\t-(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * c5)) / 2 :\n\t\t(Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * c5)) / 2 + 1;\n\n}\n\nfunction easeInOutBounce(x) {\n\treturn x < 0.5 ?\n\t\t(1 - easeOutBounce(1 - 2 * x)) / 2 :\n\t\t(1 + easeOutBounce(2 * x - 1)) / 2;\n\n}\n\nfunction easeInBounce(x) {\n\treturn 1 - easeOutBounce(1 - x);\n}\n\nfunction easeOutBounce(x) {\n\tconst n1 = 7.5625;\n\tconst d1 = 2.75;\n\n\tif (x < 1 / d1) {\n\t\treturn n1 * x * x;\n\t} else if (x < 2 / d1) {\n\t\treturn n1 * (x -= 1.5 / d1) * x + 0.75;\n\t} else if (x < 2.5 / d1) {\n\t\treturn n1 * (x -= 2.25 / d1) * x + 0.9375;\n\t} else {\n\t\treturn n1 * (x -= 2.625 / d1) * x + 0.984375;\n\t}\n\n}\n\n// === Tab: mySketch ===\nlet bg, cbg, bars, startFrame, durationFrames = 120;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tframeRate(60);\n\tnoStroke();\n\tcbg = color(\"#000000\");\n\tinit();\n}\n\nfunction init() {\n\tstartFrame = frameCount;\n\n\tbars = [];\n\n\tconst NUM = random(11, 19);\n\tconst SZE = ~~(width / NUM);\n\n\tpush();\n\tcolorMode(HSB, 1);\n\tconst hue = random();\n\tbg = color(fract(hue + random(0.3, 0.5)), random(0.2, 0.6), random(0.1, 0.2));\n\n\tfor (let j = 0; j < 4; j++) {\n\t\tfor (let x = 0, i = 0; i < NUM; x += SZE, i++) {\n\t\t\tconst sat = random(0.2, 0.9)\n\t\t\tconst clr = color(hue, sat, 1-sat, 0.25);\n\t\t\tconst fh = random(0.9, 1.2);\n\t\t\tlet bar;\n\t\t\tif (i % 2) {\n\t\t\t\tbar = new Bar(x, -SZE, SZE, fh * height + SZE, SZE / 2, clr)\n\t\t\t} else {\n\t\t\t\tbar = new Bar(x, height + SZE, SZE, -fh * height - SZE, SZE / 2, clr)\n\t\t\t}\n\t\t\t\n\t\t\tbars.push(bar);\n\t\t}\n\t}\n\n\tpop();\n}\n\nfunction mousePressed() {\n\tif ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > 0.1 * width) init();\n}\n\nfunction draw() {\n\tcbg = lerpColor(cbg, bg, 0.02);\n\tbackground(cbg);\n\n\tif (frameCount > startFrame + 1.5 * durationFrames) {\n\t\tinit();\n\t}\n\n\tconst t = constrain((frameCount - startFrame) / durationFrames, 0, 1);\n\tvar f = sin(t * PI);\n\n\tfor (const b of bars) {\n\t\tb.draw(f);\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Slow Motion Static.mp4"
+    ]
+}

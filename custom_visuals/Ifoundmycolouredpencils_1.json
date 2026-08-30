@@ -1,0 +1,22 @@
+{
+    "name": "Ifoundmycolouredpencils_1",
+    "author": "robertd052",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:36:54",
+    "url": "https://openprocessing.org/@robertd052/799653",
+    "code": "// === Tab: mySketch ===\nlet depth = 15;\nlet strtLen = 60;\n\nfunction setup() {\n  createCanvas(550, 550);\n  // noLoop() removed for animation\n}\n\nfunction draw() {\n  background(255);\n  drawPaper();\n  // startX, startY, initial angle, initial branch (trunk) length, recursion control\n  branch(width/2, height-100, -random(1.4, 1.74), strtLen, depth);\n  noFill();\n  stroke(180);\n\tstrokeWeight(1);\n  rect(0, 0, width-1, height-1);\n}\n\nfunction branch(x, y, ang, len, d) {\n  let x2 = x;\n  let y2 = y;\n  x += cos(ang) * len;\n  y += sin(ang) * len;\n\n  if (d == 1) {\n    noStroke();\n    if (len > 4.0) {\n      fill(\"#F0B102\");\n      ellipse(x2, y2, 2, 4);\n    } else if ( len <= 4.0) {\n      fill(\"#E80E02\");\n      ellipse(x2, y2, 3, 1);\n    }\n  } else {\n    drawLine(x2, y2, x, y, len);\n  }\n\n  len *= random(0.7, 0.94);\n  d--;\n  if (d > 0) {\n    branch(x, y, ang - random(0.2, 0.6), len, d);\n    branch(x, y, ang + random(0.2, 0.6), len, d);\n  }\n}\n\n\nfunction drawLine(strtx, strty, finx, finy, sw) { \n  let numSegs = 15;\n  let fraction = 0;\n  let divBy = numSegs;\n  let x1 = strtx;\n  let y1 = strty;\n  stroke(60);\n  noFill();\n  strokeWeight(sw * 0.05); \n  beginShape();\n  for (let j = 0; j <= int (numSegs); j++) {\n    let x = (randomGaussian()*.3) + x1 + (fraction * (finx-x1));\n    let y = (randomGaussian()*.3) + y1 + (fraction * (finy-y1));\n    vertex(x, y);\n    x1 = x;\n    y1 = y;\n    fraction = 1.0/divBy--;\n  }\n  endShape();\n}\n\nfunction drawPaper() {\n  noStroke();\n  for (let i = 0; i<width; i+=2) {\n    for (let j = 0; j<height; j+=2) {\n      fill(random(210,235), 150);\n      rect(i, j, 2, 2);\n    }\n  }\n  for (let i = 0; i<30; i++) {\n    fill(random(70,100), 150);\n    ellipse(random(0, width), random(0, height), random(1, 3), random(1, 3));\n  }\n}\n\nfunction mousePressed() {\n  redraw();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

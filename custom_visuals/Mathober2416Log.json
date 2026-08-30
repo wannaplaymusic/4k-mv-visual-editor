@@ -1,0 +1,22 @@
+{
+    "name": "Mathober2416Log",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:25:29",
+    "url": "https://openprocessing.org/@epi/2408726",
+    "code": "// === Tab: mySketch ===\n/*\nDay #16/24: Log\nhttps://openprocessing.org/sketch/2408726\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nlet S;\n\nfunction setup() {\n\tS = ~~(max(windowWidth, windowHeight) / ~~random(3, 13));\n  createCanvas(S*~~(windowWidth/S), S*~~(windowHeight/S)); // (S = max(windowWidth, windowHeight)), S\n\tbackground(2, 2, 8);\n\tdescribe(\"grid of intersecting lines forming a grid with log distances\");\n  \n  noFill();\n  strokeWeight(1);\n\t// colorMode(HSB, 1);\n  loop();\n}\n\nfunction draw() {\n\tblendMode(BLEND);\n  // background(\"rgb(0, 0, 8)\");\n\tbackground(2, 2, 8)\n\t// blendMode(ADD);\n\n\t// horiz\n\tstroke(\"cyan\")\n  for (let y = 0; y < height; y += S) {\n\t\tlet pos = y;\n\t\tlet target = y+S;\n\t\tfor (let i = 0; i < 7; i++) {\n\t\t\tline(0, pos, width, pos);\n\t\t\tpos = lerp(pos, target, 0.3);\n\t\t}\n\t}\n\tstroke(\"purple\")\n\tfor (let x = 0; x < width; x += S) {\n\t\tvar pos = x;\n\t\tvar target = x+S;\n\t\tfor (let i = 0; i < 7; i++) {\n\t\t\tline(pos, 0, pos, height);\n\t\t\tpos = lerp(pos, target, 0.3);\n\t\t}\n\t}\n\n  // noLoop() removed for animation\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

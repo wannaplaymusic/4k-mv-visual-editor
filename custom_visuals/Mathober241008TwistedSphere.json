@@ -1,0 +1,25 @@
+{
+    "name": "Mathober241008TwistedSphere",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:30:27",
+    "url": "https://openprocessing.org/@epi/2385842",
+    "code": "// === Tab: mySketch ===\n/*\nDay #8 Twisted Sphere\nhttps://openprocessing.org/sketch/2385842\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nconst NUM = 19;\n\nfunction setup() {\n  createCanvas((S = max(windowWidth, windowHeight)), S, WEBGL);\n  describe(\"layers of boxes rotating in different speeds and different sizes forming a twisted sphere with a gradient from top purple to bottom blue\");\n  frameRate(60);\n  noStroke();\n}\n\nfunction draw() {\n  background(0, 0, 8);\n  rotateX(-0.4);\n  orbitControl();\n\n  // lights();\n  ambientLight(255, 255, 255);\n  spotLight(\n    color(\"white\"),\n    createVector(height / 4, -height, height),\n    createVector(-height / 4, height / 2, -height / 2).normalize(),\n    PI / 3,\n    10\n  );\n\n  const RAD = max(width, height) * 0.5;\n  for (let i = 0; i < NUM; i++) {\n    push();\n    translate(0, (i * RAD) / NUM - RAD / 2, 0);\n    rotateY(-frameCount / 43 + (i / sin(frameCount / 321)) * PI);\n    const ang = PI * (map(i, 0, NUM - 1, 1, NUM * 2 - 1) / (NUM * 2));\n    const rd = sin(ang) * RAD;\n\t\tconst wh = Math.sqrt(rd*rd+rd*rd)/1.5;\n    fill(64, 8, 64 + (NUM - i) * (192 / NUM), 128);\n    box(wh, RAD / NUM, wh);\n    pop();\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Late Commute.mp4"
+    ]
+}

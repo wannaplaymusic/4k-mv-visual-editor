@@ -1,0 +1,22 @@
+{
+    "name": "Mathober24107FlexibleGraph",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:10:35",
+    "url": "https://openprocessing.org/@epi/2385182",
+    "code": "// === Tab: mySketch ===\n/*\nDay #7: Flexible Graph\nhttps://openprocessing.org/sketch/2385182\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\n// size, num, layers\nlet S, N = 5, L = 3;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tdescribe(\"overlapping layers of grid of colored nodes in different rotations with same distace to the next node (trapez)\");\n  frameRate(60);\n  S = ~~(max(width, height) / N);\n  stroke(\"rgba(245,245,220,0.25)\");\n  strokeWeight(2);\n  noStroke();\n  loop();\n  redraw();\n}\n\nfunction draw() {\n  background(32);\n  for (let i = 0; i < L; i++) {    \n    const vHor = createVector(S, 0).rotate((noise(S + i, 1, frameCount) - 0.5) * HALF_PI);\n    const vVer = createVector(0, S).rotate((noise(S, i, frameCount) - 0.5) * HALF_PI);\n    drawNodes(createVector(0, 0), vHor, vVer, i % 2 === 0);\n  }\n  L = random(1, 6);\n  // noLoop() removed for animation\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}\n\n\nfunction drawNodes(p, vHor, vVer, PRPL = true) {\n  let p1, p2, p3, p4;\n\n  p1 = p.copy();\n  p2 = p1.copy().add(vHor);\n  p4 = p2.copy().add(vVer);\n  while (p1.y < height + S) {\n    p3 = p1.copy().add(vVer);\n    // console.log(` #p1 ${p1.y}`)\n    p = p3.copy(); // next row starts with p3\n    while (p1.x < width + S) {      \n      p2 = p1.copy().add(vHor);\n      p3 = p1.copy().add(vVer);\n      p4 = p2.copy().add(vVer);\n      \n      // console.log(`p(${nf(p1.x, 0, 2)},${nf(p1.y, 0, 2)}) `);\n      line(p1.x, p1.y, p2.x, p2.y);\n      line(p1.x, p1.y, p3.x, p3.y);\n      \n      fill(~~(32, noise(p1.x/333+234234)*256), ~~(noise(p1.y/222+423423)*256), 64)\n      if (PRPL) fill(~~(noise(p1.x/333+234234)*256), 32, ~~(noise(p1.y/222+423423)*256), 64)\n      \n      beginShape();\n      vertex(p1.x, p1.y);\n      vertex(p2.x, p2.y);\n      vertex(p4.x, p4.y);\n      vertex(p3.x, p3.y);\n      endShape(CLOSE);\n      p1 = p2.copy();\n    }   \n    p1 = p.copy(); // next row starts with p / p3\n  }\n\n  // p4 = p2.copy().add(vVer);\n\n  // line(p2.x, p2.y, p4.x, p4.y);\n  // line(p3.x, p3.y, p4.x, p4.y);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

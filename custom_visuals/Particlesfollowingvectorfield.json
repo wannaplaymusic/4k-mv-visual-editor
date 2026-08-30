@@ -1,0 +1,22 @@
+{
+    "name": "Particlesfollowingvectorfield",
+    "author": "garabatospr",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:37:41",
+    "url": "https://openprocessing.org/@garabatospr/935346",
+    "code": "// === Tab: mySketch ===\n// color palette\n\nvar colors   =  [\"#ff0000\",\"#feb30f\",\"#0aa4f7\",\"#000000\",\"#ffffff\"];\n\n// set weights for each color \n\nvar weights  = [1,1,1,1,1,5];             \n\n// scale of the vector field \n// smaller values => bigger structures  \n// bigger values  ==> smaller structures \n\nvar myScale = 3;\n\n// number of drawing agents \n\nvar nAgents = 2000;\n\nlet agent = [];\n\n// set spinning direction (plus or minus)\n\nvar direction = -1;\n\nvar par = 0;\n\nfunction setup() {\n  createCanvas(800,800);\n\t//createCanvas(1920,1080);\n  colorMode(HSB, 360, 100, 100);\n  strokeCap(SQUARE);\n\t//pixelDensity(1);\n\n  background(100);\n  \n  for(let i=0;i < nAgents;i++)\n  {\n    agent.push(new Agent());\n  }\n  \n}\n\nfunction draw() {\n\n  for(let i=0;i < agent.length;i++)\n  {\n    agent[i].update();\n  }\n    \n}\n\n// select random colors with weights from palette \n\nfunction myRandom(colors,weights)\n{ \n    let tt = 0;\n    let sum = 0;\n \n    for(let i=0;i < colors.length; i++)\n    {\n      sum += weights[i];\n    }\n \n    let rr = random(0,sum);\n \n    for(let j=0;j < weights.length;j++)\n    {\n \n      if (weights[j] >= rr)\n      {\n        return colors[j];\n      }\n        rr -= weights[j];\n    }\n \n    return tt;\n }\n\n// paintining agent \n\n\nclass Agent {\n  constructor()\n  {\n    this.p     = createVector(random(width),random(height));\n  \n    this.pOld  = createVector(this.p.x,this.p.y);\n    \n    this.step  =2;\n    \n    let temp   =  myRandom(colors,weights);\n    \n    this.color = color(hue(window.color(temp)) + randomGaussian()*10,\n                       saturation(window.color(temp)) + randomGaussian()*10,\n                       brightness(window.color(temp)) - 10,random(10,90));\n    \n    this.strokeWidth = random(10,20);\n    \n    //this.strokeWidth = 2;\n    \n    this.isOutside = false; \n  }\n  \n  update() {\n\n\t //print(this.p.x);\n    \n    this.p.x += direction*vector_field(this.p.x,this.p.y).x*this.step;\n    this.p.y += direction*vector_field(this.p.x,this.p.y).y*this.step;\n    \n    strokeWeight(this.strokeWidth);\n    stroke(this.color);\n\n    \n    line(this.pOld.x,this.pOld.y,this.p.x,this.p.y);\n    \n    this.pOld.set(this.p);\n    \n    //this.isOutside = false;\n    \n  }\n    \n}\n\n// vector field function \n// the painting agents follow the flow defined \n// by this function \n\n\nfunction vector_field(x, y) {\n\n\tx = map(x, 0, width, -myScale, myScale);\n\ty = map(y, 0, height, -myScale, myScale);\n\n\tlet k1 = 5;\n\t//let k1 = map(x,-myScale,myScale,0,5);\n\tlet k2 = 3;\n  //let k2 = map(x,-myScale,myScale,0,5);\n\t\n\tlet u = sin(k1 * y) + cos(k2 * y);\n\tlet v = sin(k2 * x) - cos(k1 * x);\n\n\n\treturn createVector(u, v);\n}\n\n\n\n\n// function to select \n\nfunction myRandom(colors,weights)\n{ \n    let tt = 0;\n    let sum = 0;\n \n    for(let i=0;i < colors.length; i++)\n    {\n      sum += weights[i];\n    }\n \n    let rr = random(0,sum);\n \n    for(let j=0;j < weights.length;j++)\n    {\n \n      if (weights[j] >= rr)\n      {\n        return colors[j];\n      }\n        rr -= weights[j];\n    }\n \n    return tt;\n }",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

@@ -1,0 +1,22 @@
+{
+  "name": "TriquidRemix_1",
+  "author": "u110137",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 03:57:49",
+  "url": "https://openprocessing.org/@u110137/2461543",
+  "code": "// === Tab: mySketch ===\n// This is a fork of svagozio's beautiful Triquid sketch.\n// Just playing around here with some simple user controls!\n// Move the mouse and click to adjust parameters! :)\n\n/*\nTriquid (trigonometric liquid)\n#WCCChallenge Liquid 21.11.24\nhttps://openprocessing.org/sketch/2460217/\nThis is a particular interval of the equation that \nI have already partially used in the sketch from \nwhich I made the \"fork\". \nThis trigonometric equation also has other different \nand interesting intervals, but I highlight this one \nbecause it is very \"fluid\" ... or rather \"liquid\"\n*/\nlet j = 0;\nlet sequ_count = 0;\nlet plus_j = 0;\nlet plus_radnt = 0;\nlet scolor;\nlet ydiv=10000;\n\nfunction setup() {\n\tcreateCanvas(0.95 * windowWidth, 0.95 * windowHeight);\n\tscolor = color(random(155, 255), random(155, 255), random(155, 255));\n\tj = 2.3;\n\tbackground(0);\n\n}\n\nfunction draw() {\n\tplus_radnt = lerp(plus_radnt, map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 0.00001, 0.000001), 0.1);\n\tplus_j = lerp(plus_j, map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, -0.00003, 0.00003), 0.1);\n\tydiv = lerp(ydiv, map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 1000,1000000),0.1);\n\tfill(0, 15);\n\tnoStroke();\n\trect(0, 0, width, height);\n\tstroke(scolor);\n\tstrokeWeight(height / 300);\n\tpush();\n\ttranslate(width / 2, height / 2);\n\tlet radnt = 0;\n\tlet ini = -width / 2;\n\tj += plus_j;\n\tfor (let stp = ini; stp < 0; stp += 1) {\n\t\tradnt += plus_radnt;\n\t\tlet x = stp + stp * sin(radnt);\n\t\tif (j * x != HALF_PI) {\n\t\t\tlet y = pow(x, 3) * tan(j * x);\n\t\t\tlet x_for_canvas = x;\n\t\t\tlet y_for_canvas = y / ydiv;\n\t\t\tpoint(x_for_canvas, y_for_canvas);\n\t\t\tpoint(-x_for_canvas, y_for_canvas);\n\t\t}\n\t}\n\tpop();\n}\n\nfunction mousePressed() {\n\tj = random(-5, 5);\n\tscolor = color(random(155, 255), random(155, 255), random(155, 255));\n}\n\nfunction keyPressed() {\n\tif (keyCode == 49) j = -TAU;\n\tif (keyCode == 50) j = -PI;\n\tif (keyCode == 51) j = -HALF_PI;\n\tif (keyCode == 52) j = 0;\n\tif (keyCode == 53) j = HALF_PI;\n\tif (keyCode == 54) j = PI;\n\tif (keyCode == 55) j = TAU;\n\tif (keyCode == 56) j = 3*PI;\n\tif (keyCode == 56) j = 4*PI;\n\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

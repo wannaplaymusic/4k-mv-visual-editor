@@ -1,0 +1,25 @@
+{
+    "name": "FrozenFractalAdjustableShader_1",
+    "author": "u202203",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 02:49:48",
+    "url": "https://openprocessing.org/@u202203/1304975",
+    "code": "// === Tab: mySketch ===\nvar Shader;\nvar palette;\nfunction preload(){\n  Shader=getShader(this._renderer);\n\tpalette = loadImage(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAAXNSR0IArs4c6QAAAGRJREFUOE9jZGBg+M8ABiwMDAwcSDQyGyZHSIyQPDZzOJCsZoE6AUaDnIRDDGwUmjqYGNwrUHmQOnQxFoQc3FVIykE+AWNai7EwMPxhQOAfFLBB5gyE/uHlAeTYGM5sUEphYAAAjJafAWvSA74AAAAASUVORK5CYII=\");\n}\nfunction setup() {\n\tpixelDensity(1);\n  createCanvas(windowWidth,windowHeight,WEBGL);\n  noStroke();\nwindow.simulatedMouseX = 168/1536*width;\nwindow.simulatedMouseY = 295/672*height;\n}\nfunction draw() {\n  shader(Shader);\n\tShader.setUniform('pal', palette);\n\tShader.setUniform('c', [(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/width*2-1,(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))/height*2-1]);\n  rect(0,0,width,height);\n}\nfunction getShader(_renderer) {\n\tconst vert=`\n\t\tprecision highp float;\n\t\tattribute vec3 aPosition;\n\t\tattribute vec2 aTexCoord;\n\t\tvarying vec2 vTexCoord;\n\t\tfunction main() {\n\t\t\tvTexCoord=aTexCoord;\n\t\t\tvec4 positionVec4=vec4(aPosition,1.);\n\t\t\tpositionVec4.xy=positionVec4.xy*2.-1.; \n\t\t\tgl_Position=positionVec4;\n\t\t}\n\t`;\n\tconst frag=`\n\t\tprecision highp float;\n\t\tvarying vec2 vTexCoord;\n\t\tuniform sampler2D pal;\n\t\tuniform vec2 c;\n\t\tconst var zh=${windowHeight/windowWidth};\n\t\tfunction main() {\n\t\t\tvec2 z=vec2(5.*vTexCoord.x-2.5,(5.*vTexCoord.y-2.5)*zh);\n\t\t\tvar iter=100;\n\t\t\tfor(var i=0;i<100;i++) {\n\t\t\t\tvar x=(z.x+z.y)*(z.x-z.y)+c.x;\n\t\t\t\tvar y=2.*z.y*z.x+c.y;\n\t\t\t\tif((x*x+y*y)>4.) {iter=i;break;}\n\t\t\t\tz.x=x;\n\t\t\t\tz.y=y;\n\t\t\t}\n\t\t\tgl_FragColor = texture2D(pal,vec2(iter==100?0.0:float(iter)/100.0,1));\n\t\t}\n\t`;\n\treturn createShader(vert, frag);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Late Commute.mp4"
+    ]
+}

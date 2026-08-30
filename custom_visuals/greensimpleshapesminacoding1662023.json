@@ -1,0 +1,25 @@
+{
+    "name": "greensimpleshapesminacoding1662023",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:18:05",
+    "url": "https://openprocessing.org/@epi/1956629",
+    "code": "// === Tab: mySketch ===\n/*\n\tgreen: simple shapes // 16.6.2023\n\t#minacoding #p5js #creativecoding #generativeart #dailycoding\n */\n\nlet pa, minwh, w_h, h_h; // width / height half\nlet clrHue = 42; // 35; // green hue\nlet clrGreen; // p5js color\nlet objs;\n\nfunction setup() {\n\tconst wantedAR = 4 / 3;\n\tlet ar = windowWidth / windowHeight;\n\tlet w = windowWidth,\n\t\th = windowWidth / wantedAR;\n\tif (h > windowHeight) {\n\t\th = windowHeight\n\t\tw = windowHeight * wantedAR;\n\t}\n\tminwh = min(w, h);\n\tcreateCanvas(w, h); // createCanvas(minwh, minwh);\n\tpixelDensity(1);\n\tpa = minwh * 0.05; // padding\n\tframeRate(30);\n\tw_h = width * 0.5;\n\th_h = height * 0.5;\n\tcolorMode(HSB, 100);\n\n\t// define objs\n\tclrGreen = color(clrHue, 100, 100)\n\tobjs = [];\n\tobjs.push(new ObjCircle(w_h - 10, h_h, 0, minwh * 0.3, clrGreen, false));\n\tobjs.push(new ObjCircle(w_h + 10, h_h, PI, minwh * 0.3, color(0), true));\n\tobjs.push(new ObjRect(w_h, h_h, PI, minwh * 0.3, clrGreen));\n}\n\nfunction windowResized() {\n\tsetup();\n\tloop();\n}\n\nfunction draw() {\n\tbackground(0);\n\tnoFill();\n\n\t// moving lines\n\tpush();\n\tstroke(clrHue + 5, 75, 25); // stroke(clr, 75, 15);\n\tstrokeWeight(2)\n\tconst raster = 12;\n\tfor (let y = -height, i = 0; y < height - pa; y += raster, i++) {\n\t\t// for (let y = pa, i = 0; y < height - pa; y += raster, i++) {\n\t\tlet res1 = 0.1,\n\t\t\tres2 = 0.12;\n\t\tlet val1 = map(y, -height, height, minwh * 0.05, minwh * 0.2);\n\t\tlet val2 = map(y, -height, height, minwh * 0.2, minwh * 0.06);\n\t\tdrawingContext.setLineDash([sin((i + frameCount) * res1) * val1, cos((i + frameCount) * res2) * val2]);\n\t\tlet dy = frameCount % raster\n\t\tline(pa, y - dy, width - pa, y - dy);\n\t}\n\tpop();\n\n\t// objects\n\tobjs = [...objs].sort((a, b) => a.z - b.z);\n\tfor (let o of objs) {\n\t\to.update();\n\t\to.show();\n\t}\n\n\t// frame\n\tstroke(0); // stroke(clr, 75, 15);\n\tstrokeWeight(pa)\n\trect(pa * 0.5, pa * 0.5, width - 1 - pa, height - 1 - pa);\n\tstroke(clrHue, 75, 35); // stroke(clr, 75, 15);\n\tstrokeWeight(6)\n\trect(pa, pa, width - 1 - 2 * pa, height - 1 - 2 * pa);\n\n\t// // noLoop() removed for animation\n}\n\nclass ObjCircle {\n\tconstructor(x, y, a, d, c, o = false) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.z = a;\n\t\tthis.a = a;\n\t\tthis.d = d;\n\t\tthis.c = c;\n\t\tthis.o = o; // outline + dashed\n\t}\n\tupdate() {\n\t\tconst r = w_h - pa - this.d * 0.5;\n\t\tthis.x = cos(this.a) * r + w_h;\n\t\tthis.a = (this.a + 0.1) % TWO_PI;\n\t\tthis.z = this.a;\n\t}\n\tshow() {\n\t\tpush()\n\t\tstrokeWeight(1);\n\t\tstroke(clrGreen);\n\t\tif (this.o) {\n\t\t\tdrawingContext.setLineDash([2, 10]);\n\t\t}\n\t\tnoStroke();\n\t\tfill(0); // fill(this.c);\n\t\ttranslate(this.x, this.y);\n\t\tcircle(0, 0, this.d)\n\t\t// if (this.o) {\n\t\t\tstroke(clrGreen);\n\t\t\tvar raster = this.o ? 10 : 3;\n\t\t\tconst radius = this.d * 0.5;\n\t\t\tfor (let y = -radius; y < radius; y += raster) {\n\t\t\t\tfor (let x = -radius; x < radius; x += raster) {\n\t\t\t\t\tif (dist(x, y, 0, 0) < radius) point(floor(x), floor(y));\n\t\t\t\t}\n\t\t\t}\n\t\t// }\n\t\tpop();\n\t}\n}\n\nclass ObjRect {\n\tconstructor(x, y, a, d, c) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.z = a;\n\t\tthis.a = a;\n\t\tthis.d = d;\n\t\tthis.c = c;\n\t}\n\tupdate() {\n\t\tvar r = h_h - pa - this.d * 0.5;\n\t\tthis.y = sin(this.a) * r + h_h;\n\t\tthis.a = (this.a + 0.05) % TWO_PI;\n\t}\n\tshow() {\n\t\tpush()\n\t\tstrokeWeight(1);\n\t\tstroke(this.c);\n\t\tnoStroke()\n\t\tfill(0);\n\t\trectMode(CENTER)\n\t\ttranslate(this.x, this.y);\n\t\trotate(this.a);\n\t\t// drawingContext.shadowColor = \"green\";\n\t\t// drawingContext.shadowBlur = 100;\n\t\trect(0, 0, this.d, this.d)\n\n\t\tvar raster = 4;\n\t\tstrokeWeight(1);\n\t\tstroke(this.c);\n\t\tfor (let y = -this.d * 0.5; y < this.d * 0.5; y += raster) {\n\t\t\tfor (let x = -this.d * 0.5; x < this.d * 0.5; x += raster) {\n\t\t\t\tpoint(floor(x), floor(y));\n\t\t\t}\n\t\t}\n\t\tpop();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Synthetic Breath.mp4"
+    ]
+}

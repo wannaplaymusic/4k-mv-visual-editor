@@ -1,0 +1,22 @@
+{
+    "name": "Spiraldeviation_1",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:18:37",
+    "url": "https://openprocessing.org/@epi/2730486",
+    "code": "// === Tab: svg ===\nfunction saveFile(file_name) {\n\tsave(svgStr.split(\"\\n\"), file_name+'.svg.txt');\n\t// console.log(svgStr);\n}\n\n// === Tab: mySketch ===\nconst POST_PROCESSING = false;\nconst { Point, Line, Polygon } = EpiShapeSvg;\nconst { EpiColors } = EpiColorsPckg;\nconst PENS = [\"red\", \"blue\", \"black\"]; // \nlet svgStr;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tframeRate(30);\n\n\tbackground(212);\n\tstroke(0);\n\tstrokeWeight(3.75);\n\tnoFill();\n}\n\nfunction draw() {\n\t// blendMode(BLEND);\n\tbackground(212);\n\t// blendMode(ADD);\n\ttranslate(width/2, height/2);\n\t\n\tsvgStr = `<svg width=\"${width}\" height=\"${height}\" xmlns=\"http://www.w3.org/2000/svg\">\\n`;\n\tsvgStr += `<g id=\"none\" stroke=\"0\" fill=\"none\">\\n`;\n\tfor (let i = 0; i < PENS.length; i++) {\n\t\tstroke(EpiColors.getColor(PENS[i], 160));\n\t\tdrawSpiral(11+i*1, 5);\n\t}\n\tsvgStr += `</g>\\n`;\n\tsvgStr += `</svg>`;\n\t\n\tif (POST_PROCESSING) {\t\t\n\t\ttranslate(-width/2, -height/2);\n\t\tconst imgFull = get(0, 0, width, height)\n\t\tconst NN = 15;\n\t\tconst WW = Math.ceil(width / NN);\n\t\tfor (let i = 1; i < NN; i++) {\n\t\t\tconst j = i % 2 ? i + 1 : i - 1; // 2, 1, 4, 3, 6, 5, ...\n\t\t\t// console.log(`${i}, ${j}`)\n\t\t\tconst x = j * WW;\n\t\t\timage(imgFull.get(x, 0, min(WW, width+WW-x), height), i*WW, 0)\n\t\t}\n\t}\n\t\n\t// // noLoop() removed for animation\n}\n\nfunction drawSpiral(i, len = 2) {\n\tconst ptsArr = [];\n\tconst nf = max(width, height)/5; // 45; // noise factor\n\tconst nl = nf/5; // 20; // len of dev-vector\n\tlet dmax = max(width, height) * 0.9;\n\tlet d = dmax;\n\tlet a = -frameCount/60 + i;\n\twhile(d > len) {\n\t\tconst f = map(d, len, dmax, 0, 1); // pow(1 - len/d, 2); // 1..0\n\t\t// console.log(`${f}, ${d}, ${len}`)\n\t\tlet u = PI * d;\n\t\tconst da = len/u * TAU;\n\t\ta += da;\n\t\td -= da * len;\n\t\tvar x = cos(a) * d * 0.5;\n\t\tconst y = sin(a) * d * 0.5;\n\t\tconst n = noise(x/300 + i, y/300 + i, frameCount/300) * TAU;\n\t\tconst scl = len;\n\t\t\n\t\t/*\n\t\tconst dx = scl * cos(n) * n;\n\t\tconst dy = scl * sin(n) * (1-n);\n\t\tvertex(x + dx, y + dy);\n\t\t*/\n\t\t\n\t\tconst dv = createVector(nl*f, 0);\n\t\tdv.rotate(noise(i+(width+x)/nf, i+(height+y)/nf, i+frameCount/222)*TAU)\n\t\t// vertex(x + dv.x, y + dv.y);\n\t\tptsArr.push({x: x + dv.x, y: y + dv.y});\n\t}\n\t\n\tconst spiralPoly = new Polygon(ptsArr);\n\tspiralPoly.drawShape();\n\t\n\tsvgStr += spiralPoly.toSVG() + \"\\n\";\n}\n\nfunction mousePressed() {\n\tif (mouseButton !== RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > width*0.1) setup();\n}\n\nfunction keyPressed() {\n\tif (key === \"s\") saveFile(\"epi_spiral_noise\")\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-shapesvg@v0.0.15/dist/p5-epi-shapesvg.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

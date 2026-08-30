@@ -1,0 +1,22 @@
+{
+  "name": "MyWay",
+  "author": "u139968",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 17:24:50",
+  "url": "https://openprocessing.org/@u139968/1074325",
+  "code": "// === Tab: mySketch.js ===\nlet scribble = new Scribble(); // global mode\nlet som;\nlet amp;\nlet m = 1.25;\n\nlet i = 0;\nlet f = 60;\nlet inc = 1;\nlet fade = 0;\n\nfunction preload() {\n  som = loadSound('https://openprocessing.org/sketch/1074325/files/myway_helio.mp3');\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  angleMode(DEGREES);\n\n  scribble.roughness = 1; //distortion of lines\n\n  som.play();\n  amp = new p5.Amplitude();\n}\n\nfunction draw() {\n  background(220);\n\n  strokeWeight(3 * m);\n\n  let vol = amp.getLevel();\n  translate(width / 2, 0);\n  //corpo\n  push();\n  randomSeed(30); //same every render step\n  fill(0);\n  scribble.scribbleEllipse(0, 700 * m, 360 * m, 600 * m);\n  //cabeca\n  translate(0, (100 - 20 * vol) * m);\n  fill(255, 150, 0);\n  scribble.scribbleEllipse(0, 200 * m, 200 * m, 400 * m);\n  //olhos\n  fill(255);\n  scribble.scribbleEllipse(-45 * m, 160 * m, 20 * m, (20 - vol * 100) * m);\n  scribble.scribbleEllipse(45 * m, 160 * m, 20 * m, (20 - vol * 100) * m);\n  //nariz\n  scribble.scribbleLine(0, 150 * m, -30 * m, 245 * m);\n  scribble.scribbleLine(0, 245 * m, -30 * m, 245 * m);\n  //boca\n  fill(0);\n  translate(-25 * m, 30 * m);\n  rotate(-5);\n  scribble.scribbleEllipse(0, 280 * m, 100 * m - (vol * 300) * m, (vol * 430) * m);\n  pop();\n\n  //fade\n  push();\n  noStroke();\n  fill(0, 255 - fade);\n  rect(-width / 2, 0, width, height);\n  fade++;\n  pop();\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

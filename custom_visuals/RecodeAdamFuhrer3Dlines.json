@@ -1,0 +1,22 @@
+{
+    "name": "RecodeAdamFuhrer3Dlines",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:12:45",
+    "url": "https://openprocessing.org/@epi/2452936",
+    "code": "// === Tab: mySketch ===\n// https://x.com/adamfuhrer/status/1856039844314788103\n\nconst CLRS = [\"#0090e0\", \"#e0b000\", \"#b82828\"];\nconst NUM_RECTS = 24;\nconst NUM_LINES = 12;\nconst PTS = [29.5, 43];\n\nfunction setup() {\n  createCanvas(~~((windowHeight * 210) / 297), windowHeight);\n\tdescribe(\"recode Adam Fuhrer: colored lines forming 3d planes consisting of 12 lines\");\n\tframeRate(5);\n  noFill();\n  \n\tblendMode(BLEND);\n  background(\"#cbc8be\");\n  \n\tblendMode(MULTIPLY);\n\tdrawPoints();\n}\n\nfunction drawPoints() {\n  // points\n  const numX = PTS[0] + 1;\n  const numY = PTS[1] + 1;\n  stroke(\"grey\");\n  strokeWeight(2);\n  for (j = fract(numY); j < numY; j++) {\n    for (i = fract(numX); i < numX; i++) {\n      if (i === 0 || j === 0) continue;\n      const x = map(i, 0, numX, 0, width);\n      const y = map(j, 0, numY, 0, height);\n      point(x, y);\n    }\n  }\n}\n\nfunction draw() {\n\tif (frameCount > NUM_RECTS + 0 * NUM_LINES) {\n\t\t// noLoop() removed for animation\n\t\treturn;\n\t}\n\t\n  // trapez\n  const dst = Math.round(width / 10);\n  const xStr1 = dst;\n  const xEnd1 = width - xStr1;\n  const xStr2 = dst * 2;\n  const xEnd2 = width - xStr2;\n  const yStr1 = dst * 2;\n  const yEnd1 = height - yStr1;\n  const yStr2 = dst * 3;\n  const yEnd2 = height - yStr2;\n  // for (let i = 0; i < NUM_RECTS; i++) {\n\t\tconst i = ~~ (frameCount / 1); // NUM_LINES\n    const x1 = map(i, 0, NUM_RECTS - 1, xStr1, xEnd1);\n    const x2 = map(i, 0, NUM_RECTS - 1, xStr2, xEnd2);\n    const y1 = map(i, 0, NUM_RECTS - 1, yStr1, yEnd1);\n    const y2 = map(i, 0, NUM_RECTS - 1, yStr2, yEnd2);\n    stroke(CLRS[i % CLRS.length]);\n    for (let j = 0; j < NUM_LINES; j++) {\n\t\t\t// const j = ~~ (frameCount % NUM_LINES)\n      const f = j / (NUM_LINES - 1);\n      const xs = lerp(xStr1, xStr2, f);\n      const xe = lerp(xEnd1, xEnd2, f);\n      var y = lerp(y1, y2, f);\n\t\t\tconst dy = 0; // (i !== 7) ? 0 : (height/2+(height/2-y)-y) ;\n      dLine(xs, y, xe, y + dy);\n    }\n  // }\n}\n\nfunction dLine(x1, y1, x2, y2) {\n  var dst = dist(x1, y1, x2, y2);\n  // line(x1, y1, x2, y2);\n  for (let i = 0; i <= dst; i++) {\n    var f = i/dst;\n    var x = lerp(x1, x2, f);\n    var y = lerp(y1, y2, f);\n    const t = abs(0.5-f) * 3 + 1.5; // 3--1.5--3\n    strokeWeight(t);\n    point(x, y);\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

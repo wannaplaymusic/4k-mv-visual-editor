@@ -1,0 +1,25 @@
+{
+    "name": "flatneonWCCChallenge08082023",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:16:13",
+    "url": "https://openprocessing.org/@epi/1982578",
+    "code": "// === Tab: mySketch ===\n/*\n\tFlat // #WCCChallenge 08.08.2023\n\t#p5js #creativecoding #generativeart \n\n\tDear Raph and fellow creative coders,\n\t\n\t\n*/\n\n\nlet bars = [];\nlet clrs = [];\nlet numMove;\nlet tileS;\n\nfunction setup() {\n\tconst minWH = max(windowWidth, windowHeight)\n\tcreateCanvas(windowWidth, windowHeight); // (minWH, minWH);\n\tbackground(0)\n\tpixelDensity(1);\n\tframeRate(30);\n\t\n\t// clrs = [\"white\", \"cyan\", \"blue\", \"purple\", \"red\", \"orange\", \"yellow\"];\n\t// https://www.color-hex.com/color-palette/61235\n\tclrs = [\"#711c91\", \"#ea00d9\", \"#0abdc6\", \"#133e7c\"];\n\t\n\t// const minWH = max(width, height);\n\ttileS = minWH * 1 / 6;\n\t\n\tbars = [];\n\tfor (let y = (height - minWH + tileS) * 0.5; y <= height; y += tileS) {\n\t\tfor (let x = (width - minWH + tileS) * 0.5; x <= width; x += tileS) {\n\t\t\t// bars.push(new NeonBar(x, y, random(TWO_PI), tileS, random(clrs), 100));\t\n\t\t}\n\t}\n\tfor (let i = 0; i < 20; i++) {\n\t\tconst x = floor(random(-1, width/tileS + 1));\n\t\tconst y = floor(random(-1, height/tileS + 1));\n\t\tconst f = floor(random(1, 3));\n\t\tbars.push(new NeonBar(tileS * x, tileS * y, 0, tileS * f, random(clrs), 100));\t\n\t}\n\t/*\n\tbars.push(new NeonBar(tileS * 2, tileS, 0, tileS * 2, random(clrs), 100));\t\n\tbars.push(new NeonBar(tileS * 2, tileS * 2, 0, tileS * 2, random(clrs), 100));\t\n\tbars.push(new NeonBar(tileS, tileS * 1.5, HALF_PI, tileS, random(clrs), 100));\t\n\tbars.push(new NeonBar(tileS * 3, tileS * 1.5, HALF_PI, tileS, random(clrs), 100));\t\n\t*/\n\t\n\t// duplicate existing to move\n\tnumMove = bars.length;\n\tfor (let i = 0; i < numMove; i++) {\n\t\tbars.push(bars[i].copy());\n\t}\n\t\n\tbackground(\"#091833\");\n}\n\nfunction draw() {\n\tbackground(9,24,51, 64); // 0, 0, 12, 64);\n\t\n\ttranslate(width/2, height/2)\n\trotate(frameCount * 0.00612)\n\ttranslate(-width/2, -height/2)\n\t\n\tfor (let i = 0; i < bars.length; i++) {\n\t// for (let b of bars) {\n\t\tconst b = bars[i];\n\t\tif (i < numMove) {\n\t\t\tb.update(0, tileS * tan(frameCount * 0.021), frameCount * -0.00612);\n\t\t} else {\n\t\t\tb.update(tileS * cos(frameCount * 0.0121), tileS * -sin(frameCount * 0.021), frameCount * 0.00312);\n\t\t}\n\t\tb.show();\n\t}\n\n\t// // noLoop() removed for animation\n}\n\nclass NeonBar {\n\tconstructor(x, y, a, l, clr, int, act = true) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.a = a;\n\t\tthis.l = l;\n\t\tthis.clr = clr;\n\t\tthis.int = int;\n\t\tthis.act = act;\n\t\tthis.n = 1;\n\t\tthis.ox = 0;\n\t\tthis.oy = 0;\n\t\tthis.oa = 0;\n\t}\n\n\tupdate(ox = 0, oy = 0, oa = 0) {\n\t\tthis.n = noise(this.x * 0.01 + frameCount * 0.021 + oa, this.y * 0.03 - oa);\n\t\tthis.act = this.n < 0.65\n\t\tif (false && !this.act) {\n\t\t\tthis.ox = 0;\n\t\t\tthis.oy = 0;\n\t\t\tthis.oa = 0;\n\t\t\treturn;\n\t\t}\n\t\tthis.ox = ox;\n\t\tthis.oy = oy;\n\t\tthis.oa = oa;\n\t\t// this.a = floor(4  * noise(this.x * 0.01 + frameCount * 0.021, this.y * 0.0273)) / 4 * TWO_PI + PI * 0.25;\n\t\t// this.act = noise(this.x * 0.01 + frameCount * 0.021, this.y * 0.03) < 0.45\n\t\t this.clr = clrs[floor(clrs.length * (noise(this.x * 0.02 + frameCount * 0.0121, this.y * 0.023)))];\n\t}\n\t\n\tcopy(ox = 0, oy = 0) {\n\t\tconst n = new NeonBar(this.x + ox, this.y + oy, this.a, this.l, this.clr, this.int, this.act);\n\t\treturn n;\n\t}\n\t\n\tshow() {\n\t\t// only draw active bars\n\t\t// if (!this.act) return;\n\t\t\n\t\tpush();\n\t\tnoFill();\n\t\tnoStroke();\n\t\ttranslate(this.x + this.ox, this.y + this.oy);\n\t\trotate(this.a + this.oa); \n\t\trectMode(CENTER);\n\t\t\n\t\tlet clr = color(red(window.color(this.clr)), green(window.color(this.clr)), blue(window.color(this.clr)), map(this.n, 0.25, 0.75, 0, 1) * 256);\n\t\tfill(clr);\n\t\tdrawingContext.shadowColor = clr; // this.clr;\n\t\tdrawingContext.shadowBlur = this.int;\n\t\trect(0, 0, this.l, this.l); // 4\n\n\t\tdrawingContext.shadowColor = color(255, this.n * 256); // \"white\";\n\t\tdrawingContext.shadowBlur = this.int * 0.5;\n\t\trect(0, 0, this.l, this.l);\n\t\t\n\t\tdrawingContext.shadowColor = clr; // this.clr;\n\t\tdrawingContext.shadowBlur = this.int * 0.25;\n\t\trect(0, 0, this.l, this.l);\n\t\t\n\t\tpop();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Lost Signal.mp4"
+    ]
+}

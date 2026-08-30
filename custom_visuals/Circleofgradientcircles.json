@@ -1,0 +1,22 @@
+{
+    "name": "Circleofgradientcircles",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:31:11",
+    "url": "https://openprocessing.org/@epi/2747868",
+    "code": "// === Tab: mySketch ===\nvar DF = 0.85, N = 10;\n// const { Point, Line, Polygon } = EpiShapeSvg;\nvar { EpiColors } = EpiColorsPckg;\nvar epiColors;\n\n\nfunction setup() {\n\tcreateCanvas(~~(windowHeight*210/297), windowHeight);\n\tnoFill();\n\tnoStroke();\n\tepiColors = new EpiColors();\n\t// epiColors.BG = EpiColors.getAdjustedBrightness(EpiColors.getAdjustedSaturation(epiColors.BG, 2), 0.35);\n\tloop();\n}\n\nfunction draw() {\n\tepiColors.getRandomPalette(true);\n\tbackground(epiColors.getAverageClr()); // \"#ffeeff\");\n\tfill(random(epiColors.palette));\n\t\n\tconst ctx = drawingContext;\n\tconst x = width/2, y = height*0.4;\n\tconst d = max(width, height) * DF;\n\t\n\tfill(0, 128);\n\tcircle(x, height-y, d)\n\t\n\tfor (let i = N; i > 0; i--) {\n\t\tpush();\n\t\t\tconst f = i/N;\n\t\t\tconst a = map(i, N, 1, HALF_PI, 0);\n\t\t\tconst r = d * f * 0.5\n\t\t\tconst dx = cos(a) * r;\n\t\t\tconst dy = sin(a) * r;\n\n\t\t\t// fill gradient\n\t\t\tconst linGrad = ctx.createLinearGradient(x-dx, y-dy, x+dx, y+dy);\n\t\t\tlinGrad.addColorStop(0, epiColors.palette[0]);\n\t\t\tlinGrad.addColorStop(0.5, epiColors.palette[1]);\n\t\t\tlinGrad.addColorStop(1, epiColors.palette[2]);\n\t\t\tctx.fillStyle = linGrad;\n\n\t\t\tcircle(x, y, d * f);\n\t\t\t// line(x, y, x+dx, y+dy);\n\t\tpop();\n\t}\n\t\n\t// noLoop() removed for animation\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > width*0.1) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

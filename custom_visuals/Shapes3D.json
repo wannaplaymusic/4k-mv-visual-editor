@@ -1,0 +1,25 @@
+{
+    "name": "Shapes3D",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:25:05",
+    "url": "https://openprocessing.org/@epi/2193259",
+    "code": "// === Tab: mySketch ===\nconst NUM = 15;\nconst SZE = 250;\nlet triangles;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tcolorMode(HSB);\n\t\n\tconst HUE_OFFSET = random(360);\n\tconst HUE_RANGE = random(30, 180);\n\ttriangles = [];\n\tfor (let i = 0; i < NUM; i++) {\n\t\tconst NUM_PIECES = random(3, 7)\n\t\tconst clr = {h: HUE_OFFSET + random(HUE_RANGE) + (180 * ((random() < 0.1) ? 1 : 0)), s: random(50, 75), b: random(35, 65)}\n\t\tconst points = [];\n\t\tfor (let j = 0; j < NUM_PIECES; j++) {\n\t\t\tconst x = random(-SZE, SZE);\n\t\t\tconst y = random(-SZE, SZE);\n\t\t\tconst z = random(-SZE, SZE);\n\t\t\tpoints.push({x, y, z})\n\t\t}\n\t\ttriangles.push({clr, points});\n\t}\n}\n\nfunction draw() {\n\tbackground(0);\n\torbitControl();\n\t\n\trotateY(frameCount * 0.0081)\n\trotateZ(frameCount * 0.0031)\n\t\n\tlights();\n\t\n\tfill(255, 64)\n\tstroke(\"white\")\n\tnoStroke();\n\tfor (let t of triangles) {\n\t\tvar clr = t.clr;\n\t\tconst pts = t.points;\n\t\tfill(clr.h, clr.s, clr.b, 0.25); // +frameCount\n\t\tbeginShape(TRIANGLE_STRIP);\n\t\tfor (let p of pts) {\n\t\t\tvertex(p.x, p.y, p.z)\n\t\t}\n\t\tendShape(CLOSE);\n\t}\n}\n\nfunction doubleClicked() {\n\tif (mouseButton === LEFT) {\n\t\tsetup();\n\t\treturn false;\t\t// prevent default\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Dub Techno Core Vibration.mp4"
+    ]
+}

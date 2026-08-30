@@ -1,0 +1,22 @@
+{
+  "name": "RadialWCCChallengePrideFlag25624",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:22:07",
+  "url": "https://openprocessing.org/@epi/2306604",
+  "code": "// === Tab: mySketch ===\n/*\n\tRadial #WCCChallenge Pride Flag 25.06.2024\n\thttps://openprocessing.org/sketch/2306604\n\t#generativeart #creativecoding #p5js\n\n  Dear Raph and creative coding community,\n\t\n\twas researching to implement alternative forms and finally made it radial.\n\tWas also looking into shape packing with circles, rectangles and triangles.\n\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\n\nconst sze = 20;\nlet minDist, maxDist;\nlet spots;\n// https://www.flagcolorcodes.com/pride-rainbow\nconst CLRS = [\"#E40303\", \"#FF8C00\", \"#FFED00\", \"#008026\", \"#004CFF\", \"#732982\"]\n\nfunction setup() {\n\tcreateCanvas(S=max(windowWidth, windowHeight), S);\n\tdescribe(\"animation of radial pride flag with altering dots color intensity per noise\")\n\tpixelDensity(1);\n\tminDist = max(width, height) / 2;\n\tmaxDist = sqrt(width * width + height * height);\n\tbackground(255);\n\t// colorMode(HSB);\n\t\n\tspots = [];\n\tspots.push({x: 0, y: 0});\n\tfor (let i = 0; i < 3; i++) {\n\t\tconst x = random(-width * 0.4, width * 0.4);\n\t\tconst y = random(-height * 0.4, height * 0.4);\n\t\tspots.push({x, y});\n\t}\n}\n\nfunction windowResized() {\n\tsetup();\n}\n\nfunction draw() {\n\tbackground(255);\n\ttranslate(width * 0.5, height * 0.5)\n\t\n\tconst numClrRange = 6;\n\tconst minSpots = minDist/sze - 2; // 2 extra \n\tconst maxSpots = maxDist/sze;\n\tfor (let sector = 0; sector < maxSpots; sector++) {\n\t\tconst amount = max(1, sector * 7);\n\t\tfor (let angle = 0; angle < TWO_PI; angle+=TWO_PI/amount) {\n\t\t\t// const sector = floor(random(max(width, height) / sze ));\n\t\t\t// const angle = floor(random(amount)) * TWO_PI / amount;\n\t\t\tvar x = cos(angle) * sector * sze\n\t\t\tvar y = sin(angle) * sector * sze\n\t\t\tlet weight = map(x + y, -maxDist, maxDist, -sze * 0.15, sze)\n\t\t\t// weight += noise((x + frameCount * 0.1) * 0.01, (y + frameCount * 0.2) * 0.02) * sze * 0.5 - sze * 0.25\n\t\t\tweight += noise(x * 0.01, y * 0.02, frameCount * 0.1) * sze * 0.5 - sze * 0.25\n\t\t\tif (weight > 0.5) {\n\t\t\t\t// const hue = ~~(sector / minSpots * numClrRange) * 360 / numClrRange;\n\t\t\t\t// stroke(color(hue, 75, 50));\n\t\t\t\tif (sector > minSpots) {\n\t\t\t\t\tstroke(\"rgb(203,211,214)\")\n\t\t\t\t} else {\n\t\t\t\t\tconst ci = ~~(sector / minSpots * numClrRange);\n\t\t\t\t\tstroke(CLRS[ci]);\n\t\t\t\t}\n\t\t\t\tstrokeWeight(weight * 1.5);\n\t\t\t\tpoint(x, y)\n\t\t\t}\n\t\t}\n\t}\n\n}\n\n// not in use per now\nfunction drawRandomPointsPerFrame() {\n\ttranslate(width * 0.5, height * 0.5)\n\tconst spot = random(spots)\n\ttranslate(spot.x, spot.y)\n\t\n\tfor (let i = 0; i < 10; i++) {\n\t\tconst sector = floor(random(max(width, height) / sze ));\n\t\tvar amount = max(1, sector * 7);\n\t\tconst angle = floor(random(amount)) * TWO_PI / amount;\n\t\tvar x = cos(angle) * sector * sze\n\t\tvar y = sin(angle) * sector * sze\n\t\tvar weight = map(x + y, -maxDist, maxDist, -sze * 0.5, sze)\n\t\tweight += noise(x * 0.01, y * 0.02) * sze * 0.5 - sze * 0.25\n\t\tif (weight > 0.5) {\n\t\t\tstrokeWeight(weight * 2);\n\t\t\tpoint(x, y)\n\t\t}\n\t}\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

@@ -1,0 +1,25 @@
+{
+    "name": "abstractflowersWCCChallengeBotanical6524",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:34:11",
+    "url": "https://openprocessing.org/@epi/2261662",
+    "code": "// === Tab: mySketch ===\n/*\n\tAbstract flowers #WCCChallenge Botanical 6.5.24 \n\t#generativeart #creativecoding #p5js\n\n  Dear Raph and creative coding community,\n\t\n\tthis submissions based on an older sketch.\n\tAdded variation in the size of cells,\n\tso unordered grid is enabled in the modification.\n\t\n\tInteractions:\n\t- LMB resets animazion\n\t\t\n\tToDo:\n\t- more palettes\n\t\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\nconst SZE = 100;\nconst S_H = SZE * 0.5;\n// https://colorpalettes.net/color-palette-979/\nconst CLRS = [\"#960f16\", \"#d64d55\", \"#94c8d6\", \"#35838d\", \"#012e33\"];\n\nlet zoom = {x: 0, y:0, img: null, fc: -1};\nlet bg\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"pattern of flowers consisting of arcs randomly rotated by 90 degrees forming a pattern in an ordered grid\")\n\tpixelDensity(1);\n\tif (false) {\n\t\tCLRS.push(color(\"darkred\"))\n\t\tCLRS.push(lerpColor(color(\"cyan\"), color(\"blue\"), 0.125))\n\t\tCLRS.push(lerpColor(color(\"darkcyan\"), color(\"darkblue\"), 0.125))\n\t}\n\tframeRate(30)\n\tbackground(212);\n\timageMode(CENTER)\n}\n\nfunction draw() {\n\tif (bg) image(bg, 0, 0, width, height-1)\n\tconst x = ~~(random(width) / SZE) * SZE + S_H;\n\tconst y = ~~(random(width) / SZE) * SZE + S_H;\n\t\n\tlet scl = 1;\n\tif (random() < 0.1 && zoom && !zoom.img) {\n\t\tscl = ~~random(2, 4);\n\t\tzoom.x = x; \n\t\tzoom.y = y;\n\t\tzoom.img = get(x - S_H * scl, y - S_H * scl, SZE * scl, SZE * scl)\n\t\tzoom.fc = frameCount + 10 * ~~random(2, 5);\n\t}\n\tdrawFigure(x, y, SZE * scl);\n\t\n\tif (zoom && zoom.img) {\n\t\tif (frameCount < zoom.fc) {\n\t\t\t// keep zoomed flower\n\t\t} else {\n\t\t\t// restore stored flowers\n\t\t\t// console.log(zoom);\n\t\t\timage(zoom.img, zoom.x, zoom.y)\n\t\t\tzoom.img = null;\n\t\t}\n\t}\n\t\n\t// bg = get(0, 0, width, height)\n}\n\nfunction mousePressed() {\n\tif (mouseButton === LEFT) setup();\n}\n\nfunction drawFigure(x, y, SZE) {\n\tvar S_H = SZE / 2;\n\t\n\tpush();\n\ttranslate(x, y);\n\trotate(~~(noise(x, y, frameCount * 0.0004) * 4) * HALF_PI);\n\tstroke(212);\n\tstrokeWeight(SZE * 0.025);\n\t\n\tif (random() < 0.25) {\t\t\n\t\tfill(212)\n\t\trectMode(CENTER)\n\t\trect(0, 0, SZE)\n\t}\n\t\n\t// arc(x, y, w, h, start, stop, [mode], [detail])\n\n\tfill(random(CLRS)) // [\"darkred\", \"green\", \"darkgreen\"]\n\tarc(-S_H, 0, SZE, SZE, TWO_PI - HALF_PI, TWO_PI, PIE);\n\t\n\tif (random() < 0.1) fill(random(CLRS))\n\tarc(S_H, 0, SZE, SZE, PI, PI + HALF_PI, PIE);\n\t\n\tif (random() < 0.25) fill(random(CLRS))\t\n\tarc(0, 0, SZE, SZE, 0, HALF_PI, PIE);\n\t\n\tif (random() < 0.1) fill(random(CLRS))\n\tarc(0, 0, SZE, SZE, HALF_PI, PI, PIE);\n\tpop();\n}\n\n// === Auto Generated Stubs ===\nvar palettes = [ ['#fdfffc', '#235789', '#c1292e', '#f1d302', '#020100'], ['#0D1E40', '#224573', '#5679A6', '#F2A25C', '#D96B43'] ];",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Slow Motion Static.mp4"
+    ]
+}

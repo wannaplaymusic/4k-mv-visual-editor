@@ -1,0 +1,22 @@
+{
+  "name": "PrideCampus",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:00:19",
+  "url": "https://openprocessing.org/@epi/2672514",
+  "code": "// === Tab: mySketch ===\nvar CLRS = [\"#E40303\", \"#FF8C00\", \"#FFED00\", \"#008026\", \"#24408E\", \"#732982\"]; // https://www.sexualdiversity.org/edu/flags/1051.php\nvar dia;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tdescribe(\"\");\n\tpixelDensity(1);\n\tframeRate(30);\n\tnoStroke();\n\tdia = max(width, height) / 3;\n\tcamera(-dia, -dia, -dia*2, 0, 0, dia*CLRS.length/4, 0, 1, 0)\n}\n\nfunction draw() {\n\tbackground(\"lightblue\");\n\t\n\torbitControl();\n\tlights();\n\tpointLight(255, 25, 255, 0, -dia*2, - dia*CLRS.length/2); // clr, pos\n\tspotLight(color(\"white\"), vec = createVector(0, dia*2, -dia*4*abs(sin(frameCount/60))), vec.mult(-1).normalize(), PI / 3); // clr, pos, dir\n\t// debugMode();\n\t\n\t// pride tori\n\tpush()\n\tfor (let i = 0; i < CLRS.length; i++) {\n\t\tfill(CLRS[i]);\n\t\tpush()\n\t\tconst yOff = sin(frameCount/60+i) * dia/4;\n\t\ttranslate(0, yOff, 0);\n\t\ttorus(dia, dia/10, 64);\n\t\tpop()\n\t\ttranslate(0, 0, dia/2)\n\t}\n\tpop()\n\t\n\t// ground\n\tpush();\n\trotateX(-HALF_PI);\n\tfill(\"darkgreen\"); // fill(\"rgb(42,67,12)\");\n\tcircle(0, 0, (CLRS.length+1) * dia);\n\tconst th = dia / CLRS.length;\n\tif (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)) && mouseButton != RIGHT) { // TODO: RIGHT not working\n\t\tfor (let i = 0; i < CLRS.length * 4; i++) {\n\t\t\tfill((i+~~(frameCount/3))%2 ? \"green\" : \"darkgreen\");\n\t\t\tconst ci = i + CLRS.length - ~~(frameCount/5) % CLRS.length;\n\t\t\tfill(CLRS[ci % CLRS.length]);\n\t\t\ttorus(th * (i+1), th/2, 64);\n\t\t}\n\t}\n\tpop();\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

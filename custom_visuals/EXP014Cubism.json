@@ -1,0 +1,22 @@
+{
+  "name": "EXP014Cubism",
+  "author": "mgroufsky_16134",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 02:50:15",
+  "url": "https://openprocessing.org/@mgroufsky_16134/106144",
+  "code": "// === Tab: sketch106144 ===\nvar DY = 20;\nvar DX = DY * 0.5 * sqrt(3);\n\n//let COLOR1 = \"#FF99CC\";\n//let COLOR2 = \"#99CCFF\";\n//let COLOR3 = \"#CCFF99\";\nvar COLOR1 = \"#99CCFF\";\nvar COLOR2 = \"#99CCFF\";\nvar COLOR3 = \"#99CCFF\";\n\n/*\n u   v\n  \\ /\n   |\n   w\n*/\nfunction hexVertex(u, v, w) {\n  vertex((v - u) * DX, (w - 0.5 * (u + v)) * DY);\n}\n\nfunction hexTranslate(u, v, w) {\n  translate((v - u) * DX, (w - 0.5 * (u + v)) * DY);\n}\n\nfunction drawBlock(a, b, c, col) {\n  let d = 0 - a;\n  let e = 1 - b;\n  let f = 2 - c;\n\n  /*\n     /|\n    / /\n   | |\n   |/\n  */\n  fill(lerpColor(col, \"#000000\", 0.667));\n  beginShape();\n  hexVertex(0, 0, 0);\n  hexVertex(d, f, d);\n  hexVertex(d, f, e);\n  hexVertex(d, e, e);\n  hexVertex(d, e, f);\n  hexVertex(d, d, f);\n  endShape(CLOSE);\n\n  /*\n   |\\\n    \\ \\\n     | |\n      \\|\n  */\n  fill(lerpColor(col, \"#000000\", 0.333));\n  beginShape();\n  hexVertex(0, 0, 0);\n  hexVertex(d, d, f);\n  hexVertex(e, d, f);\n  hexVertex(e, d, e);\n  hexVertex(f, d, e);\n  hexVertex(f, d, d);\n  endShape(CLOSE);\n\n  /*\n   /\\/\\\n   \\  /\n    \\/\n  */\n  fill(col);\n  beginShape();\n  hexVertex(0, 0, 0);\n  hexVertex(f, d, d);\n  hexVertex(f, e, d);\n  hexVertex(e, e, d);\n  hexVertex(e, f, d);\n  hexVertex(d, f, d);\n  endShape(CLOSE);\n}\n\nfunction setup() {\n  createCanvas(400, 400);\n}\n\nfunction draw() {\n  let t = millis() * 1e-3;\n  let a = sin(t - 2 * THIRD_PI) / 3;\n  let b = sin(t) / 3;\n  let c = sin(t + 2 * THIRD_PI) / 3;\n  noStroke();\n  hexTranslate(t % 9, 0, 0);\n  for (let i = 0; i < 3; i++) {\n    pushMatrix();\n    for (let j = 0; j < 6; j++) {\n      pushMatrix();\n      drawBlock(a, b, c, COLOR1);\n      hexTranslate(-3, 0, 0);\n      drawBlock(b, c, a, COLOR2);\n      hexTranslate(0, -3, 0);\n      drawBlock(c, a, b, COLOR3);\n      hexTranslate(-3, 0, 0);\n      drawBlock(a, b, c, COLOR1);\n      hexTranslate(0, -3, 0);\n      drawBlock(b, c, a, COLOR2);\n      hexTranslate(-3, 0, 0);\n      drawBlock(c, a, b, COLOR3);\n      popMatrix();\n      hexTranslate(-3, +3, 0);\n    }\n    popMatrix();\n    hexTranslate(0, 0, 9);\n  }\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

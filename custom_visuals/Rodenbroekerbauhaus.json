@@ -1,0 +1,22 @@
+{
+  "name": "Rodenbroekerbauhaus",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:32:13",
+  "url": "https://openprocessing.org/@epi/1956533",
+  "code": "// === Tab: mySketch ===\n// timrodenbroeker.de/courses/bauhaus/\n\nlet objs;\n\nfunction setup() {\n\tconst mwh = max(windowWidth, windowHeight);\n\tconst ar = windowWidth / windowHeight;\n\tcreateCanvas(mwh * ar, mwh / ar); // createCanvas(mw , mw*9/16);\n\tframeRate(60);\n\n\tobjs = [];\n\tobjs.push(new BasicShape(1, height*0.5, mwh, 0.8, PI, color(222)));\n\tobjs.push(new BasicShape(2, height*0.5, mwh, 0.9, HALF_PI, color(16)));\n\tobjs.push(new BasicShape(3, height*0.5, mwh, 0.5, TWO_PI, color(222)));\n}\n\nfunction windowResized() {\n\tsetup();\n}\n\nfunction draw() {\n\tblendMode(BLEND)\n\tbackground(16);\n\t\n\tnoFill();\n\tstroke(\"white\")\n\trect(1, 1, width-2, height-2);\n\t// blendMode(DIFFERENCE)\n\tfor (let o of objs) {\n\t\to.update();\n\t\to.show();\n\t}\n}\n\nclass BasicShape {\n\tconstructor(typ, yps, sze, scl, ang, clr) {\n\t\tthis.typ = typ;\n\t\tthis.xps = 0;\n\t\tthis.yps = yps;\n\t\tthis.sze = sze;\n\t\tthis.scl = scl;\n\t\tthis.ang = ang;\n\t\tthis.clr = clr;\n\t}\n\tupdate() {\n\t\tthis.ang += 0.05;\n\t\tthis.xps = cos(this.ang) * (width - this.sze) * 0.5 + width * 0.5;\n\t}\n\tshow() {\n\t\tpush();\n\t\tnoStroke()\n\t\tfill(this.clr)\n\n\t\tif (this.typ === 1) this.showRect();\n\t\tif (this.typ === 2) this.showCircle();\n\t\tif (this.typ === 3) this.showTri();\n\t\t\n\t\tpop();\n\t}\n\t\n\tshowRect() {\n\t\trectMode(CENTER)\n\t\ttranslate(this.xps, this.yps);\n\t\trotate(this.ang);\n\t\trect(0, 0, this.sze * this.scl * 0.5, this.sze * this.scl * 0.5)\n\t}\n\tshowCircle() {\n\t\tcircle(this.xps, this.yps, this.sze * this.scl * 0.5)\n\t}\n\tshowTri() {\n\t\tconst s_h = this.sze * this.scl * 0.5;\n\t\ttriangle(this.xps - s_h, this.yps + s_h, this.xps, this.yps - s_h, this.xps + s_h, this.yps + s_h)\n\t}\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

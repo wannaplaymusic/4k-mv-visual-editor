@@ -23,7 +23,15 @@
     "is_starred": false,
     "scaling_mode": "auto",
     "used_in_videos": [
-        "Cyberpunk Informant Double-cross.mp4"
+        "Cyberpunk Informant Double-cross.mp4",
+        "Mental Drift.mp4",
+        "Prime Anchor.mp4",
+        "Subterranean Flow.mp4",
+        "Echo Directive.mp4",
+        "Monolithic Interval.mp4",
+        "Subfloor Transmission.mp4",
+        "Vacuum Memory.mp4",
+        "Ultimate Core Patterns.mp4"
     ],
-    "used_count": 1
+    "used_count": 9
 }

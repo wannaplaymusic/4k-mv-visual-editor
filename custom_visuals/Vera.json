@@ -1,0 +1,25 @@
+{
+    "name": "Vera",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:10:04",
+    "url": "https://openprocessing.org/@epi/2172980",
+    "code": "// === Tab: mySketch ===\nconst S = 150;\nconst NUM = 15;\nlet numX, numY;\nlet tiles;\n\nfunction setup() {\n\tvar numX = ~~(windowWidth/S),\n\t\t\tnumY = ~~(windowHeight/S);\n\tcreateCanvas(numX*S, numY*S);\n\tbackground(\"beige\");\n\t\n\t// noFill()\n\tnoStroke();\n\tblendMode(DIFFERENCE)\n\tfill(\"yellow\")\n\tstrokeWeight(2)\n\trectMode(CENTER)\n\td = max(width, height) * 0.95\n\t\n\ttiles = [];\n\tfor (let y = 1; y < numY; y++) {\n\t\tfor (let x = 1; x < numX; x++) {\n\t\t\ttiles.push(new Tile(S * x, S * y, S * 0.85, S / NUM))\n\t\t}\t\t\n\t}\n}\n\nfunction draw() {\n\tif (frameCount >= NUM) thisIsTheEnd();\n\t\n\tfor (let t of tiles) {\n\t\tt.update()\n\t\t// stroke(random(32), random(32), random(64, 192))\n\t\tt.show()\n\t}\n}\n\nfunction thisIsTheEnd() {\n\t// noLoop() removed for animation\n\t\n\tblendMode(BLEND);\n\tnoStroke()\n\tfill(\"white\")\n\tconst S4 = ~~(S/4);\n\trectMode(CORNER)\n\trect(0, 0, width, S4)\n\trect(0, height-S4, width, S4)\n\trect(0, 0, S4, height)\n\trect(width - S4, 0, S4, height)\n}\n\nclass Tile {\n\tconstructor(x, y, s, d) {\n\t\tthis.x = x; // pos\n\t\tthis.y = y;\n\t\tthis.s = s; // size\n\t\tthis.d = d; // delta size\n\t}\n\t\n\tupdate() {\n\t\tthis.s -= random(this.d, this.d * 1.5)\n\t}\n\t\n\tshow() {\n\t\tif (this.s < 1) return;\n\t\t\n\t\tpush()\n\t\ttranslate(this.x, this.y);\n\t\trotate(random(-0.1, 0.1))\n\t\tconst x = random(-this.d, this.d)\n\t\tconst y = random(-this.d, this.d)\n\t\trect(x, y, this.s)\n\t\tpop();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Meditative Essence Percussion.mp4"
+    ]
+}

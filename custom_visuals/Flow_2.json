@@ -1,0 +1,22 @@
+{
+  "name": "Flow_2",
+  "author": "ntsutae",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 04:30:28",
+  "url": "https://openprocessing.org/@ntsutae/1215310",
+  "code": "// === Tab: mySketch ===\nconst blackholes=[]\nconst stars=[]\nconst starsNum=5e3\nconst blackholesNum=24\nconst blackholeShiftInterval=60\nconst speed=3\n\nrandomXY=()=>\n  createVector(\n    random(width),\n    random(height)\n  )\n\nsetup=()=>{\n  createCanvas(800,800)\n  for(let i=starsNum;i--;)\n    stars.push(randomXY())  \n  for(let i=blackholesNum;i--;)\n    blackholes.push(randomXY())\n}\n\ndraw=()=> {\n  background('black')\n  stroke('white')  \n  if(frameCount%blackholeShiftInterval==0){\n    blackholes.shift()\n    blackholes.push(randomXY())\n  }  \n  for(const s of stars){\n    let direction=0 \n    for(const b of blackholes){\n      const dx=s.x-b.x\n      const dy=s.y-b.y\n      if(dx**2+dy**2>1)\n        direction+=atan2(dy,dx) // Simply add up the angles with each blackhole\n      else{ //if a star arrives at a blackhole\n        const angle=random(TWO_PI)\n        s.x=width/2+cos(angle)*width/3\n        s.y=height/2+sin(angle)*height/3\n        direction=0\n        break;\n      }\n    }\n    line(s.x,s.y,s.x+=cos(direction)*speed,s.y+=sin(direction)*speed)\n  }\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

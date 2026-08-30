@@ -1,0 +1,22 @@
+{
+  "name": "Tunnel",
+  "author": "u77506",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 04:39:53",
+  "url": "https://openprocessing.org/@u77506/699316",
+  "code": "// === Tab: mySketch ===\n\nfunction setup(){\n\tcreateCanvas(400, 400);\n}\nrectMode(CENTER);\nnoStroke();\nframeRate(60);\nvar count=0;\nvar seg = [];\ndraw = function() {\n    if(frameCount%2===0){    \n        count++;\n        var te = {x:200,y:200,t:count,c:0,s:0.0,p:[]};\n        for(var a=0;a<360;a+=15){\n            te.p.push({x:(cos(a/180*Math.PI))*200+random(-15,15),y:(sin(a/180*Math.PI))*200+random(-15,15)});\n        }\n        seg.unshift(te);\n        if(seg.length>200){seg.splice(199,seg.length);}    \n    }\n    \n    for(var i in seg){\n        var t = seg[i];\n        \n        t.s += (tan(i/180*Math.PI))/300;\n        \n        pushMatrix();\n        translate(t.x,t.y);\n        \n        scale(t.s);\n        \n        fill(constrain(exp(i/21),0,255));\n    \n        if(t.t%10===0){\n            rect(-100,0,25,350);\n            rect(100,0,25,350);\n            rect(0,-100,400,46);\n\n        }\n        if(t.t%5===0){\n            rect(0,146,120,15);\n        }\n        \n        fill(constrain(exp(i/17),0,255));\n        rect(40,145,8,35);\n        rect(-40,145,8,35);\n        \n        fill(constrain(exp(i/18),0,255));\n       \n        for(var j in t.p){\n            rect(t.p[j].x,t.p[j].y,65,65);\n        }\n        \n        popMatrix();\n    }\n    \n};",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

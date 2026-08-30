@@ -1,0 +1,25 @@
+{
+    "name": "RadialRaster",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:08:31",
+    "url": "https://openprocessing.org/@epi/1954070",
+    "code": "// === Tab: mySketch ===\n/*\n\tradial raster // 13.6.2023\n\t#minacoding #p5js #generativeart #dailycoding\n\tinspiration by https://de.freepik.com/vektoren-kostenlos/moderner-halbtonhintergrund_1492293.htm#page=12&query=raster%20background&position=1&from_view=keyword&track=ais\n\tnext time: https://de.freepik.com/fotos-vektoren-kostenlos/raster-background/3\n */\n\nconst sze = 15;\nlet maxDist;\nlet spots;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpixelDensity(1);\n\tmaxDist = sqrt(width * width + height * height);\n\tbackground(255);\n\tstroke(32, 160, 192, 212);\n\tstrokeWeight(sze * 0.8);\n\t// point(width * 0.5, height * 0.5)\n\t\n\tspots = [];\n\tspots.push({x: 0, y: 0});\n\tfor (let i = 0; i < 3; i++) {\n\t\tconst x = random(-width * 0.4, width * 0.4);\n\t\tconst y = random(-height * 0.4, height * 0.4);\n\t\tspots.push({x, y});\n\t}\n}\n\nfunction windowResized() {\n\tsetup();\n}\n\nfunction draw() {\n\tbackground(255);\n\ttranslate(width * 0.5, height * 0.5)\n\t\n\t/* uncomment, if you have a fast cpu\n\tfor (let spot of spots) {\n\t\tpush();\n\t\ttranslate(spot.x, spot.y)\n\t*/\n\t\tfor (let sector = 0; sector < maxDist/sze; sector++) {\n\t\t\tconst amount = max(1, sector * 7);\n\t\t\tfor (let angle = 0; angle < TWO_PI; angle+=TWO_PI/amount) {\n\t\t\t\t// const sector = floor(random(max(width, height) / sze ));\n\t\t\t\t// const angle = floor(random(amount)) * TWO_PI / amount;\n\t\t\t\tvar x = cos(angle) * sector * sze\n\t\t\t\tvar y = sin(angle) * sector * sze\n\t\t\t\tlet weight = map(x + y, -maxDist, maxDist, -sze * 0.5, sze)\n\t\t\t\t// weight += noise((x + frameCount * 0.1) * 0.01, (y + frameCount * 0.2) * 0.02) * sze * 0.5 - sze * 0.25\n\t\t\t\tweight += noise(x * 0.01, y * 0.02, frameCount * 0.1) * sze * 0.5 - sze * 0.25\n\t\t\t\tif (weight > 0.5) {\n\t\t\t\t\tlet cr = map(x, -width * 0.5, width * 0.5, 0, 164);\n\t\t\t\t\tlet cg = map(y, -height * 0.5, height * 0.5, 150, 200);\n\t\t\t\t\tlet cb = map(weight, 0, sze, 175, 250);\n\t\t\t\t\tstroke(color(cr, cg, cb));\n\t\t\t\t\tstrokeWeight(weight * 1.5);\n\t\t\t\t\tpoint(x, y)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t/*\n\t\tpop();\n\t}\n\t*/\n}\n\nfunction drawRandomPointsPerFrame() {\n\ttranslate(width * 0.5, height * 0.5)\n\tlet spot = random(spots)\n\ttranslate(spot.x, spot.y)\n\t\n\tfor (let i = 0; i < 10; i++) {\n\t\tconst sector = floor(random(max(width, height) / sze ));\n\t\tvar amount = max(1, sector * 7);\n\t\tconst angle = floor(random(amount)) * TWO_PI / amount;\n\t\tvar x = cos(angle) * sector * sze\n\t\tvar y = sin(angle) * sector * sze\n\t\tvar weight = map(x + y, -maxDist, maxDist, -sze * 0.5, sze)\n\t\tweight += noise(x * 0.01, y * 0.02) * sze * 0.5 - sze * 0.25\n\t\tif (weight > 0.5) {\n\t\t\tstrokeWeight(weight * 2);\n\t\t\tpoint(x, y)\n\t\t}\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Carbon Resonance.mp4"
+    ]
+}

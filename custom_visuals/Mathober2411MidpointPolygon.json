@@ -1,0 +1,22 @@
+{
+  "name": "Mathober2411MidpointPolygon",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:26:54",
+  "url": "https://openprocessing.org/@epi/2393826",
+  "code": "// === Tab: mySketch ===\n/*\nDay #11/24: Midpoint Polygon\nhttps://openprocessing.org/sketch/2393826\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nlet S, pts;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tframeRate(60);\n\tbackground(0, 0, 8);\n\tdescribe(\"rotating n-point distorted circle with recursive midpoint polygons fading from cyan to purple\");\n  \n  noFill();\n  strokeWeight(2);\n\tS = max(width, height);\n\t\n\tconst num = ~~random(6, 11);\n\tpts = [];\n\tconst da = (TWO_PI/num) * 0.2;\n\tfor (let i = 0; i < num; i++) {\n\t\tconst a = i/num*TWO_PI+random(-da, da);\n\t\tconst l = random(S*0.1, S*0.6);\n\t\tconst x = cos(a) * l;\n\t\tconst y = sin(a) * l;\n\t\tpts[i] = {x, y};\n\t}\n\tloop();\n}\n\nfunction draw() {\n\tbackground(\"rgba(0, 0, 8, 0.1)\");\n\ttranslate(width/2, height/2);\n\trotate(frameCount/60)\n\n\tlet tmp1 = copyPtsArr(pts);\n\tvar num = pts.length * 2;\n\tfor (let i = 0; i < num; i++) {\n\t\tstroke(lerpColor(color(\"cyan\"), color(\"rgba(128,0,128,0.3)\"), i/(num-1)));\n\t\tbeginShape();\n\t\tlet tmp2 = [];\n\t\tfor (let i = 0; i < tmp1.length; i++) {\n\t\t\tvertex(tmp1[i].x, tmp1[i].y);\n\t\t\tconst f = 0.5+sin(frameCount/30)*0.2; // (sin(TWO_PI*((frameCount+i)%60)/60)+1)/2;\n\t\t\ttmp2[i] = {\n\t\t\t\tx: lerp(tmp1[i].x,tmp1[(i+1)%tmp1.length].x, f),\n\t\t\t\ty: lerp(tmp1[i].y,tmp1[(i+1)%tmp1.length].y, f),\n\t\t\t}\n\t\t}\n\t\tendShape(CLOSE);\n\t\t\n\t\ttmp1 = copyPtsArr(tmp2);\n\t}\n}\n\nfunction copyPtsArr(pts) {\n\tlet tmp = [];\n\tfor (let i = 0; i < pts.length; i++) tmp[i] = {x: pts[i].x, y: pts[i].y}\n\treturn tmp;\n}\n\nfunction noisom(v1, v2) {\n\tif (v1>v2) [v1, v2] = [v2, v1];\n\tconst n = noise(v1, v2, frameCount/123);\n\treturn v1+n*(v2-v1);\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

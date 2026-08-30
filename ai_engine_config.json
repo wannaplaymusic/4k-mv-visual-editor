@@ -1,0 +1,24 @@
+{
+  "provider": "ollama",
+  "director_provider": "ollama",
+  "director_model": "llama3",
+  "ollama": {
+    "api_url": "http://localhost:11434/api/generate",
+    "model_name": "deepseek-r1:8b"
+  },
+  "kimi": {
+    "api_url": "https://api.moonshot.cn/v1/chat/completions",
+    "api_key": "",
+    "model_name": "moonshot-v1-8k"
+  },
+  "deepseek_cloud": {
+    "api_url": "https://api.deepseek.com/chat/completions",
+    "api_key": "",
+    "model_name": "deepseek-chat"
+  },
+  "openai": {
+    "api_url": "https://api.openai.com/v1/chat/completions",
+    "api_key": "",
+    "model_name": "gpt-4o"
+  }
+}

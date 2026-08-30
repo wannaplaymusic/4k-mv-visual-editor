@@ -1,0 +1,25 @@
+{
+    "name": "Triangles_3",
+    "author": "ramayac",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:47:35",
+    "url": "https://openprocessing.org/@ramayac/100937",
+    "code": "// === Tab: sketch100937 ===\n/* \n let Made by @ramayac\n @date 13/06/2013\n*/\nlet bg = \"#0393FF\";\n\nfunction setup(){\n  createCanvas(900, 600);\n  background(bg);\n}\n\nfunction draw(){\n  background(bg);\n  noStroke();  \n  \n  let step = 60;\n  for(let x = step; x < width-step; x+= step){\n    for(let y = step; y < height-step; y+= step){  \n      tri(x, y);\n    }\n  }\n  \n  // noLoop() removed for animation\n}\n\nfunction tri(x, y){\n  let t = random(1);\n  let c = random(1);\n  \n  if(c < 0.5){\n    fill(0);\n  } else {\n    fill(255);\n  }\n  \n  pushMatrix();\n  \n  translate(x, y);\n  if(t < 0.5){\n    triangle(0, 0, 60, 0, 30, 60);\n  } else {\n    triangle(0, 60, 30, 0, 60, 60);\n  }\n  \n  popMatrix();\n}\n\nfunction mousePressed(){\n  redraw();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Carbon Resonance.mp4"
+    ]
+}

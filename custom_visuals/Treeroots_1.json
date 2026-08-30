@@ -1,0 +1,22 @@
+{
+  "name": "Treeroots_1",
+  "author": "ntsutae",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 16:46:12",
+  "url": "https://openprocessing.org/@ntsutae/1482180",
+  "code": "// === Tab: mySketch ===\npins=[]\npins_num=150\n\nsetup=()=> {\n  createCanvas(windowWidth, windowHeight)\n  y=0\n  for (i=0; i<pins_num; i++ ) {\n    pins[i]=createVector(random(width), random(height))\n  }\n}\n\ndraw=()=> {\n  if (y<height) {\n    for (x=0; x<width; x++ ) {\n      angle=0\n      pins.forEach(p=>angle+=atan2(p.y-y, p.x-x))\n      colour=map(sin(angle), -1, 1, 0, 256)\n      stroke(colour)\n      line(x, y, x, y+colour)\n    }\n    y++\n  }\n}\n\nmousePressed=()=>setup()",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

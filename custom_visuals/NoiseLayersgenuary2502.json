@@ -1,0 +1,25 @@
+{
+    "name": "NoiseLayersgenuary2502",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:33:39",
+    "url": "https://openprocessing.org/@epi/2498994",
+    "code": "// === Tab: mySketch ===\n/*\n\tNoise Layers #genuary2 #genuary #genuary2502\n\tLayers upon layers upon layers\n\thttps://openprocessing.org/sketch/2498632\n\t#generativeart #creativecoding #p5js\n*/\n\nconst NUM = 3;\nconst MAR = 0.3; // margin for non filled areas\nlet SZE = 14 * NUM, CLRS;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"Layers of noise fields\");\n\tframeRate(30);\n\t\n\tCLRS = []\n\tfor (let i = 0; i < NUM; i++) {\n\t\tCLRS[i] = lerpColor(color(\"steelblue\"), color(\"gold\"), random());\n\t}\n\tCLRS[NUM-1] = lerpColor(color(\"darkred\"), color(\"darkorange\"), random());\n\t\n\tstrokeWeight(2);\n\tnoiseSeed(~~random(999999));\n}\n\nfunction draw() {\n\tbackground(2, 2, 12);\n\t\n\tfor (let i = 0; i < NUM; i++) {\n\t\tstroke(CLRS[i]);\n\t\tdrawLayer(SZE/(NUM-i+1)); // reverse order to draw smallest first\n\t}\n\t\n\tdrawMsg(\"Noise Layers (epi) #genuary2502\")\n}\n\nfunction drawLayer(SZE) {\n\tfor (let y = 0; y < height; y += SZE) {\t\t\n\t\tfor (let x = 0; x < width; x += SZE) {\n\t\t\tconst n = noise(SZE + x/SZE/12, SZE + y/SZE/12, frameCount/231);\n\t\t\tif (n < MAR) {\n\t\t\t\t// nothing\n\t\t\t} else if (n < 0.5) {\n\t\t\t\tline(x, y+SZE, x+SZE, y+SZE);\n\t\t\t\t// line(x, y+SZE/2, x+SZE, y+SZE/2);\n\t\t\t} else if (n < 1 - MAR) {\n\t\t\t\tline(x+SZE, y, x+SZE, y+SZE);\n\t\t\t\t// line(x+SZE/2, y, x+SZE/2, y+SZE);\n\t\t\t} else {\n\t\t\t\t// notinhg\n\t\t\t}\n\t\t}\n\t}\n}\n\nfunction mouseClicked() {\n\tif (mouseButton === LEFT) setup();\n}\n\nfunction drawMsg(msg) {\n\tpush();\n\t\n\tfill(\"black\")\n\tnoStroke();\n\ttextAlign(LEFT, TOP)\n\ttext(msg, 1, 1)\n\t\n\tfill(\"white\")\n\tnoStroke();\n\ttextAlign(LEFT, TOP)\n\ttext(msg, 0, 0)\n\n\tpop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Dub Techno Core Vibration.mp4"
+    ]
+}

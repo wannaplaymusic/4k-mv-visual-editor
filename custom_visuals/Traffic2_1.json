@@ -1,0 +1,25 @@
+{
+    "name": "Traffic2_1",
+    "author": "garabatospr",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 03:38:54",
+    "url": "https://openprocessing.org/@garabatospr/1091922",
+    "code": "// === Tab: mySketch ===\n// \"paint particles mixing\" by garabatospr\n\n// color palette\n\nvar colors   =  [\"#ff0000\",\"#feb30f\",\"#0aa4f7\",\"#000000\",\"#ffffff\"];\n\n// set weights for each color \n\n// red, blue, and white dominates \n\nvar weights  = [1,2,2,2,2];             \n\n// scale of the vector field \n// smaller values => bigger structures  \n// bigger values  ==> smaller structures \n\n\n// number of drawing agents \n\nvar nAgents = 500;\n\nlet border = 100;\n\nlet agent = [];\n\nfunction setup() {\n  //createCanvas(1080, 608);\n\tcreateCanvas(1000,1000);\n  colorMode(HSB, 360, 100, 100);\n\trectMode(CENTER);\n  strokeCap(SQUARE);\n\n  background(0,0,0);\n  \n  for(let i=0;i < nAgents;i++)\n  {\n    agent.push(new Agent(width*0.40,height*0.50+ randomGaussian()*20));\n\t\tagent.push(new Agent(width*0.60,height*0.50+ randomGaussian()*20));\n\t\t//agent.push(new Agent(width*0.40));\n\t\t//agent.push(new Agent(width*0.3));\n  }\n  \n}\n\nfunction draw() {\n\t\n\n  if (frameCount > 5000)\n  {\n    // noLoop() removed for animation\n  }\n  \n  for(let i=0;i < agent.length;i++)\n  {\n    agent[i].update();\n  }\n  \n  \n\tstroke(0,0,100);\n\t\n  noFill();\n  strokeWeight(20);\n  rect(width/2,height/2,700,500);\n\t\n\tstrokeWeight(2);\n\trect(width*0.60,height/2,1,500);\n\t\n\tstrokeWeight(2);\n\trect(width*0.40,height/2,1,500);\n\n}\n\n// select random colors with weights from palette \n\nfunction myRandom(colors,weights)\n{\n    let sum = 0;\n \n    for(let i=0;i < colors.length; i++)\n    {\n      sum += weights[i];\n    }\n \n    let rr = random(0,sum);\n \n    for(let j=0;j < weights.length;j++)\n    {\n \n      if (weights[j] >= rr)\n      {\n        return colors[j];\n      }\n        rr -= weights[j];\n    }\n\n }\n\n\n\n// paintining agent \n\nclass Agent {\n  constructor(x0,y0)\n  {\n    if (random(0,1) > 0.5)\n    {\n\n      this.p     = createVector(x0,y0);\n      this.direction = 1;\n      this.color = generateColor(10);\n\t\t\tthis.scale = 5;\n\t\t\tthis.strokeWidth =5 + 5*sin(frameCount);\n\t\t}else\n    {\n      this.p     = createVector(x0,height*0.5 + randomGaussian()*30)\n      this.direction = -1;\n\t\t\tthis.color = generateColor(10);\n\t\t\tthis.scale = 5;\n\t\t\tthis.strokeWidth =5 + 5*sin(frameCount);\n    }\n      \n    this.pOld  = createVector(this.p.x,this.p.y);\n    \n    this.step  = 1;\n  }\n  \n  update() {\n\t\t\n    this.p.x += this.direction*vector_field(this.p.x,this.p.y,this.scale).x*this.step;\n    this.p.y += this.direction*vector_field(this.p.x,this.p.y,this.scale).y*this.step;\n\n\t\tif ((this.p.x >= width/2 + 350) || (this.p.x <= width/2 - 350) || \n\t\t\t\t(this.p.y <= height/2 - 250) || (this.p.y >= height/2 + 250))\n\t\t{\n\t\t\tthis.step=0;\n\t\t}\n\t\t\n\t\tif (this.p.y < border || this.p.y > (height - border))\n\t\t{\n\t\t\tthis.direction *= -random(0.9,1.1)\n\t\t}\n\t\t\n\t\t\n    strokeWeight(this.strokeWidth);\n    stroke(this.color);\n    line(this.pOld.x,this.pOld.y,this.p.x,this.p.y);\n    \n    this.pOld.set(this.p);\n    \n  }\n    \n}\n\n// vector field function \n// the painting agents follow the flow defined \n// by this function \n\n\nfunction vector_field(x,y,myScale) {\n  \n  x = map(x,0,width,-myScale,myScale);\n  y = map(y,0,height,-myScale,myScale);\n  \n  let k1 = 5;\n  let k2 = 3;\n  \n  let u = sin(k1*y) + cos(k2*y) + map(noise(x,y),0,1,-1,1);\n  let v = sin(k2*x) - cos(k1*x) + map(noise(x,y),0,1,-1,1);\n \n  // litle trick to move from left to right \n  \n  if (u <= 0) \n  {\n      u = -u;\n   }  \n  \n  return createVector(u,v);\n}\n\nfunction generateColor(scale) {\n\tlet temp = myRandom(colors, weights);\n\n\tmyColor = color(hue(window.color(temp)) + randomGaussian() * scale,\n\t\t              saturation(window.color(temp)) + randomGaussian() * scale,\n\t\t              brightness(window.color(temp)) - scale, \n\t\t\t\t\t\t\t\t\trandom(1,100));\n\n\treturn myColor;\n}\n\n\n\n// function to select \n\nfunction myRandom(colors,weights)\n{ \n    let sum = 0;\n \n    for(let i=0;i < colors.length; i++)\n    {\n      sum += weights[i];\n    }\n \n    let rr = random(0,sum);\n \n    for(let j=0;j < weights.length;j++)\n    {\n \n      if (weights[j] >= rr)\n      {\n        return colors[j];\n      }\n        rr -= weights[j];\n    }\n }",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Clear View.mp4"
+    ]
+}

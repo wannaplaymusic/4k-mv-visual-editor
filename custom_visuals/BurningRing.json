@@ -1,0 +1,22 @@
+{
+  "name": "BurningRing",
+  "author": "ntsutae",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 17:07:29",
+  "url": "https://openprocessing.org/@ntsutae/1607940",
+  "code": "// === Tab: mySketch ===\nvar n = 256\nvar magnify = 2\nvar field = []\n\nsetup = () => {\n  createCanvas(n * magnify, n * magnify)\n  for (let x = 0; x < n; x++) {\n    field[x] = []\n  }\n  for (let x = 0; x < n; x++) {\n    for (let y = 0; y < n; y++) {\n      field[x][y] = 0\n    }\n  }\n}\n\ndraw = () => {\n// update field\n  let next = []\n  for (let x = 0; x < n; x++) {\n    next[x] = []\n    for (let y = 0; y < n; y++) {\n      next[x][y] = field[x][y]\n    }\n  }\n  for (let y = 0; y < n; y++) {\n    for (let x = 0; x < n; x++) {\n      let neighbors = 0\n      for (let dy = -3; dy <= 3; dy++) {\n        for (let dx = -3; dx <= 3; dx++) {\n          if (dx == 0 && dy == 0) continue;\n          if (dx * dx + dy * dy <= 10) {\n            neighbors += field[(x + dx + n) % n][(y + dy + n) % n]\n          }\n        }\n      }\n      if (field[x][y] == 1) {\n        if (neighbors < 14 || neighbors > 28) {\n          next[x][y] = 0\n        }\n      } else {\n        if (neighbors > 15) {\n          next[x][y] = 1\n        }\n      }\n      const d = sqrt((x - (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) / magnify) ** 2 + (y - (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) / magnify) ** 2)\n      if (38 < d && d < 40) next[x][y] = 1\n    }\n  }\n  field = next\n\n// show field\n  background('white')\n  fill('black')\n  noStroke()\n  for (let x = 0; x < n; x++) {\n    for (let y = 0; y < n; y++) {\n      if (field[x][y]) rect(x * magnify, y * magnify, magnify, magnify)\n    }\n  }\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

@@ -1,0 +1,22 @@
+{
+    "name": "fromthebalconyminacodingDay323",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:04:47",
+    "url": "https://openprocessing.org/@epi/1946676",
+    "code": "// === Tab: mySketch ===\n/*\n\tCoding in unusual places: from the balcony // 3.6.2023\n\t#minacoding #p5js #generativeart\n\tissue: screen not getting complete white over time\n */\n\nlet img, scl;\n\nfunction preload() {\n\t// preload() runs once\n\timg = loadImage('https://openprocessing.org/sketch/1946676/files/balcony.jpg.jpg');\n}\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpixelDensity(1);\n\tframeRate(60);\n\tscl = max(width / img.width, height / img.height);\n\n\t// set alpha of the image\n  let imgMaxIndex = 4 * (img.width) * (img.height);\n\timg.loadPixels();\n\tfor (let i = 0; i < imgMaxIndex; i+=4) {\n    img.pixels[i + 3] = 32;\n  }\n  img.updatePixels();\n}\n\nfunction windowResized() {\n\tsetup();\n}\n\nfunction draw() {\n\tbackground(255, 1);\n\t\n\tif (frameCount % 10 === 0) {\n\t\tconst ts = 80;\n\t\tconst sx = floor(random(img.width/ts))\n\t\tconst sy = floor(random(img.height/ts))\n\t\t// image(img, 0, 0, img.width * scl, img.height * scl);\n\t\timage(img, sx * ts * scl, sy * ts * scl, ts * scl, ts *scl, sx * ts, sy * ts, ts, ts);\n\t}\n\t\n\tfor (let i = 0; i < 60; i++) {\n\t\tconst x = floor(random(img.width));\n\t\tconst y = floor(random(img.height));\n\t\tlet source = img.get(x, y);\n\t\tlet sourcealpha = color(source[0], source[1], source[2], 32);\n\t\tstroke(sourcealpha);\n\t\tstrokeWeight(20);\n\t\tpoint(x * scl, y * scl);\n\t\tstroke(source);\n\t\tstrokeWeight(floor(random(1, 10)));\n\t\tpoint(x * scl, y * scl);\n\t}\n\t// // noLoop() removed for animation\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

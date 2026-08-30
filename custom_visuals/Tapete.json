@@ -1,0 +1,22 @@
+{
+    "name": "Tapete",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:06:55",
+    "url": "https://openprocessing.org/@epi/2695892",
+    "code": "// === Tab: mySketch ===\nlet S;\n\nfunction setup() {\n\tdescribe(\"grid of randomly subdived 5x5 cells\");\n\t\n\tlet w = windowWidth, h = windowHeight;\n\tS = min(w, h);\n\tlet num = 0;\n\twhile (S > 6) {\n\t\tS /= 6;\n\t\tnum++;\n\t}\n\tfor (let i = 0; i < num; i++) {\n\t\tS = ~~S * 6;\n\t}\n\t// console.log(w, h, S, num, S/num);\n\tS/=num;\n\tw=S*~~(w/S);\n\th=S*~~(h/S);\n\t// console.log(w, h);\n\t\n\tcreateCanvas(w, h);\n\tnoStroke();\n\n\t// noLoop() removed for animation\n}\n\nfunction draw() {\n\tbackground(32);\n\tfor (let y = 0; y < height; y+=S) {\t\t\n\t\tfor (let x = 0; x < width; x+=S) {\n\t\t\tdrawTile(x, y, S)\n\t\t}\n\t}\n}\n\nfunction mousePressed() {\n\tif (mouseButton !== RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > 0.1*width) {\n\t\tdraw();\n\t}\n}\n\nfunction drawTile(x, y, S) {\n\tif (S > 25 && random()<0.5) {\n\t\tS /= 2;\n\t\tdrawTile(x, y, S);\n\t\tdrawTile(x+S, y, S);\n\t\tdrawTile(x, y+S, S);\n\t\tdrawTile(x+S, y+S, S);\n\t} else {\t\t\n\t\tfill(random(200, 300), random(200), random(100, 200));\n\t\trect(x, y, S);\n\t\tvar num = 5;\n\t\tS/=num; // x+=S/2; y+= S/2;\n\t\tfor (let j = 0; j < num; j++) {\t\t\t\n\t\t\tfor (let i = 0; i < num; i++) {\n\t\t\t\tfill(255, random(100, 200));\n\t\t\t\trect(x+j*S, y+i*S, S)\n\t\t\t}\n\t\t}\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

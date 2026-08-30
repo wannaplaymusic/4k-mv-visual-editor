@@ -1,0 +1,25 @@
+{
+    "name": "PupilDilation_1",
+    "author": "u110137",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-24 19:30:54",
+    "url": "https://openprocessing.org/@u110137/1934856",
+    "code": "// === Tab: mySketch ===\n//For the #WCCChallenge, theme: \"eyes\"\n\nlet dil = 0;\nlet tdil;\nlet ang, tang;\nlet auto = true;\nlet lids = true;\nlet lim, eyesep;\nlet colorA, colorB, tcolorA;\nlet colors = [];\nlet cindex = 0;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tlim = max(width, height);\n\ttdil = 0;\n\tang = createVector(0, 0);\n\ttang = createVector(0, 0);\n\tcolors = [color(66, 140, 171, 128), color(150, 75, 0, 128), color(153, 121, 80, 128), color(73, 118, 101, 128), color(46, 83, 111, 128), color(161, 202, 241, 128)];\n\ttcolorA = colors[cindex];\n\tcolorA = color(0, 0, 0, 128);\n\tcolorB = color('rgba(228,217,119,0.5)');\n\teyesep = lim / 1.6;\n}\n\nfunction draw() {\n\tif (auto) {\nwindow.simulatedMouseX = width * noise(frameCount / 120);\nwindow.simulatedMouseY = height * noise(1000 + frameCount / 80);\n\t}\n\ttdil = map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, lim, lim / 3, 2 * lim / 3, true);\n\tdil = lerp(dil, tdil, 0.2);\n\ttang.x = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, -PI / 7.5, PI / 7.5);\n\ttang.y = map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, -PI / 14, PI / 14);\n\tang.lerp(tang, 0.2);\n\tcolorA = lerpColor(colorA, tcolorA, frameCount / 150);\n\tbackground(0);\n\ttranslate(width / 2, height / 2);\n\tdrawEye(lim, -eyesep, 0);\n\tdrawEye(lim, eyesep, 0);\n\tif (lids) {\n\t\tdrawLid(-eyesep, 0, 1, 1, lim);\n\t\tdrawLid(eyesep, 0, -1, 1, lim);\n\t}\n}\n\nfunction drawEye(esize, x, y) {\n\tpush();\n\ttranslate(x, y);\n\tpush();\n\tnoStroke();\n\tfill(255);\n\tellipse(0, 0, esize / 1.5, esize / 1.5);\n\ttranslate(sin(ang.x) * esize / 3, sin(ang.y) * esize / 3);\n\tfill(0);\n\tellipse(0, 0, (esize / 2.5) * cos(ang.x), (esize / 2.5) * cos(ang.y));\n\tfill(colorA);\n\tellipse(0, 0, (esize / 2.4) * cos(ang.x), (esize / 2.4) * cos(ang.y));\n\tfill(0);\n\ttranslate(sin(ang.x) * esize / TAU, 0);\n\tellipse(0, 0, (esize / 3 - dil / 3) * cos(ang.x), esize / 3 - dil / 3);\n\ttranslate(-sin(ang.x) * height / TAU, 0);\n\tfor (let a = 0; a < TAU; a += TAU / 50) {\n\t\tpush();\n\t\ttranslate((esize / 5.1) * cos(a), (esize / 5.1) * sin(a));\n\t\trotate(a - PI / 12);\n\t\tfor (let i = 0; i < 24; i++) {\n\t\t\tstroke(lerpColor(colorA, colorB, i / 24));\n\t\t\tstrokeWeight(map(i, 24, 0, esize / 50, esize / 200));\n\t\t\ttranslate((-(esize / 2.1) - 1.15 * dil) / 180 + (sin(ang.x) * cos(a) * 5), -sin(ang.x) * sin(a) * 5);\n\t\t\trotate(sin(i) / 4);\n\t\t\tpoint(0, 0);\n\t\t}\n\t\tpop();\n\t}\n\tpop();\n\tpush();\n\tnoStroke();\n\tfill(255, 150);\n\trotate(-PI / 8);\n\trect(esize / 20, -esize / 15, esize / 40, esize / 40, esize/120);\n\trotate(PI / 8);\n\tpop();\n\tpop();\n}\n\nfunction drawLid(x, y, flipx, flipy, lsize) {\n\tpush();\n\ttranslate(x, y - lsize / 20);\n\tscale(flipx, flipy)\n\tnoStroke();\n\tfill(0);\n\tbeginShape();\n\tcurveVertex(0, -lsize / 2);\n\tcurveVertex(lsize / 4, -lsize / 3);\n\tcurveVertex(lsize / 2.9, lsize / 12);\n\tcurveVertex(lsize / 12, -lsize / 2 + dil / 1.1);\n\tcurveVertex(-lsize / 3, -lsize / 2 + dil / 1.1);\n\tcurveVertex(-lsize / 3, -lsize / 12);\n\tcurveVertex(-lsize / 4, -lsize / 3);\n\tcurveVertex(0, -lsize / 2);\n\tendShape(CLOSE);\n\tpop();\n\n}\n\nfunction mousePressed() {\n\tauto = !auto;\n\tcindex=(cindex+1)%colors.length;\n\ttcolorA = colors[cindex];\n\tframeCount = 0;\n}\n\nfunction keyPressed() {\n\tif (keyCode == 32) lids = !lids; //remove lids\n\tif (keyCode == 13) { // move eyes together for OP thumbnail\n\t\tif (eyesep == (lim / 1.6)) eyesep = lim / 2.5;\n\t\telse eyesep = lim / 1.6;\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Time Stretch.mp4"
+    ]
+}

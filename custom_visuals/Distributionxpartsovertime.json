@@ -1,0 +1,22 @@
+{
+  "name": "Distributionxpartsovertime",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:32:42",
+  "url": "https://openprocessing.org/@epi/1980881",
+  "code": "// === Tab: mySketch ===\nconst num = 4; \n\nfunction setup() {\n  createCanvas(400, 400);\n}\n\nfunction draw() {\n  background(\"azure\");\n  noFill()\n  translate(0, width * 0.5);\n  \n  drawGrid();\n  drawSine();\n}\n\nfunction drawGrid() {\n  stroke(212, 32, 32)\n  strokeWeight(1)\n  line(0, 0, width, 0)\n  stroke(212, 32, 32, 64)\n  for (let x = 0; x < width; x+= width / num) {\n    line(x, -height * 0.5, x, height * 0.5)\n  }\n}\n\nfunction drawSine() {\n  let vals = [];\n\n  let a = frameCount * 0.01;\n  stroke(\"gray\")\n  strokeWeight(3)\n  beginShape();\n  let sum = 0;\n  let part = [];\n  for (let x = 0; x < width; x++) {\n    const y = sin(a + map(x, 0, width, 0, TWO_PI));\n    vertex(x, y * height * 0.5)\n    if (x % floor(width / num) === 0) {\n      push();\n      line(x, y * height * 0.5, x + width / num, y * height * 0.5)\n      noStroke()\n      fill(0)\n      const v = (y + 1) / 2\n      part.push(v);\n      sum += v;\n      textAlign(LEFT)\n      if (x === width) textAlign(RIGHT)\n      text(\"\" + nf(v, 1, 2) + \" / \" + nf(sum, 1, 2), x, y * height * 0.5)\n      pop();\n    }\n  }\n  endShape();\n  \n  push()\n  resetMatrix();\n  // translate(0, -height * 0.5)\n  const clrs = [color(128, 32, 64, 64), color(32, 128, 64, 64)]\n  noStroke(); \n  for (let i = 0, x = 0; i < part.length; i++) {\n    const w = part[i]/sum * width;\n    fill(clrs[i % clrs.length])\n    rect(x, 0, w, height)\n    fill(32)\n    text(\"\" + nf(w, 1, 1), x, 10)\n    x += w;\n  }\n  if (false && frameCount % 100 === 0) {\n    console.log(\"sum = \" + sum)\n    console.table(part);\n  }\n  pop();\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

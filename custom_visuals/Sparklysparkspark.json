@@ -1,0 +1,25 @@
+{
+    "name": "Sparklysparkspark",
+    "author": "juhanihalkomaki",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 16:39:11",
+    "url": "https://openprocessing.org/@juhanihalkomaki/1854471",
+    "code": "// === Tab: mySketch.js ===\nvar NUMBER_OF_SPARKLIES = 500;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpixelDensity(1);\n\tframeRate(60);\n\tcolorMode(HSB, 360, 100, 100, 100);\n\tcursor(CROSS);\n\t\nwindow.simulatedMouseX = random(-1, 1) * 50 + width / 2;\nwindow.simulatedMouseY = random(-1, 1) * 50 + height / 2;\n}\n\nfunction draw() {\n\tconst halfWidth = width / 2;\n\tconst halfHeight = height / 2;\n\tconst minSize = max(width, height);\n\t\n\tconst mDir = createVector(halfWidth - (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), halfHeight - (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))))\n\t\t\t\t\t\t\t\t.div(minSize / 2)\n\t\t\t\t\t\t\t\t.mult(5)\n\t\t\t\t\t\t\t\t.limit(5);\n\t\n\t// Draw previous frame with a bit of scaling and offset\n\tconst lastFrame = get();\n\tblendMode(BLEND);\n\tbackground(0);\n\tpush();\n\ttranslate(halfWidth, halfHeight);\n\tscale(1.02);\n\ttranslate(mDir.x, mDir.y);\n\timage(lastFrame, -halfWidth, -halfHeight);\n\tpop();\n\t\n\t// Fade out the trace\n\tbackground(0, random(6));\n\t\n\t// Draw sparkles\n\tnoStroke();\n\tblendMode(ADD);\n\tconst colr = (mDir.heading() / TWO_PI * 360 + 360) % 360;\n\tfor (let j = NUMBER_OF_SPARKLIES; j--;) {\n\t\tstroke(colr, random(20, 80), 100);\n\t\tstrokeWeight(random(1, 2));\n\t\tconst p = p5.Vector.fromAngle(random(TWO_PI))\n\t\t\t\t\t\t\t\t.mult(random(random(random(random(max(width, height) * 0.3)))));\n\t\tpoint(p.x + halfWidth, p.y + halfHeight);\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Synthetic Breath.mp4"
+    ]
+}

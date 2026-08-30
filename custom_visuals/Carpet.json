@@ -1,0 +1,25 @@
+{
+    "name": "Carpet",
+    "author": "u91723",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 02:48:06",
+    "url": "https://openprocessing.org/@u91723/503528",
+    "code": "// === Tab: mySketch ===\nvar c = color(0);\n\nvar g = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\t//createCanvas(101, 101)\n  reset();\n}\n\nfunction reset()  {\n  g = new Array(width)[height];\n  background(255);\n  g[1][1] = 1;\n  g[g.length-2][g[0].length-2] = 1;\n  f = 1;\n}\n\nfunction mouseClicked()  {\n  reset();\n}\nvar r = 1;\nvar f;\nvar all;\nfunction draw() {\n  r++;\n  all = true;\n  for (let y = 1; y<g[0].length-1; y++) {\n    for (let x = 1; x<g.length-1; x++) {\n      \n      if (g[x][y]==0) {\n        let n = 0;\n        if (g[x+1][y]==1*f) n++;\n        if (g[x][y+1]==1*f) n++;\n        if (g[x-1][y]==1*f) n++;\n        if (g[x][y-1]==1*f) n++;\n        if (n==1) {\n          g[x][y] = -2;\n          all = false;\n        } else if (n!=0) {\n          g[x][y] = -1;\n          set(x, y, color(128));\n        }\n      }\n    }\n  }\n  if(all)  {\n    f = -1;\n  }\n  for (let y = 1; y<g[0].length-1; y++) {\n    for (let x = 1; x<g.length-1; x++) {\n      if (g[x][y] == -2) {\n        g[x][y] = 1;\n        randomSeed(r*100);\n        set(x, y, color(random(255), random(255), random(255)));\n      }\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Infinite Loop.mp4"
+    ]
+}

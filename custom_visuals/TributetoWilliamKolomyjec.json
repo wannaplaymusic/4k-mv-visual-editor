@@ -1,0 +1,22 @@
+{
+  "name": "TributetoWilliamKolomyjec",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:30:18",
+  "url": "https://openprocessing.org/@epi/2561080",
+  "code": "// === Tab: mySketch ===\nlet canvaswidth = 17;\nlet canvasheight = 17;\nlet cube_size = 40;\nlet randomness = 0.03;\n\nfunction setup() {\n  createCanvas(canvaswidth * cube_size, canvasheight * cube_size, WEBGL);\n\tframeRate(60);\n  smooth(8);\n}\n\nfunction draw() {\n  background(30);\n  noStroke();\n\n  ambientLight(50);\n  pointLight(255, 2, 2, -width / 2, -height / 2, 400);\n  pointLight(color(\"darkorange\"), width / 2, height / 2, 300);\n  directionalLight(255, 5, 0, 0, -1, -1);\n\n  for (let i = 0; i < canvaswidth; i++) {\n    for (let j = 0; j < canvasheight; j++) {\n      push();\n      translate(\n        (i - canvaswidth / 2 + 0.5) * cube_size, \n        (j - canvasheight / 2 + 0.5) * cube_size, \n        0\n      );\n      \n      let iw = canvaswidth / 2 - Math.abs(i - canvaswidth / 2);\n      let jh = canvasheight / 2 - Math.abs(j - canvasheight / 2);\n      if (jh !== 0 || iw !== 0) {\n\t\t\t\tconst nx = noise(i, j, frameCount/123) - 0.5;\n\t\t\t\tconst ny = noise(j, frameCount/123, i) - 0.5;\n        rotateX(radians(iw * iw * jh * jh * nx*randomness));\n        rotateY(radians(iw * iw * jh * jh * ny*randomness));\n      }\n      \n      specularMaterial(25);\n      shininess(50);\n      box(cube_size);\n      pop();\n    }\n  }\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

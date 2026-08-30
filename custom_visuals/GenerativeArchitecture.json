@@ -1,0 +1,25 @@
+{
+    "name": "GenerativeArchitecture",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:32:26",
+    "url": "https://openprocessing.org/@epi/2522208",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n  createCanvas(800, 800);\n\tloop();\n}\n\nfunction draw() {\n  background(30); // Preto de fundo\n\n\t// Linhas / streets? before buildings\n\tdrawLinhas();\n\t\n  // Camadas principais\n  drawMainStructures();\n\t\n\t// Elementos adicionais: linhas e blocos pequenos\n  drawDetailing();\n\t\n\t// noLoop() removed for animation\n}\n\nfunction drawMainStructures() {\n  const CLRS = [\n    color(50, 50, 50), // Cinza escuro\n    color(200, 100, 50), // Laranja industrial\n    color(100) // Cinza médio\n  ];\n\n\tnoStroke();\n  for (let i = 0; i < 5; i++) {\n    let x = random(width * 0.1, width * 0.7);\n    let y = random(height * 0.2, height * 0.8);\n    let w = random(100, 300);\n    let h = random(100, 300);\n\n    fill(random(CLRS));\n    rect(x, y, w, h);\n\n    // Sobreposição com transparência\n\t\tconst clr = random(CLRS);\n\t\tclr.setAlpha(180);\n    fill(clr);\n    rect(x + random(-30, 30), y + random(-30, 30), w * 0.8, h * 0.8);\n  }\n}\n\nfunction drawDetailing() {\n  // Pequenos blocos decorativos\n  noStroke();\n  fill(200, 100, 50); // Laranja\n  for (let i = 0; i < 15; i++) {\n    var x = random(width);\n    var y = random(height);\n    var w = random(20, 50);\n    var h = random(20, 50);\n    rect(x, y, w, h);\n  }\n}\n\nfunction drawLinhas() {\n\tstroke(255, 100); // Cinza claro para linhas de detalhe\n  strokeWeight(2);\n\t\n\t// Linhas horizontais\n  for (let y = 50; y < height; y += random(50, 150)) {\n    line(0, y, width, y);\n  }\n\n  // Linhas verticais\n  for (let x = 50; x < width; x += random(50, 150)) {\n    line(x, 0, x, height);\n  }\n\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Carbon Resonance.mp4"
+    ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Sierpinskioneliner_1",
+  "author": "u268093",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 17:24:17",
+  "url": "https://openprocessing.org/@u268093/2020385",
+  "code": "// === Tab: mySketch ===\nlet t;\nlet fr;\n\n\nfunction setup() {\n\tcreateCanvas(800, 800)\n\tbackground(250)\n\tangleMode(DEGREES)\n\t\n}\n\nfunction draw() {\n\tt = {\tx: 20,\ty: 30,\ta: 60}\n\tlet pt = 280\n\tfr = ((frameCount % pt) < 200 ? (frameCount % pt)/200 : 1)\n\tbackground(250)\n\tp(7, 400, -60)\n}\n\np = (a, e, n, s = t) => (a ? (p(--a, e *= 0.5, -n).a += n, p(a, e, n).a += n, p(a, e, -n)) : line(s.x, s.y, s.x += cos(fr*s.a) * e, s.y += sin(fr*s.a) * e), s)",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

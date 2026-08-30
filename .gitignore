@@ -10,38 +10,47 @@ ENV/
 node_modules/
 models/
 assets_cache/
+js_cache/
+temp_audio/
 
 # Logs & Temporary files
 *.log
 *.log.*
 *.txt
-*.json
-temp_audio/
-js_cache/
-app_debug.log
+!requirements.txt
+app_debug.log*
 op_import_errors.txt
 batch_test_progress.json
 last_batch_run_code.js
 missing_libraries.json
 realtime_watchdog.log
+test_run_errors.log
 
 # Reports & Output directories
 render_output/
 *.html
+!realtime_watchdog_dashboard.html
 black_screen_report.*
 abnormal_previews.*
 repair_report.json
+camera_arvr_cleanup_report.json
+harmful_security_report.json
+
+# Quarantined & Backups
+custom_visuals/camera_arvr_backup/
+custom_visuals/abnormal_backup/
 
 # Test media & Scratch files
 scratch/
-*.mp3
-*.wav
 test_out.html
 test_out_*.html
 scratch_*.html
 test_p5_load.html
+/sandbox_screen.png
+/test_*.png
 
 # OS files
 .DS_Store
 Thumbs.db
+
 

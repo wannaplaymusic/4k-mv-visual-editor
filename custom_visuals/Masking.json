@@ -1,0 +1,25 @@
+{
+    "name": "Masking",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:23:44",
+    "url": "https://openprocessing.org/@epi/1972734",
+    "code": "// === Tab: mySketch ===\nlet slices = 12;\nlet pattern;\nlet masked;\nlet density;\n\nconst MaskTypes = ['circle', 'square', 'triangle', 'text'];\nlet ix = 0;\n\nfunction setup() {\n  createCanvas(400, 400);\n\tframeRate(30);\n  density = pixelDensity();\n}\n\nfunction createBG() {\n  let g = createGraphics(width, height);\n  g.noStroke();\n  g.translate(width / 2, height / 2);\n  \n\tslices = min(13, max(1, floor(map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 1, 13)))) * 2;\n  const inc = TWO_PI / slices;\n  // fill the screen\n  const d = dist(0, 0, width, height);\n  let c = 0;\n\tconst clrs = [\"yellow\", \"black\"]; [\"red\", \"yellow\", \"cyan\", \"purple\"];\n  for (let i = 0; i < TWO_PI + inc; i += inc) {\n\t\tg.fill(clrs[c % clrs.length]);\n    g.arc(0, 0, d, d, i, i + inc);\n    c++;\n  }\n  \n  pattern = createImage(width * density, height * density);\n  pattern.copy(g, 0, 0, width, height, 0, 0, width * density, height * density);\n  \n  updateMask();\n}\n\nfunction mouseClicked() {\n  ix = (ix + 1) % MaskTypes.length;\n  updateMask();\n}\n\nfunction updateMask() {\n  let m = makeMask(MaskTypes[ix]);\n  \n  masked = createImage(width * density, height * density);\n  masked.copy(pattern, 0, 0, width * density, height * density, 0, 0, width * density, height * density);\n  masked.mask(m);\n}\n\nfunction makeMask(type) {\n  var g = createGraphics(width, height);\n  g.noStroke();\n  g.fill(0);\n  g.translate(width / 2, height / 2);\n  \n  switch (type) {\n    case 'circle':\n      g.circle(0, 0, width / 1.4);\n      break;\n    case 'square':\n      g.rect(-width / 4, -height / 4, width / 2, height / 2);\n      break;\n    case 'triangle':\n      g.triangle(-width / 4, height / 4, 0, -height / 4, width / 4, height / 4);\n      break;\n    case 'text':\n      g.textAlign(CENTER, CENTER);\n      g.textSize(96);\n      g.text(\"Hello!\", 0, 0);\n      break;\n  }\n  \n  let mask = createImage(width * density, height * density);\n  mask.copy(g, 0, 0, width, height, 0, 0, width * density, height * density);\n  \n  return mask;\n}\n\nfunction draw() {\n  background(220);\n\t\n\t/*\n\tvar clrs = [\"red\", \"orange\", \"yellow\", \"orange\"];\n\tstrokeWeight(10);\n\tfor (let x = -height, ci = 0; x < width; x += 50, ci++) {\n\t\tstroke(clrs[ci % clrs.length])\n\t\tline(x + height, 0, x, height)\n\t}\n\t*/\n\t\n  createBG()\n  image(masked, 0, 0, width, height)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Late Bound.mp4"
+    ]
+}

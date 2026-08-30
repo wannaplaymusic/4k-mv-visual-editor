@@ -1,0 +1,22 @@
+{
+    "name": "Gardine2",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:07:54",
+    "url": "https://openprocessing.org/@epi/2256826",
+    "code": "// === Tab: mySketch ===\nconst fMar = 0.1; // margin percent\nconst fDevi = 0.725; // deviation noise scale\nconst fN1 = 0.0085123;\nconst fN2 = 0.0075936;\n\nfunction setup() {\n  createCanvas((S = max(windowWidth, windowHeight)), S);\n  M = S * fMar;\n  describe(\"lines from top (less noise) to bottom (more noise) increasing noise from left to right\");\n}\n\nfunction draw() {\n  background(32);\n  strokeWeight(1.5);\n  stroke(\"rgba(192,8,24,0.125)\");\n\n  // console.log(M, M * fDevi);\n  for (let x = width * fMar; x < width * (1 - fMar); x += 0.25) {\n    const fScl = x / width * 2;\n    const dx = (noise(x * fN1) - 0.5) * M * fDevi * fScl;\n    const dy = (noise(x * fN2 + TWO_PI) - 0.5) * M * fDevi * fScl;\n    // console.log(nf(dx, 0, 0), nf(dy, 0, 0));\n    line(x + dx * 0.5, M + dy * 0.5, x + dx * 2, height - M + dy * 2);\n  }\n\n  // noLoop() removed for animation\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

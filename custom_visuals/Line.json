@@ -1,0 +1,22 @@
+{
+  "name": "Line",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 22:58:33",
+  "url": "https://openprocessing.org/@epi/2228681",
+  "code": "// === Tab: shGrain ===\nvar fragSrc = `precision mediump float;\n  \n\t// x,y coordinates, given from the vertex shader\n  varying vec2 vTexCoord;\n\tuniform vec2 iResolution;\n\tuniform var iTime;\n\tuniform sampler2D tex0;\n\n#define PI 3.14159265\n\nfunction random( in vec2 st ) {\n\treturn fract(sin(dot(st.xy, vec2(12.9898,78.233)))*43758.5453123+iTime);\n}\n\nfunction main() {\n\tvec2 uv = gl_FragCoord.xy/iResolution.xy - 0.5; // 0 center\n\tuv.x *= iResolution.x / iResolution.y; // aspect ratio\n\t// get the color at current pixel\n\tvec4 clr = texture2D(tex0, vTexCoord);\n\tclr += 0.1 * (random(uv * PI)-.5);\n\tgl_FragColor = vec4(clr.rgb, 1.0);\n}`;\n\n// === Tab: mySketch ===\n/*\nhttps://www.taiyohmori.com/\nhttps://www.youtube.com/watch?v=nYGHbOjC1XM&t=361s\n*/\n\nvar shGrain;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpixelDensity(1);\n  describe('display blocks of lines forming lines, maybe overlapping');\n\tframeRate(60);\n\tshGrain = createFilterShader(fragSrc);\n}\n\nfunction draw() {\n\tif (frameCount === 1 || frameCount % 120 === 0)\t{\n\t\tbackground(216);\n\t\t// blocks\n\t\tdrawBlock()\n\t\tif (random() < 0.7) drawBlock()\n\t\tif (random() < 0.4) drawBlock()\n\t\tif (random() < 0.1) drawBlock()\n\t\t// grain\n\t\tshGrain.setUniform('iResolution', [width * displayDensity(), height * displayDensity()]);\n\t\tshGrain.setUniform(\"iTime\", millis()/1000);\n\t\t// shGrain.setUniform('tex1', get(0, 0, width, height));\n\t\tfilter(shGrain);\n\t}\n} // draw();\n\nfunction drawBlock() {\t\n\tstroke(random([16, 24, 32, \"navy\", \"darkred\"]));\n\tconst ww = random(0.6, 0.95);\n\tconst hh = random(0.02, 0.2);\n\tpush()\n\tconst minWH = max(width, height);\n\tconst f = 0.2;\n\ttranslate(random(-width*f, width*f), random(-height*f, height*f))\n\tdrawLines(width * (1-ww), height * (0.5-hh), width * ww, height * (0.5+hh))\n\tpop()\n}\n\nfunction drawLines(x1, y1, x2, y2) {\n\tfor (let x = x1; x < x2;) {\n\t\tx += random(0.5, 3)\n\t\tdrawVLine(x, y1, y2);\n\t}\n}\n\nfunction drawVLine(x, y1, y2) {\n\tstrokeWeight(random(1, 3))\n\t// line(x1, y1, x2, y2)\n\tfor (let y = y1; y < y2;) {\n\t\ty += random(0.5, 2)\n\t\tstrokeWeight(random(1, 3))\n\t\tpoint(x, y);\n\t}\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

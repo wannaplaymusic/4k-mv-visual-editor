@@ -1,0 +1,22 @@
+{
+  "name": "Mathober241003Potential",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:30:07",
+  "url": "https://openprocessing.org/@epi/2380210",
+  "code": "// === Tab: mySketch ===\n/*\nDay #3 Potential\nhttps://openprocessing.org/sketch/2380210\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nfunction setup() {\n  createCanvas((S = max(windowWidth, windowHeight)), S);\n  describe(\"anim of vector field in cycling resolution, potential colored\");\n  colorMode(HSB);\n}\n\nfunction draw() {\n  blendMode(BLEND);\n  background(\"rgb(0,0,12)\");\n  // blendMode(DIFFERENCE); // speed killer\n  drawField(40 + sin(frameCount / 123) * 30);\n}\n\nfunction drawField(n = 80) {\n  translate(width / 2, height / 2);\n  rotate(sin(frameCount/321)*PI)\n  const st = width / n;\n  strokeWeight(2);\n  const scl = (1 / max(width, height)) * 4;\n  for (let y = -width / 2 + st / 2; y < width / 2; y += st) {\n    for (let x = -height / 2 + st / 2; x < height / 2; x += st) {\n      point(x, y);\n      const ang = 5 * f(x * scl, y * scl);\n      push();\n      translate(x, y);\n      rotate(ang);\n      stroke(((((ang + TWO_PI) % TWO_PI) / TWO_PI) * 360 + 180) % 360, 65, 75);\n      line(0, 0, st, 0);\n      pop();\n    }\n  }\n}\n\nfunction f(x, y) {\n  // https://www.slideserve.com/tan/vector-fields-acting-on-a-curve\n  return (x + y) / exp(x * x + y * y);\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

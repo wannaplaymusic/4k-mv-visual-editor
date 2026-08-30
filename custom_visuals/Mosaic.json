@@ -1,0 +1,25 @@
+{
+    "name": "Mosaic",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:31:24",
+    "url": "https://openprocessing.org/@epi/1988534",
+    "code": "// === Tab: mySketch ===\nlet grid, gridW = 25, gridH = 25,gridSX, gridSY;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpixelDensity(1);\n\tframeRate(15);\n\t// // noLoop() removed for animation\n\tgrid = new Grid(gridW, gridH);\t\n}\n\nfunction draw() {\n\tbackground(64);\n\t\n\tgrid.nSclX = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) / width / 4;\n\tgrid.nSclY = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) / height / 4;\n\t\n\tconst gridSX = width / gridW;\n\tconst gridSY = height / gridH;\n\tgrid.update();\n\tnoFill();\n\tstroke(0)\n\tfor (let y = 0; y < gridH; y++) {\n\t\tbeginShape();\n\t\tcurveVertex(0, (grid.getKumm(0, y) + y) * gridSY)\n\t\tfor (let x = 0; x < gridW; x++) {\n\t\t\tconst val = grid.getKumm(x, y);\n\t\t\tcurveVertex(x * gridSX, (val + y) * gridSY)\n\t\t\tcircle(x * gridSX, (val + y) * gridSY, 8)\n\t\t}\n\t\tcurveVertex((gridW - 1) * gridSX, (grid.getKumm(gridW - 1, y) + y) * gridSY)\n\t\tendShape();\n\t}\n\t\n\tnoStroke()\n\tfill(212)\n\ttext(\"\" + nf(grid.nSclX, 0, 2) + \", \" + nf(grid.nSclY, 0, 2), 0, 10)\n}\n\nclass Grid {\n\tconstructor(w, h) {\n\t\tthis.w = w;\n\t\tthis.h = h;\n\t\tthis.nOffX = random(2222);\n\t\tthis.nOffY = random(2222);\n\t\tthis.nSclX = random(0.02, 0.005);\n\t\tthis.nSclY = random(0.5, 0.1);\n\t\t\n\t\tthis.grid = [];\n\t\tfor (let y = 0; y < gridH; y++) {\n\t\t\tthis.grid[y] = [];\n\t\t\tfor (let x = 0; x < gridW; x++) {\n\t\t\t\tthis.grid[y][x] = 0;\n\t\t\t}\n\t\t}\n\t\tthis.kumm = [];\n\t\tfor (let y = 0; y < gridH; y++) {\n\t\t\tthis.kumm[y] = [];\n\t\t\tfor (let x = 0; x < gridW; x++) {\n\t\t\t\tthis.kumm[y][x] = 0;\n\t\t\t}\n\t\t}\t\t\n\t\tthis.update();\n\t}\n\t\n\tupdate() {\n\t\tfor (let y = 0; y < gridH; y++) {\n\t\t\tfor (let x = 0; x < gridW; x++) {\n\t\t\t\tthis.grid[y][x] = noise((this.nOffX + x) * this.nSclX, (this.nOffY + y) * this.nSclY); // , frameCount * (this.nSclX+this.nSclY));\n\t\t\t\tthis.kumm[y][x] = this.grid[y][x]\n\t\t\t\tif (y > 0) this.kumm[y][x] += this.kumm[y-1][x];\n\t\t\t}\n\t\t}\t\t\n\t}\n\t\n\tget(x, y) {\n\t\treturn this.grid[y][x];\n\t}\n\tgetKumm(x, y) {\n\t\treturn this.kumm[y][x];\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Night Vision.mp4"
+    ]
+}

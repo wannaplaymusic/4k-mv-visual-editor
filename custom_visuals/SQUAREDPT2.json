@@ -1,0 +1,22 @@
+{
+    "name": "SQUAREDPT2",
+    "author": "ericfickes",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:28:47",
+    "url": "https://openprocessing.org/@ericfickes/61047",
+    "code": "// === Tab: sketch61047 ===\nlet centerX, centerY;\nlet x, y;\nlet a,b;\nlet amp = 666;\n \n//////////////////////////////////////////////////////////////////////////////\nfunction setup() {  // this is run once.   \n    \n    background(\"#EFEFEF\");\n    createCanvas(666, 666); \n \n    smooth();\n    noFill();\n \n    centerX = width/2;\n    centerY = height/2;\n \n    smooth();\n    strokeWeight(2);\n} \n \n \n//////////////////////////////////////////////////////////////////////////////\nfunction draw() {\n \n \n    stroke( random(frameCount), random(amp), random(amp), 10 ); \n    a = centerX + random(amp) * (180/TWO_PI);\n    b = centerY + random(amp) * (180/TWO_PI);\n \n    for( let t = 0; t <= 360; t += .1 ) {\n \n        x = centerX - amp * sin(a * t * TWO_PI/180);\n        y = centerY - amp * sin(b * t * TWO_PI/180);\n \n        point( x, y );\n        point( y, x );\n \n    }\n \n    if( frameCount % 60 == 0 )\n    {\n        amp *= .75;\n    }\n \n   if( frameCount > width*1.5 ) {\n        textFont(createFont(\"Helvetica\",11));\n        fill(0);\n        text(\"squared PT2\", 3, height-5);\n \n        // noLoop() removed for animation\n    }\n \n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

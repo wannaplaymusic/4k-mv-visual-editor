@@ -1,0 +1,25 @@
+{
+    "name": "Rectsinthewindgenuary2508",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:13:23",
+    "url": "https://openprocessing.org/@epi/2503156",
+    "code": "// === Tab: mySketch ===\n/*\n\trects in the wind #genuary8 #genuary #genuary2508\n\tDraw one million of something.\n\thttps://openprocessing.org/sketch/2503156\n\t#generativeart #creativecoding #p5js\n*/\nlet cnt = 0;\n\nfunction setup() {\n  createCanvas(800, 600);\n  frameRate(30);\n  noFill();\n  stroke(\"rgba(0,0,0,0.1)\");\n  rectMode(CENTER);\n  loop();\n  cnt = 0;\n}\n\nfunction draw() {\n  // for (let j = 0; j < 1; j++) {\n    if (cnt < 1000000) background(\"tan\");\n\n    let SZE = 100;\n    for (let x = SZE * 0.75; x < width * 0.925; x += SZE * 0.00725) {\n      push();\n      const y = height / 4;\n      const dF = noise(x / 23, y / 43, frameCount / 243) - 0.5;\n      translate(x, y + SZE * 2 * dF);\n      const angle = noise(x / 23, y / 41, frameCount / 243) * TWO_PI;\n      const szeF = noise(x / 93, y / 121, frameCount / 343);\n      rotate(angle);\n      if (cnt < 1000000) {\n        rect(0, 0, SZE * szeF); cnt++;\n      }\n      pop();\n      if (cnt >= 1000000) {\n        // noLoop() removed for animation\n        console.log(cnt, ~~(millis() / 1000), \"sec\");\n        break;\n      }\n    }\n  \n    let img = get(width/2, 0, width/2, height/2);\n    image(img, width/4, height/2);\n    img = get(0, 0, width/2, height/2);\n    image(img, width/4, 0);\n\n    // frame\n    if (true) {\n      push();\n      const sw = 10;\n      strokeWeight(sw);\n      stroke(\"rgb(27,26,26)\");\n      fill(\"rgb(27,26,26)\");\n      rectMode(CORNER);\n      if (false && cnt < 1000000) {\n        rect(sw/2, sw/2, width - sw, height - sw); cnt++;\n      }\n      // fill(\"rgb(22,20,20)\")\n      if (true || cnt < 1000000) {\n        rect(0, 0, width/4, height); cnt++;\n        rect(width*3/4, 0, width/4, height); cnt++;\n        line(0, height/2, width, height/2); cnt++;\n        // line(width/2, 0, width/2, height); cnt++;\n      }\n      if (false)\n      for (let i = 1; i < 4; i++) {\n        const x = 200 * i;\n        if (true || cnt < 1000000) {\n          line(x, 0, x, height); cnt++;\n        }\n      }\n      pop();\n    }\n  // }\n\t\n\tdrawMsg(\"rects in the wind (epi) #genuary2508\")\n}\n\nfunction drawMsg(msg) {\n\tpush();\n\t\n\tfill(\"black\")\n\tnoStroke();\n\ttextAlign(LEFT, TOP)\n\ttext(msg, 1, 1)\n\t\n\tfill(\"white\")\n\tnoStroke();\n\ttextAlign(LEFT, TOP)\n\ttext(msg, 0, 0)\n\n\tpop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Airlock Reverie.mp4"
+    ]
+}

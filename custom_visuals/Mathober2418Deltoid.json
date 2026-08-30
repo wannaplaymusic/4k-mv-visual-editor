@@ -1,0 +1,25 @@
+{
+    "name": "Mathober2418Deltoid",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:09:30",
+    "url": "https://openprocessing.org/@epi/2409646",
+    "code": "// === Tab: mySketch ===\n/*\nDay #18/24: Deltoid\nhttps://openprocessing.org/sketch/2409646\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nlet S;\n\nfunction setup() {\n\tS = ~~(max(windowWidth, windowHeight) / ~~random(4, 9));\n  createCanvas(S*~~(windowWidth/S), S*~~(windowHeight/S)); // (S = max(windowWidth, windowHeight)), S\n\tbackground(\"rgb(2,2,8)\");\n\tdescribe(\"grid of deltoid outlines in red/orange on dark background, some filled, slightly varying form\");\n  frameRate(60);\n  noFill();\n  strokeWeight(3);\n\tcolorMode(HSB, 1);\n  loop();\n}\n\nfunction draw() {\n\tblendMode(BLEND);\n\tbackground(\"rgb(2,2,8)\")\n\tblendMode(ADD);\n\n\tconst maxRot = 0.1;\n  for (let y = S; y <= height - S; y += S) {\n\t\tfor (let x = S; x <= width - S; x += S) {\n\t\t\tdrawDeltoid(x, y, S)\n\t\t}\n  }\n}\n\nfunction drawDeltoid(x, y, S) {\n\tpush()\n\ttranslate(x, y);\n\tS *= 2\n\tconst a = (noise(x, y, frameCount/123)-0.5) * 0.2;\n\tconst f = noise(PI*x/y+TWO_PI, frameCount/231);\n\tconst f1 = noise(x+y, frameCount/123) * 0.7 + 0.3;\n\tconst f2 = noise(x*y, frameCount/123) * 0.4 + 0.2;\n\tconst l1 = S * f1;\n\tconst l2 = S * f2;\n\tconst px = map(f, 0, 1, -l1, l1);\n\trotate(a);\n\tconst clr = color(fract(a+1), 0.75, 0.75);\n\tif (fract(a+1)<0.05) fill(clr)\n\tstroke(clr);\n\tbeginShape();\n\tvertex(-l1/2, 0);\n\tvertex(px, -l2/2);\n\tvertex(l1/2, 0);\n\tvertex(px, l2/2);\n\tendShape(CLOSE);\n\tpop()\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Slow Motion Static.mp4"
+    ]
+}

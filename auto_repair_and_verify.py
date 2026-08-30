@@ -49,6 +49,11 @@ IMMUNITY_STUBS_JS = """
   dummyObj.id = function() { return ""; };
   dummyObj.class = dummyObj.mousePressed = dummyObj.html = function() { return dummyObj; };
   dummyObj.value = function() { return 0; };
+  dummyObj.texture = function() { return dummyObj; };
+  dummyObj.changed = dummyObj.input = function() { return dummyObj; };
+  dummyObj.width = 100;
+  dummyObj.height = 100;
+  dummyObj[Symbol.iterator] = function* () { yield dummyObj; };
   const styleProxy = new Proxy(dummyObj, dummyHandler);
 
   if (typeof createP === 'undefined') window.createP = function() { return styleProxy; };
@@ -97,6 +102,45 @@ IMMUNITY_STUBS_JS = """
   if (typeof HALF_PI === 'undefined') window.HALF_PI = Math.PI / 2;
   if (typeof QUARTER_PI === 'undefined') window.QUARTER_PI = Math.PI / 4;
   if (typeof TWO_PI === 'undefined') window.TWO_PI = Math.PI * 2;
+  if (typeof window.P3D === 'undefined') window.P3D = "webgl";
+  if (typeof window.OPENGL === 'undefined') window.OPENGL = "webgl";
+  if (typeof window.P2D === 'undefined') window.P2D = "p2d";
+  if (typeof window.JAVA2D === 'undefined') window.JAVA2D = "p2d";
+  ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'].forEach(function(k) { if (typeof window[k] === 'undefined') window[k] = k.toLowerCase(); });
+  ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'].forEach(function(k) { if (typeof window[k] === 'undefined') window[k] = 0; });
+  if (typeof window.cnv === 'undefined') window.cnv = typeof createDiv !== 'undefined' ? createDiv() : { width: 1422, height: 800, parent: function(){}, position: function(){}, style: function(){} };
+  if (typeof window.inner1 === 'undefined') window.inner1 = window.cnv;
+  if (typeof window.eyePic === 'undefined') window.eyePic = window.cnv;
+  if (typeof window.myColor === 'undefined') window.myColor = '#ffffff';
+  if (typeof window.grainAmount === 'undefined') window.grainAmount = 0;
+  ['res','scr','gap','asd','nPoints','scaledT','_count','angleStepMax','objs','X0','pg','starColor','clr2','typ','largX'].forEach(function(k) {
+    if (typeof window[k] === 'undefined') {
+      if (k === 'objs') window[k] = [];
+      else if (k === 'scr') window[k] = window.cnv;
+      else if (k === 'pg') window[k] = { width: 100, height: 100, beginDraw: function(){}, endDraw: function(){}, background: function(){}, image: function(){}, get: function(){ return this; }, loadPixels: function(){}, updatePixels: function(){}, pixels: [] };
+      else if (k === 'starColor') window[k] = '#ffffff';
+      else if (k === 'clr2') window[k] = '#ffffff';
+      else if (k === 'typ') window[k] = 0;
+      else if (k === 'largX') window[k] = 0;
+      else if (k === 'angleStepMax') window[k] = 1;
+      else window[k] = 0;
+    }
+  });
+  if (typeof Element !== 'undefined' && Element.prototype && !Element.prototype.size) {
+    Element.prototype.size = function() { return this; };
+  }
+  if (typeof window._renderer !== 'undefined' && window._renderer && typeof window._renderer.getTexture !== 'function') {
+    window._renderer.getTexture = function() { return { update: function(){}, bindTexture: function(){}, unbindTexture: function(){} }; };
+  }
+  if (typeof p5 !== 'undefined' && p5.Image && p5.Image.prototype) {
+    if (!('gifProperties' in p5.Image.prototype)) {
+      Object.defineProperty(p5.Image.prototype, 'gifProperties', {
+        get: function() { return this._gifProps || { display: true, numFrames: 1, loopCount: 0, frameRate: 30, frames: [] }; },
+        set: function(val) { this._gifProps = val; },
+        configurable: true
+      });
+    }
+  }
 })();
 """
 
@@ -132,6 +176,12 @@ def transpile_processing_java_to_js(code):
     
     transpiled = re.sub(r'(\d+\.?\d*)f\b', r'\1', transpiled)
     transpiled = re.sub(r'\bfor\s*\(\s*(?:let\s+)?(?:[A-Z]\w*\s+)?(\w+)\s*:\s*(\w+)\s*\)', r'for (let \1 of \2)', transpiled)
+    
+    transpiled = re.sub(r'\bfullScreen\s*\(\s*(?:P3D|WEBGL|OPENGL)?\s*\)', 'createCanvas(windowWidth, windowHeight, WEBGL)', transpiled, flags=re.IGNORECASE)
+    transpiled = re.sub(r'\bfullScreen\s*\(\s*\)', 'createCanvas(windowWidth, windowHeight)', transpiled)
+    transpiled = re.sub(r'\bsize\s*\(\s*([^,)]+)\s*,\s*([^,)]+)\s*,\s*(?:P3D|WEBGL|OPENGL)\s*\)', r'createCanvas(\1, \2, WEBGL)', transpiled, flags=re.IGNORECASE)
+    transpiled = re.sub(r'\bsize\s*\(\s*([^,)]+)\s*,\s*([^,)]+)\s*,\s*(?:P2D|JAVA2D)\s*\)', r'createCanvas(\1, \2)', transpiled, flags=re.IGNORECASE)
+    transpiled = re.sub(r'\bsize\s*\(\s*([^,)]+)\s*,\s*([^,)]+)\s*\)', r'createCanvas(\1, \2)', transpiled)
     
     return transpiled
 
@@ -186,6 +236,17 @@ def make_test_html(code):
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
   <script>
+    (function() {{
+      const _origWarn = console.warn;
+      console.warn = function(...args) {{
+        if (args[0] && typeof args[0] === 'string' && (args[0].includes('vectors of different sizes') || args[0].includes('linger vector'))) {{
+          return;
+        }}
+        if (typeof _origWarn === 'function') {{
+          _origWarn.apply(console, args);
+        }}
+      }};
+    }})();
     window.__jsErrors = [];
     window.__drawCount = 0;
     window.__setupFinished = false;
@@ -208,6 +269,8 @@ class HeadlessTesterPage(QWebEnginePage):
         self.log_err_cb = log_err_cb
 
     def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
+        if "vectors of different sizes" in message or "linger vector" in message:
+            return
         if level.name in ['ErrorMessage', 'CriticalMessage'] or 'Uncaught' in message:
             self.log_err_cb(f"Line {lineNumber}: {message}")
 

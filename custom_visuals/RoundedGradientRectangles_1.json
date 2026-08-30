@@ -1,0 +1,25 @@
+{
+    "name": "RoundedGradientRectangles_1",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:33:54",
+    "url": "https://openprocessing.org/@epi/2751432",
+    "code": "// === Tab: mySketch ===\nconst DF = 0.9, N = 9, ANG = -0.8, FRMS = 150;\nlet startFrame, posArr;\n// const { Point, Line, Polygon } = EpiShapeSvg;\nconst { EpiColors } = EpiColorsPckg;\nlet epiColors;\n\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\t// createCanvas(~~(windowHeight*2/3), windowHeight);\n\tnoFill();\n\tnoStroke();\n\tepiColors = new EpiColors();\n\trectMode(CENTER);\n\t// epiColors.BG = EpiColors.getAdjustedBrightness(EpiColors.getAdjustedSaturation(epiColors.BG, 2), 0.35);\n\t\n\tstartFrame = frameCount;\n\t\n\tepiColors.getRandomPalette(true);\n\t\n\t// get position of clrs between 0..1\n\tposArr = [];\n\tfor (let i = 0; i <= N; i++) {\n\t\tposArr[i] = [];\n\t\tlet posSum = 0;\n\t\tfor (let j = 0; j < epiColors.palette.length; j++) {\n\t\t\tconst rndVal = random(0.3, 0.7); // keep min distance to next color\n\t\t\tposArr[i].push(rndVal);\n\t\t\tif (j < epiColors.palette.length-1) posSum += rndVal; \n\t\t}\n\t\tfor (let j = 0; j < epiColors.palette.length; j++) posArr[i][j] /= posSum; // normalize\n\t}\n\n}\n\nfunction draw() {\n\tblendMode(BLEND);\n\tbackground(\"#ffeeff\"); // \"#ffeeff\"); // epiColors.getAverageClr()\n\tblendMode(MULTIPLY);\n\tfill(\"grey\");\n\t// fill(random(epiColors.palette));\n\t\n\tconst ctx = drawingContext;\n\tconst x = width/2, y = height/2;\n\tconst d = height / 1.6;\n\tconst r = d / 2;\n\t\n\t// draw ring\n\tconst tf = 1-pow(1-min(1, (frameCount-startFrame)/FRMS), 2); // time f\n\t\n\tconst pal = [...epiColors.palette];\n\tfor (let i = N; i >= 0; i--) {\n\t\t// shuffle(epiColors.palette, true);\n\t\t// epiColors.palette.push(epiColors.palette.shift())\n\t\tpal.push(pal.shift());\n\t\tpush();\n\t\t\tconst f = i/N;\n\t\t\tconst an = ANG * f * tf;\n\t\t\tconst dx = d * map(f, 0, 1, 1, 0.1);\n\t\t\tconst dy = d * 1.5; // d * f + d * 0.5;\n\t\t  // rotated x y switched, due rect is rotated by -90 degrees \n\t\t\tconst ry = cos(an) * dy * 0.5;\n\t\t\tconst rx = sin(an) * dy * 0.5;\n\n\t\t\t// fill gradient\n\t\t\tconst linGrad = ctx.createLinearGradient(rx, -ry, -rx, ry);\n\t\t\t// console.log(\"---> \" + i, epiColors.palette)\n\t\t\tfor (let j = 0, gradPos = 0; j < pal.length; j++) {\n\t\t\t\tlinGrad.addColorStop(\n\t\t\t\t\tgradPos, // map(j, 0, epiColors.palette.length-1, 0, 1), \n\t\t\t\t\tEpiColors.getColor(pal[j], 64)\n\t\t\t\t);\n\t\t\t\t// console.log(`${j}: ${gradPos}`)\n\t\t\t\tgradPos += posArr[i][j]\n\t\t\t}\n\t\t\tctx.fillStyle = linGrad;\n\n\t\t\tpush()\n\t\t\ttranslate(x, y)\n\t\t\trotate(an);\n\t\t\trect(0, 0, dx, dy, dx/4);\n\t\t\tpop()\n\t\t\n\t\t\t// stroke(32); line(x+rx, y+ry, x-rx, y-ry); noStroke();\n\t\tpop();\n\t}\n\t\n\tif (frameCount > startFrame + FRMS * 1.5) {\n\t\tsetup();\n\t}\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > width*0.1) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Steel Horizon Loop.mp4"
+    ]
+}

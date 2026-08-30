@@ -1,0 +1,25 @@
+{
+    "name": "Followthecurve",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:08:00",
+    "url": "https://openprocessing.org/@epi/2825995",
+    "code": "// === Tab: mySketch ===\nconst NUM = 4, FRMS = 240;\nlet beziers, S, seed, BG;\n\nfunction setup() {\n\t// createCanvas(windowWidth, windowHeight);\n\tcreateCanvas(S=max(windowWidth, windowHeight), S);\n\tS = max(width, height);\n\tframeRate(30);\n\tnoFill();\n\n\t// seed\n\tseed = ~random(7654321);\n\trandomSeed(seed);\n\tnoiseSeed(seed);\n\n\tBG = color(random(16, 48), random(16, 48), random(16, 48));\n\t\n\t// beziers def\n\tbeziers = [];\n\tfor (let i = 0; i < NUM; i++) {\n\t\tlet lx, ly\n\t\tconst pts = [], calcPts = (i > 0 && random()<0.65) ? 3 : 4, bezIdx = beziers.length-1;\n\t\tif (calcPts === 3) pts.push(beziers[bezIdx][6], beziers[bezIdx][7])\n\t\tfor (let j = 0; j < calcPts; j++) {\n\t\t\tconst x = random(width);\n\t\t\tconst y = random(height);\n\t\t\tpts.push(x, y)\n\t\t}\n\t\tbeziers.push(pts);\n\t}\n\n\tbackground(\"navy\");\n\tbackground(BG);\n\tstroke(\"white\");\n\tstrokeWeight(2);\n}\n\nfunction draw() {\n\tfor (let i = 0; i < beziers.length; i++) {\n\t\tconst b = beziers[i];\n\t\t// bezier(...b);\n\n\t\tconst idx = ~~(frameCount / FRMS) % beziers.length;\n\t\tconst frg = (frameCount % FRMS) / FRMS;\n\t\tif (i === idx) drawBezPt(b, frg);\n\t}\n}\n\nfunction drawBezPt(bez, f) {\n\t// https://p5js.org/reference/p5/bezierPoint/\n\tpush();\n\tstrokeWeight(1);\n\n\tvar x = bezierPoint(bez[0], bez[2], bez[4], bez[6], f);\n\tvar y = bezierPoint(bez[1], bez[3], bez[5], bez[7], f);\n\t// circle(x, y, 7);\n\n\tconst t = millis()/10000;\n\tconst rr = noise (4*x/width, y/height, 100+t) * 300;\n\tconst gg = noise (x/width, 3*y/height, 200+t) * 200;\n\tconst bb = noise (2*x/width, 1.5*y/height, 300+t) * 255;\n\tconst dd = noise (x/width, y/height, 400+t/100) * S * 0.25;\n\n\tfill(rr, gg, bb);\n\tnoStroke();\n\tcircle(x, y, dd);\n\t\n\tpop();\n}\n\nfunction mousePressed() {\n\tif (mouseButton.left && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > width*0.1) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Night Vision.mp4"
+    ]
+}

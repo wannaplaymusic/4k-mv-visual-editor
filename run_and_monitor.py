@@ -1,131 +1,173 @@
-import sys
 import os
+import sys
 import time
-from PyQt6.QtWidgets import QApplication, QWidget, QProgressBar
+import logging
+from pathlib import Path
+from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-# Add workspace dir to system path
-workspace_dir = os.path.dirname(os.path.abspath(__file__))
-if workspace_dir not in sys.path:
-    sys.path.insert(0, workspace_dir)
+# 1. 動態環境與路徑配置
+WORKSPACE_DIR = Path(__file__).resolve().parent
+if str(WORKSPACE_DIR) not in sys.path:
+    sys.path.insert(0, str(WORKSPACE_DIR))
+
+# 可透過環境變數覆寫路徑，預設相容本地開發環境
+SCRATCH_DIR = WORKSPACE_DIR / "scratch"
+SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+
+MONITOR_LOG_PATH = SCRATCH_DIR / "monitor_log.txt"
+MONITOR_FRAME_PATH = SCRATCH_DIR / "monitor_frame.png"
+
+# 設定標準日誌系統（同時輸出控制台與檔案）
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(message)s",
+    datefmt="%H:%M:%S",
+    handlers=[
+        logging.FileHandler(MONITOR_LOG_PATH, mode="a", encoding="utf-8"),
+        logging.StreamHandler(sys.stdout),
+    ],
+)
+logging.info("=== Monitor Log Session Started ===")
 
 import main
 
-# 1. Mock output directory selection to return the last batch folder automatically
-main.safe_get_existing_directory = lambda parent, caption, directory="": "/Users/unclerm/Desktop/音樂發行/AI音樂/DUB-MV-3/Calm Twilight Chain/"
+# 2. 目錄自動注入
+DEFAULT_BATCH_DIR = (
+    "/Users/unclerm/Desktop/音樂發行/AI音樂/DUB-MV-3/Calm Twilight Chain/"
+)
+main.safe_get_existing_directory = (
+    lambda parent, caption, directory="": DEFAULT_BATCH_DIR
+)
 
-# Keep track of check times and frames
-last_check_time = [0]
-monitor_log_path = "/Users/unclerm/.gemini/antigravity/brain/09056949-c70c-41aa-8d63-30b863472947/scratch/monitor_log.txt"
 
-with open(monitor_log_path, "w", encoding="utf-8") as f:
-    f.write("=== Monitor Log Started ===\n")
-
-def check_image_content(img, frame_idx):
-    w = img.width()
-    h = img.height()
+# 3. 高效畫面檢測 (直接操作緩衝區)
+def check_image_content(img):
+    w, h = img.width(), img.height()
     if w == 0 or h == 0:
-        return "zero_size"
-        
-    is_black = True
+        return "zero_size", (0, 0, 0)
+
+    # 確保轉換為標準 32-bit RGB 格式以直接讀取記憶體
+    formatted_img = img.convertToFormat(img.Format.Format_RGB32)
+    ptr = formatted_img.bits()
+    if not ptr:
+        return "zero_size", (0, 0, 0)
+
+    ptr.setsize(formatted_img.sizeInBytes())
+    raw_bytes = bytes(ptr)
+    bytes_per_line = formatted_img.bytesPerLine()
+
     samples = []
-    # Down-sample and check colors
-    for x in range(0, w, int(max(1, w / 20))):
-        for y in range(0, h, int(max(1, h / 20))):
-            color = img.pixelColor(x, y)
-            r, g, b = color.red(), color.green(), color.blue()
+    step_x = max(1, w // 20)
+    step_y = max(1, h // 20)
+    is_black = True
+
+    # 20x20 網格取樣 (RGB32 在小端序為 B, G, R, A)
+    for y in range(0, h, step_y):
+        row_offset = y * bytes_per_line
+        for x in range(0, w, step_x):
+            pixel_offset = row_offset + (x * 4)
+            b = raw_bytes[pixel_offset]
+            g = raw_bytes[pixel_offset + 1]
+            r = raw_bytes[pixel_offset + 2]
+
             samples.append((r, g, b))
             if r > 8 or g > 8 or b > 8:
                 is_black = False
-                
-    # Check if solid color
-    first_color = samples[0] if samples else (0,0,0)
+
+    first_color = samples[0] if samples else (0, 0, 0)
     is_solid = all(c == first_color for c in samples)
-    
-    log_msg = f"[{time.strftime('%H:%M:%S')}] Frame {frame_idx}: size={w}x{h}, is_black={is_black}, is_solid={is_solid}, sample_color={first_color}\n"
-    print(log_msg.strip())
-    with open(monitor_log_path, "a", encoding="utf-8") as f:
-        f.write(log_msg)
-        
+
     if is_black:
-        return "black"
+        return "black", first_color
     if is_solid:
-        return "solid"
-    return "ok"
+        return "solid", first_color
+    return "ok", first_color
 
-# 2. Monkeypatch QProgressBar.setValue to perform visual check every 60 seconds
-original_set_value = QProgressBar.setValue
 
-def patched_set_value(self, val):
-    original_set_value(self, val)
-    
-    curr_time = time.time()
-    if curr_time - last_check_time[0] >= 60.0:  # Every 60 seconds
-        last_check_time[0] = curr_time
-        
-        # Find the clipper widget
+# 4. 獨立監控管理器 (取代 Monkeypatch)
+class RenderMonitor:
+    def __init__(self, interval_sec=60):
+        self.interval_ms = int(interval_sec * 1000)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.audit_render_frame)
+
+    def start(self):
+        self.timer.start(self.interval_ms)
+        logging.info(
+            f"[MONITOR] Audit monitor running every {self.interval_ms // 1000}s"
+        )
+
+    def audit_render_frame(self):
+        # 尋找全螢幕/無邊框渲染 Clipper 實例
         clipper = None
         for widget in QApplication.topLevelWidgets():
-            if widget.windowFlags() & Qt.WindowType.FramelessWindowHint:
-                if widget.width() > 1000:  # Large render resolution (4K or 1080p)
-                    clipper = widget
-                    break
-                    
-        if clipper:
-            views = clipper.findChildren(QWebEngineView)
-            if views:
-                # Capture frame from the active view
-                view = views[0]
-                pix = view.grab()
-                img = pix.toImage()
-                
-                # Check pixel content
-                status = check_image_content(img, val)
-                if status in ["black", "zero_size"]:
-                    warn_msg = f"⚠️ [MONITOR WARNING] Detect potential rendering anomaly! Status: {status} at Frame {val}\n"
-                    print(warn_msg.strip())
-                    with open(monitor_log_path, "a", encoding="utf-8") as f:
-                        f.write(warn_msg)
-                else:
-                    # Save a sample check image to the scratch directory for audit
-                    save_path = "/Users/unclerm/.gemini/antigravity/brain/09056949-c70c-41aa-8d63-30b863472947/scratch/monitor_frame.png"
-                    pix.save(save_path, "PNG")
-            else:
-                print("[MONITOR] Clipper found, but no QWebEngineView children active.")
+            if (
+                widget.windowFlags() & Qt.WindowType.FramelessWindowHint
+                and widget.width() > 1000
+            ):
+                clipper = widget
+                break
+
+        if not clipper:
+            logging.info(
+                "[MONITOR] Standby: Clipper widget not found in active top-level widgets."
+            )
+            return
+
+        views = clipper.findChildren(QWebEngineView)
+        if not views:
+            logging.warning(
+                "[MONITOR] Warning: Clipper found, but no QWebEngineView children attached."
+            )
+            return
+
+        view = views[0]
+        pix = view.grab()
+        img = pix.toImage()
+
+        status, sample_color = check_image_content(img)
+        log_msg = f"[AUDIT] Size={img.width()}x{img.height()}, Status={status}, SampleRGB={sample_color}"
+
+        if status in ("black", "zero_size", "solid"):
+            logging.warning(
+                f"⚠️ [MONITOR WARNING] Potential rendering anomaly! {log_msg}"
+            )
         else:
-            print("[MONITOR] Clipper widget not found in top-level widgets.")
+            logging.info(f"✅ {log_msg}")
+            pix.save(str(MONITOR_FRAME_PATH), "PNG")
 
-QProgressBar.setValue = patched_set_value
 
+# 5. 主程式入口
 def run_main():
-    print("[INFO] Starting QApplication...")
+    logging.info("[INFO] Starting QApplication...")
     app = QApplication(sys.argv)
     app.setOrganizationName("VibeCoding_Monitor")
     app.setOrganizationDomain("vibecoding_monitor.com")
     app.setApplicationName("4KMVVisualIntegrationEditor_Monitor")
-    
-    print("[INFO] Instantiating StandaloneInjectorApp...")
+
+    logging.info("[INFO] Instantiating StandaloneInjectorApp...")
     window = main.StandaloneInjectorApp()
     window.show()
-    
-    # Configure input directories
-    batch_dir = "/Users/unclerm/Desktop/音樂發行/AI音樂/DUB-MV-3/Calm Twilight Chain/"
-    window.audio_dir_input.setText(batch_dir)
-    
-    # Force output resolution to 1080p or 4K
-    window.res_select.setCurrentText("1080p (1920x1080)") # Use 1080p for faster self-test verification
+
+    # 自動載入參數
+    window.audio_dir_input.setText(DEFAULT_BATCH_DIR)
+    window.res_select.setCurrentText("1080p (1920x1080)")
     window.fps_select.setCurrentText("30")
-    
-    # We want to automatically trigger the batch rendering after UI is initialized
+
+    # 啟動獨立定時監控器
+    monitor = RenderMonitor(interval_sec=60)
+    monitor.start()
+
+    # 延遲 1.5 秒自動觸發渲染
     def auto_trigger():
-        print("[INFO] Auto-triggering batch rendering...")
+        logging.info("[INFO] Auto-triggering batch rendering...")
         window.start_batch_smart_edit_rendering()
-        
-    window.auto_trigger_func = auto_trigger
-    QTimer.singleShot(1500, window.auto_trigger_func)
-    
+
+    QTimer.singleShot(1500, auto_trigger)
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     run_main()

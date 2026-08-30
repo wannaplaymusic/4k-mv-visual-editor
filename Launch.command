@@ -46,6 +46,39 @@ if [ ! -d ".venv" ]; then
     echo "[INFO] 所有依賴套件安裝完成。"
 fi
 
+# 檢查並自動啟動本地 LLM 服務 (Ollama)
+echo "[INFO] 正在檢查本地 LLM 服務 (Ollama)..."
+if curl -s --max-time 1.5 http://localhost:11434/api/version &>/dev/null; then
+    echo "[INFO] 偵測到 Ollama 服務已在背景運行。"
+else
+    OLLAMA_BIN=""
+    if command -v ollama &>/dev/null; then
+        OLLAMA_BIN="ollama"
+    elif [ -f "/usr/local/bin/ollama" ]; then
+        OLLAMA_BIN="/usr/local/bin/ollama"
+    fi
+
+    if [ -n "$OLLAMA_BIN" ]; then
+        echo "[INFO] 正在自動啟動背景 Ollama LLM 服務..."
+        $OLLAMA_BIN serve > /dev/null 2>&1 &
+        sleep 1.5
+        if curl -s --max-time 2 http://localhost:11434/api/version &>/dev/null; then
+            echo "[INFO] 本地 LLM 服務 (Ollama) 背景啟動成功。"
+        else
+            echo "[WARNING] LLM 服務啟動中，系統將於非同步背景繼續嘗試連線。"
+        fi
+    else
+        echo "[INFO] 未偵測到本地 Ollama 命令，系統將自動採用 Rule-Based 預設導播模式。"
+    fi
+fi
+
+# 檢查 AI 核心模型檔案
+if [ -f "models/yamnet.onnx" ]; then
+    echo "[INFO] YAMNet 音頻神經網路模型 (models/yamnet.onnx) 已就緒。"
+else
+    echo "[WARNING] 未找到 models/yamnet.onnx，將使用備用 STFT 音訊特徵分析器。"
+fi
+
 # 執行主程式
 echo "[INFO] 正在啟動編輯器 GUI..."
 .venv/bin/python main.py

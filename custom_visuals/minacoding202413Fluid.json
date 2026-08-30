@@ -1,0 +1,22 @@
+{
+  "name": "minacoding202413Fluid",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:11:36",
+  "url": "https://openprocessing.org/@epi/2299503",
+  "code": "// === Tab: mySketch ===\n/*\nhttps://openprocessing.org/sketch/2299503\n#minacoding #generativeart #creativecoding #p5js\n*/\n\nconst CLRS = \"6b2737-e08e45-f8f4a6-bdf7b7-3943b7\"\n  .split(\"-\")\n  .map((i) => \"#\" + i);\n\nconst MAX_WAVES = 99;\nlet waves;\n\nfunction setup() {\n  createCanvas(400, 400);\n  // pixelDensity(1);\n  describe(\"animation of wave of abstract lines flowing left to right and varying wave heights\");\n  frameRate(60);\n  noStroke();\n  background(0, 0, 8);\n\n  waves = [];\n}\n\nfunction draw() {\n  if (waves.length < MAX_WAVES) waves.push(new Wave());\n\n  blendMode(BLEND);\n  background(0, 0, 8);\n\n  blendMode(ADD);\n  for (let w of waves) {\n    w.update();\n    w.draw();\n  }\n  waves = waves.filter((w) => w.an < TWO_PI);\n\n\t// beach\n\tblendMode(BLEND);\n\tctxLinGrad(0, height*2/3, 0, height, color(0, 0, 8, 0), color(CLRS[1]), 0.2, 0.8)\n\trect(0, height*2/3, 400, height*1/3)\n\t\n  push();\n  blendMode(BLEND);\n  stroke(0);\n  fill(255);\n  text(\"#minacoding 24/13 Fluid\", 0, 10);\n  pop();\n}\n\nclass Wave {\n  constructor() {\n    this.clr = lerpColor(color(CLRS[3]), color(CLRS[4]), random());\n    this.sw = ~~random(1, 4);\n\n    this.an = 0;\n    this.da = random(0.0001, 0.01);\n\n    this.x = ~~random(-width * 0.5, width * 0.25);\n    this.y = height - abs(randomGaussian(0, 125)); // ~~random(height);\n    this.w = ~~random(width * 0.25, width * 1.5);\n    this.h = ~~random(4, height * 0.1);\n  }\n\n  update() {\n    this.an += this.da;\n  }\n\n  draw() {\n    let x = this.x + sin(this.an/4) * this.w,\n      y = this.y,\n      w = this.w,\n      h = this.h,\n\t\t\thh = this.h * map(sin(this.an/2), 0, 1, 0.2, 1.75);\n\n\t\tlet clr = this.clr;\n\t\tconst al = (1 - abs(PI - this.an) / PI) * 500\n\t\tclr.setAlpha(al);\n    stroke(clr);\n    strokeWeight(this.sw);\n    \n    for (let xd = 0; xd < w; xd += h) {\n      const xx = x + xd;\n      if (noise(xd, y) < 0.75) line(xx, y, xx + h, y - hh);\n      if (noise(xd, y) < 0.5) line(xx + h, y, xx + h, y - hh);\n    }\n  }\n}\n\n// linear gradient\nfunction ctxLinGrad(x0, y0, x1, y1, c1, c2, p0 = 0, p1 = 1) {\n\tconst ctx = this.drawingContext;\n\tconst gradient = ctx.createLinearGradient(x0, y0, x1, y1);\n\tgradient.addColorStop(p0, c1);\n\tgradient.addColorStop(p1, c2);\n\tctx.fillStyle = gradient;\n\tctx.strokeStyle = gradient;\n};",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

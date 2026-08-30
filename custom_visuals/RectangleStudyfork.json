@@ -1,0 +1,22 @@
+{
+    "name": "RectangleStudyfork",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:08:15",
+    "url": "https://openprocessing.org/@epi/2695834",
+    "code": "// === Tab: mySketch ===\nlet rectA, rectB, rectO;\nlet palette;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tframeRate(60)\n  // // noLoop() removed for animation\n\tnoStroke();\n}\n\nfunction init() {\n\t  palette = shuffle([\n    \"#009dff\", \"#ff4500\", \"#ffc400\", \"#8bc34a\", \"#0051ff\", \"#926eff\",\n    \"#e75397\", \"#01b2e8\", \"#e8441f\", \"#ff6a00\", \"#f7a000\", \"#f4cd00\",\n    \"#54ab1d\", \"#1b82e6\", \"#6d5acf\", \"#dddddd\", \"#ff437f\", \"#ff8f35\",\n    \"#4dc268\", \"#647582\", \"#f6f6f6\", \"#028ff5\", \"#ff99cc\", \"#22d3ee\",\n    \"#15ad03\", \"#ff6347\", \"#ffec99\", \"#7fff00\", \"#0077b6\", \"#b983ff\",\n    \"#fafafa\", \"#ffcc00\", \"#3ddc84\", \"#004c6d\", \"#e6a6f5\", \"#ffdab9\",\n    \"#4a90e2\", \"#9c27b0\", \"#ffead0\", \"#d72638\", \"#ffeb3b\", \"#2196f3\",\n    \"#ff595e\", \"#ff924c\", \"#ffca3a\", \"#8ac926\", \"#1982c4\", \"#6a4c93\",\n    \"#f72585\", \"#7209b7\", \"#3a0ca3\", \"#4361ee\", \"#4cc9f0\", \"#00bbf9\",\n    \"#00f5d4\", \"#9ef01a\", \"#faff00\", \"#ff9f1c\", \"#ff4040\", \"#ff7f51\",\n    \"#d00000\", \"#f48c06\", \"#e36414\", \"#ffbf69\", \"#f28482\", \"#cdb4db\",\n    \"#a2d2ff\", \"#b5ead7\", \"#caffbf\", \"#e0fbfc\", \"#f1c0e8\", \"#e8eddf\",\n    \"#ffe66d\", \"#06d6a0\", \"#118ab2\", \"#ef476f\", \"#ffd6e0\", \"#ff99c8\"\n  ]);\n  generateRects();\n}\n\nfunction draw() {\n\tinit();\n  background(240);\n\n  fill(rectA.c);\n  rect(rectA.x, rectA.y, rectA.w, rectA.h);\n\n  fill(rectB.c);\n  rect(rectB.x, rectB.y, rectB.w, rectB.h);\n\n  if (rectO) {\n    fill(rectO.c);\n\t\tconst dx = randomGaussian()*10;\n\t\tconst dy = randomGaussian()*10;\n\t\t// console.log(`${dx}, ${dy}`);\n    rect(rectO.x + dx, rectO.y + dy, rectO.w, rectO.h);\n  }\n\n\tframeRate(1/2.5);\n  // nextGenTime = millis() + 2500;\n}\n\nfunction mousePressed() {\n  generateRects();\n}\n\nfunction generateRects() {\n  const shuffled = shuffle(palette);\n  rectO = null;\n\t\n\trectA = {\n    x: random(0, width - 200),\n    y: random(0, height - 200),\n    w: random(200, 500),\n    h: random(200, 500),\n    c: shuffled[0],\n  };\n\n\t// try hard to find a corresponding overlapping rectangle\n\tfor (let i = 0; i < 1000; i++) {\n\t\trectB = {\n\t\t\tx: random(0, width - 200),\n\t\t\ty: random(0, height - 200),\n\t\t\tw: random(200, 500),\n\t\t\th: random(200, 500),\n\t\t\tc: shuffled[1],\n\t\t};\n\t\trectO = getOverlapRect(rectA, rectB)\n\t\tif (rectO) {\n\t\t\trectO.c = shuffled[2];\n\t\t\tbreak;\n\t\t}\n\t}\n\n  redraw();\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}\n\nfunction getOverlapRect(a, b) {\n  const x_overlap = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));\n  const y_overlap = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));\n\n  if (x_overlap > 0 && y_overlap > 0) {\n    return {\n      x: Math.max(a.x, b.x),\n      y: Math.max(a.y, b.y),\n      w: x_overlap,\n      h: y_overlap\n    };\n  } else {\n    return null;\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

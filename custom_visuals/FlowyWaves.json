@@ -1,0 +1,22 @@
+{
+    "name": "FlowyWaves",
+    "author": "paulate",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-24 19:30:49",
+    "url": "https://openprocessing.org/@paulate/133048",
+    "code": "// === Tab: flowy_waves ===\nlet myPerlin;\nlet c=0;\nlet d=0;\nlet e=0;\n//let x=0;\nlet y=0;\nlet randPerl;\nlet count=0;\nlet mapHeight;\n\nfunction setup() {\n  background(\"#ffffff\");\n  createCanvas(800, 300);\n  noFill();\n  mapHeight=height;\n\n}\n\nfunction draw() {\n  changeColor();\n  changePerlin();\n  paint();\n  count++;\n  mapHeight=mapHeight-1;\n//  if (mapHeight==0) {\n//    // noLoop() removed for animation\n//  }\n  println(mapHeight);\n}\n\n\n\nfunction changeColor() {\n  \n  c = sin(radians(count))+1;\n  d = sin(radians(count+60))+1;\n  e = sin(radians(count+120))+1;\n  c = map(c,0,1,0,255);\n  d = map(d,0,1,0,255);\n  e = map(e,0,1,0,255);\n  println(c,d,e);\n  stroke(c,d,220);\n//  if (c>255) {\n//    // noLoop() removed for animation\n//  }\n}\nfunction paint() {\n  for (let x=0; x<width; x=x+1) {\n    myPerlin = noise(float(x)/200,count/200);\n    let myY = map(myPerlin, 0, 1, 0, height-mapHeight);\n    line(x, myY, x,height );\n  }\n \n}\n\nfunction changePerlin() {\n//  randPerl = random(0,110);\n  myPerlin = noise(count);\n//  println(myPerlin);\n\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

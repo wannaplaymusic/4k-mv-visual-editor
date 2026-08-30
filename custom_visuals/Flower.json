@@ -1,0 +1,22 @@
+{
+  "name": "Flower",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:02:14",
+  "url": "https://openprocessing.org/@epi/2058029",
+  "code": "// === Tab: mySketch ===\nvar flowers;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpixelDensity(1);\n\tframeRate(30)\n\tflowers = []\n\t// flowers.push(new Flower(16, 200, 350));\n\tfor (let  i = 0; i < 7; i++) {\n\t\tconst num = ~~random(9, 23);\n\t\tconst dst = ~~random(width * 0.3, width * 0.7);\n\t\tconst sze = ~~random(width * 0.5, width * 1.1);\n\t\tflowers.push(new Flower(num, dst, sze));\n\t}\n}\n\nfunction draw() {\n\tbackground(32);\n\t// translate(width * 0.5, height * 0.5)\n\t\n\tfor (let f of flowers) {\n\t\tf.update();\n\t\tf.show();\n\t}\n\t\n\t// drawCat();\n}\n\n// look here\n// https://editor.p5js.org/allison.parrish/sketches/kOHWUvQR1\n\nfunction drawCat() {\n\tpush()\n\tconst w = width\n\tconst h = height\n\tconst s = min(w, h * 0.5);\n\tfill(0)\n\tnoStroke()\n\t\n\tcircle(w * 0.5, h * 0.5, s)\n\ttriangle(w * 0.35, h * 0.2,\n\t\t\t\t\t w * 0.3, h * 0.4,\n\t\t\t\t\t w * 0.4, h * 0.4\n\t\t\t\t\t)\n\ttriangle(w * 0.65, h * 0.2,\n\t\t\t\t\t w * 0.6, h * 0.4,\n\t\t\t\t\t w * 0.7, h * 0.4\n\t\t\t\t\t)\t\n\terase();\n\tcircle(w * 0.4, h * 0.45, s * 0.2)\n\tcircle(w * 0.6, h * 0.45, s * 0.2)\n\tcircle(w * 0.5, h * 0.55, s * 0.15)\n\tarc(w * 0.5, h * 0.55, s * 0.6, s * 0.5, 0, PI)\n\tnoErase();\n\tarc(w * 0.5, h * 0.55, s * 0.6, s * 0.15, 0, PI)\n\terase();\n\tellipse(w * 0.5, h * 0.55, s * 0.15, s * 0.035)\n\tnoErase();\n\tpop()\n\tif (noise(frameCount * 0.01) < 0.35) erase() // ^^\n}\n\nclass Flower {\n\tconstructor(num, dst, sze)  {\n\t\tthis.pos = createVector(random(width * -0.3, width * 1.3), random(height * -0.3, height * 1.3))\n\t\tthis.seed = random(34875629);\n\t\tthis.num = num;\n\t\tthis.dst = dst;\n\t\tthis.sze = sze;\n\t\tthis.ang = random(TWO_PI);\n\t\tthis.clrs = [\"red\", \"green\", \"blue\"];\n\t\tthis.clrs = [\"purple\", \"white\"];\n\t}\n\tupdate()  {\n\t\t// this.ang += 0.01\n\t}\n\tshow()  {\n\t\tpush();\n\t\tblendMode(DIFFERENCE);\n\t\tnoiseSeed(this.seed);\n\t\tconst xo = 0; // (noise(123 + frameCount * 0.008512) - 0.5) * this.dst\n\t\tconst yo = 0; // (noise(234 + frameCount * 0.008134) - 0.5) * this.dst\n\t\ttranslate(this.pos.x + xo, this.pos.y + yo)\n\t\trotate(frameCount * 0.01)\n\t\tnoStroke();\n\t\tfor (let i = 0; i < this.num; i++) {\n\t\t\tconst ang = this.ang + i / this.num * TWO_PI;\n\t\t\tvar dst = sin(this.ang + frameCount * 0.01) * this.dst\n\t\t\tconst x = cos(ang) * dst;\n\t\t\tconst y = sin(ang) * dst;\n\t\t\tfill(this.clrs[i % this.clrs.length]);\n\t\t\tcircle(x, y, this.sze);\n\t\t}\n\t\tpop();\n\t}\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

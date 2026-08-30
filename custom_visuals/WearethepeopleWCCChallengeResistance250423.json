@@ -1,0 +1,22 @@
+{
+  "name": "WearethepeopleWCCChallengeResistance250423",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:15:44",
+  "url": "https://openprocessing.org/@epi/2623049",
+  "code": "// === Tab: mySketch ===\n/*\n\t\n\tWe are the people #WCCChallenge Resistance 250423 \n\thttps://openprocessing.org/sketch/2623049\n\t#generativeart #creativecoding #p5js\n\n  Dear Raph and creative coding community,\n\t\n\ta quick and simple one with the message:\n\t\t\"We are the world, We are the people\"\n\t\thttps://www.youtube.com/watch?v=9AjkUyX0rVw\n\tAgainst discrimination and abuse, pro democracy and diversity!\n\t\n\tFeel free to fork and add more colors!\n\t\n\tMaybe one intersting coding thing: lerpClrArr() #51\n\tLerps the color of an array at a specific position.\n\t\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\nconst CLRS_TXTL = [\"tan\", \"orange\", \"steelblue\", \"darkred\", \"darkgreen\", \"navy\"];\nconst CLRS_SKIN = [\"rgb(48,32,4)\", \"rgb(235,229,203)\", \"darkorange\"];\nconst SZE = 50;\nconst GR_S = ~~(SZE/4);\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"croud of abstract people filling the canvas over time with various body and textile colors to represent resistance against autocratic regimes which wants to supress diversity\");\n\tbackground(32);\n\tnoStroke();\n\trectMode(CENTER);\n}\n\nfunction draw() {\n\tdrawPeople(~~(random(width)/GR_S)*GR_S, ~~(random(height)/GR_S)*GR_S, random(0.9, 1.1)*SZE);\n}\n\nfunction drawPeople(x, y, s) {\n\ts = map(y, 0, height, s*0.5, s*2)\n\tfill(lerpClrArr(CLRS_TXTL, random()));\n\trect(x, y, s/5, s, s/20);\n\tfill(lerpClrArr(CLRS_TXTL, random()));\n\trect(x, y-s/10, s/2, s/2, s/10);\n\tfill(lerpClrArr(CLRS_SKIN, random()));\n\tcircle(x, y-s/2, s/3);\n}\n\nfunction lerpClrArr(clrArr, f) {\n\tf *= clrArr.length;\n\tconst idx1 =  ~~f;\n\tconst idx2 = (idx1 + 1) % clrArr.length;\n\tif (typeof clrArr[idx1] == \"string\") clrArr[idx1] = color(clrArr[idx1]);\n\tif (typeof clrArr[idx2] == \"string\") clrArr[idx2] = color(clrArr[idx2]);\n\treturn lerpColor(clrArr[idx1], clrArr[idx2], fract(f))\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

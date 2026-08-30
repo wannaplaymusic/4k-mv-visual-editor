@@ -1,0 +1,22 @@
+{
+  "name": "Windisblowing",
+  "author": "tsulej",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 03:14:14",
+  "url": "https://openprocessing.org/@tsulej/151044",
+  "code": "// === Tab: sketch151044 ===\nfunction setup() {\n  createCanvas(500, 500);\n  smooth();\n  noStroke();\n  noiseDetail(4);\n}\n\nlet a = 0;\nlet s = TWO_PI/120;\n\nfunction draw() {\n  doLines();\n  a+=s;\n}\n\nfunction doLines() {\n  background(226,210,184);\n   for(let j=50;j<450;j+=25) {\n     for(let i=50;i<450;i++) {\n      if(j!=50 && j!=440) { //grid\n      let step = sin(a)*(sin((450-i)*PI/400.0));\n       let swing = j+step*(180.0*noise(a+i/300.0, a+j/300.0,a/10.0)-90.0);\n       let dx = randomC()/2;\n       let dy = randomC()/2;\n       let x = i+dx;\n       let y = swing+dy;\n       fill(20,150-150*sqrt(sq(dx)+sq(dy))); // pencil effect\n       ellipse(x,y,2,2);\n    }\n  }\n }\n\n}\n\n//pseudo\nfunction randomC() {\n  let r = random(0,1);\n  let ang = sin(TWO_PI*random(0,1));\n  return r*ang;\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

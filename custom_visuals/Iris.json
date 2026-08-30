@@ -1,0 +1,22 @@
+{
+  "name": "Iris",
+  "author": "u70038",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-24 19:31:47",
+  "url": "https://openprocessing.org/@u70038/418113",
+  "code": "// === Tab: mySketch ===\n//  olibrotherhood.co.uk\n\n\nlet palette = [\"#046380\", \"#16193B\", \"#35478C\", \"#4E7AC7\", \"#7FB2F0\", \"#ADD5F7\"];\n\nlet xCen, xCen2, xCen3;\nlet yCen, yCen2, yCen3;\nlet off = 0.0;\nlet angle;\nlet off2 = 0.0;\nlet angle2;\nlet inc = random(.0075);\nlet off3 = 0.0;\nlet angle3;\nlet inc2 = random(.0075);\nlet inc3 = random(.0075);\nlet count = 0;\n\nfunction setup(){\n  createCanvas(800, 800);\n  background(255);\n  noFill();\n  xCen = width*.4;\n  yCen = height*.4;\n  xCen2 = width*random(.4);\n  yCen2 = height*random(.4); \n  xCen3 = width*random(.4);\n  yCen3 = height*random(.4);\n}\nfunction draw(){    \n  \n  if (count <= 3000){\n    translate(width/2, height/2);\n    \n    if (count % int(random(50, 100)) == 0){\n      stroke(palette[int(random(palette.length))], 10); \n    }\n    \n    bezier(0, 0, xCen3*cos(radians(angle3)), yCen3*sin(radians(angle3)), xCen2*cos(radians(angle2)), yCen2*sin(radians(angle2)), xCen*cos(radians(angle)), yCen*sin(radians(angle)));\n\n    angle = noise(off) * width; \n    off += inc;   \n    angle2 = noise(off2) * width;\n    off2 += inc2;  \n    angle3 = noise(off3) * width;\n    off3 += inc3;\n    translate(-width/2, 0);   \n    count++;\n  }\n}\n\nfunction mousePressed(){\n  background(255);\n  xCen2 = width*random(.4);\n  yCen2 = height*random(.4);\n  xCen3 = width*random(.4);\n  yCen3 = height*random(.4); \n  inc = random(.005);\n  inc2 = random(.005);\n  inc3 = random(.005);\n  count = 0;\n}\n\nfunction keyPressed(){\n  if (key == 'p'){\n    saveFrame(\"line-######.png\");\n  }\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

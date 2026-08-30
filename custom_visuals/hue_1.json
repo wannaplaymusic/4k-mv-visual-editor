@@ -1,0 +1,22 @@
+{
+  "name": "hue_1",
+  "author": "a_soluble_fish",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 17:41:08",
+  "url": "https://openprocessing.org/@a_soluble_fish/1833611",
+  "code": "// === Tab: mySketch ===\n//for weekly Creative Coding Challenge-- https://openprocessing.org/curation/78544 on theme of \"Single Hue\" \n//Don't have a lot of commentary on the artistic process this time so\n//decided to add lots of comments in the code to try to make it more legible. \n\n\n//colors array is array of hues and saturations- 'theColor' variable below chooses from array,\n//weighted towards the blues of my favorite coffee mug\ncolors=[ [198, 64],[198, 64], [198, 64],[193, 100], [193, 100],[193, 100],[88, 19], [33, 93], [355, 32]]\nlet theColor\nlet texture\n\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\t\t\t\t\t\t \n  pixelDensity(1)\n\ttheColor=random(colors)\n\tcolorMode(HSB)\n\tnoStroke()\n\t\n\t//texture-- noise with a bit randomness thrown in, pixel array of buffer,\n\t//which is rendered once in setup and drawn over canvas every frame at the end of draw\n\ttexture=createGraphics(windowWidth, windowHeight)\n\ttexture.pixelDensity(1)\n\ttexture.loadPixels()\n\tfor(let x=0; x<width; x++){\n\t\tfor(let y=0; y<height; y+=floor(random(0, 3))){\n\tvar index = (x + y * width)*4;\n\t\tlet avalue= map(noise(x/100, y/100), -1, 1, 0, 60)\n\t  texture.pixels[index+0]= 0;\n    texture.pixels[index+1]= 0;\n    texture.pixels[index+2]= 0;\n    texture.pixels[index+3]= avalue;\t\t\n\t\t}\n\t}\n\ttexture.updatePixels()\n}\n\nfunction draw() {\nbackground(theColor[0], theColor[1], 10)\n\t\n//thetaOff variable adds an offset so that the different shapes (drawn w 'blib' function  below)\n//are offset from each other in a pleasing way\nthetaOff=0\t\n\tfor(let y=-100; y<height+100; y+=75){\n\t\tthetaOff+=1\n\tfor(let x=-150; x<width+150; x+=350){\n\t\tthetaOff-=3\n\t\tblib(x, y, thetaOff)\n\t\t\n\t}\n\t}\n\t//drawing the pre-rendered texture\n\timage(texture, 0, 0)\n}\n\n//'blib' function takes an x/y position, and a 'theta' which allows\n//the shapes to be in a different place in the sine wave that defines the size of the ellipses\n//note: no shapes are actually moving, they are merely changing size\nfunction blib(x, y, theta){\n\tpush()\n\ttranslate(x, y)\n\tfor(let i=0; i<TAU; i+=TAU/22){\n\t//yer moves the shapes up as we iterate through the sine wave\n\tlet yer= map(i, 0, TAU, 0, -200)\n\t//bright changes the brightness of HSB color as we iterate\n\tbright= map(i, 0, TAU, 10, 100)\n\t\t\n\t//setting the saturation of the HSB color, desaturating towards the top, so that we get closer to white\n\tif(bright>60){\n\t\tsat=map(bright, 60, 100, theColor[1], 0)\n\t} else {\n\t\tsat=theColor[1]\n\t}\n\t\t\n\t//'size' sets the size of the ellipses according to it's place in the sine wave\n\t// as defined by it's thetaOffset, plus iteration plus slowed down frameCount\n\t//Also, sizeScaler scales the changes up and down, you can uncomment line 80 to see what sizeScaler does\n\t\tlet size= map(sin(theta+i-frameCount/30), -1, 1, 10, 200)\n\t\tlet sizeScaler= map(i, 0, TAU, 2, 0.1)\n\t//\tsizeScaler=1\n\t//fill is Hue- defined by 'theColor' variable, Saturation by the adjusted saturation\n\t//in sat variable and brightness from dark to light by iteration\n\t\tfill(theColor[0], sat, bright)\n\t\t\n\t//ellipse sized by the above variables\n\t\tellipse(0, yer, size*sizeScaler, size/2*sizeScaler)\n\t\t\n\t}\n\tpop()\n\t\n\t\n\t\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

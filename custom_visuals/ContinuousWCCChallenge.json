@@ -1,0 +1,22 @@
+{
+    "name": "ContinuousWCCChallenge",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:01:15",
+    "url": "https://openprocessing.org/@epi/1930257",
+    "code": "// === Tab: mySketch ===\n// Continuous 🥨 #WCCChallenge \n//\n// Ola Raph and fellow creative coders\n// inspired by the iconic album cover from joy divisions \"unknown pleasures\"\n// https://en.wikipedia.org/wiki/Unknown_Pleasures#Artwork_and_packaging\n// created a continuous 3D environment with retro color\n\nfunction setup() {\n  pixelDensity(1);\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  frameRate(30);\n}\n\nfunction draw() {\n  background(0, 0, 8);\n\n  rotateX(0.85);\n  // rotateX(frameCount * 0.01);\n  // rotateY(frameCount * 0.01);\n  // fill(48, 8, 40);\n\n  const sizeBar = 25;\n  const numBarsX = 60;\n  const numBarsY = 60;\n  let noiseOffX = 111 + frameCount;\n  let noiseOffY = 333 + frameCount * 2;\n\n  stroke(0); // 32, 192, 160)\n  // fill(32, 192, 160, 32);\n  let posY = (-numBarsY / 2) * sizeBar;\n  for (let y = 0; y < numBarsY; y+=2) {\n    fill(32, 192, 160, map(y, 0, numBarsY, 4, 64));\n    let posX = (-numBarsX / 2) * sizeBar;\n    for (let x = 0; x < numBarsX; x++) {\n\t\t\t// get height (n) as noise\n      const n = noise((x + noiseOffX) * 0.15, (y - noiseOffY) * 0.215);\n\t\t\t// scale n * 256 and shrink on edges (with limit 0.1)\n      const d =\n        n *\n        256 *\n        max(0.1, easeInOutExpo(1 - abs(x - numBarsX / 2) / (numBarsX / 2)));\n      rect3d(posX, posY, sizeBar, sizeBar, d);\n      posX += sizeBar;\n    }\n    posY += 2*sizeBar;\n  }\n\n  // // noLoop() removed for animation\n}\n\n// https://easings.net/#easeInOutSine\nfunction easeInOutExpo(x) {\n  return x === 0\n    ? 0\n    : x === 1\n    ? 1\n    : x < 0.5\n    ? Math.pow(2, 20 * x - 10) / 2\n    : (2 - Math.pow(2, -20 * x + 10)) / 2;\n}\nfunction easeInOutSine(x) {\n  return -(Math.cos(Math.PI * x) - 1) / 2;\n}\n\nfunction rect3d(x, y, w, h, d) {\n  push();\n  translate(x, y, d / 2);\n  box(w, h, d);\n  pop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

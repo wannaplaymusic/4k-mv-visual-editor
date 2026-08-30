@@ -1,0 +1,22 @@
+{
+    "name": "IsoView",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:26:51",
+    "url": "https://openprocessing.org/@epi/2113432",
+    "code": "// === Tab: mySketch ===\nconst NUM = 25;\nlet SZE = 20;\nlet grid;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdisplayDensity(1)\n\tframeRate(60)\n\t\n\tSZE_X = ~~ ( (width/Math.sqrt(3)) / (NUM+1))\n\tSZE_Y = ~~ ( (height/ (NUM+1)))\n\tSZE = min(SZE_X, SZE_Y)\n\t\n\t// streets\n\tlet streets = [];\n\tfor (let i = 0; i < 10; i++) {\n\t\t\n\t}\n\t\n\tgrid = []\n\tfor (let y = 0; y < NUM; y++) {\n\t\tfor (let x = 0; x < NUM; x++) {\n\t\t\t// item = new IsoCube(x, y, SZE, (x + y * 0.5) * 15, 1)\n\t\t\titem = new IsoCube(x, y, SZE, noise(x * 0.132, y * 0.5) * 360, 1)\n\t\t\titem.l = max(SZE, Math.pow(Math.pow(item.s, noise(width + item.x, height + item.y, frameCount * 0.005) + 0.5), 20));\n\t\t\tif (x === 3 || x === 4 || x === 9 || y === 4 || y === 11 || y === 12) item.l = 0;\n\t\t\tgrid.push(item)\n\t\t}\n\t}\n}\n\nfunction draw() {\n\tbackground(100);\n\t\n\t// gradient\n\tconst ctx = drawingContext;\n\tconst gradient = ctx.createLinearGradient(0, 0, 0, height);\n\tgradient.addColorStop(0, color(64));\n\tgradient.addColorStop(1, color(160));\n\tctx.fillStyle = gradient;\n\tctx.fillRect(0, 0, width, height);\t\n\n\t// cubes\n\tpush()\n\ttranslate(width * 0.5, height * 0.5 - NUM * SZE * 0.5)\n\tfor (let item of grid) {\n\t\t// item.l = item.s + sin((frameCount * 0.02+ item.x + item.y) ) * item.s * 0.5;\n\t\t// item.l = Math.pow(item.s, noise(width + item.x, height + item.y, frameCount * 0.005) + 0.65); // map(noise(item.x, item.y, frameCount * 0.005), 0, 1, 0, item.s * 3)\n\t\tif (item.l > 0) item.l = max(SZE, Math.pow(Math.pow(item.s, noise(width + item.x, height + item.y, frameCount * 0.0025) + 0.45), 1.25));\n\t\titem.show();\n\t}\n\tpop()\n\t\n\t// // noLoop() removed for animation\n}\n\n\n\nclass IsoCube {\n\tconstructor(x, y, s = 10, h = 10, l) {\n\t\tconst sx = (x - y) * s * Math.sqrt(3) * 0.5;\n\t\tconst sy = s / 2 +  x * s * 0.5 +  y * s * 0.5;\n\t\tthis.x = sx; // pos x\n\t\tthis.y = sy; // pos y\n\t\tthis.s = s; // size\n\t\tthis.h = h; // hue color\n\t\tthis.l = l || s; // length\n\t}\n\n\t// https://en.wikipedia.org/wiki/Isometric_projection\n\tshow() {\n\t\tpush()\n\t\trectMode(CENTER)\n\t\tcolorMode(HSB)\n\t\t\n\t\ttranslate(this.x, this.y)\n\t\t\n\t\tconst x = this.s * Math.sqrt(3) * 0.5;\n\t\tconst y = this.s * 0.5;\n\t\t\n\t\t// console.log(\"\" + x + \", \" + y + \", \" + this.l)\n\t\t\n\t\t// base\n\t\tfill(this.h, 50, 50)\n\t\tif (this.l <= 0) fill((this.x + this.y) % 8 + 16)\n\t\tquad(x, 0, 0, y, -x, 0, 0, -y)\n\t\tif (this.l > 0) {\n\t\t\t/* lines\n\t\t\tpush()\n\t\t\tconst d = 16\n\t\t\tstrokeWeight(d)\n\t\t\tstroke(0)\n\t\t\tline(-x + d, -this.l, 0, -y - this.l + d * 0.5)\n\t\t\tstroke(128)\n\t\t\tline(x - d, -this.l, 0, -y - this.l + d * 0.5)\n\t\t\tpop()\n\t\t\t*/\n\t\t\t// left\n\t\t\tfill(this.h, 65, 75)\n\t\t\tquad(0, y, -x, 0, -x, -this.l, 0, y - this.l)\n\t\t\t// right\n\t\t\tfill(this.h, 85, 25)\n\t\t\tquad(0, y, x, 0, x, -this.l, 0, y - this.l)\n\t\t\t// top\n\t\t\tfill(this.h, 75, 60)\n\t\t\tquad(x, -this.l, 0, y - this.l, -x, -this.l, 0, -y - this.l)\n\t\t}\n\t\tpop()\n\t}\n\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

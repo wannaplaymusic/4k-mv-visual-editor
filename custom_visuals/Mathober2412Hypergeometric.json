@@ -1,0 +1,22 @@
+{
+    "name": "Mathober2412Hypergeometric",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:01:36",
+    "url": "https://openprocessing.org/@epi/2394452",
+    "code": "// === Tab: Easings ===\n// https://easings.net/\n\nfunction easeInOutElastic(x) {\n\tconst c5 = (2 * Math.PI) / 4.5;\n\treturn x === 0\n\t\t? 0\n\t\t: x === 1\n\t\t? 1\n\t\t: x < 0.5\n\t\t? -(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * c5)) / 2\n\t\t: (Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * c5)) / 2 + 1;\n}\n\nfunction easeInOutCubic(x) {\n\treturn x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;\n}\n\nfunction easeInCubic(x) {\n\treturn x * x * x;\n}\n\nfunction easeInQuart(x) {\n\treturn x * x * x * x;\n}\n\n// === Tab: mySketch ===\n/*\nDay #12/24: Hypergeometric \nhttps://openprocessing.org/sketch/2394452\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nvar lp, np, slc, len, clrs, clr, bg;\n\nfunction setup() {\n\t// createCanvas(windowWidth, windowHeight);\n\tif (windowWidth * 0.75 > windowHeight) {\n\t  createCanvas(windowHeight / 0.75, windowHeight);\t\n\t} else {\n\t  createCanvas(windowHeight * 0.75, windowHeight);\t\n\t}\n\tcolorMode(RGB, 1);\n\tdescribe(\"random line walker with traingle angles and color from predefined palette zooming in giving an blury image with some detailed lines\");\n  frameRate(60);\n  strokeWeight(~~random(3, 5.7));\n  len = ~~(max(windowWidth, windowHeight) / random(8, 17));\n  slc = 3; // ~~random(3, 9); // 3...8 #slices\n  lp = { x: width / 2, y: height / 2 };\n  blendMode(BLEND);\n\tclr = color(\"rgb(0, 0, 8)\"); // color(random(clrs));\n  stroke(clr);\n  background(\"rgb(0, 0, 8)\"); // bg\n  loop();\n}\n\nfunction draw() {\n  // rule 1: zoom in every x frame\n  if (frameCount % 2 === 0) {\n    const bg = get(0, 0, width, height);\n\t\tconst dx = ~~(width*0.005); const dx2 = dx*2;\n\t\tconst dy = ~~(height*0.005); const dy2 = dy*2;\n    image(bg, -dx, -dy, width + dx2, height + dy2);\n\t\tlp.x = map(lp.x, 0, width-1, -dx, width+dx-1);\n\t\tlp.y = map(lp.y, 0, height-1, -dy, height+dy-1);\n  }\n  // rule 2: connect new point with last point with random color change\n  np = { x: width, y: height }; // invalid next pt, forces while loop:\n  while (np.x < 0 || np.x >= width - 1 || np.y < 0 || np.y >= height - 1) {\n    const a = (~~random(slc) * TWO_PI) / slc;\n    var dx = ~~(cos(a) * len);\n    var dy = ~~(sin(a) * len);\n    np = { x: lp.x + dx, y: lp.y + dy };\n  }\n\tlet dstClr = clr;\n\tdstClr = color(0.2, np.x/width, np.y/height);\n\tclrLine(lp.x, lp.y, np.x, np.y, clr, dstClr);\n\tclr = dstClr;\n  lp = np;\n}\n\nfunction clrLine(x1, y1, x2, y2, c1, c2) {\n\t// const easings = [easeInOutElastic, easeInOutCubic, easeInCubic];\n\t// const easing = random(easings);\n\tconst dst = dist(x1, y1, x2, y2);\n\tfor (let i = 0; i <= dst; i++) {\n\t\tconst f = i/dst;\n\t\tconst x = lerp(x1, x2, f);\n\t\tconst y = lerp(y1, y2, f);\n\t\tconst c = lerpColor(c1, c2, f); // easing(f);\n\t\tstroke(c);\n\t\tpoint(x, y);\n\t}\n}\n\nfunction mousePressed() {\n  if (mouseButton === LEFT) {\n    if (isLooping() === true) {\n      // noLoop() removed for animation\n    } else {\n      loop();\n    }\n  }\n}\n\nfunction doubleClicked() {\n  if (mouseButton === LEFT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

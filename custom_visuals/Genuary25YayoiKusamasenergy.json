@@ -1,0 +1,25 @@
+{
+    "name": "Genuary25YayoiKusamasenergy",
+    "author": "a_soluble_fish",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:30:40",
+    "url": "https://openprocessing.org/@a_soluble_fish/1808558",
+    "code": "// === Tab: mySketch ===\nlet colors=['#e2942f','#d95655','#1866a7','#68a145','#2f4f82']\nlet simplex\n\nfunction setup() {\n\tlet w= max(windowWidth, windowHeight) \n\tcreateCanvas(w, w);\n\tsimplex = new OpenSimplexNoise(Date.now());\n\trandomSeed(1)\n}\n\t\nfunction draw(){\t\n\tbackground(colors[4]);\n\ttranslate(width/2, height/2)\n\tnoStroke()\nlet colorPicker=0\nfor(let a=TAU/40; a<TAU+TAU/40; a+=TAU/20){\n\temmision(a, a+TAU/20, colorPicker%5)\n\tcolorPicker++\n}\n\t\n\t\n\t\nfill(0)\n\t\n\tfor(let a=0; a<TAU; a+=TAU/20){\n\t for(let d=width/6; d<width*0.75; d+=width/12){\n\t\t let sizer= map(d, width/8, width*0.75, width/75, width/20)\n\t\t let dOffset= map(simplex.noise3D(a/10, d/200, frameCount/50), -1, 1, -sizer/2, sizer/2)\n\t\t let aOffset= map(simplex.noise3D(d/200, cos(a/10), frameCount/50), -1, 1, -TAU/40, TAU/40)\n\t\t \n\t\t pdot(cos(a+aOffset)*d+ dOffset, sin(a+aOffset)*d+dOffset, sizer)\n\t\t \n\t }\n\t\t\n\t\t\n\t}\n\tfill('#b4032e')\n\tpdot(0, 0, width/8)\n}\n\n\nfunction emmision(beginA, endA, colorIndex){\n\tfill(colors[colorIndex])\n\tbeginShape()\n\tvertex(0, 0)\n\tfor(let d=1; d<width*0.75; d+=5){\n\t\t//let dOffset= map(simplex.noise3D(a/10, d/200, frameCount/50), -1, 1, -sizer/2, sizer/2)\n\t\tlet aOffset= map(simplex.noise3D(d/200, cos(beginA/10), frameCount/50), -1, 1, -TAU/40, TAU/40)\n\t\tvertex(cos(beginA+aOffset)*d, sin(beginA+aOffset)*d)\n\t}\n\t\n\tfor(let d=width*0.75; d>0; d-=5){\n\t\tlet aOffset= map(simplex.noise3D(d/200, cos(endA/10), frameCount/50), -1, 1, -TAU/40, TAU/40)\n\t\tvertex(cos(endA+aOffset)*d, sin(endA+aOffset)*d)\t\n\t}\n\tendShape(CLOSE)\n\t\n}\n\n\n\n\nfunction pdot(x, y, r){\n\tpush()\n\t\ttranslate(x, y)\n\t\tbeginShape()\n\trandomSeed(r)\n\tlet xOffer=random(1000)\n\tlet yOffer= random(1000)\n\t// let r= width/8\n\t\tfor(let a=0; a<=TAU; a+=TAU/100){\n\t\t\tlet xoff=map(simplex.noise3D(cos(a), xOffer, frameCount/50), -1, 1, -r/4, r/4)\n\t\t\tlet yoff=map(simplex.noise3D(sin(a), yOffer, frameCount/50), -1, 1, -r/4, r/4)\n\t\t\tcurveVertex(cos(a)*(r+ xoff), sin(a)*(r+yoff))\n\t\t\t\n\t\t}\n\t\tendShape(CLOSE)\n\t\tpop()\n\t\n\t\n}",
+    "custom_html": "<script src=\"https://openprocessing.org/OpenSimplexNoise.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Infinite Loop.mp4"
+    ]
+}

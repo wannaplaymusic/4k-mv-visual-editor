@@ -1,0 +1,25 @@
+{
+    "name": "Raytracer_1",
+    "author": "u166842",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 16:39:15",
+    "url": "https://openprocessing.org/@u166842/680446",
+    "code": "function setup() { createCanvas(windowWidth, windowHeight); }\n// === Tab: mySketch ===\nk=w=100\ndraw=(i=0,s=sin)=>{for(k++;i<w*w;i++)stroke((X=s(u=i%w/w),m=s(v=i/w/w-.5),Z=s(v+8)*s(u+8),x=k,y=7,z=0,_=w,t=Y=>{for(;y+=Y,z+=Z,_--;x+=X)if(y&8)return(x&z)*6+.2*t(-Y)|0})(m)|0),point(i%w,i/w)}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Late Commute.mp4"
+    ]
+}

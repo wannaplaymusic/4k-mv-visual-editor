@@ -1,0 +1,25 @@
+{
+    "name": "Organic20_1",
+    "author": "theRussetPotato",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 16:37:46",
+    "url": "https://openprocessing.org/@theRussetPotato/818358",
+    "code": "// === Tab: mySketch ===\n/*\nOrganic 2.0\n\nAuthor:\n  Jason Labbe\n\nSite:\n  jasonlabbe3d.com\n\nControls:\n\t- Move mouse along x-axis to change count.\n\t- Click to switch colors.\n*/\n\nvar colorThemes = [\n\t[\"#145C9E\", \"#0E2166\", \"#7692FF\", \"#058ED9\", \"#ABD2FA\"],\n\t[\"#027733\", \"#FCFAFA\", \"#8ED081\", \"#355834\", \"#B4D2BA\"],\n\t[\"#157A6E\", \"#FCB0B3\", \"#F93943\", \"#B0DB43\", \"#53DD6C\"],\n\t[\"#FBD1D3\", \"#F198AF\", \"#EBB2D6\", \"#9F81CD\", \"#766DC1\"],\n\t[\"#E88D67\", \"#A3CAD5\", \"#E0EEF1\", \"#E8CCBF\", \"#76B0C0\"]\n];\nvar colorTheme;\n\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\nwindow.simulatedMouseX = width / 4;\n\tcolorTheme = random(colorThemes);\n}\n\n\nfunction mouseClicked() {\n\tcolorTheme = random(colorThemes);\n}\n\n\nfunction draw() {\n\tlet f = frameCount;\n\t\n\tbackground(0);\n\t\n\ttranslate(width / 2, height / 2);\n\trotate(-f * 0.005);\n\t\n\tlet i = 0;\n\t\n\tfor (let rad = 0; rad < TWO_PI; rad += map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 0.02, 0.1)) {\n\t\tpush();\n\t\trotate(rad);\n\t\t\n\t\t// Kill noise at start/end so they don't overlap.\n\t\tlet weight = 1;\n\t\tif (rad < QUARTER_PI) {\n\t\t\tweight = map(rad, 0, QUARTER_PI, 0, 1);\n\t\t} else if (rad > TWO_PI - QUARTER_PI) {\n\t\t\tweight = map(rad, TWO_PI - QUARTER_PI, TWO_PI, 1, 0);\n\t\t}\n\t\t\n\t\tlet n1 = map(noise(f * 0.001 + rad), 0, 1, -2, 2) * weight;\n\t\tlet n2 = map(noise((1000 + f) * 0.001 + rad), 0, 1, -2, 2) * weight;\n\t\t\n\t\tlet pnts = [\n\t\t\t[0, 0],\n\t\t\t[sin(f * 0.04 - 5 + n1) * 25, 100],\n\t\t\t[cos(f * 0.04 - 2.5 + n2) * 50, 200],\n\t\t\t[sin(f * 0.04 + n1) * 75, 300],\n\t\t\t[0, 400],\n\t\t\t[0, 500]\n\t\t];\n\t\t\n\t\tif (i % 2 == 0) {\n\t\t\tbeginShape();\n\t\t\tpnts.reverse();\n\t\t}\n\t\t\n\t\tfor (let x = 0; x < pnts.length; x++) {\n\t\t\tcurveVertex(pnts[x][0], pnts[x][1]);\n\t\t}\n\t\t\n\t\tif (i % 2 != 0) {\n\t\t\tnoStroke();\n\t\t\tfill(colorTheme[i % colorTheme.length]);\n\t\t\tendShape();\n\t\t}\n\t\t\n\t\tpop();\n\t\t\n\t\ti++;\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Road Lines.mp4"
+    ]
+}

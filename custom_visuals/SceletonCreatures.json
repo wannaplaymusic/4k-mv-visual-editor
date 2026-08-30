@@ -1,0 +1,22 @@
+{
+  "name": "SceletonCreatures",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:04:49",
+  "url": "https://openprocessing.org/@epi/2752139",
+  "code": "// === Tab: creature ===\nclass Creature {\n\tconstructor(x, y, s, a) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.s = s;\n\t\tthis.a = a;\n\t\tthis.n = ~~random(3, 8);\n\t\tthis.clr = color(random(100, 300), random(100, 300), random(100, 300));\n\t\tthis.speed = random(1, 3);\n\t\tthis.uid = ~~random(12345);\n\t}\n\t\n\tupdate(others) {\n\t\tconst t = frameCount;\n\t\tconst len = this.speed * abs(sin(t + this.uid)+2);\n\t\tconst vec = createVector(len, 0).rotate(this.a);\n\t\tlet x = this.x + vec.x;\n\t\tlet y = this.y + vec.y;\n\t\tconst r = this.s/2;\n\t\tif (x < r) {\n\t\t\tx = r;\n\t\t\tvec.x *= -1;\n\t\t}\n\t\tif (x > width - r) {\n\t\t\tx = width - r;\n\t\t\tvec.x *= -1;\n\t\t}\n\t\tif (y < r) {\n\t\t\ty = r;\n\t\t\tvec.y *= -1;\n\t\t}\n\t\tif (y > height - r) {\n\t\t\ty = height - r;\n\t\t\tvec.y *= -1;\n\t\t}\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.a = vec.heading() + (noise(this.uid, frameCount/100)-0.5)/10;\n\t}\n\t\n\tdraw() {\n\t\tvar x = this.x;\n\t\tvar y = this.y;\n\t\tconst s = this.s;\n\t\tconst a = this.a;\n\t\t\n\t\tpush();\t\t\n\t\ttranslate(x, y);\n\t\trotate(a);\n\t\tblendMode(BLEND);\n\t\tfill(this.clr)\n\t\tellipse(0, 0, s, s/2);\n\n\t\tfill(BG)\n\t\tconst n = this.n, th = s/n, y1 = -s/4, y2 = s/4;\n\t\tfor (let i = 0; i <= n; i++) {\n\t\t\t// upper tooth\n\t\t\tconst x1 = map(i, 0, n, -s/2, +s/2);\n\t\t\tif (i < n) triangle(\n\t\t\t\tx1, y1,\n\t\t\t\tx1+th, y1,\n\t\t\t\tx1+th*random(0.45, 0.55), y1 + random(0.3, 0.4) * s\n\t\t\t)\n\t\t\t// lower tooth\n\t\t\tconst x2 = map(i, 0, n, -s/2, +s/2)-th/2;\n\t\t\ttriangle(\n\t\t\t\tx2, y2,\n\t\t\t\tx2+th, y2,\n\t\t\t\tx2+th*random(0.45, 0.55), y2 - random(0.3, 0.4) * s\n\t\t\t)\n\t\t} \n\n\t\tblendMode(DIFFERENCE)\n\t\tfill(this.clr)\n\t\tellipse(s/4, 0, s/4, s/3);\n\n\t\tpop()\n\t}\n}\n\n// === Tab: mySketch ===\nconst NUM = 10;\nlet creatures;\nlet FG, BG;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tframeRate(15);\n\t\n\tFG = color(\"navy\"); // FG.setAlpha(128);\n\tBG = color(\"lightblue\")\n\t\n\tlet S = max(width, height);\n\tcreatures = [];\n\tfor (let i = 0; i < NUM; i++) {\n\t\tconst creature = new Creature(\n\t\t\twidth  * random(0.3, 0.7), \n\t\t\theight * random(0.3, 0.7), \n\t\t\tS * random(0.07, 0.14), \n\t\t\trandom(TAU)\n\t\t);\n\t\tcreatures.push(creature);\n\t}\n\n\tnoStroke();\n}\n\nfunction draw() {\n\tbackground(BG);\n\t\n\tfor (const creature of creatures) {\n\t\tcreature.update(creatures);\n\t\tcreature.draw();\n\t}\n\t\n\tpush()\n\t// blendMode(ADD)\n\tstroke(FG);\n\t// for (let y = ~~(frameCount/8) % 8; y < height; y+= 8) line(0, y, width, y);\n\tpop()\n}\n\nfunction mousePressed() {\n\tsetup();\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

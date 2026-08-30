@@ -1,0 +1,25 @@
+{
+    "name": "Gridoflines_1",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:14:35",
+    "url": "https://openprocessing.org/@epi/2581904",
+    "code": "// === Tab: mySketch.js ===\n/*\nThis piece is an exploration of distortion, movement, and transformation within a structured framework.\nThe artwork consists of a grid of progressive deformations, where an initial order—represented by evenly spaced parallel lines—gradually succumbs to an increasing state of disorder.\nThe lines begin to ripple, bend, and fold, creating an illusion of three-dimensionality within a two-dimensional space.\n\nThe sequential nature of the composition evokes the language of digital simulation, reminiscent of algorithmic manipulations or generative art.\nIt suggests a process unfolding over time, akin to fabric being stretched and crumpled by an unseen force.\nThe visual tension arises from the contrast between the initial order and the chaotic disruption, mirroring broader themes of instability, entropy, and transformation.\n\nThis work resonates with Op Art and kinetic art influences, where the viewer's perception becomes an active component in experiencing depth and motion.\nThe subtle yet systematic deterioration of the structure also draws parallels with data corruption, glitch aesthetics, and the fragility of digital and organic systems.\n\nBy presenting this gradual shift in form, the piece invites contemplation on the nature of control and unpredictability—whether in physical materials, digital landscapes, or societal structures.\nIt is a meditation on impermanence, where order is never static but always in flux.\n\n*/\n\n\n\nlet allColumnsPoints = [];\n\nfunction drawGrid(numRows, numCols, rowWidth, colWidth, randomOffset, interpolationSteps) {\n\n\tnoFill();\n\n\t// Create all points for the grid\n\tfor (let row = 0; row < numRows; row++) {\n\t\tlet columnPoints = [];\n\t\tfor (let col = 0; col < numCols; col++) {\n\t\t\tlet x = row * rowWidth + random(randomOffset); // Adjust scaling for display\n\t\t\tlet y = col * colWidth + random(randomOffset); // Adjust scaling for display\n\t\t\tcolumnPoints.push(createVector(x, y));\n\t\t}\n\t\tallColumnsPoints.push(columnPoints);\n\t}\n\n\t// Interpolating between columns and drawing polygons\n\n\tfor (let index = 0; index < allColumnsPoints.length - 1; index++) {\n\t\tlet currentColumnPoints = allColumnsPoints[index];\n\t\tlet nextColumnPoints = allColumnsPoints[index + 1];\n\n\t\tfor (let step = 0; step < interpolationSteps; step++) {\n\n\t\t\tbeginShape();\n\t\t\tfor (let i = 0; i < currentColumnPoints.length; i++) {\n\t\t\t\tlet interpolatedX = lerp(currentColumnPoints[i].x, nextColumnPoints[i].x, step / interpolationSteps);\n\t\t\t\tlet interpolatedY = lerp(currentColumnPoints[i].y, nextColumnPoints[i].y, step / interpolationSteps);\n\t\t\t\t//curveVertex(interpolatedX, interpolatedY);\n\t\t\t\tvertex(interpolatedX, interpolatedY);\n\t\t\t}\n\t\t\tendShape(); // Close the shape to form a polygon\n\t\t}\n\n\n\n\t}\n\n\n}\n\nfunction keyTyped() {\n\tif (key === \"s\") {\n\t\tsave(\"grid lines\" + noise(1) + \".svg\");\n\t}\n}\n\nfunction setup() {\n\tcreateCanvas(1200, 1200); // Approx A4 in pixels\n\t// noLoop() removed for animation // Only draw once\n\n}\n\nfunction draw() {\n\t//background(255); // White background\n\tlet increment = 0\n\tfor (let i = 0; i < 5; i++) {\n\t\tfor (let j = 0; j < 5; j++) {\n\t\t\tpush()\n\t\t\ttranslate(30 + 200 * j, 30 + 200 * i);\n\t\t\tdrawGrid(5, 5, 40, 40, 3 * increment, 8);\n\t\t\tincrement += 1;\n\t\t\tpop()\n\t\t\tstroke(0);\n\t\t\tallColumnsPoints = []; // Black lines\n\t\t}\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Late Commute.mp4"
+    ]
+}

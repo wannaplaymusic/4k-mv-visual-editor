@@ -1,0 +1,22 @@
+{
+    "name": "DrosteEffectDay03",
+    "author": "Denisovich",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:54:35",
+    "url": "https://openprocessing.org/@Denisovich/2135963",
+    "code": "// === Tab: mySketch ===\n// Genuary2024 Day 3: Droste Effect\n// Denisovich\n\nlet code;\nlet started = false;\nconst codeURL = document.querySelector('script[src^=\"blob\"]').getAttribute('src')\n\nasync function setup() {\n    l = max(windowWidth, windowHeight)\n    l = 600\n    cnv = createCanvas(w = l / 0.8, h = l)\n\n    const response = await fetch(codeURL);\n    code = await response.text();\n    started = true;\n}\n\nfunction draw() {\n    background(\"#414b55\")\n    if (!started) return;\n    drawBrowser();\n    drawCodeEditor();\n    drawLaptop();\n}\n\nfunction drawCodeEditor() {\n    push()\n    translate(w / 2, 0);\n    fill(0, 150);\n    strokeWeight(1.5)\n    stroke(\"#757575\")\n    rect(0, 0, w / 2, h);\n\n    // tabline\n    noStroke()\n    fill(\"#89ddff\");\n    rect(5, 15, 50, 15);\n    fill(\"#3b3f51\");\n    rect(55, 15, w / 2 - 60, 15);\n    fill(\"#1f2233\");\n    rect(w / 2 - 55, 15, 50, 15);\n\n    // tab texts\n    textFont('Courier New');\n    textSize(8);\n    textStyle(BOLD);\n    fill(0);\n    text(\"sketch.js\", 7, 19, 40, 40);\n    fill(\"#8f93a2\");\n    text(\"index.html <> |...|\", 58, 19, 100, 40);\n    text(\"buffers\", w / 2 - 51, 19, 100, 40);\n\n    // editor\n    fill(\"#0f111a\");\n    rect(5, 30, w / 2 - 10, h - 35);\n\n    // code\n    fill(\"#d1d7ee\");\n    textStyle(NORMAL);\n    textSize(10)\n    textAlign(LEFT, TOP)\n    text(code, 30, 40)\n\n    lineNums = \"\"\n    for (let i = 1; i <= 50; i++) {\n        lineNums = lineNums + i + \"\\n\"\n    }\n    fill(\"#8f93a2\");\n    text(lineNums, 10, 40);\n\n    pop()\n}\n\nfunction drawLaptop() {\n    push()\n    rectMode(CENTER)\n    noStroke();\n    fill(\"#1e1e1e\");\n    rect(w / 4, h / 2, 230 / 0.84, 230, 5)\n    rectMode(CORNER)\n    rect(50.5, h / 2, 230 / 0.84, 230 / 2)\n    fill(10)\n    circle(w / 4, 193, 8)\n    fill(80)\n    circle(w / 4, 193, 5)\n\n    fill(\"#909090\");\n    beginShape()\n    vertex(50.5, 413);\n    vertex(20, 470);\n    vertex(w / 2 - 20, 470);\n    vertex(50.5 + 230 / 0.84, 413);\n    endShape(CLOSE)\n\n    push()\n    translate(w / 4, 441.5);\n    scale(0.25);\n    translate(-w / 4, -441.5);\n    translate(0, 60);\n    fill(\"#1e1e1e\");\n    beginShape()\n    vertex(50.5, 413);\n    vertex(20, 470);\n    vertex(w / 2 - 20, 470);\n    vertex(50.5 + 230 / 0.84, 413);\n    endShape(CLOSE)\n    pop()\n\n    fill(\"#b6b6b6\");\n    beginShape()\n    vertex(20, 470);\n    vertex(20, 470 + 15);\n    vertex(w / 2 - 20, 470 + 15);\n    vertex(w / 2 - 20, 470);\n    endShape(CLOSE)\n\n    stroke(\"#1e1e1e\")\n    strokeWeight(2);\n    drawingContext.setLineDash([5, 7.5]);\n    line(57, 413 + 10, 315, 413 + 10);\n    line(51, 413 + 20, 322, 413 + 20);\n    line(45, 413 + 30, 326, 413 + 30);\n\n    image(cnv, 62.5, 200, 200 / 0.8, 200);\n    image(cnv, 62.5, 200, 200 / 0.8, 200);\n    image(cnv, 62.5, 200, 200 / 0.8, 200);\n    image(cnv, 62.5, 200, 200 / 0.8, 200);\n    image(cnv, 62.5, 200, 200 / 0.8, 200);\n    pop()\n}\n\nfunction drawBrowser() {\n    push()\n    fill(\"#323232\");\n    strokeWeight(1)\n    stroke(\"#757575\")\n    rect(0, 0, w / 2, h);\n    // bar\n    stroke(\"#e2e2e2\");\n    strokeWeight(1.5);\n    circle(15, 15, 10)\n    fill(\"#e2e2e2\");\n    circle(30, 15, 10)\n    noStroke()\n    stroke(\"#202020\")\n    fill(\"#202020\")\n    rect(45, 10, w / 4, 10, 5);\n    fill(\"#e2e2e2\");\n    textSize(8);\n    text(\"\\u24D8   127.0.0.1:8080\", 50, 12, w / 4, 30)\n\n    // viewport\n    const gradient = drawingContext.createRadialGradient(w / 4, h / 2, 0, w / 4, h / 2, w);\n    gradient.addColorStop(0, \"#606060\");\n    gradient.addColorStop(0.4, \"#3a3a3a\");\n    gradient.addColorStop(0.6, \"#2b2b2b\");\n    drawingContext.fillStyle = gradient;\n    noStroke()\n    rect(5, 30, w / 2 - 10, h - 35, 5);\n    pop()\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

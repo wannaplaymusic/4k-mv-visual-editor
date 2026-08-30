@@ -1,0 +1,22 @@
+{
+  "name": "BoatWake",
+  "author": "u110137",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 03:53:56",
+  "url": "https://openprocessing.org/@u110137/2313147",
+  "code": "// === Tab: Wake ===\nclass Wake {\n\tconstructor(pos, r, ang, type) {\n\t\tthis.ang = ang\n\t\tthis.pos = pos;\n\t\tthis.type = type;\n\t\tthis.r = r;\n\t\tthis.a = 220;\n\t\tthis.sw = 1;\n\t}\n\tshow() {\n\t\tpush();\n\t\ttranslate(this.pos);\n\t\trotate(this.ang);\n\t\tnoFill();\n\t\tstrokeWeight(this.sw);\n\t\tstroke(200, this.a);\n\t\tstrokeCap(SQUARE);\n\t\tarc(-this.r, 0, this.r, this.r, -HALF_PI, HALF_PI); // main disturbance\n\t\tarc(-this.r, -this.r, this.r, this.r, HALF_PI, 3 * QUARTER_PI); // distortion wave\n\t\tarc(-this.r, this.r, this.r, this.r, 5 * QUARTER_PI, 3 * HALF_PI); // distortion wave\n\t\tfill(200, 200, 255, this.a);\n\t\tnoStroke();\n\t\tellipse(-this.r/2 - 20, 0, this.r / 10); // prop wake\n\t\tpop();\n\t}\n\tgrow() {\n\t\tthis.r += 0.5\n\t\tthis.a -= 1;\n\t\tthis.sw += 0.02;\n\t}\n}\n\n// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"waves\".\n// Lots of interesting info and pretty pictures here:\n// https://en.wikipedia.org/wiki/Kelvin_wake_pattern\n\nvar pos, ang,tang, vel, lm, water;\nvar wakes = [];\nvar type = 0;\n\nfunction setup() {\n\tcreateCanvas(windowWidth * 0.99, windowHeight * 0.99);\n\twater = createGraphics(width, height);\n\tpos = createVector(-width / 2, 0);\n\tlm = createVector(width / 2, 0);\n\tang = PI;\n\ttang = PI;\n\trectMode(CENTER);\n\timageMode(CENTER);\n\tmakeWater();\nwindow.simulatedMouseX = width / 2;\n}\n\nfunction makeWater() {\n\twater.noFill();\n\tfor (x = 0; x < water.width; x += 2) {\n\t\tfor (y = 0; y < water.height; y += 2) {\n\t\t\twater.strokeWeight(2)\n\t\t\twater.stroke(0, 50, 128 + 128 * noise(x / 100, y / 100))\n\t\t\twater.point(x, y);\n\t\t}\n\t}\n\twater.filter(BLUR, 4);\n}\n\nfunction draw() {\n\tlm.lerp(createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - height / 2), 0.1);\n\tang = atan2(pos.y - lm.y, pos.x - lm.x) + (0.5 - noise(frameCount / 60)) / 2;\n\tvel = map(pos.dist(lm), height, 0, 2, 0);\n\n\tif (pos.dist(lm) > 15) {\n\t\tpos.x -= cos(ang) * 1.5;\n\t\tpos.y -= sin(ang) * 1.5;\n\t\tif (frameCount % 3 == 0 && pos.x < width) {\n\t\t\twakes.push(new Wake(createVector(pos.x, pos.y), 15, PI + ang, type))\n\t\t\ttype = 1 - type;\n\t\t}\n\t}\n\tblendMode(BLEND);\n\tbackground(0);\n\tpush();\n\ttranslate(width / 2, height / 2)\n\timage(water, 0, 0);\n\tpop();\n\ttranslate(width / 2, height / 2);\n\tblendMode(ADD);\n\tfor (w of wakes) {\n\t\tw.show();\n\t\tw.grow();\n\t}\n\twakes = wakes.filter(w => w.a > 0);\n\tdrawBoat();\n}\n\nfunction drawBoat() {\n\tpush();\n\tblendMode(BLEND);\n\ttranslate(pos);\n\trotate(PI + ang);\n\tnoStroke();\n\tscale(0.8)\n\tarc(-10, 0, 50, 12, -7 * PI / 8, 7 * PI / 8, CHORD)\n\tfill(100);\n\trect(-5, 0, 10, 10, 0, 4, 4, 0);\n\tpop();\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

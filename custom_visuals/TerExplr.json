@@ -1,0 +1,25 @@
+{
+    "name": "TerExplr",
+    "author": "u77506",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 16:46:17",
+    "url": "https://openprocessing.org/@u77506/687846",
+    "code": "// === Tab: mySketch ===\n/** \n *   -------- CONTROLS -------\n * [UP][DOWN] -> move forwards/backwards\n * [LEFT][RIGHT] -> rotate view\n * [space] -> change viewing angle\n*/\n\n\n\nvar input=[];\nfunction keyPressed(){input[keyCode] = true;}\nfunction keyReleased(){input[keyCode] = false;}\n\nsetup = function() {\n    \n\t\tcreateCanvas(500, 500);\n    /********* Global Vars ********/\n    /**       CHANGE THESE       **/\n    var pSize = 3; // [lower = more lag]\n    var pHigh = 30;// [lower = less lag]\n    var viewDist = 400;//[dont change this unless you have a good computer]\n    var PerWF = 5;//perspective warp factor [1000 for no warp]\n    \n    \n    noStroke();\n    background(255,255,255);\n\n    loadPixels();//get the white background\n    var px=this.imageData.data,bpx;//pixel array & blank pixel array\n    \n    var z2 = 0,x2=0;//player cords\n    var velo = 0,//movement velocity\n        rotVelo = 0,rot = 100;//rotation\n    var va = 0,vat = 0;//viewing angle & viewing angle timer\n    \n   \n    this.draw = function() {\n        if (!bpx) { bpx=px.slice(0); }//sets the blank array \n        px.set(bpx);//clears pixels data\n        \n        va = sin(vat/180)*300;//sets viewing angle\n        \n        // controls    \n        if(input[RIGHT]){rotVelo-=1/180;}    \n        if(input[LEFT]){rotVelo+=1/180;}\n        if(input[UP]){velo-=2;}\n        if(input[DOWN]){velo+=2;}\n        if(input[32]){vat+=1;}\n        \n        //moves player\n        z2 -=(velo*sin(rot))/300;\n        x2 -=(velo*cos(rot))/300;\n    \n        //slows velocity\n        velo = constrain(velo*0.95,-50,50);\n        rotVelo = constrain(rotVelo*0.95,-3,3);\n        \n        rot+=rotVelo;//update rotation\n        \n        //cos/sin rotation\n        var cr=cos(rot),sr=sin(rot);\n        \n        //set vars outside of loop (saves mem)\n        var lb=0,rb=0,l=0,mx=0,my=0,c=0,s=0;\n        \n        //loop through z\n        for(var z=500;z>-viewDist;z-=pSize){\n            \n            var s2 = map(z,-viewDist,500,pSize+1,pSize*2);//width of the point\n            \n            //mapped y value (viewing angle adjustments)\n            my=map(z,-viewDist,500,va,500);\n            \n            //adjusted y for the noise function\n            var Y = (350-z)/200;\n            \n            //loop through x    \n            for(var x=20;x<480;x+=pSize){\n            \n            \n                //adjusted x for the noise function\n                var X = (300-x)/200;\n                \n                //height of the point\n                /* \n                    adjusts the point based on rotation and user cords\n                    then gets a noise value for point and adjusts it\n                */\n                s = map(noise(z2+(X*cr+Y*sr),x2+(Y*cr-X*sr)),-1,1,-500,300);\n            \n                //mapped x value (Perspective warp)\n                mx=map(x,0,500,0-PerWF/10,500+PerWF/10);\n                \n                //color of the point (based on height)\n                c=map(s,0,300,0,255);\n            \n                var y = ~~(my+s)-40;//y cord of the point\n                \n                l |= 0;//index\n                rb |= 0;//right bound\n                lb |= 0;//left bount\n                \n                //sets bounds\n                rb = ~~(mx + s2);\n                if (rb > 500) {rb = 500;}\n                lb = ~~mx;\n                if (lb < 0) {lb = 0;}\n\t\t\t\n\t\t\t    \n                for (var k = lb; k < rb; k++) {\n                    var _y = 0;\n                    l = k + y * 500 << 2;//get index of pixel\n                    while (_y < pHigh) {//draws a col 20 pixels high\n                    \n                        // stop drawing col if non white pixel is found\n                        if ( px[l + 1] !== 255) {\n                            _y = 100;\n                        } else {\n                            px[l] = c;\n                            px[l + 1] = c;\n                            px[l + 2] = c;\n                        }\n                        _y++;\n                        l += 2000;//move down 1 pixel\n                    }\n                }\n                \n            }\n        }\n        updatePixels();//update the canvas with the pixel data\n        \n        fill(255, 0, 0);\n\t\ttext(~~this.__frameRate, 10, 10);\n    };\n};\nsetup();",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Carbon Resonance.mp4"
+    ]
+}

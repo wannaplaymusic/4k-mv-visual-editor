@@ -1,0 +1,25 @@
+{
+    "name": "faces_3",
+    "author": "tequibo",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 02:58:06",
+    "url": "https://openprocessing.org/@tequibo/91932",
+    "code": "// === Tab: sketch91932 ===\nvar head;\nvar h=500, w=500;\nfunction setup() {\n  createCanvas(500, 500);\n  smooth();\n  \n  noStroke();\n  fill(\"#ffffff\");\n    rect(0, 0, width, height);\n    let sp = 100;\n    for (let j=0;j<5;j++) {\n      for (let f=0;f<5;f++) {\n       make(sp/2+j*sp, sp/2+f*sp);\n        //make(random(h),random(w));\n      }\n    }\n}\n\nfunction draw() {\n  fill(\"#ffffff\");\n  if (mousePressed) {\n    noStroke();\n    rect(0, 0, width, height);\n    let sp = 100;\n    for (let j=0;j<5;j++) {\n      for (let f=0;f<5;f++) {\n       make(sp/2+j*sp, sp/2+f*sp);\n        //make(random(h),random(w));\n      }\n    }\n  }\n}\n\n\nvar n = 10;\n\nfunction make(x, y) {\n  colorMode(HSB);\n  fill(random(255),55,155);\n  let hc = color(123, 55, random(55)+20);\n  \n  pushMatrix();\n  translate(x, y);\n  beginShape();\n  let b = random(2)*10+15;\n  let hh=random(20)+b, ww=random(10)+b, e = random(5)+4, s = 10;\n  let off = int(random(n));\n  for (let i=0;i<n+1;i++) {\n    vertex(sin((i+off)/n*PI*2)*ww+random(s)-s/2, cos((i+off)/n*PI*2)*hh+random(s)-s/2);\n  }\n\n  endShape();\n  stroke(hc);\n  let mp = random(2)+3;\n  let mw = random(12)+5;\n  beginShape();\n  for (let h =0;h<mp;h++) {\n    vertex(-mw/2+mw/mp*h+random(s)-s/2, hh/2+random(s)-s/2);\n  }\n  endShape();\n\n  noStroke();\n  fill(hc);\n  ellipse(-ww/4+random(s)-s/2, -hh/4+random(s)-s/2, e, e);\n  e = random(5)+4;\n  ellipse(ww/4+random(s)-s/2, -hh/4+random(s)-s/2, e, e);\n  popMatrix();\n}\nfunction keyPressed() {\n  if (key == 's') {\n    saveFrame(\"images/screen_#####.png\");\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Carbon Resonance.mp4"
+    ]
+}

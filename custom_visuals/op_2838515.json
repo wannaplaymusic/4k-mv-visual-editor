@@ -1,30 +1,16 @@
 {
     "name": "op_2838515",
-    "code": "// For #genuary2026, day 03: \"fibonacci forever\".\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tbackground(0);\n\ttypes = [OPEN, CHORD, PIE];\n\tdim = -PI;\n\ttindex = 2;\n\tsequence = generateFibonacci(15);\n\tlastdim = dim;\n}\n\nfunction draw() {\n\tdim = 2 * TAU * sin(frameCount / 300);\n\tlastdim = dim;\n\trotateZ(dim / 2);\n\trotateY(dim / 2);\n\trotateX(dim / 2);\n\tdrawCurl();\n}\n\nfunction drawCurl() {\n\tfor (let i = 0; i < sequence.length; i++) {\n\t\tlet r = sequence[i] * dim;\n\t\tnoFill();\n\t\tstroke(255, 50);\n\t\tstrokeWeight(0.2);\n\t\tif (i > 2) translate(-(sequence[i - 1] * abs(dim)) / 2 + (sequence[i - 3] * abs(dim)) / 2, 0);\n\t\tarc(0, 0, r, r, 0, HALF_PI, types[tindex]);\n\t\trotate(HALF_PI);\n\t}\n}\n\nfunction mousePressed() {\n\tfullscreen(true);\n\ttindex = (tindex + 1) % types.length;\n\tbackground(0);\n}\n\nfunction generateFibonacci(n) {\n\tlet fib = [0, 1];\n\tfor (let i = 2; i < n; i++) {\n\t\tfib.push(fib[i - 1] + fib[i - 2]);\n\t}\n\treturn fib;\n}\n\nfunction windowResized() {\n\tresizeCanvas(windowWidth, windowHeight);\n}\n\n// --- Immunity Guardrails ---\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n",
+    "display_name": "op_2838515",
+    "author": "u110137",
+    "license_mode": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:58:50",
+    "url": "https://openprocessing.org/@u110137/2838515",
+    "code": "// For #genuary2026, day 03: \"fibonacci forever\".\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tbackground(0);\n\ttypes = [OPEN, CHORD, PIE];\n\tdim = -PI;\n\ttindex = 2;\n\tsequence = generateFibonacci(15);\n\tlastdim = dim;\n}\n\nfunction draw() {\n\tdim = 2 * TAU * sin(frameCount / 300);\n\tlastdim = dim;\n\trotateZ(dim / 2);\n\trotateY(dim / 2);\n\trotateX(dim / 2);\n\tdrawCurl();\n}\n\nfunction drawCurl() {\n\tfor (let i = 0; i < sequence.length; i++) {\n\t\tlet r = sequence[i] * dim;\n\t\tnoFill();\n\t\tstroke(255, 50);\n\t\tstrokeWeight(1.5);\n\t\tif (i > 2) translate(-(sequence[i - 1] * abs(dim)) / 2 + (sequence[i - 3] * abs(dim)) / 2, 0);\n\t\tarc(0, 0, r, r, 0, HALF_PI, types[tindex]);\n\t\trotate(HALF_PI);\n\t}\n}\n\nfunction mousePressed() {\n\tfullscreen(true);\n\ttindex = (tindex + 1) % types.length;\n\tbackground(0);\n}\n\nfunction generateFibonacci(n) {\n\tlet fib = [0, 1];\n\tfor (let i = 2; i < n; i++) {\n\t\tfib.push(fib[i - 1] + fib[i - 2]);\n\t}\n\treturn fib;\n}\n\nfunction windowResized() {\n\tresizeCanvas(windowWidth, windowHeight);\n}\n\n// --- Immunity Guardrails ---\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n",
+    "custom_html": "",
+    "tags": [],
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "custom_html": "",
-    "custom_css": "html, body { margin: 0; padding: 0; overflow: hidden; background: #000; }\n/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5DomElement {\n    display: none !important;\n    visibility: hidden !important;\n    opacity: 0 !important;\n    pointer-events: none !important;\n    position: absolute !important;\n    left: -9999px !important;\n    top: -9999px !important;\n    width: 0px !important;\n    height: 0px !important;\n}",
-    "inline_assets": {},
-    "author": "u110137",
-    "license": "by-nc-sa",
-    "tags": [
-        "batch_import",
-        "openprocessing",
-        "u110137",
-        "fibonacci",
-        "curl",
-        "arc",
-        "genuary2026",
-        "webgl"
-    ],
-    "url": "https://openprocessing.org/@u110137/2838515",
-    "date_added": "2026-07-22 20:52:00",
-    "is_starred": false,
-    "scaling_mode": "auto",
-    "used_in_videos": [
-        "Ridge Rapture.mp4"
-    ],
-    "used_count": 1
+    "used_count": 0,
+    "is_starred": false
 }

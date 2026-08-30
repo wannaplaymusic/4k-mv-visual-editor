@@ -1,0 +1,22 @@
+{
+  "name": "voidgrad",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:15:58",
+  "url": "https://openprocessing.org/@epi/2476454",
+  "code": "// === Tab: gradShader ===\nlet gradShaderSrc = `precision highp float;\n\n// x,y coordinates, given from the vertex shader\nvarying vec2 vTexCoord;\n\n// the canvas contents, given from filter()\nuniform sampler2D tex0;\n// other useful information from the canvas\nuniform vec2 texelSize;\nuniform vec2 canvasSize;\n// a custom variable from this sketch\n// uniform float gamma;\nuniform vec4 clrFg1;\nuniform vec4 clrFg2;\nuniform vec4 clrFg3;\nuniform vec4 clrFg4;\nuniform vec4 clrBg1;\nuniform vec4 clrBg2;\nuniform vec4 clrBg3;\nuniform vec4 clrBg4;\n\nvoid main() {\n\t// get the color at current pixel\n\tvec4 color = texture2D(tex0, vTexCoord);\n\t// set the output color\n\tfloat f = (color.r + color.g + color.b) / 3.;\n\t// gamma: color = pow((color / 1.0),(1. / gamma));\n\t// dark/brighness: color *= db;\n\t\n\t// fg mix\n\tvec4 clrFgL = mix(clrFg1, clrFg4, fract(vTexCoord.y));\n\tvec4 clrFgR = mix(clrFg2, clrFg3, fract(vTexCoord.y));\n\tvec4 clrFG = mix(clrFgL, clrFgR, fract(vTexCoord.x));\n\n\t// bg mix\n\tvec4 clrBgL = mix(clrBg1, clrBg4, fract(vTexCoord.y));\n\tvec4 clrBgR = mix(clrBg2, clrBg3, fract(vTexCoord.y));\n\tvec4 clrBG = mix(clrBgL, clrBgR, fract(vTexCoord.x));\n\n\t// output based on grayscale\n\tgl_FragColor = mix(clrBG, clrFG, f);\n}`;\n\n// === Tab: mySketch ===\n// void for #WCCChallenge Void 05.12.24\n// added gradShader -> not working...\nlet fgClrs, bgClrs;\nlet gradShader;\nlet img;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tbackground(0);\n\tgradShader = createFilterShader(gradShaderSrc);\n\tfgClrs = get4Colors();\n\tbgClrs = get4Colors();\n}\nfunction draw(){\n\torbitControl();\n\tif (img) image(img, -width/2, -height/2, width-10, height-10)\n\tbox(0,500)\n\timg = get(-width/2, -height/2, width, height)\n\t// img = get(0, 0, width, height)\n\t\n\tgradShader.setUniform('clrFg1', colorToArr(fgClrs[0]));\n\tgradShader.setUniform('clrFg2', colorToArr(fgClrs[1]));\n\tgradShader.setUniform('clrFg3', colorToArr(fgClrs[2]));\n\tgradShader.setUniform('clrFg4', colorToArr(fgClrs[3]));\n\tgradShader.setUniform('clrBg1', colorToArr(bgClrs[0]));\n\tgradShader.setUniform('clrBg2', colorToArr(bgClrs[1]));\n\tgradShader.setUniform('clrBg3', colorToArr(bgClrs[2]));\n\tgradShader.setUniform('clrBg4', colorToArr(bgClrs[3]));\n  filter(gradShader);\n}\n\n\n\n\n\n\nfunction colorToArr(clr) {\n\treturn [\n\t\tred(window.color(clr))/255,\n\t\tgreen(window.color(clr))/255,\n\t\tblue(window.color(clr))/255,\n\t\talpha(window.color(clr))/255\n\t]\n}\n\nfunction get4Colors(n = 4) { // tl, tr, br, bl\n\tpush();\n\tcolorMode(HSB, 1);\n\tconst arr = [];\n\tconst hueStart = random(1);\n\tconst hueDltX = random(0.1, 0.25);\n\tconst hueDltY = random(0.1, 0.25);\n\n\tconst satStart = random(1);\n\tconst satDltX = random(0.1, 0.25);\n\tconst satDltY = random(0.1, 0.25);\n\n\tconst brStart = random(1);\n\tconst brDltX = random(0.1, 0.25);\n\tconst brDltY = random(0.1, 0.25);\n\n\tarr.push(color(hueStart, satStart, brStart));\n\tarr.push(color((hueStart+hueDltX)%1, (satStart+satDltX)%1, (brStart+brDltX)%1));\n\tarr.push(color((hueStart+hueDltX+hueDltY)%1, (satStart+satDltX+satDltY)%1, (brStart+brDltX+brDltY)%1));\n\tarr.push(color((hueStart+hueDltY)%1, (satStart+satDltY)%1, (brStart+brDltY)%1));\n\t\n\tpop();\n\t\n\t//console.log(arr);\n\treturn arr;\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

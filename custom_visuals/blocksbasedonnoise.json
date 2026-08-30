@@ -1,0 +1,22 @@
+{
+  "name": "blocksbasedonnoise",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:21:06",
+  "url": "https://openprocessing.org/@epi/2321753",
+  "code": "// === Tab: mySketch ===\n// https://paragraph.xyz/@stc/time-shifting\n\nconst PAD = 50;\nconst SZE = 4 * 7;\n\nfunction setup() {\n  const maxX = ~~((windowWidth - PAD - PAD) / SZE) * SZE + PAD + PAD;\n  const maxY = ~~((windowHeight - PAD - PAD) / SZE) * SZE + PAD + PAD;\n  createCanvas(maxX, maxY);\n  describe(\"grid of horizontal lines based on noise\");\n  frameRate(4);\n\n  stroke(\"black\");\n  strokeWeight(2);\n}\n\nfunction draw() {\n  background(\"beige\");\n\n  for (let y = PAD + SZE / 2; y <= height - SZE / 2 - PAD; y += SZE) {\n    for (let x = PAD + SZE / 2; x <= width - SZE / 2 - PAD; x += SZE) {\n      drawShape(x, y, SZE);\n    }\n  }\n}\n\nfunction drawShape(x, y, s) {\n  push();\n  translate(x, y);\n  noStroke();\n  fill(\"rgb(48,48,80)\");\n\n  const s2 = s / 2;\n  const s4 = s / 4;\n  const n = noise(x, y, frameCount * 0.1);\n  if (n < 0.5) {\n    // nothing\n  } else if (n < 0.6) {\n    crect(-s2, -s2, s, s4);\n  } else if (n < 0.7) {\n    crect(-s2, 0, s, s4);\n  } else {\n    crect(-s2, -s2, s, s4);\n    crect(-s2, 0, s, s4);\n  }\n\n  pop();\n}\n\nfunction mousePressed() {\n  if (mouseButton === LEFT) setup();\n}\n\nfunction crect(x, y, w, r) {\n  rect(x, y, w, r);\n  return;\n  /*\n  strokeWeight(r);\n  stroke(lerpColor(color(~~random(32, 64)), color(\"navy\"), random(0.3, 0.7)));\n  for (let i = 0; i < 4; i++) point(x + r / 2 + i * r, r / 2);\n  */\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

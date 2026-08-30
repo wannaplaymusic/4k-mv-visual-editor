@@ -1,18 +1,29 @@
 {
-    "name": "Textmodev1",
-    "code": "// === Tab: mySketch ===\nlet asciiChars = [\n  \"░\", \"▒\", \"▓\", \"█\",\n  \"▄\", \"▀\", \"▌\", \"▐\",\n  \"▖\", \"▗\", \"▘\", \"▙\", \"▚\", \"▛\", \"▜\", \"▝\", \"▞\", \"▟\",\n  \"▁\", \"▂\", \"▃\", \"▄\", \"▅\", \"▆\", \"▇\", \"█\",\n  \"▏\", \"▎\", \"▍\", \"▌\", \"▋\", \"▊\", \"▉\", \"█\",\n  \"─\", \"━\", \"│\", \"┃\", \"┌\", \"┐\", \"└\", \"┘\",\n  \"├\", \"┤\", \"┬\", \"┴\", \"┼\", \"╳\", \"╱\", \"╲\",\n  \"⣿\", \"⣾\", \"⣽\", \"⣻\", \"⢿\", \"⡿\", \"⣟\", \"⣯\",\n  \"⠀\", \"⠁\", \"⠃\", \"⠇\", \"⠏\", \"⠟\", \"⠿\", \"⡿\"\n];\n\nlet colors = ['#484064', '#786B88', '#DFAF66', '#24212C', '#B79767',\n              '#EDE1D6', '#C16359', '#38806B', '#719CA9', '#979189'];\n\nlet cols, rows;\nlet cellSize = 10;\nlet zOff = 0;\n\n// padding (relative to canvas)\nlet padLeft, padRight, padTop, padBottom;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  frameRate(12);\n  textSize(cellSize);\n  textAlign(CENTER, CENTER);\n  textFont(\"Courier New, Lucida Console, monospace\");\n  computeGrid();\n  noiseDetail(5, 0.5);\n}\n\nfunction draw() {\n  background(255);\n  noStroke();\n\n  let xStart = frameCount * 0.1;\n  let yStart = frameCount * 0.1;\n\n  for (let y = 0; y < rows; y++) {\n    let yOff = y * 0.15 + yStart;\n    for (let x = 0; x < cols; x++) {\n      let xOff = x * 0.15 + xStart;\n      let n = noise(xOff, yOff, zOff);\n\n      // map to ASCII char\n      let idxChar = floor(map(n, 0, 1, 0, asciiChars.length));\n      idxChar = constrain(idxChar, 0, asciiChars.length - 1);\n\n      // map to color\n      let idxCol = floor(map(n, 0, 1, 0, colors.length));\n      idxCol = constrain(idxCol, 0, colors.length - 1);\n\n      let ch = asciiChars[idxChar];\n      let c = colors[idxCol];\n\n      fill(c);\n      text(\n        ch.toString(),\n        padLeft + x * cellSize + cellSize / 2,\n        padTop + y * cellSize + cellSize / 2\n      );\n    }\n  }\n\n  zOff += 0.02;\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n  computeGrid();\n}\n\nfunction computeGrid() {\n  padLeft   = width * 0.15;\n  padRight  = width * 0.15;\n  padTop    = height * 0.15;\n  padBottom = height * 0.15;\n\n  let gridWidth = width - padLeft - padRight;\n  let gridHeight = height - padTop - padBottom;\n\n  cols = floor(gridWidth / cellSize);\n  rows = floor(gridHeight / cellSize);\n}\n\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            try {\n                if (typeof this.createGraphics === 'function') {\n                    return this.createGraphics(10, 10);\n                } else if (typeof createGraphics === 'function') {\n                    return createGraphics(10, 10);\n                }\n            } catch(e) {}\n            try {\n                if (typeof this.createImage === 'function') {\n                    return this.createImage(1, 1);\n                }\n            } catch(e) {}\n            return {\n                width: 1,\n                height: 1,\n                pixels: [0, 0, 0, 0],\n                loadPixels: function() {},\n                updatePixels: function() {},\n                get: function() { return [0, 0, 0, 255]; },\n                vertices: []\n            };\n        }\n        try {\n            return window._origGet.apply(this, args);\n        } catch(e) {\n            return {\n                width: 1,\n                height: 1,\n                pixels: [0, 0, 0, 0],\n                loadPixels: function() {},\n                updatePixels: function() {},\n                get: function() { return [0, 0, 0, 255]; },\n                vertices: []\n            };\n        }\n    };\n}\n",
-    "frequency": 50,
-    "storyboard_weight": 50,
-    "post_fx_intensity": 50,
-    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-    "custom_css": "",
-    "inline_assets": {},
-    "author": "lomz",
-    "license": "CC BY-NC-SA",
-    "tags": [
-        "batch_import",
-        "audio_reactive"
-    ],
-    "url": "https://openprocessing.org/@u302704/2703291",
-    "date_added": "2026-07-06 20:58:20"
+  "name": "Textmodev1",
+  "code": "// === Tab: mySketch ===\nlet asciiChars = [\n  \"░\", \"▒\", \"▓\", \"█\",\n  \"▄\", \"▀\", \"▌\", \"▐\",\n  \"▖\", \"▗\", \"▘\", \"▙\", \"▚\", \"▛\", \"▜\", \"▝\", \"▞\", \"▟\",\n  \"▁\", \"▂\", \"▃\", \"▄\", \"▅\", \"▆\", \"▇\", \"█\",\n  \"▏\", \"▎\", \"▍\", \"▌\", \"▋\", \"▊\", \"▉\", \"█\",\n  \"─\", \"━\", \"│\", \"┃\", \"┌\", \"┐\", \"└\", \"┘\",\n  \"├\", \"┤\", \"┬\", \"┴\", \"┼\", \"╳\", \"╱\", \"╲\",\n  \"⣿\", \"⣾\", \"⣽\", \"⣻\", \"⢿\", \"⡿\", \"⣟\", \"⣯\",\n  \"⠀\", \"⠁\", \"⠃\", \"⠇\", \"⠏\", \"⠟\", \"⠿\", \"⡿\"\n];\n\nlet colors = ['#484064', '#786B88', '#DFAF66', '#24212C', '#B79767',\n              '#EDE1D6', '#C16359', '#38806B', '#719CA9', '#979189'];\n\nlet cols, rows;\nlet cellSize = 10;\nlet zOff = 0;\n\n// padding (relative to canvas)\nlet padLeft, padRight, padTop, padBottom;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  frameRate(12);\n  textSize(cellSize);\n  textAlign(CENTER, CENTER);\n  textFont(\"Courier New, Lucida Console, monospace\");\n  computeGrid();\n  noiseDetail(5, 0.5);\n}\n\nfunction draw() {\n  background(255);\n  noStroke();\n\n  let xStart = frameCount * 0.1;\n  let yStart = frameCount * 0.1;\n\n  for (let y = 0; y < rows; y++) {\n    let yOff = y * 0.15 + yStart;\n    for (let x = 0; x < cols; x++) {\n      let xOff = x * 0.15 + xStart;\n      let n = noise(xOff, yOff, zOff);\n\n      // map to ASCII char\n      let idxChar = floor(map(n, 0, 1, 0, asciiChars.length));\n      idxChar = constrain(idxChar, 0, asciiChars.length - 1);\n\n      // map to color\n      let idxCol = floor(map(n, 0, 1, 0, colors.length));\n      idxCol = constrain(idxCol, 0, colors.length - 1);\n\n      let ch = asciiChars[idxChar];\n      let c = colors[idxCol];\n\n      fill(c);\n      text(\n        ch.toString(),\n        padLeft + x * cellSize + cellSize / 2,\n        padTop + y * cellSize + cellSize / 2\n      );\n    }\n  }\n\n  zOff += 0.02;\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n  computeGrid();\n}\n\nfunction computeGrid() {\n  padLeft   = width * 0.15;\n  padRight  = width * 0.15;\n  padTop    = height * 0.15;\n  padBottom = height * 0.15;\n\n  let gridWidth = width - padLeft - padRight;\n  let gridHeight = height - padTop - padBottom;\n\n  cols = floor(gridWidth / cellSize);\n  rows = floor(gridHeight / cellSize);\n}",
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "author": "lomz",
+  "license": "CC BY-NC-SA",
+  "tags": [
+    "batch_import",
+    "audio_reactive"
+  ],
+  "url": "https://openprocessing.org/@u302704/2703291",
+  "date_added": "2026-07-06 20:58:20",
+  "scaling_mode": "auto",
+  "used_in_videos": [
+    "Cold Vacuum.mp4",
+    "Digital Haze.mp4",
+    "Concrete Tides.mp4",
+    "Echo Directive.mp4",
+    "Monolithic Interval.mp4",
+    "Subfloor Transmission.mp4",
+    "Ultimate Core Patterns.mp4"
+  ],
+  "used_count": 7
 }

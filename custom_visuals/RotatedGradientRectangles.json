@@ -1,0 +1,22 @@
+{
+    "name": "RotatedGradientRectangles",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:06:45",
+    "url": "https://openprocessing.org/@epi/2748274",
+    "code": "// === Tab: Stripe ===\nclass Stripe {\n\tconstructor(cx, cy, r, pal, a, da = 0) {\n\t\tthis.cx = cx;\n\t\tthis.cy = cy;\n\t\tthis.r = r;\n\t\tthis.pal = pal;\n\t\tthis.a = a;\n\t\tthis.da = da;\n\t}\n\t\n\tupdate(f = 1) {\n\t\tthis.a += this.da * f;\t\n\t}\n\t\n\tdraw() {\n\t\tpush();\n\t\t\tconst x = this.cx;\n\t\t\tconst y = this.cy;\n\t\t\tconst r = this.r;\n\t\t\tconst a = this.a;\n\t\t\tconst dx = cos(a) * r;\n\t\t\tconst dy = sin(a) * r;\n\t\t\tconst d1 = createVector(r, 0).rotate(a);\n\t\t\tconst d2 = createVector(0, r/3).rotate(a);\n\t\t\n\t\t\t// gradient line\n\t\t\tconst ctx = drawingContext;\n\t\t\tconst linGrad = ctx.createLinearGradient(x-d1.x, y-d1.y, x+d1.x, y+d1.y);\n\t\t\tfor (let j=0; j<epiColors.palette.length; j++) {\n\t\t\t\tconst clr = EpiColors.getColor(epiColors.palette[j], 128);\n\t\t\t\tconst pos = map(j, 0, epiColors.palette.length-1, 0, 1);\n\t\t\t\tlinGrad.addColorStop(pos, clr);\n\t\t\t}\n\t\t\tctx.fillStyle = linGrad;\n\t\t\t// line(x-d1.x, y-d1.y, x+d1.x, y+d1.y);rdfg\n\n\t\t\tbeginShape();\n\t\t\tvertex(x+d1.x-d2.x, y+d1.y-d2.y);\n\t\t\tvertex(x+d1.x+d2.x, y+d1.y+d2.y);\n\t\t\tvertex(x-d1.x+d2.x, y-d1.y+d2.y);\n\t\t\tvertex(x-d1.x-d2.x, y-d1.y-d2.y);\n\t\t\tendShape(CLOSE);\n\t\tpop();\n\t}\n}\n\n// === Tab: mySketch ===\nconst DF = 0.9, N = 18, FRMS = 300;\nlet stripes, startFrame; \n\n// const { Point, Line, Polygon } = EpiShapeSvg;\nconst { EpiColors } = EpiColorsPckg;\nlet epiColors;\n\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"rotating gradient rectangles\");\n\tframeRate(30);\n\t\n\t// createCanvas(~~(windowHeight*2/3), windowHeight);\n\tnoFill();\n\tnoStroke();\n\trectMode(CENTER);\n\t\n\tepiColors = new EpiColors();\n\t// epiColors.BG = EpiColors.getAdjustedBrightness(EpiColors.getAdjustedSaturation(epiColors.BG, 2), 0.35);\n\tepiColors.getRandomPalette(true);\n\tfill(random(epiColors.palette));\n\tshuffle(epiColors.palette, true);\n\tepiColors.palette.splice(0, 1);\n\t\n\tvar x = ~~(width/2), y = ~~(height/2);\n\tvar r = ~~(max(width, height) / 2.2);\n\t\n\t// getting stripes\n\tstripes = [];\n\tfor (let i=0; i<N; i++) {\n\t\tconst f = i/(N-1);\n\t\tvar a = f * PI * random(0.9, 1/0.9);\n\t\tconst da = random(0.0038131, 0.0095712) * Math.sign(i%2-0.5);\n\t\tconst stripe = new Stripe(x, y, r, epiColors.palette, a, da);\n\t\tstripes.push(stripe);\n\t}\n\tshuffle(stripes, true);\n\t\n\t// rewind\n\tfor (let i=0; i<FRMS; i++) {\n\t\tfor (const stripe of stripes) stripe.update(-1); //reverse order\n\t}\n\t\n\tstartFrame = frameCount;\n\t\n\tloop();\n}\n\nfunction draw() {\n\tblendMode(BLEND);\n\tbackground(\"#ffeeff\"); // \"#ffeeff\"); epiColors.getAverageClr()\n\t// blendMode(MULTIPLY);\n\t\n\tconst canUpdate = frameCount < startFrame + FRMS;\n\t\n\tfor (const stripe of stripes) {\n\t\tstripe.draw();\n\t\tif (canUpdate) stripe.update();\n\t}\n\t\n\t// shifting thru array every n-th frame\n\tif (canUpdate && frameCount % 10 === 0) stripes.push(stripes.shift());\n\t\n\t// wait additional frames to initialize again\n\tif (frameCount > startFrame + FRMS * 1.5) setup();\n\t// // noLoop() removed for animation\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > width*0.1) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

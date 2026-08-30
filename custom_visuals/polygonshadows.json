@@ -1,0 +1,25 @@
+{
+    "name": "polygonshadows",
+    "author": "u77123",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:40:10",
+    "url": "https://openprocessing.org/@u77123/432500",
+    "code": "// === Tab: mySketch ===\nvar walls = [];\nvar light = {};\nvar polygonVerts = [];\n\nfunction setup() {\n  createCanvas(windowHeight, windowHeight);\n  \n  // Light type: 'POINT' or 'SUN' (point infinitely far)\n  light = new Light('POINT');\n  \n  // 1. Regular polygon of walls\n  let center = createVector(width/2,height/2);\n  let radius = 100;\n  let edges = 6;\n  \n  let prev = {};\n  for(let i=0; i<edges; i++){\n    let nxt = p5.Vector.fromAngle(i*TAU/edges).mult(radius).add(center);\n    polygonVerts.push(createVector(nxt.x,nxt.y));\n    if(i>0){\n      walls.push(new Wall(prev.x,prev.y,nxt.x,nxt.y));\n    }\n    prev = nxt;\n  }\n  let first = p5.Vector.fromAngle(0).mult(radius).add(center);\n  walls.push(new Wall(prev.x,prev.y,first.x,first.y));\n}\n\nfunction draw() {\n  background(0,150,150);\n  \n  if(((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))){\n    light.setPos((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n  }\n  \n  light.scanWalls(walls);\n  light.display(color(255));\n  light.castShadow(color(0,20));\n  \n  // Polygon\n  fill(255);\n  beginShape();\n  for(let vert of polygonVerts){\n    vertex(vert.x,vert.y);\n  }\n  endShape(CLOSE);\n  \n  // println(frameRate());\n}\n\n\n/* Wall class */\nvar Wall = function(x0,y0,x1,y1){\n  this.point0 = createVector(x0,y0);\n  this.point1 = createVector(x1,y1);\n}\nWall.prototype = {\n  display: function(){\n    strokeWeight(2);\n    stroke(255);\n    line(this.point0.x,this.point0.y,this.point1.x,this.point1.y);\n  }\n}\n\n/* Light class*/\nvar Light = function(typ = 'POINT'){\n  this.typ = typ; // 0 point | 1 sun\n  this.angle = 0; // If type 0 (point)\n  this.pos = createVector(100,100);\n  this.shadows = [[]];\n  this.maxDist = sqrt(width*width + height*height);\n}\nLight.prototype = {\n  setPos: function(x,y){\n    this.pos.set(x,y);\n  },\n  scanWalls: function(walls){\n    for(let i=0; i<walls.length; i++){\n      this.shadows[i] = [];\n      \n      this.shadows[i][0] = walls[i].point0;\n      this.shadows[i][1] = walls[i].point1;\n      \n      if(this.typ == 'POINT'){\n        let relPos0 = p5.Vector.sub(walls[i].point0,this.pos);\n        let relPos1 = p5.Vector.sub(walls[i].point1,this.pos);\n        this.shadows[i][2] = p5.Vector.mult(relPos1,this.maxDist).add(this.pos);\n      this.shadows[i][3] = p5.Vector.mult(relPos0,this.maxDist).add(this.pos);\n      } else if(this.typ == 'SUN'){\n        let relPos = p5.Vector.sub(createVector(width/2,height/2),this.pos).normalize();\n        this.shadows[i][2] = p5.Vector.mult(relPos,this.maxDist).add(walls[i].point1);\n        this.shadows[i][3] = p5.Vector.mult(relPos,this.maxDist).add(walls[i].point0);\n      }\n    }\n  },\n  display: function(col){\n    fill(col);\n    ellipse(this.pos.x,this.pos.y,20,20);\n  },\n  castShadow: function(col){\n    fill(col);\n    noStroke();\n    for(let i=0; i<this.shadows.length; i++){\n      beginShape();\n      for(let j=0; j<this.shadows[i].length; j++){\n        vertex(this.shadows[i][j].x, this.shadows[i][j].y);\n      }\n      endShape(CLOSE);\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Meditative Essence Percussion.mp4"
+    ]
+}

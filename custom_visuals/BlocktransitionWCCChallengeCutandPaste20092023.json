@@ -1,0 +1,22 @@
+{
+  "name": "BlocktransitionWCCChallengeCutandPaste20092023",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:01:39",
+  "url": "https://openprocessing.org/@epi/2013752",
+  "code": "// === Tab: mySketch ===\n/*\n\tBlocktransition // #WCCChallenge \"Cut and Paste\" 20.09.2023\n\thttps://openprocessing.org/sketch/2013752\n\t#p5js #creativecoding #generativeart\n\tVideo https://www.twitch.tv/videos/1930267661\n\t\n\tDear Raph and fellow creative coders,\n\t\n\tcan you figure out from which artist I was heavily inspired?\n\tAlways appreciated the pixel art and movement of blocks.\n\tCurious for the other contributions :-)\n\t\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tContributions: https://openprocessing.org/curation/78544\n*/\n\nvar sze = 20;\nvar num, bg;\n\nfunction setup() {\n\tnum =  floor(min(innerWidth, innerHeight) / sze)\n\tconst minWH = num * sze;\n\tcreateCanvas(minWH, minWH);\n\tpixelDensity(1);\n\tframeRate(6);\n\tdescribe(\"transition of pixel blocks overlayed by animated figure\");\n}\n\nfunction draw() {\n\tbackground(32);\n\tpasteSavedState();\n\t\n\tif (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)) && mouseButton === LEFT /*&& frameCount % 4 === 0*/) drawBgLine();\n\tdrawBgPattern();\n\tdrawFgFigure();\n\t\n\tbg = get(0, 0, width, height)\n}\n\nfunction windowResized() {\n\tsetup();\n}\n\nfunction pasteSavedState() {\n\tif (!bg) return;\n\t\n\tpush()\n\tconst ctx = drawingContext;\n\tctx.beginPath();\n\tctx.moveTo(0, height); // Move pen to bottom-left corner\n\tfor (let x = 0, y = height; x < width; x += sze, y -= sze) {\n\t\tctx.lineTo(x, y - sze); // Line to top corner\n\t\tctx.lineTo(x + sze, y - sze); // Line to bottom-right corner\n\t}\n\tctx.lineTo(width, height);\n\t\n\tctx.closePath(); // Line to bottom-left corner\n\tctx.clip();\n\t// tint(0, 153, 204);\n\timage(bg, sze, sze)\n\tpop()\n}\n\nfunction drawBgPattern() {\n\t// raster\n\tpush();\n\tnoStroke()\n\tfill(\"#dfe\");\n\tconst deviation = 5;\n\tconst step = abs((frameCount % (deviation*2)) - deviation) + 2; // pendelum between 2..8..2\n\tfor (let y = floor(step * 0.5); y < num; y += step) {\n\t\tfor (let x = floor(step * 0.5); x < num; x += step) {\n\t\t\tif (x + y <= num) {\n\t\t\t\trect(x * sze, y * sze, sze)\n\t\t\t}\n\t\t}\n\t}\n\tpop();\n}\nfunction drawBgLine() {\n\t// single line\n\tpush();\n\tconst xyOff = floor(num * 0.5) * sze;\n\tconst yOff = sin(frameCount * 0.1)\n\ttranslate(xyOff, xyOff);\n\t// rotate(frameCount * 0.1);\n\tnoStroke()\n\tfill(\"#fec\");\n\tfor (let x = - num; x < num; x++) {\n\t\ty = floor(x * yOff);\n\t\trect(x * sze, y * sze, sze)\n\t}\n\tpop();\n}\n\nfunction drawFgFigure() {\n\tpush();\n\tnoStroke()\n\tfill(192, 32, 160); // fill(32, 192, 160);\n\tvar minWH = max(width, height);\n\tconst rad = sin(frameCount * 0.1) * minWH * 0.45;\n\tfor (let a = 0; a < TWO_PI; a += TWO_PI / num * 1.5) {\n\t\tconst cx = width * 0.5 + sin(a + a) * minWH * 0.1;\n\t\tconst cy = height * 0.5 + cos(a + a) * minWH * 0.1;;\n\t\tconst x = translateBlockCoord(cos(a) * rad + cx);\n\t\tconst y = translateBlockCoord(sin(a) * rad + cy);\n\t\trect(x, y, sze)\n\t}\n\tpop();\n}\n\nfunction translateBlockCoord(pos) {\n\treturn sze * floor(pos / sze)\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

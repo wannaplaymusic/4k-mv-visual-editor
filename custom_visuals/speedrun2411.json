@@ -1,0 +1,22 @@
+{
+    "name": "speedrun2411",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:23:57",
+    "url": "https://openprocessing.org/@epi/2159350",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(600, 600);\n}\n\t\n\nfunction draw() {\n\tbackground(\"beige\")\n\t\n\tconst swX = width * 0.1;\n\tconst swY = swX * 0.5;\n\n\tnoStroke()\n\tfor (let x = 0; x < width; x += swX * 2) {\n\t\tfill(random([\"grey\", \"white\", \"yellow\", 64]))\n\t\trect(x, 0, swX, height)\n\t}\n\n\tfor (let y = 0; y < height; y += swY * 2) {\n\t\tfill(random([\"grey\", \"white\", \"yellow\", 64]))\n\t\trect(0, y, height, swY)\n\t}\n\n\t\n\t// noLoop() removed for animation\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

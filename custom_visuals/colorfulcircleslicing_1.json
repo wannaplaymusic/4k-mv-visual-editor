@@ -1,0 +1,25 @@
+{
+    "name": "colorfulcircleslicing_1",
+    "author": "Xeronimo74",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 03:10:59",
+    "url": "https://openprocessing.org/@Xeronimo74/218937",
+    "code": "// === Tab: sketch218937 ===\nlet num = 5, points = 100, frames = 240;\nlet d = 180, theta=3*PI/2, angle;\nlet palette = [\"#490A3D\", \"#BD1550\", \"#E97F02\", \"#F8CA00\", \"#8A9B0F\"];\n\nfunction setup() {\n  createCanvas(540, 540);\n}\n\nfunction draw() {\n  background(255);\n\n  for (let i=0; i<num; i++) {\n    drawCircle(i);\n  }\n\n  theta += TWO_PI/frames;\n  //if (frameCount<=frames) saveFrame(\"image-###.gif\");\n}\n\nfunction drawCircle(_i) {\n  fill(palette[_i]);\n  noStroke();\n  pushMatrix();\n  let d = map(_i, 0, num-1, 180, 50);\n  let px = map(_i, 0, num-1, 0, d);\n  px = 0;\n  translate(width/2+px, height/2);\n  beginShape();\n  let arcAmount = map(sin(theta), -1, 1, 0, TWO_PI);\n  for (let i=0; i<points+3; i++) {\n    if (frameCount%frames<frames/2) {\n      angle = arcAmount/points*i;\n    } else {\n      angle = TWO_PI-arcAmount/points*i;\n    }\n    let x = cos(angle)*d;\n    let y = sin(angle)*d;\n    vertex(x, y);\n  }\n  endShape(CLOSE);\n  popMatrix();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Dub Techno Core Vibration.mp4"
+    ]
+}

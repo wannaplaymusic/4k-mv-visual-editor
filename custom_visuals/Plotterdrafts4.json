@@ -1,0 +1,22 @@
+{
+    "name": "Plotterdrafts4",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:10:20",
+    "url": "https://openprocessing.org/@epi/2494032",
+    "code": "// === Tab: mySketch ===\n// https://x.com/luruke/status/1315605417498759169\n// https://idrawpenplotter.com/\n// SALE064\n\nfunction setup() {\n  createCanvas(500, 700, SVG);\n  stroke(32);\n  // noLoop() removed for animation\n}\n\nfunction draw() {\n\tbackground(222);\n  const MAR = 50;\n\tconst ww = 100;\n\tstrokeWeight(1);\n\tnoFill()\n\t\n\t// horizontal lines: hills\n\tfor (let S=1, y = MAR; y < height - MAR; y += S) {\n\t\tS = map(y, 0, height, 1, 10);\n\t\tconst zf = pow(sin(y/height*PI), 2) * height*0.65; // map(y, 0, height, 1, 200);\n\t\t// line(MAR, y, width-MAR, y)\n\t\tbeginShape();\n\t\tfor (let x = MAR; x < width - MAR; x += 5) {\n\t\t\tconst xf = pow(sin(x/width*PI), 2);\n\t\t\tconst z = noise(12.3 + x/123, 23.4 + y/231, frameCount) * zf * xf;\n\t\t\tvertex(x, y - z);\n\t\t}\n\t\tendShape();\n\t}\n\t\n\t// vertical lines: perspective\n\tconst SP = 5;\n\tlet numDebug = 2;\n\tfor (let x = MAR+SP; x < width-MAR-SP; x += SP) {\n\t\tconst d = width/2 - x;\n\t\tlet xx = width/2 - d*2.186;\n\t\tlet yy = height-MAR;\n\t\tif (xx < MAR) {\n\t\t\tconst f = abs(x-MAR)/abs(x-xx);\n\t\t\txx = MAR;\n\t\t\tyy = lerp(MAR, height-MAR, f);\n\t\t} else if (xx > width-MAR) {\n\t\t\tvar f = abs(width-MAR-x)/abs(xx-x);\n\t\t\txx = width-MAR;\n\t\t\tyy = lerp(MAR, height-MAR, f);\n\t\t}\n\t\tline(x, MAR, xx, yy); // width/2 - d*2.186, height-MAR);\n\t}\n}\n\nfunction mousePressed() {\n\tif (mouseButton === LEFT) redraw();\n}\n\nfunction keyPressed() {\n\tif (key === 's' || key === 'S') {\n\t\tsave(\"mySketch.svg\"); // Save the canvas as SVG\n\t}\n}",
+    "custom_html": "<script src=\"https://unpkg.com/p5.js-svg@1.5.1\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

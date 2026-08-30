@@ -1,0 +1,25 @@
+{
+    "name": "SchatziGrid",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:07:01",
+    "url": "https://openprocessing.org/@epi/2666023",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(S=max(windowWidth, windowHeight), S);\n\tdescribe(\"quadtratic still of 3 rows with each 15 4-edges shifting between dark and bright\")\n\tstrokeWeight(2);\n\tfill(212);\n\tloop();\n}\n\nfunction draw() {\n\tbackground(32);\n\t\n\tconst nx = 7, ny = 3;\n\tconst xx = S / nx, yy = S / ny, dx = xx * 0.8;\n\tfor (let y = 0; y < height; y += yy) {\n\t\tfor (let x = 0; x < width; x += xx) {\n\t\t\tlet x1 = x + noise(x, y, frameCount) * dx;\n\t\t\tlet x2 = x + xx - noise(x+1, y, frameCount) * dx;\n\t\t\tlet x3 = x + noise(x, y+1, frameCount) * dx;\n\t\t\tlet x4 = x + xx - noise(x+1, y+1, frameCount) * dx;\n\t\t\tif (x1 > x2) [x1, x2] = [x2, x1];\n\t\t\tif (x3 > x4) [x3, x4] = [x4, x3];\n\t\t\tnoStroke();\n\t\t\tquad(x1, y, x2, y, x4, y+yy, x3, y+yy);\n\t\t\tstroke(32);\n\t\t\tline(x1, y, x4, y + yy);\n\t\t}\n\t}\n\t\n\t// noLoop() removed for animation\n}\n\nfunction mouseClicked() {\n\tif (mouseButton != RIGHT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Infinite Loop.mp4"
+    ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Petallica",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 22:59:02",
+  "url": "https://openprocessing.org/@epi/2344556",
+  "code": "// === Tab: mySketch ===\n/*\n * Petallica\n *\n * Made for the #WCCChallenge created by Raphaël de Courville\n * 2024/09/05\n */\n\nvar spirals = [];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(255);\n\t\n\tsetInterval(() => {\n\t\t\n\t\tlet origin = createVector(\n\t\t\t~~random(0, width),\n\t\t\t~~randomGaussian(height*0.75, height*0.05) // ~~random(0, height)\n\t\t);\n\t\t\n\t\tlet len = ~~random(width * 1.5, width * 0.5); // ~~random(width / 10, width / 5);\n\t\tlet nSegments = floor(random(1, 10));\n\t\tlet spiral = {\n\t\t\tsegments : [],\n\t\t\torigin,\n\t\t\tlen\n\t\t};\n\t\t\n\t\tlet vectorPos2 = createVector(0, len);\n\t\tlet ang = 0;\n\t\t\n\t\tfor (let j = 0; j < nSegments; ++j) {\n\t\t\t\n\t\t\tlet pos = p5.Vector.rotate(vectorPos2, ang);\n\t\t\tspiral.segments.push({\n\t\t\t\tpos,\n\t\t\t\tc : color(\n\t\t\t\t\t~~random(64, 255),\n\t\t\t\t\t~~random(0, 128),\n\t\t\t\t\t~~random(32, 192)\n\t\t\t\t)\n\t\t\t});\n\t\t\t\n\t\t\tang += (TWO_PI / nSegments);\n\t\t}\n\t\t\n\t\tif (spirals.length < width * 0.025) spirals.push(spiral);\n\t}, 2000);\n}\n\nfunction draw() {\n\tfill(255, 0.5);\n\t// rect(0, 0, width, height);\n\t\n\tspirals.forEach((spiral) => {\n\t\t\n\t\tpush();\n\t\ttranslate(\n\t\t\tspiral.origin.x, \n\t\t\tspiral.origin.y\n\t\t);\n\t\t\n\t\tspiral.segments.forEach((segment) => {\n\t\t\t\n\t\t\tif (segment.pos.mag() > 1) {\n\t\t\t\tconst dst = segment.pos.mag() / spiral.len;\n\t\t\t\tconst clr = segment.c;\n\t\t\t\tclr.setAlpha(dst > 0.1 ? dst*160 : 10)\n\t\t\t\t// console.log(dst, spiral.len/(dst+0.0001)*500)\n\t\t\t\tstroke(clr)\n\t\t\t\tline(random(-2, 2), random(-2, 2), segment.pos.x+random(-2, 2), segment.pos.y+random(-2, 2));\n\t\t\t\tsegment.pos.setHeading(segment.pos.heading() + PI / 50);\n\t\t\t\tsegment.pos.setMag(segment.pos.mag() - 0.5);\n\t\t\t}\n\t\t\t\n\t\t});\n\t\tpop();\n\t});\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

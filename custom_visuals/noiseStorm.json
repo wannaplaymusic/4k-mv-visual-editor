@@ -1,0 +1,25 @@
+{
+    "name": "noiseStorm",
+    "author": "robertd052",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:09:39",
+    "url": "https://openprocessing.org/@robertd052/197563",
+    "code": "// === Tab: noiseStorm ===\n// noise(), sin(), rotate(),\nlet x, y, x2, y2, rad, rad2, dist, dist2;\nlet deg, incr, yIn, rotateBy, ang;\n\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n  //createCanvas(600, 600);\n  //background(\"#02021A\");\n  background(255);\n  incr = 1; // numVerts = 360/incr\n  rad = -20;\n  rad2 = -160;\n  dist = 500;\n  dist2 = 550;\n}\n\nfunction draw() {\n  noStroke();\n  fill(\"#02021A\", 10);\n  rect(0, 0, width, height);\n  fill(random(0, 255), 255, 255);\n  \n  rotateBy += .003;\n  pushMatrix();\n  translate(width/2, height/2);\n  rotate(rotateBy);\n  deg = 0;\n  while (deg <= 360) {\n    deg += incr;\n    ang = radians(deg);\n    x = cos(ang) * (rad + (dist * noise(y/100, yIn)));\n    y = sin(ang) * (rad + (dist * noise(x/80, yIn)));\n    ellipse(x, y, 1.5, 1.5);\n    x2 = sin(ang) * (rad2 + (dist2 * noise(y2/20, yIn)));\n    y2 = cos(ang) * (rad2 + (dist2 * noise(y2/20, yIn)));\n    ellipse(x2, y2, 1, 1);\n  }\n  yIn += .005;\n  popMatrix();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Slow Velocity.mp4"
+    ]
+}

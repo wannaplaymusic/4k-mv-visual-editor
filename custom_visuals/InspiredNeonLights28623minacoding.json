@@ -1,0 +1,22 @@
+{
+    "name": "InspiredNeonLights28623minacoding",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:58:30",
+    "url": "https://openprocessing.org/@epi/1964249",
+    "code": "// === Tab: mySketch ===\n/*\n\tInspired Neon Lights // 28.6.2023\n\t#minacoding #p5js #creativecoding #generativeart #dailycoding\n\thttps://www.twitch.tv/videos/1857899385\n\t\n\tInspired by light studies from @zachlieberman\n\thttps://twitter.com/zachlieberman/status/1449782484720406532\n*/\n\n\nvar bars = [];\nvar clrs = [];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpixelDensity(1);\n\tframeRate(30);\n\t\n\tclrs = [\"white\", \"white\", \"cyan\", \"red\", \"yellow\", \"yellow\"];\n\t\n\tconst minWH = max(width, height);\n\tconst tileS = minWH * 1 / 6;\n\t\n\tbars = [];\n\tfor (let y = (height - minWH + tileS) * 0.5; y <= height; y += tileS) {\n\t\tfor (let x = (width - minWH + tileS) * 0.5; x <= width; x += tileS) {\n\t\t\tbars.push(new NeonBar(x, y, random(TWO_PI), tileS, random(clrs), 100));\t\n\t\t}\n\t}\n}\n\nfunction draw() {\n\tbackground(0, 0, 8, 64);\n\t\n\tfor (let b of bars) {\n\t\tb.update();\n\t\tb.show();\n\t}\n\n\t// // noLoop() removed for animation\n}\n\nclass NeonBar {\n\tconstructor(x, y, a, l, clr, len, act = true) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.a = a;\n\t\tthis.l = l;\n\t\tthis.clr = clr;\n\t\tthis.len = len;\n\t\tthis.act = act;\n\t}\n\n\tupdate() {\n\t\tthis.a = floor(4  * noise(this.x * 0.01 + frameCount * 0.021, this.y * 0.0273)) / 4 * TWO_PI + PI * 0.25;\n\t\tthis.act = noise(this.x * 0.01 + frameCount * 0.021, this.y * 0.03) < 0.45\n\t\tthis.clr = clrs[floor(clrs.length * (noise(this.x * 0.02 + frameCount * 0.0121, this.y * 0.023)))];\n\t}\n\t\n\tshow() {\n\t\t// only draw active bars\n\t\tif (!this.act) return;\n\t\t\n\t\tpush();\n\t\tnoFill();\n\t\tnoStroke();\n\t\ttranslate(this.x, this.y);\n\t\trotate(this.a); \n\t\trectMode(CENTER);\n\t\t\n\t\tfill(this.clr);\n\t\tdrawingContext.shadowColor = this.clr;\n\t\tdrawingContext.shadowBlur = this.len;\n\t\trect(0, 0, this.l, 4);\n\n\t\tdrawingContext.shadowColor = \"white\";\n\t\tdrawingContext.shadowBlur = this.len * 0.5;\n\t\trect(0, 0, this.l, 4);\n\t\t\n\t\tdrawingContext.shadowColor = this.clr;\n\t\tdrawingContext.shadowBlur = this.len * 0.25;\n\t\trect(0, 0, this.l, 4);\n\t\t\n\t\tpop();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

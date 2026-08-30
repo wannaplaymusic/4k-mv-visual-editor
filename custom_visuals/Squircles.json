@@ -1,0 +1,22 @@
+{
+    "name": "Squircles",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:15:17",
+    "url": "https://openprocessing.org/@epi/2839931",
+    "code": "// === Tab: mySketch ===\nlet S, TH;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tS = max(width, height);\n\tloop();\n}\n\nfunction draw() {\n\tblendMode(BLEND)\n\tbackground(\"tan\");\n\n\ttranslate(width/2, height/2);\n\trotate(random(TAU))\n\tTH = random(10, 30);\n\t\n\tstrokeWeight(TH * 0.95);\n\tstroke(\"darkred\");\n\tdrawSpiralSquircle(S * 0.9, TH * 1.5);\n\t\n\tblendMode(MULTIPLY);\n\trotate(random(-0.2, 0.2))\n\tstroke(\"steelblue\");\n\tdrawSpiralSquircle(S * 0.9 - TH * 2, TH * 1.5, random(-0.3, 0.3));\n\t\n\t// noLoop() removed for animation\n}\n\nfunction mousePressed() {\n\tif (mouseButton.left) redraw();\n}\n\nfunction drawSpiralSquircle(size, step, a = 0, exponent = 3) {\n  noFill();\n  beginShape();\n  \n  // let a = 0;          // angle\n  let r = size / 2;   // radius (decreases each loop)\n  \n  while (r > step) {\n    // superellipse / squircle formula\n    let ca = cos(a);\n    let sa = sin(a);\n    \n    let x = Math.sign(ca) * pow(abs(ca), 2/exponent) * r;\n    let y = Math.sign(sa) * pow(abs(sa), 2/exponent) * r;\n\n    vertex(x, y);\n\n    a += 0.12;      // smaller step = smoother spiral\n    r -= step/40;   // reduce radius\n  }\n  \n  endShape();\n}\n\nfunction AdrawSpiralRect(sze, d, mn = d) {\n\tnoFill();\n\tbeginShape();\n\tlet a = 0;\n\twhile (sze > d) {\n\t\tvar x = cos(a) * sze * 0.5;\n\t\tvar y = sin(a) * sze * 0.5;\n\t\tvertex(x, y);\n\t\tsze -= d/4;\n\t\ta += HALF_PI;\n\t}\n\tendShape();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

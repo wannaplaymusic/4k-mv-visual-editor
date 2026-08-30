@@ -1,0 +1,25 @@
+{
+    "name": "MemorySnake_1",
+    "author": "lungtwist",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:09:26",
+    "url": "https://openprocessing.org/@lungtwist/492286",
+    "code": "// === Tab: mySketch ===\nlet size = 512;\nlet siz = size-1;\n\nlet tension = 0.5;\nlet sympathy = 0.05;\n\nlet draggedNode = -1;\n\nlet colorray = new Array(16);\n\nlet px = new Array(size);\nlet py = new Array(size);\nlet vx = new Array(size);\nlet vy = new Array(size);\nlet ax = new Array(size);\nlet ay = new Array(size);\n\n/////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n  ellipseMode(RADIUS);\n\tfill(255, 128);\n  \n  for (let i = 1; i < siz; i++) {\n    px[i] = width * i / size;\n    py[i] = height/2 + randomGaussian() * 16;\n  }\n\t\n\tpx[0] = 16;\n\tpy[0] = height/2;\n\tpx[siz] = width - 64;\n\tpy[siz] = height/2;\n\t\n\tchangeColors();\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction draw() {\n\tfor (let i = 1; i < siz; i++) {\n\t\tax[i] = (px[i-1] + px[i+1] - px[i] - px[i]) * tension + (vx[i-1] + vx[i+1] - vx[i] - vx[i]) * sympathy;\n\t\tay[i] = (py[i-1] + py[i+1] - py[i] - py[i]) * tension + (vy[i-1] + vy[i+1] - vy[i] - vy[i]) * sympathy;\n\t}\n\t\n\tfor (let i = 1; i < siz; i++) {\n\t\tvx[i] += ax[i];\n\t\tvy[i] += ay[i];\n\t\tpx[i] += vx[i];\n\t\tpy[i] += vy[i];\n\t}\n\t\n\tif (draggedNode != -1) {\n\t\tpx[draggedNode] = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n\t\tpy[draggedNode] = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n\t}\n\t\n\t\n\tbackground(32);\n\tnoStroke();\n\t\n\tellipse(px[0], py[0], 16, 16);\n\tellipse(px[siz], py[siz], 16, 16);\n\t\n\t\n\tfor (let i = 1; i < colorray.length + 1; i++) {\n\t\tstroke(colorray[i-1]);\n\t\t\n\t\tfor (let node = 0; node < size-i; node++) {\n\t\t\tline(px[node], py[node], px[node+i], py[node+i]);\n\t\t}\n\t}\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction mousePressed() {\n\tchangeColors();\n\t\n\tdraggedNode = -1;\n\t\n\tif (abs((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - px[0]) < 16    &&    abs((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - py[0]) < 16) {\n\t\tdraggedNode = 0;\n\t}\n\telse if (abs((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - px[siz]) < 16    &&    abs((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - py[siz]) < 16) {\n\t\tdraggedNode = siz;\n\t}\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction mouseReleased() {\n\tdraggedNode = -1;\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction changeColors() {\n\tlet r = random(256);\n\tlet g = random(256);\n\tlet b = random(256);\n\t\n\tfor (let i = 0; i < colorray.length; i++) {\n\t\tcolorray[i] = color(r + gauss(64), g + gauss(64), b + gauss(64), 128);\n\t}\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction gauss(n) {\n\treturn randomGaussian() * n;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Carbon Resonance.mp4"
+    ]
+}

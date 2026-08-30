@@ -1,0 +1,25 @@
+{
+    "name": "ShadowMathsCliffordAttractorVariation_1",
+    "author": "gorillasun",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:12:28",
+    "url": "https://openprocessing.org/@gorillasun/1751832",
+    "code": "// === Tab: mySketch ===\n/*\n\tSubmission for @sableRaph's weekly creative coding challenge #WCCChallenge\n\tTopic: Shadow Maths\n\t\n\tMade an attractor and messed a bit with the maths\n\tVariation based on these parametric equations: http://paulbourke.net/fractals/clifford/\n*/\n\n// you can change these values\n[a, b, c, d] = [-1.8, -2.0, -0.5, -0.9]\nx = y = prevX = prevY = 0\n\nfunction setup() {\n  createCanvas(600, 600);\n  background(0);\n}\n\n\nfunction draw() {\n  background(0,50);\n  stroke(255)\n  strokeWeight(1)\n  translate(300, 300)\n  \n  t = millis()/10000\n  \n  x = millis()/2000\n  y = millis()/2000\n\n  prevX = x\n  prevY = y\n  \n  for(let n = 0; n < 3000; n++){\n    x =  sin(a * prevY + t) + c * cos(a * prevX + t) * sin(b * prevX + t)\n    y =  sin(b * prevX + t) + d * cos(b * prevY + t) * sin(a * prevY + t)\n    \n    // try these for another spicy attractor\n    //x =  sin(a * prevY + t)*cos(a * prevX + t) + c * cos(a * prevX + t) * sin(b * prevX + t)\n  \t//y =  sin(b * prevX + t)*cos(b * prevY + t) + d * cos(b * prevY + t) * sin(a * prevY + t)\n    \n\n    point(120 * x, 120 * y)\n\n    prevX = x\n    prevY = y\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Distant Industrial Rain.mp4"
+    ]
+}

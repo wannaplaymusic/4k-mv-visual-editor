@@ -1,0 +1,22 @@
+{
+  "name": "Flashlight_1",
+  "author": "u91723",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 16:44:27",
+  "url": "https://openprocessing.org/@u91723/582314",
+  "code": "// === Tab: mySketch ===\nvar r = 80; // size of blocks\nvar h = 1.3; // relative height of blocks\n\nvar top = color(250, 100, 50); // block side colors\nvar right = color(50, 100, 200);\nvar left = color(100, 20, 120);\n\nvar shadow = color(0); // shadows. colors other than black will look weird.\nvar highlight = color(255); // highlights. colors other than white may look weird\nvar hl = 1.2; // range 0-2. how much to blow out highlights\nvar ambient = 0; // range 0-1. ambient light\nvar drag = 4; // how slowly the light follows the mouse. must be above, or equal to 1\n\nfunction setup() {\n  //createCanvas(900, 600);\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n}\n\n\nvar mx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\nvar my = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n\nfunction draw() {\n  \n  mx+=((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))-mx)/drag;\n  my+=((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))-my)/drag;\n\n  let x1 = r, x2 = -r/2;\n  let y1 = -r, y2 = -r/2;\n  let z1 = 0, z2 = r*h;\n\n  let w1 = x1-y1;\n  //let w2 = x2-y2;\n  let h1 = z1-y1;\n  let h2 = z2-y2;\n\n\n  for (let y = 0; (y-1)*h2<height; y++) {\n    for (let x = 0; (x-1)*w1<width; x++) {\n      pushMatrix();\n      translate(w1*x+h1*(y%2), h2*y);\n\n      let dx = (w1*x+h1*(y%2))-mx;\n      let dy = h2*y-my;\n      fill(lumin(top, reflect(dx, dy+r)));\n      quad(0, 0, \n        x1, x2, \n        x1+y1, x2+y2, \n        y1, y2);\n\n      dx = (w1*x+h1*(y%2))-mx - (x1+x1+z1+z1)/2;\n      dy = h2*y-my-(x2+x2+z2+z2)/2;\n      let a = 2*PI/3;\n      fill(lumin(right, reflect(cos(a)*dx+sin(a)*dy, cos(a)*dy-sin(a)*dx)));\n      quad(0, 0, \n        x1, x2, \n        x1+z1, x2+z2, \n        z1, z2);\n\n\n      dx = (w1*x+h1*(y%2))-mx + (x1+x1+z1+z1)/2;\n      dy = h2*y-my-(x2+x2+z2+z2)/2;\n      a = -2*PI/3;\n      fill(lumin(left, reflect(cos(a)*dx+sin(a)*dy, cos(a)*dy-sin(a)*dx)));\n      quad(0, 0, \n        z1, z2, \n        z1+y1, z2+y2, \n        y1, y2);\n      popMatrix();\n    }\n  }\n}\n\nfunction reflect(offset, distance) {\n  let d = distance/2/r-0.3;\n  let ans = constrain(\n    2*(d/(d*d+0.5))/1.41\n    /max(1, abs(offset)/r), \n    0, 1);\n    \n    ans = (ans+sq(ans))/2;\n    return ans;\n}\n\n// returns a let with a shadow added based on the light received. 0 is dark, 0.5 returns same color, 1 is blown out\nfunction lumin(base, light) {\n  return light<0.5?\n    lerpColor(shadow, base, map(light*2, 0, 1, ambient, 1)):\n    lerpColor(base, highlight, (light-0.5)*hl);\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

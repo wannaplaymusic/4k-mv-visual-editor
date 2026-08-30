@@ -1,0 +1,25 @@
+{
+    "name": "RainbowArcs",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:58:07",
+    "url": "https://openprocessing.org/@epi/2190718",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(\"#ddeeff\");\n\tcolorMode(HSB)\n}\n\nfunction draw() {\n\ttranslate(width/2,-height/8)\n\t\n\tnoFill()\n\tstrokeWeight(30)\n\tfor (let i = 0; i < 10; i++) {\n\t\tstroke(abs(360 - (330 + i * 30)) % 360, 25, 75)\n\t\tconst d = i * 80 + height/2;\n\t\tarc(0, 0, d, d, 0, HALF_PI + i * PI/16)\n\t}\n\t\n\t// noLoop() removed for animation\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Carbon Resonance.mp4"
+    ]
+}

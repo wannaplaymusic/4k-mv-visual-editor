@@ -1,0 +1,22 @@
+{
+  "name": "Juliasetofsinz",
+  "author": "ntsutae",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 16:42:13",
+  "url": "https://openprocessing.org/@ntsutae/1693953",
+  "code": "// === Tab: mySketch ===\n// Inspired by Paul Bourke (http://paulbourke.net/fractals/sinjulia/)\n// Reference: http://negativespace.net/art/julia-set-sinz\nvar a = 1;\nvar b = 0.2;\nvar julia = (x, y) => {\n  for (iter = 0; iter < 100; iter++) {\n    let u = sin(x) * Math.cosh(y);\n    let v = cos(x) * Math.sinh(y);\n    x = a * u - b * v;\n    y = b * u + a * v;\n    if (abs(y) > 50) return iter;\n  }\n  return 0;\n};\n\nvar maxx, maxy;\nsetup = () => {\n  createCanvas(windowWidth, windowHeight);\n  let avr = sqrt(width * height);\n  maxx = (avr / height) * PI;\n  maxy = (avr / width) * PI;\n};\n\nyy = 0;\ndraw = () => {\n  if (yy < height) {\n    const y = map(yy, 0, height, -maxy, maxy);\n    for (let xx = width; xx--; ) {\n      const x = map(xx, 0, width, -maxx, maxx);\n      const iter = julia(x, y);\n      const r= sin(iter/12)**2*256\n      const g= (15000 / iter) % 256\n      const b= (25000 / log(iter)) % 256\n\t\t\t\n      stroke(r,g,b);\n      line(xx, yy, xx, yy + iter);\n    }\n    yy++;\n  }\n};",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

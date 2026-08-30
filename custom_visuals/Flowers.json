@@ -1,0 +1,25 @@
+{
+    "name": "Flowers",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-04 00:42:15",
+    "url": "https://openprocessing.org/@epi/2833754",
+    "code": "// === Tab: mySketch ===\nconst TLS = 3;\nlet S;\nlet FG = \"#ff007f\";\nlet BG = \"#101018\";\nlet palettes = [\n  [\"#FF1493\", \"#00BFFF\", \"#FFD700\", \"#FF4500\", \"#7B68EE\"],\n  [\"#00F5D4\", \"#7B2CBF\", \"#F72585\", \"#4CC9F0\", \"#FFE66D\"],\n  [\"#FF595E\", \"#FFCA3A\", \"#8AC926\", \"#1982C4\", \"#6A4C93\"],\n  [\"#F72585\", \"#7209B7\", \"#3A0CA3\", \"#4361EE\", \"#4CC9F0\"]\n];\nlet currentPal = 0;\nlet numArr = [];\nlet clrArr = [];\nlet animAngle = 0;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  S = min(windowWidth, windowHeight) / TLS;\n  frameRate(30);\n  resetShapeData();\n}\n\nfunction resetShapeData() {\n  numArr = [];\n  for (let i = 1; i <= TLS * TLS; i++) numArr.push(i);\n  shuffle(numArr, true);\n  let pal = palettes[currentPal % palettes.length];\n  clrArr = [];\n  for (let i = 0; i < 5; i++) clrArr.push(pal[i % pal.length]);\n}\n\nfunction draw() {\n  let bass = (typeof sub_bass !== 'undefined') ? sub_bass : (typeof bass_ratio !== 'undefined' ? bass_ratio : 0);\n  let perc = (typeof percussive !== 'undefined') ? percussive : 0;\n  let is_beat_active = (typeof is_beat !== 'undefined' && is_beat);\n  \n  if (is_beat_active && frameCount % 30 === 0) {\n    currentPal++;\n    resetShapeData();\n  }\n  \n  background(BG);\n  \n  S = min(width, height) / TLS;\n  let offsetX = (width - S * TLS) / 2;\n  let offsetY = (height - S * TLS) / 2;\n  \n  animAngle += 0.02 + bass * 0.05;\n  \n  push();\n  translate(offsetX, offsetY);\n  for (let y = 0, i = 0; y < TLS; y++) {\n    for (let x = 0; x < TLS; x++, i++) {\n      drawShape(x * S, y * S, S, numArr[i % numArr.length], clrArr, bass, perc);\n    }\n  }\n  pop();\n\n  strokeWeight(S * 0.04);\n  stroke(clrArr[0] || FG);\n  noFill();\n  rect(0, 0, width, height);\n}\n\nfunction drawShape(x, y, s, n, pal, bass, perc) {\n  const ctx = drawingContext;\n  const da = PI / max(1, n);\n\n  push();\n  translate(x + s / 2, y + s / 2);\n  rotate(animAngle + n * da);\n  s *= (0.82 + bass * 0.2);\n\n  strokeWeight(s * 0.025);\n  stroke(BG);\n  fill(pal[0]);\n  rectMode(CENTER);\n\n  const rx = s / 2;\n  const ry = 0;\n\n  if (ctx && ctx.createLinearGradient) {\n    const linGrad = ctx.createLinearGradient(rx, -ry, -rx, ry);\n    for (let i = 0; i < pal.length; i++) {\n      linGrad.addColorStop(map(i, 0, max(1, pal.length - 1), 0, 1), pal[i]);\n    }\n    ctx.fillStyle = linGrad;\n  }\n\n  for (let i = 0; i < n; i++) {\n    rect(0, 0, s, s / 4, s / 8);\n    rotate(-da + perc * 0.05);\n  }\n\n  pop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": true,
+    "used_in_videos": [
+        "Airlock Reverie.mp4"
+    ]
+}

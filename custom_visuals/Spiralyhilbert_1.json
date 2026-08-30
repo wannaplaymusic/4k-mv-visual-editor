@@ -1,0 +1,25 @@
+{
+    "name": "Spiralyhilbert_1",
+    "author": "chubas",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:25:01",
+    "url": "https://openprocessing.org/@chubas/1750344",
+    "code": "// === Tab: mySketch ===\n// WCCChallenge - \"Shadow math\"\n// Another sketch featuring the Hilbert curve. Tried to do alternate the colors to simulate some \"shading\" in a spiral pattern, kind of a stretch :\\\n\nOPC.slider('hilbertNumber', 6, 3, 7, 1)\nOPC.slider('lineWidth', 2, 0.5, 10, 0.5)\nOPC.slider('spiralSpace', 40, 10, 100, 5)\nOPC.slider('spiralDivisions', 16, 4, 30, 2)\nOPC.slider('color1', 66, 0, 255, 1)\nOPC.slider('color2', 225, 0, 255, 1)\nOPC.slider('rotateSpeed', 50, 10, 100, 5)\n\nfunction setup () {\n\tcanvasWidth = canvasHeight = max(windowWidth, windowHeight)\n  createCanvas(canvasWidth, canvasHeight)\n  angleMode(DEGREES)\n\tbackground(bgColor)\n\tstrokeCap(PROJECT)\n\n\tgenerateLines()\n}\n\nlet cartToPolar = (x, y) => [sqrt(x*x+y*y), x === 0 ? 0 : atan(y/x)]\n\nfunction draw () {\n  background(bgColor)\n  noFill()\n\n  let cx = canvasWidth / 2, cy = canvasHeight / 2\n\n  let divisions = spiralDivisions / 2\n  let maxLength = dist(cx, cy, canvasWidth, canvasHeight)\n  let n = ceil(maxLength / spiralSpace)\n  let angle = 360 / divisions\n\n\t// Get the middle point. Calculate its polar position and color it according to the rotation and distance to the center\n  for (let [i, [x1, y1, x2, y2]] of lines.entries()) {\n    let px = ((x1 + x2) / 2), py = ((y1 + y2) / 2)\n    let [r, theta] = cartToPolar(px - cx, py - cy)\n    let _d = floor(r / spiralSpace)\n    let _a = theta - _d * (frameCount / rotateSpeed)\n    let section = fract(_a / angle)\n    strokeWeight(lineWidth)\n    stroke(section < 0.5 ? color1 : color2)\n    line(x1, y1, x2, y2)\n  }\n\n}\n\nlet canvasWidth = 800, canvasHeight = 800\nlet ant, theCurve, iterations, iterStep\nlet lines = []\nlet bgColor = 200\n\n// Taken from https://openprocessing.org/sketch/1396198\n// Generates the lines for a Hilbert curve or order N (global hilbertNumber)\nfunction generateLines () {\n\titerations = hilbertNumber\n\titerStep = 0\n\tlines = []\n  ant = {\n    x: 0,\n    y: 0,\n    stepSize: (min(canvasWidth, canvasHeight) - 20) / (2 ** iterations - 1),\n    // stepSize: 10,\n    movements: []\n  }\n  for(var j = 0; j < iterations; j++) {\n    ant.movements = [...[...ant.movements].reverse().map((m)=>(m+1)%4),1,...ant.movements,0,...ant.movements,3,...[...ant.movements].reverse().map((m)=>(m+3)%4)];\n  }\n\n  for (let movement of ant.movements) {\n    lines.push([\n      ant.x + 10,\n      ant.y + 10,\n      ant.x + ant.stepSize * cos(movement * 90) + 10,\n      ant.y + ant.stepSize * sin(movement * 90) + 10\n    ])\n    ant.x += ant.stepSize * cos(movement * 90)\n    ant.y += ant.stepSize * sin(movement * 90)\n  }\n}\n\nfunction parameterChanged (variableName, value) {\n\tif (variableName === 'hilbertNumber') {\n\t\tgenerateLines()\n\t}\n}\n\nfunction mousePressed() {\n\tlet fs = fullscreen()\n\tfullscreen(!fs)\n\tcanvasWidth = canvasHeight = max(windowWidth, windowHeight)\n\tgenerateLines()\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/msawired/OPC@v0.2.3/opc.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset, form, nav,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5Dom {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Synthetic Breath.mp4"
+    ]
+}

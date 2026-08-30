@@ -1,0 +1,25 @@
+{
+    "name": "ParticleLifefork_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 05:09:00",
+    "url": "https://openprocessing.org/@ntsutae/1602466",
+    "code": "// === Tab: mySketch ===\n///////////////////////////////////////////////////////////////////////////////////////////\n// This sketch is a folk of saranomy's https://editor.p5js.org/saranomy/sketches/3PBgIF8UE\n///////////////////////////////////////////////////////////////////////////////////////////\n// Reference: Particle Life - A Game of Life Made of Particles\n// https://www.youtube.com/watch?v=Z_zmZ23grXE&t=55s\n///////////////////////////////////////////////////////////////////////////////////////////\nclass Particle {\n  constructor(type, x, y) {\n    this.type = type\n    this.x = x\n    this.y = y\n    this.vx = 0\n    this.vy = 0\n    this.r = 3\n    this.slow = 0.9\n    this.rmax = 30 + type * 15\n    this.rmin=this.rmax/4\n  }\n  draw() {\n    fill(['red', 'green', 'blue'][this.type])\n    ellipse(this.x, this.y, this.r * 2)\n  }\n  update() {\n    for (const other of particles) {\n      if (this === other) continue;\n      const dx = other.x - this.x\n      const dy = other.y - this.y\n// The dist function in p5js is very laggy\n      const d = sqrt(dx ** 2 + dy ** 2)\n\n      if (d < this.rmin) {\n        const k = 1/(d+2)-1/(this.rmin+2)\n        this.vx -= k * dx\n        this.vy -= k * dy\n      } else if (d < this.rmax) {\n// Red likes blue, green likes red, blue likes green\n        if ((3 + this.type - other.type) % 3 == 2) {\n          const k = .015\n          this.vx += k * dx\n          this.vy += k * dy\n// Any types hate their own kind\n        } else if (this.type == other.type) {\n          const k = .01\n          this.vx -= k * dx\n          this.vy -= k * dy\n        }\n      }\n    }\n    const v = createVector(this.vx, this.vy).limit(4)\n    this.vx = v.x\n    this.vy = v.y\n    this.x += this.vx\n    this.y += this.vy\n    this.vx *= this.slow\n    this.vy *= this.slow\n    this.x = (this.x + width) % width\n    this.y = (this.y + height) % height\n  }\n}\n////////////////////////////////////////////////////////////////////////////////////////////////////\nlet lastTime = Date.now()\nlet sum = 0\nlet fps = 0\nlet particles = []\n////////////////////////////////////////////////////////////////////////////////////////////////////\nsetup = () => {\n  createCanvas(640, 640)\n  noStroke()\n  for (let i = 350; i--;) {\n    spawn()\n  }\n}\nspawn = () => {\n  let r = random()\n  let type = int(random(3))\n  let x = random(0, width)\n  let y = random(0, height)\n  particles.push(new Particle(type, x, y))\n}\ndraw = () => {\n  background(255)\n  for (const p of particles) {\n    p.update()\n    p.draw()\n  }\n  fill('black')\n  sum += Date.now() - lastTime\n  if (frameCount % 5 == 0) {\n    fps = 1000 / (sum / 5)\n    sum = 0\n  }\n  text(floor(fps) + \"fps\", 5, 10)\n  lastTime = Date.now()\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Clear View.mp4"
+    ]
+}

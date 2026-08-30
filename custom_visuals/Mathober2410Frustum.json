@@ -1,0 +1,22 @@
+{
+    "name": "Mathober2410Frustum",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:17:20",
+    "url": "https://openprocessing.org/@epi/2393761",
+    "code": "// === Tab: mySketch ===\n/*\nDay #10/24: Frustum\nhttps://openprocessing.org/sketch/2393761\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nlet S;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tbackground(0, 0, 8);\n\tdescribe(\"net of frustum: circle(s), arc(s), circle(s)\");\n  \n  noFill();\n\tstroke(\"silver\");\n  strokeWeight(2);\n\tS = max(width, height);\n  loop();\n}\n\nfunction draw() {\n\tbackground(\"rgb(0, 0, 8)\");\n\n\tconst d1 = noisom(S/5, S/8);\n\tconst u1 = PI*d1;\n\tconst d2 = noisom(S/8, S/12);\n\tconst u2 = PI*d2;\n\t\n\tconst d = noisom(S/6, S/3)\n\tconst u = PI*S;\n\tconst da = ((u1+u2)/2)/u*PI;\n\tconst a1 = HALF_PI - da;\n\tconst r1 = S/2-d/2;\n\tconst p1 = {x: cos(a1)*r1, y: sin(a1)*r1}\n\tconst a2 = HALF_PI + da;\n\tconst r2 = S/2+d/2;\n\tconst p2 = {x: cos(a2)*r2, y: sin(a2)*r2}\n\n\t/*\n\tstroke(\"cyan\");\n\tarc(width/2, 0, r1+r1, r1+r1, a1, a2)\n\tstroke(\"purple\");\n\tarc(width/2, 0, r2+r2, r2+r2, a1, a2)\n\tstroke(\"blue\")\n\tline(width/2+p1.x, p1.y, width/2-p2.x, p2.y)\n\tline(width/2-p1.x, p1.y, width/2+p2.x, p2.y)\n\t*/\n\t\n\tconst df = 6 / (r2-r1);\n\tfor (let f = 0; f <= 1; f += df) {\n\t\tstroke(lerpColor(color(\"cyan\"), color(\"purple\"), 1-f));\n\t\tconst r = map(f, 0, 1, r1, r2);\n\t\tarc(width/2, 0, r+r, r+r, a1, a2)\n\t}\n\t\n\tstroke(\"cyan\");\n\tmcircle(width/2, height*1/4, d2)\n\tstroke(\"purple\");\n\tmcircle(width/2, height*3/4, d1)\n\t\n  // // noLoop() removed for animation\n}\n\nfunction mcircle(x, y, d) {\n\tfor (let dd = d; dd > 0; dd -= 10) {\n\t\tcircle(x, y, dd);\n\t}\n}\n\nfunction noisom(v1, v2) {\n\tif (v1>v2) [v1, v2] = [v2, v1];\n\tconst n = noise(v1, v2, frameCount/123);\n\treturn v1+n*(v2-v1);\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

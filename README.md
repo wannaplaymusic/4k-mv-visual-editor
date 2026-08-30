@@ -1,6 +1,6 @@
 # 4K MV Visual Integration Editor 🎬✨
 
-[![GitHub Release](https://img.shields.io/badge/Release-v1.2.0-blue.svg)](https://github.com/wannaplaymusic/4k-mv-visual-editor)
+[![GitHub Release](https://img.shields.io/badge/Release-v1.3.0-blue.svg)](https://github.com/wannaplaymusic/4k-mv-visual-editor)
 [![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11-green.svg)](https://python.org)
 [![GUI Framework](https://img.shields.io/badge/GUI-PyQt6-orange.svg)](https://www.riverbankcomputing.com/software/pyqt/)
 [![Aesthetic Layout](https://img.shields.io/badge/Aesthetic-Glassmorphic%20VJ%20System-purple.svg)]()
@@ -110,6 +110,22 @@ graph TD
 ---
 
 ### 📅 更新日誌 (Changelog)
+
+#### [v1.3.0] - 2026-08-30
+* **👾 像素視覺模組生成器**：新增專屬 Tab，支援 15 種經典復古像素與點陣風格，提供 WebGL/p5.js 沙盒預覽、參數調節、調色盤映射與一鍵模組收編。
+* **📱 YouTube Shorts 豎屏短影音批量匯出**：新增 9:16 (1080x1920) 智慧豎屏裁切、多曲目隊列排程與硬體加速離線批量渲染管線。
+* **🎬 AI 導演曲式通告單排程系統**：自適應曲式結構（Intro, Verse, Chorus, Bridge, Drop, Outro）排定場景通告單，並搭載模組影格快取與平滑降級過渡保護。
+* **🛡️ 實時渲染品質與音視響應診斷器**：實時抽幀黑畫面檢測、Drop/Chorus 高潮熱烈度驗證，以及大鼓/小鼓/Hi-hat 音視動態響應自動補償。
+* **🎨 現代 GLSL 著色器庫**：新增 34 種高效能 GLSL 後處理與視覺著色器（Raymarching, Volumetric Godrays, SSFR Fluid 等）。
+* **🧹 模組庫全面淨化與自癒修復**：隔離攝像頭與 WebXR/AR/VR 異常模組，強化沙盒免疫 Stubs，標準化並修復視覺模組。
+
+#### [v1.3.0] - 2026-08-30 (English)
+* **👾 Pixel Visual Module Generator**: Dedicated tab featuring 15 retro pixel & dither styles, dynamic parameter controls, palette mapping, and one-click visual module saving.
+* **📱 YouTube Shorts Batch Exporter**: 9:16 vertical crop with intelligent centering, multi-track queue scheduling, and hardware-accelerated offline batch rendering.
+* **🎬 AI Director Call Sheet & Orchestration**: Song-structure aware (Intro, Verse, Chorus, Drop, etc.) scene scheduling, module frame cache, and seamless fallback protection against black screens.
+* **🛡️ Real-time Render QC & Audio-Visual Auditor**: Frame-by-frame black screen detection, Drop/Chorus intensity audits, and dynamic Kick/Snare/Hi-hat response compensation.
+* **🎨 Modern GLSL Shader Library**: 34 high-performance GLSL post-processing & visual shaders added.
+* **🧹 Visual Modules Clean-up & Auto-Repair**: Quarantined camera/ARVR dependent modules, enhanced p5.js immunity stubs, and standardized metadata.
 
 #### [v1.2.1] - 2026-08-06
 * **🧹 儲存庫清理與 Git 規則最佳化**：更新 `.gitignore` 並清除 Git 歷史追蹤中的多餘暫存檔、快取、模型與日誌檔。

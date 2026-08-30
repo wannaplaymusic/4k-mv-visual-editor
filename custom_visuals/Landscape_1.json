@@ -1,0 +1,22 @@
+{
+  "name": "Landscape_1",
+  "author": "ntsutae",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 03:42:35",
+  "url": "https://openprocessing.org/@ntsutae/2330217",
+  "code": "// === Tab: mySketch ===\nconst agentCount = 1000;\nconst agentArray = [];\nconst agentSpeed = 5;\nlet world;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n  init();\n}\n\nfunction init() {\n  background(0);\n  world = array2d();\n  agentArray.length = 0;\n  for (let i = 0; i < agentCount; i++) {\n    agentArray.push(agent());\n  }\n}\n\nmouseClicked = () => init();\n\nfunction draw() {\n  for (let i = 0; i < agentSpeed; i++) {\n    agentArray.forEach((agent) => agent.next());\n  }\n}\n\nfunction* agent() {\n  const colour = \"#\" + hex(random(), 6);\n  const x = floor(random(width));\n  const y = floor(random(height));\n  const stack = [{ x, y }];\n  world.set(x, y, colour);\n\n  const directions = [\n    { dx: +1, dy: +1 },\n    { dx: 0, dy: +1 },\n    { dx: -1, dy: 0 },\n    { dx: 0, dy: -1 },\n    { dx: +1, dy: 0 },\n  ];\n  random(2) < 1 && directions.push(directions.shift());\n\n  while (stack.length) {\n    const { x, y } = stack.pop();\n\n    for (const { dx, dy } of directions) {\n      if (random() < 0.12) continue;\n      const newX = (x + dx + width) % width;\n      const newY = (y + dy + height) % height;\n      if (!world.canMoveTo(newX, newY)) continue;\n      stack.push({ x: newX, y: newY });\n      world.set(newX, newY, colour);\n      yield;\n    }\n  }\n}\n\nfunction array2d() {\n  const array = Array.from({ length: width }, () => Array(height).fill(false));\n\n  return {\n    canMoveTo: (x, y) => {\n      return array[x][y] === false;\n    },\n    set: (x, y, colour) => {\n      array[x][y] = true;\n      fill(colour);\n      rect(x, y, 1);\n    },\n  };\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

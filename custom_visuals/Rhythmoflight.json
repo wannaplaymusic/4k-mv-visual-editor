@@ -1,0 +1,22 @@
+{
+    "name": "Rhythmoflight",
+    "author": "kiantiong",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 03:03:27",
+    "url": "https://openprocessing.org/@kiantiong/2260351",
+    "code": "// === Tab: mySketch ===\n/*\nUse OPC to get new output\n\nRhythm of light 光之韻\nMade for #WCCChallenge topic \"Simplify 😶\" by TKt\n\nWhile searching for reference images of \"Simplify\",\nI came across several images that turned messy lines \ninto straight ones, which inspired this creation.\n\nI practiced the 3D features of p5.js in this sketch. \nI haven't used this part much before, so I'm not very \nfamiliar with it. Setting up camera movement and rotation \ntook me quite some time reading the p5js documentation \nand try.\n*/\n\nOPC.toggle(\"lineMode\",false)\nOPC.slider(\"nodeCount\",50,5,100,1)\n\nvar nodes = []\nvar aniDuration = 1000\n\nfunction setup() {\n\tconst canvaSize = max(windowWidth, windowHeight)\n\tcreateCanvas(canvaSize,canvaSize, WEBGL);\n\tbackground(0)\n\tcurveDetail(25)\n\t\n\t// set the start and end of the final line\n\tconst startVec = createVector(-height,0,0)\n\tconst endVec = createVector(height,0,0)\n\tconst r = height\n\n\tnodes.push(new Node(startVec,0))\n\tfor(let i=0;i<nodeCount;i++){\n\t\tconst coor = p5.Vector.random3D().mult(randomGaussian(r,r*0.05))\n\t\tconst dur = map(i,0,nodeCount,1,aniDuration)\n\t\tconst node = new Node(coor,dur)\n\t\tconst target = p5.Vector.lerp(startVec,endVec,(i/nodeCount))\n\t\tnode.setTarget(target)\n\t\tnodes.push(node)\n\t}\n\tnodes.push(new Node(endVec,0))\n\tstrokeWeight(3)\n\tcolorMode(HSB)\n\t\n}\n\nfunction draw() {\n\tif(lineMode){\n\t\tbackground(0);\n\t\tnoFill()\n\t\tstroke(100)\n\t}else{\n\t\tstroke(frameCount%360,70,100,0.01)\n\t\tnoFill()\n\t\tblendMode(ADD)\n\t}\n\t\n\t// camera setting\n\tconst cameraStart = createVector(-height,0,0)\n\tconst cameraEnd = createVector(0,0,0)\n\tconst cameraFace = p5.Vector.lerp(cameraStart,cameraEnd,easeOutSine(map(frameCount/aniDuration,0,1,0,1,true)))\n\tconst cameraP = [cameraFace.x+height*1.7, cameraFace.y+sin(frameCount*0.01)*500, cameraFace.z+cos(frameCount*0.01)*500]\n\tcamera(...cameraP, // the position of the camera\n\t\t\t\tcameraFace.x,cameraFace.y,cameraFace.z, // the point that the camera face at\n\t\t\t\t1,0,0) // the 'up' vertex of the camera\n\tperspective(1.4)\n\t\n\t// draw the nodes\n\tbeginShape()\n\tcurveVertex(nodes[0].p.x, nodes[0].p.y, nodes[0].p.z)\n\tcurveVertex(nodes[0].p.x, nodes[0].p.y, nodes[0].p.z)\n\tfor(let node of nodes){\n\t\tnode.update()\n\t\t// node.show()\n\t\tcurveVertex(node.p.x, node.p.y, node.p.z)\n\t}\n\tcurveVertex(nodes[nodes.length-1].p.x, nodes[nodes.length-1].p.y, nodes[nodes.length-1].p.z)\n\tcurveVertex(nodes[nodes.length-1].p.x, nodes[nodes.length-1].p.y, nodes[nodes.length-1].p.z)\n\tendShape()\n}\n\nfunction parameterChanged() {\n\tnodes = []\n\tframeCount = 0\n\tsetup()\n}\n\nclass Node{\n\tconstructor(vec, duration){\n\t\tthis.p = vec.copy()\n\t\tthis.start = vec.copy()\n\t\tthis.target = vec.copy()\n\t\tthis.duration = duration\n\t\tthis.t = 0\n\t}\n\tsetTarget(vec){\n\t\tthis.target = vec.copy()\n\t}\n\tupdate(){\n\t\tthis.t = this.t<this.duration?this.t+1:this.duration\n\t\tlet ratio = easeInOutCubic(this.t / this.duration)\n\t\tthis.p = p5.Vector.lerp(this.start, this.target, ratio)\n\t}\n\tshow(){\n\t\tcircle(this.p.x,this.p.y,5)\n\t}\n}\n\n// easing function\n\nfunction easeOutQuint(x) {\n\treturn 1 - Math.pow(1 - x, 5);\n}\n\nfunction easeOutSine(x) {\n  return Math.sin((x * Math.PI) / 2);\n}\n\nfunction easeInOutCubic(x) {\n\treturn x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/msawired/OPC@0.5.0/opc.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset, form, nav,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5Dom {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

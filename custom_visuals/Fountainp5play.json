@@ -1,0 +1,22 @@
+{
+  "name": "Fountainp5play",
+  "author": "q5play",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 02:53:15",
+  "url": "https://openprocessing.org/@q5play/1722665",
+  "code": "// === Tab: mySketch.js ===\n// This sketch uses p5play v3. Learn how to use it at p5play.org!\n\nfunction setup() {\n\tnew Canvas('1:1');\n\tworld.gravity.y = canvas.w * 0.012;\n\tstrokeWeight(canvas.w * 0.003);\n\tnoStroke();\n\n\tlet w99 = canvas.w * 0.99;\n\n\tlines = new Group();\n\tlines.collider = 'static';\n\tlines.color = () => color(random(100, 150), random(100, 250), random(230, 255));\n\n\tfor (let i = 0; i < 11; i++) {\n\t\tlet x = i * canvas.w * 0.1;\n\t\tnew lines.Sprite([\n\t\t\t[0, canvas.h - x],\n\t\t\t[canvas.w - x, canvas.h]\n\t\t]);\n\n\t\tnew lines.Sprite([\n\t\t\t[canvas.w - x, 0],\n\t\t\t[canvas.w, canvas.h - x]\n\t\t]);\n\t}\n\n\tlet minVel = canvas.w * 0.02;\n\tlet maxVel = canvas.w * 0.03;\n\n\twater = new Group();\n\twater.diameter = canvas.w * 0.02;\n\twater.x = w99;\n\twater.y = w99;\n\twater.vel.y = () => -map(world.physicsTime > 4 ? mouse.y : 0, 0, canvas.w, minVel, maxVel);\n\twater.color = () => color(random(100, 150), random(100, 250), random(230, 255));\n\twater.life = 240;\n}\n\nfunction draw() {\n\tbackground('#001d39');\n\tif (frameCount % 6 == 0) new water.Sprite();\n\t\n\tfor (let drop of water) {\n\t\tdrop.d = canvas.w * drop.life / 7000;\n\t}\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/quinton-ashley/p5play@3.21.4/planck.min.js; https://cdn.jsdelivr.net/gh/quinton-ashley/p5play@3.21.4/p5play.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

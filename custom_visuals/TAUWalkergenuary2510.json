@@ -1,0 +1,25 @@
+{
+    "name": "TAUWalkergenuary2510",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:30:34",
+    "url": "https://openprocessing.org/@epi/2505753",
+    "code": "// === Tab: mySketch ===\n// TAU Walker #genuary10  #genuary  #genuary2510 \n// You can only use TAU in your code, no other number allowed.\n// https://openprocessing.org/sketch/2505753\n\nlet S, pos;\nlet numZro, numOne, numTwo;\n\nfunction setup() {\n\tnumZro = TAU-TAU;\n\tnumOne = TAU/TAU;\n\tnumTwo = TAU/TAU + TAU/TAU;\n\tcreateCanvas(S = ~~(TAU*TAU*TAU*TAU/(numTwo)), S); // createCanvas(windowWidth, windowHeight);\n\tdescribe(\"random walker strokes in pink-blueish pattern\")\n\tbackground(~~(TAU*TAU));\n\tpos = {x: random(width), y: random(height)}\n}\n\nfunction draw() {\n\t// background(TAU, TAU/numTwo)\n\tconst dir = createVector(random(TAU, TAU*TAU), numZro).rotate(random(TAU));\n\tconst nxt = {x: pos.x + dir.x, y: pos.y + dir.y}\n\tif (nxt.x < numZro || nxt.x > S) nxt.x = pos.x - dir.x;\n\tif (nxt.y < numZro || nxt.y > S) nxt.y = pos.y - dir.y;\n\tstroke(random(TAU*TAU, TAU*TAU*TAU*TAU), random(TAU*TAU, TAU*TAU*TAU), random(TAU*TAU*TAU, TAU*TAU*TAU*TAU))\n\tstrokeWeight(noise(TAU+nxt.x/S, TAU*TAU+nxt.y/S) * TAU/numTwo);\n\tline(pos.x, pos.y, nxt.x, nxt.y);\n\tpos = {x: nxt.x, y: nxt.y}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Dub Techno Core Vibration.mp4"
+    ]
+}

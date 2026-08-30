@@ -1,0 +1,25 @@
+{
+    "name": "Circulation",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:11:02",
+    "url": "https://openprocessing.org/@ntsutae/1986597",
+    "code": "// === Tab: mySketch ===\n//circulation\nvar agentColor = new Uint8Array([0, 0, 0]);\nvar agentsNum = 1000;\nvar sensorOffset = 10;\nvar sensorAngle = 45;\nvar turnAngle = 60;\nvar agents;\n\nfunction setup() {\n  angleMode(DEGREES);\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  stroke(\"gray\");\n  strokeWeight(1);\n  g = createGraphics(1000, 1000);\n  g.pixelDensity(1);\n  agents = new Agents();\n}\n\nfunction draw() {\n  clear();\n  texture(g);\n  torus(360, 270);\n  \n  const camAngle = frameCount / 5;\n  const camDist = 640;\n  const x=camDist*cos(camAngle);\n  const y=camDist*sin(camAngle);\n  camera(x, y, 0, 0, 0, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - height / 2, 0, 0, 1);\n\n  g.background(255, 10);\n  g.loadPixels();\n  for (i = 10; i--; ) {\n    agents.update();\n  }\n  g.updatePixels();\n}\n\nfunction mouseClicked(){\n  agents = null;\n  agents = new Agents();\n}\n\nclass Agent {\n  constructor() {\n    this.x = width / 2;\n    this.y = height / 2;\n    this.dir = random(360);\n  }\n\n  updateDirection() {\n    const right = this.sense(+sensorAngle);\n    const center = this.sense(0);\n    const left = this.sense(-sensorAngle);\n\n    const threeWays = [left, center - 1, right];\n    const minIndex = threeWays.indexOf(min(...threeWays));\n    this.dir += turnAngle * (minIndex - 1);\n  }\n\n  sense(dirOffset) {\n    const angle = this.dir + dirOffset;\n    let x = floor(this.x + sensorOffset * cos(angle));\n    let y = floor(this.y + sensorOffset * sin(angle));\n    x = (x + g.width) % g.width;\n    y = (y + g.height) % g.height;\n\n    const index = (x + y * g.width) * 4;\n    return g.pixels[index];\n  }\n\n  updatePosition() {\n    this.x += cos(this.dir);\n    this.y += sin(this.dir);\n    this.x = (this.x + g.width) % g.width;\n    this.y = (this.y + g.height) % g.height;\n\n    const index = floor(this.x) + floor(this.y) * g.width;\n    g.pixels.set(agentColor, index * 4);\n  }\n}\n\nclass Agents {\n  constructor() {\n    this.agents = Array(agentsNum)\n      .fill()\n      .map((e) => new Agent());\n  }\n  update() {\n    this.agents.forEach((e) => e.updateDirection());\n    this.agents.forEach((e) => e.updatePosition());\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/msawired/OPC@v0.2.3/opc.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Street Vapor.mp4"
+    ]
+}

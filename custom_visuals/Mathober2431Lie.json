@@ -1,0 +1,25 @@
+{
+    "name": "Mathober2431Lie",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:58:53",
+    "url": "https://openprocessing.org/@epi/2412533",
+    "code": "// === Tab: mySketch ===\n/*\nDay #31/24: Lie\nhttps://openprocessing.org/sketch/2412533\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nvar S, desiredPt;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tbackground(2, 2, 8);\n\tdescribe(\"visualization of a blended animation between archimedes circle and a line lerping to the endpoint\");\n  \n  noFill();\n\tstroke(\"silver\");\n\tS = max(width, height);\n\t\n\tdesiredPt = getDesiredPt();\n\t\n  loop();\n}\n\nfunction draw() {\n\tif (frameCount % 1200 === 0) {\n\t\tbackground(\"rgb(2, 2, 8)\");\n\t\tdesiredPt = getDesiredPt();\n\t}\n\t\n\ttranslate(width/2, height/2);\n\trotate(fract(desiredPt.x+desiredPt.y)-0.5);\n\t\n\tstrokeWeight(2);\n\tstroke(\"purple\");\n\tconst t = constrain((frameCount % 1200) / 1000, 0, 1); // 0..1\n\tconst p1 = drawArch(t);\n\tconst p2 = drawLine(t);\n\tstroke(\"cyan\")\n\tstrokeWeight(4);\n\tdrawPt(p1, p2, t);\n}\n\nfunction getDesiredPt() {\n\tconst x = random(width); // width/2, \n\tconst y = random(height); // height/3\n\treturn {x, y};\n}\n\nfunction drawArch(t) {\n\tconst r = map(t, 0, 1, 0, max(width, height)/2)\n\tconst a = map(t, 0, 1, 0, 5 * TWO_PI);\n\tvar x = cos(a) * r;\n\tvar y = sin(a) * r;\n\tconst p = {x, y};\n\tpoint(p.x, p.y);\n\treturn p;\n}\n\nfunction drawLine(t) {\n\tvar p1 = {x: 0, y: 0};\n\tvar p2 = desiredPt; // {x: width/2, y: height/3};\n\tt = t*t*t*t;\n\tvar p = {x: lerp(p1.x, p2.x, t), y: lerp(p1.y, p2.y, t)}\n\tpoint(p.x, p.y);\n\treturn p;\n}\n\nfunction drawPt(p1, p2, t) {\n\tt = t*t*t*t;\n\tvar p = {x: lerp(p1.x, p2.x, t), y: lerp(p1.y, p2.y, t)}\n\tpoint(p.x, p.y);\n}\n\nfunction noisom(v1, v2) {\n\tif (v1>v2) [v1, v2] = [v2, v1];\n\tconst n = noise(v1, v2, frameCount/123);\n\treturn v1+n*(v2-v1);\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Infinite Loop.mp4"
+    ]
+}

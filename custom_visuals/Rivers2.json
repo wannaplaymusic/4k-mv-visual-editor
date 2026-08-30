@@ -1,18 +1,31 @@
 {
-    "name": "Rivers2",
-    "code": "// === Tab: mySketch ===\n//-----------------\n//let in p5js\n//-----------------\n//C=0,H=128\n//draw=_=>{createCanvas(W=640,W)\n//C+=.002\n//for(j=0;j<W;j+=H)for(i=0;i<W;i+=H)D(i,j,H)}\n//D=(x,y,s)=>{a=x+s/2,b=y+s/2\n//abs(noise(a/W,b/W,mag(a,b)/W-C)-.5)>\n//map(s,4,H,.05,.18)?\n//square(x,y,s):\n//(s/=2)>4&&(D(x,y,s),D(x+s,y,s),D(x,y+s,s),D(x+s,y+s,s))}\n\n//-----------------\n//let in Processing(Java)\n//-----------------\nlet Unit;\nlet Counter;\nlet MX, MY;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  Unit=128; // largest size of a square\n  Counter=0;\n  stroke(0);\n\tnoFill();\n}\n\nfunction draw() {\n  background(255);\n  Counter+=0.002;\n  MX=(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))*0.001;\n  MY=(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))*0.001;\n  for (j=0; j<height; j+=Unit) {\n    for (i=0; i<width; i+=Unit) {\n      DrawRect(i, j, Unit);\n    }\n  }\n}\n\nfunction DrawRect(x, y, size) {\n  let cx=x+size/2; // center in the square for noise\n  let cy=y+size/2;\n  let n=noise(cx/width-MX, cy/height-MY, mag(cx, cy)/height-Counter);\n  let threshold=map(size, Unit, 4, 0.18, 0.05 );\n  if (abs(n-0.5)>threshold) {\n    rect(x, y, size, size);\n  } else {\n    size=size/2;\n    if (size>=4) { // smallest size of a square = 4pixels\n      DrawRect(x     , y     , size);\n      DrawRect(x+size, y     , size);\n      DrawRect(x     , y+size, size);\n      DrawRect(x+size, y+size, size);\n    }\n  }\n}\n\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            try {\n                if (typeof this.createGraphics === 'function') {\n                    return this.createGraphics(10, 10);\n                } else if (typeof createGraphics === 'function') {\n                    return createGraphics(10, 10);\n                }\n            } catch(e) {}\n            try {\n                if (typeof this.createImage === 'function') {\n                    return this.createImage(1, 1);\n                }\n            } catch(e) {}\n            return {\n                width: 1,\n                height: 1,\n                pixels: [0, 0, 0, 0],\n                loadPixels: function() {},\n                updatePixels: function() {},\n                get: function() { return [0, 0, 0, 255]; },\n                vertices: []\n            };\n        }\n        try {\n            return window._origGet.apply(this, args);\n        } catch(e) {\n            return {\n                width: 1,\n                height: 1,\n                pixels: [0, 0, 0, 0],\n                loadPixels: function() {},\n                updatePixels: function() {},\n                get: function() { return [0, 0, 0, 255]; },\n                vertices: []\n            };\n        }\n    };\n}\n",
-    "frequency": 50,
-    "storyboard_weight": 50,
-    "post_fx_intensity": 50,
-    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-    "custom_css": "",
-    "inline_assets": {},
-    "author": "Naoki Tsutae",
-    "license": "CC BY-NC-SA",
-    "tags": [
-        "batch_import",
-        "audio_reactive"
-    ],
-    "url": "https://openprocessing.org/@ntsutae/815389",
-    "date_added": "2026-07-06 22:06:14"
+  "name": "Rivers2",
+  "code": "// === Tab: mySketch ===\n//-----------------\n//let in p5js\n//-----------------\n//C=0,H=128\n//draw=_=>{createCanvas(W=640,W)\n//C+=.002\n//for(j=0;j<W;j+=H)for(i=0;i<W;i+=H)D(i,j,H)}\n//D=(x,y,s)=>{a=x+s/2,b=y+s/2\n//abs(noise(a/W,b/W,mag(a,b)/W-C)-.5)>\n//map(s,4,H,.05,.18)?\n//square(x,y,s):\n//(s/=2)>4&&(D(x,y,s),D(x+s,y,s),D(x,y+s,s),D(x+s,y+s,s))}\n\n//-----------------\n//let in Processing(Java)\n//-----------------\nlet Unit;\nlet Counter;\nlet MX, MY;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  Unit=128; // largest size of a square\n  Counter=0;\n  stroke(0);\n\tnoFill();\n}\n\nfunction draw() {\n  background(255);\n  Counter+=0.002;\n  MX=(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))*0.001;\n  MY=(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))*0.001;\n  for (j=0; j<height; j+=Unit) {\n    for (i=0; i<width; i+=Unit) {\n      DrawRect(i, j, Unit);\n    }\n  }\n}\n\nfunction DrawRect(x, y, size) {\n  let cx=x+size/2; // center in the square for noise\n  let cy=y+size/2;\n  let n=noise(cx/width-MX, cy/height-MY, mag(cx, cy)/height-Counter);\n  let threshold=map(size, Unit, 4, 0.18, 0.05 );\n  if (abs(n-0.5)>threshold) {\n    rect(x, y, size, size);\n  } else {\n    size=size/2;\n    if (size>=4) { // smallest size of a square = 4pixels\n      DrawRect(x     , y     , size);\n      DrawRect(x+size, y     , size);\n      DrawRect(x     , y+size, size);\n      DrawRect(x+size, y+size, size);\n    }\n  }\n}",
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "author": "Naoki Tsutae",
+  "license": "CC BY-NC-SA",
+  "tags": [
+    "batch_import",
+    "audio_reactive"
+  ],
+  "url": "https://openprocessing.org/@ntsutae/815389",
+  "date_added": "2026-07-06 22:06:14",
+  "used_in_videos": [
+    "Warp Engine Roar.mp4",
+    "Mental Drift.mp4",
+    "Prime Anchor.mp4",
+    "Concrete Tides.mp4",
+    "Icebound Groove.mp4",
+    "Monolithic Interval.mp4",
+    "Reverb Tail Haze.mp4",
+    "Vacuum Memory.mp4",
+    "Ultimate Core Patterns.mp4"
+  ],
+  "used_count": 9,
+  "scaling_mode": "auto"
 }

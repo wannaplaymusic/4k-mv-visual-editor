@@ -1,25 +1,33 @@
 {
-    "name": "Uncler M - 17_var2",
-    "code": "\n// --- Safety Guardrails for Thumbnail and Sandbox ---\nif (typeof width === 'undefined') { var width = 1280; }\nif (typeof height === 'undefined') { var height = 720; }\n\n\n// --- Global Variables for Uncler M Variants ---\nvar uM_colors = [\"#0f172a\", \"#38bdf8\", \"#818cf8\", \"#c084fc\", \"#f472b6\"];\nvar speedMult = 1.0;\nvar lineScale = 1.0;\nvar dynamicShift = 0;\nvar scalePulse = 1.0;\nvar rotAngle = 0;\nvar gridOffset = 0;\nvar uM_rot = 0;\n\n// === Inspired by '17' by 'Rubén Medellín &lt;chubas&gt;' ===\n// Created as variant #2 by Uncler M\n// Infused with creative algorithmic modifications.\n\n// === Tab: mySketch ===\n// 17\n// For the #WCCChallenge << 17 Squares >> (join the discord! https://discord.gg/S8c7qcjw2b)\n// Short and sweet one this time\nlet numSquares = 17;\nlet baseSize = 80;\nlet squareSize = 400;\nlet amp = 200;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  angleMode(RADIANS);\n  colorMode(HSB);\n  noFill();\n  strokeWeight(5);\n  strokeJoin(MITER);\n\trectMode(CENTER);\n}\n\nfunction draw() {\n  // === Variant 2: Organic Lissajous Morph ===\n  scalePulse = 1.0 + 0.25 * sin(frameCount * 0.03);\n  rotAngle = frameCount * 0.015;\n  push();\n  translate(width/2, height/2);\n  rotate(rotAngle);\n  scale(scalePulse);\n  translate(-width/2, -height/2);\n\n  background(10, 10, 15);\n  orbitControl();\n\n  let t = millis() * 0.0006;\n\n  for (let i = 0; i < numSquares; i++) {\n    let angle = TAU * i / numSquares;\n    let y = amp * sin(t + angle);\n    let s = abs(baseSize + squareSize * cos(t + angle));\n\n    let h = map(angle, 0, TWO_PI, 0, 360);\n    stroke(h, 100, 100);\n\n    push();\n    translate(0, y, 0);\n    rotateX(HALF_PI);\n    rect(0, 0, s, s);\n    pop();\n  }\n\n  pop();\n}\n\n\n// 1. 免疫 DOM 元素建立導致的看門狗攔截\nif (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }\nif (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }\n\n// 2. 圖片與非同步資產載入後備自癒護欄\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origLoadImage === 'undefined') { window._origLoadImage = p5.prototype.loadImage; }\n    p5.prototype.loadImage = function(path, successCallback, failureCallback) {\n        if (typeof path !== 'string' || (path.startsWith('http') === false && path.startsWith('data:') === false)) {\n            // 當發現是相對路徑或丟失的外部圖片資產時，使用 1x1 灰色 GIF 的 Base64 代替，防止渲染死鎖\n            const dummyPath = \"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\";\n            return window._origLoadImage.call(this, dummyPath, successCallback, failureCallback);\n        }\n        return window._origLoadImage.call(this, path, successCallback, failureCallback);\n    };\n}\n\n// 3. 修正 3D 渲染圖層 WebGL 與 Canvas 2D 上下文屬性缺失\nif (typeof p5 !== 'undefined' && p5.prototype) {\n    if (typeof window._origGet === 'undefined') { window._origGet = p5.prototype.get; }\n    p5.prototype.get = function(...args) {\n        if (this.width === 0 || this.height === 0) {\n            try {\n                if (typeof this.createGraphics === 'function') {\n                    return this.createGraphics(10, 10);\n                } else if (typeof createGraphics === 'function') {\n                    return createGraphics(10, 10);\n                }\n            } catch(e) {}\n            try {\n                if (typeof this.createImage === 'function') {\n                    return this.createImage(1, 1);\n                }\n            } catch(e) {}\n            return {\n                width: 1,\n                height: 1,\n                pixels: [0, 0, 0, 0],\n                loadPixels: function() {},\n                updatePixels: function() {},\n                get: function() { return [0, 0, 0, 255]; },\n                vertices: []\n            };\n        }\n        try {\n            return window._origGet.apply(this, args);\n        } catch(e) {\n            return {\n                width: 1,\n                height: 1,\n                pixels: [0, 0, 0, 0],\n                loadPixels: function() {},\n                updatePixels: function() {},\n                get: function() { return [0, 0, 0, 255]; },\n                vertices: []\n            };\n        }\n    };\n}\n",
-    "frequency": 50,
-    "storyboard_weight": 50,
-    "post_fx_intensity": 50,
-    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-    "custom_css": "",
-    "inline_assets": {},
-    "author": "Uncler M",
-    "license": "CC BY-NC-SA",
-    "tags": [
-        "Uncler M",
-        "generative",
-        "variant",
-        "starred_17"
-    ],
-    "url": "https://openprocessing.org/@chubas/2658771",
-    "date_added": "2026-07-08 23:13:00",
-    "is_starred": false,
-    "used_in_videos": [
-        "4AM Tollbooth.mp4"
-    ],
-    "used_count": 1
+  "name": "Uncler M - 17_var2",
+  "code": "\n// --- Safety Guardrails for Thumbnail and Sandbox ---\nif (typeof width === 'undefined') { var width = 1280; }\nif (typeof height === 'undefined') { var height = 720; }\n\n\n// --- Global Variables for Uncler M Variants ---\nvar uM_colors = [\"#0f172a\", \"#38bdf8\", \"#818cf8\", \"#c084fc\", \"#f472b6\"];\nvar speedMult = 1.0;\nvar lineScale = 1.0;\nvar dynamicShift = 0;\nvar scalePulse = 1.0;\nvar rotAngle = 0;\nvar gridOffset = 0;\nvar uM_rot = 0;\n\n// === Inspired by '17' by 'Rubén Medellín &lt;chubas&gt;' ===\n// Created as variant #2 by Uncler M\n// Infused with creative algorithmic modifications.\n\n// === Tab: mySketch ===\n// 17\n// For the #WCCChallenge << 17 Squares >> (join the discord! https://discord.gg/S8c7qcjw2b)\n// Short and sweet one this time\nlet numSquares = 17;\nlet baseSize = 80;\nlet squareSize = 400;\nlet amp = 200;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  angleMode(RADIANS);\n  colorMode(HSB);\n  noFill();\n  strokeWeight(5);\n  strokeJoin(MITER);\n\trectMode(CENTER);\n}\n\nfunction draw() {\n  // === Variant 2: Organic Lissajous Morph ===\n  scalePulse = 1.0 + 0.25 * sin(frameCount * 0.03);\n  rotAngle = frameCount * 0.015;\n  push();\n  translate(width/2, height/2);\n  rotate(rotAngle);\n  scale(scalePulse);\n  translate(-width/2, -height/2);\n\n  background(10, 10, 15);\n  orbitControl();\n\n  let t = millis() * 0.0006;\n\n  for (let i = 0; i < numSquares; i++) {\n    let angle = TAU * i / numSquares;\n    let y = amp * sin(t + angle);\n    let s = abs(baseSize + squareSize * cos(t + angle));\n\n    let h = map(angle, 0, TWO_PI, 0, 360);\n    stroke(h, 100, 100);\n\n    push();\n    translate(0, y, 0);\n    rotateX(HALF_PI);\n    rect(0, 0, s, s);\n    pop();\n  }\n\n  pop();\n}",
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "author": "Uncler M",
+  "license": "CC BY-NC-SA",
+  "tags": [
+    "Uncler M",
+    "generative",
+    "variant",
+    "starred_17"
+  ],
+  "url": "https://openprocessing.org/@chubas/2658771",
+  "date_added": "2026-07-08 23:13:00",
+  "is_starred": false,
+  "used_in_videos": [
+    "4AM Tollbooth.mp4",
+    "Still Infinity.mp4",
+    "Thin Air.mp4",
+    "Cold Vacuum.mp4",
+    "Icebound Groove.mp4",
+    "Monolithic Interval.mp4",
+    "Reverb Tail Haze.mp4",
+    "Ultimate Core Patterns.mp4"
+  ],
+  "used_count": 8,
+  "scaling_mode": "auto"
 }

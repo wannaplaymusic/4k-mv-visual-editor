@@ -1,0 +1,22 @@
+{
+  "name": "ConnectingCircuits",
+  "author": "epi",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-08-22 23:15:22",
+  "url": "https://openprocessing.org/@epi/2181806",
+  "code": "// === Tab: mySketch ===\n// for the BirdsNest Streaming Backgrounds @sableRaph (eg #WCCChallenge) <3\n\n// const S = 600;\nvar C = 20;\nvar palettes = [\n\t[\"#ff2a6d\", \"#d1f7ff\", \"#f5d9e8\", \"#005678\", \"#01012b\"],\n\t[\"#b0acb0\", \"#e2dddf\", \"#85ebd9\", \"#3d898d\", \"#2f404d\"],\n\t[\"#ff6e27\", \"#fbf665\", \"#73fffe\", \"#6287f8\", \"#383e65\"],\n\t[\"#7700a6\", \"#fe00fe\", \"#defe47\", \"#00b3fe\", \"#0016ee\"],\n\t[\"#ff184c\", \"#ff577d\", \"#ffccdc\", \"#0a9cf5\", \"#003062\"]\n]\t\nvar palettes_ = [\n\t[\"#8386f5\", \"#3d43b4\", \"#04134b\", \"#083e12\", \"#1afe49\"],\n\t[\"#f887ff\", \"#de004e\", \"#860029\", \"#321450\", \"#29132e\"],\n\t[\"#e96d5e\", \"#ff9760\", \"#ffe69d\", \"#6a7e6a\", \"#393f5f\"],\n\t[\"#ff124f\", \"#ff00a0\", \"#fe75fe\", \"#7a04eb\", \"#120458\"],\n\t[\"#63345e\", \"#ac61b9\", \"#b7c1de\", \"#0b468c\", \"#092047\"],\n\t[\"#af43be\", \"#fd8090\", \"#c4ffff\", \"#08deea\", \"#1261d1\"],\n\t[\"#a0ffe3\", \"#65dc98\", \"#8d8980\", \"#575267\", \"#222035\"],\n\t[\"#490109\", \"#d40011\", \"#fd7495\", \"#5e4ef8\", \"#14029a\"],\n\t[\"#8f704b\", \"#daae6d\", \"#89e3f6\", \"#4d9e9b\", \"#44786a\"],\n\t[\"#fff69f\", \"#fdd870\", \"#d0902f\", \"#a15501\", \"#351409\"]\n]\nvar palette;\n\nfunction setup() {\n  createCanvas(innerWidth, innerHeight);\n\tframeRate(60)\n\tpalette = random(palettes).map((e) => e + \"80\");\n  frameRate(30);\n  loop();\n}\n\nfunction draw() {\n\tif (frameCount % 300 === 0) setup(); // 5 sec\n  const S = max(width, height)\n  const D = S / C;\n  background(\"lightgray\");\n  // translate((noise(12.3+frameCount*0.0234)-0.5)*D*2, (noise(23.1+frameCount*0.0341)-0.5)*D*2)\n  strokeWeight(D / 2);\n  for (let y = D; y < height; y += D) {\n    for (let x = D; x < width; x += D) {\n      stroke(arr_noise(palette, x*x-y));\n      point(x, y);\n      if (noise(252345.23 + frameCount * 0.00142 + x + y * 1.34) < 0.4) {\n        stroke(arr_noise(palette, x+y*y));\n        const xf = noise(245.231 + frameCount * 0.0008142 + x + y * 1.34) < 0.5 ? -1 : 1;\n        const yf = noise(1345.123 + frameCount * 0.0009142 + x * 1.34 + y) < 0.5 ? -1 : 1;\n        mline(x, y, x + xf * D, y + yf * D);\n      }\n    }\n  }\n}\n\nfunction mline(x1, y1, x2, y2) {\n  if (x1 === 0 || y1 === 0 || x2 === 0 || y2 === 0) return;\n  if (x1 >= width || x2 >= width) return;\n  if (y1 >= height || y2 >= height) return;\n  line(x1, y1, x2, y2);\n}\n\nfunction arr_noise(arr, magicNum) {\n  const n = noise(magicNum + frameCount * 0.001234);\n  const i = ~~(n * arr.length);\n  return arr[i];\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

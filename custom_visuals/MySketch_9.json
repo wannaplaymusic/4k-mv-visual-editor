@@ -1,0 +1,22 @@
+{
+    "name": "MySketch_9",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-04 00:39:02",
+    "url": "https://openprocessing.org/@epi/2831837",
+    "code": "// === Tab: NPartcl ===\nclass NPartcl {\n\n\tconstructor(x, y) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.nx = x;\n\t\tthis.ny = y;\n\t\tthis.stop = false;\n\t\tthis.clr = lerpColor(color(\"white\"), color(\"deeppink\"), random());\n\t}\n\n\tupdate(hills, t = 0) {\n\t\tthis.x = this.nx;\n\t\tthis.y = this.ny;\n\t\t\n\t\tconst nx = this.x / width * multi;\n\t\tconst ny = this.y / height * multi;\n\t\tconst ns = noise(nx, ny, t)\n\t\tconst vec = createVector(disti/5, 0);\n\t\tlet ang = ns*TAU*4;\n\t\tvec.rotate(ang);\n\n\t\tthis.nx = this.x + vec.x;\n\t\tthis.ny = this.y + vec.y;\n\n\t\tif (random() < 0.01) this.stop = true;\n\t\tif (this.nx < 0 || this.nx > width) this.stop = true;\n\t\tif (this.ny < 0 || this.ny > height) this.stop = true;\n\t}\n\n\tdraw() {\n\t\tstroke(this.clr);\n\t\tif (random()<0.76) line(this.x, this.y, this.nx, this.ny);\n\t}\n\n}\n\n// === Tab: copy ===\nclass NPartclCopy {\n\n\tconstructor(x, y) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.nx = x;\n\t\tthis.ny = y;\n\t\tthis.stop = false;\n\t\tthis.clr = lerpColor(color(\"white\"), color(\"deeppink\"), random());\n\t}\n\n\tupdate(t = 0) {\n\t\tthis.x = this.nx;\n\t\tthis.y = this.ny;\n\t\t\n\t\tconst nx = this.x / width * multi;\n\t\tconst ny = this.y / height * multi;\n\t\tconst ns = noise(nx, ny, t)\n\t\tconst vec = createVector(disti/5, 0);\n\t\tvec.rotate(ns*TAU*4);\n\n\t\tthis.nx = this.x + vec.x;\n\t\tthis.ny = this.y + vec.y;\n\n\t\tif (random() < 0.01) this.stop = true;\n\t\tif (this.nx < 0 || this.nx > width) this.stop = true;\n\t\tif (this.ny < 0 || this.ny > height) this.stop = true;\n\t}\n\n\tdraw() {\n\t\tstroke(this.clr);\n\t\tif (random()<0.76) line(this.x, this.y, this.nx, this.ny);\n\t}\n\n}\n\n// === Tab: mySketch ===\nOPC.slider({\n\tname: 'disti',\n\tvalue: 15,\n\tmin: 2,\n\tmax: 50,\n\tstep:1,\n\tlabel: 'grid raster',\n\tdescription: 'Changes the raster of the grid'\n});\nOPC.slider({\n\tname: 'multi',\n\tvalue: 15,\n\tmin: 1,\n\tmax: 25,\n\tstep:1,\n\tlabel: 'noise mult',\n\tdescription: 'Changes zoom multiplier of the noise field'\n});\n\nlet particles, hills;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"standard noise field\");\n\tstrokeWeight(2);\n\tstroke(\"deeppink\");\n\tnoFill();\n\tbackground(\"navy\");\n\n\tparticles = [];\n\tfor (let y = 0; y < height; y += disti) {\n\t\tfor (let x = 0; x < width; x += disti) {\n\t\t\tif (random()<0.05) particles.push(new NPartcl(x, y));\n\t\t}\t\t\n\t}\n\n\thills = [];\n\tfor (let i = 0; i < 10; i++) hills.push({x: random(width), y: random(height), z: random(1, 10)})\n}\n\nfunction draw() {\n\tbackground(\"#00008004\");\n\n\tconst t = millis()/1000;\n\n\tstroke(\"cyan\")\n\tfor (const h of hills) {\n\t\tcircle(h.x, h.y, 10 * h.z)\n\t}\n\t\n\tfor (const p of particles) {\n\t\tp.update(hills);\n\t\tp.draw();\n\t}\n\n\tparticles = particles.filter((p) => !p.stop);\n\t\n\tparticles.push(new NPartcl(random(~~(width/disti)) * disti, random(~~(height/disti)) * disti));\n\n\t// if (frameCount % 100 === 0) console.log(particles.length);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/msawired/OPC@0.7.1/opc.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset, form, nav,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5Dom {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

@@ -1,0 +1,22 @@
+{
+  "name": "offSquarebr",
+  "author": "robertd052",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 17:40:11",
+  "url": "https://openprocessing.org/@robertd052/415128",
+  "code": "// === Tab: mySketch ===\n// let from function Crawshay(Ray) let at http://oolong.co.uk/Trochor.htm\n// sin, cos, frameCount, TWO_PI, vertex\n// 17 wobbly rectangles\n// no interaction\n\nlet numPoints ;\nlet incr, R1, numTurns, phi, sw1, ratio1; \n\n\nfunction setup() {\n  createCanvas(700, 600); \n  numPoints = 200;\n  incr = TWO_PI/float(numPoints);\n  numTurns = 1;\n  ratio1 = 3;\n  stroke(255);\n  noFill();\n}\n\nfunction draw() {\n  background(\"#379CED\");\n  translate(width/2, height/2);\n  rotate(-sin(frameCount * .005));\n  phi = frameCount * .01;\n  R1 = 220;\n  sw1 = 18;\n  for (let i = 0; i <= 16; i++) {\n    drawShape(R1, R1/5, ratio1, sw1);\n    R1 *= .85;\n    sw1 *= .8;\n  }\n}\n\nfunction drawShape(R, r, ratio, sw) {\n  strokeWeight(sw);\n  beginShape();\n  for (let i = 0; i < TWO_PI * numTurns; i += incr) {\n    let x = R * cos(i) + r * cos(ratio * i - phi);\n    let y = R * sin(i) + r * sin(ratio * i + phi);\n    vertex(x, y);\n  }\n  endShape();\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

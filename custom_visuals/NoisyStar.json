@@ -1,0 +1,22 @@
+{
+    "name": "NoisyStar",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:59:41",
+    "url": "https://openprocessing.org/@epi/2718438",
+    "code": "// === Tab: mySketch ===\nvar M, R, N, L = 5; // max radius, normal radius, num points, length between points\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"noisy star\");\n\tframeRate(30);\n\t\n\tM = ~~max(width, height) * 0.45; // max dia\n\tR = M / 5;                      // normal dia\n\tconst CIRC = TWO_PI * R;            // circumference \n\tN = ~~(CIRC / L);               // num of points\n\t\n\tFG = color(\"deeppink\");\n\tBG = color(4, 4, 12);\n\t\n\tbackground(BG);\n\tstrokeWeight(2);\n\tstroke(FG);\n\tnoFill();\n\t\n\tloop();\n}\n\nfunction draw() {\n\tbackground(BG);\n\ttranslate(width/2, height/2);\n\t\n\tconst t = frameCount/30;\n\trotate(noise(t/10));\n\t// circle(0, 0, S);\n\tbeginShape();\n\tfor (let i = 0; i < N; i++) {\n\t\tconst f = i/N;\n\t\tconst a = TAU * f;\n\t\tconst cos_angle = cos(a);\n\t\tconst sin_angle = sin(a);\n\t\tconst n = noise(10 + cos_angle * 5, 30 + sin_angle * 5, t);\n\t\tconst EVERY_SECOND = i % 2 === 0;\n\t\tconst DR = EVERY_SECOND ? 0 : (1 - n * n) * (M-R)\n\t\tconst DX = EVERY_SECOND ? cos_angle * R * n : 0;\n\t\tconst DY = EVERY_SECOND ? sin_angle * R * n : 0;\n\t\tconst x = DX + cos_angle * (R + DR);\n\t\tconst y = DY + sin_angle * (R + DR);\n\t\tvertex(x, y);\n\t}\n\tendShape(CLOSE);\n\n\t// // noLoop() removed for animation\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

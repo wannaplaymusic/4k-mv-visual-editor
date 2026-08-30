@@ -1,0 +1,22 @@
+{
+  "name": "GrowingSquares",
+  "author": "ntsutae",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 04:02:56",
+  "url": "https://openprocessing.org/@ntsutae/1381854",
+  "code": "// === Tab: mySketch ===\nsetup=()=>{\n  createCanvas(640,640)\n  pg=createGraphics(width/4,height/4)\n}\n\ndraw=()=> {\n\tt=frameCount\n  pg.background(255)\n  pg.loadPixels()\n  for(y=pg.height;y--;){\n    for(x=pg.width;x--;){  \n      n=noise(x/60,y/60,t/60)*128\n      x+y&n-t/2||pg.set(x,y,0)\n    }\n  }\n  pg.updatePixels()\n\t\t\n  translate(width/2,height/2)\n  scale(2)\n  for(v of [[1,1],[-1,1],[1,-1],[-1,-1]]){\n    push()\n    scale(v)\n    image(pg,0,0)\n    pop()\n  }\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

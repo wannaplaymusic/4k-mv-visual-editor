@@ -1,0 +1,25 @@
+{
+    "name": "TreeRootsPseudo3D_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:46:13",
+    "url": "https://openprocessing.org/@ntsutae/1593692",
+    "code": "// === Tab: mySketch ===\nlet y\nlet pins = []\n////////////////////////////////////////////////////////////////////////////////////////////////////\nOPC.slider(\"pins_num\", 30, 1, 100)\nOPC.slider(\"complexity\", 3, 1, 10, 1)\nOPC.slider(\"maximumHeight\", 100, 10, 100)\nparameterChanged = (variableName, value) => setup()\n////////////////////////////////////////////////////////////////////////////////////////////////////\nsetup = () => {\n  createCanvas(windowWidth, windowHeight)\n  strokeWeight(1.5)\n  y = 0\n  pins.length = 0\n  for (let i = 0; i < pins_num; i++) {\n    pins[i] = createVector(random(width), random(height))\n  }\n}\ndraw = () => {\n  if (y < height) {\n    beginShape()\n    for (let x = 0; x < width; x++) {\n      angle = pins.reduce((sum, p) => sum + complexity * atan2(p.y - y, p.x - x), 0)\n      z = map(cos(angle), -1, 1, 0, maximumHeight)\n      vertex(x, y + z)\n    }\n    vertex(width, height)\n    vertex(0, height)\n    endShape(CLOSE)\n    y++\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/msawired/OPC@v0.2.3/opc.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset, form, nav,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5Dom {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Road Lines.mp4"
+    ]
+}

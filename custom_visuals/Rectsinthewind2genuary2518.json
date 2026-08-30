@@ -1,0 +1,25 @@
+{
+    "name": "Rectsinthewind2genuary2518",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:32:10",
+    "url": "https://openprocessing.org/@epi/2515404",
+    "code": "// === Tab: mySketch ===\n/*\n\trects in the wind #genuary18 #genuary #genuary2518\n\tWhat does wind look like?\n\thttps://openprocessing.org/sketch/2503156\n\t#generativeart #creativecoding #p5js\n*/\nlet cnt = 0;\nlet BG = \"#202020\";\nlet PAD = 4;\n\nfunction setup() {\n  createCanvas(innerWidth, innerWidth*0.3);\n  frameRate(30);\n  noFill();\n  stroke(\"rgba(0,0,0,0.1)\");\n\n  loop();\n  cnt = 0;\n}\n\nfunction draw() {\n  // for (let j = 0; j < 1; j++) {\n\tbackground(BG)\n\t\n\tnoStroke()\n  fill(\"tan\");\n\trectMode(CORNER);\n\t// rect(PAD, PAD, width-PAD-PAD, height-PAD-PAD)\n\trect(0, 0, width, height)\n\tnoFill();\n\tstroke(\"rgba(0,0,0,0.1)\");\n\trectMode(CENTER);\n\t\n    let SZE = 100;\n    for (let x = SZE * 0.75; x < width * 0.925; x += SZE * 0.00725) {\n      push();\n      const y = height / 2;\n      const dF = noise(x / 23, y / 43, frameCount / 143) - 0.5;\n      translate(x, y + SZE * 2 * dF * map(x, 0, width, 0.5, 4));\n      const angle = noise(x / 23, y / 41, frameCount / 143) * TWO_PI;\n      const szeF = noise(x / 93, y / 66, frameCount / 143);\n      rotate(angle);\n      rect(0, 0, SZE * szeF); cnt++;\n      \n      pop();\n    }\n  \n\n\n    // frame\n    if (true) {\n      push();\n      const sw = 10;\n      strokeWeight(sw);\n      stroke(BG);\n      fill(BG);\n      rectMode(CORNER);\n      for (let i = 1, num=4; i < num; i++) {\n        const x = width/num * i;\n        if (true || cnt < 1000000) {\n          line(x, 0, x, height); cnt++;\n        }\n      }\n      pop();\n    }\n  // }\n\t\n\tdrawMsg(\"rects in the wind #2 (epi) #genuary2518\")\n}\n\nfunction drawMsg(msg) {\n\tpush();\n\t\n\tfill(\"white\")\n\tnoStroke();\n\ttextAlign(LEFT, TOP)\n\ttext(msg, 1, 1)\n\t\n\tfill(\"black\")\n\tnoStroke();\n\ttextAlign(LEFT, TOP)\n\ttext(msg, 0, 0)\n\n\tpop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Terminal Structure.mp4"
+    ]
+}

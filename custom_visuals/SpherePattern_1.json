@@ -1,0 +1,22 @@
+{
+    "name": "SpherePattern_1",
+    "author": "kiantiong",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:21:16",
+    "url": "https://openprocessing.org/@kiantiong/2324695",
+    "code": "// === Tab: mySketch ===\nOPC.slider('radius',200,50,500,1)\nOPC.slider('viewAngle',60,-360,360,1)\nOPC.slider('angle1',0,-360,360,1)\nOPC.slider('angle2',45,0,180,1)\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tangleMode(DEGREES)\n\tbackground(0);\n}\n\nfunction draw() {\n\tbackground(0);\n\tpush()\n\ttranslate(width/2,height/2)\n\t\n\tstroke(255)\n\tnoFill()\n\tstrokeWeight(4)\n\tpoint(0,0)\n\t\n\tstrokeWeight(2)\n\t\n\tstroke(\"yellow\")\n\t\n\tline(0,0,cos(angle1)*radius*cos(angle2),-radius*sin(angle2)*sin(viewAngle) + sin(angle1)*radius*cos(viewAngle)*cos(angle2))\n\t\n\tstrokeWeight(4)\n\tpoint(cos(angle1)*radius*cos(angle2),-radius*sin(angle2)*sin(viewAngle) + sin(angle1)*radius*cos(viewAngle)*cos(angle2))\n\tstroke(255)\n\t//輔助線\n\tstrokeWeight(1)\n\tsetLineDash([5,5])\n\tarc(0,0,radius*2,radius*2*cos(viewAngle),180,360)\n\t\n\tline(0,0,cos(angle1)*radius,sin(angle1)*radius*cos(viewAngle))\n\tpush()\n\t// stroke(255,0,0)\n\t// setLineDash([0])\n\t// line(0,0,0,-radius*sin(angle2)*sin(viewAngle))\n\t// line(0,-radius*sin(angle2)*sin(viewAngle),\n\t// \t\t 0 + cos(angle1)*radius*cos(angle2),\n\t// \t\t -radius*sin(angle2)*sin(viewAngle) + sin(angle1)*radius*cos(viewAngle)*cos(angle2))\n\tpop()\n\t\n\tsetLineDash([0])\n\tarc(0,0,radius*2,radius*2*cos(viewAngle),0,180)\n\tarc(0,0,radius*2,radius*2,180,360)\n\tline(0,0,radius,0)\n\tline(0,0,0,-radius*sin(viewAngle))\n\tstrokeWeight(4)\n\tpoint(0,-radius*sin(viewAngle))\n\t\n\tpop()\n}\n\nfunction setLineDash(list) {\n  drawingContext.setLineDash(list);\n}\n\nfunction lineDashOffset(value){\n\tdrawingContext.lineDashOffset = value;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/msawired/OPC@0.5.0/opc.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset, form, nav,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5Dom {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

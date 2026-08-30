@@ -1,0 +1,22 @@
+{
+    "name": "Philharmonie",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:14:42",
+    "url": "https://openprocessing.org/@epi/2666299",
+    "code": "// === Tab: mySketch ===\n// sketch.js\n\n// How many clusters across / down\nconst CLUSTERS_X = 4;\nconst CLUSTERS_Y = 3;\n\n// Within each cluster: how many circles per row / column\nconst CIRCLES_PER_CLUSTER = 7;\n\n// Diameter of each circle\nconst CIRCLE_DIAMETER = 40;\n\n// Spacing between adjacent circles (in a grid)\nconst INNER_SPACING = 8;\n\n// Extra gap between clusters (outer black border)\nconst CLUSTER_GAP = 24;\n\n// A small palette of bluish/teal/pink/red tones\nlet palette = [\"#E40303\", \"#FF8C00\", \"#FFED00\", \"#008026\", \"#24408E\", \"#732982\"];\n\nlet palette1 = [\n  \"#B3E5FC\", // very light cyan\n  \"#40C4FF\", // bright sky blue\n  \"#03A9F4\", // deeper blue\n  \"#1DE9B6\", // light teal\n  \"#C51162\", // magenta/pink\n  \"#F50057\", // pinkish\n  \"#D50000\", // red\n  \"#B2EBF2\", // pale aqua\n  \"#01579B\"  // dark blue\n];\n\nfunction setup() {\n  // Create canvas roughly the same aspect ratio as your photo\n  createCanvas(innerWidth, innerHeight);\n\tdescribe(\"colored circles in grids, inspired by Berlin Philharmonie\");\n\tframeRate(30);\n  loop();\n}\n\nfunction draw() {\n  background(0);\n  noStroke();\n\n  // Compute the size (in pixels) of one full cluster (including its own inner spacing)\n  //   7 circles × diameter  +  6 gaps × INNER_SPACING\n  const clusterSize = CIRCLES_PER_CLUSTER * CIRCLE_DIAMETER\n                    + (CIRCLES_PER_CLUSTER - 1) * INNER_SPACING;\n\n  // Loop over each cluster row/column\n  for (let cy = 0; cy < CLUSTERS_Y; cy++) {\n    for (let cx = 0; cx < CLUSTERS_X; cx++) {\n      // Top-left corner of this cluster’s “bounding box”\n      const clusterX = cx * (clusterSize + CLUSTER_GAP) + CLUSTER_GAP / 2;\n      const clusterY = cy * (clusterSize + CLUSTER_GAP) + CLUSTER_GAP / 2;\n\n      // Now draw a 7×7 grid of circles “inside” this cluster.\n      // We’ll stagger every other row by half a diameter.\n      for (let row = 0; row < CIRCLES_PER_CLUSTER; row++) {\n        for (let col = 0; col < CIRCLES_PER_CLUSTER; col++) {\n          // Horizontal offset: if this is an “odd” row, shift right by half a diameter\n          let xOffset = (row % 2 === 1) ? (CIRCLE_DIAMETER / 2) : 0;\n\n          // Compute center‐x and center‐y of each circle\n          let x = clusterX\n                + xOffset\n                + col * (CIRCLE_DIAMETER + INNER_SPACING);\n\n          let y = clusterY\n                + row * (CIRCLE_DIAMETER + INNER_SPACING);\n\n          // Pick a random color from our palette\n          fill(random(palette));\n\t\t\t\t\tconst ns = noise((x/CLUSTERS_X)/CIRCLES_PER_CLUSTER, y/CLUSTERS_Y/CIRCLES_PER_CLUSTER, frameCount/120)\n\t\t\t\t\tfill(palette[~~(ns*2*palette.length)%palette.length])\n          nedge(x, y, CIRCLE_DIAMETER, CIRCLE_DIAMETER, 6, PI/6);\n        }\n      }\n    }\n  }\n\t\n\t// // noLoop() removed for animation\n}\n\nfunction nedge(cx, cy, dx, dy, n, da = 0) {\n\t// ellipse(cx, cy, dx, dy)\n\tbeginShape()\n\tfor (let i = 0; i < n; i++) {\n\t\tconst a = i / n * TAU;\n\t\tvar x = cos(a+da) * dx / 2 + cx;\n\t\tvar y = sin(a+da) * dy / 2 + cy;\n\t\tvertex(x, y);\n\t}\n\tendShape(CLOSE);\n}\n\nfunction mouseClicked() {\n\tif (mouseButton != RIGHT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

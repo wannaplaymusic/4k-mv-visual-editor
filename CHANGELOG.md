@@ -4,6 +4,31 @@
 
 ---
 
+## 🌟 [v1.3.0] - 2026-08-30
+### 👾 像素視覺生成器、Shorts 豎屏匯出、AI 導演通告單與全能 QC 審核
+- **👾 像素視覺模組生成器 (`pixel_generator_tab.py` & `pixel_ai_engine.py`)**：
+  - 新增專屬像素視覺生成器 Tab，支援 15 種經典復古像素與點陣風格（Block 方塊、Bayer4/Bayer8 抖動、Blue Noise 藍噪、Halftone 半色調、Crosshatch 漫畫素描、CRT 螢光粉、Diamond 菱形、ASCII 字符矩陣、Glitch 故障撕裂、Voronoi 水晶多邊形、Voxel 3D 浮雕、Amiga HAM6 流體油畫、Life Game 生命遊戲、FLIR 熱成像）。
+  - 整合 WebGL/p5.js 即時沙盒預覽、參數動態微調、調色盤映射以及一鍵存檔收編為標準視覺模組。
+- **📱 YouTube Shorts 豎屏短影音批量匯出 (`shorts_exporter_tab.py`)**：
+  - 新增專屬短影音批量匯出 Tab，支援 9:16 (1080x1920) 智慧豎屏比例裁切與中心焦點對齊。
+  - 支援多曲目、多模組智慧排程與隊列式離線渲染匯出，結合硬體加速與高品質音視壓制。
+- **🎬 AI 導演曲式通告單排程系統 (`AIDirectorCallSheetWidget` & `AIDirectorOrchestrationThread`)**：
+  - 深度結合曲式段落結構（Intro, Verse, Chorus, Bridge, Drop, Outro），自動排定場景通告單（Call Sheet）。
+  - 模組影格智慧快取管理器 (`ModuleFrameCacheManager`) 與降級平滑過渡保護 (`apply_graceful_fallback`)，杜絕切換鏡頭時的卡頓與黑畫面。
+- **🛡️ 實時渲染品質與音視響應診斷器 (`realtime_qc_auditor.py`)**：
+  - 實時抽幀黑畫面檢測、Drop/Chorus 高潮熱烈度與色彩對比度驗證。
+  - 大鼓 (Kick)、小鼓 (Snare)、Hi-hat 動態音視響應審核與自動補償機制。
+- **🎨 現代 GLSL 著色器庫 (`shaders/`)**：
+  - 新增 34 種高效能 GLSL 後處理與視覺著色器（Raymarching, Volumetric Godrays, SSFR Fluid, Reaction Diffusion, Caustic Grid, Gyroid Surface, Attractor Field, Holographic Interference 等）。
+- **🧹 模組庫全面淨化、修復與標準化**：
+  - 排查並隔離攝像頭 (Camera/Webcam) 與 WebXR/AR/VR 等硬體相依異常模組，保證運行環境純粹與安全。
+  - 強化 p5.js 沙盒免疫 Stubs（DOM 方法、gifProperties、P3D/OPENGL 常數代理）。
+  - 修復並標準化數千個視覺模組，補齊縮圖與分類星標管理。
+- **⚙️ 儲存庫體積最佳化與 Git 追蹤規則校正**：
+  - 修正 `.gitignore` 中的全域通配符規則，確保模組 JSON 與核心相依正確被追蹤，移除非必要日誌與修復報告。
+
+---
+
 ## 📌 [v1.2.1 / 6eba29d] - 2026-08-06
 ### 🧹 儲存庫清理、Git 規則與更新文件 (Repository Cleanup & Documentation)
 - **版本控制精簡 (`069de5d`)**：

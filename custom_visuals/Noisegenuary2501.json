@@ -1,0 +1,25 @@
+{
+    "name": "Noisegenuary2501",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:25:07",
+    "url": "https://openprocessing.org/@epi/2498667",
+    "code": "// === Tab: mySketch ===\n/*\n\tSpiral Galaxy #genuary1 #genuary #genuary2501\n\tVertical or horizontal lines only\n\thttps://openprocessing.org/sketch/2498632\n\t#generativeart #creativecoding #p5js\n*/\n\nlet SZE = 12;\nconst MAR = 0.3; // margin for non filled areas\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tframeRate(30);\n\tstroke(lerpColor(color(\"steelblue\"), color(\"gold\"), random()))\n\tstrokeWeight(2);\n\tnoiseSeed(~~random(999999));\n}\n\nfunction draw() {\n\tbackground(2, 2, 12);\n\t\n\tfor (let y = 0; y < height; y += SZE) {\t\t\n\t\tfor (let x = 0; x < width; x += SZE) {\n\t\t\tconst n = noise(x/231, y/231, frameCount/231);\n\t\t\tif (n < MAR) {\n\t\t\t\t// nothing\n\t\t\t} else if (n < 0.5) {\n\t\t\t\tline(x, y+SZE, x+SZE, y+SZE);\n\t\t\t\t// line(x, y+SZE/2, x+SZE, y+SZE/2);\n\t\t\t} else if (n < 1 - MAR) {\n\t\t\t\tline(x+SZE, y, x+SZE, y+SZE);\n\t\t\t\t// line(x+SZE/2, y, x+SZE/2, y+SZE);\n\t\t\t} else {\n\t\t\t\t// notinhg\n\t\t\t}\n\t\t}\n\t}\n\t\n\tdrawMsg(\"Noise (epi) #genuary2501\")\n}\n\nfunction mouseClicked() {\n\tif (mouseButton === LEFT) setup();\n}\n\nfunction drawMsg(msg) {\n\tpush();\n\tfill(\"white\")\n\tnoStroke();\n\ttextAlign(LEFT, TOP)\n\ttext(msg, 0, 0)\n\tpop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Synthetic Breath.mp4"
+    ]
+}

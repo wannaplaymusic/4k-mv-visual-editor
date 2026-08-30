@@ -1,0 +1,22 @@
+{
+    "name": "WittgensteinsRod",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:00:28",
+    "url": "https://openprocessing.org/@ntsutae/1590089",
+    "code": "// === Tab: mySketch ===\n////////////////////////////////////////////////////////////////////////////////////////////////////\n// Wittgenstein's rod\n// Ported from https://www.desmos.com/calculator/m9lx9kxrth\n////////////////////////////////////////////////////////////////////////////////////////////////////\nOPC.slider('rodLength',300,100,800)\nOPC.slider('diameter',200,100,800)\nconst step = .025\nlet angle = 0\nlet pivotx\nlet pivoty\nlet grabFlg = false\n////////////////////////////////////////////////////////////////////////////////////////////////////\nsetup = () => {\n  createCanvas(windowWidth, windowHeight)\n  strokeWeight(2)\n  path = createGraphics(width, height)\n  path.strokeWeight(8)\n\tpath.noFill()\n  pivotx = width / 2 + 120\n  pivoty = height / 2\n}\ndraw = () => {\n  clear()\n  image(path, 0, 0, width, height)\n  noFill()\n  ellipse(width / 2, height / 2, diameter)\n  cpoint(pivotx, pivoty, lerpColor(color('green'),color('white'),sin(frameCount/10)**2))\n\n\tpath.beginShape()\n  for (i = 0; i < step; i += step / 100) {\n    angle += step / 100\n    x = cos(angle) * diameter / 2 + width / 2\n    y = sin(angle) * diameter / 2 + height / 2\n    a = atan2(pivoty - y, pivotx - x)\n\t\tpathx = x + cos(a) * rodLength\n\t\tpathy = y + sin(a) * rodLength\n    line(x, y, pathx, pathy)\n    path.vertex(pathx, pathy)\n  }\n  path.endShape()\n  cpoint(pathx, pathy, 'white')\n  cpoint(x, y, 'red')\n}\n////////////////////////////////////////////////////////////////////////////////////////////////////\ncpoint = (x, y, colour) => {\n  fill(colour)\n  ellipse(x, y, 20)\n}\nparameterChanged = (variableName, value) => {\n  path.clear()\n}\nmousePressed = () => {\n  grabFlg = dist((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), pivotx, pivoty) < 10\n}\nmouseDragged = () => {\n  if (grabFlg) {\n    pivotx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))\n    pivoty = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))\n    path.clear()\n  }\n}\nmouseReleased = () => {\n  grabFlg = false\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/msawired/OPC@v0.2.3/opc.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "/* Auto-hidden controls */\ninput, select, button, textarea, label, fieldset, form, nav,\n.dg, .lil-gui, .qs_main, .opc-container, .opc-gui, .quicksettings, .p5Dom {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

@@ -1,0 +1,22 @@
+{
+    "name": "RowofCircles",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:14:04",
+    "url": "https://openprocessing.org/@epi/2337754",
+    "code": "// === Tab: mySketch ===\n\n\n// https://coolors.co/palette/03071e-370617-6a040f-9d0208-d00000-dc2f02-e85d04-f48c06-faa307-ffba08\nlet CLRS = (\"03071e-370617-6a040f-9d0208-d00000-dc2f02-e85d04-f48c06-faa307-ffba08\").split(\"-\");\nlet startFrame;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"outline of a row of circles in an unordered color range from yellow>red>black \");\n\tbackground(\"beige\");\n\t\n\tCLRS = shuffle(CLRS);\n\tframeRate(15);\n\tstartFrame = frameCount || 0;\n}\n\nfunction draw() {\n\tconst repeatEveryNthCircles = 4;\n\tconst num = CLRS.length;\n\tconst _d_w = (width / (num / repeatEveryNthCircles + 1)) * 1; // max(width, height) / num * repeatEveryNthCircles * 1.5;\n\tconst _d_h = height * 0.7;\n\tconst d = ~~min(_d_w, _d_h);\n\tconst sw = d/repeatEveryNthCircles; // d/(repeatEveryNthCircles+1)\n\tstrokeWeight(sw);\n\tnoFill();\n\t\n\tconst i = frameCount - startFrame;\n\tif (i === num) {\n\t\t// noLoop() removed for animation\n\t\treturn;\n\t}\n\t// for (let i = 0; i < num; i++) {\n\t\tconst clr = color(\"#\"+CLRS[i]+\"F0\");\n\t\tstroke(clr)\n\t\t// circle(d + i * d / 4, height - d * 1.2, d)\n\t\t// circleOfPoints(width/2 - num/repeatEveryNthCircles/2 * d + i * d/repeatEveryNthCircles, height - d/2 -sw, d-sw, d+sw, clr, pow(d, 1.8))\n\t\tcircleOfArcs(width/2 - num/repeatEveryNthCircles/2 * d + i * d/repeatEveryNthCircles, height - d/2 -sw, d-sw, d+sw, clr, sw); // pow(d, 0.75)\n\t// }\n}\n\nfunction circleOfPoints(x, y, d1, d2, clr, num, debug = false) {\n\tpush();\n\t\n\tif (debug)  {\t\t\n\t\tstroke(32, 64);\n\t\tstrokeWeight(1);\n\t\tnoFill();\n\t\tcircle(x, y, d1);\n\t\tcircle(x, y, d2);\n\t}\n\t\n\t// stroke(clr);\n\tconst dev = 12;\n\tconst clrRed = red(window.color(clr));\n\tconst clrGreen = green(window.color(clr));\n\tconst clrBlue = blue(window.color(clr));\n\tconst clrAlpha = alpha(window.color(clr));\n\tfor (let i = 0; i < num; i++) {\n\t\tstroke(\n\t\t\tconstrain(clrRed + random(-dev, dev), 0, 255),\n\t\t\tconstrain(clrGreen + random(-dev, dev), 0, 255),\n\t\t\tconstrain(clrBlue + random(-dev, dev), 0, 255),\n\t\t\tclrAlpha\n\t\t);\n\t\tstrokeWeight(random(0.5, 3.3));\n\t\tconst a = random(TWO_PI);\n\t\tconst r = random(d1, d2) / 2;\n\t\tconst xo = cos(a) * r;\n\t\tconst yo = sin(a) * r;\n\t\tpoint(x + xo, y + yo);\n\t}\n\t\t\n\tpop();\n}\n\nfunction circleOfArcs(x, y, d1, d2, clr, num, debug = false) {\n\tpush();\n\t\n\tif (debug)  {\t\t\n\t\tstroke(32, 64);\n\t\tstrokeWeight(1);\n\t\tnoFill();\n\t\tcircle(x, y, d1);\n\t\tcircle(x, y, d2);\n\t}\n\t\n\t// stroke(clr);\n\tvar dev = 12;\n\tvar clrRed = red(window.color(clr));\n\tvar clrGreen = green(window.color(clr));\n\tvar clrBlue = blue(window.color(clr));\n\tvar clrAlpha = alpha(window.color(clr));\n\tfor (let i = 0; i < num; i++) {\n\t\tstroke(\n\t\t\tconstrain(clrRed + random(-dev, dev), 0, 255),\n\t\t\tconstrain(clrGreen + random(-dev, dev), 0, 255),\n\t\t\tconstrain(clrBlue + random(-dev, dev), 0, 255),\n\t\t\tclrAlpha\n\t\t);\n\t\tstrokeWeight(random(0.5, 4.3));\n\t\tconst a1 = PI-random(PI); // random(TWO_PI);\n\t\tconst a2 = PI+random(PI); // random(TWO_PI);\n\t\tvar d = random(d1, d2);\n\t\tarc(x, y, d, d, a1, a2);\n\t}\n\t\t\n\tpop();\n}\n\nfunction mouseReleased() {\n\tloop();\n\tsetup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

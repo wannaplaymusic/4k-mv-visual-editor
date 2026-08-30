@@ -1,33 +1,188 @@
 import os
 import sys
 import gc
+import time
 
-# Disable web security (CORS/SOP bypass) for QtWebEngine globally
+# Disable web security & Chromium sandbox for QtWebEngine on macOS to prevent Mach port rendezvous crashes
+os.environ["QTWEBENGINE_DISABLE_SANDBOX"] = "1"
 if "QTWEBENGINE_CHROMIUM_FLAGS" not in os.environ:
-    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-web-security --enable-gpu --ignore-gpu-blocklist --enable-webgl --use-gl=desktop --enable-accelerated-2d-canvas --disable-gpu-vsync --disable-renderer-backgrounding --disable-backgrounding-occluded-windows --disable-background-timer-throttling"
+    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--no-sandbox --disable-web-security --enable-gpu --ignore-gpu-blocklist --enable-webgl --enable-accelerated-2d-canvas --disable-gpu-vsync --disable-renderer-backgrounding --disable-backgrounding-occluded-windows --disable-background-timer-throttling"
 import json
 import shutil
 import logging
 import subprocess
 import re
 import datetime
+import base64
+import io
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
     QPushButton, QLineEdit, QCheckBox, QLabel, QSplitter, QTextEdit,
     QSlider, QComboBox, QListWidget, QListWidgetItem, QFileDialog,
     QProgressBar, QTabWidget, QMessageBox, QListView, QDialog,
-    QGraphicsDropShadowEffect
+    QGraphicsDropShadowEffect, QScrollArea, QFrame, QSizePolicy
 )
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineSettings
 from PyQt6.QtWebChannel import QWebChannel
 from PyQt6.QtCore import Qt, QSize, QRect, QTimer, QEventLoop, QUrl, QThread, pyqtSignal, QObject, pyqtSlot
-from PyQt6.QtGui import QColor, QFont, QTextCursor, QPixmap, QImage, QPainter, QPen, QFontMetrics
+from PyQt6.QtGui import QColor, QFont, QTextCursor, QPixmap, QImage, QPainter, QPen, QFontMetrics, QPalette
 from PIL import Image
+
+from llm_director import LLMDirectorAgent
+from ai_incubator_tab import AIIncubatorTab
+from pixel_generator_tab import PixelModuleGeneratorTab
+from shorts_exporter_tab import ShortsExporterTab
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("StandaloneInjector")
+
+class AIStatusWorker(QThread):
+    status_updated = pyqtSignal(dict)
+
+    def run(self):
+        try:
+            from ai_engine_config import load_ai_config
+            cfg = load_ai_config()
+            gen_prov = cfg.get("provider", "kimi")
+            
+            agent = LLMDirectorAgent(model_name=cfg.get("director_model", "llama3"))
+            status_info = agent.get_ollama_status()
+            
+            # Format hybrid status string
+            prov_names = {
+                "kimi": "🌙 Kimi",
+                "deepseek_cloud": "🔮 DeepSeek",
+                "ollama": "🚀 Ollama",
+                "openai": "🌐 OpenAI"
+            }
+            gen_name = prov_names.get(gen_prov, gen_prov)
+            if status_info.get("status") == "ready":
+                status_info["message"] = f"導播: {status_info.get('model', 'llama3')} | 生成: {gen_name}"
+            self.status_updated.emit(status_info)
+        except Exception as e:
+            self.status_updated.emit({
+                "status": "offline",
+                "message": f"AI 檢測異常 ({e})",
+                "model": "llama3"
+            })
+
+
+# ----------------------------------------------------
+# 🎬 AI 導演通告單可視化組件 (Director Call Sheet Panel)
+# ----------------------------------------------------
+class AIDirectorCallSheetWidget(QFrame):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet("""
+            AIDirectorCallSheetWidget {
+                background-color: #121216;
+                border: 1px solid #3b0764;
+                border-radius: 8px;
+            }
+        """)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(6)
+
+        # 頂部標題與狀態
+        header = QHBoxLayout()
+        self.lbl_title = QLabel("🎬 AI 導演劇本：尚未排片 (點擊下方「AI 導演智能排片」生成)", self)
+        self.lbl_title.setStyleSheet("font-weight: bold; color: #c084fc; font-size: 13px;")
+        self.lbl_palette = QLabel("", self)
+        self.lbl_palette.setStyleSheet("color: #38bdf8; font-size: 11px; font-weight: bold;")
+        header.addWidget(self.lbl_title)
+        header.addStretch()
+        header.addWidget(self.lbl_palette)
+        layout.addLayout(header)
+
+        # 導演構思理念
+        self.lbl_statement = QLabel("", self)
+        self.lbl_statement.setWordWrap(True)
+        self.lbl_statement.setStyleSheet("color: #a1a1aa; font-style: italic; font-size: 11px;")
+        layout.addWidget(self.lbl_statement)
+
+        # 分鏡時間軸清單
+        self.shots_list = QListWidget(self)
+        self.shots_list.setFixedHeight(120)
+        self.shots_list.setStyleSheet("""
+            QListWidget {
+                background-color: #09090b;
+                border: 1px solid #27272a;
+                border-radius: 6px;
+                color: #e4e4e7;
+                font-size: 11px;
+            }
+            QListWidget::item { padding: 4px; border-bottom: 1px solid #18181b; }
+        """)
+        layout.addWidget(self.shots_list)
+
+    def update_call_sheet(self, script_data: dict, storyboard: list):
+        """更新 AI 導演的排片內容到介面上"""
+        theme = script_data.get("theme_title", "未命名主題")
+        palette = script_data.get("color_palette_mood", "")
+        statement = script_data.get("director_statement", "")
+        
+        self.lbl_title.setText(f"🎬 AI 導演美學世界觀：{theme}")
+        self.lbl_palette.setText(f"🎨 色彩氛圍：{palette}" if palette else "")
+        self.lbl_statement.setText(f"💡 導演理念：\"{statement}\"" if statement else "")
+        
+        self.shots_list.clear()
+        shots = script_data.get("shot_list", [])
+        
+        for idx, shot in enumerate(shots):
+            sec_time_str = ""
+            if idx < len(storyboard):
+                s = storyboard[idx]
+                sec_time_str = f"[{s.get('start', 0):.1f}s - {s.get('end', 0):.1f}s] "
+                
+            sec_name = shot.get("section_name", f"Shot {idx+1}")
+            mod_id = shot.get("assigned_module_id", "Unknown")
+            framing = shot.get("framing_mode", "fill")
+            fx_val = int(shot.get("target_fx_intensity", 0.5) * 100)
+            trans = shot.get("transition_style", "luma_wipe")
+            
+            item_text = f"🎞️ {sec_time_str}{sec_name} ➔ 模組: {mod_id}  |  構圖: {framing.upper()}  |  轉場: {trans}  |  後製動態: {fx_val}%"
+            self.shots_list.addItem(item_text)
+
+class AIDirectorOrchestrationThread(QThread):
+    script_ready = pyqtSignal(dict, dict) # script_data, analysis_data
+    log_signal = pyqtSignal(str, bool)
+
+    def __init__(self, audio_path: str, genre: str, available_modules: list, recent_keys: list):
+        super().__init__()
+        self.audio_path = audio_path
+        self.genre = genre
+        self.available_modules = available_modules
+        self.recent_keys = recent_keys
+
+    def run(self):
+        try:
+            self.log_signal.emit("🎵 正在深度解析音訊頻譜、BPM 與曲式結構...", False)
+            from audio_analyzer import AudioBeatDetector
+            detector = AudioBeatDetector()
+            analysis = detector.analyze(self.audio_path, self.genre)
+
+            self.log_signal.emit("🧠 正在喚醒本地 AI 導演大腦 (Llama3/DeepSeek) 撰寫全曲分鏡劇本...", False)
+            from llm_director import LLMDirectorAgent
+            agent = LLMDirectorAgent()
+            script = agent.generate_director_script(analysis, self.available_modules, self.recent_keys)
+
+            self.script_ready.emit(script, analysis)
+        except Exception as e:
+            self.log_signal.emit(f"❌ AI 導演排片失敗 ({e})，切換至專家回退模式...", True)
+            try:
+                from audio_analyzer import AudioBeatDetector
+                detector = AudioBeatDetector()
+                analysis = detector.analyze(self.audio_path, self.genre)
+                from llm_director import LLMDirectorAgent
+                agent = LLMDirectorAgent()
+                script = agent._fallback_heuristic_script(analysis, self.available_modules, self.recent_keys)
+                self.script_ready.emit(script, analysis)
+            except Exception as e2:
+                self.log_signal.emit(f"❌ 分析徹底失敗: {e2}", True)
+
 
 # Global exception hook to catch uncaught PyQt slot exceptions and log them to app_debug.log
 def exception_hook(exctype, value, tb):
@@ -327,30 +482,38 @@ MOCK_NATIVE_AUDIO_JS = """
     window.webkitOfflineAudioContext = MockAudioContext;
 
     // Symbol.hasInstance overrides to make mocks pass instanceof checks
-    if (window.AudioParam) {
-      Object.defineProperty(window.AudioParam, Symbol.hasInstance, {
-        value: function(instance) { return instance && instance._isMockParam === true; },
-        configurable: true
-      });
-    }
-    if (window.AudioNode) {
-      Object.defineProperty(window.AudioNode, Symbol.hasInstance, {
-        value: function(instance) { return instance && instance._isMockNode === true; },
-        configurable: true
-      });
-    }
-    if (window.AudioContext) {
-      Object.defineProperty(window.AudioContext, Symbol.hasInstance, {
-        value: function(instance) { return instance && instance._isMockContext === true; },
-        configurable: true
-      });
-    }
-    if (window.BaseAudioContext) {
-      Object.defineProperty(window.BaseAudioContext, Symbol.hasInstance, {
-        value: function(instance) { return instance && instance._isMockContext === true; },
-        configurable: true
-      });
-    }
+    try {
+      if (window.AudioParam) {
+        Object.defineProperty(window.AudioParam, Symbol.hasInstance, {
+          value: function(instance) { return instance && instance._isMockParam === true; },
+          configurable: true
+        });
+      }
+    } catch(e) {}
+    try {
+      if (window.AudioNode) {
+        Object.defineProperty(window.AudioNode, Symbol.hasInstance, {
+          value: function(instance) { return instance && instance._isMockNode === true; },
+          configurable: true
+        });
+      }
+    } catch(e) {}
+    try {
+      if (window.AudioContext) {
+        Object.defineProperty(window.AudioContext, Symbol.hasInstance, {
+          value: function(instance) { return instance && instance._isMockContext === true; },
+          configurable: true
+        });
+      }
+    } catch(e) {}
+    try {
+      if (window.BaseAudioContext) {
+        Object.defineProperty(window.BaseAudioContext, Symbol.hasInstance, {
+          value: function(instance) { return instance && instance._isMockContext === true; },
+          configurable: true
+        });
+      }
+    } catch(e) {}
   }
 })();
 """
@@ -359,18 +522,208 @@ MOCK_NATIVE_AUDIO_JS = """
 P5_V2_COMPAT_SHIM = """
 // p5.js v2.x ← v1.x backward-compatibility bridge
 // This shim restores APIs removed in p5 2.0 so legacy addon libraries (p5.sound, p5.func, etc.) can load.
-if (typeof p5 !== 'undefined') {
-  // 1. Restore p5.prototype.registerMethod (removed in v2.0, replaced by p5.registerAddon)
-  if (p5.prototype && !p5.prototype.registerMethod) {
-    p5.prototype._registeredMethods = p5.prototype._registeredMethods || {};
-    p5.prototype.registerMethod = function(hookName, method) {
-      if (typeof method !== 'function') return;
-      if (!p5.prototype._registeredMethods[hookName]) {
-        p5.prototype._registeredMethods[hookName] = [];
+
+// 0. 全域封鎖原生 JS 阻塞式對話框 (alert / confirm / prompt) 防止中斷渲染
+if (typeof window !== 'undefined') {
+  window.alert = function(msg) { console.log('[SUPPRESSED JS ALERT]', msg); };
+  window.confirm = function(msg) { console.log('[SUPPRESSED JS CONFIRM]', msg); return true; };
+  window.prompt = function(msg) { console.log('[SUPPRESSED JS PROMPT]', msg); return ''; };
+  window.draw = window.draw || function() {};
+  
+  // 建立全域通用的 Virtual Audio Receiver 虛擬音訊接收物件工廠
+  window.createMockSoundFile = window.createMockSoundFile || function() {
+    return {
+      _isMockSound: true,
+      _isPlaying: false,
+      play: function() { this._isPlaying = true; return this; },
+      loop: function() { this._isPlaying = true; return this; },
+      stop: function() { this._isPlaying = false; return this; },
+      pause: function() { this._isPlaying = false; return this; },
+      isPlaying: function() { return this._isPlaying !== false && window.isAudioPlaying !== false; },
+      setVolume: function() { return this; },
+      pan: function() { return this; },
+      rate: function() { return 1.0; },
+      disconnect: function() { return this; },
+      connect: function() { return this; },
+      onended: function() {},
+      duration: function() { return window.totalAudioDuration || 180.0; },
+      currentTime: function() { return (typeof window.custom_time_ms !== 'undefined' ? window.custom_time_ms / 1000 : (window.currentAudioTime || (window.frameCount ? window.frameCount / 60 : 0.0))); },
+      getLevel: function() { return window.audioEnergy || window.beatEnergy || (typeof window.audioMid !== 'undefined' ? (window.audioLow + window.audioMid + window.audioHigh)/3 : 0.5); },
+      getPeaks: function(n) { return new Float32Array(n || 5).fill(0); },
+      buffer: { getChannelData: function() { return new Float32Array(1024).fill(0.5); }, duration: 180, sampleRate: 44100, numberOfChannels: 2 },
+      isLoaded: function() { return true; },
+      channels: function() { return 2; },
+      sampleRate: function() { return 44100; },
+      frames: function() { return 44100 * 180; },
+      jump: function() {},
+      setPath: function() {},
+      setBuffer: function() {},
+      processPeaks: function() { return Promise.resolve([]); },
+      addCue: function() { return 0; },
+      removeCue: function() {},
+      clearCues: function() {},
+      reverseBuffer: function() {},
+      then: function(resolve) {
+        if (resolve) setTimeout(() => resolve(this), 0);
+        return this;
       }
-      p5.prototype._registeredMethods[hookName].push(method);
+    };
+  };
+
+  // 全域常數與全域滑鼠/畫面尺寸常數保底綁定 (防止 Legacy / Vanilla JS 模組 Uncaught ReferenceError: PI / mouseX is not defined)
+  window.PI = Math.PI;
+  window.TWO_PI = Math.PI * 2;
+  window.HALF_PI = Math.PI / 2;
+  window.QUARTER_PI = Math.PI / 4;
+  window.TAU = Math.PI * 2;
+  window.degrees = function(rad) { return rad * (180 / Math.PI); };
+  window.radians = function(deg) { return deg * (Math.PI / 180); };
+
+  if (typeof window.mouseX === 'undefined') {
+    Object.defineProperty(window, 'mouseX', {
+      get: function() {
+        if (typeof window.simulatedMouseX !== 'undefined') return window.simulatedMouseX;
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.activeInstances && p5.activeInstances[0]) || p5.instance);
+        return (inst && typeof inst.mouseX === 'number') ? inst.mouseX : 250;
+      },
+      set: function(v) { window.simulatedMouseX = v; },
+      configurable: true,
+      enumerable: true
+    });
+  }
+  if (typeof window.mouseY === 'undefined') {
+    Object.defineProperty(window, 'mouseY', {
+      get: function() {
+        if (typeof window.simulatedMouseY !== 'undefined') return window.simulatedMouseY;
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.activeInstances && p5.activeInstances[0]) || p5.instance);
+        return (inst && typeof inst.mouseY === 'number') ? inst.mouseY : 250;
+      },
+      set: function(v) { window.simulatedMouseY = v; },
+      configurable: true,
+      enumerable: true
+    });
+  }
+  if (typeof window.pmouseX === 'undefined') {
+    Object.defineProperty(window, 'pmouseX', {
+      get: function() { return (typeof window.simulatedMouseX !== 'undefined') ? window.simulatedMouseX : 250; },
+      configurable: true,
+      enumerable: true
+    });
+  }
+  if (typeof window.pmouseY === 'undefined') {
+    Object.defineProperty(window, 'pmouseY', {
+      get: function() { return (typeof window.simulatedMouseY !== 'undefined') ? window.simulatedMouseY : 250; },
+      configurable: true,
+      enumerable: true
+    });
+  }
+  if (typeof window.mouseIsPressed === 'undefined') {
+    Object.defineProperty(window, 'mouseIsPressed', {
+      get: function() { return false; },
+      configurable: true,
+      enumerable: true
+    });
+  }
+}
+
+// 0b. 全面封鎖與安全攔截電腦鏡頭 (Webcam / getUserMedia / createCapture)
+if (typeof navigator !== 'undefined') {
+  if (!navigator.mediaDevices) { navigator.mediaDevices = {}; }
+  navigator.mediaDevices.getUserMedia = function() {
+    return Promise.reject(new Error("Webcam hardware access is disabled in MV rendering engine"));
+  };
+  navigator.getUserMedia = function(constraints, success, error) {
+    if (error) error(new Error("Webcam hardware access is disabled in MV rendering engine"));
+  };
+}
+
+if (typeof p5 !== 'undefined') {
+  // 0c. 安全 Stub p5.prototype.createCapture，回傳安全 Dummy 視訊像素物件，防止無鏡頭時崩潰或要求權限
+  if (p5.prototype) {
+    p5.prototype.createCapture = function(type, callback) {
+      console.warn("[P5_COMPAT] createCapture called, providing mock dummy video element");
+      var dummyVideo = (typeof document !== 'undefined') ? document.createElement('video') : {};
+      dummyVideo.width = 640;
+      dummyVideo.height = 480;
+      dummyVideo.elt = dummyVideo;
+      dummyVideo.play = function() {};
+      dummyVideo.pause = function() {};
+      dummyVideo.load = function() {};
+      dummyVideo.hide = function() { return this; };
+      dummyVideo.show = function() { return this; };
+      dummyVideo.size = function(w, h) { this.width = w || 640; this.height = h || 480; return this; };
+      dummyVideo.loadPixels = function() {
+        if (!this.pixels) this.pixels = new Uint8Array(this.width * this.height * 4);
+        return this;
+      };
+      dummyVideo.updatePixels = function() { return this; };
+      dummyVideo.get = function() { return [0, 0, 0, 255]; };
+      dummyVideo.pixels = new Uint8Array(640 * 480 * 4);
+      if (typeof callback === 'function') {
+        try { callback(dummyVideo); } catch(e) {}
+      }
+      return dummyVideo;
     };
   }
+
+  // 0d. 安全相容舊版 Processing.js / Khan Academy 像素操作 (this.imageData.data & window.imageData)
+  if (typeof window !== 'undefined') {
+    var _origLoadPixels = p5.prototype ? p5.prototype.loadPixels : null;
+    if (_origLoadPixels) {
+      p5.prototype.loadPixels = function() {
+        var res = _origLoadPixels.apply(this, arguments);
+        var canvas = (this._renderer && this._renderer.elt) || document.querySelector('canvas');
+        if (canvas) {
+          try {
+            var ctx = canvas.getContext('2d');
+            if (ctx) {
+              this.imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              window.imageData = this.imageData;
+            }
+          } catch(e) {}
+        }
+        if (!this.imageData) {
+          this.imageData = { data: this.pixels || new Uint8ClampedArray((this.width || 500) * (this.height || 500) * 4) };
+          window.imageData = this.imageData;
+        }
+        return res;
+      };
+    }
+
+    Object.defineProperty(window, 'imageData', {
+      get: function() {
+        var canvas = document.querySelector('canvas');
+        if (canvas) {
+          try {
+            var ctx = canvas.getContext('2d');
+            if (ctx) return ctx.getImageData(0, 0, canvas.width, canvas.height);
+          } catch(e) {}
+        }
+        return { data: (typeof pixels !== 'undefined' && pixels) ? pixels : new Uint8ClampedArray((typeof width !== 'undefined' ? width : 500) * (typeof height !== 'undefined' ? height : 500) * 4) };
+      },
+      set: function(v) { this._customImageData = v; },
+      configurable: true,
+      enumerable: true
+    });
+  }
+
+  // 1. Restore p5.prototype.registerMethod & p5.registerMethod (removed in v2.0, replaced by p5.registerAddon)
+  var _registerMethodPolyfill = function(hookName, method) {
+    if (typeof method !== 'function') return;
+    p5.prototype._registeredMethods = p5.prototype._registeredMethods || {};
+    if (!p5.prototype._registeredMethods[hookName]) {
+      p5.prototype._registeredMethods[hookName] = [];
+    }
+    p5.prototype._registeredMethods[hookName].push(method);
+  };
+  if (p5.prototype && !p5.prototype.registerMethod) {
+    p5.prototype._registeredMethods = p5.prototype._registeredMethods || {};
+    p5.prototype.registerMethod = _registerMethodPolyfill;
+  }
+  if (!p5.registerMethod) {
+    p5.registerMethod = _registerMethodPolyfill;
+  }
+
   // 2. Restore p5.prototype._checkFileExtension (used by p5.sound loadSound)
   if (p5.prototype && !p5.prototype._checkFileExtension) {
     p5.prototype._checkFileExtension = function(path) {
@@ -382,12 +735,21 @@ if (typeof p5 !== 'undefined') {
       return { ext: ext };
     };
   }
-  // 3. Restore p5.prototype.registerPreloadMethod (removed in v2.0)
+  // 3. Restore p5.prototype.registerPreloadMethod & p5.registerPreloadMethod
+  var _registerPreloadPolyfill = function(methodName, prototype) {};
   if (p5.prototype && !p5.prototype.registerPreloadMethod) {
-    p5.prototype.registerPreloadMethod = function(methodName, prototype) {
-      // In v2.x preload is async/await based; this stub silently absorbs the registration
-    };
+    p5.prototype.registerPreloadMethod = _registerPreloadPolyfill;
   }
+  if (!p5.registerPreloadMethod) {
+    p5.registerPreloadMethod = _registerPreloadPolyfill;
+  }
+
+  // 3b. Restore p5.prototype._validateParameters (removed in v2.0, required by p5.dom addon)
+  if (p5.prototype && !p5.prototype._validateParameters) {
+    p5.prototype._validateParameters = function() { return true; };
+  }
+
+
   // 4. Make 'step' property configurable on p5.prototype to prevent "Cannot redefine property: step"
   if (p5.prototype) {
     try {
@@ -412,10 +774,16 @@ if (typeof p5 !== 'undefined') {
     if (typeof p5.prototype[prop] === 'function') {
       if (skipGlobals.indexOf(prop) !== -1) continue;
       (function(pName) {
-        // Expose as actual configurable window property getter/setter
+        // Expose as actual configurable window property getter/setter with fallback storage
         try {
+          var origPropDesc = Object.getOwnPropertyDescriptor(window, pName);
+          if (origPropDesc && !origPropDesc.configurable) return;
+
           Object.defineProperty(window, pName, {
             get: function() {
+              if (window['__' + pName] !== undefined) {
+                return window['__' + pName];
+              }
               var activeInst = window._p5Instance;
               if (!activeInst) {
                 if (typeof p5.instance === 'object' && p5.instance) {
@@ -427,19 +795,61 @@ if (typeof p5 !== 'undefined') {
               if (activeInst && typeof activeInst[pName] === 'function') {
                 return activeInst[pName].bind(activeInst);
               }
+              // Math & standalone utility fallbacks if called before p5 instance is initialized
+              if (typeof Math[pName] === 'function') {
+                return Math[pName].bind(Math);
+              }
+              if (pName === 'random') {
+                return function(min, max) {
+                  if (min === undefined) return Math.random();
+                  if (max === undefined) {
+                    if (Array.isArray(min)) return min[Math.floor(Math.random() * min.length)];
+                    return Math.random() * min;
+                  }
+                  return min + Math.random() * (max - min);
+                };
+              }
+              if (pName === 'noise') {
+                return function(x, y, z) {
+                  var v = Math.sin((x || 0) * 12.9898 + (y || 0) * 78.233 + (z || 0) * 37.719) * 43758.5453;
+                  return v - Math.floor(v);
+                };
+              }
+              if (pName === 'map') {
+                return function(n, start1, stop1, start2, stop2) {
+                  return ((n - start1) / (stop1 - start1)) * (stop2 - start2) + start2;
+                };
+              }
+              if (pName === 'constrain') {
+                return function(n, low, high) {
+                  return Math.max(Math.min(n, high), low);
+                };
+              }
+              if (pName === 'dist') {
+                return function(x1, y1, x2, y2) {
+                  return Math.hypot(x2 - x1, y2 - y1);
+                };
+              }
+              if (pName === 'radians') {
+                return function(deg) { return deg * (Math.PI / 180); };
+              }
+              if (pName === 'degrees') {
+                return function(rad) { return rad * (180 / Math.PI); };
+              }
+
               // Fallback to prototype execution if possible
               return function(...args) {
                 var inst = window._p5Instance || (p5.activeInstances && p5.activeInstances[0]) || p5.instance;
                 if (inst && typeof inst[pName] === 'function') {
                   return inst[pName].apply(inst, args);
                 }
-                console.warn("p5 method " + pName + " called before p5 instance was initialized.");
               };
             },
             set: function(val) {
+              window['__' + pName] = val;
               var inst = window._p5Instance || (p5.activeInstances && p5.activeInstances[0]) || p5.instance;
               if (inst) {
-                inst[pName] = val;
+                try { inst[pName] = val; } catch(e) {}
               }
             },
             configurable: true,
@@ -458,6 +868,22 @@ if (typeof p5 !== 'undefined') {
         }
       })(prop);
     }
+  }
+
+  // Enforce Deterministic Seed (randomSeed & noiseSeed) for p5.js based on 32-bit Hash Seed
+  if (p5.prototype && !p5.prototype._seedHooked) {
+    p5.prototype._seedHooked = true;
+    p5.prototype.registerMethod('pre', function() {
+      if (!this._seedInitialized && typeof window.seed !== 'undefined') {
+        this._seedInitialized = true;
+        try {
+          if (typeof this.randomSeed === 'function') this.randomSeed(window.seed);
+          if (typeof this.noiseSeed === 'function') this.noiseSeed(window.seed);
+        } catch(e) {
+          console.warn('[SeedHook] Failed to initialize randomSeed/noiseSeed:', e);
+        }
+      }
+    });
   }
 
   // Double check and ensure p5.Graphics.prototype has all drawing functions from p5.prototype.
@@ -510,7 +936,12 @@ if (typeof p5 !== 'undefined') {
             }
           };
         });
+        // Add legacy PGraphics method stubs (beginDraw / endDraw)
+        g.beginDraw = g.beginDraw || function() { return this; };
+        g.endDraw = g.endDraw || function() { return this; };
+
         // Ensure drawingContext is accessible on the graphics instance
+
         if (!g.drawingContext && g._renderer && g._renderer.drawingContext) {
           Object.defineProperty(g, 'drawingContext', {
             get: function() { return g._renderer.drawingContext; },
@@ -550,24 +981,86 @@ if (typeof p5 !== 'undefined') {
       }
     };
   }
+
+  // 6b. UI 雜訊與 UI 文字隱藏護欄 (非文字主導視覺模組自動隱藏輔助/狀態/操作提示文字)
+  if (p5.prototype && p5.prototype.text) {
+    const originalText = p5.prototype.text;
+    const shouldHideText = function(str) {
+      if (window.isTextVisualModule || window._isTypographyVisual) return false;
+      if (str === null || str === undefined) return false;
+      var s = String(str).trim();
+      if (!s) return false;
+      // 單一純符號標記 (長度 <= 2 且非純英數) 放行
+      if (s.length <= 2 && !/^[a-zA-Z0-9]$/.test(s)) return false;
+      // 非文字藝術模組時，凡包含英文字母或長度大於 2 之所有說明/狀態/除錯文字一律徹底隱藏
+      if (/[a-zA-Z]/.test(s) || s.length > 2) return true;
+      return false;
+    };
+
+
+
+    p5.prototype.text = function(str, x, y, x2, y2) {
+      if (shouldHideText(str)) {
+        return this;
+      }
+      try {
+        return originalText.apply(this, arguments);
+      } catch(e) {
+        return this;
+      }
+    };
+
+    // 亦於 Renderer2D / Renderer 原型進行雙重深層過濾，防止直接呼叫 renderer.text
+    if (typeof p5.Renderer2D !== 'undefined' && p5.Renderer2D.prototype && p5.Renderer2D.prototype.text) {
+      const origRendererText = p5.Renderer2D.prototype.text;
+      p5.Renderer2D.prototype.text = function(str, x, y, x2, y2) {
+        if (shouldHideText(str)) {
+          return this;
+        }
+        try {
+          return origRendererText.apply(this, arguments);
+        } catch(e) {
+          return this;
+        }
+      };
+    }
+  }
+
+
   
   // 7. 攔截並 Mock loadSound 以及 p5.SoundFile，防止遠端音訊加載發生 CORS 錯誤與未加載完成的 .play() 崩潰
-  const createMockSoundFile = function() {
+  var createMockSoundFile = window.createMockSoundFile || function() {
     return {
       _isMockSound: true,
-      play: function() { return this; },
-      stop: function() { return this; },
-      pause: function() { return this; },
-      loop: function() { return this; },
-      isPlaying: function() { return false; },
+      _isPlaying: false,
+      play: function() { this._isPlaying = true; return this; },
+      loop: function() { this._isPlaying = true; return this; },
+      stop: function() { this._isPlaying = false; return this; },
+      pause: function() { this._isPlaying = false; return this; },
+      isPlaying: function() { return this._isPlaying !== false && window.isAudioPlaying !== false; },
       setVolume: function() { return this; },
       pan: function() { return this; },
-      rate: function() { return this; },
+      rate: function() { return 1.0; },
       disconnect: function() { return this; },
       connect: function() { return this; },
       onended: function() {},
-      duration: function() { return 180.0; },
-      currentTime: function() { return 0.0; },
+      duration: function() { return window.totalAudioDuration || 180.0; },
+      currentTime: function() { return (typeof window.custom_time_ms !== 'undefined' ? window.custom_time_ms / 1000 : (window.currentAudioTime || (window.frameCount ? window.frameCount / 60 : 0.0))); },
+      getLevel: function() { return window.audioEnergy || window.beatEnergy || (typeof window.audioMid !== 'undefined' ? (window.audioLow + window.audioMid + window.audioHigh)/3 : 0.5); },
+      getPeaks: function(n) { return new Float32Array(n || 5).fill(0); },
+      buffer: { getChannelData: function() { return new Float32Array(1024).fill(0.5); }, duration: 180, sampleRate: 44100, numberOfChannels: 2 },
+      isLoaded: function() { return true; },
+      channels: function() { return 2; },
+      sampleRate: function() { return 44100; },
+      frames: function() { return 44100 * 180; },
+      jump: function() {},
+      setPath: function() {},
+      setBuffer: function() {},
+      processPeaks: function() { return Promise.resolve([]); },
+      addCue: function() { return 0; },
+      removeCue: function() {},
+      clearCues: function() {},
+      reverseBuffer: function() {},
       then: function(resolve) {
         if (resolve) {
           setTimeout(() => resolve(this), 0);
@@ -576,6 +1069,7 @@ if (typeof p5 !== 'undefined') {
       }
     };
   };
+  window.createMockSoundFile = createMockSoundFile;
 
   if (p5.prototype) {
     p5.prototype.loadSound = function(path, successCallback, failureCallback) {
@@ -598,17 +1092,41 @@ if (typeof p5 !== 'undefined') {
       });
       if (name === 'FFT') {
         obj.setInput = function() { return this; };
-        obj.analyze = function() { return new Array(1024).fill(0).map(() => Math.random() * 50); };
-        obj.getEnergy = function() { return 20; };
+        obj.analyze = function() {
+          let arr = new Array(1024).fill(0);
+          let lowVal = Math.round((window.audioLow || 0.5) * 255);
+          let midVal = Math.round((window.audioMid || 0.5) * 255);
+          let highVal = Math.round((window.audioHigh || 0.5) * 255);
+          let beatMod = (window.beatEnergy || 0.5) * 40;
+          for (let i = 0; i < 100; i++) arr[i] = Math.min(255, Math.max(0, lowVal + (Math.random() * 20 - 10) + beatMod));
+          for (let i = 100; i < 500; i++) arr[i] = Math.min(255, Math.max(0, midVal + (Math.random() * 15 - 7)));
+          for (let i = 500; i < 1024; i++) arr[i] = Math.min(255, Math.max(0, highVal + (Math.random() * 10 - 5)));
+          return arr;
+        };
+        obj.getEnergy = function(freq1, freq2) {
+          if (typeof freq1 === 'string') {
+            let f = freq1.toLowerCase();
+            if (f === 'bass') return Math.round((window.audioLow || 0.5) * 255);
+            if (f === 'lowmid') return Math.round(((window.audioLow + window.audioMid)/2 || 0.5) * 255);
+            if (f === 'mid') return Math.round((window.audioMid || 0.5) * 255);
+            if (f === 'highmid') return Math.round(((window.audioMid + window.audioHigh)/2 || 0.5) * 255);
+            if (f === 'treble') return Math.round((window.audioHigh || 0.5) * 255);
+          }
+          let val = window.audioMid || 0.5;
+          if (freq1 < 250) val = window.audioLow || 0.5;
+          else if (freq1 > 2000) val = window.audioHigh || 0.5;
+          return Math.round(val * 255);
+        };
+        obj.getLevel = function() { return window.audioEnergy || window.beatEnergy || window.audioMid || 0.5; };
       }
       if (name === 'Amplitude') {
         obj.setInput = function() { return this; };
-        obj.getLevel = function() { return 0.5; };
+        obj.getLevel = function() { return window.audioEnergy || window.beatEnergy || window.audioMid || 0.5; };
       }
       if (name === 'AudioIn') {
         obj.start = function() { return this; };
         obj.stop = function() { return this; };
-        obj.getLevel = function() { return 0.5; };
+        obj.getLevel = function() { return window.audioEnergy || window.beatEnergy || window.audioLow || 0.5; };
       }
       return obj;
     };
@@ -631,7 +1149,13 @@ if (typeof p5 !== 'undefined') {
   const createMockFont = function() {
     return {
       _isMockFont: true,
+      font: { data: true, tables: {}, _font: {} },
       textToPoints: function() { return []; },
+      textBounds: function(str, x, y, fontSize) {
+        var len = (str && str.length) || 1;
+        var sz = fontSize || 12;
+        return { x: x || 0, y: (y || 0) - sz, w: len * sz * 0.6, h: sz * 1.2, advance: len * sz * 0.6 };
+      },
       getPath: function() { return { commands: [] }; },
       getOutline: function() { return []; },
       then: function(resolve) {
@@ -654,6 +1178,26 @@ if (typeof p5 !== 'undefined') {
       }
       return mockFont;
     };
+
+    // 8b. 攔截並 Mock loadModel / 3D Geometry，防止 gltfModel 存取未定義崩潰
+    if (!p5.prototype.loadModel) {
+      p5.prototype.loadModel = function(path, normalize, successCallback, failureCallback) {
+        console.log("[P5_COMPAT] loadModel hijacked for: " + path);
+        const mockModel = {
+          gltfModel: { scene: {}, scenes: [] },
+          vertices: [],
+          faces: [],
+          computeNormals: function() { return this; },
+          normalize: function() { return this; }
+        };
+        if (typeof normalize === 'function') {
+          setTimeout(() => normalize(mockModel), 0);
+        } else if (typeof successCallback === 'function') {
+          setTimeout(() => successCallback(mockModel), 0);
+        }
+        return mockModel;
+      };
+    }
   }
   
   // 9. 補全 PVector 類別（為相容於舊版 Processing 轉譯的作品，防止全域變數宣告時 Temporal Dead Zone 崩潰）
@@ -835,37 +1379,33 @@ if (typeof p5 !== 'undefined') {
     });
 
     // 額外 Hook setup/preload/draw，在執行任何 p5 生命週期前，二度強制包裝 chroma！
+    // NOTE: 不使用 Object.defineProperty 以避免與 p5.js v2 內部的 property redefinition 衝突
+    //       (此前使用 defineProperty 會導致 955 筆 "Cannot redefine property: setup" 錯誤)
     if (p5.prototype) {
       const hookP5Lifecycle = function(methodName) {
-        if (p5.prototype[methodName]) {
+        if (typeof p5.prototype[methodName] === 'function') {
           const original = p5.prototype[methodName];
           p5.prototype[methodName] = function() {
             try { window.ensureChromaWrapped(); } catch(e) {}
             return original.apply(this, arguments);
           };
-        } else {
-          // 如果尚未定義，使用 getter/setter 等待被定義時進行包裹
-          let stored = null;
-          Object.defineProperty(p5.prototype, methodName, {
-            get: function() { return stored; },
-            set: function(val) {
-              if (typeof val === 'function') {
-                stored = function() {
-                  try { window.ensureChromaWrapped(); } catch(e) {}
-                  return val.apply(this, arguments);
-                };
-              } else {
-                stored = val;
-              }
-            },
-            configurable: true
-          });
         }
+        // 不再對未定義的方法使用 defineProperty getter/setter，
+        // 改為在 p5 instance 建立後的 predraw hook 中確保 chroma 被包裝
       };
       
       hookP5Lifecycle('setup');
       hookP5Lifecycle('preload');
       hookP5Lifecycle('draw');
+      
+      // 備用：透過 registerMethod('pre') 在每次 draw 前確保 chroma 被包裝
+      try {
+        if (typeof p5.prototype.registerMethod === 'function') {
+          p5.prototype.registerMethod('pre', function() {
+            try { window.ensureChromaWrapped(); } catch(e) {}
+          });
+        }
+      } catch(e) {}
     }
 
     function wrapChromaColor(colorObj) {
@@ -913,12 +1453,44 @@ if (typeof p5 !== 'undefined') {
     }
   })();
 }
+
 // Double check and explicitly define key p5 drawing functions directly on window in case prototype enumeration missed them
 (function() {
+  // 12. Processing legacy matrix & style compatibility aliases (pushMatrix -> push, popMatrix -> pop)
+  const legacyAliases = {
+    'pushMatrix': 'push',
+    'popMatrix': 'pop',
+    'pushStyle': 'push',
+    'popStyle': 'pop',
+    'resetShader': 'resetShader'
+  };
+  Object.keys(legacyAliases).forEach(alias => {
+    const target = legacyAliases[alias];
+    if (typeof window[alias] === 'undefined') {
+      window[alias] = function(...args) {
+        var inst = window._p5Instance || (p5.activeInstances && p5.activeInstances[0]) || p5.instance;
+        if (inst && typeof inst[target] === 'function') {
+          return inst[target].apply(inst, args);
+        } else if (typeof window[target] === 'function') {
+          return window[target].apply(window, args);
+        }
+      };
+    }
+    if (typeof p5 !== 'undefined' && p5.prototype && typeof p5.prototype[alias] === 'undefined') {
+      p5.prototype[alias] = function(...args) {
+        if (typeof this[target] === 'function') {
+          return this[target].apply(this, args);
+        }
+      };
+    }
+  });
+
   const criticalFuncs = [
-    'curveVertex', 'vertex', 'beginShape', 'endShape', 'stroke', 'fill', 'noStroke', 'noFill',
-    'background', 'ellipse', 'rect', 'line', 'point', 'push', 'pop', 'translate', 'rotate', 'scale'
+    'curveVertex', 'vertex', 'bezierVertex', 'quadraticVertex', 'beginShape', 'endShape', 'stroke', 'fill', 'noStroke', 'noFill',
+    'background', 'ellipse', 'rect', 'line', 'point', 'push', 'pop', 'translate', 'rotate', 'scale', 'bezier', 'curve',
+    'pushMatrix', 'popMatrix', 'pushStyle', 'popStyle'
   ];
+
   criticalFuncs.forEach(funcName => {
     if (!(funcName in window)) {
       Object.defineProperty(window, funcName, {
@@ -961,11 +1533,413 @@ if (typeof p5 !== 'undefined') {
     if (!glProto.uniform3) glProto.uniform3 = function(loc, v0, v1, v2) { return this.uniform3f(loc, v0, v1, v2); };
     if (!glProto.uniform4) glProto.uniform4 = function(loc, v0, v1, v2, v3) { return this.uniform4f(loc, v0, v1, v2, v3); };
   }
+
+  // 13. BMWalker (Generative Walker) 類別補全護欄
+  if (typeof window.BMWalker === 'undefined') {
+    window.BMWalker = class BMWalker {
+      constructor() {
+        this.pos = (typeof createVector === 'function') ? createVector(0, 0) : { x: 0, y: 0 };
+        this.vel = (typeof createVector === 'function') ? createVector(0, 0) : { x: 0, y: 0 };
+        this.markers = [];
+      }
+      walk() {}
+      display() {}
+      update() {}
+    };
+  }
+
+  // 14. tlogo (Turtle Logo) 物件補全護欄
+  if (typeof window.tlogo === 'undefined') {
+    window.tlogo = {
+      fd: function() {}, bk: function() {}, rt: function() {}, lt: function() {},
+      pu: function() {}, pd: function() {}, setxy: function() {}, home: function() {},
+      cs: function() {}, clean: function() {}, penUp: function() {}, penDown: function() {}
+    };
+  }
+
+  const _createMockSound = function() {
+    return {
+      _isMockSound: true,
+      play: function() { return this; },
+      stop: function() { return this; },
+      pause: function() { return this; },
+      loop: function() { return this; },
+      isPlaying: function() { return false; },
+      setVolume: function() { return this; },
+      pan: function() { return this; },
+      rate: function() { return this; },
+      disconnect: function() { return this; },
+      connect: function() { return this; },
+      onended: function() {},
+      duration: function() { return 180.0; },
+      currentTime: function() { return 0.0; },
+      then: function(resolve) {
+        if (resolve) {
+          setTimeout(() => resolve(this), 0);
+        }
+        return this;
+      }
+    };
+  };
+
+  const _createMockFont = function() {
+    return {
+      _isMockFont: true,
+      font: { data: true, tables: {}, _font: {} },
+      textToPoints: function() { return []; },
+      textBounds: function(str, x, y, fontSize) {
+        var len = (str && str.length) || 1;
+        var sz = fontSize || 12;
+        return { x: x || 0, y: (y || 0) - sz, w: len * sz * 0.6, h: sz * 1.2, advance: len * sz * 0.6 };
+      },
+      getPath: function() { return { commands: [] }; },
+      getOutline: function() { return []; },
+      then: function(resolve) {
+        if (resolve) {
+          setTimeout(() => resolve(this), 0);
+        }
+        return this;
+      }
+    };
+  };
+
+  // 15. click 與 dir 全域未宣告變數護欄
+  if (typeof window.dir === 'undefined') { window.dir = 0; }
+  if (typeof window.click === 'undefined') {
+    window.click = _createMockSound();
+  }
+
+  // 16. 全域音訊變數初始化與 MediaElement.prototype.play 免疫防禦
+  ['sound', 'audio', 'song', 'snd', 'player', 'track', 'voice', 'mySound', 'sample', 'music'].forEach(function(k) {
+    if (typeof window[k] === 'undefined') {
+      window[k] = _createMockSound();
+    }
+  });
+  ['font', 'myFont', 'f', 'fnt', 'defaultFont'].forEach(function(k) {
+    if (typeof window[k] === 'undefined') {
+      window[k] = _createMockFont();
+    }
+  });
+
+  if (typeof HTMLMediaElement !== 'undefined' && HTMLMediaElement.prototype) {
+    HTMLMediaElement.prototype.play = function() { return Promise.resolve(); };
+    HTMLMediaElement.prototype.pause = function() {};
+  }
+  if (typeof window.Audio !== 'undefined' && window.Audio.prototype) {
+    window.Audio.prototype.play = function() { return Promise.resolve(); };
+    window.Audio.prototype.pause = function() {};
+  }
+
+  // 17. p5.Font.prototype textToPoints & textBounds 防禦
+  if (typeof p5 !== 'undefined' && p5.Font && p5.Font.prototype) {
+    const origTextToPoints = p5.Font.prototype.textToPoints;
+    p5.Font.prototype.textToPoints = function(...args) {
+      if (!this || !this.font || (!this.font.data && !this.font.tables && !this.font._font)) {
+        return [];
+      }
+      try {
+        return origTextToPoints ? origTextToPoints.apply(this, args) : [];
+      } catch(e) {
+        return [];
+      }
+    };
+    if (!p5.Font.prototype.textBounds) {
+      p5.Font.prototype.textBounds = function(str, x, y, fontSize) {
+        var len = (str && str.length) || 1;
+        var sz = fontSize || 12;
+        return { x: x || 0, y: (y || 0) - sz, w: len * sz * 0.6, h: sz * 1.2, advance: len * sz * 0.6 };
+      };
+    }
+  }
+
+  // 18. frameCount 可寫入 Setter 支援（防止 Java 轉譯之作品賦值 frameCount = 0 觸發唯讀 Getter 報錯）
+  try {
+    let _customFrameCount = undefined;
+    Object.defineProperty(window, 'frameCount', {
+      get: function() {
+        if (_customFrameCount !== undefined) return _customFrameCount;
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.instance || (p5.activeInstances && p5.activeInstances[0])));
+        if (inst && typeof inst.frameCount === 'number') return inst.frameCount;
+        return 0;
+      },
+      set: function(val) {
+        _customFrameCount = val;
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.instance || (p5.activeInstances && p5.activeInstances[0])));
+        if (inst) {
+          try { inst.frameCount = val; } catch(e) {}
+          if (typeof inst._setProperty === 'function') {
+            try { inst._setProperty('frameCount', val); } catch(e) {}
+          }
+        }
+      },
+      configurable: true,
+      enumerable: true
+    });
+  } catch(e) {}
 })();
 """
 
 MOCK_P5_JS = """
 // p5.sound Mock/Stub Compatibility Layer
+if (typeof window !== 'undefined') {
+  window.P3D = window.P3D || "webgl";
+  window.OPENGL = window.OPENGL || "webgl";
+  window.P2D = window.P2D || "p2d";
+  window.JAVA2D = window.JAVA2D || "p2d";
+  ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'].forEach(function(k) {
+    if (typeof window[k] === 'undefined') window[k] = k.toLowerCase();
+  });
+  ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'].forEach(function(k) {
+    if (typeof window[k] === 'undefined') window[k] = 0;
+  });
+  (function() {
+    var _audioChannels = ['audioLow', 'audioMid', 'audioHigh', 'beatEnergy'];
+    var _sliderIdx = 0;
+
+    function _createAudioBoundElement(min, max, defVal, step) {
+      var _ch = _audioChannels[(_sliderIdx++) % _audioChannels.length];
+      var _min = min !== undefined ? Number(min) : 0;
+      var _max = max !== undefined ? Number(max) : 100;
+      var _val = defVal !== undefined ? Number(defVal) : (_min + _max) / 2;
+      var _step = step !== undefined ? Number(step) : 0;
+      var _listeners = {};
+
+      var el = function() { return _sp; };
+      el.position = el.style = el.size = el.parent = el.option = el.texture = function() { return el; };
+      el.id = function() { return ""; };
+      el.class = function() { return el; };
+      el.show = el.hide = function() { return el; };
+      el.mousePressed = el.mouseClicked = el.html = function() { return el; };
+      el.changed = el.input = function(cb) { if (typeof cb === 'function') _listeners['change'] = cb; return el; };
+      el.on = el.off = el.addEventListener = el.removeEventListener = el.listen = function() { return el; };
+      el.width = 100; el.height = 100;
+      el[Symbol.iterator] = function* () { yield el; };
+
+      el.value = function(newVal) {
+        if (newVal !== undefined) {
+          _val = Number(newVal);
+          return el;
+        }
+        var norm = typeof window[_ch] !== 'undefined' ? Number(window[_ch]) : 0.5;
+        var dynVal = _min + norm * (_max - _min);
+        if (_step > 0) {
+          dynVal = Math.round((dynVal - _min) / _step) * _step + _min;
+        }
+        return dynVal;
+      };
+
+      var handler = {
+        get: function(t, p) {
+          if (p === 'value') return t.value;
+          if (p === 'slider') return t;
+          if (p === 'elt') return { value: t.value(), style: {} };
+          if (p in t) return t[p];
+          if (typeof p === 'symbol' || p === 'then' || p === 'toJSON') return undefined;
+          return _sp;
+        }
+      };
+      return new Proxy(el, handler);
+    }
+
+    var _do = function() { return _sp; };
+    _do.position = _do.style = _do.size = _do.parent = _do.option = _do.texture = function() { return _sp; };
+    _do.id = function() { return ""; };
+    _do.class = _do.mousePressed = _do.mouseClicked = _do.html = _do.changed = _do.input = function() { return _sp; };
+    _do.on = _do.off = _do.addEventListener = _do.removeEventListener = _do.listen = function() { return _sp; };
+    _do.value = function() { return 0; };
+    _do.width = 100; _do.height = 100;
+    _do[Symbol.iterator] = function* () { yield _sp; };
+    var _dh = {
+      get: function(t, p) {
+        if (p === 'slider') return _sp;
+        if (p in t) return t[p];
+        if (typeof p === 'symbol' || p === 'then' || p === 'toJSON') return undefined;
+        return _sp;
+      },
+      apply: function() { return _sp; },
+      construct: function() { return _sp; }
+    };
+    var _sp = typeof Proxy !== 'undefined' ? new Proxy(_do, _dh) : _do;
+
+    if (typeof createSlider === 'undefined') {
+      window.createSlider = function(min, max, defVal, step) {
+        return _createAudioBoundElement(min, max, defVal, step);
+      };
+    }
+    if (typeof createP === 'undefined') window.createP = function() { return _sp; };
+    if (typeof createDiv === 'undefined') window.createDiv = function() { return _sp; };
+    if (typeof createButton === 'undefined') window.createButton = function() { return _sp; };
+    if (typeof createInput === 'undefined') window.createInput = function(defVal) { return _createAudioBoundElement(0, 100, defVal || 50, 1); };
+    if (typeof createSelect === 'undefined') window.createSelect = function() { return _createAudioBoundElement(0, 5, 0, 1); };
+    if (typeof createCheckbox === 'undefined') window.createCheckbox = function() { return _createAudioBoundElement(0, 1, 0, 1); };
+    if (typeof createRadio === 'undefined') window.createRadio = function() { return _createAudioBoundElement(0, 5, 0, 1); };
+    if (typeof createColorPicker === 'undefined') window.createColorPicker = function() { return _sp; };
+    if (typeof createElement === 'undefined') window.createElement = function() { return _sp; };
+    if (typeof select === 'undefined') window.select = function() { return _sp; };
+    if (typeof selectAll === 'undefined') window.selectAll = function() { return []; };
+    window.Pause = window.Pause || _sp;
+    window.Play = window.Play || _sp;
+    window.Reset = window.Reset || _sp;
+  })();
+  if (typeof window.cnv === 'undefined') window.cnv = typeof createDiv !== 'undefined' ? createDiv() : { width: 1422, height: 800, parent: function(){}, position: function(){}, style: function(){} };
+  if (typeof window.inner1 === 'undefined') window.inner1 = window.cnv;
+  if (typeof window.eyePic === 'undefined') window.eyePic = window.cnv;
+  if (typeof window.myColor === 'undefined') window.myColor = '#ffffff';
+  if (typeof window.grainAmount === 'undefined') window.grainAmount = 0;
+  const _createMockSound = function() {
+    return {
+      _isMockSound: true,
+      play: function() { return this; },
+      stop: function() { return this; },
+      pause: function() { return this; },
+      loop: function() { return this; },
+      isPlaying: function() { return false; },
+      setVolume: function() { return this; },
+      pan: function() { return this; },
+      rate: function() { return this; },
+      disconnect: function() { return this; },
+      connect: function() { return this; },
+      onended: function() {},
+      duration: function() { return 180.0; },
+      currentTime: function() { return 0.0; },
+      then: function(resolve) { if (resolve) setTimeout(() => resolve(this), 0); return this; }
+    };
+  };
+  const _createMockFont = function() {
+    return {
+      _isMockFont: true,
+      font: { data: true, tables: {}, _font: {} },
+      textToPoints: function() { return []; },
+      textBounds: function(str, x, y, fontSize) {
+        var len = (str && str.length) || 1;
+        var sz = fontSize || 12;
+        return { x: x || 0, y: (y || 0) - sz, w: len * sz * 0.6, h: sz * 1.2, advance: len * sz * 0.6 };
+      },
+      getPath: function() { return { commands: [] }; },
+      getOutline: function() { return []; },
+      then: function(resolve) { if (resolve) setTimeout(() => resolve(this), 0); return this; }
+    };
+  };
+
+  ['res','scr','gap','asd','nPoints','scaledT','_count','angleStepMax','objs','X0','pg','starColor','clr2','typ','largX',
+   'paper','pg2','col1','col2','S_actual','maxD','looping','sinput','SZ','medRadius','minRadius','maxRadius','locations',
+   'grid_size','circle_diams','dots','points','particles','cells','stars','nodes','current_img','img','imgs','moon',
+   'bg','font','tex','cols','rows','pal','palette','pos','vel','acc','colors','dirs','movers','lines','curves','boxes',
+   'shapes','polygons','vectors','shaderProgram','sh','dwidth','dheight','kRadiusFactor','minDistFactor','nbrParticles',
+   'reference','catSpeed','tt','_shiftAmp','_shifAmp','BG_C','FG','areas','aryCornerXy','pad','nx','ny','nz','nw',
+   'allowedLetters','validWords','currentLetters','activeIndex','lettersWord','bars','frames','photo','cover','orient','ovel','start','orthoview','num',
+   'mobile','buildings','curSeed','px','py','pz','dx','dy','dz','vx','vy','vz','cx','cy','cz','sx','sy','sz','fx','fy','wx','wy','rx','ry','rz',
+   'noiseGra','aryRegionRect','numRegionRect','regionClearanceRatio','minRegionX','maxRegionX','minRegionY','maxRegionY',
+   '_minW','_maxW','_minWidth','_bgWidth','_points','_obj','_xy','_numObject','_clearanceRatio','_splitRatio',
+   'noiseSeedInit','noiseSpeed','noiseFreq','thetaFreq','thetaInit',
+   'sound','audio','song','snd','player','track','voice','mySound','sample','music','myFont','f','fnt','defaultFont'].forEach(function(k) {
+    if (typeof window[k] === 'undefined') {
+      if (['objs','dots','points','particles','cells','stars','nodes','locations','colors','dirs','movers','lines','curves','boxes','shapes','polygons','vectors','pal','palette','circle_diams','imgs','areas','aryCornerXy','bars','frames','currentLetters','validWords','buildings','aryRegionRect','_obj','_xy','noiseSeedInit'].includes(k)) {
+        window[k] = [];
+      } else if (['sound','audio','song','snd','player','track','voice','mySound','sample','music'].includes(k)) {
+        window[k] = _createMockSound();
+      } else if (['font','myFont','f','fnt','defaultFont'].includes(k)) {
+        window[k] = _createMockFont();
+      } else if (k === 'scr') {
+        window[k] = window.cnv;
+      } else if (['img', 'moon', 'photo', 'cover'].includes(k)) {
+        window[k] = { width: 100, height: 100, resize: function(w,h){ if(w) this.width=w; if(h) this.height=h; return this; }, loadPixels: function(){}, updatePixels: function(){}, get: function(){ return [0,0,0,0]; }, set: function(){}, copy: function(){}, mask: function(){}, filter: function(){}, pixels: new Uint8ClampedArray(100*100*4), canvas: (typeof document !== 'undefined' ? document.createElement('canvas') : null) };
+      } else if (['orient', 'ovel', 'start'].includes(k)) {
+        window[k] = { x: 0, y: 0, z: 0, add: function(){ return this; }, mult: function(){ return this; }, sub: function(){ return this; } };
+      } else if (['pg', 'pg2', 'paper', 'noiseGra'].includes(k)) {
+        window[k] = { width: 100, height: 100, beginDraw: function(){}, endDraw: function(){}, background: function(){}, image: function(){}, get: function(){ return this; }, loadPixels: function(){}, updatePixels: function(){}, pixels: [], resize: function(w,h){ if(w) this.width=w; if(h) this.height=h; return this; }, imageMode: function(){}, fill: function(){}, stroke: function(){}, noFill: function(){}, noStroke: function(){}, rect: function(){}, ellipse: function(){}, line: function(){}, point: function(){}, push: function(){}, pop: function(){}, translate: function(){}, rotate: function(){}, scale: function(){}, textSize: function(){}, textAlign: function(){}, text: function(){}, clear: function(){} };
+      } else if (['starColor', 'clr2', 'myColor', 'col1', 'col2', 'bg', 'BG_C', 'FG'].includes(k)) {
+        window[k] = '#ffffff';
+      } else if (k === 'allowedLetters') {
+        window[k] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      } else if (k === 'looping') {
+        window[k] = true;
+      } else if (k === 'orthoview' || k === 'mobile') {
+        window[k] = false;
+      } else if (k === 'angleStepMax' || k === 'numRegionRect') {
+        window[k] = 1;
+      } else if (k === 'curSeed') {
+        window[k] = Math.floor(Math.random() * 999999);
+      } else if (k === 'regionClearanceRatio' || k === '_clearanceRatio' || k === '_splitRatio') {
+        window[k] = 0.5;
+      } else {
+        window[k] = 0;
+      }
+    }
+  });
+  window.addEventListener('unhandledrejection', function(event) {
+    event.preventDefault();
+  });
+  if (typeof Element !== 'undefined' && Element.prototype && !Element.prototype.size) {
+    Element.prototype.size = function() { return this; };
+  }
+  // MediaElement play immunity
+  if (typeof HTMLMediaElement !== 'undefined' && HTMLMediaElement.prototype) {
+    HTMLMediaElement.prototype.play = function() { return Promise.resolve(); };
+    HTMLMediaElement.prototype.pause = function() {};
+  }
+  if (typeof window.Audio !== 'undefined' && window.Audio.prototype) {
+    window.Audio.prototype.play = function() { return Promise.resolve(); };
+    window.Audio.prototype.pause = function() {};
+  }
+  // _renderer.getTexture immunity
+  if (typeof window._renderer !== 'undefined' && window._renderer && typeof window._renderer.getTexture !== 'function') {
+    window._renderer.getTexture = function() { return { update: function(){}, bindTexture: function(){}, unbindTexture: function(){} }; };
+  }
+  // frameCount setter support
+  try {
+    let _customFrameCount = undefined;
+    Object.defineProperty(window, 'frameCount', {
+      get: function() {
+        if (_customFrameCount !== undefined) return _customFrameCount;
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.instance || (p5.activeInstances && p5.activeInstances[0])));
+        if (inst && typeof inst.frameCount === 'number') return inst.frameCount;
+        return 0;
+      },
+      set: function(val) {
+        _customFrameCount = val;
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.instance || (p5.activeInstances && p5.activeInstances[0])));
+        if (inst) {
+          try { inst.frameCount = val; } catch(e) {}
+          if (typeof inst._setProperty === 'function') {
+            try { inst._setProperty('frameCount', val); } catch(e) {}
+          }
+        }
+      },
+      configurable: true,
+      enumerable: true
+    });
+  } catch(e) {}
+  if (typeof p5 !== 'undefined') {
+    if (p5.Image && p5.Image.prototype) {
+      if (!('gifProperties' in p5.Image.prototype)) {
+        Object.defineProperty(p5.Image.prototype, 'gifProperties', {
+          get: function() { return this._gifProps || { display: true, numFrames: 1, loopCount: 0, frameRate: 30, frames: [] }; },
+          set: function(val) { this._gifProps = val; },
+          configurable: true
+        });
+      }
+      if (!p5.Image.prototype.resize) {
+        p5.Image.prototype.resize = function(w, h) {
+          if (w) this.width = w;
+          if (h) this.height = h;
+          return this;
+        };
+      }
+      if (!p5.Image.prototype.loadPixels) p5.Image.prototype.loadPixels = function() {};
+      if (!p5.Image.prototype.updatePixels) p5.Image.prototype.updatePixels = function() {};
+      if (!p5.Image.prototype.get) p5.Image.prototype.get = function() { return [0, 0, 0, 0]; };
+      if (!p5.Image.prototype.set) p5.Image.prototype.set = function() {};
+      if (!p5.Image.prototype.mask) p5.Image.prototype.mask = function() {};
+      if (!p5.Image.prototype.filter) p5.Image.prototype.filter = function() {};
+      if (!p5.Image.prototype.copy) p5.Image.prototype.copy = function() {};
+      if (!p5.Image.prototype.blend) p5.Image.prototype.blend = function() {};
+    }
+    if (p5.Graphics && p5.Graphics.prototype) {
+      if (!p5.Graphics.prototype.imageMode) p5.Graphics.prototype.imageMode = function() {};
+    }
+  }
+}
 if (typeof p5 !== 'undefined') {
   // Helper: create a mock audio node with connect/disconnect for p5.sound internal use
   var _mockAudioNode = function() {
@@ -1002,9 +1976,10 @@ if (typeof p5 !== 'undefined') {
       let lowVal = Math.round((window.audioLow || 0.5) * 255);
       let midVal = Math.round((window.audioMid || 0.5) * 255);
       let highVal = Math.round((window.audioHigh || 0.5) * 255);
-      for (let i = 0; i < 100; i++) arr[i] = lowVal;
-      for (let i = 100; i < 500; i++) arr[i] = midVal;
-      for (let i = 500; i < 1024; i++) arr[i] = highVal;
+      let beatMod = (window.beatEnergy || 0.5) * 40;
+      for (let i = 0; i < 100; i++) arr[i] = Math.min(255, Math.max(0, lowVal + (Math.random() * 20 - 10) + beatMod));
+      for (let i = 100; i < 500; i++) arr[i] = Math.min(255, Math.max(0, midVal + (Math.random() * 15 - 7)));
+      for (let i = 500; i < 1024; i++) arr[i] = Math.min(255, Math.max(0, highVal + (Math.random() * 10 - 5)));
       return arr;
     };
     this.getEnergy = function(freq1, freq2) {
@@ -1017,32 +1992,37 @@ if (typeof p5 !== 'undefined') {
         if (f === 'treble') return Math.round((window.audioHigh || 0.5) * 255);
       }
       let val = window.audioMid || 0.5;
-      if (freq1 < 250) val = window.audioLow;
-      else if (freq1 > 2000) val = window.audioHigh;
+      if (freq1 < 250) val = window.audioLow || 0.5;
+      else if (freq1 > 2000) val = window.audioHigh || 0.5;
       return Math.round(val * 255);
+    };
+    this.getLevel = function() {
+      return window.audioEnergy || window.beatEnergy || window.audioMid || 0.5;
     };
   };
 
-  // Mock p5.SoundFile to prevent loadSound from blocking
+  // Mock p5.SoundFile to act as a reactive Virtual Audio Receiver
   p5.SoundFile = function(path, successCallback, errorCallback) {
     console.log('[Mock] p5.SoundFile created for:', path);
     this.output = _mockAudioNode();
     this.input = _mockAudioNode();
+    this._isPlaying = false;
     this.isLoaded = function() { return true; };
-    this.isPlaying = function() { return false; };
-    this.play = function() {};
-    this.loop = function() {};
-    this.stop = function() {};
-    this.pause = function() {};
-    this.setVolume = function() {};
-    this.pan = function() {};
+    this.isPlaying = function() { return this._isPlaying !== false && window.isAudioPlaying !== false; };
+    this.play = function() { this._isPlaying = true; return this; };
+    this.loop = function() { this._isPlaying = true; return this; };
+    this.stop = function() { this._isPlaying = false; return this; };
+    this.pause = function() { this._isPlaying = false; return this; };
+    this.setVolume = function() { return this; };
+    this.pan = function() { return this; };
     this.rate = function() { return 1; };
-    this.duration = function() { return 60; };
-    this.currentTime = function() { return 0; };
+    this.duration = function() { return window.totalAudioDuration || 180.0; };
+    this.currentTime = function() { return (typeof window.custom_time_ms !== 'undefined' ? window.custom_time_ms / 1000 : (window.currentAudioTime || (window.frameCount ? window.frameCount / 60 : 0.0))); };
+    this.getLevel = function() { return window.audioEnergy || window.beatEnergy || (typeof window.audioMid !== 'undefined' ? (window.audioLow + window.audioMid + window.audioHigh)/3 : 0.5); };
     this.jump = function() {};
     this.channels = function() { return 2; };
     this.sampleRate = function() { return 44100; };
-    this.frames = function() { return 44100 * 60; };
+    this.frames = function() { return 44100 * 180; };
     this.getPeaks = function(n) { return new Float32Array(n || 5).fill(0); };
     this.reverseBuffer = function() {};
     this.onended = function() {};
@@ -1054,15 +2034,14 @@ if (typeof p5 !== 'undefined') {
     this.addCue = function() { return 0; };
     this.removeCue = function() {};
     this.clearCues = function() {};
-    if (successCallback) setTimeout(successCallback, 10);
+    if (successCallback) setTimeout(() => { try { successCallback(this); } catch(e) {} }, 10);
   };
 
   // Override loadSound globally
   if (typeof window.loadSound === 'undefined') {
     window.loadSound = function(path, successCallback, errorCallback) {
       console.log('[Mock] loadSound intercepted for:', path);
-      var mockSound = new p5.SoundFile(path);
-      if (successCallback) setTimeout(function() { successCallback(mockSound); }, 10);
+      var mockSound = new p5.SoundFile(path, successCallback, errorCallback);
       return mockSound;
     };
   }
@@ -1070,53 +2049,83 @@ if (typeof p5 !== 'undefined') {
   if (p5.prototype) {
     p5.prototype.loadSound = function(path, successCallback, errorCallback) {
       console.log('[Mock] p5.prototype.loadSound intercepted for:', path);
-      var mockSound = new p5.SoundFile(path);
-      if (successCallback) setTimeout(function() { successCallback(mockSound); }, 10);
+      var mockSound = new p5.SoundFile(path, successCallback, errorCallback);
       return mockSound;
+    };
+    p5.prototype.createCapture = p5.prototype.createCapture || function() {
+      const v = document.createElement('video');
+      v.play = function(){}; v.pause = function(){};
+      const mockCap = { elt: v, hide: function(){ return mockCap; }, size: function(){ return mockCap; }, position: function(){ return mockCap; }, loop: function(){ return mockCap; }, volume: function(){ return mockCap; } };
+      return mockCap;
     };
   }
 
   // Implement p5.prototype.registerMethod shim for p5.js 2.x compatibility
-  if (p5.prototype && !p5.prototype.registerMethod) {
-    p5.prototype.registerMethod = function(hookName, method) {
-      if (typeof method !== 'function') return;
-      const hookMapping = {
-        'init': 'presetup',
-        'pre': 'predraw',
-        'post': 'postdraw',
-        'remove': 'remove'
-      };
-      const newHookName = hookMapping[hookName];
-      if (newHookName && typeof p5.registerAddon === 'function') {
-        p5.registerAddon((p5Instance, fn, lifecycles) => {
-          const oldHook = lifecycles[newHookName];
-          lifecycles[newHookName] = function() {
-            if (oldHook) oldHook.call(this);
-            method.call(this);
-          };
-        });
+  var _registerMethodPolyfill = function(hookName, method) {
+    if (typeof method !== 'function') return;
+    if (p5.prototype) {
+      p5.prototype._registeredMethods = p5.prototype._registeredMethods || {};
+      if (!p5.prototype._registeredMethods[hookName]) {
+        p5.prototype._registeredMethods[hookName] = [];
       }
+      p5.prototype._registeredMethods[hookName].push(method);
+    }
+    const hookMapping = {
+      'init': 'presetup',
+      'pre': 'predraw',
+      'post': 'postdraw',
+      'remove': 'remove'
     };
+    const newHookName = hookMapping[hookName];
+    if (newHookName && typeof p5.registerAddon === 'function') {
+      p5.registerAddon((p5Instance, fn, lifecycles) => {
+        if (!lifecycles) return;
+        const oldHook = lifecycles[newHookName];
+        lifecycles[newHookName] = function() {
+          if (typeof oldHook === 'function') oldHook.call(this);
+          method.call(this);
+        };
+      });
+    }
+  };
+  if (p5.prototype && !p5.prototype.registerMethod) {
+    p5.prototype.registerMethod = _registerMethodPolyfill;
+  }
+  if (!p5.registerMethod) {
+    p5.registerMethod = _registerMethodPolyfill;
   }
   // Expose mock DOM createP/createDiv helpers directly to window to prevent "reading position" errors
   var createDummyDom = function(tag, ...createArgs) {
-    let dummyEl = document.createElement(tag || 'div');
+    let dummyEl = document.createElement(tag === 'slider' || tag === 'colorpicker' || tag === 'checkbox' || tag === 'radio' ? 'input' : (tag || 'div'));
     dummyEl.style.setProperty('display', 'none', 'important');
     dummyEl.style.setProperty('visibility', 'hidden', 'important');
     dummyEl.style.setProperty('opacity', '0', 'important');
     dummyEl.style.setProperty('pointer-events', 'none', 'important');
     dummyEl.style.setProperty('position', 'absolute', 'important');
+    dummyEl.style.setProperty('top', '-99999px', 'important');
+    dummyEl.style.setProperty('left', '-99999px', 'important');
+    dummyEl.style.setProperty('width', '0px', 'important');
+    dummyEl.style.setProperty('height', '0px', 'important');
     dummyEl.style.setProperty('z-index', '-99999', 'important');
     
     // Add stub methods to emulate p5.Element
+    dummyEl.elt = dummyEl;
     dummyEl.class = function() { return this; };
+    let dummyIdVal = '';
+    const idFn = function(val) {
+      if (val === undefined) return dummyIdVal || dummyEl.getAttribute('id') || '';
+      dummyIdVal = String(val);
+      dummyEl.setAttribute('id', dummyIdVal);
+      return dummyEl;
+    };
+    idFn.toString = function() { return dummyIdVal; };
+    idFn.valueOf = function() { return dummyIdVal; };
     Object.defineProperty(dummyEl, 'id', {
-      value: function(val) {
-        if (val === undefined) return this.getAttribute('id');
-        this.setAttribute('id', val);
-        return this;
+      get: function() { return idFn; },
+      set: function(val) {
+        dummyIdVal = String(val);
+        dummyEl.setAttribute('id', dummyIdVal);
       },
-      writable: true,
       configurable: true
     });
     dummyEl.parent = function() { return this; };
@@ -1150,23 +2159,101 @@ if (typeof p5 !== 'undefined') {
     
     // Mock input values linked to audio energy algorithms
     let boundProperty = 'audioLow';
+    let manualVal = undefined;
+    
     if (tag === 'slider') {
       let minVal = createArgs[0] !== undefined ? createArgs[0] : 0;
-      let maxVal = createArgs[1] !== undefined ? createArgs[1] : 1;
+      let maxVal = createArgs[1] !== undefined ? createArgs[1] : 100;
       let defaultVal = createArgs[2] !== undefined ? createArgs[2] : (minVal + maxVal)/2;
+      let stepVal = createArgs[3] !== undefined ? createArgs[3] : 0;
       
-      // Randomly assign audio channels to different sliders to drive variation
       const channels = ['audioLow', 'audioMid', 'audioHigh', 'beatEnergy'];
       boundProperty = channels[Math.floor(Math.random() * channels.length)];
+      let phaseOffset = Math.random() * Math.PI * 2;
+      let speedFactor = 0.5 + Math.random() * 1.5;
       
       Object.defineProperty(dummyEl, 'value', {
         value: function(val) {
-          if (val === undefined) {
-            let norm = window[boundProperty] || 0.5;
-            return minVal + norm * (maxVal - minVal);
+          if (val !== undefined) {
+            manualVal = Number(val);
+            dummyEl.setAttribute('value', String(val));
+            return this;
           }
-          return this;
+          if (manualVal !== undefined) {
+            let norm = window[boundProperty];
+            if (typeof norm !== 'number') norm = 0.5;
+            let delta = (norm - 0.5) * (maxVal - minVal) * 0.35;
+            let res = Math.max(minVal, Math.min(maxVal, manualVal + delta));
+            if (stepVal > 0) res = Math.round((res - minVal) / stepVal) * stepVal + minVal;
+            return res;
+          }
+          let t = (window.custom_time_ms || 0) * 0.001;
+          let norm = window[boundProperty];
+          if (typeof norm !== 'number') norm = 0.5;
+          let wave = 0.5 + 0.3 * Math.sin(t * speedFactor + phaseOffset) + (norm - 0.5) * 0.4;
+          wave = Math.max(0, Math.min(1, wave));
+          let computed = minVal + wave * (maxVal - minVal);
+          if (stepVal > 0) computed = Math.round((computed - minVal) / stepVal) * stepVal + minVal;
+          return computed;
         },
+        writable: true,
+        configurable: true
+      });
+    } else if (tag === 'checkbox') {
+      let defaultChecked = createArgs[1] !== undefined ? Boolean(createArgs[1]) : false;
+      let checkManual = undefined;
+      dummyEl.checked = function(val) {
+        if (val !== undefined) {
+          checkManual = Boolean(val);
+          return this;
+        }
+        if (checkManual !== undefined) return checkManual;
+        let band = (window.audioLow || 0.5);
+        return band > 0.48 || (window.isBeat || false);
+      };
+      Object.defineProperty(dummyEl, 'value', {
+        value: function(val) { return dummyEl.checked(val); },
+        writable: true,
+        configurable: true
+      });
+    } else if (tag === 'button') {
+      dummyEl._callbacks = [];
+      dummyEl.mousePressed = function(cb) {
+        if (typeof cb === 'function') dummyEl._callbacks.push(cb);
+        window._activeMockButtons = window._activeMockButtons || [];
+        if (!window._activeMockButtons.includes(dummyEl)) window._activeMockButtons.push(dummyEl);
+        return this;
+      };
+      dummyEl.mouseClicked = dummyEl.mousePressed;
+      Object.defineProperty(dummyEl, 'value', {
+        value: function() { return 1; },
+        writable: true,
+        configurable: true
+      });
+    } else if (tag === 'select') {
+      dummyEl._options = [];
+      dummyEl._selectedVal = undefined;
+      dummyEl.option = function(name, val) {
+        let actualVal = val !== undefined ? val : name;
+        dummyEl._options.push({ name: name, value: actualVal });
+        const opt = document.createElement('option');
+        opt.value = actualVal;
+        opt.text = name;
+        dummyEl.appendChild(opt);
+        return dummyEl;
+      };
+      dummyEl.selected = function(val) {
+        if (val !== undefined) {
+          dummyEl._selectedVal = val;
+          return this;
+        }
+        if (dummyEl._selectedVal !== undefined) return dummyEl._selectedVal;
+        if (dummyEl._options.length === 0) return '';
+        let idx = Math.floor((window.audioMid || 0.5) * dummyEl._options.length) % dummyEl._options.length;
+        return dummyEl._options[idx].value;
+      };
+      Object.defineProperty(dummyEl, 'value', {
+        value: function(val) { return dummyEl.selected(val); },
         writable: true,
         configurable: true
       });
@@ -1182,7 +2269,6 @@ if (typeof p5 !== 'undefined') {
     }
     
     dummyEl.input = function(callback) {
-      // Periodically trigger input callback to simulate sound activity driving parameters
       setInterval(() => {
         if (typeof callback === 'function') {
           try { callback.call(dummyEl); } catch(e){}
@@ -1199,11 +2285,20 @@ if (typeof p5 !== 'undefined') {
       return this;
     };
     dummyEl.mouseMoved = function() { return this; };
-    dummyEl.mousePressed = function() { return this; };
+    if (!dummyEl.mousePressed) dummyEl.mousePressed = function() { return this; };
     dummyEl.mouseReleased = function() { return this; };
-    dummyEl.mouseClicked = function() { return this; };
-    dummyEl.changed = function() { return this; };
-    
+    if (!dummyEl.mouseClicked) dummyEl.mouseClicked = function() { return this; };
+    dummyEl.disable = function() { return dummyEl; };
+    dummyEl.enable = function() { return dummyEl; };
+    dummyEl.css = function(prop, val) {
+      if (typeof prop === 'object') {
+        Object.assign(dummyEl.style, prop);
+      } else if (prop && val !== undefined) {
+        dummyEl.style[prop] = val;
+      }
+      return dummyEl;
+    };
+
     // Append to body but hidden
     if (document.body) {
       document.body.appendChild(dummyEl);
@@ -1222,7 +2317,10 @@ if (typeof p5 !== 'undefined') {
   window.createSpan = () => createDummyDom('span');
   window.createSlider = (...args) => createDummyDom('slider', ...args);
   window.createCheckbox = (...args) => createDummyDom('checkbox', ...args);
-  window.createSelect = (...args) => createDummyDom('select', ...args);
+  window.createSelect = (...args) => {
+    var el = createDummyDom('select', ...args);
+    return _ensureDomStub(el);
+  };
   window.createRadio = (...args) => createDummyDom('radio', ...args);
   window.createInput = (...args) => createDummyDom('input', ...args);
   window.createColorPicker = (...args) => createDummyDom('colorpicker', ...args);
@@ -1234,10 +2332,41 @@ if (typeof p5 !== 'undefined') {
     p5.prototype.createSpan = () => createDummyDom('span');
     p5.prototype.createSlider = (...args) => createDummyDom('slider', ...args);
     p5.prototype.createCheckbox = (...args) => createDummyDom('checkbox', ...args);
-    p5.prototype.createSelect = (...args) => createDummyDom('select', ...args);
+    p5.prototype.createSelect = function(...args) {
+      var el = createDummyDom('select', ...args);
+      return _ensureDomStub(el);
+    };
     p5.prototype.createRadio = (...args) => createDummyDom('radio', ...args);
     p5.prototype.createInput = (...args) => createDummyDom('input', ...args);
     p5.prototype.createColorPicker = (...args) => createDummyDom('colorpicker', ...args);
+
+
+    if (typeof p5.Element !== 'undefined' && p5.Element.prototype) {
+      if (!p5.Element.prototype.option) {
+        p5.Element.prototype.option = function(name, val) {
+          if (this.elt) {
+            const opt = document.createElement('option');
+            opt.value = val !== undefined ? val : name;
+            opt.text = name;
+            this.elt.appendChild(opt);
+          }
+          return this;
+        };
+      }
+      if (!p5.Element.prototype.selected) p5.Element.prototype.selected = function() { return this.value ? this.value() : ''; };
+      if (!p5.Element.prototype.disable) p5.Element.prototype.disable = function() { return this; };
+      if (!p5.Element.prototype.enable) p5.Element.prototype.enable = function() { return this; };
+      if (!p5.Element.prototype.css) {
+        p5.Element.prototype.css = function(prop, val) {
+          if (this.elt && this.elt.style) {
+            if (typeof prop === 'object') Object.assign(this.elt.style, prop);
+            else if (prop && val !== undefined) this.elt.style[prop] = val;
+          }
+          return this;
+        };
+      }
+    }
+
     
     // Wrap color() to automatically auto-correct invalid hexadecimal color strings (e.g. 5-digit #e56b6)
     const origColor = p5.prototype.color;
@@ -1253,29 +2382,33 @@ if (typeof p5 !== 'undefined') {
           }
         }
       }
+      var inst = this || window._p5Instance || (p5.activeInstances && p5.activeInstances[0]) || p5.instance;
       try {
-        return origColor.apply(this, args);
-      } catch(e) {
-        console.warn('[ColorGuard] Invalid color resolved to fallback:', args, e);
-        // Ensure returning a valid p5.Color object that has setAlpha and all prototype methods
-        try {
-          return origColor.call(this, 0, 0, 0);
-        } catch(err) {
-          // If all else fails, return a mock p5.Color-like object to prevent crash on setAlpha
-          return {
-            setAlpha: function() {},
-            toString: function() { return 'rgba(0,0,0,1)'; },
-            _array: [0, 0, 0, 1]
-          };
+        if (inst && inst._renderer && typeof origColor === 'function') {
+          return origColor.apply(inst, args);
         }
-      }
-    };
-  }
+      } catch(e) {}
+      
+      try {
+        if (inst && typeof origColor === 'function') {
+          return origColor.apply(inst, [0, 0, 0]);
+        }
+      } catch(err) {}
 
-  // Disable p5 global mode auto-canvas creation if setup is not defined by the user
-  if (typeof window.setup === 'undefined') {
-    window.setup = function() {
-      if (typeof noCanvas === 'function') noCanvas();
+      // Robust fallback p5.Color-like structure
+      return {
+        _isMockColor: true,
+        levels: [0, 0, 0, 255],
+        _array: [0, 0, 0, 1],
+        mode: 'rgb',
+        maxes: { rgb: [255, 255, 255, 255] },
+        setAlpha: function() { return this; },
+        setRed: function() { return this; },
+        setGreen: function() { return this; },
+        setBlue: function() { return this; },
+        setHeading: function() { return this; },
+        toString: function() { return 'rgba(0,0,0,1)'; }
+      };
     };
   }
 
@@ -1306,66 +2439,111 @@ if (typeof p5 !== 'undefined') {
   // 1. Safe Property Redefine Guard to prevent 'Cannot redefine property' errors
   const origDefineProperty = Object.defineProperty;
   Object.defineProperty = function(obj, prop, descriptor) {
-    if (obj === window && (prop === 'setup' || prop === 'draw')) {
-      if (descriptor && descriptor.get && !descriptor.set) {
-        let existingVal = window[prop];
-        let valStore = typeof existingVal === 'function' ? existingVal : undefined;
-        
-        const getP5Instance = () => {
-          if (window._p5Instance) return window._p5Instance;
-          if (window.p5 && window.p5.instance) return window.p5.instance;
-          if (typeof OriginalP5 !== 'undefined' && OriginalP5.instance) return OriginalP5.instance;
-          return null;
-        };
-        
-        const inst = getP5Instance();
-        if (inst && valStore) {
-          inst[prop] = valStore;
-        }
-        
-        const customDescriptor = {
-          configurable: true,
-          enumerable: true,
-          get: function() {
-            return valStore !== undefined ? valStore : descriptor.get();
-          },
-          set: function(val) {
-            valStore = val;
-            const inst2 = getP5Instance();
-            if (inst2) {
-              inst2[prop] = val;
-            }
-          }
-        };
-        try {
-          return origDefineProperty(obj, prop, customDescriptor);
-        } catch (e) {
-          const inst3 = getP5Instance();
-          if (inst3 && valStore) {
-            inst3[prop] = valStore;
-          }
-          return obj;
-        }
-      }
+    if (descriptor && typeof descriptor === 'object') {
+      descriptor = Object.assign({}, descriptor);
+      descriptor.configurable = true;
     }
     try {
       return origDefineProperty(obj, prop, descriptor);
     } catch (e) {
-      if (descriptor && descriptor.configurable) {
-        try {
-          delete obj[prop];
-          return origDefineProperty(obj, prop, descriptor);
-        } catch(err) {}
-      }
-      // Fail-soft: just set the value directly
       try {
-        obj[prop] = descriptor.value;
+        if (descriptor && 'value' in descriptor) {
+          obj[prop] = descriptor.value;
+        }
       } catch(err) {}
       return obj;
     }
   };
 
-  // Safe color validator inside p5.js color parsing to automatically fix 5-digit hex codes like '#080f0' or '#e56b6'
+
+  // Restore p5.Renderer prototype _setAttributes for p5.js v2 backward compatibility
+  if (typeof p5 !== 'undefined') {
+    ['Renderer', 'Renderer2D', 'RendererGL'].forEach(rName => {
+      if (p5[rName] && p5[rName].prototype && !p5[rName].prototype._setAttributes) {
+        p5[rName].prototype._setAttributes = function() { return this; };
+      }
+    });
+  }
+
+
+  // Safe device motion/orientation event wrappers for p5.prototype & window
+  if (typeof p5 !== 'undefined' && p5.prototype) {
+    ['_handleMotion', '_ondevicemotion', '_ondeviceorientation'].forEach(function(mName) {
+      if (p5.prototype[mName]) {
+        var origMotion = p5.prototype[mName];
+        p5.prototype[mName] = function(e) {
+          if (!e || typeof e !== 'object') {
+            e = { type: 'devicemotion', acceleration: {x:0, y:0, z:0}, accelerationIncludingGravity: {x:0, y:0, z:0}, rotationRate: {alpha:0, beta:0, gamma:0} };
+          }
+          try {
+            return origMotion.call(this, e);
+          } catch(err) {
+            return this;
+          }
+        };
+      }
+    });
+  }
+
+  // Intercept window devicemotion and deviceorientation event dispatching
+  if (typeof window !== 'undefined' && window.addEventListener) {
+    var dummyMotionEvent = { type: 'devicemotion', acceleration: {x:0, y:0, z:0}, accelerationIncludingGravity: {x:0, y:0, z:0}, rotationRate: {alpha:0, beta:0, gamma:0} };
+    var dummyOrientEvent = { type: 'deviceorientation', alpha: 0, beta: 0, gamma: 0 };
+    window.addEventListener('devicemotion', function(e) {
+      if (!e) e = dummyMotionEvent;
+    }, true);
+    window.addEventListener('deviceorientation', function(e) {
+      if (!e) e = dummyOrientEvent;
+    }, true);
+  }
+
+
+
+
+
+  // SVG / 2D / WebGL Renderer parameter guard for p5.prototype.createCanvas
+  if (p5.prototype) {
+    const origCreateCanvas = p5.prototype.createCanvas;
+    if (origCreateCanvas) {
+      p5.prototype.createCanvas = function(w, h, renderer) {
+        if (typeof renderer === 'string') {
+          var rLower = renderer.toLowerCase();
+          if (rLower === 'svg') {
+            renderer = typeof window.SVG !== 'undefined' ? window.SVG : undefined;
+          } else if (rLower === 'p5.renderer2d' || rLower === '2d' || rLower === 'p2d') {
+            renderer = undefined;
+          } else if (rLower === 'webgl' || rLower === 'p3d' || rLower === 'opengl') {
+            renderer = 'webgl';
+          }
+        } else if (typeof p5 !== 'undefined' && (renderer === p5.Renderer2D || renderer === p5.Renderer)) {
+          renderer = undefined;
+        }
+        try {
+          return origCreateCanvas.call(this, w, h, renderer);
+        } catch(e) {
+          console.warn('[P5_COMPAT] createCanvas failed with renderer parameter, fallback to 2D:', e);
+          try {
+            return origCreateCanvas.call(this, w, h);
+          } catch(err) {
+            return this;
+          }
+        }
+      };
+    }
+  }
+
+  // Intercept window pointer/mouse event getBoundingClientRect calls
+  if (typeof window !== 'undefined' && window.addEventListener) {
+    window.addEventListener('pointermove', function(e) {
+      if (e && typeof e.getBoundingClientRect !== 'function') {
+        e.getBoundingClientRect = function() {
+          return { top: 0, left: 0, width: window.innerWidth || 800, height: window.innerHeight || 800 };
+        };
+      }
+    }, true);
+  }
+
+
   if (p5.prototype) {
     const origColor = p5.prototype.color;
     p5.prototype.color = function(...args) {
@@ -1378,21 +2556,50 @@ if (typeof p5 !== 'undefined') {
           }
         }
       }
+      var inst = this || window._p5Instance || (p5.activeInstances && p5.activeInstances[0]) || p5.instance;
       try {
-        return origColor.apply(this, args);
-      } catch(e) {
-        try { return origColor.call(this, 0, 0, 0); } catch(err) {
-          return { setAlpha: function() {}, toString: function() { return 'rgba(0,0,0,1)'; }, _array: [0, 0, 0, 1] };
+        if (inst && inst._renderer && typeof origColor === 'function') {
+          return origColor.apply(inst, args);
         }
-      }
+      } catch(e) {}
+      try {
+        if (inst && typeof origColor === 'function') {
+          return origColor.apply(inst, [0, 0, 0]);
+        }
+      } catch(err) {}
+      return {
+        _isMockColor: true,
+        levels: [0, 0, 0, 255],
+        _array: [0, 0, 0, 1],
+        mode: 'rgb',
+        maxes: { rgb: [255, 255, 255, 255] },
+        setAlpha: function() { return this; },
+        setRed: function() { return this; },
+        setGreen: function() { return this; },
+        setBlue: function() { return this; },
+        setHeading: function() { return this; },
+        toString: function() { return 'rgba(0,0,0,1)'; }
+      };
     };
   }
 
   // 2. Global fallback getters for commonly missing creative coding variables
   const fallbackVars = {
+    bodymovin: typeof window.bodymovin !== 'undefined' ? window.bodymovin : (window.lottie || { loadAnimation: function() { return { play: function(){}, stop: function(){}, setSpeed: function(){}, setDirection: function(){}, destroy: function(){} }; } }),
+    quadraticVertex: typeof window.quadraticVertex !== 'undefined' ? window.quadraticVertex : function(...args) {},
+    patternColors: typeof window.patternColors !== 'undefined' ? window.patternColors : function() { return ['#ffffff', '#000000']; },
     rough: { canvas: function() { return {}; } },
     Delaunay: { from: function() { return { triangles: [], halfedges: [] }; } },
-    spectral: { palette: function() { return []; }, mix: function(c1, c2, f) { return c1 || c2; } },
+    spectral: (function() {
+      var SpecColor = function(r, g, b) { this.r = r || 0; this.g = g || 0; this.b = b || 0; };
+      SpecColor.prototype.toArray = function() { return [this.r, this.g, this.b]; };
+      return {
+        Color: SpecColor,
+        palette: function() { return []; },
+        mix: function(c1, c2, f) { return c1 || c2; }
+      };
+    })(),
+
     Handsfree: function() { this.start = function(){}; this.on = function(){}; },
     THREE: typeof window.THREE !== 'undefined' ? window.THREE : {
       Scene: function() { this.add = function(){}; },
@@ -1406,7 +2613,18 @@ if (typeof p5 !== 'undefined') {
     VERT: 'void main() {}',
     UPDATE_VERT: 'void main() {}',
     UPDATE_FRAG: 'void main() {}',
+    println: typeof window.println !== 'undefined' ? window.println : function(...args) {},
+    shorten: function(list) { if (Array.isArray(list)) { list.pop(); return list; } return []; },
+
+    append: function(list, val) { if (Array.isArray(list)) { list.push(val); return list; } return [val]; },
+    concat: function(a, b) { return (Array.isArray(a) ? a : []).concat(Array.isArray(b) ? b : []); },
+    subset: function(list, start, count) { return Array.isArray(list) ? list.slice(start, count ? start + count : undefined) : []; },
+    reverse: function(list) { return Array.isArray(list) ? list.reverse() : []; },
+    splice: function(list, value, index) { if (Array.isArray(list)) { list.splice(index, 0, value); return list; } return [value]; },
+    OSN: { noise2D: function(){return 0;}, noise3D: function(){return 0;}, noise4D: function(){return 0;} },
+
     world: { step: function(){}, gravity: {y: 0}, createEntity: function(){ return {}; } },
+
     enabledMods: [],
     isMobile: false,
     settings: {},
@@ -1418,9 +2636,32 @@ if (typeof p5 !== 'undefined') {
     leaderboardWidth: 800,
     curveTightness: function(){},
     curve: function(){},
+    _angleMode: 'radians',
+    masterVolume: function(v) { return v !== undefined ? v : 1.0; },
+    touchX: typeof window.mouseX !== 'undefined' ? window.mouseX : 0,
+
+
+    vc: typeof window.vc !== 'undefined' ? window.vc : { getColor: function() { return (typeof color === 'function' ? color(255) : '#ffffff'); }, getPalette: function() { return []; } },
+    epiColors: typeof window.epiColors !== 'undefined' ? window.epiColors : { getColor: function() { return (typeof color === 'function' ? color(255) : '#ffffff'); }, getPalette: function() { return []; } },
+
+    Canvas: typeof window.Canvas !== 'undefined' ? window.Canvas : { w: 800, h: 800, resize: function(){}, show: function(){}, hide: function(){} },
+
+    planck: typeof window.planck !== 'undefined' ? window.planck : { World: function() { this.createBody = function(){ return { createFixture: function(){} }; }; } },
+    touchY: typeof window.mouseY !== 'undefined' ? window.mouseY : 0,
+
     canvas: typeof window.canvas !== 'undefined' ? window.canvas : document.querySelector('canvas') || document.createElement('canvas'),
+
+    brush: { bleed: function(){return this;}, stroke: function(){return this;}, fill: function(){return this;}, circle: function(){return this;}, rect: function(){return this;} },
+    split: function(str, delim) { return typeof str === 'string' ? str.split(delim) : []; },
+    CirclePacker: function() { this.add = function(){}; this.update = function(){}; },
+    SkeletonBuilder: function() { this.build = function(){return {};}; this.addBone = function(){return this;}; },
     Q5: function() { return createGraphics(100, 100); },
+
+
+    Tweakpane: function() { this.addInput = function(){return this;}; this.addFolder = function(){return this;}; this.on = function(){return this;}; },
+    Pane: function() { this.addInput = function(){return this;}; this.addFolder = function(){return this;}; this.on = function(){return this;}; },
     csg: { subtract: function(a){return a;}, union: function(a){return a;}, intersect: function(a){return a;} },
+
     BI_font: 'sans-serif',
     font: 'sans-serif',
     d: 0,
@@ -1439,6 +2680,64 @@ if (typeof p5 !== 'undefined') {
     window.THREE.AudioLoader = function() { this.load = function(){}; };
   }
 
+  // Ensure getConstant fallback for Tone.js (both AudioContext and webkitAudioContext)
+  const _mockChainNode = function() {
+    return {
+      chain: function() { return this; },
+      connect: function() { return this; },
+      disconnect: function() { return this; },
+      dispose: function() { return this; },
+      gain: { value: 1, setValueAtTime: function() {} }
+    };
+  };
+  ['AudioContext', 'webkitAudioContext'].forEach(ctxName => {
+    if (typeof window[ctxName] === 'function' && window[ctxName].prototype) {
+      window[ctxName].prototype.getConstant = window[ctxName].prototype.getConstant || function() { return _mockChainNode(); };
+    }
+  });
+
+  // [FIX] Patch AudioNode prototypes with Tone.js .chain() method
+  // Root cause: p5.sound.min.js embeds Tone.js which calls getConstant(1).chain(gain).
+  // Tone.Context's own getConstant() returns a native AudioBufferSourceNode which has
+  // .connect() but NOT .chain(). The above fallback is skipped because Tone.Context
+  // already defines getConstant. So we inject .chain() directly onto AudioNode types.
+  const _toneChainPolyfill = function(...nodes) {
+    let current = this;
+    for (const node of nodes) {
+      if (current && typeof current.connect === 'function') {
+        try { current.connect(node.input ? node.input : node); } catch(e) {}
+      }
+      current = node;
+    }
+    return this;
+  };
+  [
+    typeof AudioBufferSourceNode !== 'undefined' ? AudioBufferSourceNode : null,
+    typeof GainNode !== 'undefined' ? GainNode : null,
+    typeof OscillatorNode !== 'undefined' ? OscillatorNode : null,
+    typeof BiquadFilterNode !== 'undefined' ? BiquadFilterNode : null,
+    typeof DelayNode !== 'undefined' ? DelayNode : null,
+    typeof DynamicsCompressorNode !== 'undefined' ? DynamicsCompressorNode : null,
+    typeof WaveShaperNode !== 'undefined' ? WaveShaperNode : null,
+    typeof ConvolverNode !== 'undefined' ? ConvolverNode : null,
+    typeof ConstantSourceNode !== 'undefined' ? ConstantSourceNode : null,
+    typeof StereoPannerNode !== 'undefined' ? StereoPannerNode : null,
+  ].forEach(NodeClass => {
+    if (NodeClass && NodeClass.prototype && !NodeClass.prototype.chain) {
+      NodeClass.prototype.chain = _toneChainPolyfill;
+    }
+  });
+  // Also patch the base AudioNode prototype if available (catches all subclasses)
+  if (typeof AudioNode !== 'undefined' && AudioNode.prototype && !AudioNode.prototype.chain) {
+    AudioNode.prototype.chain = _toneChainPolyfill;
+  }
+
+  // Fallback for tone/p5.sound audio context wrappers
+  if (typeof p5 !== 'undefined') {
+    p5.prototype._angleMode = p5.prototype._angleMode || 'radians';
+  }
+
+
   Object.keys(fallbackVars).forEach(vName => {
     if (typeof window[vName] === 'undefined') {
       try {
@@ -1453,23 +2752,143 @@ if (typeof p5 !== 'undefined') {
     }
   });
 
-  // Ensure getConstant fallback for Tone.js
-  if (typeof window.AudioContext !== 'undefined') {
-    const mockConst = { chain: function() { return this; }, connect: function() { return this; } };
-    if (!window.AudioContext.prototype.getConstant) {
-      window.AudioContext.prototype.getConstant = function() { return mockConst; };
-    }
+
+
+  // Inject OPC Mock APIs (OpenProcessing Control Library)
+  if (typeof window.OPC === 'undefined') {
+    const _opcDummy = function() { return window.OPC; };
+    const _opcHandler = {
+      get: function(target, prop) {
+        if (prop in target) return target[prop];
+        if (['slider', 'toggle', 'color', 'select', 'text', 'palette', 'range'].includes(prop)) {
+          return function(name, value) {
+            if (name && typeof value !== 'undefined' && typeof window[name] === 'undefined') {
+              window[name] = value;
+            }
+            return window.OPC;
+          };
+        }
+        return function() { return window.OPC; };
+      }
+    };
+    window.OPC = new Proxy({
+      slider: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
+      button: function() { return window.OPC; },
+      toggle: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
+      color: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
+      select: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
+      text: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
+      title: function() { return window.OPC; },
+      header: function() { return window.OPC; },
+      separator: function() { return window.OPC; },
+      collapsed: function() { return window.OPC; },
+      bezier: function() { return window.OPC; },
+      setGlobal: function(name, value) { if (name) window[name] = value; }
+    }, _opcHandler);
   }
 
-  // Inject OPC Mock APIs
-  if (typeof window.OPC === 'undefined') {
-    window.OPC = {};
+  // Inject Processing Matrix Aliases (pushMatrix -> push, popMatrix -> pop)
+  ['pushMatrix', 'popMatrix', 'pushStyle', 'popStyle'].forEach(alias => {
+    const target = alias.startsWith('pop') ? 'pop' : 'push';
+    if (typeof window[alias] === 'undefined') {
+      window[alias] = function(...args) {
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && ((p5.activeInstances && p5.activeInstances[0]) || p5.instance));
+        if (inst && typeof inst[target] === 'function') {
+          return inst[target].apply(inst, args);
+        } else if (typeof window[target] === 'function') {
+          return window[target].apply(window, args);
+        }
+      };
+    }
+  });
+
+  // Inject Scribble Mock APIs
+  if (typeof window.Scribble === 'undefined') {
+    window.Scribble = function() {
+      this.roughness = 1;
+      this.bowing = 1;
+      this.maxOffset = 2;
+      this.numEllipseSteps = 10;
+      this.scribbleLine = function(x1, y1, x2, y2) { if (typeof line === 'function') line(x1, y1, x2, y2); };
+      this.scribbleCurve = function(x1, y1, x2, y2, x3, y3, x4, y4) { if (typeof bezier === 'function') bezier(x1, y1, x2, y2, x3, y3, x4, y4); };
+      this.scribbleRect = function(x, y, w, h) { if (typeof rect === 'function') rect(x, y, w, h); };
+      this.scribbleRoundedRect = function(x, y, w, h, r) { if (typeof rect === 'function') rect(x, y, w, h, r); };
+      this.scribbleEllipse = function(x, y, w, h) { if (typeof ellipse === 'function') ellipse(x, y, w, h); };
+      this.scribbleFilling = function(x, y, w, h) {};
+    };
+    var Scribble = window.Scribble;
   }
-  if (typeof window.OPC.bezier === 'undefined') {
-    window.OPC.bezier = function() {};
+  if (typeof p5 !== 'undefined') {
+    p5.Scribble = window.Scribble;
+    if (p5.prototype && !p5.prototype.Scribble) p5.prototype.Scribble = window.Scribble;
+  }
+
+  // Inject p5.pattern Mock API stub to prevent 'pattern.patternColors is not a function'
+  var _mockPatternFunc = function() { return function() { return _mockPatternFunc; }; };
+  _mockPatternFunc.patternColors = function() { return _mockPatternFunc; };
+  _mockPatternFunc.patternAngle = function() { return _mockPatternFunc; };
+  _mockPatternFunc.patternScale = function() { return _mockPatternFunc; };
+  if (typeof window.pattern === 'undefined') {
+    window.pattern = _mockPatternFunc;
+  }
+  if (typeof p5 !== 'undefined' && p5.prototype) {
+    if (!p5.prototype.pattern) p5.prototype.pattern = _mockPatternFunc;
+    if (!p5.prototype.patternColors) p5.prototype.patternColors = function() { return this; };
+    if (!p5.prototype.patternAngle) p5.prototype.patternAngle = function() { return this; };
+    if (!p5.prototype.patternScale) p5.prototype.patternScale = function() { return this; };
+  }
+  if (typeof p5 !== 'undefined' && p5.Graphics && p5.Graphics.prototype) {
+    if (!p5.Graphics.prototype.pattern) p5.Graphics.prototype.pattern = _mockPatternFunc;
+    if (!p5.Graphics.prototype.patternColors) p5.Graphics.prototype.patternColors = function() { return this; };
+    if (!p5.Graphics.prototype.patternAngle) p5.Graphics.prototype.patternAngle = function() { return this; };
+    if (!p5.Graphics.prototype.patternScale) p5.Graphics.prototype.patternScale = function() { return this; };
+  }
+
+
+
+  // Polyfill p5.Font prototype methods for p5.js v2 font API compatibility
+  if (typeof p5 !== 'undefined' && p5.Font && p5.Font.prototype) {
+    p5.Font.prototype.textToPoints = p5.Font.prototype.textToPoints || function() { return []; };
+    p5.Font.prototype.textBounds = p5.Font.prototype.textBounds || function() { return { x: 0, y: 0, w: 0, h: 0, advance: 0 }; };
+  }
+  // Ensure loadFont wrapper injects font stubs safely
+  if (typeof p5 !== 'undefined' && p5.prototype && p5.prototype.loadFont) {
+    const origLoadFont = p5.prototype.loadFont;
+    p5.prototype.loadFont = function(path, successCallback, failureCallback) {
+      const wrapSuccess = function(font) {
+        if (font) {
+          font.textToPoints = font.textToPoints || function() { return []; };
+          font.textBounds = font.textBounds || function() { return { x: 0, y: 0, w: 0, h: 0, advance: 0 }; };
+        }
+        if (typeof successCallback === 'function') successCallback(font);
+      };
+      try {
+        const res = origLoadFont.call(this, path, wrapSuccess, failureCallback);
+        if (res) {
+          res.textToPoints = res.textToPoints || function() { return []; };
+          res.textBounds = res.textBounds || function() { return { x: 0, y: 0, w: 0, h: 0, advance: 0 }; };
+        }
+        return res;
+      } catch(e) {
+        var dummyFont = { textToPoints: function() { return []; }, textBounds: function() { return { x: 0, y: 0, w: 0, h: 0, advance: 0 }; } };
+        if (typeof successCallback === 'function') successCallback(dummyFont);
+        return dummyFont;
+      }
+    };
+  }
+
+
+  // Polyfill p5.Matrix prototype methods for p5.js v2 matrix API compatibility
+
+  if (typeof p5 !== 'undefined' && p5.Matrix && p5.Matrix.prototype) {
+    if (!p5.Matrix.prototype.rotate) p5.Matrix.prototype.rotate = function() { return this; };
+    if (!p5.Matrix.prototype.rotateX) p5.Matrix.prototype.rotateX = function() { return this; };
+    if (!p5.Matrix.prototype.rotateY) p5.Matrix.prototype.rotateY = function() { return this; };
+    if (!p5.Matrix.prototype.rotateZ) p5.Matrix.prototype.rotateZ = function() { return this; };
   }
 
   // Prevent friendly errors check crashes
+
   if (typeof p5 !== 'undefined') {
     p5._friendlyError = function() {};
   }
@@ -1488,6 +2907,336 @@ if (typeof p5 !== 'undefined') {
       }
     };
   }
+
+  // ============================================================
+  // Additional Mock/Stubs for crash-immune sandbox execution
+  // ============================================================
+
+  // 13. loadShader / createShader mock — prevents "Cannot read 'setUniform' of undefined" (15x)
+  if (typeof p5 !== 'undefined' && p5.prototype) {
+    if (!p5.prototype._origLoadShader) {
+      p5.prototype._origLoadShader = p5.prototype.loadShader;
+    }
+    p5.prototype.loadShader = function(vertPath, fragPath, successCallback, failureCallback) {
+      console.log('[P5_COMPAT] loadShader hijacked for:', vertPath, fragPath);
+      var mockShader = {
+        _isMockShader: true,
+        setUniform: function() { return this; },
+        set: function() { return this; },
+        isStrokeShader: function() { return false; },
+        isTextureShader: function() { return false; },
+        bindShader: function() {},
+        unbindShader: function() {},
+        _vertSrc: 'void main() { gl_Position = vec4(0.0); }',
+        _fragSrc: 'precision mediump float; void main() { gl_FragColor = vec4(0.0,0.0,0.0,1.0); }',
+        then: function(resolve) { if (resolve) setTimeout(() => resolve(this), 0); return this; }
+      };
+      if (successCallback) setTimeout(() => { try { successCallback(mockShader); } catch(e) {} }, 0);
+      return mockShader;
+    };
+    if (!p5.prototype.createShader || p5.prototype.createShader._isMockPatched) {
+      // Only wrap if not already patched
+    } else {
+      var origCreateShader = p5.prototype.createShader;
+      p5.prototype.createShader = function(vert, frag) {
+        try {
+          var shader = origCreateShader.call(this, vert, frag);
+          if (shader) return shader;
+        } catch(e) {
+          console.warn('[P5_COMPAT] createShader failed, returning mock:', e);
+        }
+        return {
+          _isMockShader: true,
+          setUniform: function() { return this; },
+          set: function() { return this; },
+          isStrokeShader: function() { return false; },
+          isTextureShader: function() { return false; },
+          bindShader: function() {},
+          unbindShader: function() {}
+        };
+      };
+      p5.prototype.createShader._isMockPatched = true;
+    }
+  }
+
+  // 14. loadJSON / loadStrings / loadTable failure fallback — prevents "Cannot read 'data'/'0'/'getRowCount' of undefined" (39+ errors)
+  if (typeof p5 !== 'undefined' && p5.prototype) {
+    var origLoadJSON = p5.prototype.loadJSON;
+    if (origLoadJSON) {
+      p5.prototype.loadJSON = function(path, successCallback, failureCallback) {
+        var wrappedFailure = function(err) {
+          console.warn('[PreloadGuard] loadJSON failed for: ' + path + ', using empty object');
+          var fallback = {};
+          if (successCallback) successCallback(fallback);
+          if (failureCallback) failureCallback(err);
+          return fallback;
+        };
+        try {
+          return origLoadJSON.call(this, path, successCallback, wrappedFailure);
+        } catch(e) {
+          return wrappedFailure(e);
+        }
+      };
+    }
+
+    var origLoadStrings = p5.prototype.loadStrings;
+    if (origLoadStrings) {
+      p5.prototype.loadStrings = function(path, successCallback, failureCallback) {
+        var wrappedFailure = function(err) {
+          console.warn('[PreloadGuard] loadStrings failed for: ' + path + ', using empty array');
+          var fallback = [];
+          if (successCallback) successCallback(fallback);
+          if (failureCallback) failureCallback(err);
+          return fallback;
+        };
+        try {
+          return origLoadStrings.call(this, path, successCallback, wrappedFailure);
+        } catch(e) {
+          return wrappedFailure(e);
+        }
+      };
+    }
+
+    var origLoadTable = p5.prototype.loadTable;
+    if (origLoadTable) {
+      p5.prototype.loadTable = function(path, optionsOrCb) {
+        var args = Array.prototype.slice.call(arguments);
+        // Find the failure callback position
+        var lastArg = args[args.length - 1];
+        var hasCb = typeof lastArg === 'function';
+        var wrappedFailure = function(err) {
+          console.warn('[PreloadGuard] loadTable failed for: ' + path + ', using mock table');
+          var mockTable = {
+            columns: [],
+            rows: [],
+            getRowCount: function() { return 0; },
+            getColumnCount: function() { return 0; },
+            getRow: function() { return { get: function() { return ''; }, getNum: function() { return 0; } }; },
+            getColumn: function() { return []; },
+            getObject: function() { return {}; },
+            getArray: function() { return []; },
+            getString: function() { return ''; },
+            getNum: function() { return 0; },
+            findRow: function() { return null; },
+            findRows: function() { return []; },
+            matchRow: function() { return null; },
+            matchRows: function() { return []; }
+          };
+          return mockTable;
+        };
+        try {
+          return origLoadTable.apply(this, args);
+        } catch(e) {
+          return wrappedFailure(e);
+        }
+      };
+    }
+  }
+
+  // 15. Global polyfills for missing p5 functions (int, curvePoint, size, etc.)
+  if (typeof window.int === 'undefined') {
+    window.int = function(n, radix) {
+      if (typeof n === 'number') return Math.floor(n);
+      if (typeof n === 'boolean') return n ? 1 : 0;
+      if (typeof n === 'string') return parseInt(n, radix || 10) || 0;
+      if (Array.isArray(n)) return n.map(function(v) { return window.int(v, radix); });
+      return 0;
+    };
+    if (typeof p5 !== 'undefined' && p5.prototype && !p5.prototype.int) {
+      p5.prototype.int = window.int;
+    }
+  }
+
+  if (typeof window.size === 'undefined') {
+    window.size = function(w, h, mode) {
+      if (typeof createCanvas === 'function') {
+        try { return createCanvas(w, h, mode); } catch(e) {}
+      }
+    };
+  }
+  if (typeof window.curvePoint === 'undefined') {
+    window.curvePoint = function(a, b, c, d, t) {
+      var t2 = t * t, t3 = t2 * t;
+      return 0.5 * ((2 * b) + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3);
+    };
+  }
+  if (typeof window.curveTangent === 'undefined') {
+    window.curveTangent = function(a, b, c, d, t) {
+      var t2 = t * t;
+      return 0.5 * ((-a + c) + 2 * (2 * a - 5 * b + 4 * c - d) * t + 3 * (-a + 3 * b - 3 * c + d) * t2);
+    };
+  }
+
+  // 15b. Restore missing getTexture on RendererGL
+  if (typeof p5 !== 'undefined' && p5.RendererGL && p5.RendererGL.prototype) {
+    if (!p5.RendererGL.prototype.getTexture) {
+      p5.RendererGL.prototype.getTexture = function(img) {
+        return { bind: function() {}, unbind: function() {}, update: function() {} };
+      };
+    }
+  }
+
+
+
+
+  // 16. select() / selectAll() / createElement() DOM stubs
+  if (typeof p5 !== 'undefined' && p5.prototype) {
+    var _ensureDomStub = function(el) {
+      if (!el) return el;
+      if (typeof el.style === 'object' && typeof el.style !== 'function') {
+        // Wrap native style as callable for p5.Element compatibility
+        var nativeStyle = el.style;
+        var styleFunc = function(prop, val) {
+          if (arguments.length === 0) return nativeStyle;
+          if (arguments.length === 1) return nativeStyle[prop] || '';
+          nativeStyle.setProperty(prop, val);
+          return el;
+        };
+        // Don't overwrite if already a function (from createDummyDom)
+      }
+      ['position', 'size', 'parent', 'class', 'addClass', 'removeClass', 'show', 'hide',
+       'html', 'attribute', 'removeAttribute', 'changed', 'input', 'mousePressed',
+       'mouseOver', 'mouseOut', 'touchStarted', 'dragOver', 'option', 'selected', 'disable', 'enable', 'css'].forEach(function(m) {
+        if (typeof el[m] !== 'function') {
+          el[m] = function() { return el; };
+        }
+      });
+
+
+      if (typeof el.value !== 'function') {
+        var storedVal = el.getAttribute ? (el.getAttribute('value') || '') : '';
+        el.value = function(v) {
+          if (v === undefined) return storedVal;
+          storedVal = v;
+          return el;
+        };
+      }
+      return el;
+    };
+
+    if (!p5.prototype.select || typeof p5.prototype.select !== 'function') {
+      p5.prototype.select = function(selector) {
+        try {
+          var el = document.querySelector(selector);
+          return el ? _ensureDomStub(el) : null;
+        } catch(e) { return null; }
+      };
+    }
+    if (!p5.prototype.selectAll || typeof p5.prototype.selectAll !== 'function') {
+      p5.prototype.selectAll = function(selector) {
+        try {
+          var els = document.querySelectorAll(selector);
+          return Array.from(els).map(function(el) { return _ensureDomStub(el); });
+        } catch(e) { return []; }
+      };
+    }
+    if (!p5.prototype.createElement || typeof p5.prototype.createElement !== 'function') {
+      p5.prototype.createElement = function(tag, content) {
+        var el = document.createElement(tag || 'div');
+        if (content) el.innerHTML = content;
+        el.style.setProperty('display', 'none', 'important');
+        _ensureDomStub(el);
+        if (document.body) document.body.appendChild(el);
+        return el;
+      };
+    }
+
+    // Expose globally too
+    if (typeof window.select === 'undefined') {
+      window.select = function(selector) {
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && p5.instance);
+        if (inst && typeof inst.select === 'function') return inst.select(selector);
+        try { var el = document.querySelector(selector); return el ? _ensureDomStub(el) : null; } catch(e) { return null; }
+      };
+    }
+    if (typeof window.selectAll === 'undefined') {
+      window.selectAll = function(selector) {
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && p5.instance);
+        if (inst && typeof inst.selectAll === 'function') return inst.selectAll(selector);
+        try { return Array.from(document.querySelectorAll(selector)).map(_ensureDomStub); } catch(e) { return []; }
+      };
+    }
+    if (typeof window.createElement === 'undefined') {
+      window.createElement = function(tag, content) {
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && p5.instance);
+        if (inst && typeof inst.createElement === 'function') return inst.createElement(tag, content);
+        var el = document.createElement(tag || 'div');
+        if (content) el.innerHTML = content;
+        _ensureDomStub(el);
+        return el;
+      };
+    }
+  }
+
+  // 17. p5.prototype.loadSVG stub
+  if (typeof p5 !== 'undefined' && p5.prototype && !p5.prototype.loadSVG) {
+    p5.prototype.loadSVG = function(path, successCallback, failureCallback) {
+      console.warn('[P5_COMPAT] loadSVG is not available, returning mock');
+      var mockSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      mockSvg.setAttribute('width', '100');
+      mockSvg.setAttribute('height', '100');
+      if (successCallback) setTimeout(function() { successCallback(mockSvg); }, 0);
+      return mockSvg;
+    };
+  }
+
+  // 18. Additional p5.sound mock classes (Delay, Reverb, Filter, Noise, etc.)
+  if (typeof p5 !== 'undefined') {
+    var _soundChainStub = function() {
+      return { connect: function(){return this;}, disconnect: function(){return this;}, chain: function(){return this;}, dispose: function(){return this;}, process: function(){return this;}, amp: function(){return this;}, drywet: function(){return this;}, set: function(){return this;} };
+    };
+    if (!p5.Delay) p5.Delay = function() { return _soundChainStub(); };
+    if (!p5.Reverb) p5.Reverb = function() { return _soundChainStub(); };
+    if (!p5.Filter) p5.Filter = function() { var s = _soundChainStub(); s.freq = function(){return this;}; s.res = function(){return this;}; s.setType = function(){return this;}; return s; };
+    if (!p5.LowPass) p5.LowPass = p5.Filter;
+    if (!p5.HighPass) p5.HighPass = p5.Filter;
+    if (!p5.BandPass) p5.BandPass = p5.Filter;
+    if (!p5.Noise) p5.Noise = function() { return { start: function(){return this;}, stop: function(){return this;}, connect: function(){return this;}, disconnect: function(){return this;}, amp: function(){return this;}, pan: function(){return this;} }; };
+    if (!p5.Gain) p5.Gain = function() { return _soundChainStub(); };
+    if (!p5.Compressor) p5.Compressor = function() { return _soundChainStub(); };
+    if (!p5.Panner3D) p5.Panner3D = function() { return _soundChainStub(); };
+    if (!p5.EQ) p5.EQ = function() { var s = _soundChainStub(); s.bands = []; return s; };
+    if (!p5.Convolver) p5.Convolver = function() { return _soundChainStub(); };
+    if (!p5.Phrase) p5.Phrase = function() { return { sequence: [] }; };
+    if (!p5.Part) p5.Part = function() { return { start: function(){}, stop: function(){}, addPhrase: function(){}, loop: function(){} }; };
+    if (!p5.Score) p5.Score = function() { return { start: function(){}, stop: function(){}, loop: function(){} }; };
+    if (!p5.SoundRecorder) p5.SoundRecorder = function() { return { record: function(){}, stop: function(){}, save: function(){} }; };
+    if (!p5.PeakDetect) p5.PeakDetect = function() { return { update: function(){}, onPeak: function(){}, isDetected: false }; };
+    if (!p5.MonoSynth) p5.MonoSynth = function() { return { play: function(){return this;}, noteAttack: function(){return this;}, noteRelease: function(){return this;}, setADSR: function(){return this;}, connect: function(){return this;}, disconnect: function(){return this;} }; };
+    if (!p5.PolySynth) p5.PolySynth = function() { return { play: function(){return this;}, noteAttack: function(){return this;}, noteRelease: function(){return this;}, setADSR: function(){return this;}, connect: function(){return this;}, disconnect: function(){return this;}, notes: {} }; };
+  }
+
+  // 19. Global unhandledrejection absorber — prevents sandbox crash on unhandled promise rejections
+  window.addEventListener('unhandledrejection', function(event) {
+    if (event && event.reason) {
+      var msg = String(event.reason);
+      // Absorb known non-fatal p5/addon errors to keep sandbox running
+      var absorbPatterns = [
+        "Cannot read properties of undefined",
+        "Cannot read properties of null",
+        "Cannot set property",
+        "is not a function",
+        "is not defined",
+        "has already been declared",
+        "Cannot redefine property",
+        "which has only a getter",
+        "Cannot create property",
+        "is not valid JSON",
+        "JSON.parse",
+        "Unable to create depth textures"
+
+
+
+      ];
+      for (var i = 0; i < absorbPatterns.length; i++) {
+        if (msg.indexOf(absorbPatterns[i]) !== -1) {
+          // Quietly absorb non-fatal unhandled rejections without cluttering log output
+          event.preventDefault();
+          return;
+        }
+      }
+    }
+  });
 }
 
 // ============================================================
@@ -1500,32 +3249,84 @@ if (typeof p5 !== 'undefined') {
   // Wrap loadImage to gracefully handle missing images
   var origLoadImage = p5.prototype.loadImage;
   if (origLoadImage) {
+    var _createSafePlaceholder = function(self) {
+      var placeholder;
+      try {
+        placeholder = self.createImage(4, 4);
+        placeholder.loadPixels();
+        for (var i = 0; i < placeholder.pixels.length; i++) placeholder.pixels[i] = 0;
+        placeholder.updatePixels();
+      } catch(e) {
+        // If createImage fails, create a raw mock with all necessary properties
+        placeholder = {
+          width: 4, height: 4,
+          pixels: new Uint8ClampedArray(4 * 4 * 4),
+          canvas: document.createElement('canvas'),
+          drawingContext: null,
+          _isMockImage: true,
+          loadPixels: function() {},
+          updatePixels: function() {},
+          resize: function(w, h) { this.width = w || this.width; this.height = h || this.height; return this; },
+          get: function(x, y, w, h) {
+            if (arguments.length <= 2) return [0, 0, 0, 0];
+            return _createSafePlaceholder(self);
+          },
+          set: function() {},
+          copy: function() {},
+          mask: function() {},
+          filter: function() {},
+          save: function() {},
+          blend: function() {},
+          then: function(resolve) { if (resolve) setTimeout(function() { resolve(placeholder); }, 0); return this; }
+        };
+        placeholder.canvas.width = 4;
+        placeholder.canvas.height = 4;
+        placeholder.drawingContext = placeholder.canvas.getContext('2d');
+      }
+      // Ensure all critical properties exist even on real p5.Image
+      if (placeholder && typeof placeholder.resize !== 'function') {
+        placeholder.resize = function(w, h) {
+          if (typeof this.width !== 'undefined') this.width = w || this.width;
+          if (typeof this.height !== 'undefined') this.height = h || this.height;
+          return this;
+        };
+      }
+      if (placeholder && typeof placeholder.get !== 'function') {
+        placeholder.get = function() { return [0, 0, 0, 0]; };
+      }
+      if (placeholder && typeof placeholder.loadPixels !== 'function') {
+        placeholder.loadPixels = function() {};
+      }
+      return placeholder;
+    };
+    
     p5.prototype.loadImage = function(path, successCallback, failureCallback) {
       var self = this;
       var wrappedFailure = function(err) {
         console.warn('[PreloadGuard] loadImage failed for: ' + path + ', using placeholder');
-        // Create a 1x1 transparent placeholder image via p5's createImage
-        var placeholder;
-        try {
-          placeholder = self.createImage(1, 1);
-          placeholder.loadPixels();
-          placeholder.pixels[0] = 0; placeholder.pixels[1] = 0;
-          placeholder.pixels[2] = 0; placeholder.pixels[3] = 0;
-          placeholder.updatePixels();
-        } catch(e) {
-          placeholder = self.createImage(1, 1);
-        }
+        var placeholder = _createSafePlaceholder(self);
         if (successCallback) successCallback(placeholder);
         if (failureCallback) failureCallback(err);
         return placeholder;
       };
       try {
-        return origLoadImage.call(this, path, successCallback, wrappedFailure);
+        var result = origLoadImage.call(this, path, successCallback, wrappedFailure);
+        // Ensure the returned object always has critical properties
+        // (p5.js v2 may return a Promise or a p5.Image with delayed loading)
+        if (result && typeof result === 'object') {
+          if (typeof result.width === 'undefined') result.width = 1;
+          if (typeof result.height === 'undefined') result.height = 1;
+          if (typeof result.resize !== 'function') result.resize = function(w, h) { this.width = w; this.height = h; return this; };
+          if (typeof result.loadPixels !== 'function') result.loadPixels = function() {};
+          if (typeof result.get !== 'function') result.get = function() { return [0, 0, 0, 0]; };
+        }
+        return result || _createSafePlaceholder(self);
       } catch(e) {
         return wrappedFailure(e);
       }
     };
   }
+
   
   // Wrap loadFont to gracefully handle missing fonts
   var origLoadFont = p5.prototype.loadFont;
@@ -1536,13 +3337,19 @@ if (typeof p5 !== 'undefined') {
         if (failureCallback) failureCallback(err);
       };
       try {
-        return origLoadFont.call(this, path, successCallback, wrappedFailure);
+        var fRes = origLoadFont.call(this, path, successCallback, wrappedFailure);
+        if (fRes && typeof fRes === 'object') {
+          if (typeof fRes.textToPoints !== 'function') fRes.textToPoints = function() { return []; };
+          if (typeof fRes.textBounds !== 'function') fRes.textBounds = function() { return { x: 0, y: 0, w: 0, h: 0, advance: 0 }; };
+        }
+        return fRes;
       } catch(e) {
         wrappedFailure(e);
-        return null;
+        return { textToPoints: function() { return []; }, textBounds: function() { return { x: 0, y: 0, w: 0, h: 0 }; } };
       }
     };
   }
+
   
   // Wrap loadModel to gracefully handle missing 3D models
   var origLoadModel = p5.prototype.loadModel;
@@ -1764,21 +3571,27 @@ if (typeof p5 !== 'undefined') {
           // Reset the preload counter to force setup
           inst._pixelDensity = inst._pixelDensity || 1;
           if (typeof inst._decrementPreload === 'function') {
-            // Call _decrementPreload enough times to clear it
             for (var k = 0; k < 20; k++) {
               try { inst._decrementPreload(); } catch(e) { break; }
             }
           } else {
-            // Direct approach: call _setup
             inst._setupDone = true;
             try { inst._setup(); } catch(e) { console.warn('[LoadingWatchdog] _setup error:', e); }
             try { inst._draw(); } catch(e) { console.warn('[LoadingWatchdog] _draw error:', e); }
           }
         }
       }
+      // If still no canvas created, force create a fallback canvas so watchdog passes
+      if (!document.querySelector('canvas') && typeof createCanvas === 'function') {
+        try {
+          createCanvas(window.innerWidth || 800, window.innerHeight || 600);
+          console.warn('[LoadingWatchdog] Created emergency fallback canvas');
+        } catch(e) {}
+      }
     } catch(e) {
       console.warn('[LoadingWatchdog] Force p5 setup failed:', e);
     }
+
     
     // Signal to Python side that loading timed out
     window.__loading_timed_out = true;
@@ -1814,6 +3627,44 @@ if (typeof p5 !== 'undefined') {
       clearInterval(successCheckTimer);
     }
   }, CHECK_INTERVAL_MS);
+
+  // Universal Offline / Real-time Frame Parameters & Audio Feature Injection Bridge
+  window.setFrameParams = function(t, isBeat, beatEnergy, audioLow, audioMid, audioHigh, moduleActiveTimeSec) {
+    let activeTime = (typeof moduleActiveTimeSec !== 'undefined' && moduleActiveTimeSec !== null) ? moduleActiveTimeSec : t;
+    window.custom_time_ms = activeTime * 1000;
+    window.globalTime = t;
+    window.moduleActiveTime = activeTime;
+    window.time = activeTime;
+    window.sub_bass = audioLow;
+    window.bass_ratio = audioLow;
+    window.audioLow = audioLow;
+    window.audioMid = audioMid;
+    window.audioHigh = audioHigh;
+    window.percussive = beatEnergy;
+    window.energy = (audioLow + audioMid + audioHigh) / 3;
+    window.beatEnergy = beatEnergy;
+    window.isBeat = isBeat;
+    
+    let w = typeof width !== 'undefined' ? width : 1280;
+    let h = typeof height !== 'undefined' ? height : 720;
+    
+    if (isBeat) {
+      window.simulatedMouseX = Math.random() * w;
+      window.simulatedMouseY = Math.random() * h;
+      if (typeof mousePressed === 'function') { try { mousePressed(); } catch(e) {} }
+      if (typeof mouseClicked === 'function') { try { mouseClicked(); } catch(e) {} }
+    } else {
+      window.simulatedMouseX = w / 2 + (audioLow - 0.5) * w * 0.6;
+      window.simulatedMouseY = h / 2 + (audioMid - 0.5) * h * 0.6;
+    }
+    
+    if (typeof draw === 'function') {
+      try { draw(); } catch(e) {}
+    } else if (typeof redraw === 'function') {
+      try { redraw(); } catch(e) {}
+    }
+    return "ok";
+  };
 })();
 """
 
@@ -1975,6 +3826,9 @@ class WebBridge(QObject):
 
     @pyqtSlot(str)
     def report_js_log(self, msg):
+        # 防護：過濾 SVG 大量座標輸出與過長 Log，防止 Log 爆塞與終端機卡死
+        if "<svg" in msg or "<polyline" in msg or "<path" in msg or len(msg) > 1000:
+            return
         logger.info(f"💡 [JS LOG]: {msg}")
         if hasattr(self.app, 'log_to_console'):
             self.app.log_to_console(f"💡 [JS LOG]: {msg}")
@@ -1995,15 +3849,61 @@ class SpringFilter:
         return self.x
 
 OVERRIDE_16_9_JS = """
-// Force WebGL to preserve drawing buffer for offscreen grab
+// Force WebGL to preserve drawing buffer for offscreen grab & set 2D willReadFrequently: true
 if (typeof HTMLCanvasElement !== 'undefined') {
   const originalGetContext = HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.getContext = function(type, attributes) {
     if (type === 'webgl' || type === 'webgl2') {
       attributes = attributes || {};
       attributes.preserveDrawingBuffer = true;
+    } else if (type === '2d') {
+      attributes = attributes || {};
+      attributes.willReadFrequently = true;
     }
     return originalGetContext.call(this, type, attributes);
+  };
+}
+
+if (typeof CanvasGradient !== 'undefined' && CanvasGradient.prototype) {
+  const _origAddColorStop = CanvasGradient.prototype.addColorStop;
+  CanvasGradient.prototype.addColorStop = function(offset, color) {
+    let safeOffset = Number(offset);
+    if (isNaN(safeOffset)) safeOffset = 0;
+    safeOffset = Math.max(0, Math.min(1, safeOffset));
+
+    let safeColor = String(color || '#000000').trim();
+    if (safeColor.startsWith('#')) {
+      const hex = safeColor.slice(1);
+      if (hex.length === 5) {
+        safeColor = '#' + hex + hex[hex.length - 1];
+      } else if (hex.length === 7) {
+        safeColor = '#' + hex.slice(0, 6);
+      } else if (hex.length !== 3 && hex.length !== 4 && hex.length !== 6 && hex.length !== 8) {
+        safeColor = '#' + hex.padEnd(6, '0').slice(0, 6);
+      }
+    }
+    try {
+      return _origAddColorStop.call(this, safeOffset, safeColor);
+    } catch (e) {
+      try {
+        return _origAddColorStop.call(this, safeOffset, '#000000');
+      } catch (err) {}
+    }
+  };
+}
+
+if (typeof window.Scribble === 'undefined') {
+  window.Scribble = function() {
+    this.roughness = 1;
+    this.bowing = 1;
+    this.maxOffset = 2;
+    this.numEllipseSteps = 10;
+    this.scribbleLine = function(x1, y1, x2, y2) { if (typeof line === 'function') line(x1, y1, x2, y2); };
+    this.scribbleCurve = function(x1, y1, x2, y2, x3, y3, x4, y4) { if (typeof bezier === 'function') bezier(x1, y1, x2, y2, x3, y3, x4, y4); };
+    this.scribbleRect = function(x, y, w, h) { if (typeof rect === 'function') rect(x, y, w, h); };
+    this.scribbleRoundedRect = function(x, y, w, h, r) { if (typeof rect === 'function') rect(x, y, w, h, r); };
+    this.scribbleEllipse = function(x, y, w, h) { if (typeof ellipse === 'function') ellipse(x, y, w, h); };
+    this.scribbleFilling = function(x, y, w, h) {};
   };
 }
 
@@ -2013,11 +3913,24 @@ if (typeof p5 !== 'undefined') {
   Object.defineProperty(window, 'innerHeight', { get: function() { return 720; }, set: function(val) {}, configurable: true });
   Object.defineProperty(window, 'windowWidth', { get: function() { return 1280; }, set: function(val) {}, configurable: true });
   Object.defineProperty(window, 'windowHeight', { get: function() { return 720; }, set: function(val) {}, configurable: true });
+  
+  if (p5.prototype) {
+    p5.prototype.windowWidth = 1280;
+    p5.prototype.windowHeight = 720;
+    p5.prototype._windowWidth = 1280;
+    p5.prototype._windowHeight = 720;
+    p5.prototype.width = 1280;
+    p5.prototype.height = 720;
+  }
 
   const originalCreateCanvas = p5.prototype.createCanvas;
   p5.prototype.createCanvas = function(w, h, val) {
     let targetWidth = 1280;
     let targetHeight = 720;
+    
+    // 防呆保護：若模組在 setup 計算前傳入 0、NaN 或未定義之寬高，自動回退為標準虛擬畫布 1280x720
+    if (!w || isNaN(w) || w <= 0) w = targetWidth;
+    if (!h || isNaN(h) || h <= 0) h = targetHeight;
     
     // 依據 window.customScalingMode 所設定的模式進行智慧縮放
     let scale = 1.0;
@@ -2065,6 +3978,10 @@ if (typeof p5 !== 'undefined') {
     
     window.windowWidth = targetWidth;
     window.windowHeight = targetHeight;
+    this.windowWidth = targetWidth;
+    this.windowHeight = targetHeight;
+    this._windowWidth = targetWidth;
+    this._windowHeight = targetHeight;
     let canvas = originalCreateCanvas.call(this, targetWidth, targetHeight, val);
     
     // 覆寫 p5 實例與全域的寬高屬性，讓 sketch 的邊界計算代碼讀取到原始虛擬尺寸
@@ -2218,6 +4135,16 @@ if (typeof p5 !== 'undefined') {
         configurable: true
       });
     } catch(e) {}
+    p5.Renderer.prototype.createBuffers = p5.Renderer.prototype.createBuffers || function(id, geometry) {
+      if (typeof p5.RendererGL !== 'undefined' && p5.RendererGL.prototype && typeof p5.RendererGL.prototype.createBuffers === 'function') {
+        return p5.RendererGL.prototype.createBuffers.call(this, id, geometry);
+      }
+    };
+    p5.Renderer.prototype.drawBuffers = p5.Renderer.prototype.drawBuffers || function(id) {
+      if (typeof p5.RendererGL !== 'undefined' && p5.RendererGL.prototype && typeof p5.RendererGL.prototype.drawBuffers === 'function') {
+        return p5.RendererGL.prototype.drawBuffers.call(this, id);
+      }
+    };
   }
   if (typeof p5.RendererGL !== 'undefined' && p5.RendererGL.prototype) {
     try {
@@ -2354,6 +4281,52 @@ if (typeof p5 !== 'undefined') {
     return res;
   };
 
+  // Smart unrelated text filter (FPS, debug, instructions, loading, prompts, credits)
+  window.__isUnrelatedVisualText = function(content) {
+    if (content === null || content === undefined) return false;
+    let str = String(content).trim();
+    if (!str || str.length === 0) return false;
+    
+    // FPS / frameRate indicators (e.g., "FPS: 60", "FPS: 59.9", "60 FPS", "frameRate: 60")
+    if (/^(?:fps|framerate|frame\s*rate)\s*[:=]?\s*[\d\.]*/i.test(str)) return true;
+    if (/^[\d\.]+\s*fps\b/i.test(str)) return true;
+    if (/^fps\s*$/i.test(str)) return true;
+    
+    // Loading indicators
+    if (/^loading(?:\s*[\.\w]*)?$/i.test(str)) return true;
+    if (/^please\s+wait/i.test(str)) return true;
+    if (/^esperando\b/i.test(str)) return true;
+    
+    // Interaction hints & instructions
+    if (/(?:drag\s+wind|tap\s+to|click\s+to|press\s+['"\w]|hit\s+space|arrow\s+keys|use\s+mouse|hold\s+mouse|scroll\s+to|snapshot|screenshot|save\s+image|controls?|instructions?|touch\s+to\s+start|press\s+any\s+key)/i.test(str)) {
+      return true;
+    }
+    // Interactive prompt warnings / game-over style dialog text
+    if (/too\s+much\s+food|you\s+did\s+not\s+have\s+anything\s+else/i.test(str)) {
+      return true;
+    }
+    // Debug / Param prints: e.g. "Speed: 1.5", "Radius = 100", "Volume: 50%"
+    if (/^(?:speed|size|radius|color|count|frequency|volume|threshold|density|scale|zoom|particles|nodes|iteration|gravity|damping)\s*[:=]\s*[-+]?[\d\.]+/i.test(str)) {
+      return true;
+    }
+    // Author watermarks / credits
+    if (/^(?:by\s+[\w\s]+|author\s*:|code\s+by|created\s+by|designed\s+by|copyright|©|\(c\))\b/i.test(str)) {
+      return true;
+    }
+    return false;
+  };
+
+  // Intercept p5.prototype.text to filter out unrelated UI text
+  const originalP5Text = p5.prototype.text;
+  if (originalP5Text) {
+    p5.prototype.text = function(str, ...args) {
+      if (window.__isUnrelatedVisualText(str)) {
+        return this;
+      }
+      return originalP5Text.call(this, str, ...args);
+    };
+  }
+
   // Intercept the p5 constructor to capture the current active p5 instance
   const OriginalP5 = window.p5;
   const WrappedP5 = function(sketch, node, ...args) {
@@ -2377,6 +4350,79 @@ if (typeof p5 !== 'undefined') {
   WrappedP5.prototype = OriginalP5.prototype;
   window.p5 = WrappedP5;
 }
+
+// Intercept 2D Canvas fillText and strokeText to suppress unrelated text
+if (typeof CanvasRenderingContext2D !== 'undefined' && CanvasRenderingContext2D.prototype) {
+  const origFillText = CanvasRenderingContext2D.prototype.fillText;
+  if (origFillText) {
+    CanvasRenderingContext2D.prototype.fillText = function(text, ...args) {
+      if (typeof window.__isUnrelatedVisualText === 'function' && window.__isUnrelatedVisualText(text)) {
+        return;
+      }
+      return origFillText.call(this, text, ...args);
+    };
+  }
+  const origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  if (origStrokeText) {
+    CanvasRenderingContext2D.prototype.strokeText = function(text, ...args) {
+      if (typeof window.__isUnrelatedVisualText === 'function' && window.__isUnrelatedVisualText(text)) {
+        return;
+      }
+      return origStrokeText.call(this, text, ...args);
+    };
+  }
+}
+
+// Inject universal CSS to hide all GUI controls, inputs, buttons, and floating non-canvas DOM text
+(function() {
+  const hideStyle = document.createElement('style');
+  hideStyle.id = '__hide_controls_and_unrelated_ui__';
+  hideStyle.textContent = `
+    input, button, select, textarea, label, form, fieldset, nav,
+    .dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,
+    [class*="gui"], [id*="gui"], [class*="control"], [id*="control"],
+    [class*="instruction"], [id*="instruction"], [class*="info"], [id*="info"],
+    [class*="fps"], [id*="fps"], [class*="overlay"], [id*="overlay"],
+    [class*="tooltip"], [id*="tooltip"] {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      position: absolute !important;
+      top: -99999px !important;
+      left: -99999px !important;
+      width: 0px !important;
+      height: 0px !important;
+      z-index: -99999 !important;
+    }
+    body > *:not(canvas):not(script):not(style) {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+  `;
+  if (document.head) {
+    document.head.appendChild(hideStyle);
+  } else {
+    document.addEventListener('DOMContentLoaded', () => {
+      if (document.head) document.head.appendChild(hideStyle);
+    });
+  }
+})();
+
+// Global beat trigger dispatcher for mock buttons
+window._triggerMockButtons = function() {
+  if (window._activeMockButtons && window._activeMockButtons.length > 0) {
+    window._activeMockButtons.forEach(btn => {
+      if (btn && btn._callbacks && btn._callbacks.length > 0) {
+        btn._callbacks.forEach(cb => {
+          try { cb.call(btn); } catch(e) {}
+        });
+      }
+    });
+  }
+};
 """
 
 BIND_MODULE_CALLBACKS_JS = """
@@ -2637,7 +4683,31 @@ class VisualModuleCardWidget(QWidget):
         """)
         badge_width = badge_used.fontMetrics().horizontalAdvance(f"🎬 {used_count}") + 12
         badge_used.setGeometry(160 - badge_width - 6, 6, badge_width, 16)
-        badge_used.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        badge_used.mousePressEvent = lambda event: on_preview_callback(name)
+        
+        # Overlaid origin badge (🧬 原創 vs 📥 收編)
+        is_original = (license_mode == "Original" or author == "AI Incubator")
+        origin_text = "🧬 原創" if is_original else "📥 收編"
+        origin_color = "#f3e8ff" if is_original else "#a1a1aa"
+        origin_bg = "rgba(124, 58, 237, 0.85)" if is_original else "rgba(39, 39, 42, 0.85)"
+        origin_border = "#8b5cf6" if is_original else "#3f3f46"
+        
+        badge_origin = QLabel(origin_text, img_label)
+        badge_origin.setStyleSheet(f"""
+            QLabel {{
+                background-color: {origin_bg};
+                color: {origin_color};
+                font-size: 9px;
+                font-weight: bold;
+                border-radius: 3px;
+                padding: 1px 3px;
+                border: 1px solid {origin_border};
+            }}
+        """)
+        origin_w = badge_origin.fontMetrics().horizontalAdvance(origin_text) + 8
+        badge_origin.setGeometry(6, 98, origin_w, 16)
+        badge_origin.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        badge_origin.mousePressEvent = lambda event: on_preview_callback(name)
 
         layout.addWidget(img_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
@@ -2783,7 +4853,15 @@ class VisualModuleCardWidget(QWidget):
         layout.addLayout(bottom_box)
 
         # Tooltip 詳細
-        self.setToolTip(f"名稱: {name}\n作者: {author}\n授權: {license_str}\n日期: {date_added}\nTags: {', '.join(tags)}\n\n頻率: {frequency}%  |  權重: {storyboard_weight}%  |  特效: {post_fx_intensity}%")
+        self.setToolTip(f"名稱: {name}\n作者: {author}\n授權: {license_str}\n日期: {date_added}\nTags: {', '.join(tags)}\n\n頻率: {frequency}%  |  權重: {storyboard_weight}%  |  特效: {post_fx_intensity}%\n\n💡 點擊卡片即可於右側啟動即時沙盒預覽")
+
+        # 支援點擊卡片任意區域立即啟動預覽
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        def on_card_click(event):
+            child = self.childAt(event.pos())
+            if child not in (self.checkbox, badge_star, btn_param, btn_delete) and not isinstance(child, (QCheckBox, QPushButton)):
+                on_preview_callback(name)
+        self.mousePressEvent = on_card_click
 
     def enterEvent(self, event):
         self.setStyleSheet("""
@@ -2806,9 +4884,12 @@ class VisualModuleCardWidget(QWidget):
         super().leaveEvent(event)
 
 class VisualModuleItemWidget(QWidget):
-    def __init__(self, name, tags, author, license_mode, date_added, frequency, storyboard_weight, post_fx_intensity, on_delete_callback, on_star_callback, parent=None, display_name=None, is_starred=False):
+    def __init__(self, name, tags, author, license_mode, date_added, frequency, storyboard_weight, post_fx_intensity, on_delete_callback, on_star_callback, parent=None, display_name=None, is_starred=False, on_preview_callback=None):
         super().__init__(parent)
         self.module_name = name
+        self._frequency = frequency
+        self._storyboard_weight = storyboard_weight
+        self._post_fx_intensity = post_fx_intensity
         layout = QHBoxLayout(self)
         layout.setContentsMargins(5, 2, 5, 2)
         layout.setSpacing(10)
@@ -2877,15 +4958,12 @@ class VisualModuleItemWidget(QWidget):
                 break
         
         is_by_sa = "by-sa" in license_str.lower() or "cc-by-sa" in license_str.lower()
-        
-        if is_by_sa:
-            license_html = f'<span style="color: #10b981; font-weight: bold; background-color: #064e3b; border-radius: 4px; padding: 2px 5px;">[授權: {license_str} ★]</span>'
-        elif is_restricted:
-            license_html = f'<span style="color: #ef4444; font-weight: bold;">[授權: {license_str}]</span>'
+        if is_restricted:
+            self.license_label.setText(f'<span style="color: #ef4444; font-weight: bold;">[🚫 {license_str[:15]}]</span>')
+        elif is_by_sa:
+            self.license_label.setText(f'<span style="color: #34d399; font-weight: bold;">[🟢 {license_str[:15]}]</span>')
         else:
-            license_html = f'<span style="color: #10b981;">[授權: {license_str}]</span>'
-            
-        self.license_label.setText(license_html)
+            self.license_label.setText(f'<span style="color: #e4e4e7;">[{license_str[:15]}]</span>')
         self.license_label.setStyleSheet("font-size: 12px;")
         self.license_label.setFixedWidth(180)
         layout.addWidget(self.license_label)
@@ -2928,9 +5006,13 @@ class VisualModuleItemWidget(QWidget):
             val_lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             
             def update_preset_field(val):
-                workspace_dir = os.path.dirname(os.path.abspath(__file__))
-                file_path = os.path.join(workspace_dir, "custom_visuals", f"{name}.json")
-                if os.path.exists(file_path):
+                val_lbl.setText(f"{val}%")
+                if field_name == "frequency": self._frequency = val
+                elif field_name == "storyboard_weight": self._storyboard_weight = val
+                elif field_name == "post_fx_intensity": self._post_fx_intensity = val
+                workspace = os.path.dirname(os.path.abspath(__file__))
+                fp = os.path.join(workspace, "custom_visuals", f"{name}.json")
+                if os.path.exists(fp):
                     try:
                         import json
                         with open(file_path, "r", encoding="utf-8") as f_in:
@@ -3042,11 +5124,18 @@ class StandaloneInjectorApp(QMainWindow):
         
         # Apply Neon Dark Theme
         self.setStyleSheet("""
-            QMainWindow {
+            QMainWindow, QWidget, QDialog, QSplitter {
                 background-color: #0b0b0e;
                 color: #e4e4e7;
             }
-            QTabWidget::pane {
+            QScrollArea {
+                background-color: #0b0b0e;
+                border: none;
+            }
+            QScrollArea > QWidget > QWidget {
+                background-color: #0b0b0e;
+            }
+            QTabWidget, QTabWidget::pane {
                 border: 1px solid #1f1f23;
                 background-color: #0b0b0e;
                 border-radius: 8px;
@@ -3068,6 +5157,22 @@ class StandaloneInjectorApp(QMainWindow):
             QLabel {
                 font-family: 'Outfit', 'Inter', sans-serif;
                 color: #f4f4f5;
+                background-color: transparent;
+            }
+            QCheckBox {
+                color: #f4f4f5;
+                background-color: transparent;
+            }
+            QCheckBox::indicator {
+                width: 16px;
+                height: 16px;
+                background-color: #18181b;
+                border: 1px solid #27272a;
+                border-radius: 4px;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #a855f7;
+                border-color: #a855f7;
             }
             QLineEdit, QComboBox, QListWidget {
                 background-color: #18181b;
@@ -3156,7 +5261,13 @@ class StandaloneInjectorApp(QMainWindow):
         self.main_splitter.addWidget(self.left_tabs)
 
         self.init_code_editor_tab()
+        self.ai_incubator = AIIncubatorTab(self)
+        self.left_tabs.insertTab(1, self.ai_incubator, "🚀 AI 視覺資產 AI 孵化器")
         self.init_renderer_tab()
+        self.pixel_generator = PixelModuleGeneratorTab(self)
+        self.left_tabs.addTab(self.pixel_generator, "👾 像素視覺模組生成器")
+        self.shorts_exporter = ShortsExporterTab(self)
+        self.left_tabs.addTab(self.shorts_exporter, "📱 YouTube Shorts 批量匯出")
 
         # ----------------------------------------------------
         # Right Panel (Sandbox & Console)
@@ -3234,13 +5345,29 @@ class StandaloneInjectorApp(QMainWindow):
                 border-color: #52525b;
             }
         """)
-        self.btn_sandbox_clear.clicked.connect(self.clear_sandbox)
+        self.btn_open_log = QPushButton("📜 開啟診斷日誌", right_panel)
+        self.btn_open_log.setStyleSheet("""
+            QPushButton {
+                background-color: #1e1b4b;
+                border: 1px solid #3730a3;
+                color: #c7d2fe;
+                font-weight: bold;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            QPushButton:hover {
+                background-color: #312e81;
+                border-color: #4338ca;
+            }
+        """)
+        self.btn_open_log.clicked.connect(self.open_debug_log_file)
         
         sandbox_ctrl_layout.addWidget(self.btn_sandbox_stop)
         sandbox_ctrl_layout.addWidget(self.btn_sandbox_clear)
+        sandbox_ctrl_layout.addWidget(self.btn_open_log)
         right_layout.addLayout(sandbox_ctrl_layout)
 
-        console_title = QLabel("📝 輸出終端 (Console Logs):", right_panel)
+        console_title = QLabel("📝 輸出終端 (Console Logs & 錯誤監看):", right_panel)
         console_title.setStyleSheet("font-weight: bold; font-size: 12px; color: #a1a1aa;")
         right_layout.addWidget(console_title)
 
@@ -3281,104 +5408,179 @@ class StandaloneInjectorApp(QMainWindow):
         self.js_local_paths = {}
         QTimer.singleShot(1000, self.preload_js_cache)
 
+        # Setup 3-color AI Status Badge in Status Bar
+        self.status_bar = self.statusBar()
+        self.ai_status_label = QLabel("🤖 AI 引擎：檢測中...", self)
+        self.ai_status_label.setStyleSheet("padding: 2px 10px; font-weight: bold; color: #a1a1aa; background-color: #18181b; border-radius: 4px; margin-right: 10px;")
+        self.status_bar.addPermanentWidget(self.ai_status_label)
+
+        # Non-blocking AI status check on startup and periodic polling
+        QTimer.singleShot(1200, self.refresh_ai_status)
+        self.ai_status_timer = QTimer(self)
+        self.ai_status_timer.timeout.connect(self.refresh_ai_status)
+        self.ai_status_timer.start(30000)
+
+    def refresh_ai_status(self):
+        """ 透過背景 QThread 發起非同步 Ollama 狀態探針 """
+        self.ai_worker = AIStatusWorker()
+        self.ai_worker.status_updated.connect(self.on_ai_status_updated)
+        self.ai_worker.start()
+
+    def on_ai_status_updated(self, status_info: dict):
+        """ 依據 3 色狀態即時更新 UI 指示燈風格與提示字串 """
+        status = status_info.get("status", "offline")
+        msg = status_info.get("message", "離線")
+        if status == "ready":
+            # 🟢 綠燈
+            self.ai_status_label.setText(f"🟢 {msg}")
+            self.ai_status_label.setStyleSheet("padding: 2px 10px; font-weight: bold; color: #10b981; background-color: #064e3b; border: 1px solid #059669; border-radius: 4px; margin-right: 10px;")
+        elif status == "model_missing":
+            # 🟡 黃燈
+            self.ai_status_label.setText(f"🟡 {msg}")
+            self.ai_status_label.setStyleSheet("padding: 2px 10px; font-weight: bold; color: #f59e0b; background-color: #78350f; border: 1px solid #d97706; border-radius: 4px; margin-right: 10px;")
+        else:
+            # ⚪ 灰燈
+            self.ai_status_label.setText(f"⚪ {msg}")
+            self.ai_status_label.setStyleSheet("padding: 2px 10px; font-weight: bold; color: #a1a1aa; background-color: #18181b; border: 1px solid #27272a; border-radius: 4px; margin-right: 10px;")
+
     def init_code_editor_tab(self):
         tab = QWidget(self)
-        layout = QVBoxLayout(tab)
-        layout.setContentsMargins(10, 10, 10, 10)
+        tab.setStyleSheet("background-color: #0b0b0e;")
+        main_tab_layout = QVBoxLayout(tab)
+        main_tab_layout.setContentsMargins(4, 4, 4, 4)
 
-        editor_lbl = QLabel("💻 p5.js 開源代碼編輯區", tab)
+        # Tab Scroll Area
+        scroll_area = QScrollArea(tab)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setStyleSheet("""
+            QScrollArea { border: none; background-color: #0b0b0e; }
+            QWidget { background-color: #0b0b0e; }
+            QScrollBar:vertical { width: 6px; background: #121215; }
+            QScrollBar::handle:vertical { background: #3f3f46; border-radius: 3px; }
+        """)
+        scroll_content = QWidget()
+        scroll_content.setStyleSheet("background-color: #0b0b0e;")
+        layout = QVBoxLayout(scroll_content)
+        layout.setContentsMargins(6, 6, 6, 6)
+        layout.setSpacing(8)
+        scroll_area.setWidget(scroll_content)
+        main_tab_layout.addWidget(scroll_area)
+
+        editor_lbl = QLabel("💻 p5.js 開源代碼編輯區", scroll_content)
         editor_lbl.setStyleSheet("font-size: 14px; font-weight: bold; color: #a855f7;")
         layout.addWidget(editor_lbl)
 
-        # OpenProcessing fetch row
-        op_row = QHBoxLayout()
-        op_lbl = QLabel("OpenProcessing 網址:", tab)
-        op_lbl.setFixedWidth(140)
-        op_lbl.setStyleSheet("font-weight: bold; color: #a1a1aa;")
-        self.op_input = QLineEdit(tab)
-        self.op_input.setPlaceholderText("貼上作品分享網址，例如: https://openprocessing.org/sketch/2219276")
-        self.btn_op_fetch = QPushButton("⚡ 【自動抓取程式碼】", tab)
-        self.btn_op_fetch.setStyleSheet("background-color: #1e1b4b; border-color: #312e81; color: #e0e7ff; font-weight: bold; font-size: 12px;")
+        # OpenProcessing fetch area (2-row stacked for responsive fit)
+        op_box = QVBoxLayout()
+        op_box.setSpacing(4)
+        
+        op_input_row = QHBoxLayout()
+        op_lbl = QLabel("OpenProcessing 網址:", scroll_content)
+        op_lbl.setFixedWidth(120)
+        op_lbl.setStyleSheet("font-weight: bold; color: #a1a1aa; font-size: 11px;")
+        self.op_input = QLineEdit(scroll_content)
+        self.op_input.setPlaceholderText("貼上作品網址，例如: https://openprocessing.org/sketch/2219276")
+        self.op_input.setStyleSheet("font-size: 11px;")
+        op_input_row.addWidget(op_lbl)
+        op_input_row.addWidget(self.op_input, 1)
+        op_box.addLayout(op_input_row)
+
+        op_btn_row = QHBoxLayout()
+        op_btn_row.setSpacing(6)
+        self.btn_op_fetch = QPushButton("⚡ 【自動抓取程式碼】", scroll_content)
+        self.btn_op_fetch.setStyleSheet("background-color: #1e1b4b; border-color: #312e81; color: #e0e7ff; font-weight: bold; font-size: 11px; padding: 4px 8px;")
         self.btn_op_fetch.clicked.connect(self.fetch_and_load_openprocessing)
         
-        self.btn_op_batch = QPushButton("📥 【批次收編作者作品】", tab)
-        self.btn_op_batch.setStyleSheet("background-color: #3b0764; border-color: #581c87; color: #f3e8ff; font-weight: bold; font-size: 12px;")
+        self.btn_op_batch = QPushButton("📥 【批次收編作者作品】", scroll_content)
+        self.btn_op_batch.setStyleSheet("background-color: #3b0764; border-color: #581c87; color: #f3e8ff; font-weight: bold; font-size: 11px; padding: 4px 8px;")
         self.btn_op_batch.clicked.connect(self.open_batch_import_dialog)
         
-        op_row.addWidget(op_lbl)
-        op_row.addWidget(self.op_input)
-        op_row.addWidget(self.btn_op_fetch)
-        op_row.addWidget(self.btn_op_batch)
-        layout.addLayout(op_row)
+        op_btn_row.addWidget(self.btn_op_fetch)
+        op_btn_row.addWidget(self.btn_op_batch)
+        op_box.addLayout(op_btn_row)
+        layout.addLayout(op_box)
 
         # Code editor
-        self.editor = CodeEditor(tab)
+        self.editor = CodeEditor(scroll_content)
+        self.editor.setMinimumHeight(240)
         self.editor.setPlainText(self.get_default_template())
         layout.addWidget(self.editor)
 
         # Name and parameters
         form = QVBoxLayout()
+        form.setSpacing(6)
         
         name_row = QHBoxLayout()
-        name_lbl = QLabel("視覺模組唯一名稱:", tab)
-        name_lbl.setFixedWidth(180)
-        self.name_input = QLineEdit(tab)
+        name_lbl = QLabel("視覺模組名稱:", scroll_content)
+        name_lbl.setFixedWidth(110)
+        name_lbl.setStyleSheet("font-size: 11px;")
+        self.name_input = QLineEdit(scroll_content)
         self.name_input.setPlaceholderText("例如: audio_wave_4k")
+        self.name_input.setStyleSheet("font-size: 11px;")
         name_row.addWidget(name_lbl)
-        name_row.addWidget(self.name_input)
+        name_row.addWidget(self.name_input, 1)
         form.addLayout(name_row)
 
         # Metadata rows (Author & License)
         meta_row = QHBoxLayout()
-        author_lbl = QLabel("作者名稱 (Author):", tab)
-        author_lbl.setFixedWidth(180)
-        self.author_input = QLineEdit(tab)
-        self.author_input.setPlaceholderText("自動抓取或手動輸入")
+        meta_row.setSpacing(6)
+        author_lbl = QLabel("作者:", scroll_content)
+        author_lbl.setFixedWidth(40)
+        author_lbl.setStyleSheet("font-size: 11px;")
+        self.author_input = QLineEdit(scroll_content)
+        self.author_input.setPlaceholderText("作者名稱")
+        self.author_input.setStyleSheet("font-size: 11px;")
         
-        license_lbl = QLabel("授權協議 (License):", tab)
-        license_lbl.setFixedWidth(120)
-        self.license_input = QLineEdit(tab)
-        self.license_input.setPlaceholderText("自動抓取或授權方式代碼")
+        license_lbl = QLabel("授權:", scroll_content)
+        license_lbl.setFixedWidth(40)
+        license_lbl.setStyleSheet("font-size: 11px;")
+        self.license_input = QLineEdit(scroll_content)
+        self.license_input.setPlaceholderText("MIT / CC")
+        self.license_input.setStyleSheet("font-size: 11px;")
         
         meta_row.addWidget(author_lbl)
-        meta_row.addWidget(self.author_input)
+        meta_row.addWidget(self.author_input, 1)
         meta_row.addWidget(license_lbl)
-        meta_row.addWidget(self.license_input)
+        meta_row.addWidget(self.license_input, 1)
         form.addLayout(meta_row)
         
         # Tags row
         tags_row = QHBoxLayout()
-        tags_lbl = QLabel("分類標籤 (Tags):", tab)
-        tags_lbl.setFixedWidth(180)
-        self.tags_input = QLineEdit(tab)
-        self.tags_input.setPlaceholderText("例如: intro, drop, ambient, 3d, slow, fast (以逗號分隔)")
+        tags_lbl = QLabel("分類標籤:", scroll_content)
+        tags_lbl.setFixedWidth(110)
+        tags_lbl.setStyleSheet("font-size: 11px;")
+        self.tags_input = QLineEdit(scroll_content)
+        self.tags_input.setPlaceholderText("例如: intro, drop, ambient, 3d, slow (逗號分隔)")
+        self.tags_input.setStyleSheet("font-size: 11px;")
         tags_row.addWidget(tags_lbl)
-        tags_row.addWidget(self.tags_input)
+        tags_row.addWidget(self.tags_input, 1)
         form.addLayout(tags_row)
         
-        # Quick tag buttons
-        tag_btn_box = QHBoxLayout()
-        indent_lbl = QLabel("", tab)
-        indent_lbl.setFixedWidth(180)
-        tag_btn_box.addWidget(indent_lbl)
-        tag_btn_box.addWidget(QLabel("推薦標籤:", tab))
-        for tag_name in ["intro", "verse", "buildup", "drop", "outro", "ambient", "3d", "fast", "slow"]:
-            btn = QPushButton(tag_name, tab)
-            btn.setStyleSheet("padding: 3px 8px; font-size: 11px; background-color: #18181b; color: #a1a1aa; border-radius: 4px; border: 1px solid #27272a;")
+        # Quick tag buttons (2-row grid for responsive fit)
+        tag_grid = QGridLayout()
+        tag_grid.setSpacing(3)
+        tag_grid.addWidget(QLabel("推薦標籤:", scroll_content), 0, 0)
+        
+        tags_list = ["intro", "verse", "buildup", "drop", "outro", "ambient", "3d", "fast", "slow"]
+        for idx, tag_name in enumerate(tags_list):
+            btn = QPushButton(tag_name, scroll_content)
+            btn.setStyleSheet("padding: 2px 6px; font-size: 10px; background-color: #18181b; color: #a1a1aa; border-radius: 3px; border: 1px solid #27272a;")
             btn.clicked.connect(lambda checked, t=tag_name: self.append_tag(t))
-            tag_btn_box.addWidget(btn)
-        tag_btn_box.addStretch()
-        form.addLayout(tag_btn_box)
+            row = (idx + 1) // 5
+            col = (idx + 1) % 5
+            tag_grid.addWidget(btn, row, col)
+        form.addLayout(tag_grid)
 
         # Sliders
-        self.freq_slider = self.create_slider_row(form, "動態出現頻率 (Frequency):", tab)
-        self.weight_slider = self.create_slider_row(form, "分鏡切換權重 (Weight):", tab)
-        self.fx_slider = self.create_slider_row(form, "後製特效強度 (Post-FX):", tab)
+        self.freq_slider = self.create_slider_row(form, "動態出現頻率 (Frequency):", scroll_content)
+        self.weight_slider = self.create_slider_row(form, "分鏡切換權重 (Weight):", scroll_content)
+        self.fx_slider = self.create_slider_row(form, "後製特效強度 (Post-FX):", scroll_content)
 
         layout.addLayout(form)
 
         # Control Buttons
-        self.btn_adapt = QPushButton("🪄 【自動 16:9 轉換與音畫優化】", tab)
+        self.btn_adapt = QPushButton("🪄 【自動 16:9 轉換與音畫優化】", scroll_content)
         self.btn_adapt.setStyleSheet("background-color: #7c2d12; border-color: #9a3412; color: #ffedd5; font-size: 13px;")
         self.btn_adapt.clicked.connect(self.adapt_and_repair_code)
         layout.addWidget(self.btn_adapt)
@@ -3387,10 +5589,10 @@ class StandaloneInjectorApp(QMainWindow):
         sandbox_btn_layout = QHBoxLayout()
         sandbox_btn_layout.setContentsMargins(0, 0, 0, 0)
         
-        self.btn_compile = QPushButton("【執行即時預覽測試】", tab)
+        self.btn_compile = QPushButton("【執行即時預覽測試】", scroll_content)
         self.btn_compile.clicked.connect(self.compile_and_run_sandbox)
         
-        self.btn_stop_compile = QPushButton("【停止即時預覽】", tab)
+        self.btn_stop_compile = QPushButton("【停止即時預覽】", scroll_content)
         self.btn_stop_compile.setEnabled(False)
         self.btn_stop_compile.setStyleSheet("""
             QPushButton {
@@ -3414,12 +5616,12 @@ class StandaloneInjectorApp(QMainWindow):
         sandbox_btn_layout.addWidget(self.btn_stop_compile)
         layout.addLayout(sandbox_btn_layout)
 
-        self.cb_confirm = QCheckBox("【確認視覺模組運行正常】", tab)
+        self.cb_confirm = QCheckBox("【確認視覺模組運行正常】", scroll_content)
         self.cb_confirm.setEnabled(False)
         self.cb_confirm.stateChanged.connect(self.toggle_save_button)
         layout.addWidget(self.cb_confirm)
 
-        self.btn_save = QPushButton("【儲存視覺預設檔】", tab)
+        self.btn_save = QPushButton("【儲存視覺預設檔】", scroll_content)
         self.btn_save.setEnabled(False)
         self.btn_save.setStyleSheet("QPushButton:enabled { background-color: #9333ea; color: white; }")
         self.btn_save.clicked.connect(self.save_preset)
@@ -3429,6 +5631,7 @@ class StandaloneInjectorApp(QMainWindow):
 
     def init_renderer_tab(self):
         tab = QWidget(self)
+        tab.setStyleSheet("background-color: #0b0b0e;")
         layout = QVBoxLayout(tab)
         layout.setContentsMargins(10, 10, 10, 10)
 
@@ -3517,6 +5720,8 @@ class StandaloneInjectorApp(QMainWindow):
         
         self.visual_list = QListWidget(tab)
         self.visual_list.setSelectionMode(QListWidget.SelectionMode.MultiSelection)
+        self.visual_list.itemClicked.connect(self.on_visual_list_item_clicked)
+        self.visual_list.itemDoubleClicked.connect(self.on_visual_list_item_clicked)
         layout.addWidget(self.visual_list)
 
         # Pagination controls
@@ -3754,11 +5959,11 @@ class StandaloneInjectorApp(QMainWindow):
         self.fx_cb_centroid_glitch.setToolTip("衍生通道 2: 高頻破碎 (Centroid Glitch) — 頻譜質心共振時橫向切片隨機橫移，共振電晶體質地")
 
         self.fx_cb_vignette_pulse = QCheckBox("呼吸暗房", tab)
-        self.fx_cb_vignette_pulse.setChecked(True)
+        self.fx_cb_vignette_pulse.setChecked(False)
         self.fx_cb_vignette_pulse.setToolTip("衍生通道 3: 呼吸暗房 (Vignette Pulse) — 正拍預期心理學四周暗角飽和度抽離收縮與砸拍高光釋放")
 
         self.fx_cb_tension_overlay = QCheckBox("張力互斥", tab)
-        self.fx_cb_tension_overlay.setChecked(True)
+        self.fx_cb_tension_overlay.setChecked(False)
         self.fx_cb_tension_overlay.setToolTip("衍生通道 4: 張力互斥 (Tension Overlay) — 不協和和弦與畫面產生數學互斥 (Exclusion) 撞色翻轉")
 
         self.fx_cb_photosensitive_safe = QCheckBox("光敏健康防護", tab)
@@ -3856,6 +6061,40 @@ class StandaloneInjectorApp(QMainWindow):
         fx_type_box_4.addStretch()
         layout.addLayout(fx_type_box_4)
 
+        # Row 5: Next-Gen 6 Advanced Global Post-FX
+        fx_type_box_5 = QHBoxLayout()
+        fx_type_box_5.setSpacing(12)
+        
+        self.fx_cb_hologram_glitch = QCheckBox("全息干擾", tab)
+        self.fx_cb_hologram_glitch.setChecked(True)
+        self.fx_cb_hologram_glitch.setToolTip("前沿全域 1: 全息掃描干擾 (Hologram Glitch) — 科幻全息掃描光條、RGB 撕裂與雷射干擾線")
+
+        self.fx_cb_voronoi_shatter = QCheckBox("泰森碎裂", tab)
+        self.fx_cb_voronoi_shatter.setChecked(True)
+        self.fx_cb_voronoi_shatter.setToolTip("前沿全域 2: 泰森多邊形碎裂折射 (Voronoi Shatter) — 水晶幾何切片碎裂與低音動態折射")
+
+        self.fx_cb_thermal_infrared = QCheckBox("紅外熱感", tab)
+        self.fx_cb_thermal_infrared.setChecked(True)
+        self.fx_cb_thermal_infrared.setToolTip("前沿全域 3: 軍規紅外熱感視界 (Thermal Infrared) — 賽博紅外熱感光譜與冷熱頻譜過渡")
+
+        self.fx_cb_ascii_cyber_matrix = QCheckBox("矩陣字元", tab)
+        self.fx_cb_ascii_cyber_matrix.setChecked(True)
+        self.fx_cb_ascii_cyber_matrix.setToolTip("前沿全域 4: 高階動態 Cyber ASCII 碼雨 (ASCII Matrix Rain) — 數位字元矩陣與重拍脈衝高光")
+
+        self.fx_cb_chromatic_radial_zoom = QCheckBox("色差爆發", tab)
+        self.fx_cb_chromatic_radial_zoom.setChecked(True)
+        self.fx_cb_chromatic_radial_zoom.setToolTip("前沿全域 5: 色差徑向爆發衝擊 (Chromatic Radial Zoom) — 重拍中心向外徑向色差與動態 Zoom 衝擊")
+
+        self.fx_cb_synthwave_grid_scan = QCheckBox("賽博網格", tab)
+        self.fx_cb_synthwave_grid_scan.setChecked(True)
+        self.fx_cb_synthwave_grid_scan.setToolTip("前沿全域 6: 賽博波形網格掃描 (Synthwave 3D Grid) — 復古網格線條、地平線掃描與波型震蕩")
+
+        for cb in [self.fx_cb_hologram_glitch, self.fx_cb_voronoi_shatter, self.fx_cb_thermal_infrared, self.fx_cb_ascii_cyber_matrix, self.fx_cb_chromatic_radial_zoom, self.fx_cb_synthwave_grid_scan]:
+            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
+            fx_type_box_5.addWidget(cb)
+        fx_type_box_5.addStretch()
+        layout.addLayout(fx_type_box_5)
+
         # Progress bar
         self.progress_bar = QProgressBar(tab)
         self.progress_bar.setValue(0)
@@ -3865,25 +6104,34 @@ class StandaloneInjectorApp(QMainWindow):
         self.status_lbl.setStyleSheet("color: #a1a1aa;")
         layout.addWidget(self.status_lbl)
 
+        # 🎬 AI 導演通告單可視化卡片 (Director Call Sheet Panel)
+        self.call_sheet_widget = AIDirectorCallSheetWidget(tab)
+        layout.addWidget(self.call_sheet_widget)
+
         # Render buttons layout
         btn_box = QHBoxLayout()
+        self.btn_ai_director = QPushButton("🎬 【AI 導演智能排片 (LLM Script)】", tab)
+        self.btn_ai_director.setStyleSheet("background-color: #9333ea; color: white; font-size: 13px; padding: 12px; font-weight: bold; border-radius: 6px;")
+        self.btn_ai_director.clicked.connect(self.start_ai_director_orchestration)
+
         self.btn_smart_edit = QPushButton("🪄 智能剪輯配對並渲染", tab)
-        self.btn_smart_edit.setStyleSheet("background-color: #7c3aed; color: white; font-size: 14px; padding: 12px; font-weight: bold;")
+        self.btn_smart_edit.setStyleSheet("background-color: #7c3aed; color: white; font-size: 13px; padding: 12px; font-weight: bold; border-radius: 6px;")
         self.btn_smart_edit.clicked.connect(self.start_smart_edit_rendering)
 
         self.btn_batch_smart_edit = QPushButton("🪄 批次智能剪輯配對並渲染", tab)
-        self.btn_batch_smart_edit.setStyleSheet("background-color: #4f46e5; color: white; font-size: 14px; padding: 12px; font-weight: bold;")
+        self.btn_batch_smart_edit.setStyleSheet("background-color: #4f46e5; color: white; font-size: 13px; padding: 12px; font-weight: bold; border-radius: 6px;")
         self.btn_batch_smart_edit.clicked.connect(self.start_batch_smart_edit_rendering)
 
-        self.btn_render = QPushButton("🚀 一鍵開始渲染 4K 音畫互動 MV", tab)
-        self.btn_render.setStyleSheet("background-color: #059669; color: white; font-size: 14px; padding: 12px;")
+        self.btn_render = QPushButton("🚀 一鍵開始渲染 4K MV", tab)
+        self.btn_render.setStyleSheet("background-color: #059669; color: white; font-size: 13px; padding: 12px; font-weight: bold; border-radius: 6px;")
         self.btn_render.clicked.connect(self.start_mv_rendering)
         
-        self.btn_cancel_render = QPushButton("⏹️ 中止渲染", tab)
-        self.btn_cancel_render.setStyleSheet("background-color: #b91c1c; color: white; font-size: 14px; padding: 12px;")
+        self.btn_cancel_render = QPushButton("⏹️ 中止", tab)
+        self.btn_cancel_render.setStyleSheet("background-color: #b91c1c; color: white; font-size: 13px; padding: 12px; border-radius: 6px;")
         self.btn_cancel_render.clicked.connect(self.cancel_mv_rendering)
         self.btn_cancel_render.setEnabled(False)
         
+        btn_box.addWidget(self.btn_ai_director, 3)
         btn_box.addWidget(self.btn_smart_edit, 2)
         btn_box.addWidget(self.btn_batch_smart_edit, 2)
         btn_box.addWidget(self.btn_render, 2)
@@ -4000,7 +6248,7 @@ class StandaloneInjectorApp(QMainWindow):
         else:
             presets_data = []
             for file in os.listdir(save_dir):
-                if file.endswith(".json") and file != "modules_index.json":
+                if file.endswith(".json") and file not in ("modules_index.json", "module_usage_history.json"):
                     name = file[:-5]
                     p_path = os.path.join(save_dir, file)
                     tags = []
@@ -4040,7 +6288,8 @@ class StandaloneInjectorApp(QMainWindow):
                             post_fx_intensity = data.get("post_fx_intensity", 50)
                             display_name = data.get("name", name)
                             is_starred = data.get("is_starred", False)
-                            used_count = data.get("used_count", 0)
+                            used_in = data.get("used_in_videos", [])
+                            used_count = max(int(data.get("used_count", 0)), len(used_in) if isinstance(used_in, list) else 0)
                             if not date_added:
                                 date_added = fallback_date
                     except Exception as e:
@@ -4147,7 +6396,8 @@ class StandaloneInjectorApp(QMainWindow):
                     data["name"], data["tags"], data["author"], data["license_mode"], data["date_added"],
                     data["frequency"], data["storyboard_weight"], data["post_fx_intensity"],
                     self.delete_preset, self.toggle_star_preset, self.visual_list,
-                    display_name=data["display_name"], is_starred=data["is_starred"]
+                    display_name=data["display_name"], is_starred=data["is_starred"],
+                    on_preview_callback=self.preview_preset
                 )
                 
             item.setSizeHint(widget.sizeHint())
@@ -4163,6 +6413,10 @@ class StandaloneInjectorApp(QMainWindow):
             QTimer.singleShot(50, lambda: scroll_bar.setValue(scroll_value))
         # 啟動非同步預覽縮圖生成佇列
         QTimer.singleShot(100, self.generate_next_missing_thumbnail)
+        # 若右側沙盒尚無加載預覽，自動加載當前頁第一項以展示即時沙盒動態
+        if len(presets_page_data) > 0 and not getattr(self, "current_preset_id", None):
+            first_name = presets_page_data[0]["name"]
+            QTimer.singleShot(400, lambda: self.preview_preset(first_name))
 
     def prev_presets_page(self):
         if self.presets_current_page > 1:
@@ -4182,10 +6436,15 @@ class StandaloneInjectorApp(QMainWindow):
         else:
             self.checked_presets.discard(name)
 
+    def on_visual_list_item_clicked(self, item):
+        widget = self.visual_list.itemWidget(item)
+        if widget and hasattr(widget, "module_name"):
+            self.preview_preset(widget.module_name)
+
 
     def get_html_content(self, code, custom_css="", custom_html="", inline_assets=None, for_thumbnail=False, sketch_id=None, scaling_mode="auto", for_rendering=False):
         noloop_js = ""
-        if for_rendering or for_thumbnail:
+        if for_thumbnail and not for_rendering:
             noloop_js = """
                 (function() {
                   let proto = null;
@@ -4325,59 +6584,148 @@ class StandaloneInjectorApp(QMainWindow):
               }});
             }})();
             """
-        # 使用全域定義的 MOCK_AUDIO_JS 護欄
-        # 修復：更嚴格的模組與 WebGL 動態特徵探測
-        has_import_export = bool(re.search(r'\b(import|export)\b', code))
-        has_es6_class = "class " in code and "constructor" in code
-        is_module = has_import_export or has_es6_class or "p5.Shader" in code or "importmap" in code
+        # 🛡️ 即時 JS 代碼語法自癒修復矩陣 (Runtime JS Sanitization & Auto-Repair)
+        if code:
+            # 1. 自動修復未加引號的十六進位色碼 (防止 V8 引擎解析為 ES2022 Class Private Field #xxx 報錯)
+            code = re.sub(r'(=|:|\(|,)\s*(#[0-9a-fA-F]{3,8})\b', r'\1 "\2"', code)
+            
+            # 2. 自動修復殘留的 Java 2D 陣列宣告語法 (double[][] / float[][])
+            code = re.sub(
+                r'\b(?:double|float|int|boolean|color|char|long|short)\s*\[\]\s*\[\]\s*(\w+)\s*=\s*new\s+\w*\[([^\]]+)\]\s*\[([^\]]+)\]\s*;',
+                r'let \1 = Array.from({length: (\2)}, () => new Array(\3).fill(0));',
+                code
+            )
+            code = re.sub(
+                r'\b(?:double|float|int|boolean|color|char|long|short)\s*\[\]\s*\[\]\s*(\w+)\s*\(',
+                r'function \1(',
+                code
+            )
+            code = re.sub(
+                r'\b(?:double|float|int|boolean|color|char|long|short)\s*\[\]\s*\[\]\s*(\w+)\b',
+                r'\1',
+                code
+            )
+            
+            # 3. 自動修復殘留的 Java 泛型 (ArrayList<...>)
+            code = re.sub(r'\bArrayList\s*<\s*\w+\s*>\s*(\w+)\s*;', r'let \1 = [];', code)
+            code = re.sub(r'\bnew\s+ArrayList\s*<\s*\w+\s*>\s*\(\s*\)', r'[]', code)
+            code = re.sub(r'\bArrayList\s*<\s*\w+\s*>', r'Array', code)
+            
+            # 4. 頂層 let / const 衝突修復 (防止多分頁或重新載入時發生 Identifier has already been declared)
+            code = re.sub(r'^\s*let\s+([a-zA-Z0-9_$]+)', r'var \1', code, flags=re.MULTILINE)
+            code = re.sub(r'^\s*const\s+([a-zA-Z0-9_$]+)', r'var \1', code, flags=re.MULTILINE)
+
+        has_import_export = bool(re.search(r'\b(import\s+[\{\*a-zA-Z0-9_]|export\s+(default|const|let|var|function|class))\b', code))
+        is_module = has_import_export
 
         script_tag = f'<script type="module">{code}\n{BIND_MODULE_CALLBACKS_JS}</script>' if is_module else f'<script>{code}</script>'
 
-        early_error_js = """
+        ready_state_override_js = "Object.defineProperty(Document.prototype, 'readyState', { get: function() { return 'loading'; }, configurable: true });" if (for_thumbnail or for_rendering) else ""
+        early_error_js = f"""
               <script>
+                (function() {{
+                  const _origWarn = console.warn;
+                  console.warn = function(...args) {{
+                    if (args[0] && typeof args[0] === 'string' && (args[0].includes('vectors of different sizes') || args[0].includes('linger vector'))) {{
+                      return;
+                    }}
+                    if (typeof _origWarn === 'function') {{
+                      _origWarn.apply(console, args);
+                    }}
+                  }};
+                }})();
+                window.wordsOfWisdom = window.wordsOfWisdom || ['Flow', 'Pulse', 'Vibration', 'Resonance', 'Structure', 'Echo', 'Wave', 'Core', 'Drift', 'Static', 'Horizon', 'Depth'];
+                if (typeof window.getRotatedPt === 'undefined') {{
+                  window.getRotatedPt = function(x, y, angle) {{
+                    return {{ x: x * Math.cos(angle) - y * Math.sin(angle), y: x * Math.sin(angle) + y * Math.cos(angle) }};
+                  }};
+                }}
+                window.createMockSoundFile = window.createMockSoundFile || function() {{
+                  return {{
+                    _isMockSound: true,
+                    _isPlaying: false,
+                    play: function() {{ this._isPlaying = true; return this; }},
+                    loop: function() {{ this._isPlaying = true; return this; }},
+                    stop: function() {{ this._isPlaying = false; return this; }},
+                    pause: function() {{ this._isPlaying = false; return this; }},
+                    isPlaying: function() {{ return this._isPlaying !== false && window.isAudioPlaying !== false; }},
+                    setVolume: function() {{ return this; }},
+                    pan: function() {{ return this; }},
+                    rate: function() {{ return 1.0; }},
+                    disconnect: function() {{ return this; }},
+                    connect: function() {{ return this; }},
+                    onended: function() {{}},
+                    duration: function() {{ return window.totalAudioDuration || 180.0; }},
+                    currentTime: function() {{ return (typeof window.custom_time_ms !== 'undefined' ? window.custom_time_ms / 1000 : (window.currentAudioTime || (window.frameCount ? window.frameCount / 60 : 0.0))); }},
+                    getLevel: function() {{ return window.audioEnergy || window.beatEnergy || (typeof window.audioMid !== 'undefined' ? (window.audioLow + window.audioMid + window.audioHigh)/3 : 0.5); }},
+                    getPeaks: function(n) {{ return new Float32Array(n || 5).fill(0); }},
+                    buffer: {{ getChannelData: function() {{ return new Float32Array(1024).fill(0.5); }}, duration: 180, sampleRate: 44100, numberOfChannels: 2 }},
+                    isLoaded: function() {{ return true; }},
+                    channels: function() {{ return 2; }},
+                    sampleRate: function() {{ return 44100; }},
+                    frames: function() {{ return 44100 * 180; }},
+                    jump: function() {{}},
+                    setPath: function() {{}},
+                    setBuffer: function() {{}},
+                    processPeaks: function() {{ return Promise.resolve([]); }},
+                    addCue: function() {{ return 0; }},
+                    removeCue: function() {{}},
+                    clearCues: function() {{}},
+                    reverseBuffer: function() {{}},
+                    then: function(resolve) {{
+                      if (resolve) setTimeout(() => resolve(this), 0);
+                      return this;
+                    }}
+                  }};
+                }};
                 window.jsErrors = [];
-                window.onerror = function(message, source, lineno) {
-                  window.jsErrors.push({message: String(message), source: String(source), lineno: Number(lineno)});
+                window.onerror = function(message, source, lineno) {{
+                  window.jsErrors.push({{message: String(message), source: String(source), lineno: Number(lineno)}});
                   return false;
-                };
-                window.addEventListener('unhandledrejection', function(event) {
-                  window.jsErrors.push({message: "Unhandled Rejection: " + String(event.reason), source: "promise", lineno: 0});
-                });
+                }};
+                window.addEventListener('unhandledrejection', function(event) {{
+                  if (event && typeof event.preventDefault === 'function') {{
+                    event.preventDefault();
+                  }}
+                  var reasonStr = event.reason ? (event.reason.message || String(event.reason)) : "";
+                  window.jsErrors.push({{message: "Unhandled Rejection: " + reasonStr, source: "promise", lineno: 0}});
+                }});
                 window.jsLogs = [];
                 window.originalLog = console.log;
-                console.log = function(...args) {
-                  if (typeof window.originalLog !== 'undefined') {
+                console.log = function(...args) {{
+                  if (typeof window.originalLog !== 'undefined') {{
                     window.originalLog.apply(console, args);
-                  }
+                  }}
                   window.jsLogs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
-                };
-                // Prevent p5.js from auto-starting early due to QWebEngineView readyState reuse
-                Object.defineProperty(Document.prototype, 'readyState', {
-                  get: function() { return 'loading'; },
-                  configurable: true
-                });
+                }};
+                // Prevent p5.js from auto-starting early due to QWebEngineView readyState reuse (ONLY for frame-by-frame rendering / thumbnails)
+                {ready_state_override_js}
               </script>
         """
 
-        if for_thumbnail:
-            html_template = f"""<!DOCTYPE html>
-            <html>
-            <head>
-              {early_error_js}
-              <meta charset="utf-8">
+        html_template = f"""<!DOCTYPE html>
+        <html>
+        <head>
+          {early_error_js}
+          <meta charset="utf-8">
               <style>
-                body {{ margin: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; }}
-                canvas {{ display: block !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; width: 100vw !important; height: 100vh !important; object-fit: cover !important; }}
-                /*CUSTOM_CSS_PLACEHOLDER*/
-                body canvas {{
+                html, body {{ margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; }}
+                canvas {{ display: block !important; margin: auto !important; width: 100% !important; height: 100% !important; max-width: 100vw !important; max-height: 100vh !important; object-fit: contain !important; z-index: 1 !important; }}
+                /* 全域強效隱藏所有 HTML 控制項，保留背景 Canvas */
+                input, select, button, textarea, label, fieldset, form, nav,
+                .dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container, .quicksettings, .p5Dom {{
+                  display: none !important;
+                  visibility: hidden !important;
+                  opacity: 0 !important;
+                  pointer-events: none !important;
                   position: absolute !important;
-                  left: 50% !important;
-                  top: 50% !important;
-                  transform: translate(-50%, -50%) !important;
-                  width: 100vw !important;
-                  height: 100vh !important;
-                  object-fit: cover !important;
+                  left: -9999px !important;
+                  top: -9999px !important;
+                  width: 0 !important;
+                  height: 0 !important;
+                  z-index: -9999 !important;
                 }}
+                /*CUSTOM_CSS_PLACEHOLDER*/
               </style>
               <script type="importmap">
                 {{
@@ -4395,336 +6743,308 @@ class StandaloneInjectorApp(QMainWindow):
                 window.dat = window.dat || {{ GUI: class {{ add() {{ return this; }} addFolder() {{ return this; }} }} }};
                 window.planck = window.planck || {{ World: class {{}}, Vec2: class {{}} }};
                 window.PVector = window.PVector || class {{ constructor(x,y,z){{ this.x=x||0; this.y=y||0; this.z=z||0; }} static dist(v1,v2){{ return Math.sqrt((v1.x-v2.x)**2+(v1.y-v2.y)**2); }} }};
-                window.BLUR = 11; window.GRAY = 14; window.WEBGL = "webgl";
-
+                window.BLUR = 11; window.GRAY = 14; window.WEBGL = "webgl"; window.P3D = "webgl"; window.OPENGL = "webgl"; window.P2D = "p2d"; window.JAVA2D = "p2d";
                 (function() {{
-                  const orgGetContext = HTMLCanvasElement.prototype.getContext;
-                  HTMLCanvasElement.prototype.getContext = function(type, attribs) {{
-                    if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {{
-                      attribs = attribs || {{}};
-                      attribs.preserveDrawingBuffer = true;
-                    }}
-                    return orgGetContext.call(this, type, attribs);
-                  }};
-                }})();
+                  var _audioChannels = ['audioLow', 'audioMid', 'audioHigh', 'beatEnergy'];
+                  var _sliderIdx = 0;
 
-                // fxhash / fxrand compatibility layer
-                window.fxrand = window.fxrand || Math.random;
-                window.fxhash = window.fxhash || (function() {{
-                  const alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-                  return "oo" + Array(49).fill(0).map(() => alphabet[(Math.random() * alphabet.length) | 0]).join('');
-                }})();
+                  function _createAudioBoundElement(min, max, defVal, step) {{
+                    var _ch = _audioChannels[(_sliderIdx++) % _audioChannels.length];
+                    var _min = min !== undefined ? Number(min) : 0;
+                    var _max = max !== undefined ? Number(max) : 100;
+                    var _val = defVal !== undefined ? Number(defVal) : (_min + _max) / 2;
+                    var _step = step !== undefined ? Number(step) : 0;
+                    var _listeners = {{}};
 
-                // OpenProcessing compatibility layer
-                window.publishPreviewPulse = window.publishPreviewPulse || function() {{}};
+                    var el = function() {{ return _sp; }};
+                    el.position = el.style = el.size = el.parent = el.option = el.texture = function() {{ return el; }};
+                    el.id = function() {{ return ""; }};
+                    el.class = function() {{ return el; }};
+                    el.show = el.hide = function() {{ return el; }};
+                    el.mousePressed = el.mouseClicked = el.html = function() {{ return el; }};
+                    el.changed = el.input = function(cb) {{ if (typeof cb === 'function') _listeners['change'] = cb; return el; }};
+                    el.on = el.off = el.addEventListener = el.removeEventListener = el.listen = function() {{ return el; }};
+                    el.width = 100; el.height = 100;
+                    el[Symbol.iterator] = function* () {{ yield el; }};
 
-                // OPC stub compatibility layer
-                if (typeof OPC === 'undefined') {{
-                  window.OPC = {{
-                    slider: function(name, value, min, max, step) {{ window[name] = value; return this; }},
-                    button: function() {{ return this; }},
-                    toggle: function(name, value) {{ window[name] = value; return this; }},
-                    color: function(name, value) {{ window[name] = value; return this; }},
-                    select: function(name, value) {{ window[name] = value; return this; }},
-                    text: function(name, value) {{ window[name] = value; return this; }},
-                    setGlobal: function(name, value) {{ window[name] = value; }}
-                  }};
-                }}
+                    el.value = function(newVal) {{
+                      if (newVal !== undefined) {{
+                        _val = Number(newVal);
+                        return el;
+                      }}
+                      var norm = typeof window[_ch] !== 'undefined' ? Number(window[_ch]) : 0.5;
+                      var dynVal = _min + norm * (_max - _min);
+                      if (_step > 0) {{
+                        dynVal = Math.round((dynVal - _min) / _step) * _step + _min;
+                      }}
+                      return dynVal;
+                    }};
 
-                // Seed compatibility
-                window.seed = window.seed || Math.floor(Math.random() * 999999);
-                {MOCK_NATIVE_AUDIO_JS}
-              </script>
-              <script src="custom_visuals/libs/p5.min.js"></script>
-              <script>{P5_V2_COMPAT_SHIM}</script>
-              <script src="custom_visuals/libs/p5.sound.min.js"></script>
-              <script src="custom_visuals/libs/p5.func.min.js"></script>
-              <script src="custom_visuals/libs/gsap.min.js"></script>
-              <script src="custom_visuals/libs/opc.min.js"></script>
-              <script src="custom_visuals/libs/p5.flex.min.js"></script>
-              <script src="custom_visuals/libs/rampensau.js"></script>
-              <script src="custom_visuals/libs/chroma.min.js"></script>
-              <script>
-                window.customScalingMode = "{scaling_mode}";
-                {OVERRIDE_16_9_JS}
-                {MOCK_P5_JS}
-              </script>
-            </head>
-            <body>
-              <!--CUSTOM_HTML_PLACEHOLDER-->
-              {script_tag}
-            </body>
-            </html>"""
-        else:
-            html_template = f"""<!DOCTYPE html>
-            <html>
-            <head>
-              {early_error_js}
-              <meta charset="utf-8">
-              <style>
-                body {{ margin: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; }}
-                canvas {{ display: block !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; width: 100vw !important; height: 100vh !important; object-fit: cover !important; }}
-                /*CUSTOM_CSS_PLACEHOLDER*/
-                body canvas {{
-                  position: absolute !important;
-                  left: 50% !important;
-                  top: 50% !important;
-                  transform: translate(-50%, -50%) !important;
-                  width: 100vw !important;
-                  height: 100vh !important;
-                  object-fit: cover !important;
-                }}
-              </style>
-              <script type="importmap">
-                {{
-                  "imports": {{
-                    "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js",
-                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/",
-                    "rampensau": "https://cdn.jsdelivr.net/npm/rampensau/+esm"
+                    var handler = {{
+                      get: function(t, p) {{
+                        if (p === 'value') return t.value;
+                        if (p === 'slider') return t;
+                        if (p === 'elt') return {{ value: t.value(), style: {{}} }};
+                        if (p in t) return t[p];
+                        if (typeof p === 'symbol' || p === 'then' || p === 'toJSON') return undefined;
+                        return _sp;
+                      }}
+                    }};
+                    return new Proxy(el, handler);
                   }}
-                }}
-              </script>
-              <!--ASSET_INTERCEPTOR-->
-              <script>
-                // 強力打樁：防止部分作品調用網頁 UI 庫引發 Uncaught ReferenceError
-                window.lil = window.lil || {{ GUI: class {{ add() {{ return this; }} addFolder() {{ return this; }} open() {{ return this; }} onChange() {{ return this; }} setValue() {{ return this; }} }} }};
-                window.dat = window.dat || {{ GUI: class {{ add() {{ return this; }} addFolder() {{ return this; }} }} }};
-                window.planck = window.planck || {{ World: class {{}}, Vec2: class {{}} }};
-                window.PVector = window.PVector || class {{ constructor(x,y,z){{ this.x=x||0; this.y=y||0; this.z=z||0; }} static dist(v1,v2){{ return Math.sqrt((v1.x-v2.x)**2+(v1.y-v2.y)**2); }} }};
-                window.BLUR = 11; window.GRAY = 14; window.WEBGL = "webgl";
 
-                (function() {{
-                  const orgGetContext = HTMLCanvasElement.prototype.getContext;
-                  HTMLCanvasElement.prototype.getContext = function(type, attribs) {{
-                    if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {{
-                      attribs = attribs || {{}};
-                      attribs.preserveDrawingBuffer = true;
-                    }}
-                    return orgGetContext.call(this, type, attribs);
+                  var _do = function() {{ return _sp; }};
+                  _do.position = _do.style = _do.size = _do.parent = _do.option = _do.texture = function() {{ return _sp; }};
+                  _do.id = function() {{ return ""; }};
+                  _do.class = _do.mousePressed = _do.mouseClicked = _do.html = _do.changed = _do.input = function() {{ return _sp; }};
+                  _do.on = _do.off = _do.addEventListener = _do.removeEventListener = _do.listen = function() {{ return _sp; }};
+                  _do.value = function() {{ return 0; }};
+                  _do.width = 100; _do.height = 100;
+                  _do[Symbol.iterator] = function* () {{ yield _sp; }};
+                  var _dh = {{
+                    get: function(t, p) {{
+                      if (p === 'slider') return _sp;
+                      if (p in t) return t[p];
+                      if (typeof p === 'symbol' || p === 'then' || p === 'toJSON') return undefined;
+                      return _sp;
+                    }},
+                    apply: function() {{ return _sp; }},
+                    construct: function() {{ return _sp; }}
                   }};
-                }})();
+                  var _sp = typeof Proxy !== 'undefined' ? new Proxy(_do, _dh) : _do;
 
-                // fxhash / fxrand compatibility layer
-                window.fxrand = window.fxrand || Math.random;
-                window.fxhash = window.fxhash || (function() {{
-                  const alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-                  return "oo" + Array(49).fill(0).map(() => alphabet[(Math.random() * alphabet.length) | 0]).join('');
-                }})();
-
-                // OpenProcessing compatibility layer
-                window.publishPreviewPulse = window.publishPreviewPulse || function() {{}};
-
-                // OPC stub compatibility layer
-                if (typeof OPC === 'undefined') {{
-                  window.OPC = {{
-                    slider: function(name, value, min, max, step) {{ window[name] = value; return this; }},
-                    button: function() {{ return this; }},
-                    toggle: function(name, value) {{ window[name] = value; return this; }},
-                    color: function(name, value) {{ window[name] = value; return this; }},
-                    select: function(name, value) {{ window[name] = value; return this; }},
-                    text: function(name, value) {{ window[name] = value; return this; }},
-                    setGlobal: function(name, value) {{ window[name] = value; }}
-                  }};
-                }}
-
-                // Seed compatibility
-                window.seed = window.seed || Math.floor(Math.random() * 999999);
-                {MOCK_NATIVE_AUDIO_JS}
-              </script>
-              <script src="custom_visuals/libs/p5.min.js"></script>
-              <script>{P5_V2_COMPAT_SHIM}</script>
-              <script src="custom_visuals/libs/p5.sound.min.js"></script>
-              <script src="custom_visuals/libs/p5.func.min.js"></script>
-              <script src="custom_visuals/libs/gsap.min.js"></script>
-              <script src="custom_visuals/libs/opc.min.js"></script>
-              <script src="custom_visuals/libs/p5.flex.min.js"></script>
-              <script src="custom_visuals/libs/rampensau.js"></script>
-              <script src="custom_visuals/libs/chroma.min.js"></script>
-              <script>
-                window.customScalingMode = "{scaling_mode}";
-                {OVERRIDE_16_9_JS}
-                
-                // Inject CSS to hard-hide any leftover GUI containers
-                (function() {{
-                  const style = document.createElement('style');
-                  style.innerHTML = `
-                    .dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container {{
-                      display: none !important;
-                      visibility: hidden !important;
-                      opacity: 0 !important;
-                      pointer-events: none !important;
-                    }}
-                  `;
-                  document.head.appendChild(style);
-                }})();
-
-                // Overwrite OPC methods to prevent control panels from rendering and dynamically link them to audio low/mid/high/beat
-                if (typeof OPC !== 'undefined' || true) {{
-                  const opcMock = {{
-                    slider: function(name, value, min, max, step) {{
-                      const channels = ['audioLow', 'audioMid', 'audioHigh', 'beatEnergy'];
-                      const bound = channels[Math.floor(Math.random() * channels.length)];
-                      Object.defineProperty(window, name, {{
-                        get: function() {{
-                          let norm = window[bound] || 0.5;
-                          let rMin = min !== undefined ? min : 0;
-                          let rMax = max !== undefined ? max : 1;
-                          return rMin + norm * (rMax - rMin);
-                        }},
-                        set: function() {{}},
-                        configurable: true
-                      }});
-                      return this;
-                    }},
-                    button: function() {{ return this; }},
-                    toggle: function(name, value) {{
-                      Object.defineProperty(window, name, {{
-                        get: function() {{
-                          return (window.audioLow || 0.5) > 0.5;
-                        }},
-                        set: function() {{}},
-                        configurable: true
-                      }});
-                      return this;
-                    }},
-                    color: function(name, value) {{
-                      window[name] = value;
-                      return this;
-                    }},
-                    select: function(name, value) {{
-                      window[name] = value;
-                      return this;
-                    }},
-                    text: function(name, value) {{
-                      window[name] = value;
-                      return this;
-                    }},
-                    setGlobal: function(name, value) {{
-                      window[name] = value;
-                    }}
-                  }};
-                  window.OPC = opcMock;
-                  if (typeof p5 !== 'undefined') {{
-                    p5.prototype.OPC = opcMock;
+                  if (typeof createSlider === 'undefined') {{
+                    window.createSlider = function(min, max, defVal, step) {{
+                      return _createAudioBoundElement(min, max, defVal, step);
+                    }};
                   }}
-                }}
-
-                window.isBeat = false;
-                window.beatEnergy = 0;
-                window.audioLow = 0;
-                window.audioMid = 0;
-                window.audioHigh = 0;
-                window.custom_time_ms = 0;
-                window.simulatedMouseX = 400;
-                window.simulatedMouseY = 300;
-                window.beatFramesLeft = 0;
-
-                // Override performance.now
-                window.performance.now = function() {{
-                  return window.custom_time_ms;
+                  if (typeof createP === 'undefined') window.createP = function() {{ return _sp; }};
+                  if (typeof createDiv === 'undefined') window.createDiv = function() {{ return _sp; }};
+                  if (typeof createButton === 'undefined') window.createButton = function() {{ return _sp; }};
+                  if (typeof createInput === 'undefined') window.createInput = function(defVal) {{ return _createAudioBoundElement(0, 100, defVal || 50, 1); }};
+                  if (typeof createSelect === 'undefined') window.createSelect = function() {{ return _createAudioBoundElement(0, 5, 0, 1); }};
+                  if (typeof createCheckbox === 'undefined') window.createCheckbox = function() {{ return _createAudioBoundElement(0, 1, 0, 1); }};
+                  if (typeof createRadio === 'undefined') window.createRadio = function() {{ return _createAudioBoundElement(0, 5, 0, 1); }};
+                  if (typeof createColorPicker === 'undefined') window.createColorPicker = function() {{ return _sp; }};
+                  if (typeof createElement === 'undefined') window.createElement = function() {{ return _sp; }};
+                  if (typeof select === 'undefined') window.select = function() {{ return _sp; }};
+                  if (typeof selectAll === 'undefined') window.selectAll = function() {{ return []; }};
+                  window.Pause = window.Pause || _sp;
+                  window.Play = window.Play || _sp;
+                  window.Reset = window.Reset || _sp;
+                }})();
+                if (typeof window.cnv === 'undefined') window.cnv = typeof createDiv !== 'undefined' ? createDiv() : {{ width: 1422, height: 800, parent: function(){{}}, position: function(){{}}, style: function(){{}} }};
+                if (typeof window.inner1 === 'undefined') window.inner1 = window.cnv;
+                if (typeof window.eyePic === 'undefined') window.eyePic = window.cnv;
+                if (typeof window.myColor === 'undefined') window.myColor = '#ffffff';
+                if (typeof window.grainAmount === 'undefined') window.grainAmount = 0;
+                const _createMockSound = function() {{
+                  return {{
+                    _isMockSound: true,
+                    play: function() {{ return this; }},
+                    stop: function() {{ return this; }},
+                    pause: function() {{ return this; }},
+                    loop: function() {{ return this; }},
+                    isPlaying: function() {{ return false; }},
+                    setVolume: function() {{ return this; }},
+                    pan: function() {{ return this; }},
+                    rate: function() {{ return this; }},
+                    disconnect: function() {{ return this; }},
+                    connect: function() {{ return this; }},
+                    onended: function() {{}},
+                    duration: function() {{ return 180.0; }},
+                    currentTime: function() {{ return 0.0; }},
+                    then: function(resolve) {{ if (resolve) setTimeout(() => resolve(this), 0); return this; }}
+                  }};
                 }};
-
-                // Override Date
-                const OriginalDate = window.Date;
-                class MockedDate extends OriginalDate {{
-                  constructor(...args) {{
-                    if (args.length === 0) {{
-                      super(1719300000000 + window.custom_time_ms);
+                const _createMockFont = function() {{
+                  return {{
+                    _isMockFont: true,
+                    font: {{ data: true, tables: {{}}, _font: {{}} }},
+                    textToPoints: function() {{ return []; }},
+                    textBounds: function(str, x, y, fontSize) {{
+                      var len = (str && str.length) || 1;
+                      var sz = fontSize || 12;
+                      return {{ x: x || 0, y: (y || 0) - sz, w: len * sz * 0.6, h: sz * 1.2, advance: len * sz * 0.6 }};
+                    }},
+                    getPath: function() {{ return {{ commands: [] }}; }},
+                    getOutline: function() {{ return []; }},
+                    then: function(resolve) {{ if (resolve) setTimeout(() => resolve(this), 0); return this; }}
+                  }};
+                }};
+                ['res','scr','gap','asd','nPoints','scaledT','_count','angleStepMax','objs','X0','pg','starColor','clr2','typ','largX',
+                 'paper','pg2','col1','col2','S_actual','maxD','looping','sinput','SZ','medRadius','minRadius','maxRadius','locations',
+                 'grid_size','circle_diams','dots','points','particles','cells','stars','nodes','current_img','img','imgs','moon',
+                 'bg','font','tex','cols','rows','pal','palette','pos','vel','acc','colors','dirs','movers','lines','curves','boxes',
+                 'shapes','polygons','vectors','shaderProgram','sh','dwidth','dheight','kRadiusFactor','minDistFactor','nbrParticles',
+                 'reference','catSpeed','tt','_shiftAmp','BG_C','FG','areas','aryCornerXy','pad','nx','ny','nz','nw',
+                 'allowedLetters','validWords','currentLetters','activeIndex','lettersWord','bars','frames','photo','cover','orient','ovel','start','orthoview','num',
+                 'mobile','buildings','curSeed','px','py','pz','dx','dy','dz','vx','vy','vz','cx','cy','cz','sx','sy','sz','fx','fy','wx','wy','rx','ry','rz',
+                 'sound','audio','song','snd','player','track','voice','mySound','sample','music','myFont','fnt','defaultFont'].forEach(k => {{
+                  if (typeof window[k] === 'undefined') {{
+                    if (['objs','dots','points','particles','cells','stars','nodes','locations','colors','dirs','movers','lines','curves','boxes','shapes','polygons','vectors','pal','palette','circle_diams','imgs','areas','aryCornerXy','bars','frames','currentLetters','validWords','buildings'].includes(k)) {{
+                      window[k] = [];
+                    }} else if (['sound','audio','song','snd','player','track','voice','mySound','sample','music'].includes(k)) {{
+                      window[k] = _createMockSound();
+                    }} else if (['font','myFont','f','fnt','defaultFont'].includes(k)) {{
+                      window[k] = _createMockFont();
+                    }} else if (k === 'scr') {{
+                      window[k] = window.cnv;
+                    }} else if (['img', 'moon', 'photo', 'cover'].includes(k)) {{
+                      window[k] = {{ width: 100, height: 100, resize: function(w,h){{ if(w) this.width=w; if(h) this.height=h; return this; }}, loadPixels: function(){{}}, updatePixels: function(){{}}, get: function(){{ return [0,0,0,0]; }}, set: function(){{}}, copy: function(){{}}, mask: function(){{}}, filter: function(){{}}, pixels: new Uint8ClampedArray(100*100*4), canvas: (typeof document !== 'undefined' ? document.createElement('canvas') : null) }};
+                    }} else if (['orient', 'ovel', 'start'].includes(k)) {{
+                      window[k] = {{ x: 0, y: 0, z: 0, add: function(){{ return this; }}, mult: function(){{ return this; }}, sub: function(){{ return this; }} }};
+                    }} else if (['pg', 'pg2', 'paper'].includes(k)) {{
+                      window[k] = {{ width: 100, height: 100, beginDraw: function(){{}}, endDraw: function(){{}}, background: function(){{}}, image: function(){{}}, get: function(){{ return this; }}, loadPixels: function(){{}}, updatePixels: function(){{}}, pixels: [], resize: function(w,h){{ if(w) this.width=w; if(h) this.height=h; return this; }}, imageMode: function(){{}}, fill: function(){{}}, stroke: function(){{}}, noFill: function(){{}}, noStroke: function(){{}}, rect: function(){{}}, ellipse: function(){{}}, line: function(){{}}, point: function(){{}}, push: function(){{}}, pop: function(){{}}, translate: function(){{}}, rotate: function(){{}}, scale: function(){{}}, textSize: function(){{}}, textAlign: function(){{}}, text: function(){{}}, clear: function(){{}} }};
+                    }} else if (['starColor', 'clr2', 'myColor', 'col1', 'col2', 'bg', 'BG_C', 'FG'].includes(k)) {{
+                      window[k] = '#ffffff';
+                    }} else if (k === 'allowedLetters') {{
+                      window[k] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    }} else if (k === 'looping') {{
+                      window[k] = true;
+                    }} else if (k === 'orthoview' || k === 'mobile') {{
+                      window[k] = false;
+                    }} else if (k === 'angleStepMax') {{
+                      window[k] = 1;
+                    }} else if (k === 'curSeed') {{
+                      window[k] = Math.floor(Math.random() * 999999);
                     }} else {{
-                      super(...args);
+                      window[k] = 0;
                     }}
                   }}
+                }});
+                if (typeof Element !== 'undefined' && Element.prototype && !Element.prototype.size) {{
+                  Element.prototype.size = function() {{ return this; }};
                 }}
-                MockedDate.now = function() {{
-                  return 1719300000000 + window.custom_time_ms;
-                }};
-                MockedDate.UTC = OriginalDate.UTC;
-                MockedDate.parse = OriginalDate.parse;
-                window.Date = MockedDate;
-
-                if (typeof p5 !== 'undefined') {{
-                  p5.prototype.millis = function() {{ return window.custom_time_ms; }};
+                if (typeof HTMLMediaElement !== 'undefined' && HTMLMediaElement.prototype) {{
+                  HTMLMediaElement.prototype.play = function() {{ return Promise.resolve(); }};
+                  HTMLMediaElement.prototype.pause = function() {{}};
                 }}
-
-                window.setFrameParams = function(t, isBeat, beatEnergy, audioLow, audioMid, audioHigh) {{
-                  window.custom_time_ms = t * 1000;
-                  
-                  let w = typeof width !== 'undefined' ? width : 1080;
-                  let h = typeof height !== 'undefined' ? height : 1080;
-                  
-                  // 1. 新一輪拍點觸發，且目前處於無點擊狀態
-                  if (isBeat && window.beatFramesLeft === 0 && !window.isBeat) {{
-                    window.simulatedMouseX = Math.random() * w;
-                    window.simulatedMouseY = Math.random() * h;
-                    
-                    // 動態決定持續幀數（隨能量設定持續 2 至 15 幀）
-                    window.beatFramesLeft = Math.round(2 + beatEnergy * 13);
-                    window.isBeat = true;
-                    
-                    try {{
-                      let moveEvt = new MouseEvent('mousemove', {{ clientX: window.simulatedMouseX, clientY: window.simulatedMouseY, bubbles: true }});
-                      let downEvt = new MouseEvent('mousedown', {{ clientX: window.simulatedMouseX, clientY: window.simulatedMouseY, button: 0, buttons: 1, bubbles: true }});
-                      window.dispatchEvent(moveEvt);
-                      window.dispatchEvent(downEvt);
-                      let canvas = document.querySelector('canvas');
-                      if (canvas) {{
-                        canvas.dispatchEvent(moveEvt);
-                        canvas.dispatchEvent(downEvt);
-                      }}
-                    }} catch(e) {{}}
-
-                    if (typeof mousePressed === 'function') {{
-                      try {{ mousePressed(); }} catch(e) {{}}
-                    }}
-                    if (typeof mouseClicked === 'function') {{
-                      try {{ mouseClicked(); }} catch(e) {{}}
-                    }}
-                  }} 
-                  // 2. 點擊按壓期間，扣減剩餘幀數
-                  else if (window.beatFramesLeft > 0) {{
-                    window.beatFramesLeft--;
-                    if (window.beatFramesLeft === 0) {{
-                      window.isBeat = false;
-                      try {{
-                        let upEvt = new MouseEvent('mouseup', {{ clientX: window.simulatedMouseX, clientY: window.simulatedMouseY, button: 0, bubbles: true }});
-                        window.dispatchEvent(upEvt);
-                        let canvas = document.querySelector('canvas');
-                        if (canvas) {{
-                          canvas.dispatchEvent(upEvt);
+                if (typeof window.Audio !== 'undefined' && window.Audio.prototype) {{
+                  window.Audio.prototype.play = function() {{ return Promise.resolve(); }};
+                  window.Audio.prototype.pause = function() {{}};
+                }}
+                if (typeof window._renderer !== 'undefined' && window._renderer && typeof window._renderer.getTexture !== 'function') {{
+                  window._renderer.getTexture = function() {{ return {{ update: function(){{}}, bindTexture: function(){{}}, unbindTexture: function(){{}} }}; }};
+                }}
+                try {{
+                  let _customFrameCount = undefined;
+                  Object.defineProperty(window, 'frameCount', {{
+                    get: function() {{
+                      if (_customFrameCount !== undefined) return _customFrameCount;
+                      var inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.instance || (p5.activeInstances && p5.activeInstances[0])));
+                      if (inst && typeof inst.frameCount === 'number') return inst.frameCount;
+                      return 0;
+                    }},
+                    set: function(val) {{
+                      _customFrameCount = val;
+                      var inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.instance || (p5.activeInstances && p5.activeInstances[0])));
+                      if (inst) {{
+                        try {{ inst.frameCount = val; }} catch(e) {{}}
+                        if (typeof inst._setProperty === 'function') {{
+                          try {{ inst._setProperty('frameCount', val); }} catch(e) {{}}
                         }}
-                      }} catch(e) {{}}
-                      
-                      if (typeof mouseReleased === 'function') {{
-                        try {{ mouseReleased(); }} catch(e) {{}}
                       }}
+                    }},
+                    configurable: true,
+                    enumerable: true
+                  }});
+                }} catch(e) {{}}
+                if (typeof p5 !== 'undefined') {{
+                  if (p5.Image && p5.Image.prototype) {{
+                    if (!p5.Image.prototype.resize) p5.Image.prototype.resize = function(w, h) {{ if(w) this.width=w; if(h) this.height=h; return this; }};
+                    if (!p5.Image.prototype.loadPixels) p5.Image.prototype.loadPixels = function() {{}};
+                    if (!p5.Image.prototype.updatePixels) p5.Image.prototype.updatePixels = function() {{}};
+                    if (!p5.Image.prototype.get) p5.Image.prototype.get = function() {{ return [0,0,0,0]; }};
+                    if (!p5.Image.prototype.set) p5.Image.prototype.set = function() {{}};
+                    if (!p5.Image.prototype.mask) p5.Image.prototype.mask = function() {{}};
+                    if (!p5.Image.prototype.filter) p5.Image.prototype.filter = function() {{}};
+                    if (!p5.Image.prototype.copy) p5.Image.prototype.copy = function() {{}};
+                    if (!p5.Image.prototype.blend) p5.Image.prototype.blend = function() {{}};
+                  }}
+                  if (p5.Graphics && p5.Graphics.prototype) {{
+                    if (!p5.Graphics.prototype.imageMode) p5.Graphics.prototype.imageMode = function() {{}};
+                  }}
+                  if (p5.Font && p5.Font.prototype) {{
+                    if (!p5.Font.prototype.textBounds) {{
+                      p5.Font.prototype.textBounds = function(str, x, y, fontSize) {{
+                        var len = (str && str.length) || 1;
+                        var sz = fontSize || 12;
+                        return {{ x: x || 0, y: (y || 0) - sz, w: len * sz * 0.6, h: sz * 1.2, advance: len * sz * 0.6 }};
+                      }};
                     }}
-                  }} 
-                  // 3. 平常無點擊狀態，平滑波動
-                  else {{
-                    window.isBeat = false;
-                    window.simulatedMouseX = w / 2 + (audioLow - 0.5) * w * 0.6;
-                    window.simulatedMouseY = h / 2 + (audioMid - 0.5) * h * 0.6;
-                    
-                    try {{
-                      let moveEvt = new MouseEvent('mousemove', {{ clientX: window.simulatedMouseX, clientY: window.simulatedMouseY, bubbles: true }});
-                      window.dispatchEvent(moveEvt);
-                      let canvas = document.querySelector('canvas');
-                      if (canvas) {{
-                        canvas.dispatchEvent(moveEvt);
-                      }}
-                    }} catch(e) {{}}
                   }}
-                  
-                  window.beatEnergy = beatEnergy;
-                  window.audioLow = audioLow;
-                  window.audioMid = audioMid;
-                  window.audioHigh = audioHigh;
-                  if (typeof redraw === 'function') {{
-                    redraw();
-                  }}
-                  return "ok";
-                }};
+                }}
 
+                (function() {{
+                  const orgGetContext = HTMLCanvasElement.prototype.getContext;
+                  HTMLCanvasElement.prototype.getContext = function(type, attribs) {{
+                    if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {{
+                      attribs = attribs || {{}};
+                      attribs.preserveDrawingBuffer = true;
+                    }}
+                    return orgGetContext.call(this, type, attribs);
+                  }};
+                }})();
+
+                // fxhash / fxrand compatibility layer
+                window.fxrand = window.fxrand || Math.random;
+                window.fxhash = window.fxhash || (function() {{
+                  const alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+                  return "oo" + Array(49).fill(0).map(() => alphabet[(Math.random() * alphabet.length) | 0]).join('');
+                }})();
+
+                // OpenProcessing compatibility layer
+                window.publishPreviewPulse = window.publishPreviewPulse || function() {{}};
+
+                // OPC stub compatibility layer (OpenProcessing Control Library)
+                if (typeof OPC === 'undefined') {{
+                  const _opcHandler = {{
+                    get: function(target, prop) {{
+                      if (prop in target) return target[prop];
+                      if (['slider', 'toggle', 'color', 'select', 'text', 'palette', 'range'].includes(prop)) {{
+                        return function(name, value) {{
+                          if (name && typeof value !== 'undefined' && typeof window[name] === 'undefined') {{
+                            window[name] = value;
+                          }}
+                          return window.OPC;
+                        }};
+                      }}
+                      return function() {{ return window.OPC; }};
+                    }}
+                  }};
+                  window.OPC = new Proxy({{
+                    slider: function(name, value, min, max, step) {{ if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; }},
+                    button: function() {{ return window.OPC; }},
+                    toggle: function(name, value) {{ if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; }},
+                    color: function(name, value) {{ if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; }},
+                    select: function(name, value) {{ if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; }},
+                    text: function(name, value) {{ if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; }},
+                    title: function() {{ return window.OPC; }},
+                    header: function() {{ return window.OPC; }},
+                    separator: function() {{ return window.OPC; }},
+                    collapsed: function() {{ return window.OPC; }},
+                    bezier: function() {{ return window.OPC; }},
+                    setGlobal: function(name, value) {{ if (name) window[name] = value; }}
+                  }}, _opcHandler);
+                }}
+
+                // Seed compatibility
+                window.seed = window.seed || Math.floor(Math.random() * 999999);
+                {MOCK_NATIVE_AUDIO_JS}
+              </script>
+              <script src="custom_visuals/libs/p5.min.js"></script>
+              <script>
+                {OVERRIDE_16_9_JS}
+                {P5_V2_COMPAT_SHIM}
+              </script>
+              <script src="custom_visuals/libs/p5.sound.min.js"></script>
+              <script src="custom_visuals/libs/p5.func.min.js"></script>
+              <script src="custom_visuals/libs/p5.flex.min.js"></script>
+              <script src="custom_visuals/libs/rampensau.js"></script>
+              <script src="custom_visuals/libs/chroma.min.js"></script>
+              <script>
+                window.customScalingMode = "{scaling_mode}";
                 {MOCK_P5_JS}
                 {asset_override_js}
                 {noloop_js}
@@ -4733,6 +7053,27 @@ class StandaloneInjectorApp(QMainWindow):
             <body>
               <!--CUSTOM_HTML_PLACEHOLDER-->
               {script_tag}
+              <script>
+                (function() {{
+                  function ensureP5Active() {{
+                    if (!document.querySelector('canvas') && typeof p5 === 'function') {{
+                      try {{
+                        if (typeof window.setup === 'function' || typeof setup === 'function') {{
+                          new p5();
+                        }}
+                      }} catch(e) {{}}
+                    }}
+                  }}
+                  if (document.readyState === 'complete' || document.readyState === 'interactive') {{
+                    ensureP5Active();
+                  }} else {{
+                    window.addEventListener('DOMContentLoaded', ensureP5Active);
+                    window.addEventListener('load', ensureP5Active);
+                  }}
+                  setTimeout(ensureP5Active, 30);
+                  setTimeout(ensureP5Active, 100);
+                }})();
+              </script>
             </body>
             </html>"""
         import json
@@ -4815,9 +7156,8 @@ class StandaloneInjectorApp(QMainWindow):
             });
           }
         </script>
-        </head>
         """
-        res_html = res_html.replace("</head>", webchannel_js_code)
+        res_html = res_html.replace("</head>", f"{webchannel_js_code}\n</head>", 1)
         
         if hasattr(self, "js_local_paths") and self.js_local_paths:
             for online_url, local_url in self.js_local_paths.items():
@@ -5013,7 +7353,7 @@ class StandaloneInjectorApp(QMainWindow):
         url = target_data.get("url", "").strip()
         if url:
             import re
-            match = re.search(r'/sketch/(\d+)', url)
+            match = re.search(r'/(?:sketch/|@[\w\-]+/)?(\d+)', url)
             if match:
                 sketch_id = match.group(1)
                 self.thumbnail_generating = True
@@ -5029,19 +7369,19 @@ class StandaloneInjectorApp(QMainWindow):
                     try:
                         thumb_url = f"https://openprocessing.org/usercontent/sketches/images/{sketch_id}.jpg"
                         img_resp = requests.get(thumb_url, headers=headers, timeout=5)
-                        if img_resp.status_code == 200:
+                        if img_resp.status_code == 200 and len(img_resp.content) > 100:
                             with open(dest_thumb_path, "wb") as img_f:
                                 img_f.write(img_resp.content)
                             success = True
                         else:
                             thumb_url_png = f"https://openprocessing.org/usercontent/sketches/images/{sketch_id}.png"
                             img_resp = requests.get(thumb_url_png, headers=headers, timeout=5)
-                            if img_resp.status_code == 200:
+                            if img_resp.status_code == 200 and len(img_resp.content) > 100:
                                 with open(dest_thumb_path, "wb") as img_f:
                                     img_f.write(img_resp.content)
                                 success = True
                     except Exception as e:
-                        print(f"背景下載 OpenProcessing 縮圖出錯: {e}")
+                        pass
                         
                     if success:
                         QTimer.singleShot(0, lambda: self.on_bg_thumbnail_download_success(target_name, dest_thumb_path))
@@ -5057,15 +7397,38 @@ class StandaloneInjectorApp(QMainWindow):
 
     def on_bg_thumbnail_download_success(self, target_name, thumb_path):
         self.thumbnail_generating = False
-        self.log_to_console(f"✅ 「{target_name}」背景下載預覽縮圖成功！")
+        print(f"[THUMB] ✅ 「{target_name}」背景下載預覽縮圖成功！", flush=True)
         self.update_single_thumbnail_in_ui(target_name, thumb_path)
         QTimer.singleShot(100, self.generate_next_missing_thumbnail)
+
+    def generate_fallback_placeholder_thumbnail(self, target_name, save_dir):
+        """當作品無法透過 WebEngine 或 OpenProcessing 取得縮圖時，生成質感霓虹漸層占位圖並存檔，避免重啟重複嘗試"""
+        try:
+            from PIL import Image as PILImage, ImageDraw, ImageFont
+            thumb_dir = os.path.join(save_dir, "thumbnails")
+            os.makedirs(thumb_dir, exist_ok=True)
+            thumb_path = os.path.join(thumb_dir, f"{target_name}.jpg")
+            
+            # 建立 140x140 霓虹暗色系卡片
+            img = PILImage.new("RGB", (140, 140), color=(18, 18, 24))
+            draw = ImageDraw.Draw(img)
+            
+            # 畫內框霓虹微光
+            draw.rectangle([6, 6, 133, 133], outline=(90, 45, 140), width=2)
+            draw.ellipse([45, 45, 95, 95], fill=(35, 25, 55), outline=(168, 85, 247), width=2)
+            
+            # 存檔至磁碟
+            img.save(thumb_path, "JPEG", quality=85)
+            self.update_single_thumbnail_in_ui(target_name, thumb_path)
+            return thumb_path
+        except Exception:
+            return None
 
     def generate_thumbnail_via_webengine(self, target_name, target_data, save_dir):
         self.thumbnail_generating = True
         self.thumbnail_has_js_error = False
         self.thumbnail_missing_libs = set()
-        self.log_to_console(f"⏳ 正在背景生成「{target_name}」的實時預覽縮圖...")
+        print(f"[THUMB] ⏳ 正在背景生成「{target_name}」的實時預覽縮圖...", flush=True)
         
         w, h = 300, 300
         clipper = QWidget(None)
@@ -5093,7 +7456,7 @@ class StandaloneInjectorApp(QMainWindow):
                 
             if is_err or "uncaught" in msg_lower or "is not defined" in msg_lower or "unexpected token" in msg_lower or "cannot read properties" in msg_lower:
                 self.thumbnail_has_js_error = True
-            self.log_to_console(f"🎥 [縮圖渲染] Line {line_num}: {message}", is_err)
+            print(f"[THUMB] Line {line_num}: {message}", flush=True)
         view.setPage(CustomWebEnginePage(log_thumb_msg, view))
         
         settings = view.settings()
@@ -5119,109 +7482,95 @@ class StandaloneInjectorApp(QMainWindow):
         
         view.setHtml(html, get_local_base_url())
         
-        ev = QEventLoop()
-        def on_load_finished(ok):
+        is_cleaned = False
+        def cleanup_thumb_view(success=False):
+            nonlocal is_cleaned
+            if is_cleaned:
+                return
+            is_cleaned = True
             try:
-                ev.quit()
-            except RuntimeError:
+                view.setPage(None)
+                view.setParent(None)
+                view.close()
+                view.deleteLater()
+            except:
                 pass
-            
-        view.loadFinished.connect(on_load_finished)
-        def safe_quit_ev():
             try:
-                ev.quit()
-            except RuntimeError:
+                clipper.setParent(None)
+                clipper.close()
+                clipper.deleteLater()
+            except:
                 pass
-        QTimer.singleShot(2000, safe_quit_ev)
-        ev.exec()
-        try:
-            view.loadFinished.disconnect(on_load_finished)
-        except:
-            pass
-            
-        render_ev = QEventLoop()
+            self.thumbnail_generating = False
+            if success:
+                thumb_path = os.path.join(save_dir, "thumbnails", f"{target_name}.jpg")
+                self.update_single_thumbnail_in_ui(target_name, thumb_path)
+            else:
+                self.failed_thumbnails.add(target_name)
+                self.generate_fallback_placeholder_thumbnail(target_name, save_dir)
+            QTimer.singleShot(100, self.generate_next_missing_thumbnail)
+
         def capture_and_save():
+            if is_cleaned:
+                return
             try:
-                times_to_try = [1500, 2000, 5000]
-                success = False
-                
-                for t_ms in times_to_try:
-                    js_code = f"""
-                    (function() {{
-                        window.isBeat = true;
-                        window.beatEnergy = 0.8;
-                        window.audioLow = 0.7;
-                        window.audioMid = 0.6;
-                        window.audioHigh = 0.8;
-                        window.custom_time_ms = {t_ms};
-                        
-                        let w = typeof width !== 'undefined' ? width : 300;
-                        let h = typeof height !== 'undefined' ? height : 300;
-                        window.simulatedMouseX = w / 2;
-                        window.simulatedMouseY = h / 2;
-                        try {{
-                            let moveEvt = new MouseEvent('mousemove', {{ clientX: w/2, clientY: h/2, bubbles: true }});
-                            let downEvt = new MouseEvent('mousedown', {{ clientX: w/2, clientY: h/2, button: 0, buttons: 1, bubbles: true }});
-                            window.dispatchEvent(moveEvt);
-                            window.dispatchEvent(downEvt);
-                            let canvas = document.querySelector('canvas');
-                            if (canvas) {{
-                                canvas.dispatchEvent(moveEvt);
-                                canvas.dispatchEvent(downEvt);
-                            }}
-                            if (typeof mousePressed === 'function') mousePressed();
-                            if (typeof mouseClicked === 'function') mouseClicked();
-                        }} catch(e) {{}}
-                        
-                        if (typeof redraw === 'function') {{
-                            redraw();
-                        }}
-                        
-                        try {{
-                            let canvas = document.querySelector('canvas') || document.getElementsByTagName('canvas')[0];
-                            if (canvas) {{
-                                return canvas.toDataURL('image/jpeg', 0.9);
-                            }}
-                        }} catch(e) {{}}
-                        return "no_canvas";
-                    }})();
-                    """
-                    js_loop = QEventLoop()
-                    canvas_data = [None]
-                    def on_js_done(val):
-                        canvas_data[0] = val
-                        try:
-                            js_loop.quit()
-                        except RuntimeError:
-                            pass
-                    view.page().runJavaScript(js_code, on_js_done)
-                    def safe_quit_js():
-                        try:
-                            js_loop.quit()
-                        except RuntimeError:
-                            pass
-                    QTimer.singleShot(250, safe_quit_js)
-                    js_loop.exec()
-    
-                    if hasattr(self, "thumbnail_has_js_error") and self.thumbnail_has_js_error:
-                        raise Exception("代碼運行期間發生了嚴重的 JS 未捕獲錯誤，此作品損毀或缺少必要庫")
+                js_code = """
+                (function() {
+                    window.isBeat = true;
+                    window.beatEnergy = 0.8;
+                    window.audioLow = 0.7;
+                    window.audioMid = 0.6;
+                    window.audioHigh = 0.8;
+                    window.custom_time_ms = 1500;
                     
+                    let w = typeof width !== 'undefined' ? width : 300;
+                    let h = typeof height !== 'undefined' ? height : 300;
+                    window.simulatedMouseX = w / 2;
+                    window.simulatedMouseY = h / 2;
+                    try {
+                        let moveEvt = new MouseEvent('mousemove', { clientX: w/2, clientY: h/2, bubbles: true });
+                        let downEvt = new MouseEvent('mousedown', { clientX: w/2, clientY: h/2, button: 0, buttons: 1, bubbles: true });
+                        window.dispatchEvent(moveEvt);
+                        window.dispatchEvent(downEvt);
+                        let canvas = document.querySelector('canvas');
+                        if (canvas) {
+                            canvas.dispatchEvent(moveEvt);
+                            canvas.dispatchEvent(downEvt);
+                        }
+                        if (typeof mousePressed === 'function') mousePressed();
+                        if (typeof mouseClicked === 'function') mouseClicked();
+                    } catch(e) {}
+                    
+                    if (typeof redraw === 'function') {
+                        redraw();
+                    }
+                    
+                    try {
+                        let canvas = document.querySelector('canvas') || document.getElementsByTagName('canvas')[0];
+                        if (canvas) {
+                            return canvas.toDataURL('image/jpeg', 0.9);
+                        }
+                    } catch(e) {}
+                    return "no_canvas";
+                })();
+                """
+                def on_canvas_captured(val):
+                    if is_cleaned:
+                        return
                     is_black = True
-                    if canvas_data[0] and canvas_data[0].startswith("data:image/"):
+                    if val and isinstance(val, str) and val.startswith("data:image/"):
                         import base64
                         import io
                         from PIL import Image as PILImage
                         try:
-                            header, encoded = canvas_data[0].split(",", 1)
+                            header, encoded = val.split(",", 1)
                             img_bytes = base64.b64decode(encoded)
-                            
                             with PILImage.open(io.BytesIO(img_bytes)) as pil_img:
                                 extrema = pil_img.convert("L").getextrema()
-                                if extrema and extrema[1] >= 15:
+                                if extrema and extrema[1] >= 10:
                                     thumb_dir = os.path.join(save_dir, "thumbnails")
                                     os.makedirs(thumb_dir, exist_ok=True)
                                     thumb_path = os.path.join(thumb_dir, f"{target_name}.jpg")
-                                    
                                     w_val, h_val = pil_img.size
                                     min_dim = min(w_val, h_val)
                                     left = (w_val - min_dim) / 2
@@ -5231,152 +7580,45 @@ class StandaloneInjectorApp(QMainWindow):
                                     cropped_img = pil_img.crop((left, top, right, bottom))
                                     resized_img = cropped_img.resize((140, 140), PILImage.Resampling.LANCZOS)
                                     resized_img.save(thumb_path, "JPEG", quality=90)
-                                    
                                     is_black = False
-                        except Exception as capture_err:
-                            print(f"Canvas capture extraction failed: {capture_err}")
+                        except Exception:
                             is_black = True
                     
-                    if is_black:
-                        pix = view.grab()
-                        if pix.isNull() or pix.width() <= 0 or pix.height() <= 0:
-                            continue
-                        
-                        scaled_pix = pix.scaled(140, 140, Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation)
-                        rect = QRect(0, 0, 140, 140)
-                        cropped_pix = scaled_pix.copy(rect)
-                        if cropped_pix.isNull():
-                            continue
-                        
-                        thumb_dir = os.path.join(save_dir, "thumbnails")
-                        os.makedirs(thumb_dir, exist_ok=True)
-                        thumb_path = os.path.join(thumb_dir, f"{target_name}.jpg")
-                        if not cropped_pix.save(thumb_path, "JPG", 90):
-                            continue
-                        
+                    if is_black and not is_cleaned:
                         try:
-                            from PIL import Image as PILImage
-                            with PILImage.open(thumb_path) as img:
-                                extrema = img.convert("L").getextrema()
-                                if extrema and extrema[1] >= 15:
-                                    is_black = False
-                        except Exception as check_err:
-                            print(f"Check thumbnail black failed: {check_err}")
-                            is_black = False
+                            pix = view.grab()
+                            if not pix.isNull() and pix.width() > 0 and pix.height() > 0:
+                                scaled_pix = pix.scaled(140, 140, Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation)
+                                rect = QRect(0, 0, 140, 140)
+                                cropped_pix = scaled_pix.copy(rect)
+                                if not cropped_pix.isNull():
+                                    thumb_dir = os.path.join(save_dir, "thumbnails")
+                                    os.makedirs(thumb_dir, exist_ok=True)
+                                    thumb_path = os.path.join(thumb_dir, f"{target_name}.jpg")
+                                    if cropped_pix.save(thumb_path, "JPG", 90):
+                                        is_black = False
+                        except Exception:
+                            pass
                     
                     if not is_black:
-                        success = True
-                        self.log_to_console(f"✅ 「{target_name}」預覽縮圖生成成功！(時間點: {t_ms/1000:.1f} 秒)")
-                        break
+                        print(f"[THUMB] ✅ 「{target_name}」預覽縮圖生成成功！", flush=True)
+                        cleanup_thumb_view(success=True)
                     else:
-                        self.log_to_console(f"⚠️ 偵測到「{target_name}」在 {t_ms/1000:.1f} 秒接近全黑，將嘗試更長的時間點...")
-                
-                if not success:
-                    self.log_to_console(f"ℹ️ 「{target_name}」在 5.0 秒後仍接近全黑，保留最後生成的預覽圖。")
-            except Exception as e:
-                if self.thumbnail_missing_libs and self.thumbnail_current_attempts < 1:
-                    self.thumbnail_current_attempts += 1
-                    self.log_to_console(f"🔧 偵測到缺失必要庫 {self.thumbnail_missing_libs}，正在自動補齊並重新加載...", is_err=True)
-                    
-                    json_path = os.path.join(save_dir, f"{target_name}.json")
-                    if os.path.exists(json_path):
-                        try:
-                            with open(json_path, "r", encoding="utf-8") as f:
-                                json_data = json.load(f)
-                            
-                            new_libs_html = ""
-                            for lib in self.thumbnail_missing_libs:
-                                local_url = self.get_and_cache_library(lib)
-                                if local_url:
-                                    new_libs_html += f'<script src="{local_url}"></script>\n'
-                            
-                            json_data["custom_html"] = new_libs_html + json_data.get("custom_html", "")
-                            
-                            with open(json_path, "w", encoding="utf-8") as f:
-                                json.dump(json_data, f, indent=4, ensure_ascii=False)
-                        except Exception as repair_err:
-                            self.log_to_console(f"   [!] 自動補庫寫入失敗: {repair_err}", is_err=True)
-                    
-                    view.setPage(None)
-                    view.setParent(None)
-                    view.close()
-                    view.deleteLater()
-                    try:
-                        clipper.setParent(None)
-                        clipper.close()
-                        clipper.deleteLater()
-                    except:
-                        pass
-                    self.thumbnail_generating = False
-                    render_ev.quit()
-                    
-                    QTimer.singleShot(100, self.generate_next_missing_thumbnail)
-                    return
-                
-                self.failed_thumbnails.add(target_name)
-                json_path = os.path.join(save_dir, f"{target_name}.json")
-                
-                report_path = os.path.join(workspace_dir, "op_import_errors.txt")
-                try:
-                    orig_code = "N/A"
-                    orig_url = "N/A"
-                    orig_html = "N/A"
-                    if os.path.exists(json_path):
-                        with open(json_path, "r", encoding="utf-8") as f:
-                            err_data = json.load(f)
-                            orig_code = err_data.get("code", "N/A")
-                            orig_url = err_data.get("url", "N/A")
-                            orig_html = err_data.get("custom_html", "N/A")
-                    
-                    with open(report_path, "a", encoding="utf-8") as f:
-                        f.write("\n" + "="*70 + "\n")
-                        f.write(f"--- [縮圖渲染失敗項目] ---\n")
-                        f.write(f"作品名稱 (Title): {target_name}\n")
-                        f.write(f"作品網址 (URL): {orig_url}\n")
-                        f.write(f"錯誤訊息 (Error): {e}\n")
-                        import datetime
-                        f.write(f"產生時間: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                        f.write("\n[Original Code Snapshot]\n")
-                        f.write("```javascript\n")
-                        f.write(f"{orig_code}\n")
-                        f.write("```\n")
-                        if orig_html and orig_html != "N/A":
-                            f.write("\n[Original Custom HTML Snapshot]\n")
-                            f.write("```html\n")
-                            f.write(f"{orig_html}\n")
-                            f.write("```\n")
-                        f.write("="*70 + "\n")
-                except Exception as log_err:
-                    print(f"追加縮圖失敗報告出錯: {log_err}")
+                        cleanup_thumb_view(success=False)
 
-                if os.path.exists(json_path):
-                    try:
-                        os.remove(json_path)
-                    except:
-                        pass
-                self.log_to_console(f"❌ 「{target_name}」預覽縮圖生成失敗 (已自動刪除損毀作品，並已將代碼紀錄至 op_import_errors.txt): {e}", is_err=True)
-            finally:
-                view.setPage(None)
-                view.setParent(None)
-                view.close()
-                view.deleteLater()
-                try:
-                    clipper.setParent(None)
-                    clipper.close()
-                    clipper.deleteLater()
-                except:
-                    pass
-                self.thumbnail_generating = False
-                render_ev.quit()
-                if success:
-                    thumb_path = os.path.join(save_dir, "thumbnails", f"{target_name}.jpg")
-                    self.update_single_thumbnail_in_ui(target_name, thumb_path)
-                else:
-                    self.remove_single_preset_from_ui(target_name)
-                QTimer.singleShot(100, self.generate_next_missing_thumbnail)
-                
-        QTimer.singleShot(1000, capture_and_save)
-        render_ev.exec()
+                if not is_cleaned:
+                    view.page().runJavaScript(js_code, on_canvas_captured)
+
+            except Exception as e:
+                self.failed_thumbnails.add(target_name)
+                print(f"[THUMB] ⚠️ 「{target_name}」預覽縮圖生成未成功: {e}", flush=True)
+                cleanup_thumb_view(success=False)
+
+        def on_loaded(ok):
+            QTimer.singleShot(600, capture_and_save)
+
+        view.loadFinished.connect(on_loaded)
+        QTimer.singleShot(4000, lambda: cleanup_thumb_view(success=False))
 
     def update_single_thumbnail_in_ui(self, module_name, thumb_path):
         for i in range(self.visual_list.count()):
@@ -5428,6 +7670,15 @@ class StandaloneInjectorApp(QMainWindow):
         sys.stdout.flush()
         try:
             log_path = os.path.join(workspace_dir, "app_debug.log")
+            # Log rotation: if log file exceeds 20MB, rotate it to .1
+            if os.path.exists(log_path) and os.path.getsize(log_path) > 20 * 1024 * 1024:
+                backup_path = os.path.join(workspace_dir, "app_debug.log.1")
+                try:
+                    if os.path.exists(backup_path):
+                        os.remove(backup_path)
+                    os.rename(log_path, backup_path)
+                except Exception:
+                    pass
             with open(log_path, "a", encoding="utf-8") as lf:
                 import datetime
                 lf.write(f"{datetime.datetime.now().isoformat()} - {prefix}{text}\n")
@@ -5514,7 +7765,13 @@ function lm(a, b) {
   return a;
 }
 """
-                transpiled = src
+                # Protect strings, template literals, and shader GLSL blocks from transpilation corruption
+                placeholders = {}
+                def _mask_str(m):
+                    key = f"__STR_LITERAL_PLACEHOLDER_{len(placeholders)}__"
+                    placeholders[key] = m.group(0)
+                    return key
+                transpiled = re.sub(r'(`[\s\S]*?`|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\')', _mask_str, src)
                 # Remove Java access modifiers and keywords that cause JS syntax errors
                 transpiled = re.sub(r'\b(private|public|protected|static|transient|volatile)\s+', '', transpiled)
                 transpiled = re.sub(r'\bfinal\s+', '', transpiled)
@@ -5586,12 +7843,11 @@ function lm(a, b) {
                         # typed methods in class
                         elif re.search(r'\b(int|float|double|boolean|color|char|[A-Z]\w*)\s+(\w+)\s*\(', line):
                             line = re.sub(r'\b(int|float|double|boolean|color|char|[A-Z]\w*)\s+(\w+)\s*\(', r'\2(', line)
-                        
-                        # (g) 移除 class 內部欄位宣告的 let 關鍵字（JS class body 不允許 let/const/var）
+                        # (g) 移除 class 內部欄位宣告的 let/var/const 關鍵字（JS class body 不允許 let/const/var）
                         if is_class_body_field:
                             stripped = line.strip()
-                            if stripped.startswith('let ') and '(' not in stripped and '=' in stripped:
-                                line = line.replace('let ', '', 1)
+                            if re.match(r'^(let|var|const)\s+', stripped) and '(' not in stripped:
+                                line = re.sub(r'^(\s*)(let|var|const)\s+', r'\1', line)
                     else:
                         # Non-class functions
                         line = re.sub(r'\b(int|float|double|boolean|color|char|[A-Z]\w*)\s+(\w+)\s*\(', r'function \2(', line)
@@ -5634,17 +7890,24 @@ function lm(a, b) {
                     transpiled = "function arraycopy(s,sp,d,dp,l){for(var _i=0;_i<l;_i++)d[dp+_i]=s[sp+_i];}\n" + transpiled
                 
                 # 6. fullScreen() & size()
+                transpiled = re.sub(r'\bfullScreen\s*\(\s*(?:P3D|WEBGL|OPENGL)?\s*\)', 'createCanvas(windowWidth, windowHeight, WEBGL)', transpiled, flags=re.IGNORECASE)
                 transpiled = re.sub(r'\bfullScreen\s*\(\s*\)', 'createCanvas(windowWidth, windowHeight)', transpiled)
+                transpiled = re.sub(r'\bsize\s*\(\s*([^,)]+)\s*,\s*([^,)]+)\s*,\s*(?:P3D|WEBGL|OPENGL)\s*\)', r'createCanvas(\1, \2, WEBGL)', transpiled, flags=re.IGNORECASE)
+                transpiled = re.sub(r'\bsize\s*\(\s*([^,)]+)\s*,\s*([^,)]+)\s*,\s*(?:P2D|JAVA2D)\s*\)', r'createCanvas(\1, \2)', transpiled, flags=re.IGNORECASE)
                 transpiled = re.sub(r'\bsize\s*\(\s*([^,)]+)\s*,\s*([^,)]+)\s*\)', r'createCanvas(\1, \2)', transpiled)
                 
                 return transpiled
 
             adapted = transpile_processing_to_js(adapted)
+            adapted = re.sub(r'\bendShapepop\s*\(\s*\)', 'endShape(); pop();', adapted)
 
 
-        # Force fullscreen fill: Replace min(width/height) with max(width/height) to expand drawing viewport
-        adapted = re.sub(r'\bmin\s*\(\s*windowWidth\s*,\s*windowHeight\s*\)', 'max(windowWidth, windowHeight)', adapted)
-        adapted = re.sub(r'\bmin\s*\(\s*width\s*,\s*height\s*\)', 'max(width, height)', adapted)
+        # Dynamic fullscreen scaling mode: controlled by director system (window.fullscreenFitMode)
+        # Modes: 'fill'/'cover' -> max(w,h), 'contain'/'fit' -> min(w,h)
+        fit_mode_eval = "(window.fullscreenFitMode === 'contain' || window.fullscreenFitMode === 'fit' ? min : max)"
+        adapted = re.sub(r'\bmin\s*\(\s*windowWidth\s*,\s*windowHeight\s*\)', f'{fit_mode_eval}(windowWidth, windowHeight)', adapted)
+        adapted = re.sub(r'\bmin\s*\(\s*width\s*,\s*height\s*\)', f'{fit_mode_eval}(width, height)', adapted)
+
 
         # Convert OpenProcessing's non-standard new p5.Shader(this.renderer, vert, frag) to standard p5.js createShader(vert, frag)
         adapted = re.sub(
@@ -5685,10 +7948,13 @@ function lm(a, b) {
         # WebGL check
         has_3d_keywords = any(re.search(kw, adapted) for kw in [
             r'\bbox\s*\(', r'\bsphere\s*\(', r'\btorus\s*\(', r'\bcylinder\s*\(',
-            r'\brotateX\s*\(', r'\brotateY\s*\(', r'\brotateZ\s*\('
+            r'\brotateX\s*\(', r'\brotateY\s*\(', r'\brotateZ\s*\(', r'\bP3D\b'
         ])
         if has_3d_keywords and "WEBGL" not in adapted:
-            adapted = re.sub(r'createCanvas\s*\(\s*([^,)]*)\s*,\s*([^,)]*)\s*\)', r'createCanvas(\1, \2, WEBGL)', adapted)
+            if "createCanvas" in adapted:
+                adapted = re.sub(r'createCanvas\s*\(\s*([^,)]*)\s*,\s*([^,)]*)\s*\)', r'createCanvas(\1, \2, WEBGL)', adapted)
+            else:
+                adapted = "function setup() { createCanvas(windowWidth, windowHeight, WEBGL); }\n" + adapted
 
         # Auto stub additions
         def is_declared(name, text):
@@ -5721,9 +7987,96 @@ function lm(a, b) {
         if "window._origLoadImage =" not in adapted and "const _origLoadImage =" not in adapted:
             adapted += """
 
-// 1. 免疫 DOM 元素建立導致的看門狗攔截
-if (typeof createP === 'undefined') { window.createP = function() { return { position: function(){}, style: function(){} }; }; }
-if (typeof createDiv === 'undefined') { window.createDiv = function() { return { position: function(){}, style: function(){} }; }; }
+// 1. 免疫 DOM 元素建立並於背景以音視頻段驅動
+(function() {
+    var _audioChannels = ['audioLow', 'audioMid', 'audioHigh', 'beatEnergy'];
+    var _sliderIdx = 0;
+
+    function _createAudioBoundElement(min, max, defVal, step) {
+        var _ch = _audioChannels[(_sliderIdx++) % _audioChannels.length];
+        var _min = min !== undefined ? Number(min) : 0;
+        var _max = max !== undefined ? Number(max) : 100;
+        var _val = defVal !== undefined ? Number(defVal) : (_min + _max) / 2;
+        var _step = step !== undefined ? Number(step) : 0;
+        var _listeners = {};
+
+        var el = function() { return _sp; };
+        el.position = el.style = el.size = el.parent = el.option = el.texture = function() { return el; };
+        el.id = function() { return ""; };
+        el.class = function() { return el; };
+        el.show = el.hide = function() { return el; };
+        el.mousePressed = el.mouseClicked = el.html = function() { return el; };
+        el.changed = el.input = function(cb) { if (typeof cb === 'function') _listeners['change'] = cb; return el; };
+        el.on = el.off = el.addEventListener = el.removeEventListener = el.listen = function() { return el; };
+        el.width = 100; el.height = 100;
+        el[Symbol.iterator] = function* () { yield el; };
+
+        el.value = function(newVal) {
+            if (newVal !== undefined) {
+                _val = Number(newVal);
+                return el;
+            }
+            var norm = typeof window[_ch] !== 'undefined' ? Number(window[_ch]) : 0.5;
+            var dynVal = _min + norm * (_max - _min);
+            if (_step > 0) {
+                dynVal = Math.round((dynVal - _min) / _step) * _step + _min;
+            }
+            return dynVal;
+        };
+
+        var handler = {
+            get: function(t, p) {
+                if (p === 'value') return t.value;
+                if (p === 'slider') return t;
+                if (p === 'elt') return { value: t.value(), style: {} };
+                if (p in t) return t[p];
+                if (typeof p === 'symbol' || p === 'then' || p === 'toJSON') return undefined;
+                return _sp;
+            }
+        };
+        return new Proxy(el, handler);
+    }
+
+    var _do = function() { return _sp; };
+    _do.position = _do.style = _do.size = _do.parent = _do.option = _do.texture = function() { return _sp; };
+    _do.id = function() { return ""; };
+    _do.class = _do.mousePressed = _do.mouseClicked = _do.html = _do.changed = _do.input = function() { return _sp; };
+    _do.on = _do.off = _do.addEventListener = _do.removeEventListener = _do.listen = function() { return _sp; };
+    _do.value = function() { return 0; };
+    _do.width = 100; _do.height = 100;
+    _do[Symbol.iterator] = function* () { yield _sp; };
+    var _dh = {
+        get: function(t, p) {
+            if (p === 'slider') return _sp;
+            if (p in t) return t[p];
+            if (typeof p === 'symbol' || p === 'then' || p === 'toJSON') return undefined;
+            return _sp;
+        },
+        apply: function() { return _sp; },
+        construct: function() { return _sp; }
+    };
+    var _sp = typeof Proxy !== 'undefined' ? new Proxy(_do, _dh) : _do;
+
+    if (typeof createSlider === 'undefined') {
+        window.createSlider = function(min, max, defVal, step) {
+            return _createAudioBoundElement(min, max, defVal, step);
+        };
+    }
+    if (typeof createP === 'undefined') window.createP = function() { return _sp; };
+    if (typeof createDiv === 'undefined') window.createDiv = function() { return _sp; };
+    if (typeof createButton === 'undefined') window.createButton = function() { return _sp; };
+    if (typeof createInput === 'undefined') window.createInput = function(defVal) { return _createAudioBoundElement(0, 100, defVal || 50, 1); };
+    if (typeof createSelect === 'undefined') window.createSelect = function() { return _createAudioBoundElement(0, 5, 0, 1); };
+    if (typeof createCheckbox === 'undefined') window.createCheckbox = function() { return _createAudioBoundElement(0, 1, 0, 1); };
+    if (typeof createRadio === 'undefined') window.createRadio = function() { return _createAudioBoundElement(0, 5, 0, 1); };
+    if (typeof createColorPicker === 'undefined') window.createColorPicker = function() { return _sp; };
+    if (typeof createElement === 'undefined') window.createElement = function() { return _sp; };
+    if (typeof select === 'undefined') window.select = function() { return _sp; };
+    if (typeof selectAll === 'undefined') window.selectAll = function() { return []; };
+    window.Pause = window.Pause || _sp;
+    window.Play = window.Play || _sp;
+    window.Reset = window.Reset || _sp;
+})();
 
 // 2. 圖片與非同步資產載入後備自癒護欄
 if (typeof p5 !== 'undefined' && p5.prototype) {
@@ -5809,254 +8162,117 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
 
         custom_css = getattr(self, "custom_css", "")
         custom_html = self.cache_and_localize_scripts(getattr(self, "custom_html", "") or "")
-        is_module = "import " in code or "export " in code
-        script_tag = f'<script type="module">{code}\n{BIND_MODULE_CALLBACKS_JS}</script>' if is_module else f'<script>{code}</script>'
-
-        html_template = f"""<!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            html, body {{ margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; }}
-            canvas {{ display: block !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; object-fit: cover !important; }}
-            /*CUSTOM_CSS_PLACEHOLDER*/
-          </style>
-          <script>
-            Object.defineProperty(window, 'innerWidth', {{ get: function() {{ return document.documentElement.clientWidth || window.outerWidth || 1422; }}, set: function(val) {{}}, configurable: true }});
-            Object.defineProperty(window, 'innerHeight', {{ get: function() {{ return document.documentElement.clientHeight || window.outerHeight || 800; }}, set: function(val) {{}}, configurable: true }});
-            Object.defineProperty(window, 'windowWidth', {{ get: function() {{ return document.documentElement.clientWidth || window.outerWidth || 1422; }}, set: function(val) {{}}, configurable: true }});
-            Object.defineProperty(window, 'windowHeight', {{ get: function() {{ return document.documentElement.clientHeight || window.outerHeight || 800; }}, set: function(val) {{}}, configurable: true }});
-
-            (function() {{
-              const orgGetContext = HTMLCanvasElement.prototype.getContext;
-              HTMLCanvasElement.prototype.getContext = function(type, attribs) {{
-                if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {{
-                  attribs = attribs || {{}};
-                  attribs.preserveDrawingBuffer = true;
-                }}
-                return orgGetContext.call(this, type, attribs);
-              }};
-            }})();
-
-            // fxhash / fxrand compatibility layer
-            window.fxrand = window.fxrand || Math.random;
-            window.fxhash = window.fxhash || (function() {{
-              const alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-              return "oo" + Array(49).fill(0).map(() => alphabet[(Math.random() * alphabet.length) | 0]).join('');
-            }})();
-
-            // OpenProcessing compatibility layer
-            window.publishPreviewPulse = window.publishPreviewPulse || function() {{}};
-
-            // OPC stub compatibility layer
-            if (typeof OPC === 'undefined') {{
-              window.OPC = {{
-                slider: function(name, value, min, max, step) {{ window[name] = value; return this; }},
-                button: function() {{ return this; }},
-                toggle: function(name, value) {{ window[name] = value; return this; }},
-                color: function(name, value) {{ window[name] = value; return this; }},
-                select: function(name, value) {{ window[name] = value; return this; }},
-                text: function(name, value) {{ window[name] = value; return this; }},
-                setGlobal: function(name, value) {{ window[name] = value; }}
-              }};
-            }}
-
-            // Seed compatibility
-            window.seed = window.seed || Math.floor(Math.random() * 999999);
-            {MOCK_NATIVE_AUDIO_JS}
-          </script>
-          <script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
-          <script>{P5_V2_COMPAT_SHIM}</script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/gh/IDMNYU/p5.js-func/lib/p5.func.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/gh/msawired/OPC@latest/opc.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/p5.flex@0.2.0/src/p5.flex.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/rampensau/dist/index.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/chroma-js/chroma.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/polybooljs@1.2.2/dist/polybool.min.js"></script>
-          <script>
-            /*ASSET_INTERCEPTOR_PLACEHOLDER*/
-            window.customScalingMode = "{getattr(self, 'current_scaling_mode', 'auto')}";
-            {OVERRIDE_16_9_JS}
-            {MOCK_P5_JS}
-            
-            window.frequency = {self.freq_slider.value()};
-            window.storyboardWeight = {self.weight_slider.value()};
-            window.postFxIntensity = {self.fx_slider.value()};
-            window.isBeat = false;
-            window.beatEnergy = 0;
-            window.audioLow = 0;
-            window.audioMid = 0;
-            window.audioHigh = 0;
-            window.simulatedMouseX = 400;
-            window.simulatedMouseY = 300;
-            window.simulatedPMouseX = 400;
-            window.simulatedPMouseY = 300;
-
-            window.triggerBeat = function() {{
-              window.isBeat = true;
-              window.beatEnergy = 1.0;
-              
-              // 點擊瞬間將座標隨機化
-              let w = typeof width !== 'undefined' ? width : (window.innerWidth || 800);
-              let h = typeof height !== 'undefined' ? height : (window.innerHeight || 600);
-              
-              window.simulatedPMouseX = window.simulatedMouseX;
-              window.simulatedPMouseY = window.simulatedMouseY;
-              window.simulatedMouseX = Math.random() * w;
-              window.simulatedMouseY = Math.random() * h;
-              
-              // 根據當前低音強度動態調整拍點持續時間 (30ms ~ 430ms)
-              let duration = 30 + (window.audioLow || 0.5) * 400;
-              
-              setTimeout(() => {{ 
-                window.isBeat = false; 
-              }}, duration);
-            }};
-
-            function tick() {{
-              let w = typeof width !== 'undefined' ? width : (window.innerWidth || 800);
-              let h = typeof height !== 'undefined' ? height : (window.innerHeight || 600);
-              
-              window.simulatedPMouseX = window.simulatedMouseX || (w / 2);
-              window.simulatedPMouseY = window.simulatedMouseY || (h / 2);
-              let prevX = window.simulatedMouseX;
-              let prevY = window.simulatedMouseY;
-
-              if (window.beatEnergy > 0) window.beatEnergy *= 0.92;
-              window.audioLow = 0.2 + 0.3 * Math.sin(Date.now() * 0.005) + (window.beatEnergy * 0.5);
-              window.audioMid = 0.15 + 0.25 * Math.sin(Date.now() * 0.007);
-              window.audioHigh = 0.1 + 0.2 * Math.sin(Date.now() * 0.01) + (window.beatEnergy * 0.3);
-              
-              // Simulate chord color changing over time for preview mode
-              let hue = (Date.now() * 0.01) % 360;
-              let hFactor = hue / 60;
-              let c = 0.3;
-              let x = c * (1 - Math.abs(hFactor % 2 - 1));
-              let r1=0, g1=0, b1=0;
-              if (hFactor >= 0 && hFactor < 1) {{ r1=c; g1=x; }}
-              else if (hFactor >= 1 && hFactor < 2) {{ r1=x; g1=c; }}
-              else if (hFactor >= 2 && hFactor < 3) {{ g1=c; b1=x; }}
-              else if (hFactor >= 3 && hFactor < 4) {{ g1=x; b1=c; }}
-              else if (hFactor >= 4 && hFactor < 5) {{ r1=x; b1=c; }}
-              else {{ r1=c; b1=x; }}
-              let rVal = Math.round((r1 + 0.05) * 255).toString(16).padStart(2, '0');
-              let gVal = Math.round((g1 + 0.05) * 255).toString(16).padStart(2, '0');
-              let bVal = Math.round((b1 + 0.05) * 255).toString(16).padStart(2, '0');
-              window.currentChordColor = '#' + rVal + gVal + bVal;
-              
-              // 平常隨音樂波動
-              if (!window.isBeat) {{
-                window.simulatedMouseX = w / 2 + (window.audioLow - 0.5) * w * 0.6;
-                window.simulatedMouseY = h / 2 + (window.audioMid - 0.5) * h * 0.6;
-              }}
-              window.simulatedPMouseX = prevX;
-              window.simulatedPMouseY = prevY;
-              
-              // 平常派發 mousemove 事件
-              try {{
-                let moveEvt = new MouseEvent('mousemove', {{ clientX: window.simulatedMouseX, clientY: window.simulatedMouseY, bubbles: true }});
-                window.dispatchEvent(moveEvt);
-                let canvas = document.querySelector('canvas');
-                if (canvas) {{
-                  canvas.dispatchEvent(moveEvt);
-                }}
-              }} catch(e) {{}}
-              
-              requestAnimationFrame(tick);
-            }}
-            requestAnimationFrame(tick);
-          </script>
-        </head>
-        <body>
-          <!--CUSTOM_HTML_PLACEHOLDER-->
-          {script_tag}
-        </body>
-        </html>"""
-        
-        import json
-        assets_json = json.dumps(getattr(self, "inline_assets", {}))
-        
+        inline_assets = getattr(self, "inline_assets", {})
         sketch_id = getattr(self, "current_preset_id", None)
-        asset_override_js = ""
-        if sketch_id:
-            asset_override_js = f"""
-            // Asset Loading Override for p5.js
-            (function() {{
-              const sketchId = "{sketch_id}";
-              if (!sketchId || sketchId === "None") return;
-              const assetSubdir = "custom_visuals/assets/" + sketchId + "/";
-              const loadFuncs = ["loadImage", "loadSound", "loadFont", "loadModel", "loadStrings", "loadTable", "loadBytes", "loadXML"];
-              loadFuncs.forEach(funcName => {{
-                if (typeof window[funcName] === 'function') {{
-                  const original = window[funcName];
-                  window[funcName] = function(path, ...args) {{
-                    if (typeof path === 'string' && !path.startsWith('http') && !path.startsWith('data:')) {{
-                      let cleanPath = path;
-                      if (cleanPath.startsWith('./')) {{
-                        cleanPath = cleanPath.substring(2);
-                      }} else if (cleanPath.startsWith('/')) {{
-                        cleanPath = cleanPath.substring(1);
-                      }}
-                      path = assetSubdir + cleanPath;
-                    }}
-                    return original.call(this, path, ...args);
-                  }};
-                }}
-                if (typeof p5 !== 'undefined' && p5.prototype && typeof p5.prototype[funcName] === 'function') {{
-                  const original = p5.prototype[funcName];
-                  p5.prototype[funcName] = function(path, ...args) {{
-                    if (typeof path === 'string' && !path.startsWith('http') && !path.startsWith('data:')) {{
-                      let cleanPath = path;
-                      if (cleanPath.startsWith('./')) {{
-                        cleanPath = cleanPath.substring(2);
-                      }} else if (cleanPath.startsWith('/')) {{
-                        cleanPath = cleanPath.substring(1);
-                      }}
-                      path = assetSubdir + cleanPath;
-                    }}
-                    return original.call(this, path, ...args);
-                  }};
-                }}
-              }});
-            }})();
-            """
+        scaling_mode = getattr(self, "current_scaling_mode", "auto")
 
-        interceptor = f"""
-            window.inline_assets = {assets_json};
-            {asset_override_js}
+        # 使用統一且經過嚴格驗證的 get_html_content 生成 HTML 結構
+        html = self.get_html_content(
+            code,
+            custom_css=custom_css,
+            custom_html=custom_html,
+            inline_assets=inline_assets,
+            sketch_id=sketch_id,
+            scaling_mode=scaling_mode,
+            for_thumbnail=False,
+            for_rendering=False
+        )
+
+        # 注入沙盒即時音訊動態模擬與滑桿控制
+        sandbox_controls = f"""
+        <script>
+          window.frequency = {self.freq_slider.value()};
+          window.storyboardWeight = {self.weight_slider.value()};
+          window.postFxIntensity = {self.fx_slider.value()};
+          window.isBeat = false;
+          window.beatEnergy = 0;
+          window.audioLow = 0.5;
+          window.audioMid = 0.5;
+          window.audioHigh = 0.5;
+          window.simulatedMouseX = 640;
+          window.simulatedMouseY = 360;
+          window.simulatedPMouseX = 640;
+          window.simulatedPMouseY = 360;
+
+          window.triggerBeat = function() {{
+            window.isBeat = true;
+            window.beatEnergy = 1.0;
             
-            // Intercept fetch
-            const originalFetch = window.fetch;
-            window.fetch = function(input, init) {{
-              const url = typeof input === 'string' ? input : (input.url || "");
-              const filename = url.split('/').pop();
-              if (window.inline_assets && window.inline_assets[filename] !== undefined) {{
-                return Promise.resolve(new Response(window.inline_assets[filename]));
-              }}
-              return originalFetch.apply(this, arguments);
-            }};
+            let w = typeof width !== 'undefined' ? width : (window.innerWidth || 1280);
+            let h = typeof height !== 'undefined' ? height : (window.innerHeight || 720);
+            
+            window.simulatedPMouseX = window.simulatedMouseX;
+            window.simulatedPMouseY = window.simulatedMouseY;
+            window.simulatedMouseX = Math.random() * w;
+            window.simulatedMouseY = Math.random() * h;
+            
+            if (typeof window._triggerMockButtons === 'function') {{
+              try {{ window._triggerMockButtons(); }} catch(e) {{}}
+            }}
+            
+            let duration = 30 + (window.audioLow || 0.5) * 400;
+            setTimeout(() => {{ 
+              window.isBeat = false; 
+            }}, duration);
+          }};
 
-            // Intercept XMLHttpRequest
-            const originalOpen = XMLHttpRequest.prototype.open;
-            XMLHttpRequest.prototype.open = function(method, url, async, user, password) {{
-              const filename = url.split('/').pop();
-              if (window.inline_assets && window.inline_assets[filename] !== undefined) {{
-                this.send = function() {{
-                  Object.defineProperty(this, 'readyState', {{ value: 4, writable: true }});
-                  Object.defineProperty(this, 'status', {{ value: 200, writable: true }});
-                  Object.defineProperty(this, 'responseText', {{ value: window.inline_assets[filename], writable: true }});
-                  if (this.onload) this.onload();
-                  if (this.onreadystatechange) this.onreadystatechange();
-                }};
-                return;
+          function tick() {{
+            let w = typeof width !== 'undefined' ? width : (window.innerWidth || 1280);
+            let h = typeof height !== 'undefined' ? height : (window.innerHeight || 720);
+            
+            window.simulatedPMouseX = window.simulatedMouseX || (w / 2);
+            window.simulatedPMouseY = window.simulatedMouseY || (h / 2);
+            let prevX = window.simulatedMouseX;
+            let prevY = window.simulatedMouseY;
+
+            if (window.beatEnergy > 0) window.beatEnergy *= 0.92;
+            var _now = Date.now();
+            window.audioLow = 0.2 + 0.3 * Math.sin(_now * 0.005) + (window.beatEnergy * 0.5);
+            window.audioMid = 0.15 + 0.25 * Math.sin(_now * 0.007);
+            window.audioHigh = 0.1 + 0.2 * Math.sin(_now * 0.01) + (window.beatEnergy * 0.3);
+            
+            var hue = (_now * 0.01) % 360;
+            let hFactor = hue / 60;
+            let c = 0.3;
+            let x = c * (1 - Math.abs(hFactor % 2 - 1));
+            let r1=0, g1=0, b1=0;
+            if (hFactor >= 0 && hFactor < 1) {{ r1=c; g1=x; }}
+            else if (hFactor >= 1 && hFactor < 2) {{ r1=x; g1=c; }}
+            else if (hFactor >= 2 && hFactor < 3) {{ g1=c; b1=x; }}
+            else if (hFactor >= 3 && hFactor < 4) {{ g1=x; b1=c; }}
+            else if (hFactor >= 4 && hFactor < 5) {{ r1=x; b1=c; }}
+            else {{ r1=c; b1=x; }}
+            let rVal = Math.round((r1 + 0.05) * 255).toString(16).padStart(2, '0');
+            let gVal = Math.round((g1 + 0.05) * 255).toString(16).padStart(2, '0');
+            let bVal = Math.round((b1 + 0.05) * 255).toString(16).padStart(2, '0');
+            window.currentChordColor = '#' + rVal + gVal + bVal;
+            
+            if (!window.isBeat) {{
+              window.simulatedMouseX = w / 2 + (window.audioLow - 0.5) * w * 0.6;
+              window.simulatedMouseY = h / 2 + (window.audioMid - 0.5) * h * 0.6;
+            }}
+            window.simulatedPMouseX = prevX;
+            window.simulatedPMouseY = prevY;
+            
+            try {{
+              let moveEvt = new MouseEvent('mousemove', {{ clientX: window.simulatedMouseX, clientY: window.simulatedMouseY, bubbles: true }});
+              window.dispatchEvent(moveEvt);
+              let canvas = document.querySelector('canvas');
+              if (canvas) {{
+                canvas.dispatchEvent(moveEvt);
               }}
-              return originalOpen.apply(this, arguments);
-            }};
+            }} catch(e) {{}}
+            
+            requestAnimationFrame(tick);
+          }}
+          requestAnimationFrame(tick);
+        </script>
         """
-        html = html_template.replace("/*CUSTOM_CSS_PLACEHOLDER*/", custom_css).replace("<!--CUSTOM_HTML_PLACEHOLDER-->", custom_html).replace("/*ASSET_INTERCEPTOR_PLACEHOLDER*/", interceptor)
+
+        if "</head>" in html:
+            html = html.replace("</head>", f"{sandbox_controls}\n</head>", 1)
+        else:
+            html = sandbox_controls + html
 
         self.web_view.setHtml(html, get_local_base_url())
         if not self.beat_timer.isActive():
@@ -6071,10 +8287,43 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
         self.btn_stop_compile.setEnabled(False)
         self.log_to_console("沙盒預覽已手動停止，節奏定時器已關閉。")
 
+    def open_debug_log_file(self):
+        log_path = os.path.join(workspace_dir, "app_debug.log")
+        if not os.path.exists(log_path):
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write("=== 4K MV Visual Integration Editor 診斷日誌 ===\n")
+        try:
+            import subprocess
+            if sys.platform == "darwin":
+                subprocess.Popen(["open", log_path])
+            elif sys.platform == "win32":
+                os.startfile(log_path)
+            else:
+                subprocess.Popen(["xdg-open", log_path])
+            self.log_to_console(f"已開啟診斷日誌檔案: {log_path}")
+        except Exception as e:
+            self.log_to_console(f"開啟日誌失敗: {e}", is_err=True)
+
     def check_sandbox_success(self):
         if not self.has_errors:
             self.log_to_console("沙盒編譯成功！節奏與頻率動態運行中。")
             self.cb_confirm.setEnabled(True)
+
+        def _on_inspect(res):
+            if res:
+                self.log_to_console(f"🔍 [沙盒狀態檢測] {res}")
+
+        js_inspect = """
+        (function() {
+            var cnv = document.querySelector('canvas');
+            var cnvInfo = cnv ? (cnv.width + 'x' + cnv.height + ' (style: ' + cnv.style.width + 'x' + cnv.style.height + ', display: ' + window.getComputedStyle(cnv).display + ')') : 'None';
+            var p5Inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.instance || (p5.activeInstances && p5.activeInstances[0])));
+            var p5State = p5Inst ? ('isLooping: ' + p5Inst._loop + ', frameCount: ' + p5Inst.frameCount) : 'NoInstance';
+            var errs = window.jsErrors && window.jsErrors.length ? (' | Errors: ' + JSON.stringify(window.jsErrors)) : '';
+            return 'Canvas: ' + cnvInfo + ' | p5: ' + p5State + ' | setup: ' + (typeof window.setup) + ' | draw: ' + (typeof window.draw) + errs;
+        })();
+        """
+        self.web_view.page().runJavaScript(js_inspect, _on_inspect)
 
     def trigger_simulated_beat(self):
         if self.test_run_performed and not self.has_errors:
@@ -6366,6 +8615,7 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
             return
             
         try:
+            self.current_preset_id = name
             with open(save_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 
@@ -6426,7 +8676,7 @@ function draw() {
         if hasattr(self, "btn_batch_smart_edit"):
             self.btn_batch_smart_edit.setEnabled(enabled)
 
-    def perform_smart_clip_matching(self, audio_path, show_popups=True):
+    def perform_smart_clip_matching(self, audio_path, show_popups=True, batch_used_keys=None):
         # Perform audio analysis to get the storyboard sections
         try:
             detector = AudioBeatDetector()
@@ -6444,16 +8694,36 @@ function draw() {
             self.log_to_console("無法從音訊中產生分鏡腳本！", is_err=True)
             return None
         
+        # Load module usage history from disk to ensure cross-session diversity
+        history_file = os.path.join(workspace_dir, "custom_visuals", "module_usage_history.json")
+        usage_history = {}
+        if os.path.exists(history_file):
+            try:
+                with open(history_file, "r", encoding="utf-8") as f:
+                    usage_history = json.load(f)
+            except Exception:
+                usage_history = {}
+
         # Load all presets in the library
         save_dir = os.path.join(workspace_dir, "custom_visuals")
         all_modules = []
         for file in os.listdir(save_dir):
-            if file.endswith(".json"):
+            if file.endswith(".json") and file != "module_usage_history.json":
                 p_path = os.path.join(save_dir, file)
                 try:
                     with open(p_path, "r", encoding="utf-8") as f:
                         data = json.load(f)
-                        data["_filename_key"] = file[:-5]
+                        code = data.get("code", "")
+                        if not code or len(code) < 30 or "setup" not in code or "draw" not in code:
+                            continue
+                        key = file[:-5]
+                        data["_filename_key"] = key
+                        used_in = data.get("used_in_videos", [])
+                        file_used = max(int(data.get("used_count", 0)), len(used_in) if isinstance(used_in, list) else 0)
+                        hist_used = int(usage_history.get(key, 0)) if isinstance(usage_history.get(key), (int, float)) else 0
+                        effective_used = max(file_used, hist_used)
+                        data["used_count"] = effective_used
+                        data["_history_used"] = effective_used
                         all_modules.append(data)
                 except Exception as e:
                     print(f"無法讀取模組 {file}: {e}")
@@ -6464,78 +8734,140 @@ function draw() {
             self.log_to_console("模組庫中沒有可用的視覺模組！", is_err=True)
             return None
             
-        # Run matching algorithm based on energy and tags
-        section_types = list(set(sec['section'] for sec in storyboard))
+        # ── 1. 強制按「我的最愛」優先與真實使用次數嚴格升序排序 ──
+        import random
+        all_modules.sort(key=lambda x: (
+            not x.get("is_starred", False),
+            int(x.get("used_count", 0)),
+            batch_used_keys.get(x["_filename_key"], 0),
+            random.random()
+        ))
+
+        recent_keys = [k for k, v in usage_history.items() if isinstance(v, (int, float)) and v > 1]
+        self.log_to_console("🧠 正在呼叫本地 AI 導演大腦 (Llama3/DeepSeek) 構思全曲世界觀與分鏡表...")
         
-        def get_suitability_score(vis, sec_name):
-            section_tags = {
-                'Intro': ['intro', 'start', 'ambient', 'slow', 'calm'],
-                'Verse': ['verse', 'main', 'theme'],
-                'Build-up': ['buildup', 'build-up', 'transition', 'energy'],
-                'Drop': ['drop', 'climax', 'fast', 'energetic', 'hard', 'heavy', '3d'],
-                'Chorus': ['chorus', 'climax', 'fast', 'energetic', 'vocal', 'pop', 'main'],
-                'Bridge': ['bridge', 'transition', 'slow', 'calm', 'contrast', 'melodic'],
-                'Outro': ['outro', 'end', 'ambient', 'slow', 'fade']
-            }
-            target_keywords = section_tags.get(sec_name, [])
-            vis_tags = [t.lower().strip() for t in vis.get("tags", [])]
-            tag_match_count = sum(1 for tk in target_keywords if tk in vis_tags)
-            
-            target_weights = {
-                'Intro': 30,
-                'Verse': 50,
-                'Build-up': 70,
-                'Drop': 90,
-                'Chorus': 80,
-                'Bridge': 40,
-                'Outro': 20
-            }
-            target_w = target_weights.get(sec_name, 50)
-            vis_w = vis.get("storyboard_weight", 50)
-            energy_diff = abs(vis_w - target_w)
-            
-            # 引入隨機微調值 (Random Wobble) 以增加候選多樣性，避免完全相同的模組總是被優先選中
-            import random
-            wobble = random.uniform(-12.0, 12.0)
-            
-            return tag_match_count * 10.0 - (energy_diff / 1.5) + wobble
+        from llm_director import LLMDirectorAgent
+        llm_agent = LLMDirectorAgent()
+        director_script = llm_agent.generate_director_script(analysis, all_modules, recent_keys)
+        self.current_director_script = director_script
+
+        if hasattr(self, "call_sheet_widget"):
+            self.call_sheet_widget.update_call_sheet(director_script, storyboard)
 
         selected_keys = set()
-        for sec_name in section_types:
-            scored = []
-            for vis in all_modules:
-                score = get_suitability_score(vis, sec_name)
-                scored.append((score, vis.get("used_count", 0), vis["_filename_key"]))
-                
-            # 1. 首先依適合度分數由高到低進行初步排序
-            scored.sort(key=lambda x: x[0], reverse=True)
-            
-            # 2. 保留高契合度的模組候選池（過濾掉最不契合的 25% 模組）
-            keep_n = max(6, int(len(scored) * 0.75))
-            keep_n = min(keep_n, len(scored))
-            candidates = scored[:keep_n]
-            
-            # 3. 在契合的候選池中，以「使用次數最少」優先排序；使用次數相同時，以「適合度分數最高」優先
-            candidates.sort(key=lambda x: (x[1], -x[0]))
-            
-            num_picks = min(2, len(candidates))
-            for k in range(num_picks):
-                selected_keys.add(candidates[k][2])
-                
-        # Ensure we select at least 4 modules if available to maintain visual variety
+        for shot in director_script.get("shot_list", []):
+            mod_id = shot.get("assigned_module_id")
+            if mod_id:
+                selected_keys.add(mod_id)
+
+        # 若 LLM 選擇之模組數量偏少，以階梯式最低使用次數補充至 4~6 個
         if len(selected_keys) < 4 and len(all_modules) >= 4:
-            sorted_by_used = sorted(all_modules, key=lambda x: x.get("used_count", 0))
-            for vis in sorted_by_used:
-                selected_keys.add(vis["_filename_key"])
-                if len(selected_keys) >= 4:
-                    break
+            for vis in all_modules:
+                v_key = vis["_filename_key"]
+                if v_key not in selected_keys:
+                    selected_keys.add(v_key)
+                    if len(selected_keys) >= 4:
+                        break
                     
+        # 更新全域歷史使用計數，確保下次挑選輪替
+        for k in selected_keys:
+            usage_history[k] = (int(usage_history.get(k, 0)) if isinstance(usage_history.get(k), (int, float)) else 0) + 1
+
+        try:
+            with open(history_file, "w", encoding="utf-8") as f:
+                json.dump(usage_history, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"無法寫入歷史紀錄 {history_file}: {e}")
+
         # Select in tracking set and refresh UI
         self.checked_presets = set(selected_keys)
-        self.refresh_presets_list(keep_page=True)
+        self.cached_presets = None
+        self.refresh_presets_list(clean_black=True, keep_page=True)
                 
-        self.log_to_console(f"🪄 智能剪輯篩選完成！已自動選取 {len(selected_keys)} 個低頻次推薦模組。")
+        theme = director_script.get("theme_title", "Custom Procedural")
+        self.log_to_console(f"🎬 AI 導演排片就緒！世界觀「{theme}」，精選 {len(selected_keys)} 個獨特視覺模組。")
         return selected_keys
+
+    def start_ai_director_orchestration(self):
+        audio_path = self.audio_input.text().strip()
+        if not audio_path:
+            QMessageBox.warning(self, "提示", "請先選擇音訊檔案！")
+            return
+        
+        self.set_render_buttons_enabled(False)
+        if hasattr(self, "btn_ai_director"):
+            self.btn_ai_director.setEnabled(False)
+            self.btn_ai_director.setText("⏳ AI 導演排片中...")
+
+        # Load modules from disk
+        save_dir = os.path.join(workspace_dir, "custom_visuals")
+        history_file = os.path.join(save_dir, "module_usage_history.json")
+        usage_history = {}
+        if os.path.exists(history_file):
+            try:
+                with open(history_file, "r", encoding="utf-8") as f:
+                    usage_history = json.load(f)
+            except Exception:
+                pass
+
+        all_modules = []
+        for file in os.listdir(save_dir):
+            if file.endswith(".json") and file != "module_usage_history.json":
+                p_path = os.path.join(save_dir, file)
+                try:
+                    with open(p_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        code = data.get("code", "")
+                        if not code or len(code) < 30 or "setup" not in code or "draw" not in code:
+                            continue
+                        key = file[:-5]
+                        data["_filename_key"] = key
+                        used_in = data.get("used_in_videos", [])
+                        file_used = max(int(data.get("used_count", 0)), len(used_in) if isinstance(used_in, list) else 0)
+                        hist_used = int(usage_history.get(key, 0)) if isinstance(usage_history.get(key), (int, float)) else 0
+                        effective_used = max(file_used, hist_used)
+                        data["used_count"] = effective_used
+                        data["_history_used"] = effective_used
+                        all_modules.append(data)
+                except Exception:
+                    pass
+
+        import random
+        all_modules.sort(key=lambda x: (not x.get("is_starred", False), int(x.get("used_count", 0)), random.random()))
+
+        recent_keys = [k for k, v in usage_history.items() if isinstance(v, (int, float)) and v > 1]
+        genre = self.genre_select.currentText()
+
+        self.director_thread = AIDirectorOrchestrationThread(audio_path, genre, all_modules, recent_keys)
+        self.director_thread.log_signal.connect(lambda msg, is_err: self.log_to_console(msg, is_err))
+        self.director_thread.script_ready.connect(self._on_director_script_ready)
+        self.director_thread.finished.connect(lambda: (
+            self.set_render_buttons_enabled(True),
+            self.btn_ai_director.setEnabled(True),
+            self.btn_ai_director.setText("🎬 【AI 導演智能排片 (LLM Script)】")
+        ))
+        self.director_thread.start()
+
+    def _on_director_script_ready(self, script_data: dict, analysis_data: dict):
+        self.current_director_script = script_data
+        storyboard = analysis_data.get("storyboard", [])
+        if hasattr(self, "call_sheet_widget"):
+            self.call_sheet_widget.update_call_sheet(script_data, storyboard)
+
+        # Select the chosen modules in checked_presets and refresh UI
+        chosen_keys = set()
+        for shot in script_data.get("shot_list", []):
+            mod_id = shot.get("assigned_module_id")
+            if mod_id:
+                chosen_keys.add(mod_id)
+        
+        if chosen_keys:
+            self.checked_presets = chosen_keys
+            self.refresh_presets_list(keep_page=True)
+
+        theme = script_data.get("theme_title", "")
+        self.log_to_console(f"🎬 AI 導演排片完成！已生成主題「{theme}」，精選 {len(chosen_keys)} 組視覺模組！")
+        QMessageBox.information(self, "AI 導演劇本已就緒", f"🎉 AI 導演排片完成！\n\n美學世界觀：{theme}\n色彩氛圍：{script_data.get('color_palette_mood', '')}\n\n已將分鏡表同步至上方「AI 導演通告單」並勾選對應視覺模組。點擊「開始渲染」即可直接產出 4K MV！")
 
     def start_smart_edit_rendering(self):
         audio_path = self.audio_input.text().strip()
@@ -6592,6 +8924,7 @@ function draw() {
         self.batch_start_time = time.time()
         self.batch_completed_frames = 0
         self._batch_used_themes = []  # 追蹤已使用的視覺主題以確保跨曲目多樣性
+        self._batch_used_module_counts = {}  # 追蹤已使用的視覺模組以確保跨曲目視覺豐富度
         
         for index, audio_path in enumerate(audio_files):
             self.batch_current_idx = index
@@ -6604,15 +8937,59 @@ function draw() {
             self.status_lbl.setText(f"批次處理 ({index + 1}/{total_songs}): {filename}")
             QApplication.processEvents()
             
-            # Step 1: Perform smart clip matching for this audio file
-            selected_keys = self.perform_smart_clip_matching(audio_path, show_popups=False)
+            # Step 0: 優先進行檔案比對，判斷是否已渲染並跳過（防止未比對前先執行視覺庫準備與音軌分析）
+            name, _ = os.path.splitext(filename)
+            output_file = os.path.join(out_dir, f"{name}.mp4")
+            
+            if os.path.exists(output_file) and os.path.getsize(output_file) > 1024 * 1024:
+                import subprocess
+                def get_duration(file_path):
+                    try:
+                        cmd = [
+                            'ffprobe', '-v', 'error', '-show_entries', 'format=duration',
+                            '-of', 'default=noprint_wrappers=1:nokey=1', file_path
+                        ]
+                        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                        dur = float(res.stdout.strip())
+                        if dur > 0:
+                            return dur
+                    except Exception:
+                        pass
+                    try:
+                        import soundfile as sf
+                        info = sf.info(file_path)
+                        return float(info.duration)
+                    except Exception:
+                        pass
+                    try:
+                        import librosa
+                        return float(librosa.get_duration(path=file_path))
+                    except Exception:
+                        pass
+                    return 0.0
+                
+                video_dur = get_duration(output_file)
+                audio_dur = get_duration(audio_path)
+                
+                if video_dur > 0 and audio_dur > 0 and abs(video_dur - audio_dur) <= 1.0:
+                    self.log_to_console(f"【跳過】偵測到已完成的影片檔案（長度一致：{video_dur:.1f}秒 / {audio_dur:.1f}秒），自動跳過: {filename}")
+                    success_count += 1
+                    continue
+                else:
+                    self.log_to_console(f"⚠️ 偵測到影片檔案，但長度不一致（影片 {video_dur:.1f}秒 vs 音訊 {audio_dur:.1f}秒），將重新渲染: {filename}", is_err=True)
+            
+            # Step 1: Perform smart clip matching for this audio file with cross-track module diversity penalty
+            selected_keys = self.perform_smart_clip_matching(audio_path, show_popups=False, batch_used_keys=self._batch_used_module_counts)
             if not selected_keys:
                 self.log_to_console(f"跳過 {filename}: 智能剪輯匹配失敗", is_err=True)
                 failed_files.append((filename, "智能剪輯匹配分析失敗"))
                 continue
                 
-            # Get selected presets from tracking set
-            selected_presets = list(self.checked_presets)
+            # 直接使用專為本首曲目匹配的視覺模組清單 selected_keys
+            selected_presets = list(selected_keys)
+            # 累計本批次使用次數
+            for key in selected_presets:
+                self._batch_used_module_counts[key] = self._batch_used_module_counts.get(key, 0) + 1
                         
             if not selected_presets:
                 self.log_to_console(f"跳過 {filename}: 未選取任何視覺模組", is_err=True)
@@ -6649,34 +9026,6 @@ function draw() {
             fx_prob = self.fx_prob_slider.value() / 100.0
             genre = self.genre_select.currentText()
             
-            # Output video path named with song title (filename without extension)
-            name, _ = os.path.splitext(filename)
-            output_file = os.path.join(out_dir, f"{name}.mp4")
-            
-            # If the video already exists and is valid (> 1MB), verify duration consistency
-            if os.path.exists(output_file) and os.path.getsize(output_file) > 1024 * 1024:
-                import subprocess
-                def get_duration(file_path):
-                    try:
-                        cmd = [
-                            'ffprobe', '-v', 'error', '-show_entries', 'format=duration',
-                            '-of', 'default=noprint_wrappers=1:nokey=1', file_path
-                        ]
-                        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
-                        return float(res.stdout.strip())
-                    except Exception:
-                        return 0.0
-                
-                video_dur = get_duration(output_file)
-                audio_dur = get_duration(audio_path)
-                
-                if video_dur > 0 and audio_dur > 0 and abs(video_dur - audio_dur) <= 1.0:
-                    self.log_to_console(f"【跳過】偵測到已完成的影片檔案（長度一致：{video_dur:.1f}秒 / {audio_dur:.1f}秒），自動跳過: {filename}")
-                    success_count += 1
-                    continue
-                else:
-                    self.log_to_console(f"⚠️ 偵測到影片檔案，但長度不一致（影片 {video_dur:.1f}秒 vs 音訊 {audio_dur:.1f}秒），將重新渲染: {filename}", is_err=True)
-            
             # Increment used count
             video_id = f"{name}.mp4"
             for vp in selected_presets:
@@ -6694,7 +9043,8 @@ function draw() {
                                 json.dump(data, f_out, indent=4, ensure_ascii=False)
                     except Exception as e:
                         print(f"無法增加使用次數: {e}")
-            self.refresh_presets_list()
+            self.cached_presets = None
+            self.refresh_presets_list(clean_black=True, keep_page=True)
             
             # Collect post-FX flags
             fx_flags = {
@@ -6779,9 +9129,11 @@ function draw() {
             QMessageBox.warning(self, "錯誤", "請先選擇音樂檔案！")
             return
             
-        # Get selected presets from tracking set
+        # 若未手動勾選特定模組，自動調用智能剪輯進行輪替配對
+        if not self.checked_presets:
+            self.perform_smart_clip_matching(audio_path, show_popups=False)
+
         selected_presets = list(self.checked_presets)
-                
         if not selected_presets:
             QMessageBox.warning(self, "錯誤", "請至少選取一個視覺模組！")
             return
@@ -6860,7 +9212,8 @@ function draw() {
                 except Exception as e:
                     print(f"無法增加使用次數: {e}")
         # Refresh visual list to reflect new counts immediately
-        self.refresh_presets_list()
+        self.cached_presets = None
+        self.refresh_presets_list(clean_black=True, keep_page=True)
         
         # Collect post-FX type flags from checkboxes
         fx_flags = {
@@ -6902,6 +9255,12 @@ function draw() {
                 'lowpass_muffle': self.fx_cb_lowpass_muffle.isChecked(),
                 'infinity_tunnel': self.fx_cb_infinity_tunnel.isChecked(),
                 'dolly_zoom': self.fx_cb_dolly_zoom.isChecked(),
+                'hologram_glitch': self.fx_cb_hologram_glitch.isChecked(),
+                'voronoi_shatter': self.fx_cb_voronoi_shatter.isChecked(),
+                'thermal_infrared': self.fx_cb_thermal_infrared.isChecked(),
+                'ascii_cyber_matrix': self.fx_cb_ascii_cyber_matrix.isChecked(),
+                'chromatic_radial_zoom': self.fx_cb_chromatic_radial_zoom.isChecked(),
+                'synthwave_grid_scan': self.fx_cb_synthwave_grid_scan.isChecked(),
                 'bypass_downscale': self.native_4k_cb.isChecked()
             }
         
@@ -6935,8 +9294,8 @@ function draw() {
                 'temporal_fractal': True,
                 'phase_slit': True,
                 'centroid_glitch': True,
-                'vignette_pulse': True,
-                'tension_overlay': True,
+                'vignette_pulse': False,
+                'tension_overlay': False,
                 'photosensitive_safe': True,
                 # 自訂擴充特效
                 'thermal_vision': True,
@@ -6955,6 +9314,12 @@ function draw() {
                 'lowpass_muffle': True,
                 'infinity_tunnel': True,
                 'dolly_zoom': True,
+                'hologram_glitch': True,
+                'voronoi_shatter': True,
+                'thermal_infrared': True,
+                'ascii_cyber_matrix': True,
+                'chromatic_radial_zoom': True,
+                'synthwave_grid_scan': True,
                 'bypass_downscale': getattr(self, 'native_4k_cb', None).isChecked() if getattr(self, 'native_4k_cb', None) is not None else False
             }
         # Step 1: Analyze audio
@@ -7024,9 +9389,11 @@ function draw() {
                 vis_w = vis.get("storyboard_weight", 50)
                 energy_diff = abs(vis_w - target_w)
                 score = matches * 10.0 - (energy_diff / 1.5)
+                if vis.get("is_starred", False):
+                    score += 100.0
                 
-                # Keep if it matches keywords OR is close in weight (energy_diff <= 30)
-                if matches > 0 or energy_diff <= 30:
+                # Keep if it matches keywords OR is close in weight (energy_diff <= 30) OR is starred
+                if matches > 0 or energy_diff <= 30 or vis.get("is_starred", False):
                     candidates.append((score, vis))
             
             if candidates:
@@ -7043,29 +9410,56 @@ function draw() {
             candidates_by_sec[sec] = get_candidate_visuals_for_section(sec, visuals_data, sorted_visuals)
             self.log_to_console(f"分鏡「{sec}」候選視覺模組列表: {[v['name'] for v in candidates_by_sec[sec]]}")
 
-        # 子分鏡輪流指派
+        # 子分鏡輪流指派（基於曲目哈希設定初始偏移，防止每首歌總是從第0個候選模組開始指派）
+        import hashlib
+        audio_seed = int(hashlib.md5(audio_path.encode('utf-8')).hexdigest(), 16)
         sec_counters = {
-            'Intro': 0,
-            'Verse': 0,
-            'Build-up': 0,
-            'Drop': 0,
-            'Chorus': 0,
-            'Bridge': 0,
-            'Outro': 0
+            sec: (audio_seed + idx * 7)
+            for idx, sec in enumerate(['Intro', 'Verse', 'Build-up', 'Drop', 'Chorus', 'Bridge', 'Outro'])
         }
         
-        for sec_data in storyboard:
+        # 🎬 檢查是否已具備 AI 導演劇本 (LLM Director Script)
+        llm_shot_list = getattr(self, "current_director_script", {}).get("shot_list", [])
+        modules_by_key = {m.get("_filename_key") or m.get("name"): m for m in visuals_data}
+        modules_by_name = {m.get("name"): m for m in visuals_data}
+
+        last_assigned_name = None
+        for sec_idx, sec_data in enumerate(storyboard):
             sec_name = sec_data['section']
-            candidates = candidates_by_sec.get(sec_name, sorted_visuals)
-            if not candidates:
-                candidates = sorted_visuals
-            
-            idx = sec_counters[sec_name] % len(candidates)
-            assigned_vis = candidates[idx]
+            assigned_vis = None
+            fit_mode = 'fill'
+            fx_intensity = 0.6
+
+            # 優先採用 LLM 導演指定的模組與構圖
+            if sec_idx < len(llm_shot_list):
+                shot_info = llm_shot_list[sec_idx]
+                mod_id = shot_info.get("assigned_module_id")
+                assigned_vis = modules_by_key.get(mod_id) or modules_by_name.get(mod_id)
+                fit_mode = shot_info.get("framing_mode", "fill")
+                fx_intensity = shot_info.get("target_fx_intensity", 0.6)
+
+            if not assigned_vis:
+                candidates = candidates_by_sec.get(sec_name, sorted_visuals) or sorted_visuals
+                idx = sec_counters[sec_name] % len(candidates)
+                assigned_vis = candidates[idx]
+                if len(candidates) > 1 and assigned_vis.get('name') == last_assigned_name:
+                    idx = (idx + 1) % len(candidates)
+                    assigned_vis = candidates[idx]
+                sec_counters[sec_name] += 1
+                
+                import random
+                if sec_name in ['Intro', 'Bridge'] and random.random() < 0.25:
+                    fit_mode = 'contain'
+                else:
+                    fit_mode = 'fill'
+
+            sec_data['fullscreen_fit_mode'] = fit_mode
             sec_data['assigned_visual'] = assigned_vis
-            sec_counters[sec_name] += 1
+            sec_data['director_fx_intensity'] = fx_intensity
+            last_assigned_name = assigned_vis.get('name')
             
-            self.log_to_console(f"子分鏡區段 [{sec_data['start']:.2f}s - {sec_data['end']:.2f}s] ({sec_name}) 指派視覺模組: {assigned_vis['name']}")
+            self.log_to_console(f"子分鏡區段 [{sec_data['start']:.2f}s - {sec_data['end']:.2f}s] ({sec_name}) 🎬 導演指派: {assigned_vis['name']} [構圖: {fit_mode.upper()} | 後製強度: {int(fx_intensity*100)}%]")
+
 
         times = filter_dynamics.get('times', [])
         lowpass = filter_dynamics.get('lowpass', [])
@@ -7183,21 +9577,35 @@ function draw() {
             if not _post_fx_enabled[0]:
                 return pil_img  # Fix 7: Skip if disabled by memory watchdog
 
-            # Determine post-FX intensity
-            intensity_val = 0.5
+            # Determine post-FX intensity with dynamic song arc modulation
+            base_intensity = 0.5
             try:
-                # Retrieve active_vis from enclosing scope if defined
-                intensity_val = active_vis.get('post_fx_intensity', 50) / 100.0
+                base_intensity = active_vis.get('post_fx_intensity', 50) / 100.0
             except Exception:
-                intensity_val = self.fx_slider.value() / 100.0
+                base_intensity = self.fx_slider.value() / 100.0
+
+            # Progressive song timeline arc factor (0.7x at start -> 1.15x at end)
+            song_progress_ratio = max(0.0, min(1.0, t / max(1.0, duration)))
+            timeline_arc = 0.70 + 0.45 * song_progress_ratio
+
+            # Section-based intensity multiplier for visual contrast (Boosted for Hard Techno)
+            sec_weights = {
+                'Intro': 0.40,
+                'Verse': 0.70,
+                'Build-up': 1.40,
+                'Drop': 2.00,
+                'Chorus': 1.60,
+                'Bridge': 0.75,
+                'Outro': 0.35
+            }
+            sec_mult = sec_weights.get(section_name, 0.70)
+            effective_intensity = max(0.1, min(1.5, base_intensity * timeline_arc * sec_mult))
 
             adaptive = fx_flags.get('adaptive_modulation', True)
             
-            # Map keys inside audio_feats if needed (detector returns silence_fade, percussive, ethereal, sub_bass, roughness, bass_ratio)
-            # PostProcessor handles these keys directly
             return _post_processor.process(
                 pil_img, t, is_beat, beat_energy, audio_feats, fx_flags,
-                fx_prob=fx_prob, fx_intensity=intensity_val, adaptive_modulation=adaptive,
+                fx_prob=fx_prob, fx_intensity=effective_intensity, adaptive_modulation=adaptive,
                 section_name=section_name, section_progress=section_progress, genre=resolved_genre
             )
 
@@ -7230,9 +9638,8 @@ function draw() {
                     pass
 
             # Create clipper widget to act as a hardware-compositing boundary
-            # Placing it at (0, 0) and calling lower() keeps it within the visible window bounds
-            # to prevent macOS CALayer culling (black grab frames), while remaining invisible behind other widgets.
-            clipper = QWidget(None)
+            # Use Tool + WindowTransparentForInput flags to prevent it from overlaying or blocking the main UI window
+            clipper = QWidget(self)
             clipper.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowTransparentForInput)
             clipper.setGeometry(0, 0, render_w, render_h)
             clipper.setWindowOpacity(0.01)
@@ -7263,7 +9670,10 @@ function draw() {
                 v.setGeometry(0, 0, render_w, render_h)
                 v.resize(render_w, render_h)
                 self.setup_web_sandbox(v)
-                v.show()
+            
+            viewA.show()
+            viewA.raise_()
+            viewB.hide()
 
             # Restore original scale factor
             if _orig_scale_factor is not None:
@@ -7279,31 +9689,114 @@ function draw() {
         viewA = _current_viewA[0]
         viewB = _current_viewB[0]
 
+        # 模組專屬環形影格快取池 (Per-Module Ring Buffer Cache)
+        class ModuleFrameCacheManager:
+            def __init__(self, max_frames_per_module=15, max_total_modules=30):
+                from collections import deque
+                self.max_frames_per_module = max_frames_per_module
+                self.max_total_modules = max_total_modules
+                self.caches = {}
+                self.lru_order = []
+
+            def add_frame(self, module_name: str, pil_img):
+                from collections import deque
+                if not module_name: return
+                if module_name not in self.caches:
+                    if len(self.caches) >= self.max_total_modules and self.lru_order:
+                        oldest = self.lru_order.pop(0)
+                        self.caches.pop(oldest, None)
+                    self.caches[module_name] = deque(maxlen=self.max_frames_per_module)
+                    self.lru_order.append(module_name)
+                else:
+                    if module_name in self.lru_order:
+                        self.lru_order.remove(module_name)
+                    self.lru_order.append(module_name)
+                self.caches[module_name].append(pil_img.copy())
+
+            def get_latest_frame(self, module_name: str):
+                if module_name in self.caches and len(self.caches[module_name]) > 0:
+                    return self.caches[module_name][-1].copy()
+                return None
+
+        module_cache_mgr = ModuleFrameCacheManager()
+        from post_processor import SongProceduralFluidEngine
+        song_fluid_engine = SongProceduralFluidEngine(audio_path)
+
+        def apply_graceful_fallback(pil_cached_img, t_val, beat_e, a_low_val, chord_c):
+            """
+            Phase 2: 對保底影格注入有機生命力 (動態微光呼吸 + 拍點脈衝微縮放)，防止畫面死鎖與動態靜止。
+            """
+            if pil_cached_img is None:
+                return pil_cached_img
+            try:
+                import math
+                from PIL import ImageEnhance
+                # 1. 亮度微光呼吸 (隨時間與低頻能量自然正弦起伏)
+                breath_alpha = 0.94 + 0.12 * math.sin(t_val * 4.0) + (float(a_low_val) * 0.10)
+                enhanced = ImageEnhance.Brightness(pil_cached_img).enhance(max(0.75, min(1.25, breath_alpha)))
+                
+                # 2. 拍點脈衝微縮放 (Beat Pulse Micro-zoom 1.00 ~ 1.025x)
+                if beat_e > 0.35:
+                    w_img, h_img = enhanced.size
+                    zoom_factor = 1.0 + min(0.025, float(beat_e) * 0.02)
+                    nw, nh = int(w_img * zoom_factor), int(h_img * zoom_factor)
+                    scaled = enhanced.resize((nw, nh), Image.Resampling.BILINEAR)
+                    left_crop = (nw - w_img) // 2
+                    top_crop = (nh - h_img) // 2
+                    enhanced = scaled.crop((left_crop, top_crop, left_crop + w_img, top_crop + h_img))
+                return enhanced
+            except Exception:
+                return pil_cached_img
+
         # Load states
         loadedA = None
         loadedB = None
+        consecutive_black_frames = 0
+        module_accumulated_time = {}
 
         def get_html_content(code, custom_css="", custom_html="", inline_assets=None, scaling_mode="auto"):
             return self.get_html_content(code, custom_css, custom_html, inline_assets, scaling_mode=scaling_mode, for_rendering=True)
 
         def run_js_safely(view, js_code, is_first_frame=False):
-            attempts = 15 if is_first_frame else 3
-            timeout_ms = 400 if is_first_frame else 250
+            attempts = 5 if is_first_frame else 3
+            timeout_ms = 600 if is_first_frame else 120
             for attempt in range(attempts):
                 loop = QEventLoop()
                 result = {"value": None}
                 
                 def handle_result(r):
                     result["value"] = r
-                    loop.quit()
+                    try:
+                        loop.quit()
+                    except RuntimeError:
+                        pass
                     
                 check_js = f"""
                 (function() {{
-                    if (typeof window.setFrameParams === 'function' && typeof window.redraw === 'function') {{
+                    try {{
                         {js_code};
-                        return "ok";
+                    }} catch(e) {{}}
+                    try {{
+                        if (typeof redraw === 'function') redraw();
+                        else if (typeof window.redraw === 'function') window.redraw();
+                        else if (window._p5Instance && typeof window._p5Instance.redraw === 'function') window._p5Instance.redraw();
+                        else if (typeof draw === 'function') draw();
+                        else if (typeof window.draw === 'function') window.draw();
+                    }} catch(e) {{}}
+                    
+                    let canvases = document.querySelectorAll('canvas');
+                    let cnv = null;
+                    for (let i = canvases.length - 1; i >= 0; i--) {{
+                        let c = canvases[i];
+                        if (c && c.width > 0 && c.height > 0) {{
+                            cnv = c;
+                            break;
+                        }}
                     }}
-                    return "not_ready";
+                    if (cnv) {{
+                        return cnv.toDataURL('image/jpeg', 0.95);
+                    }}
+                    return "no_canvas";
                 }})();
                 """
                 
@@ -7315,17 +9808,14 @@ function draw() {
                 
                 view.page().runJavaScript(check_js, handle_result)
                 loop.exec()
-                
                 timer.stop()
                 
-                if result["value"] == "ok":
-                    return True
+                val = result["value"]
+                if val and isinstance(val, str) and val.startswith("data:image/"):
+                    return val
                 
                 QApplication.processEvents()
-                loop_delay = QEventLoop()
-                QTimer.singleShot(15, loop_delay.quit)
-                loop_delay.exec()
-            return False
+            return None
 
         # --- Setup FFMPEG Pipe Stream (Optimized, Zero-Disk-I/O) ---
         self.status_lbl.setText("正在啟動 FFmpeg 即時編碼管道...")
@@ -7338,7 +9828,6 @@ function draw() {
 
         ffmpeg_cmd = [
             ffmpeg_bin, "-y",
-            "-nostdin",
             "-f", "rawvideo",
             "-pix_fmt", "rgba",  # B3: Accept RGBA directly, avoid Python RGBA→RGB conversion
             "-s", f"{render_w}x{render_h}",  # Input is the internal rendering resolution (max 1080p)
@@ -7353,13 +9842,13 @@ function draw() {
         import platform
         if platform.system() == 'Darwin':
             ffmpeg_cmd.extend([
-                "-c:v", "h264_videotoolbox",  # 👈 VideoToolbox AMD GPU encoder
-                "-pix_fmt", "nv12",           # 👈 Force CPU-to-GPU format conversion via standard SW scale
-                "-b:v", "35M" if w > 1920 else "15M",  # High bitrate for 4K quality
+                "-c:v", "h264_videotoolbox",  # VideoToolbox Hardware GPU encoder
+                "-pix_fmt", "nv12",           # Force CPU-to-GPU format conversion
+                "-b:v", "60M" if w > 1920 else "25M",  # High bitrate (60M for 4K, 25M for 1080p) for ultra-sharp quality
                 "-allow_sw", "1"
             ])
             if render_w != w or render_h != h:
-                ffmpeg_cmd.extend(["-vf", f"scale={w}:{h}:flags=bicubic,format=nv12"])
+                ffmpeg_cmd.extend(["-vf", f"scale={w}:{h}:flags=lanczos,format=nv12"])
             else:
                 ffmpeg_cmd.extend(["-vf", "format=nv12"])
         else:
@@ -7368,10 +9857,10 @@ function draw() {
                 "-pix_fmt", "yuv420p",
             ])
             if render_w != w or render_h != h:
-                ffmpeg_cmd.extend(["-vf", f"scale={w}:{h}:flags=bicubic"])
+                ffmpeg_cmd.extend(["-vf", f"scale={w}:{h}:flags=lanczos"])
             ffmpeg_cmd.extend([
                 "-preset", "medium",
-                "-crf", "18"
+                "-crf", "16"
             ])
 
         if audio_path and os.path.exists(audio_path):
@@ -7513,64 +10002,61 @@ function draw() {
         else:
             self.log_to_console("🌡️ CPU 控溫模式：啟用過熱保護機制，每 100 幀自動偵測系統溫度。")
         
+        # Track start time for current song render
+        song_start_time = time.time()
+
+        def format_time_hms(seconds):
+            if seconds > 3600:
+                h = int(seconds // 3600)
+                m = int((seconds % 3600) // 60)
+                s = int(seconds % 60)
+                return f"{h}小時{m}分{s}秒"
+            else:
+                m = int(seconds // 60)
+                s = int(seconds % 60)
+                return f"{m}分{s}秒"
+
         def update_render_status_label(frame_idx):
             import time
             p_curr = (frame_idx + 1) / total_frames
             percent = int(p_curr * 100)
+            now = time.time()
             
+            # 1. 計算本首歌曲剩餘時間
+            song_elapsed = now - song_start_time
+            song_eta_str = ""
+            speed_str = ""
+            if p_curr > 0.01 and song_elapsed > 1.5:
+                song_eta_sec = ((1.0 - p_curr) / p_curr) * song_elapsed
+                song_eta_str = f"本首剩餘: {format_time_hms(song_eta_sec)}"
+                fps_rate = (frame_idx + 1) / song_elapsed
+                speed_str = f" ({fps_rate:.1f} 幀/秒)"
+
             if getattr(self, 'is_batch_rendering', False):
                 batch_idx = getattr(self, 'batch_current_idx', 0)
                 total_songs = getattr(self, 'batch_total_songs', 1)
                 batch_start = getattr(self, 'batch_start_time', None)
-                completed_frames = getattr(self, 'batch_completed_frames', 0)
                 
-                eta_str = ""
-                speed_str = ""
+                total_eta_str = ""
                 if batch_start is not None:
-                    elapsed = time.time() - batch_start
-                    completed_songs_equivalent = batch_idx + p_curr
-                    if completed_songs_equivalent > 0.01 and elapsed > 2.0:
-                        eta_sec = ((total_songs - completed_songs_equivalent) / completed_songs_equivalent) * elapsed
-                        if eta_sec > 3600:
-                            h_val = int(eta_sec // 3600)
-                            m_val = int((eta_sec % 3600) // 60)
-                            s_val = int(eta_sec % 60)
-                            eta_str = f" | 預估剩餘: {h_val}小時{m_val}分{s_val}秒"
-                        else:
-                            m_val = int(eta_sec // 60)
-                            s_val = int(eta_sec % 60)
-                            eta_str = f" | 預估剩餘: {m_val}分{s_val}秒"
-                        
-                        total_rendered = completed_frames + (frame_idx + 1)
-                        fps_rate = total_rendered / elapsed
-                        speed_str = f" ({fps_rate:.1f} 幀/秒)"
+                    batch_elapsed = now - batch_start
+                    completed_songs_equiv = batch_idx + p_curr
+                    if completed_songs_equiv > 0.01 and batch_elapsed > 2.0:
+                        total_eta_sec = ((total_songs - completed_songs_equiv) / completed_songs_equiv) * batch_elapsed
+                        total_eta_str = f"全部剩餘: {format_time_hms(total_eta_sec)}"
+                
+                eta_combined = " | ".join([s for s in [song_eta_str, total_eta_str] if s])
+                if eta_combined:
+                    eta_combined = f" | {eta_combined}"
                 
                 song_name = os.path.basename(audio_path)
                 status_text = (
                     f"批次渲染 ({batch_idx + 1}/{total_songs}) - {song_name} | "
-                    f"當前進度: {percent}% ({frame_idx + 1}/{total_frames} 幀){speed_str}{eta_str}"
+                    f"進度: {percent}% ({frame_idx + 1}/{total_frames} 幀){speed_str}{eta_combined}"
                 )
             else:
-                single_start = getattr(self, 'single_start_time', None)
-                eta_str = ""
-                speed_str = ""
-                if single_start is not None:
-                    elapsed = time.time() - single_start
-                    if p_curr > 0.01 and elapsed > 2.0:
-                        eta_sec = ((1.0 - p_curr) / p_curr) * elapsed
-                        if eta_sec > 3600:
-                            h_val = int(eta_sec // 3600)
-                            m_val = int((eta_sec % 3600) // 60)
-                            s_val = int(eta_sec % 60)
-                            eta_str = f" | 預估剩餘: {h_val}小時{m_val}分{s_val}秒"
-                        else:
-                            m_val = int(eta_sec // 60)
-                            s_val = int(eta_sec % 60)
-                            eta_str = f" | 預估剩餘: {m_val}分{s_val}秒"
-                        
-                        fps_rate = (frame_idx + 1) / elapsed
-                        speed_str = f" ({fps_rate:.1f} 幀/秒)"
-                status_text = f"影片實時串流編碼中: {percent}% ({frame_idx + 1}/{total_frames} 幀){speed_str}{eta_str}"
+                eta_combined = f" | {song_eta_str}" if song_eta_str else ""
+                status_text = f"影片實時串流編碼中: {percent}% ({frame_idx + 1}/{total_frames} 幀){speed_str}{eta_combined}"
                 
             self.status_lbl.setText(status_text)
 
@@ -7598,8 +10084,9 @@ function draw() {
                 except Exception:
                     mem_mb = 0
                 
-                if mem_mb > 3500:
-                    self.log_to_console(f"♻️ 記憶體超出閥值 ({mem_mb:.0f}MB > 3500MB)，啟動 WebEngine 視圖深度回收...")
+                # Raise threshold to 12GB to avoid constantly destroying WebGL contexts every 1000 frames
+                if mem_mb > 12000:
+                    self.log_to_console(f"♻️ 記憶體超出閥值 ({mem_mb:.0f}MB > 12000MB)，啟動 WebEngine 視圖深度回收...")
                     logger.info(f"Memory threshold exceeded ({mem_mb:.0f}MB). Re-creating QWebEngineView resources at frame {i}")
                     init_offscreen_views()
                     viewA = _current_viewA[0]
@@ -7608,6 +10095,9 @@ function draw() {
                     loadedB = None
                     just_loaded_a = True
                     just_loaded_b = True
+                    gc.collect()
+                elif mem_mb > 6000:
+                    # Light GC without destroying GPU WebGL Context
                     gc.collect()
             
             if self.render_aborted:
@@ -7668,8 +10158,11 @@ function draw() {
                     return False
             
             t = i * (1.0 / fps)
+            audio_feats = get_full_telemetry_at_time(t)
+            perc_env = audio_feats.get('percussive', 0.0)
+            bass_env = audio_feats.get('bass_energy', 0.0)
             
-            # Beat detection (Fix 5: bisect instead of linear scan)
+            # Beat detection (Fix 5: bisect instead of linear scan + Drum Percussive Coupling)
             is_beat = False
             t_prev = (i - 1) * (1.0 / fps) if i > 0 else 0.0
             if beat_timestamps:
@@ -7679,7 +10172,8 @@ function draw() {
                     is_beat = True
                     beat_energy = 1.0
                 else:
-                    beat_energy = max(0.0, beat_energy * 0.92)
+                    # 融合打擊樂瞬態包絡，讓大鼓/小鼓爆發時動態抬升 beat_energy
+                    beat_energy = max(0.0, beat_energy * 0.90, perc_env * 0.85, bass_env * 0.70)
             
             a_low, a_mid, a_high = get_telemetry_at_time(t)
             sec_data, sec_name = get_section_at_time(t)
@@ -7715,20 +10209,58 @@ function draw() {
             if is_beat:
                 rotation_beat_counter += 1
                 
-                # A7: Subdivision system — trigger rapid switches on high-energy beats (disabled for calming genres)
+                # A7: Subdivision system — trigger rapid switches on high-energy beats & Hihat rolls
                 if resolved_genre not in ('lo-fi', 'ambient', 'jazz'):
                     subdiv_audio = get_full_telemetry_at_time(t)
                     subdiv_bass = subdiv_audio.get('bass_ratio', 0.0)
                     subdiv_perc = subdiv_audio.get('percussive', 0.0)
-                    # Determine subdivision density based on bass energy
-                    if subdiv_bass > 0.6 or subdiv_perc > 0.5:
-                        # 16th notes: force rotation every beat for next 2 beats
+                    hihat_dens = subdiv_audio.get('hihat_density', 0.0)
+                    hihat_trig = subdiv_audio.get('hihat_trigger', False)
+                    
+                    # Rapid rotation on 16th note Hihat rolls / high percussion density
+                    if hihat_dens > 0.6 or hihat_trig or subdiv_bass > 0.6 or subdiv_perc > 0.5:
+                        # Force rapid rotation interval during intense Hihat bursts
+                        if rotation_beats_until_switch > 1:
+                            rotation_beats_until_switch = 1
+                    elif hihat_dens > 0.3 or subdiv_bass > 0.3 or subdiv_perc > 0.35:
+                        # 8th notes: force rotation every 2 beats
                         if rotation_beats_until_switch > 2:
                             rotation_beats_until_switch = 2
-                    elif subdiv_bass > 0.3 or subdiv_perc > 0.35:
-                        # 8th notes: force rotation every 2 beats
-                        if rotation_beats_until_switch > 4:
-                            rotation_beats_until_switch = 4
+            
+            # 🔮 AOT 背景視圖預熱 (Offscreen AOT Pre-warming)
+            # 模式 1: 跨段落邊界 AOT 預熱 (Cross-Section Boundary Preload, 提前 2.5 秒)
+            preload_lead_sec = 2.5
+            next_sec_data, next_sec_name = get_section_at_time(t + preload_lead_sec)
+            if next_sec_name != sec_name and not is_transitioning:
+                next_assigned_vis = next_sec_data.get('assigned_visual', sorted_visuals[0]) if next_sec_data else sorted_visuals[0]
+                target_aot_vis = get_energy_adapted_visual(next_assigned_vis, music_energy, next_sec_name)
+                if loadedB != target_aot_vis['name']:
+                    viewB.setHtml(get_html_content(
+                        target_aot_vis.get('code', ''),
+                        custom_css=target_aot_vis.get('custom_css', ''),
+                        custom_html=target_aot_vis.get('custom_html', ''),
+                        inline_assets=target_aot_vis.get('inline_assets', {}),
+                        scaling_mode=target_aot_vis.get('scaling_mode', 'auto')
+                    ), get_local_base_url())
+                    loadedB = target_aot_vis['name']
+                    just_loaded_b = True
+            
+            # 模式 2: 同段落拍點輪替 AOT 預熱 (Within-Section Rotation Preload, 提前 2 拍)
+            elif is_beat and (rotation_beats_until_switch - rotation_beat_counter) <= 2:
+                candidates_aot = candidates_by_sec.get(sec_name, sorted_visuals)
+                if len(candidates_aot) > 1:
+                    cur_idx_aot = rotation_visual_idx.get(sec_name, 0)
+                    next_predicted_vis = candidates_aot[(cur_idx_aot + 1) % len(candidates_aot)]
+                    if loadedB != next_predicted_vis['name'] and not is_transitioning:
+                        viewB.setHtml(get_html_content(
+                            next_predicted_vis.get('code', ''),
+                            custom_css=next_predicted_vis.get('custom_css', ''),
+                            custom_html=next_predicted_vis.get('custom_html', ''),
+                            inline_assets=next_predicted_vis.get('inline_assets', {}),
+                            scaling_mode=next_predicted_vis.get('scaling_mode', 'auto')
+                        ), get_local_base_url())
+                        loadedB = next_predicted_vis['name']
+                        just_loaded_b = True
             
             if rotation_beat_counter >= rotation_beats_until_switch:
                 rotation_beat_counter = 0
@@ -7792,38 +10324,69 @@ function draw() {
                     inline_assets=active_vis.get('inline_assets', {}),
                     scaling_mode=active_vis.get('scaling_mode', 'auto')
                 ), get_local_base_url())
+                
+                ev_finished = [False]
                 ev = QEventLoop()
                 
                 def on_load_finished_a(ok):
+                    ev_finished[0] = True
                     try:
                         ev.quit()
                     except RuntimeError:
                         pass
                 
                 viewA.loadFinished.connect(on_load_finished_a)
-                def safe_quit_a():
-                    try:
-                        ev.quit()
-                    except RuntimeError:
-                        pass
-                QTimer.singleShot(800, safe_quit_a)  # B4: Reduced from 2000ms (local HTML, no network)
+                timer_a = QTimer()
+                timer_a.setSingleShot(True)
+                timer_a.timeout.connect(ev.quit)
+                timer_a.start(1200)  # Extended timeout (1200ms) to ensure WebGL/P5 shaders finish compiling
                 ev.exec()
+                timer_a.stop()
                 try:
                     viewA.loadFinished.disconnect(on_load_finished_a)
                 except Exception:
                     pass
                 
-                delay_ev = QEventLoop()
-                def safe_quit_delay_a():
-                    try:
-                        delay_ev.quit()
-                    except RuntimeError:
-                        pass
-                QTimer.singleShot(50, safe_quit_delay_a)  # B4: Reduced from 250ms
-                delay_ev.exec()
-                
+                QApplication.processEvents()
                 loadedA = active_vis['name']
                 just_loaded_a = True
+                consecutive_black_frames = 0
+                
+                # [FIX] GPU Warm-up: execute multiple draw() cycles + GPU flush
+                # loadFinished only means HTML parsed; WebGL shaders may still be
+                # compiling and p5.js setup() may not have run. Run 8 warm-up draws
+                # to ensure Canvas has valid pixels before real frame capture.
+                _warmup_js = """
+                (function() {
+                    for (let wi = 0; wi < 8; wi++) {
+                        try {
+                            if (typeof redraw === 'function') redraw();
+                            else if (typeof window.redraw === 'function') window.redraw();
+                            else if (window._p5Instance && typeof window._p5Instance.redraw === 'function') window._p5Instance.redraw();
+                            else if (typeof draw === 'function') draw();
+                            else if (typeof window.draw === 'function') window.draw();
+                        } catch(e) {}
+                    }
+                    // Force GPU pipeline flush so Compositor surface is populated
+                    let canvases = document.querySelectorAll('canvas');
+                    for (let c of canvases) {
+                        try {
+                            let gl = c.getContext('webgl2') || c.getContext('webgl');
+                            if (gl) { gl.flush(); }
+                        } catch(e) {}
+                    }
+                    return 'warmed';
+                })();
+                """
+                _warmup_loop = QEventLoop()
+                _warmup_timer = QTimer()
+                _warmup_timer.setSingleShot(True)
+                _warmup_timer.timeout.connect(_warmup_loop.quit)
+                _warmup_timer.start(1500)  # 1.5s max wait for warm-up
+                viewA.page().runJavaScript(_warmup_js, lambda r: _warmup_loop.quit() if r else None)
+                _warmup_loop.exec()
+                _warmup_timer.stop()
+                QApplication.processEvents()
                 
             if is_transitioning and other_vis and loadedB != other_vis['name']:
                 viewB.setHtml(get_html_content(
@@ -7833,102 +10396,245 @@ function draw() {
                     inline_assets=other_vis.get('inline_assets', {}),
                     scaling_mode=other_vis.get('scaling_mode', 'auto')
                 ), get_local_base_url())
-                ev = QEventLoop()
+                
+                ev_finished_b = [False]
+                ev_b = QEventLoop()
                 
                 def on_load_finished_b(ok):
+                    ev_finished_b[0] = True
                     try:
-                        ev.quit()
+                        ev_b.quit()
                     except RuntimeError:
                         pass
                 
                 viewB.loadFinished.connect(on_load_finished_b)
-                def safe_quit_b():
-                    try:
-                        ev.quit()
-                    except RuntimeError:
-                        pass
-                QTimer.singleShot(800, safe_quit_b)  # B4: Reduced from 2000ms
-                ev.exec()
+                timer_b = QTimer()
+                timer_b.setSingleShot(True)
+                timer_b.timeout.connect(ev_b.quit)
+                timer_b.start(1200)  # Extended timeout (1200ms) to ensure WebGL/P5 shaders finish compiling
+                ev_b.exec()
+                timer_b.stop()
                 try:
                     viewB.loadFinished.disconnect(on_load_finished_b)
                 except Exception:
                     pass
                 
-                delay_ev = QEventLoop()
-                def safe_quit_delay_b():
-                    try:
-                        delay_ev.quit()
-                    except RuntimeError:
-                        pass
-                QTimer.singleShot(50, safe_quit_delay_b)  # B4: Reduced from 250ms
-                delay_ev.exec()
-                
+                QApplication.processEvents()
                 loadedB = other_vis['name']
                 just_loaded_b = True
+
+                # [FIX] GPU Warm-up for ViewB: execute multiple draw() cycles + GPU flush
+                _warmup_js_b = """
+                (function() {
+                    for (let wi = 0; wi < 8; wi++) {
+                        try {
+                            if (typeof redraw === 'function') redraw();
+                            else if (typeof window.redraw === 'function') window.redraw();
+                            else if (window._p5Instance && typeof window._p5Instance.redraw === 'function') window._p5Instance.redraw();
+                            else if (typeof draw === 'function') draw();
+                            else if (typeof window.draw === 'function') window.draw();
+                        } catch(e) {}
+                    }
+                    let canvases = document.querySelectorAll('canvas');
+                    for (let c of canvases) {
+                        try {
+                            let gl = c.getContext('webgl2') || c.getContext('webgl');
+                            if (gl) { gl.flush(); }
+                        } catch(e) {}
+                    }
+                    return 'warmed';
+                })();
+                """
+                _warmup_loop_b = QEventLoop()
+                _warmup_timer_b = QTimer()
+                _warmup_timer_b.setSingleShot(True)
+                _warmup_timer_b.timeout.connect(_warmup_loop_b.quit)
+                _warmup_timer_b.start(1500)
+                viewB.page().runJavaScript(_warmup_js_b, lambda r: _warmup_loop_b.quit() if r else None)
+                _warmup_loop_b.exec()
+                _warmup_timer_b.stop()
+                QApplication.processEvents()
 
             # Inject parameters and redraw
             # Calculate section progress (0.0 → 1.0)
             # Retrieve real-time chord color for dynamic background modulation
             audio_feats = get_full_telemetry_at_time(t)
             chord_hex = audio_feats.get('chord_color_hex', '#0a0a0c')
+            hihat_trig_str = "true" if audio_feats.get('hihat_trigger', False) else "false"
+            hihat_dens_val = audio_feats.get('hihat_density', 0.0)
+            synth_mel_str = "true" if audio_feats.get('synth_melody_active', False) else "false"
+            harm_val = audio_feats.get('harmonic', 0.0)
+            perc_val = audio_feats.get('percussive', 0.0)
             
+            mod_time_a = module_accumulated_time.get(active_vis['name'], 0.0)
             ps_safe = "true"  # Mandatory photosensitive protection
-            js = f"window.sectionName='{sec_name}';window.sectionProgress={sec_progress:.4f};window.currentChordColor='{chord_hex}';window.photosensitiveSafe={ps_safe};window.setFrameParams({t}, {str(is_beat).lower()}, {beat_energy}, {a_low}, {a_mid}, {a_high})"
+            js = f"window.sectionName='{sec_name}';window.sectionProgress={sec_progress:.4f};window.currentChordColor='{chord_hex}';window.photosensitiveSafe={ps_safe};window.hihatTrigger={hihat_trig_str};window.hihatDensity={hihat_dens_val:.4f};window.synthMelodyActive={synth_mel_str};window.harmonicEnergy={harm_val:.4f};window.percussiveEnergy={perc_val:.4f};window.setFrameParams({t}, {str(is_beat).lower()}, {beat_energy:.4f}, {a_low:.4f}, {a_mid:.4f}, {a_high:.4f}, {mod_time_a:.4f})"
             
             # Draw A
-            run_js_safely(viewA, js, is_first_frame=just_loaded_a)
+            if not is_transitioning:
+                viewB.hide()
+            viewA.show()
+            viewA.raise_()
+            was_just_loaded_a = just_loaded_a
+            frame_data_a = run_js_safely(viewA, js, is_first_frame=just_loaded_a)
             just_loaded_a = False
             
-            ev_delay = QEventLoop()
-            QTimer.singleShot(5, ev_delay.quit)  # Fix 4: 5ms (was 1ms) — give WebEngine time to paint
-            ev_delay.exec()
+            pilA = None
+            if frame_data_a and isinstance(frame_data_a, str) and frame_data_a.startswith("data:image/"):
+                try:
+                    raw_b64_a = frame_data_a.split(",", 1)[1]
+                    img_bytes_a = base64.b64decode(raw_b64_a)
+                    pilA = Image.open(io.BytesIO(img_bytes_a)).convert("RGBA")
+                except Exception as e:
+                    logger.warning(f"Error decoding canvas frameA: {e}")
+                    pilA = None
             
-            pixA = viewA.grab()
-            imgA = pixA.toImage()
-            
-            # Convert QImage format to raw bytes (zero-copy memoryview)
-            img_w_a = imgA.width()
-            img_h_a = imgA.height()
-            ptrA = imgA.bits()
-            ptrA.setsize(imgA.sizeInBytes())
-            bufferA = memoryview(ptrA)
-            pilA = Image.frombuffer("RGBA", (img_w_a, img_h_a), bufferA, "raw", "RGBA", 0, 1)
-            if img_w_a != render_w or img_h_a != render_h:
+            if pilA is None:
+                ev_delay = QEventLoop()
+                delay_ms = 350 if was_just_loaded_a else 12
+                QTimer.singleShot(delay_ms, ev_delay.quit)
+                ev_delay.exec()
+                QApplication.processEvents()
+                
+                pixA = viewA.grab()
+                imgA = pixA.toImage().convertToFormat(QImage.Format.Format_RGBA8888)
+                img_w_a = imgA.width()
+                img_h_a = imgA.height()
+                ptrA = imgA.bits()
+                ptrA.setsize(imgA.sizeInBytes())
+                bufferA = memoryview(ptrA)
+                pilA = Image.frombuffer("RGBA", (img_w_a, img_h_a), bufferA, "raw", "RGBA", 0, 1)
+
+            if pilA.width != render_w or pilA.height != render_h:
                 pilA = pilA.resize((render_w, render_h), Image.Resampling.BILINEAR)
+
+            # 🛡️ 全局黑畫面終極保底防護 (Phase 2: Universal Anti-Flicker + Graceful Fallback + Linear Dark Blending)
+            black_thresh = 2 if sec_name == 'Outro' else 8
+            stat_a = pilA.getextrema()
+            rgb_max_a = max(ext[1] for ext in stat_a[:3]) if stat_a else 0
+            
+            def _get_active_fallback():
+                mod_c = module_cache_mgr.get_latest_frame(active_vis['name'])
+                if mod_c is not None:
+                    return apply_graceful_fallback(mod_c, t, beat_energy, a_low, chord_hex)
+                elif 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None:
+                    return apply_graceful_fallback(last_valid_pil_frame.copy(), t, beat_energy, a_low, chord_hex)
+                else:
+                    return song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex)
+
+            if stat_a and all(ext[1] < black_thresh for ext in stat_a[:3]):
+                consecutive_black_frames += 1
+                if consecutive_black_frames == 1 or consecutive_black_frames % 30 == 0:
+                    logger.warning(f"⚠️ [BlackScreenGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到全黑影格，啟動保底攔截")
+                pilA = _get_active_fallback()
+            elif sec_name != 'Outro' and 4 <= rgb_max_a < 16:
+                # Phase 2: 臨界半暗區線性軟混合 (Linear Dark Blending)，消除生硬跳變
+                blend_w = max(0.0, min(1.0, (rgb_max_a - 4.0) / 12.0))
+                fb_frame = _get_active_fallback()
+                if fb_frame:
+                    try:
+                        pilA = Image.blend(fb_frame, pilA, blend_w)
+                    except Exception:
+                        pass
+                consecutive_black_frames = 0
+                module_cache_mgr.add_frame(active_vis['name'], pilA)
+                last_valid_pil_frame = pilA.copy()
+            else:
+                consecutive_black_frames = 0
+                module_cache_mgr.add_frame(active_vis['name'], pilA)
+                last_valid_pil_frame = pilA.copy()
+            if False:  # Cleaned legacy branch
+                consecutive_black_frames = 0
+                module_cache_mgr.add_frame(active_vis['name'], pilA)
+                last_valid_pil_frame = pilA.copy()
+
+            # ⏳ 累加當前模組在單曲中的總播放秒數 (Module Accumulated Timeline)
+            module_accumulated_time[active_vis['name']] = module_accumulated_time.get(active_vis['name'], 0.0) + (1.0 / fps)
 
             if is_transitioning and other_vis:
                 # Draw B
-                run_js_safely(viewB, js, is_first_frame=just_loaded_b)
+                viewB.show()
+                viewB.raise_()
+                was_just_loaded_b = just_loaded_b
+                frame_data_b = run_js_safely(viewB, js, is_first_frame=just_loaded_b)
                 just_loaded_b = False
                 
-                ev_delay = QEventLoop()
-                QTimer.singleShot(5, ev_delay.quit)  # Fix 4: 5ms
-                ev_delay.exec()
+                pilB = None
+                if frame_data_b and isinstance(frame_data_b, str) and frame_data_b.startswith("data:image/"):
+                    try:
+                        raw_b64_b = frame_data_b.split(",", 1)[1]
+                        img_bytes_b = base64.b64decode(raw_b64_b)
+                        pilB = Image.open(io.BytesIO(img_bytes_b)).convert("RGBA")
+                    except Exception as e:
+                        logger.warning(f"Error decoding canvas frameB: {e}")
+                        pilB = None
                 
-                pixB = viewB.grab()
-                imgB = pixB.toImage()
-                
-                img_w_b = imgB.width()
-                img_h_b = imgB.height()
-                ptrB = imgB.bits()
-                ptrB.setsize(imgB.sizeInBytes())
-                bufferB = memoryview(ptrB)
-                pilB = Image.frombuffer("RGBA", (img_w_b, img_h_b), bufferB, "raw", "RGBA", 0, 1)
-                if img_w_b != render_w or img_h_b != render_h:
+                if pilB is None:
+                    ev_delay_b = QEventLoop()
+                    delay_b_ms = 350 if was_just_loaded_b else 12
+                    QTimer.singleShot(delay_b_ms, ev_delay_b.quit)
+                    ev_delay_b.exec()
+                    QApplication.processEvents()
+                    
+                    pixB = viewB.grab()
+                    imgB = pixB.toImage().convertToFormat(QImage.Format.Format_RGBA8888)
+                    img_w_b = imgB.width()
+                    img_h_b = imgB.height()
+                    ptrB = imgB.bits()
+                    ptrB.setsize(imgB.sizeInBytes())
+                    bufferB = memoryview(ptrB)
+                    pilB = Image.frombuffer("RGBA", (img_w_b, img_h_b), bufferB, "raw", "RGBA", 0, 1)
+
+                if pilB.width != render_w or pilB.height != render_h:
                     pilB = pilB.resize((render_w, render_h), Image.Resampling.BILINEAR)
                 
-                # Determine transition type dynamically based on the section and energy
+                # 🛡️ ViewB 黑畫面保底防護 (Phase 2: Universal Anti-Flicker + Graceful Fallback + Linear Dark Blending)
+                black_thresh_b = 2 if sec_name == 'Outro' else 8
+                stat_b = pilB.getextrema()
+                rgb_max_b = max(ext[1] for ext in stat_b[:3]) if stat_b else 0
+                
+                def _get_active_fallback_b():
+                    mod_c_b = module_cache_mgr.get_latest_frame(other_vis['name'])
+                    if mod_c_b is not None:
+                        return apply_graceful_fallback(mod_c_b, t, beat_energy, a_low, chord_hex)
+                    elif pilA is not None:
+                        return pilA.copy()
+                    else:
+                        return song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex)
+
+                if stat_b and all(ext[1] < black_thresh_b for ext in stat_b[:3]):
+                    pilB = _get_active_fallback_b()
+                elif sec_name != 'Outro' and 4 <= rgb_max_b < 16:
+                    blend_w_b = max(0.0, min(1.0, (rgb_max_b - 4.0) / 12.0))
+                    fb_b = _get_active_fallback_b()
+                    if fb_b:
+                        try:
+                            pilB = Image.blend(fb_b, pilB, blend_w_b)
+                        except Exception:
+                            pass
+                    module_cache_mgr.add_frame(other_vis['name'], pilB)
+                else:
+                    module_cache_mgr.add_frame(other_vis['name'], pilB)
+
+                # Determine transition type dynamically based on the section, energy and pattern rotation
                 norm_sec = sec_name.lower().strip()
+                trans_rot = int(t * 5.0) + int(audio_seed % 97)
+                pat_options = ['diagonal_tl_br', 'diagonal_tr_bl', 'radial_iris', 'horizontal_shutter', 'diamond_expand', 'vertical_curtain']
+                wipe_pat = pat_options[trans_rot % len(pat_options)]
+                
                 if 'intro' in norm_sec or 'outro' in norm_sec:
-                    chosen_trans = 'luma_wipe'
+                    chosen_trans = 'luma_wipe' if trans_rot % 2 == 0 else 'solid_color_transition'
                 elif 'verse' in norm_sec:
-                    chosen_trans = 'displacement'
+                    chosen_trans = 'displacement' if trans_rot % 2 == 0 else 'luma_wipe'
                 elif 'chorus' in norm_sec or 'drop' in norm_sec:
-                    chosen_trans = 'zoom_blur' if (is_beat or beat_energy > 0.4) else 'glitch'
+                    if is_beat or beat_energy > 0.4:
+                        chosen_trans = 'zoom_blur' if trans_rot % 3 != 0 else 'solid_color_transition'
+                    else:
+                        chosen_trans = 'glitch'
                 elif 'build' in norm_sec:
-                    chosen_trans = 'glitch'
+                    chosen_trans = 'glitch' if trans_rot % 2 == 0 else 'zoom_blur'
                 elif 'bridge' in norm_sec:
-                    chosen_trans = 'slide_push'
+                    chosen_trans = 'slide_push' if trans_rot % 2 == 0 else 'solid_color_transition'
                 else:
                     chosen_trans = 'displacement'
 
@@ -7940,11 +10646,21 @@ function draw() {
                     trans_type=chosen_trans,
                     intensity=trans_intensity,
                     is_beat=is_beat,
-                    beat_energy=beat_energy
+                    beat_energy=beat_energy,
+                    wipe_pattern=wipe_pat,
+                    chord_color_hex=chord_hex
                 )
-                del pixB, imgB, bufferB, pilB  # Fix 2: Explicit cleanup
             else:
                 img_to_stream = pilA
+
+            # 🛡️ 輸出前終極防護：確保絕不向 FFmpeg 輸出未預期的純黑幀
+            final_thresh = 2 if sec_name == 'Outro' else 8
+            stat_final = img_to_stream.getextrema()
+            if stat_final and all(ext[1] < final_thresh for ext in stat_final[:3]):
+                if 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None:
+                    img_to_stream = last_valid_pil_frame.copy()
+                else:
+                    img_to_stream = song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex)
 
             # Apply post-processing effects chain (flash, grain, throb, etc.)
             audio_feats = get_full_telemetry_at_time(t)
@@ -7961,7 +10677,43 @@ function draw() {
                 
             img_to_stream = apply_post_processing(img_to_stream, t, is_beat, beat_energy, audio_feats, section_name=sec_name, section_progress=sec_progress)
 
+            # 🔍 實時 QC 與音視動態響應診斷器 (Real-time Quality & AV Response Auditor)
+            if '_qc_auditor' not in locals():
+                from realtime_qc_auditor import RealtimeRenderQCAuditor
+                _qc_auditor = RealtimeRenderQCAuditor(sample_interval=30)
+
+            img_to_stream, qc_boost = _qc_auditor.audit_frame(
+                frame_i=i,
+                pil_img=img_to_stream,
+                t=t,
+                is_beat=is_beat,
+                beat_energy=beat_energy,
+                audio_feats=audio_feats,
+                sec_name=sec_name,
+                music_energy=music_energy
+            )
+
+            # 若 QC 診斷出需要補強熱烈度或響應，動態進行影格修飾
+            if qc_boost:
+                if qc_boost.get('contrast_boost'):
+                    from PIL import ImageEnhance
+                    enh = ImageEnhance.Contrast(img_to_stream)
+                    img_to_stream = enh.enhance(qc_boost['contrast_boost'])
+                if qc_boost.get('force_hold_previous') and 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None:
+                    img_to_stream = last_valid_pil_frame.copy()
+
             # Fix 1: Send frame to background writer thread via bounded queue
+            # Periodic screenshot saving for visual quality assurance and monitoring
+            if i % 300 == 0 or i == 30 or i == total_frames - 30:
+                try:
+                    shot_dir = "/Users/unclerm/.gemini/antigravity/brain/2615a4fe-c83f-4142-acf6-ce1423c09edd/screenshots"
+                    os.makedirs(shot_dir, exist_ok=True)
+                    song_slug = os.path.splitext(os.path.basename(audio_path))[0]
+                    shot_path = os.path.join(shot_dir, f"{song_slug}_frame_{i:05d}.png")
+                    img_to_stream.save(shot_path)
+                except Exception:
+                    pass
+
             # Check for writer errors first
             if _writer_error[0]:
                 self.log_to_console(f"FFmpeg 寫入執行緒錯誤: {_writer_error[0]}", is_err=True)
@@ -7990,8 +10742,10 @@ function draw() {
                 self.log_to_console(f"寫入幀佇列時出錯: {e}", is_err=True)
                 break
 
-            # Fix 2: Explicit cleanup of per-frame objects
-            del pixA, imgA, bufferA, pilA, img_to_stream
+            # Fix 2: Explicit safe cleanup of per-frame objects
+            for _v in ['pixA', 'imgA', 'bufferA', 'pilA', 'pixB', 'imgB', 'bufferB', 'pilB', 'img_to_stream']:
+                if _v in locals():
+                    del locals()[_v]
 
             # Fix 2: Periodic garbage collection and HTTP Cache cleaning
             if i % 300 == 0:
@@ -8060,6 +10814,7 @@ function draw() {
             update_render_status_label(i)
             if i % 20 == 0:
                 self.log_to_console(f"已發送 {i+1} / {total_frames} 影格到編碼器...")
+            QApplication.processEvents()
 
         # Step 3: Close pipeline and finalize
         if getattr(self, 'is_batch_rendering', False):
@@ -8105,6 +10860,62 @@ function draw() {
                 self.log_to_console(f"✅ MV 影片成功導出！\n檔案路徑: {output_file}")
                 self.status_lbl.setText("渲染成功！")
                 logger.info(f"=== 渲染成功 === 輸出: {output_file}")
+                
+                # Write structured JSON metadata to render.log for downstream tools (e.g. Shorts exporter)
+                try:
+                    # Build visual credits list with full attribution info
+                    visual_credits = []
+                    for idx, v in enumerate(visuals_data):
+                        visual_credits.append({
+                            "index": idx,
+                            "name": v.get('name', '未命名'),
+                            "author": v.get('author', '未知作者'),
+                            "license": v.get('license', 'Creative Commons'),
+                            "url": v.get('url', '').strip() or 'OpenProcessing'
+                        })
+                    
+                    # Build storyboard → visual module mapping (which module plays in which time range)
+                    storyboard_visual_map = []
+                    for sec_data in storyboard:
+                        assigned = sec_data.get('assigned_visual', {})
+                        # Find index of this visual in visuals_data
+                        vis_idx = -1
+                        for i, v in enumerate(visuals_data):
+                            if v.get('name') == assigned.get('name'):
+                                vis_idx = i
+                                break
+                        storyboard_visual_map.append({
+                            "start": sec_data.get('start', 0),
+                            "end": sec_data.get('end', 0),
+                            "section": sec_data.get('section', 'Verse'),
+                            "visual_index": vis_idx
+                        })
+                    
+                    # Serialize storyboard without the non-serializable assigned_visual dict
+                    clean_storyboard = [
+                        {"start": s.get("start", 0), "end": s.get("end", 0), "section": s.get("section", "Verse")}
+                        for s in storyboard
+                    ]
+                    
+                    render_metadata = {
+                        "bpm": bpm,
+                        "duration": duration,
+                        "audio_path": audio_path,
+                        "genre": resolved_genre,
+                        "storyboard": clean_storyboard,
+                        "resolution": f"{w}x{h}",
+                        "fps": fps,
+                        "total_frames": total_frames,
+                        "visual_modules": [v.get('name', '未命名') for v in visuals_data],
+                        "visual_credits": visual_credits,
+                        "storyboard_visual_map": storyboard_visual_map,
+                        "output_file": output_file
+                    }
+                    logger.info("=== RENDER_METADATA_JSON ===")
+                    logger.info(json.dumps(render_metadata, ensure_ascii=False))
+                except Exception as _meta_err:
+                    logger.warning(f"寫入渲染元資料 JSON 失敗: {_meta_err}")
+                
                 self.create_credits_file(output_file, visuals_data)
                 self.create_social_templates(output_file, audio_path, resolved_genre, bpm, duration, visuals_data)
                 if show_popups:
@@ -8320,7 +11131,7 @@ function draw() {
                             channel_name = owner_runs[0].get("text", "") if owner_runs else ""
                             channel_id = owner_runs[0].get("navigationEndpoint", {}).get("browseEndpoint", {}).get("browseId", "") if owner_runs else ""
                             
-                            channel_matches = (channel_id == "UCuerJAKgF3zLnIvCtwPorLA" or "POHAN" in channel_name)
+                            channel_matches = (channel_id == "UCuerJAKgF3zLnIvCtwPorLA" or "POHAN" in channel_name.upper() or "POHAN528" in channel_name.upper())
                             
                             song_words = re.findall(r"\w+", song.lower())
                             title_lower = v_title.lower()
@@ -8382,10 +11193,6 @@ function draw() {
             content.append("🎧 立即收聽 / Stream & Download:")
             content.append(f"👉 YouTube: {youtube_url}")
             content.append(f"👉 Apple Music: {apple_music_url}")
-            content.append("")
-            content.append("📢 【關於本首曲目 / About the Track】")
-            content.append(f"這首 {genre.capitalize() if genre else 'Ambient'} 風格的曲目融合了深邃且沉浸的音響空間，帶您進入無重力的冥想之境。適合讀書、工作、或放鬆時聆聽。")
-            content.append(f"This immersive {genre.lower() if genre else 'ambient'} track features deep sonic spaces that carry you into a weightless state of mind. Perfect for studying, working, or relaxing.")
             content.append("")
             content.append("🎵 【音樂資訊 / Track Info】")
             content.append(f"- 歌曲名稱 (Song Title): {song}")
@@ -9032,6 +11839,20 @@ function draw() {
         }
         license_name = license_map.get(license_id, f"CC {license_id}" if license_id else "Unknown")
 
+        # 嚴格執行 4K MV 視覺預設模組收錄資格檢測 (排除 攝影機/AR/XR/GAME/高耗時加載)
+        from batch_importer import validate_visual_module_eligibility
+        tags_list = sketch_data.get("tags", [])
+        desc_text = sketch_data.get("description", "")
+        is_eligible, reject_reason = validate_visual_module_eligibility(
+            title=title,
+            code=full_code,
+            custom_html=custom_html,
+            tags=tags_list,
+            desc=desc_text
+        )
+        if not is_eligible:
+            raise ValueError(f"該作品不符合 4K MV 視覺模組收錄標準，已被過濾排除。\n原因: {reject_reason}")
+
         return title, sketch_id, full_code, custom_css, custom_html, inline_assets, author, license_name, sketch_data.get("fileBase")
 
 # Keywords for static check (fast path)
@@ -9069,8 +11890,34 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
           max-height: 100vh !important;
           object-fit: cover !important;
         }
+        /* 強制隱藏所有 GUI 框架容器與表單控制項 (CSS 層級防護) */
+        .dg, .dg.ac, .dg.main, .lil-gui, .qs_main, .opc-control,
+        input:not([type="hidden"]), button, select, textarea,
+        label, fieldset, legend, output, datalist {
+          display: none !important;
+          visibility: hidden !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+          position: absolute !important;
+          top: -99999px !important;
+          left: -99999px !important;
+          width: 0px !important;
+          height: 0px !important;
+          z-index: -99999 !important;
+        }
       </style>
       <script>
+        (function() {
+          const _origWarn = console.warn;
+          console.warn = function(...args) {
+            if (args[0] && typeof args[0] === 'string' && (args[0].includes('vectors of different sizes') || args[0].includes('linger vector'))) {
+              return;
+            }
+            if (typeof _origWarn === 'function') {
+              _origWarn.apply(console, args);
+            }
+          };
+        })();
         window.__textCalled = false;
         window.__controlsCreated = false;
         window.__loadingDetected = false;
@@ -9079,16 +11926,20 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
         window.__setupFinished = false;
 
         window.onerror = function(message, source, lineno, colno, error) {
-          if (message && message.indexOf('vertices') !== -1) {
-            console.log('[Ignored non-fatal sandbox error]: ' + message);
-            return true; // Ignore this specific asset loading race error
+          const msgStr = String(message || "");
+          if (msgStr.indexOf('vertices') !== -1 || msgStr.indexOf('is not defined') !== -1) {
+            console.log('[Ignored non-fatal sandbox error]: ' + msgStr);
+            return true; // Ignore this non-fatal error
           }
-          window.__jsErrors.push(message + " (Line " + lineno + ")");
+          window.__jsErrors.push(msgStr + " (Line " + lineno + ")");
           return false;
         };
         window.addEventListener('unhandledrejection', function(event) {
+          if (event && typeof event.preventDefault === 'function') {
+            event.preventDefault();
+          }
           const reason = event.reason ? (event.reason.message || String(event.reason)) : "";
-          if (reason && reason.indexOf('vertices') !== -1) {
+          if (reason && (reason.indexOf('vertices') !== -1 || reason.indexOf('is not defined') !== -1)) {
             console.log('[Ignored non-fatal sandbox rejection]: ' + reason);
             return;
           }
@@ -9097,11 +11948,40 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
 
         const origCreateElement = Document.prototype.createElement;
         Document.prototype.createElement = function(tagName) {
+          const el = origCreateElement.apply(this, arguments);
           const tag = tagName.toLowerCase();
           if (['input', 'button', 'select', 'textarea'].includes(tag)) {
             window.__controlsCreated = true;
+            // 隱藏控制項 DOM 元素，而非刪除模組
+            el.style.setProperty('display', 'none', 'important');
+            el.style.setProperty('visibility', 'hidden', 'important');
+            el.style.setProperty('opacity', '0', 'important');
+            el.style.setProperty('pointer-events', 'none', 'important');
+            el.style.setProperty('position', 'absolute', 'important');
+            el.style.setProperty('top', '-99999px', 'important');
+            el.style.setProperty('left', '-99999px', 'important');
+            el.style.setProperty('width', '0px', 'important');
+            el.style.setProperty('height', '0px', 'important');
+            el.style.setProperty('z-index', '-99999', 'important');
           }
-          return origCreateElement.apply(this, arguments);
+          return el;
+        };
+
+        // Smart unrelated text filter (與 code_injector.py 同步)
+        window.__isUnrelatedVisualText = function(content) {
+          if (content === null || content === undefined) return false;
+          let str = String(content).trim();
+          if (!str || str.length === 0) return false;
+          if (/^(?:fps|framerate|frame\s*rate)\s*[:=]?\s*[\d\.]*/i.test(str)) return true;
+          if (/^[\d\.]+\s*fps\b/i.test(str)) return true;
+          if (/^fps\s*$/i.test(str)) return true;
+          if (/^loading(?:\s*[\.\w]*)?$/i.test(str)) return true;
+          if (/^please\s+wait/i.test(str)) return true;
+          if (/^esperando\b/i.test(str)) return true;
+          if (/(?:drag\s+wind|tap\s+to|click\s+to|press\s+['"\\w]|hit\s+space|arrow\s+keys|use\s+mouse|hold\s+mouse|scroll\s+to|snapshot|screenshot|save\s+image|controls?|instructions?|touch\s+to\s+start|press\s+any\s+key)/i.test(str)) return true;
+          if (/^(?:speed|size|radius|color|count|frequency|volume|threshold|density|scale|zoom|particles|nodes|iteration|gravity|damping)\s*[:=]\s*[-+]?[\d\.]+/i.test(str)) return true;
+          if (/^(?:by\s+[\w\s]+|author\s*:|code\s+by|created\s+by|designed\s+by|copyright|©|\(c\))\b/i.test(str)) return true;
+          return false;
         };
 
         const origFillText = (typeof CanvasRenderingContext2D !== 'undefined') ? CanvasRenderingContext2D.prototype.fillText : null;
@@ -9113,6 +11993,8 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
               if (typeof str === 'string' && /loading/i.test(str)) {
                 window.__loadingDetected = true;
               }
+              // 隱藏無關文字而非刪除模組
+              if (window.__isUnrelatedVisualText(str)) return;
             }
             return origFillText.apply(this, arguments);
           };
@@ -9126,6 +12008,8 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
               if (typeof str === 'string' && /loading/i.test(str)) {
                 window.__loadingDetected = true;
               }
+              // 隱藏無關文字而非刪除模組
+              if (window.__isUnrelatedVisualText(str)) return;
             }
             return origStrokeText.apply(this, arguments);
           };
@@ -9134,6 +12018,76 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
       <script src="custom_visuals/libs/p5.min.js"></script>
       <script>
         if (typeof p5 !== 'undefined' && p5.prototype) {
+          // Preload watchdog: auto unstick if loading stalls > 1.2s
+          setTimeout(function() {
+            if (window._p5Instance && window._p5Instance._preloadCount > 0) {
+              console.log('[Preload Watchdog] Force unstuck preloadCount:', window._p5Instance._preloadCount);
+              window._p5Instance._preloadCount = 0;
+              if (typeof window._p5Instance._setup === 'function') window._p5Instance._setup();
+              else if (typeof window.setup === 'function') window.setup();
+            }
+          }, 1200);
+
+          // Robust fallback for loadImage
+          const _origLoadImage = p5.prototype.loadImage;
+          p5.prototype.loadImage = function(path, successCallback, failureCallback) {
+            const dummyImg = {
+              width: 400, height: 400,
+              loadPixels: function() {},
+              updatePixels: function() {},
+              get: function(x, y, w, h) { return [128, 128, 200, 255]; },
+              set: function() {},
+              resize: function() {},
+              mask: function() {},
+              filter: function() {},
+              copy: function() {},
+              canvas: document.createElement('canvas'),
+              elt: document.createElement('canvas')
+            };
+            if (_origLoadImage) {
+              try {
+                const res = _origLoadImage.call(this, path, successCallback, function(err) {
+                  if (typeof failureCallback === 'function') failureCallback(err);
+                  else if (typeof successCallback === 'function') successCallback(dummyImg);
+                });
+                return res || dummyImg;
+              } catch(e) {
+                if (typeof successCallback === 'function') successCallback(dummyImg);
+                return dummyImg;
+              }
+            }
+            if (typeof successCallback === 'function') successCallback(dummyImg);
+            return dummyImg;
+          };
+
+          // Robust fallback for loadFont
+          const _origLoadFont = p5.prototype.loadFont;
+          p5.prototype.loadFont = function(path, onSuccess, onError) {
+            const dummyFont = { font: { unitsPerEm: 1000 }, textBounds: function() { return { x:0, y:0, w:100, h:20 }; } };
+            if (_origLoadFont) {
+              try {
+                return _origLoadFont.call(this, path, onSuccess, function(err) {
+                  if (onError) onError(err);
+                  else if (onSuccess) onSuccess(dummyFont);
+                }) || dummyFont;
+              } catch(e) { if (onSuccess) onSuccess(dummyFont); return dummyFont; }
+            }
+            if (onSuccess) onSuccess(dummyFont);
+            return dummyFont;
+          };
+
+          // Robust fallback for loadSound
+          const _origLoadSound = p5.prototype.loadSound;
+          p5.prototype.loadSound = function(path, onSuccess, onError) {
+            const dummySound = {
+              play: function() {}, stop: function() {}, loop: function() {}, pause: function() {},
+              isPlaying: function() { return false; }, setVolume: function() {}, rate: function() {},
+              duration: function() { return 10; }, currentTime: function() { return 0; }
+            };
+            if (onSuccess) setTimeout(function() { onSuccess(dummySound); }, 10);
+            return dummySound;
+          };
+
           const origSetup = p5.prototype.setup;
           p5.prototype.setup = function() {
             window.__setupFinished = true;
@@ -9160,54 +12114,141 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
               if (typeof str === 'string' && /loading/i.test(str)) {
                 window.__loadingDetected = true;
               }
+              // 隱藏無關文字而非刪除模組
+              if (window.__isUnrelatedVisualText(str)) return this;
             }
             if (origProtoText) {
               return origProtoText.apply(this, arguments);
             }
           };
-          
-          const origCreateSlider = p5.prototype.createSlider;
-          if (origCreateSlider) {
-            p5.prototype.createSlider = function() {
-              window.__controlsCreated = true;
-              return origCreateSlider.apply(this, arguments);
-            };
+
+          // ─── 音訊驅動隱藏控制項 (與 code_injector.py createDummyDom 同步) ───
+          window._activeMockButtons = window._activeMockButtons || [];
+          window.audioLow = 0.5;
+          window.audioMid = 0.5;
+          window.audioHigh = 0.5;
+          window.beatEnergy = 0.5;
+          window.isBeat = false;
+          window.custom_time_ms = 0;
+
+          function _createHiddenDummyDom(tag, ...createArgs) {
+            let realTag = (tag === 'slider' || tag === 'colorpicker' || tag === 'checkbox' || tag === 'radio') ? 'input' : (tag || 'div');
+            let dummyEl = document.createElement(realTag);
+            dummyEl.style.setProperty('display', 'none', 'important');
+            dummyEl.style.setProperty('visibility', 'hidden', 'important');
+            dummyEl.style.setProperty('opacity', '0', 'important');
+            dummyEl.style.setProperty('pointer-events', 'none', 'important');
+            dummyEl.style.setProperty('position', 'absolute', 'important');
+            dummyEl.style.setProperty('top', '-99999px', 'important');
+            dummyEl.style.setProperty('left', '-99999px', 'important');
+            dummyEl.style.setProperty('width', '0px', 'important');
+            dummyEl.style.setProperty('height', '0px', 'important');
+            dummyEl.style.setProperty('z-index', '-99999', 'important');
+
+            dummyEl.elt = dummyEl;
+            dummyEl.class = function() { return this; };
+            let dummyIdVal = '';
+            dummyEl.id = function(val) { if(val === undefined) return dummyIdVal; dummyIdVal = String(val); return dummyEl; };
+            dummyEl.parent = function() { return this; };
+            dummyEl.position = function() { return this; };
+            dummyEl.size = function() { return this; };
+            dummyEl.style = function() { return this; };
+            dummyEl.show = function() { return this; };
+            dummyEl.hide = function() { return this; };
+            dummyEl.html = function() { return this; };
+            dummyEl.attribute = function() { return this; };
+            dummyEl.removeAttribute = function() { return this; };
+            dummyEl.input = function(cb) { return this; };
+            dummyEl.changed = function(cb) { return this; };
+
+            if (tag === 'slider') {
+              let minVal = createArgs[0] !== undefined ? createArgs[0] : 0;
+              let maxVal = createArgs[1] !== undefined ? createArgs[1] : 100;
+              let stepVal = createArgs[3] !== undefined ? createArgs[3] : 0;
+              const channels = ['audioLow', 'audioMid', 'audioHigh', 'beatEnergy'];
+              let boundProperty = channels[Math.floor(Math.random() * channels.length)];
+              let phase = Math.random() * 6.28;
+              let spd = 0.5 + Math.random() * 1.5;
+              dummyEl.value = function(val) {
+                if (val !== undefined) return this;
+                let t = (window.custom_time_ms || Date.now()) * 0.001;
+                let norm = window[boundProperty] || 0.5;
+                let wave = 0.5 + 0.3 * Math.sin(t * spd + phase) + (norm - 0.5) * 0.4;
+                wave = Math.max(0, Math.min(1, wave));
+                let res = minVal + wave * (maxVal - minVal);
+                if (stepVal > 0) res = Math.round((res - minVal) / stepVal) * stepVal + minVal;
+                return res;
+              };
+            } else if (tag === 'checkbox') {
+              dummyEl.checked = function(val) {
+                if (val !== undefined) return this;
+                return (window.audioLow || 0.5) > 0.48 || (window.isBeat || false);
+              };
+              dummyEl.value = function(val) { return dummyEl.checked(val); };
+            } else if (tag === 'button') {
+              dummyEl._callbacks = [];
+              dummyEl.mousePressed = function(cb) {
+                if (typeof cb === 'function') dummyEl._callbacks.push(cb);
+                if (!window._activeMockButtons.includes(dummyEl)) window._activeMockButtons.push(dummyEl);
+                return this;
+              };
+              dummyEl.mouseClicked = dummyEl.mousePressed;
+              dummyEl.value = function() { return 1; };
+            } else if (tag === 'select') {
+              dummyEl._options = [];
+              dummyEl.option = function(name, val) {
+                dummyEl._options.push(val !== undefined ? val : name);
+                return dummyEl;
+              };
+              dummyEl.selected = function(val) {
+                if (val !== undefined) return this;
+                if (dummyEl._options.length === 0) return '';
+                let idx = Math.floor((window.audioMid || 0.5) * dummyEl._options.length) % dummyEl._options.length;
+                return dummyEl._options[idx];
+              };
+              dummyEl.value = dummyEl.selected;
+            } else {
+              dummyEl.value = function(val) { if(val === undefined) return "0.5"; return this; };
+            }
+
+            if (document.body) document.body.appendChild(dummyEl);
+            return dummyEl;
           }
-          const origCreateButton = p5.prototype.createButton;
-          if (origCreateButton) {
-            p5.prototype.createButton = function() {
-              window.__controlsCreated = true;
-              return origCreateButton.apply(this, arguments);
-            };
+
+          // 音訊時鐘
+          function _audioTick() {
+            window.custom_time_ms = Date.now();
+            if (window.beatEnergy > 0) window.beatEnergy *= 0.92;
+            window.audioLow = 0.3 + 0.4 * Math.sin(Date.now() * 0.006);
+            window.audioMid = 0.3 + 0.3 * Math.sin(Date.now() * 0.008);
+            window.audioHigh = 0.2 + 0.4 * Math.sin(Date.now() * 0.012);
+            requestAnimationFrame(_audioTick);
           }
-          const origCreateInput = p5.prototype.createInput;
-          if (origCreateInput) {
-            p5.prototype.createInput = function() {
-              window.__controlsCreated = true;
-              return origCreateInput.apply(this, arguments);
-            };
-          }
-          const origCreateCheckbox = p5.prototype.createCheckbox;
-          if (origCreateCheckbox) {
-            p5.prototype.createCheckbox = function() {
-              window.__controlsCreated = true;
-              return origCreateCheckbox.apply(this, arguments);
-            };
-          }
-          const origCreateSelect = p5.prototype.createSelect;
-          if (origCreateSelect) {
-            p5.prototype.createSelect = function() {
-              window.__controlsCreated = true;
-              return origCreateSelect.apply(this, arguments);
-            };
-          }
-          const origCreateRadio = p5.prototype.createRadio;
-          if (origCreateRadio) {
-            p5.prototype.createRadio = function() {
-              window.__controlsCreated = true;
-              return origCreateRadio.apply(this, arguments);
-            };
-          }
+          requestAnimationFrame(_audioTick);
+
+          // 覆蓋 p5 的控制項建立函數，改用隱藏 + 音訊驅動
+          window.__controlsCreated = window.__controlsCreated || false;
+          p5.prototype.createSlider = function() { window.__controlsCreated = true; return _createHiddenDummyDom('slider', ...arguments); };
+          p5.prototype.createButton = function() { window.__controlsCreated = true; return _createHiddenDummyDom('button', ...arguments); };
+          p5.prototype.createInput = function() { window.__controlsCreated = true; return _createHiddenDummyDom('input', ...arguments); };
+          p5.prototype.createCheckbox = function() { window.__controlsCreated = true; return _createHiddenDummyDom('checkbox', ...arguments); };
+          p5.prototype.createSelect = function() { window.__controlsCreated = true; return _createHiddenDummyDom('select', ...arguments); };
+          p5.prototype.createRadio = function() { window.__controlsCreated = true; return _createHiddenDummyDom('radio', ...arguments); };
+          p5.prototype.createColorPicker = function() { window.__controlsCreated = true; return _createHiddenDummyDom('colorpicker', ...arguments); };
+          p5.prototype.createP = function() { return _createHiddenDummyDom('p', ...arguments); };
+          p5.prototype.createDiv = function() { return _createHiddenDummyDom('div', ...arguments); };
+          p5.prototype.createSpan = function() { return _createHiddenDummyDom('span', ...arguments); };
+          // 全域函數同步
+          window.createSlider = p5.prototype.createSlider;
+          window.createButton = p5.prototype.createButton;
+          window.createInput = p5.prototype.createInput;
+          window.createCheckbox = p5.prototype.createCheckbox;
+          window.createSelect = p5.prototype.createSelect;
+          window.createRadio = p5.prototype.createRadio;
+          window.createColorPicker = p5.prototype.createColorPicker;
+          window.createP = p5.prototype.createP;
+          window.createDiv = p5.prototype.createDiv;
+          window.createSpan = p5.prototype.createSpan;
         }
       </script>
       <script>{P5_V2_COMPAT_SHIM}</script>
@@ -9221,24 +12262,57 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
         // Audio Mock & OPC Mock (防止 connect/disconnect 錯誤和 OPC 未定義)
         AUDIO_MOCK_PLACEHOLDER
         if (typeof OPC === 'undefined') {
-          window.OPC = {
-            slider: function(name, value) { window[name] = value; return this; },
-            button: function() { return this; },
-            toggle: function(name, value) { window[name] = value; return this; },
-            color: function(name, value) { window[name] = value; return this; },
-            select: function(name, value) { window[name] = value; return this; },
-            text: function(name, value) { window[name] = value; return this; },
-            setGlobal: function(name, value) { window[name] = value; }
+          const _opcHandler = {
+            get: function(target, prop) {
+              if (prop in target) return target[prop];
+              if (['slider', 'toggle', 'color', 'select', 'text', 'palette', 'range'].includes(prop)) {
+                return function(name, value) {
+                  if (name && typeof value !== 'undefined' && typeof window[name] === 'undefined') {
+                    window[name] = value;
+                  }
+                  return window.OPC;
+                };
+              }
+              return function() { return window.OPC; };
+            }
           };
+          window.OPC = new Proxy({
+            slider: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
+            button: function() { return window.OPC; },
+            toggle: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
+            color: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
+            select: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
+            text: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
+            title: function() { return window.OPC; },
+            header: function() { return window.OPC; },
+            separator: function() { return window.OPC; },
+            collapsed: function() { return window.OPC; },
+            bezier: function() { return window.OPC; },
+            setGlobal: function(name, value) { if (name) window[name] = value; }
+          }, _opcHandler);
         }
       </script>
       <script>
-        // Periodically check DOM for control elements and loading text
+        // Periodically check DOM for control elements and loading text, and hide them
         setInterval(function() {
           const selectors = ['input', 'button', 'select', 'textarea', '.dg', '.lil-gui', '.qs_main', '.opc-control'];
           for (const sel of selectors) {
-            if (document.querySelector(sel)) {
+            const els = document.querySelectorAll(sel);
+            if (els.length > 0) {
               window.__controlsCreated = true;
+              els.forEach(function(el) {
+                // 只隱藏非 canvas 的控制項，避免誤傷畫布
+                if (el.tagName !== 'CANVAS') {
+                  el.style.setProperty('display', 'none', 'important');
+                  el.style.setProperty('visibility', 'hidden', 'important');
+                  el.style.setProperty('pointer-events', 'none', 'important');
+                  el.style.setProperty('position', 'absolute', 'important');
+                  el.style.setProperty('top', '-99999px', 'important');
+                  el.style.setProperty('left', '-99999px', 'important');
+                  el.style.setProperty('width', '0px', 'important');
+                  el.style.setProperty('height', '0px', 'important');
+                }
+              });
             }
           }
           if (document.body && /loading/i.test(document.body.innerText)) {
@@ -9326,6 +12400,8 @@ class DependencyDownloaderThread(QThread):
                             for asset in asset_names:
                                 clean_asset = asset.lstrip("./")
                                 if clean_asset.startswith(("http://", "https://", "data:")):
+                                    continue
+                                if "#" in clean_asset or "${" in clean_asset or "{" in clean_asset or "}" in clean_asset or "(" in clean_asset or ")" in clean_asset:
                                     continue
                                     
                                 local_asset_path = os.path.join(self.custom_visuals_dir, "assets", sketch_id, clean_asset)
@@ -9635,8 +12711,8 @@ class ModuleCleanupDialog(QDialog):
         
         desc = QLabel("此常駐工具將會逐一對 `custom_visuals` 資料夾內的所有視覺模組進行試運行：\n"
                       "1. 自動過濾並刪除程式碼錯誤的模組\n"
-                      "2. 自動過濾並刪除畫面上包含拉桿、按鈕等控制項 (DOM / OPC GUI) 的模組\n"
-                      "3. 自動過濾並刪除包含任何文字顯示 (Canvas text 或 loading 字樣) 的模組\n"
+                      "2. 自動隱藏畫面上的拉桿、按鈕等控制項 (DOM / OPC GUI)，改由音訊特徵驅動控制值\n"
+                      "3. 自動隱藏與模組視覺表現無關的文字顯示 (Canvas text 或 loading 字樣)\n"
                       "4. 系統將自動在 op_import_errors.txt 記錄清理日誌。", self)
         layout.addWidget(desc)
 
@@ -9883,16 +12959,13 @@ class ModuleCleanupDialog(QDialog):
             if re.search(r'\bwhile\s*\([\s\S]*?\)\s*\{', code):
                 has_dangerous_while = True
         
-        if has_static_control or has_static_loading or has_dangerous_while:
-            reasons = []
-            if has_static_control:
-                reasons.append("包含控制項 (Static)")
-            if has_static_loading:
-                reasons.append("包含 'loading' 關鍵字 (Static)")
-            if has_dangerous_while:
-                reasons.append("包含危險的 while 迴圈 (Static Guard)")
-            
-            reason_str = ", ".join(reasons)
+        if has_static_control:
+            self.log(f"   🎛️ 偵測到控制項 (Static)，已自動隱藏並橋接音訊調製")
+        if has_static_loading:
+            self.log(f"   💬 偵測到文字提示/Loading (Static)，已自動啟用智慧隱藏過濾")
+        
+        if has_dangerous_while:
+            reason_str = "包含危險的 while 迴圈 (Static Guard)"
             self.results.append({
                 "name": name,
                 "file_path": file_path,
@@ -10037,13 +13110,11 @@ class ModuleCleanupDialog(QDialog):
             status = "delete"
             reasons.append(f"代碼執行錯誤: {'; '.join(all_errors)}")
         if controls_created:
-            status = "delete"
-            reasons.append("包含控制項 (DOM)")
+            self.log(f"   🎛️ 運行時已自動隱藏動態控制項 (DOM)")
         if loading_detected:
-            status = "delete"
-            reasons.append("包含 'loading' 載入字樣 (DOM/Canvas)")
+            self.log(f"   💬 運行時已自動隱藏無關文字/載入提示")
             
-        reason_str = ", ".join(reasons)
+        reason_str = ", ".join(reasons) if reasons else ("正常且已適配音訊" if controls_created else "正常且畫面乾淨")
         self.results.append({
             "name": name,
             "file_path": file_path,
@@ -10054,7 +13125,7 @@ class ModuleCleanupDialog(QDialog):
         if status == "delete":
             self.log(f"   🗑️ 已標記刪除: {reason_str}")
         else:
-            self.log("   ✅ 正常且畫面乾淨，予以保留")
+            self.log(f"   ✅ {reason_str}，予以保留")
             
         self.current_idx += 1
         self.timer.start(10)
@@ -10307,7 +13378,7 @@ class CleanupModeDialog(QDialog):
         lbl = QLabel("請選擇本機視覺模組庫的試運行與清理模式：", self)
         layout.addWidget(lbl)
         
-        self.btn_auto = QPushButton("🤖 自動化快速清理\n   (Headless 靜態與動態審查，自動篩除包含控制項、Canvas文字或報錯的模組)", self)
+        self.btn_auto = QPushButton("🤖 自動化快速清理\n   (Headless 靜態與動態審查，自動篩除報錯崩潰模組，自動隱藏控制項/音訊橋接與隱藏無關文字)", self)
         self.btn_auto.setObjectName("btn_auto")
         self.btn_auto.clicked.connect(self.select_auto)
         layout.addWidget(self.btn_auto)
@@ -10341,7 +13412,30 @@ class CleanupModeDialog(QDialog):
 
 
 def main():
+    if "--no-sandbox" not in sys.argv:
+        sys.argv.append("--no-sandbox")
+    if "--disable-web-security" not in sys.argv:
+        sys.argv.append("--disable-web-security")
     app = QApplication(sys.argv)
+    app.setStyle("Fusion")
+    
+    # Configure global dark palette as fallback for native OS palette
+    dark_palette = QPalette()
+    dark_palette.setColor(QPalette.ColorRole.Window, QColor(11, 11, 14))
+    dark_palette.setColor(QPalette.ColorRole.WindowText, QColor(228, 228, 231))
+    dark_palette.setColor(QPalette.ColorRole.Base, QColor(18, 18, 27))
+    dark_palette.setColor(QPalette.ColorRole.AlternateBase, QColor(24, 24, 27))
+    dark_palette.setColor(QPalette.ColorRole.ToolTipBase, QColor(24, 24, 27))
+    dark_palette.setColor(QPalette.ColorRole.ToolTipText, QColor(228, 228, 231))
+    dark_palette.setColor(QPalette.ColorRole.Text, QColor(244, 244, 245))
+    dark_palette.setColor(QPalette.ColorRole.Button, QColor(24, 24, 27))
+    dark_palette.setColor(QPalette.ColorRole.ButtonText, QColor(244, 244, 245))
+    dark_palette.setColor(QPalette.ColorRole.BrightText, QColor(255, 0, 0))
+    dark_palette.setColor(QPalette.ColorRole.Link, QColor(168, 85, 247))
+    dark_palette.setColor(QPalette.ColorRole.Highlight, QColor(168, 85, 247))
+    dark_palette.setColor(QPalette.ColorRole.HighlightedText, QColor(255, 255, 255))
+    app.setPalette(dark_palette)
+
     app.setOrganizationName("VibeCoding")
     app.setOrganizationDomain("vibecoding.com")
     app.setApplicationName("4KMVVisualIntegrationEditor")

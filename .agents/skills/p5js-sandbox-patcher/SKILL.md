@@ -15,7 +15,13 @@ description: 轉譯 Processing (Java) 代碼為 ES6 p5.js，並為 p5.js 運行�
 import re
 
 def transpile_processing_to_js(src):
-    transpiled = src
+    # 0. 先行遮罩字串與 GLSL Shader 範本字面量，防止內部 void / float / int 等被誤轉譯
+    placeholders = {}
+    def _mask_str(m):
+        key = f"__STR_LITERAL_PLACEHOLDER_{len(placeholders)}__"
+        placeholders[key] = m.group(0)
+        return key
+    transpiled = re.sub(r'(`[\s\S]*?`|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\')', _mask_str, src)
     
     # (a) 移除 Java 存取修飾詞與 final
     transpiled = re.sub(r'\b(private|public|protected|static|transient|volatile)\s+', '', transpiled)
@@ -39,6 +45,10 @@ def transpile_processing_to_js(src):
     # (f) 轉換 for-each 迴圈 (例如 for (Particle p : list) -> for (let p of list))
     transpiled = re.sub(r'\bfor\s*\(\s*(?:let\s+)?(?:[A-Z]\w*\s+)?(\w+)\s*:\s*(\w+)\s*\)', r'for (let \1 of \2)', transpiled)
     
+    # 還原字串與 GLSL Shader
+    for k, v in placeholders.items():
+        transpiled = transpiled.replace(k, v)
+        
     return transpiled
 ```
 
@@ -76,9 +86,10 @@ def transpile_processing_to_js(src):
   if (typeof createSlider === 'undefined') window.createSlider = function() { return styleProxy; };
 })();
 
-// 2. 免疫 Element.prototype.style/checked 覆寫或崩潰
+// 2. 免疫 Element.prototype.size / style / checked 覆寫或崩潰
 try {
   if (typeof Element !== 'undefined') {
+    if (!Element.prototype.size) Element.prototype.size = function() { return this; };
     const dummyObj = function() { return dummyObj; };
     const p = new Proxy(dummyObj, { get: (t, prop) => p });
     Object.defineProperty(Element.prototype, 'style', {
@@ -92,7 +103,7 @@ try {
   }
 } catch(e) {}
 
-// 3. 免疫機器學習與物理引擎缺失 (Stubs)
+// 3. 免疫機器學習、物理引擎與 p5.Image / p5.Graphics 缺失方法
 if (typeof window.ml5 === 'undefined') {
     const mock = { on: () => {}, ready: Promise.resolve(), features: { get: () => [] } };
     window.ml5 = { poseNet: () => mock, bodypix: () => mock, handpose: () => mock };
@@ -103,4 +114,31 @@ if (typeof PVector === 'undefined') {
         static dist(v1,v2) { return Math.sqrt((v1.x-v2.x)**2+(v1.y-v2.y)**2); }
     };
 }
+if (typeof p5 !== 'undefined') {
+  if (p5.Image && p5.Image.prototype) {
+    if (!p5.Image.prototype.resize) p5.Image.prototype.resize = function(w, h) { if(w) this.width=w; if(h) this.height=h; return this; };
+    if (!p5.Image.prototype.loadPixels) p5.Image.prototype.loadPixels = function() {};
+    if (!p5.Image.prototype.updatePixels) p5.Image.prototype.updatePixels = function() {};
+    if (!p5.Image.prototype.get) p5.Image.prototype.get = function() { return [0, 0, 0, 0]; };
+  }
+}
+
+// 4. 免疫 Processing 渲染模式常量與未定義全域變數拋錯
+if (typeof window.P3D === 'undefined') window.P3D = "webgl";
+if (typeof window.OPENGL === 'undefined') window.OPENGL = "webgl";
+if (typeof window.P2D === 'undefined') window.P2D = "p2d";
+if (typeof window.JAVA2D === 'undefined') window.JAVA2D = "p2d";
+['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'].forEach(k => {
+    if (typeof window[k] === 'undefined') window[k] = k.toLowerCase();
+});
+['paper', 'col2', 'col1', 'S_actual', 'maxD', 'looping', 'sinput', 'SZ', 'medRadius', 'minRadius', 'maxRadius', 'locations', 'grid_size', 'circle_diams', 'dots', 'points', 'particles', 'img', 'imgs', 'moon', 'bg', 'palette'].forEach(k => {
+    if (typeof window[k] === 'undefined') {
+        if (['dots','points','particles','locations','palette','circle_diams','imgs'].includes(k)) window[k] = [];
+        else if (['img','moon'].includes(k)) window[k] = { width: 100, height: 100, resize: function(w,h){ if(w) this.width=w; if(h) this.height=h; return this; }, loadPixels: function(){}, updatePixels: function(){}, get: function(){ return [0,0,0,0]; } };
+        else if (['paper','pg'].includes(k)) window[k] = { width: 100, height: 100, beginDraw: function(){}, endDraw: function(){}, background: function(){}, image: function(){}, get: function(){ return this; }, resize: function(){ return this; } };
+        else if (['col1','col2','bg'].includes(k)) window[k] = '#ffffff';
+        else if (k === 'looping') window[k] = true;
+        else window[k] = 0;
+    }
+});
 ```

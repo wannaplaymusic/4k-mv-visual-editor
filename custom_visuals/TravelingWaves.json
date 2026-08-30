@@ -1,0 +1,25 @@
+{
+    "name": "TravelingWaves",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 03:34:38",
+    "url": "https://openprocessing.org/@ntsutae/1722723",
+    "code": "// === Tab: mySketch ===\nconst n = 400;\nlet grid;\nlet zoom;\nlet pg;\n\nsetup = () => {\n  const m = max(windowWidth, windowHeight);\n  createCanvas(m, m);\n  zoom = n / m;\n  pg = createGraphics(n, n);\n  grid = new Uint8Array(n * n);\n  pg.background(0).pixelDensity(1).loadPixels();\n};\n\ndraw = () => {\n  background(128);\n  const mx = 0 | constrain((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) * zoom, 0, n - 1);\n  const my = 0 | constrain((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) * zoom, 0, n - 1);\n  ((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)) && (grid[mx + my * n] = 1);\n\n  let next = new Uint8Array(grid);\n\n  for (let y = 4; y < n - 4; y++) {\n    for (let x = 4; x < n - 4; x++) {\n      const i = x + y * n;\n      grid[i] && (pg.pixels[i * 4 + 1] = (pg.pixels[i * 4 + 1] - 2) & 0xff);\n      \n      const sum0 =\n        +grid[i + 1]\n        +grid[i - 1]\n        +grid[i - n]\n        +grid[i + n]\n        +grid[i - 1 - n] \n        +grid[i - 1 + n] \n        +grid[i + 1 - n] \n        +grid[i + 1 + n]\n \n         +grid[i + 2]\n         +grid[i + 2+n]\n         +grid[i + 2-n]\n\n         +grid[i - 2]\n         +grid[i - 2+n]\n         +grid[i - 2-n]\n      \n         +grid[i + 2*n]\n         +grid[i + 2*n-1]\n         +grid[i + 2*n+1]\n\n        +grid[i - 2*n]\n        +grid[i - 2*n+1]\n        +grid[i - 2*n-1]\n \n      const sum1 =\n        +grid[i+1] \n        +grid[i+2] \n        +grid[i+3] \n        +grid[i+4] \n\n        +grid[i-1] \n        +grid[i-2] \n        +grid[i-3] \n        +grid[i-4] \n\n        +grid[i-n] \n        +grid[i-2*n] \n        +grid[i-3*n] \n        +grid[i-4*n] \n\n        +grid[i+n] \n        +grid[i+2*n] \n        +grid[i+3*n] \n        +grid[i+4*n] \n\n        +grid[i - n +1] \n        +grid[i - n +2] \n        +grid[i - n +3] \n        +grid[i - n +4]\n\n        +grid[i - 2*n +1] \n        +grid[i - 2*n +2] \n        +grid[i - 2*n +3] \n\n        +grid[i - 3*n +1] \n        +grid[i - 3*n +2] \n        +grid[i - 4*n +1] \n\n        +grid[i + n +1] \n        +grid[i + n +2] \n        +grid[i + n +3] \n        +grid[i + n +4]\n\n        +grid[i + 2*n +1] \n        +grid[i + 2*n +2] \n        +grid[i + 2*n +3] \n\n        +grid[i + 3*n +1] \n        +grid[i + 3*n +2] \n\n        +grid[i + 4*n +1] \n\n        +grid[i - n -1] \n        +grid[i - n -2] \n        +grid[i - n -3] \n        +grid[i - n -4]\n\n        +grid[i - 2*n -1] \n        +grid[i - 2*n -2] \n        +grid[i - 2*n -3] \n\n        +grid[i - 3*n -1] \n        +grid[i - 3*n -2] \n\n        +grid[i - 4*n -1] \n\n        +grid[i + n -1] \n        +grid[i + n -2] \n        +grid[i + n -3] \n        +grid[i + n -4]\n\n        +grid[i + 2*n -1] \n        +grid[i + 2*n -2] \n        +grid[i + 2*n -3] \n\n        +grid[i + 3*n -1] \n        +grid[i + 3*n -2] \n\n        +grid[i + 4*n -1] ;\n\n      \n      let bool;\n      if (grid[i] == 0) {\n        bool = sum0*2.6 > sum1 ; \n      } else {\n        bool = sum0!=sum1\n      }\n      next[i] = bool;\n      pg.pixels[i * 4 + 3] = bool ? 255 : 0;\n    }\n  }\n  grid = next;\n  pg.updatePixels();\n  image(pg, 0, 0, width, height);\n};",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Slow Motion Static.mp4"
+    ]
+}

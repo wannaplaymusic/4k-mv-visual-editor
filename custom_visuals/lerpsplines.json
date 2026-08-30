@@ -1,0 +1,22 @@
+{
+    "name": "lerpsplines",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:08:25",
+    "url": "https://openprocessing.org/@epi/2704405",
+    "code": "// === Tab: mySketch ===\nlet epiColors, S;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tS = max(width, height) / random(2, 6);\n\tstrokeWeight(4);\n\tnoFill();\n\tloop();\n\t\n\tconst { EpiColors } = EpiColorsPckg;\n\tepiColors = new EpiColors();\n}\n\nfunction draw() {\n\tbackground(8, 8, 24);\n\t// noLoop() removed for animation\n\t\n\tconst SZE = S * 0.5;\n\tfor (let y = 0; y < height-S; y += SZE) {\t\t\n\t\tfor (let x = 0; x < width-S; x += SZE) {\n\t\t\tdrawCell(x, y, S, S);\n\t\t}\n\t}\n}\n\nfunction drawCell(x, y, w, h) {\n\tepiColors.getRandomPalette();\n\t\n\tconst p1 = createVector(x + random(0.2, 0.3)*w, y + random(0.7, 0.9)*h);\n\tconst p2 = createVector(x + random(0.7, 0.9)*w, y + random(0.7, 0.9)*h);\n\n\tconst a1a = createVector(x + random(0.0, 0.5)*w, y + random(0.1, 0.6)*h);\n\tconst a1b = createVector(x + random(0.0, 0.5)*w, y + random(0.1, 0.6)*h);\n\n\tconst a2a = createVector(x + random(0.5, 1.0)*w, y + random(0.1, 0.6)*h);\n\tconst a2b = createVector(x + random(0.5, 1.0)*w, y + random(0.1, 0.6)*h);\n\t\n\tconst num = epiColors.palette.length;\n\tfor (let i = 0; i < num; i++) {\n\t\tconst f = i/(num-1);\n\t\tconst a1 = p5.Vector.lerp(a1a, a1b, f);\n\t\tconst a2 = p5.Vector.lerp(a2a, a2b, f);\n\t\tconst pa = p5.Vector.lerp(p1, p2, f/10);\n\t\tconst pb = p5.Vector.lerp(p1, p2, 1-f/10);\n\t\t\n\t\tstroke(epiColors.palette[i]);\n\t\tbezier(pa.x, p1.y, a1.x, a1.y, a2.x, a2.y, pb.x, p2.y);\n\t\t// bezier(pa.x, pa.y, a1.x, a1.y, a2.x, a2.y, pb.x, pb.y);\n\t}\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > 0.1*width) {\n\t\tsetup();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.5/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

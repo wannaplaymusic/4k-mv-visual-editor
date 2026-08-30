@@ -1,0 +1,22 @@
+{
+  "name": "Networking_1",
+  "author": "ntsutae",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 16:40:21",
+  "url": "https://openprocessing.org/@ntsutae/1751229",
+  "code": "// === Tab: mySketch ===\n// Inspired by randØ - Polar Mystery\n// https://twitter.com/rand0mograph/status/1595175999699881986\nvar agentsNum = 200;\nvar range = 640;\n\nsetup = () => {\n  createCanvas(640, 640, WEBGL);\n  Agents.init();\n};\n\ndraw = () => {\n  background(\"white\");\n  rotateX(1);\n  rotateZ(frameCount * 0.01);\n  Agents.addAgents();\n  Agents.updateAgents();\n  Agents.render();\n};\n\nvar agent = () => ({\n  angle: random(TWO_PI),\n  distance: 0,\n  x: 0,\n  y: 0,\n});\n\nvar Agents = {\n  agents: [],\n\n  init() {\n    this.agents.length = 0;\n  },\n  addAgents() {\n    if (this.agents.length < agentsNum) {\n      this.agents.push(agent());\n    }\n  },\n  updateAgents() {\n    for (const a of this.agents) {\n      a.distance += 2;\n      a.x = cos(a.angle) * a.distance;\n      a.y = sin(a.angle) * a.distance;\n    }\n    this.agents = this.agents.filter((a) => a.distance < width);\n  },\n  render() {\n    translate(0, 0, 50);\n\n    for (let i = this.agents.length; i--; ) {\n      const current = this.agents[i];\n      for (let j = i; j--; ) {\n        const other = this.agents[j];\n        const dis2 = (current.x - other.x) ** 2 + (current.y - other.y) ** 2;\n\n        if (\n          !this.agents.some(\n            (any) =>\n              dis2 > (any.x - current.x) ** 2 + (any.y - current.y) ** 2 &&\n              dis2 > (any.x - other.x) ** 2 + (any.y - other.y) ** 2\n          )\n        ) {\n          const ave = (current.distance + other.distance) / 2;\n          const z = 1.017 ** (width / 2 - ave);\n          const s = ave / 8;\n          stroke(map(ave, 0, range, 0, 255));\n          push();\n          translate(\n            (current.x + other.x) / 2,\n            (current.y + other.y) / 2,\n            z / 2\n          );\n          const r = atan2(current.y - other.y, current.x - other.x);\n          rotate(r);\n          dis3 = (current.x - other.x) ** 2 + (current.y - other.y) ** 2;\n          box(dis3 ** 0.5, 2, z);\n          pop();\n        }\n      }\n    }\n\n    for (const a of this.agents) {\n      const z = 1.017 ** (width / 2 - a.distance);\n      const s = a.distance / 8;\n      stroke(map(a.distance, 0, range, 0, 255));\n      push();\n      translate(a.x, a.y, z / 2);\n      rotate(a.angle);\n      box(s / 2, s / 2, z / 2);\n      pop();\n    }\n  },\n};",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

@@ -1,0 +1,25 @@
+{
+    "name": "Fidgetcubes",
+    "author": "theRussetPotato",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:42:48",
+    "url": "https://openprocessing.org/@theRussetPotato/434598",
+    "code": "let boxSize = 35;\nlet allCubes = [];\n\nclass Cube {\n  constructor(x, y) {\n    this.pos = createVector(x, y);\n    this.rot = createVector(0, 0);\n    this.spinX = random(-0.02, 0.02);\n    this.spinY = random(-0.02, 0.02);\n    this.hueValue = random(255);\n  }\n\n  update(bass = 0, perc = 0) {\n    this.spinX += (noise(this.pos.x * 0.01, frameCount * 0.02) - 0.5) * 0.05 + bass * 0.05;\n    this.spinY += (noise(this.pos.y * 0.01, frameCount * 0.02) - 0.5) * 0.05 + perc * 0.05;\n    this.rot.x += this.spinX;\n    this.rot.y += this.spinY;\n    this.spinX *= 0.95;\n    this.spinY *= 0.95;\n    this.hueValue = (this.hueValue + 0.5 + bass * 2) % 255;\n  }\n\n  display(bass = 0) {\n    push();\n    translate(this.pos.x, this.pos.y, 0);\n    rotateY(this.rot.x);\n    rotateX(this.rot.y);\n    fill(this.hueValue, 200, 240);\n    stroke(0, 40);\n    strokeWeight(1);\n    box(boxSize * (1.0 + bass * 0.4));\n    pop();\n  }\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  colorMode(HSB, 255);\n  initCubes();\n}\n\nfunction initCubes() {\n  allCubes = [];\n  let step = boxSize * 1.6;\n  let halfW = width / 2;\n  let halfH = height / 2;\n  for (let y = -halfH + step; y < halfH - step; y += step) {\n    for (let x = -halfW + step; x < halfW - step; x += step) {\n      allCubes.push(new Cube(x, y));\n    }\n  }\n}\n\nfunction draw() {\n  let bass = (typeof sub_bass !== undefined) ? sub_bass : (typeof bass_ratio !== undefined ? bass_ratio : 0);\n  let perc = (typeof percussive !== undefined) ? percussive : 0;\n  background(20, 20, 30);\n  if (allCubes.length === 0 || frameCount === 1) {\n    initCubes();\n  }\n  for (let c of allCubes) {\n    c.update(bass, perc);\n    c.display(bass);\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": true,
+    "used_in_videos": [
+        "Slow Motion Static.mp4"
+    ]
+}

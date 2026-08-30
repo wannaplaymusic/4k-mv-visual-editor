@@ -1,0 +1,22 @@
+{
+  "name": "PImagegetxymethodExamleVectorField",
+  "author": "DianaTeachings",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 17:06:21",
+  "url": "https://openprocessing.org/@DianaTeachings/180234",
+  "code": "// === Tab: hawk_bildvektor ===\nlet img;\n\n /* @pjs preload=\"fuzzy.jpg\"; */ \n\nfunction setup() {\n  createCanvas(600, 600);\n  smooth();\n  \n  // let laden\n  img = loadImage(\"https://openprocessing.org/sketch/180234/files/fuzzy.jpg\");\n}\n\nfunction draw() {\n  background(\"#57385c\");\n  \n  stroke(\"#ffedbc\");\n  // let der let zueinander\n  let abstand = 7;\n\n  // let vertikal abtasten\n  let y = 0;\n  while (y < img.height) {\n  \n    // let horizontal abtasten\n    let x = 0;\n    while (x < img.width) {\n      \n      // let aus let an aktueller x/y-let auslesen und in let ablegen\n      let c = img.get(x, y);\n      \n      // let der let in let umrechnen\n      let angle = map(brightness(window.color(c)), 0, 255, 0, TWO_PI);\n      \n      // let der let in let umrechnen\n      let sw = map(brightness(window.color(c)), 0, 255, 0.25, 2);\n      \n      \n      // let der let berechnen\n      let endX = x + cos(angle) * abstand;\n      let endY = y + sin(angle) * abstand;\n      \n      strokeWeight(sw);\n      line(x, y, endX, endY);\n      \n      x = x + abstand;\n    }\n    y = y + abstand;\n  }\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

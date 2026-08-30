@@ -1,0 +1,25 @@
+{
+    "name": "Sunslices",
+    "author": "Xeronimo74",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:04:30",
+    "url": "https://openprocessing.org/@Xeronimo74/149960",
+    "code": "// === Tab: sketch149960 ===\nlet step, i=0, num=26;\nlet theta;\n\nfunction setup() {\n  createCanvas(500, 500);\n\n  step=height/num;\n\n}\n\nfunction draw() {\n  background(20);\n  fill(\"#FFB700\");\n  noStroke();\n  ellipse(width/2,height/2,width*.6, height*.6);\n  i=0;\n  for (let y=2*step; y<height-2*step+1; y += step) {\n    let sw = map(sin(theta+(TWO_PI/num*i)), -1, 1, 1.5, 12);\n    let edge = 2*step;\n    stroke(20);\n    strokeWeight(sw);\n    line(edge, y, width-edge, y);\n    i++;\n  }\n  theta += .0523;\n  \n  //if (frameCount%1==0 && frameCount<121) saveFrame(\"image-###.gif\");\n  \n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Inner Sight.mp4"
+    ]
+}

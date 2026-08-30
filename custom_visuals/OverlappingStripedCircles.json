@@ -1,0 +1,22 @@
+{
+    "name": "OverlappingStripedCircles",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:20:10",
+    "url": "https://openprocessing.org/@epi/2857547",
+    "code": "// === Tab: Circle ===\nclass Circle {\n\tconstructor(x, y, r, clr) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.r = r;\n\t\tthis.clr = clr;\n\t}\n\n\toverlaps(others, f = 1) {\n\t\t// just allow half radius overlapping to ensure space filling\n\t\tfor (const o of others) {\n\t\t\tif (dist(this.x, this.y, o.x, o.y) < (this.r + o.r) * f) return true;\n\t\t}\n\t\treturn false;\n\t}\n\n\tdraw() {\n\t\tpush();\n\t\t\tbeginClip();\n\t\t\tnoStroke();\n\t\t\tfill(255);\n\t\t\tcircle(this.x, this.y, this.r + this.r);\n\t\t\tendClip();\n\t\t\tfill(this.clr);\n\t\t\tfor (let xx = this.x - this.r; xx < this.x + this.r; xx += 3 * SCL) {\n\t\t\t\trect(xx, 0, SCL, height);\n\t\t\t}\n\t\tpop();\n\t}\n}\n\n// === Tab: mySketch ===\nconst NUM = 5, BG = \"tan\";\nconst CLRS = [\"grey\", \"blue\", \"darkgreen\", \"darkred\", \"darkorange\", \"cyan\", \"yellow\", \"orange\"]\nlet S, SCL, circles;\n\nfunction setup() {\n\tcreateCanvas(S=max(windowWidth, windowHeight), S);\n\tdescribe(\"bunch of overlapping circles out of striped lines\")\n\tbackground(\"navy\");\n\t// noLoop() removed for animation\n}\n\nfunction draw() {\n\tS=max(windowWidth, windowHeight)\n\tSCL = max(2, ~~(S/200));\n\tconst colorMode = random() < 0.5;\n\n\tif (colorMode) {\n\t\tbackground(\"navy\");\n\t} else {\n\t\tbackground(BG);\n\t}\n\t\n\tcircles = [];\n\tfor (let i = 0; i < 999; i++) {\n\t\tconst clr =  colorMode ? CLRS[i % CLRS.length] : getColor();\n\t\tlet tries = 99;\n\t\tfor (; tries > 0; tries--) {\t\t\n\t\t\tconst x = ~~(random(-0.2, 1.2) * width);\n\t\t\tconst y = ~~(random(-0.2, 1.2) * height);\n\t\t\tconst r = ~~random(S/7, S/3);\n\t\t\tconst circ = new Circle(x, y, r, clr);\n\t\t\tif (!circ.overlaps(circles, 0.45)) {\n\t\t\t\tcircles.push(circ);\n\t\t\t\tcirc.draw();\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t\t// console.log(`${i}: ${tries} ${circles.length}`);\n\t\tif (tries <= 0) {\n\t\t\t// console.log(\"*\", circles.length);\n\t\t\tbreak;\n\t\t}\n\t}\n\t// console.log(`circles: ${circles.length}`);\n}\n\nfunction getColor() {\n\tif (random() < 0.5) {\n\t\treturn lerpColor(color(BG), color(0), random(0.3, 0.8));\n\t} else {\n\t\treturn lerpColor(color(BG), color(255), random(0.3, 0.8));\n\t}\n}\n\nfunction mousePressed() {\n\tredraw();\n}\nfunction windowResized() {\n\tresizeCanvas(windowWidth, windowHeight);\n\tredraw();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

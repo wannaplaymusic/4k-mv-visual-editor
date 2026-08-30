@@ -1,0 +1,22 @@
+{
+    "name": "circleoflines",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:29:42",
+    "url": "https://openprocessing.org/@epi/2732336",
+    "code": "// === Tab: mySketch ===\nlet S, TH, N = 11;\nconst PENS = [\"orange\", \"pink\", \"deeppink\"];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"overlapping circles of different colors formed by lines \");\n\tS = max(width, height);\n\tTH = S/N;\n\tstrokeWeight(TH/2);\n}\n\nfunction draw() {\n\tblendMode(BLEND)\n\tbackground(4, 4, 12);\n\tblendMode(ADD)\n\ttranslate(width/2, height/2);\n\t\n\tlet a = frameCount/123; // random(TAU);\n\tfor (let i = 0; i < PENS.length; i++) {\n\t\tpush();\n\t\tconst clr = color(PENS[i])\n\t\tclr.setAlpha(160);\n\t\tstroke(clr);\n\t\trotate(a);\n\t\tdrawForm();\n\t\tpop();\n\t\t\n\t\ta += noise(i/321, frameCount/321) * TWO_PI / PENS.length;\n\t}\n\t\n\t// // noLoop() removed for animation\n}\n\nfunction drawForm() {\n\tlet xs = -TH * N / 2;\n\tlet xe = xs + S;\n\tlet x = xs + TH/2;\n\tfor (let i = 0; i < N; i++) {\n\t\tconst h = S/2-abs(x);\n\t\tconst y = sqrt(S*h-h*h); // Kreissehne\n\t\tline(x, -y, x, y);\n\t\tx += TH;\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

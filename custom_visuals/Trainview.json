@@ -1,0 +1,22 @@
+{
+  "name": "Trainview",
+  "author": "ntsutae",
+  "license": "CC BY-SA 3.0",
+  "date_added": "2026-07-23 04:00:54",
+  "url": "https://openprocessing.org/@ntsutae/1940336",
+  "code": "// === Tab: mySketch ===\nlet poles = [];\nlet wires = [];\nconst polesNum = 200;\nconst polesHeight = 60;\nconst radius = 300;\nconst viewAngle = -0.5;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  \n  poles = Array(polesNum).fill().map(e=>{\n    const r = random(2 * PI);\n    const d = random(2) < 1 \n    ? random(radius*.7, radius*.9) \n    : random(radius*1.1, radius*1.2);\n    const pos = createVector(cos(r) * d, sin(r) * d);\n    return pos;\n  })\n\n  for (let i = polesNum; i--; ) {\n    const current = poles[i];\n    for (let j = i; j--; ) {\n      const other = poles[j];\n      const delta = other.copy().sub(current);\n      const dst = delta.mag();\n\n      if (!poles.some((any) => \n        dst > any.dist(current) && dst > any.dist(other))\n      ) {\n        const pos = current.copy().add(other).div(2);\n        const length = current.dist(other);\n        const angle = atan2(other.y - current.y, other.x - current.x);\n        wires.push({ pos, length, angle });\n      }\n    }\n  }\n}\n\nfunction draw() {\n  background('white');\n\n// Railway track\n  noFill();\n  stroke('black')\n  torus(radius*1.05, 1);\n  torus(radius*0.95, 1);\n\n// Railway sleepers\n  fill('white');\n  stroke('black')\n  for (r = 0; r < 2 * PI; r += 0.06) {\n    push();\n    rotateZ(r);\n    translate(radius*.995, 0, 0);\n    box(radius*0.15, 5, 2);\n    pop();\n  }\n\n// Poles\n  fill('white');\n  stroke('black')\n  for (p of poles) {\n    push();\n    translate(p.x, p.y, polesHeight / 2);\n    box(2, 2, polesHeight);\n    pop();\n  }\n  \n// Wires\n  fill('black');\n  noStroke();\n  for (w of wires) {\n    push();\n    translate(w.pos);\n    translate(0, 0, polesHeight * 0.95);\n    rotate(w.angle);\n    box(w.length, 1, 1);\n    pop();\n  }\n\n// Camera setting\n  const t = frameCount / 150;\n  camera(\n    cos(t) * radius, sin(t) * radius, radius/3,\n    cos(t + viewAngle) * radius, sin(t + viewAngle) * radius, 0,\n    0, 0,-1\n  );\n}",
+  "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/msawired/OPC@v0.3.0/opc.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+  "custom_css": "",
+  "inline_assets": {},
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "restored"
+  ],
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "used_count": 0,
+  "is_starred": false
+}

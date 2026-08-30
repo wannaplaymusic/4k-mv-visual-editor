@@ -1,0 +1,25 @@
+{
+    "name": "Trisolaris",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:27:59",
+    "url": "https://openprocessing.org/@epi/2860926",
+    "code": "// === Tab: mySketch ===\nlet S;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tS = max(width, height);\n\tnoFill();\n\tstroke(\"deeppink\");\n\tstrokeWeight(2);\n}\n\nfunction draw() {\n\tbackground(\"#00006020\");\n\ttranslate(width/2, height/2);\n\n\tconst t = millis()/1000/2;\n\tdia = S * 0.8;\n\tdd = 0.4;\n\tconst a1 = (noise(t, 100) - 0.5) / 4\n\tconst a2 = (noise(t, 200) - 0.5) / 3\n\tconst a3 = (noise(t, 300) - 0.5) / 2\n\tnoStroke();\n\tfill(\"#FFBFCA80\");\n\tfill(\"#FF149210\");\n\tdrawCirc(0, 0, dia, a1, 30); // arc(0, 0, dia, dia, dd/10+a1, TAU-dd/10+a1);\n\tdrawCirc(-dia/6, 0, dia/1.5, a2, 20); // arc(-dia/6, 0, dia/1.5, dia/1.5, PI+dd+a2, 1.5*TAU-dd+a2)\n\tdrawCirc(0, 0, dia/3, a3, 10); // arc(0, 0, dia/3, dia/3, dd+a3, TAU-dd+a3)\n}\n\nfunction drawCirc(x, y, s, a, n, f = 0.333) {\n\tpush();\n\ttranslate(x, y);\n\trotate(a)\n\tbeginClip();\n\tcircle(0, 0, s)\n\tendClip();\n\tconst w = s / (n+f)\n\tconst x1 = w * f\n\tconst x2 = w - x1\n\t\n\tfor (let i = 0, x = -s/2; i <= n; i++, x += w) {\n\t\trect(x, -height/2, x1, height)\n\t}\n\tpop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Road Lines.mp4"
+    ]
+}

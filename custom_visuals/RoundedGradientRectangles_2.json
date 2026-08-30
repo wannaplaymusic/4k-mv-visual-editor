@@ -1,0 +1,22 @@
+{
+    "name": "RoundedGradientRectangles_2",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:59:28",
+    "url": "https://openprocessing.org/@epi/2748141",
+    "code": "// === Tab: mySketch ===\nvar DF = 0.9, N = 8;\n// const { Point, Line, Polygon } = EpiShapeSvg;\nvar { EpiColors } = EpiColorsPckg;\nvar epiColors;\n\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t// createCanvas(~~(windowHeight*2/3), windowHeight);\n\tnoFill();\n\tnoStroke();\n\tepiColors = new EpiColors();\n\trectMode(CENTER);\n\t// epiColors.BG = EpiColors.getAdjustedBrightness(EpiColors.getAdjustedSaturation(epiColors.BG, 2), 0.35);\n\tloop();\n}\n\nfunction draw() {\n\tepiColors.getRandomPalette(true);\n\tbackground(epiColors.getAverageClr()); // \"#ffeeff\");\n\tfill(random(epiColors.palette));\n\t\n\tconst ctx = drawingContext;\n\tconst x = width/2, y = height/2;\n\tconst d = height / 1.6;\n\t\n\t// draw ring\n\tfor (let i = N; i > 0; i--) {\n\t\tshuffle(epiColors.palette, true);\n\t\tpush();\n\t\t\tconst f = i/N;\n\t\t\tconst dx = d * f;\n\t\t\tconst dy = d * f + d * 0.5;\n\n\t\t\tif (i == 1) {\n\t\t\t\tfill(epiColors.getAverageClr()); // last as background\n\t\t\t\t\n\t\t\t} else {\t\n\t\t\t\t// get position of clrs between 0..1\n\t\t\t\tlet posArr = [], posSum = 0;\n\t\t\t\tfor (let j = 0; j < epiColors.palette.length; j++) {\n\t\t\t\t\tconst rndVal = random(0.3, 0.7); // keep min distance to next function posArr.push(rndVal);\n\t\t\t\t\tif (j < epiColors.palette.length-1) posSum += rndVal; \n\t\t\t\t}\n\t\t\t\tfor (let j = 0; j < epiColors.palette.length; j++) posArr[j] /= posSum; // normalize\n\t\t\t\t\n\t\t\t\t// fill gradient\n\t\t\t\tconst linGrad = ctx.createLinearGradient(x-dx/2, y-dy/2, x-dx/2, y+dy/2);\n\t\t\t\tfor (let j = 0, gradPos = 0; j < epiColors.palette.length; j++) {\n\t\t\t\t\tlinGrad.addColorStop(\n\t\t\t\t\t\tgradPos, // map(j, 0, epiColors.palette.length-1, 0, 1), \n\t\t\t\t\t\tepiColors.palette[j]\n\t\t\t\t\t);\n\t\t\t\t\t// console.log(gradPos);\n\t\t\t\t\tgradPos += posArr[j]\n\t\t\t\t}\n\t\t\t\tctx.fillStyle = linGrad;\n\t\t\t}\n\t\t\t\n\n\t\t\trect(x, y, dx, dy, dx/2);\n\t\tpop();\n\t}\n\t\n\t// noLoop() removed for animation\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > width*0.1) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

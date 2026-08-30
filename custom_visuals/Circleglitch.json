@@ -1,0 +1,22 @@
+{
+    "name": "Circleglitch",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:19:41",
+    "url": "https://openprocessing.org/@epi/2276138",
+    "code": "// === Tab: mySketch ===\n// adopted from @Metamere\n// https://openprocessing.org/sketch/2272174/\n\nvar NUM = 5;\nvar S, S2;\n\nfunction setup() {\n  let D = max(windowWidth, windowHeight);\n  S = D / NUM;\n\tS2 = S/2;\n  createCanvas(D, D);\n\tframeRate(1);\n}\n\nfunction mousePressed() {\n  if (mouseButton === LEFT) loop();\n}\n\nfunction draw() {\n  background(\"rgb(130,218,177)\");\n\n  for (let y = 0; y < NUM; y++) {\n    for (let x = 0; x < NUM; x++) {\n      drawCirc(x * S + S2, y * S + S2, S * 0.9);\n    }\n  }\n\n  // // noLoop() removed for animation\n}\n\nfunction drawCirc(xc, yc, s) {\n\tvar S = s;\n\tconst S2 = s/2;\n  push();\n  noStroke();\n\t\n\t// colors\n\tconst clr1 = color(\"darkorange\")\n\tconst clr2 = color(\"darkred\")\n\t\n\t// mask | { invert: true }\n\tbeginClip(); \n  circle(xc, yc, s);\n  endClip();\n\t\n\t// fragments in circle\n  let y = 0;\n  while (y < S) {\n\t\t// height\n    const h = ~~random(S * 0.075, S * 0.25);\n\t\t// const h = randomGaussian(S * 0.1, S * 0.01);\n\t\t\n\t\t// padding\n\t\tconst p = ~~random(S * 0.05, S * 0.25)\n\t\t// const p = randomGaussian(S * 0.05, S * 0.01);\n\t\t\n\t\t// function fill(lerpColor(clr1, clr2, random(0.25)))\n\t\t\n\t\t// stripe\n\t\tif (y + h + p < S * 0.95) {\n\t\t\trect(xc -S2, yc+y -S2, s, h)\n\t\t} else {\n\t\t\trect(xc -S2, yc+y -S2, s, s-y)\n\t\t\ty = S;\n\t\t}\n\n    y += h + p; // increment by height + padding\n  }\n\n  pop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}

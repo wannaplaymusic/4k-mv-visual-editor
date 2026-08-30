@@ -1,0 +1,22 @@
+{
+    "name": "RotatedShapesWCCChallengeTangram251114",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-04 00:40:50",
+    "url": "https://openprocessing.org/@epi/2792171",
+    "code": "// === Tab: helper ===\nfunction getTangramShapes(S) {\n\tlet shapes = [];\n\t\n\tshapes.push(new Polygon([[0, 0], [50, 50], [0, 100]], true));\n\tshapes.push(new Polygon([[100, 0], [50, 50], [0, 0]], true));\n\tshapes.push(new Polygon([[100, 0], [100, 50], [75, 25]], true));\n\tshapes.push(new Polygon([[100, 50], [100, 100], [50, 100]], true));\n\tshapes.push(new Polygon([[50, 100], [0, 100], [25, 75], [75, 75]], true));\n\tshapes.push(new Polygon([[25, 75], [75, 75], [50, 50]], true));\n\tshapes.push(new Polygon([[50, 50], [75, 25], [100, 50], [75, 75]], true));\n\t\n\tfor (const sh of shapes) {\n\t\tsh.scale(S/100)\n\t}\n\t\n\treturn shapes;\n}\n\n// === Tab: mySketch ===\n/*\n\tRotated Shapes #WCCChallenge \"Tangram\" //250916 \n\thttps://openprocessing.org/sketch/2792171\n\t#generativeart #creativecoding #p5js\n\n\tDear Raph and creative coding community,\n\t\n\tanimation of palette based random colored rotating tangram tiles on a random point of a shape till no overlapping.\n\tOverlapping detection is not always correct, but doesnt matter :D\n\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\nconst { Point, Line, Polygon } = EpiShapeSvg; // external library https://cdn.jsdelivr.net/gh/epibyte/p5-epi-shapesvg@v0.0.19/dist/p5-epi-shapesvg.js\nlet shapesTangram;\n\nconst { EpiColors } = EpiColorsPckg;\nlet epiColors, FG, BG;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tdescribe(\"animation of palette based random colored rotating tangram tiles on a random point of a shape till no overlapping\");\n\tframeRate(60);\n\t\n\tinit();\n}\n\nfunction init() {\n\tepiColors = new EpiColors();\n\tepiColors.getRandomPalette();\n\tFG = epiColors.FG;\n\tBG = epiColors.BG;\n\n\tconst S = ~~(max(width, height) * 0.4);\n\tshapesTangram = getTangramShapes(S);\n\t// shuffle(shapesTangram, true);\n\tfor (const sh of shapesTangram) sh.translate([(width-sh.bbox.width)/2, (height-sh.bbox.height)/2]);\n\t\n\tblendMode(BLEND);\n\tif (frameCount === 0) background(BG);\n\tbackground(BG);\n\t// blendMode(ADD);\n\tstroke(FG);\n\tstrokeWeight(2);\n\tfill(BG);\n\tfor (let i = 0; i < 99; i++) {\n\t\tstroke(epiColors.getRandomClr());\n\t\tcircle(random(width), random(height), random(S/10, S/5));\n\t}\n\tstroke(BG);\n\tnoFill();\n\t\n\tloop();\n}\n\nfunction draw() {\n\t// do n times for speed\n\tfor (let speed = 0; speed < 10; speed++) {\t\n\t\tfor (const sh of shapesTangram) {\n\t\t\t// fill(color(random(100, 255), random(0, 200), random(200, 255)))\n\t\t\tfill(epiColors.getRandomClr()); // stroke(epiColors.getRandomClr());\n\t\t\tsh.drawShape();\n\t\t\tsh.rotate(0.075, sh.pts[0][~~random(sh.pts[0].length)]);\n\t\t}\n\n\t\t// look, if no overlapping\n\t\tlet overlapping = false;\n\t\tfor (let i = 0; i < shapesTangram.length - 1; i++) {\t\n\t\t\tfor (let j = i + 1; j < shapesTangram.length; j++) {\n\t\t\t\tif (shapesTangram[i].isOverlapping(shapesTangram[j])) overlapping = true;\n\t\t\t}\n\t\t}\n\t\t\n\t\tif (!overlapping) {\n\t\t\t// noLoop() removed for animation\n\t\t\tbreak;\n\t\t}\n\t} // repeat n times\n}\n\nfunction mousePressed() {\n\tif (mouseButton != RIGHT) init();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.7/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-shapesvg@v0.0.19/dist/p5-epi-shapesvg.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 0,
+    "is_starred": false
+}
