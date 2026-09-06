@@ -1,22 +1,25 @@
 {
-  "name": "Mathober2426Elliptic",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:34:34",
-  "url": "https://openprocessing.org/@epi/2410368",
-  "code": "// === Tab: mySketch ===\n/*\nDay #26/24: Eliptic\nhttps://openprocessing.org/sketch/2410368\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nlet S, N, FCD, ellipses;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tbackground(2, 2, 8);\n\tdescribe(\"different ellipses in cyan to purple growing, moving our from the center and rotating by each offsetting from the own center\");\n\tframeRate(60);\n  \n  noFill();\n\tS = max(width, height);\n\tN = ~~random(3, 11);\n\tFCD = ~~random(100, 500);\n\t\n\tellipses = [];\n\taddEllipse();\n  loop();\n}\n\nfunction addEllipse() {\n\tconst x = width/2;\n\tconst y = height/2;\n\tconst w = random(25, 150);\n\tconst h = random(25, 150);\n\tconst tx = random(w);\n\tconst ty = random(h);\n\tconst a = random(TWO_PI);\n\tconst r = 0;\n\tconst ea = random(TWO_PI);\n\tconst ead = random(-0.1, 0.1);\n\tconst clr = lerpColor(color(\"cyan\"), color(\"purple\"), random());\n\tconst lt = random(0.75, 2);\n\tellipses.push({x, y, w, h, tx, ty, a, r, ea, ead, clr, lt});\n}\n\nfunction draw() {\n\tif (frameCount%30 === 0) addEllipse();\n\tellipses = ellipses.filter((e) => e.lt > 0);\n\tbackground(2, 2, 8, 48);\n\ttranslate(width/2, height/2)\n\t// rotate(noisom(1, 1.4, FCD)-1.2); // to avoid symmetries in nosir, instaed of (-0.2, 0.2)\n\t\n\tstrokeWeight(3);\n\tfor (let e of ellipses) drawEllipse(e);\n}\n\nfunction drawEllipse(e) {\n\tpush();\n\t// {x, y, w, h, tx, ty, a, r, ea, ead, clr, lt}\n\tvar x = cos(e.a) * e.r;\n\tvar y = sin(e.a) * e.r;\n\te.r+=0.25;\n\n\n\tnoFill();\n\tvar clr = e.clr;\n\tclr.setAlpha(e.lt*255)\n\te.lt -= 0.005;\n\tstroke(clr);\n\ttranslate(e.tx, e.ty);\n\trotate(e.ea)\n\te.ea += e.ead;\n\tellipse(x, y, e.w, e.h)\n\te.w += 2\n\te.h += 2\n\t\n\tpop();\n\t\n\t// console.log(e)\n}\n\n\nfunction noisom(v1, v2, fcd = 234) {\n\tif (v1>v2) [v1, v2] = [v2, v1];\n\tconst n = noise(v1, v2, frameCount/234);\n\treturn v1+n*(v2-v1);\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Mathober2426Elliptic",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:34:34",
+    "url": "https://openprocessing.org/@epi/2410368",
+    "code": "// === Tab: mySketch ===\n/*\nDay #26/24: Eliptic\nhttps://openprocessing.org/sketch/2410368\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nlet S, N, FCD, ellipses;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tbackground(2, 2, 8);\n\tdescribe(\"different ellipses in cyan to purple growing, moving our from the center and rotating by each offsetting from the own center\");\n\tframeRate(60);\n  \n  noFill();\n\tS = max(width, height);\n\tN = ~~random(3, 11);\n\tFCD = ~~random(100, 500);\n\t\n\tellipses = [];\n\taddEllipse();\n  loop();\n}\n\nfunction addEllipse() {\n\tconst x = width/2;\n\tconst y = height/2;\n\tconst w = random(25, 150);\n\tconst h = random(25, 150);\n\tconst tx = random(w);\n\tconst ty = random(h);\n\tconst a = random(TWO_PI);\n\tconst r = 0;\n\tconst ea = random(TWO_PI);\n\tconst ead = random(-0.1, 0.1);\n\tconst clr = lerpColor(color(\"cyan\"), color(\"purple\"), random());\n\tconst lt = random(0.75, 2);\n\tellipses.push({x, y, w, h, tx, ty, a, r, ea, ead, clr, lt});\n}\n\nfunction draw() {\n\tif (frameCount%30 === 0) addEllipse();\n\tellipses = ellipses.filter((e) => e.lt > 0);\n\tbackground(2, 2, 8, 48);\n\ttranslate(width/2, height/2)\n\t// rotate(noisom(1, 1.4, FCD)-1.2); // to avoid symmetries in nosir, instaed of (-0.2, 0.2)\n\t\n\tstrokeWeight(3);\n\tfor (let e of ellipses) drawEllipse(e);\n}\n\nfunction drawEllipse(e) {\n\tpush();\n\t// {x, y, w, h, tx, ty, a, r, ea, ead, clr, lt}\n\tvar x = cos(e.a) * e.r;\n\tvar y = sin(e.a) * e.r;\n\te.r+=0.25;\n\n\n\tnoFill();\n\tvar clr = e.clr;\n\tclr.setAlpha(e.lt*255)\n\te.lt -= 0.005;\n\tstroke(clr);\n\ttranslate(e.tx, e.ty);\n\trotate(e.ea)\n\te.ea += e.ead;\n\tellipse(x, y, e.w, e.h)\n\te.w += 2\n\te.h += 2\n\t\n\tpop();\n\t\n\t// console.log(e)\n}\n\n\nfunction noisom(v1, v2, fcd = 234) {\n\tif (v1>v2) [v1, v2] = [v2, v1];\n\tconst n = noise(v1, v2, frameCount/234);\n\treturn v1+n*(v2-v1);\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Lost Signal.mp4"
+    ]
 }

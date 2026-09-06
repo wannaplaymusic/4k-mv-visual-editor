@@ -1,22 +1,25 @@
 {
-  "name": "Circles_2",
-  "author": "Asher_Salomon",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-24 19:32:56",
-  "url": "https://openprocessing.org/@Asher_Salomon/152505",
-  "code": "// === Tab: Circles ===\nvar spacing = 16;\nvar meanDiam = 8;\nfunction setup(){\n  createCanvas(800, 600);\n  ellipseMode(CENTER);\n  noStroke();\n  fill(255);\nwindow.simulatedMouseX = width/2;\nwindow.simulatedMouseY = height/2;\n}\nfunction draw(){\n  background(0);\n  let flipFlop = 1;\n  for(let y=spacing/2;y<width;y+=spacing){\n    flipFlop = (flipFlop+1)%2;\n    for(x=spacing*(1-flipFlop*0.5);x<width;x+=spacing){\n      let dx = x-(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n      let dy = y-(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n      let radius = mag(dy,dx);\n      let angle = atan2(dy,dx)-frameCount*TWO_PI/40;\n      let variation = meanDiam/2*cos(radius*TWO_PI/spacing/4+angle);\n      let varried = meanDiam*1.25+variation;\n      ellipse(x,y,varried,varried);\n    }\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Circles_2",
+    "author": "Asher_Salomon",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-24 19:32:56",
+    "url": "https://openprocessing.org/@Asher_Salomon/152505",
+    "code": "// === Tab: Circles ===\nvar spacing = 16;\nvar meanDiam = 8;\nfunction setup(){\n  createCanvas(800, 600);\n  ellipseMode(CENTER);\n  noStroke();\n  fill(255);\nwindow.simulatedMouseX = width/2;\nwindow.simulatedMouseY = height/2;\n}\nfunction draw(){\n  background(0);\n  let flipFlop = 1;\n  for(let y=spacing/2;y<width;y+=spacing){\n    flipFlop = (flipFlop+1)%2;\n    for(x=spacing*(1-flipFlop*0.5);x<width;x+=spacing){\n      let dx = x-(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n      let dy = y-(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n      let radius = mag(dy,dx);\n      let angle = atan2(dy,dx)-frameCount*TWO_PI/40;\n      let variation = meanDiam/2*cos(radius*TWO_PI/spacing/4+angle);\n      let varried = meanDiam*1.25+variation;\n      ellipse(x,y,varried,varried);\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Sublevel 3.mp4"
+    ]
 }

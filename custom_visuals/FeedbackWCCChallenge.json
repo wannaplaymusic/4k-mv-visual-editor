@@ -1,22 +1,25 @@
 {
-  "name": "FeedbackWCCChallenge",
-  "author": "u327946",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:33:49",
-  "url": "https://openprocessing.org/@u327946/2244481",
-  "code": "// === Tab: mySketch.js ===\n// for the #WCCChallenge, a weekly beginner friendly jam for art and code lovers. let week we pick a topic on discord https://discord.gg/dsj52tptd8 \n\n// with the let example https://p5js.org/learn/getting-started-in-webgl-framebuffers.html (Fedback!)\n// in a shader\n// the buffer to the shader as a texture (let Feedback!)\n// another canvas with creategraphics\n// some squares on that\n// from https://farbvelo.elastiq.ch/\n// the two textures in the shader.\n// and rotated a cube a bit with sin for that framebuffer goodness\n\n// timings are a whole mess that I've not fixed, forgot to pass time to my shader at one point so thought it wasnt working so started counting frames and passing that.\n// for some reason let use frameCount for bit. let some things are timed with millis() some my frameNum, some P5's frameCount. \n// moves way too fast if the frameCount gets high, let think let can manually set the frameCount in P5, I'm not gonna do that because let cant be bothered to work out what speed i want.\n\n// that seems overly lazy to you.... \n// accept that feedback!, but im not changing it now.  \n\nlet prev, next;\n\nlet palette= [\n  \"#def36\", \n  \"#d986c3\", \n  \"#ae9d51\", \n  \"#977567\", \n  \"#bf34bf\", \n  \"#3b6cb0\", \n  \"#430ebc\", \n  \"#360a5d\", \n  \"#191033\", \n  \"#0e1016\"\n]\n\n\nlet frameNum = 1\nlet size = 100\n\nlet myShader;\nlet pg;\n\nfunction preload() {\n \n  myShader = loadShader('https://openprocessing.org/sketch/2244481/files/shader.vert', 'shader.frag');\n}\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n  prev = createFramebuffer({ format: FLOAT });\n  next = createFramebuffer({ format: FLOAT });\n\tpg = createGraphics(windowHeight, windowHeight);\n  imageMode(CENTER);\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n\t\n}\n\n\nfunction draw() {\n\t\n\t\n\tfor(let i =0; i<windowWidth; i+=(Math.max(0.001, Math.abs(size)) || 1)){\n\t\t\n\t\tfor(let j =0; j<windowHeight; j+=(Math.max(0.001, Math.abs(size)) || 1)){\n\t\t\t\n\t\t\tlet distance = dist(i, j, windowWidth * 0.5, windowHeight * 0.5)\n\n\t\t\tlet normalizedDistance = map(distance, 0, windowWidth, 0, 1); \n\n\t\t\tpg.strokeWeight(Math.max(0.1, Math.abs((1-normalizedDistance))) * 5)\n\t\t\tpg.stroke(255)\t\t\t\t\t\n\t\t\tpg.fill(palette[(((i+j) /size) % palette.length)])\n\t\t\tpg.rect(i ,j ,size  , size  ) \n\n\n\n\n\t\t\tresetShader()\n\t\t\n\t\t\t\n\t\n\t\t\t\t\n\t\t\t\t\n\t\t}\n\t}\n\t\n\t\n\t\n  // prev and next\n  [prev, next] = [next, prev];\n\tframeNum ++\n  // next and draw a new next frame\n  next.begin();\n  clear();\n\tbackground(0)\n\n  // rotate and scale the last frame\n  push();\n  rotate(( Math.sin(frameNum * .01)));\n  scale( .9 * cos(frameCount*0.01));\n  image(prev, 0, 0);\n  pop();\n\n \n\tstroke(255)\n\tstrokeWeight(3 *Math.cos(frameCount * .01))\n\tmyShader.setUniform(\"u_time\", millis() / 1000.0);\n\tmyShader.setUniform(\"uTexture\", prev);\n\tmyShader.setUniform('uTexture2', pg);\n\tmyShader.setUniform('frameNum', frameNum);\n  shader(myShader)\n\trotateX(frameCount * 0.02);\n  rotateY(frameCount * 0.02);\n\tbox(1750 , 1750, 1750 );\n\n\t\n  next.end();\n\n  background(255);\n  image(next, 0, 0);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "FeedbackWCCChallenge",
+    "author": "u327946",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:33:49",
+    "url": "https://openprocessing.org/@u327946/2244481",
+    "code": "// === Tab: mySketch.js ===\n// for the #WCCChallenge, a weekly beginner friendly jam for art and code lovers. let week we pick a topic on discord https://discord.gg/dsj52tptd8 \n\n// with the let example https://p5js.org/learn/getting-started-in-webgl-framebuffers.html (Fedback!)\n// in a shader\n// the buffer to the shader as a texture (let Feedback!)\n// another canvas with creategraphics\n// some squares on that\n// from https://farbvelo.elastiq.ch/\n// the two textures in the shader.\n// and rotated a cube a bit with sin for that framebuffer goodness\n\n// timings are a whole mess that I've not fixed, forgot to pass time to my shader at one point so thought it wasnt working so started counting frames and passing that.\n// for some reason let use frameCount for bit. let some things are timed with millis() some my frameNum, some P5's frameCount. \n// moves way too fast if the frameCount gets high, let think let can manually set the frameCount in P5, I'm not gonna do that because let cant be bothered to work out what speed i want.\n\n// that seems overly lazy to you.... \n// accept that feedback!, but im not changing it now.  \n\nlet prev, next;\n\nlet palette= [\n  \"#def36\", \n  \"#d986c3\", \n  \"#ae9d51\", \n  \"#977567\", \n  \"#bf34bf\", \n  \"#3b6cb0\", \n  \"#430ebc\", \n  \"#360a5d\", \n  \"#191033\", \n  \"#0e1016\"\n]\n\n\nlet frameNum = 1\nlet size = 100\n\nlet myShader;\nlet pg;\n\nfunction preload() {\n \n  myShader = loadShader('https://openprocessing.org/sketch/2244481/files/shader.vert', 'shader.frag');\n}\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n  prev = createFramebuffer({ format: FLOAT });\n  next = createFramebuffer({ format: FLOAT });\n\tpg = createGraphics(windowHeight, windowHeight);\n  imageMode(CENTER);\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n\t\n}\n\n\nfunction draw() {\n\t\n\t\n\tfor(let i =0; i<windowWidth; i+=(Math.max(0.001, Math.abs(size)) || 1)){\n\t\t\n\t\tfor(let j =0; j<windowHeight; j+=(Math.max(0.001, Math.abs(size)) || 1)){\n\t\t\t\n\t\t\tlet distance = dist(i, j, windowWidth * 0.5, windowHeight * 0.5)\n\n\t\t\tlet normalizedDistance = map(distance, 0, windowWidth, 0, 1); \n\n\t\t\tpg.strokeWeight(Math.max(0.1, Math.abs((1-normalizedDistance))) * 5)\n\t\t\tpg.stroke(255)\t\t\t\t\t\n\t\t\tpg.fill(palette[(((i+j) /size) % palette.length)])\n\t\t\tpg.rect(i ,j ,size  , size  ) \n\n\n\n\n\t\t\tresetShader()\n\t\t\n\t\t\t\n\t\n\t\t\t\t\n\t\t\t\t\n\t\t}\n\t}\n\t\n\t\n\t\n  // prev and next\n  [prev, next] = [next, prev];\n\tframeNum ++\n  // next and draw a new next frame\n  next.begin();\n  clear();\n\tbackground(0)\n\n  // rotate and scale the last frame\n  push();\n  rotate(( Math.sin(frameNum * .01)));\n  scale( .9 * cos(frameCount*0.01));\n  image(prev, 0, 0);\n  pop();\n\n \n\tstroke(255)\n\tstrokeWeight(3 *Math.cos(frameCount * .01))\n\tmyShader.setUniform(\"u_time\", millis() / 1000.0);\n\tmyShader.setUniform(\"uTexture\", prev);\n\tmyShader.setUniform('uTexture2', pg);\n\tmyShader.setUniform('frameNum', frameNum);\n  shader(myShader)\n\trotateX(frameCount * 0.02);\n  rotateY(frameCount * 0.02);\n\tbox(1750 , 1750, 1750 );\n\n\t\n  next.end();\n\n  background(255);\n  image(next, 0, 0);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Frequency Band.mp4"
+    ]
 }

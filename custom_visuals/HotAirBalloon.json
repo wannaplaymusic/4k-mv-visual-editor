@@ -1,22 +1,25 @@
 {
-  "name": "HotAirBalloon",
-  "author": "bourneidentity",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:11:55",
-  "url": "https://openprocessing.org/@bourneidentity/1963114",
-  "code": "// === Tab: mySketch ===\n/* \n  Hot Air Balloon by Richard Bourne, created June 26, 2023 for the #WCCChallenge 'Floating'. A few years back when I had a chance to take a hot air balloon ride, I \n\ttalked to the pilot about his technique. He explained that a hot air balloon does not fly at a constant altitude. \n  It constantly rises and falls as the propane burner is turned on and off by the pilot. The trick is to keep\n\tthe height oscillations to a minimum range, thereby conserving fuel.\n\t\n  This was an experiment to create an animation with synchronized sound. I thought I would need \n\tto play the sound each time the burner came on, and stop it when the burner shut off. But due to some\n\tuncanny luck, the free hot air burner sound I downloaded was the right length to end in sync with the flame,\n\tso I only needed the stop command once. Each burst is triggered by frameCount every 630 frames. The burn \n\tcycle shown in this sketch is speeded up quite a bit compared to one in a real-life flight.\n*/\n\nfunction preload(){\n  img = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/default_texture.png');     // hot air balloon\n\timg2 = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/default_texture.png');    // small section of balloon to hide top of flame\n\timg3 = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/default_texture.png');    // clouds\n\tsnd = loadSound('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/default_texture.png'); // burner sound\n}\nlet posX = -550;\nlet posY = 0;\nlet trigger = 630;\n\nfunction setup() {\n\tcreateCanvas(1112, 834);\n\tbackground(255);\n\tnoStroke();\n\tsnd.setVolume(.2); // a low sound volume\n\n\t// start audio with a mouse tap\n  userStartAudio();\n}\n\nfunction draw() {\n\t// background clouds\n\timage(img3, 0, 0, width, height);\n\t\n\t// set the correct size for the hot air balloon (a transparent .png)\n\timg.resize(300, 0);\n\timg2.resize(300, 0);\n\timage(img, 200 + posX, 120 + posY);\n\tif (frameCount == 50) snd.play();\n\tif (frameCount == 330) snd.stop();\n  if (frameCount%trigger == 0) snd.play();\n\n\tif (posY > 0){\n\t\tfill(255, 215, 0);\n\t  ellipse(346 + posX, 450 + posY, 8, 25);\n\t\tfill(255);\n\t\tellipse(346 + posX, 450 + posY, 4, 15);\n\t}\n\t// add a small section of the balloon neck that hides the top of the flame\n\t// so it seems to be entering the balloon\n\timage(img2, 200 + posX, 120 + posY);\n\t\n\t// move the balloon\n\tposX++;\n\tposY = sin(frameCount*.01)*100; // sin \n\tif (posX > width) posX = -500;\n}\n\nfunction keyPressed(){\n  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/p5@v1.6.0/lib/addons/p5.sound.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "HotAirBalloon",
+    "author": "bourneidentity",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:11:55",
+    "url": "https://openprocessing.org/@bourneidentity/1963114",
+    "code": "// === Tab: mySketch ===\n/* \n  Hot Air Balloon by Richard Bourne, created June 26, 2023 for the #WCCChallenge 'Floating'. A few years back when I had a chance to take a hot air balloon ride, I \n\ttalked to the pilot about his technique. He explained that a hot air balloon does not fly at a constant altitude. \n  It constantly rises and falls as the propane burner is turned on and off by the pilot. The trick is to keep\n\tthe height oscillations to a minimum range, thereby conserving fuel.\n\t\n  This was an experiment to create an animation with synchronized sound. I thought I would need \n\tto play the sound each time the burner came on, and stop it when the burner shut off. But due to some\n\tuncanny luck, the free hot air burner sound I downloaded was the right length to end in sync with the flame,\n\tso I only needed the stop command once. Each burst is triggered by frameCount every 630 frames. The burn \n\tcycle shown in this sketch is speeded up quite a bit compared to one in a real-life flight.\n*/\n\nfunction preload(){\n  img = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/default_texture.png');     // hot air balloon\n\timg2 = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/default_texture.png');    // small section of balloon to hide top of flame\n\timg3 = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/default_texture.png');    // clouds\n\tsnd = loadSound('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/default_texture.png'); // burner sound\n}\nlet posX = -550;\nlet posY = 0;\nlet trigger = 630;\n\nfunction setup() {\n\tcreateCanvas(1112, 834);\n\tbackground(255);\n\tnoStroke();\n\tsnd.setVolume(.2); // a low sound volume\n\n\t// start audio with a mouse tap\n  userStartAudio();\n}\n\nfunction draw() {\n\t// background clouds\n\timage(img3, 0, 0, width, height);\n\t\n\t// set the correct size for the hot air balloon (a transparent .png)\n\timg.resize(300, 0);\n\timg2.resize(300, 0);\n\timage(img, 200 + posX, 120 + posY);\n\tif (frameCount == 50) snd.play();\n\tif (frameCount == 330) snd.stop();\n  if (frameCount%trigger == 0) snd.play();\n\n\tif (posY > 0){\n\t\tfill(255, 215, 0);\n\t  ellipse(346 + posX, 450 + posY, 8, 25);\n\t\tfill(255);\n\t\tellipse(346 + posX, 450 + posY, 4, 15);\n\t}\n\t// add a small section of the balloon neck that hides the top of the flame\n\t// so it seems to be entering the balloon\n\timage(img2, 200 + posX, 120 + posY);\n\t\n\t// move the balloon\n\tposX++;\n\tposY = sin(frameCount*.01)*100; // sin \n\tif (posX > width) posX = -500;\n}\n\nfunction keyPressed(){\n  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/p5@v1.6.0/lib/addons/p5.sound.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Underground Tides.mp4"
+    ]
 }

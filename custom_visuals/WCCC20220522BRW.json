@@ -1,22 +1,26 @@
 {
-  "name": "WCCC20220522BRW",
-  "author": "u281256",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 16:51:39",
-  "url": "https://openprocessing.org/@u281256/1582090",
-  "code": "// === Tab: mySketch ===\n// !!! Had to leave. Sorry !!!\n\nlet rInc = 0;\nlet aInc = 0;\nlet boxSize;\nlet tex;\n\npreload = _ => {\n  tex = loadImage('https://openprocessing.org/sketch/1582090/files/cracks.png');\n}\n\nsetup = (_) => {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  boxSize = windowWidth < windowHeight ? windowWidth / 10 : windowHeight / 10;\n\tnoStroke();\n}\n\ndraw = (_) => {\n  background(0);\n  orbitControl(1, 1, 0);\n  pointLight(255, 255, 255, 0, -500, 500);\n  ambientLight(130);\n  rotateY(rInc / 10);\n  translate(-2 * boxSize, -2 * boxSize, -2 * boxSize);\n\n  let bw = 0;\n  let vCount = 0;\n\t\n  for (z = 0; z < 5; z++) {\n    bw++;\n    for (y = 0; y < 5; y++) {\n      bw++;\n      for (x = 0; x < 5; x++) {\n        if (vCount % 2 != 0) {\n\n          xx = abs(sin(x * (PI / 5) + aInc));\n          yy = abs(sin(y * (PI / 5) + aInc));\n          zz = abs(sin(z * (PI / 5) + aInc));\n\n          // Correct the last value\n          // It should be zero but it looks like it isn't?\n          if (x === 5) xx = 0;\n          if (y === 5) yy = 0;\n          if (z === 5) zz = 0;\n\n          // Avoid near zero scale flickering\n          xx = xx < 0.02 ? xx = 0.02 : xx;\n          yy = yy < 0.02 ? yy = 0.02 : yy;\n          zz = zz < 0.02 ? zz = 0.02 : zz;\n        \n          push();\n\n          let whiteCol = [0, 255][bw++ % 2];\n          fill(255,whiteCol,whiteCol);\n\n          translate(x * boxSize, y * boxSize, z * boxSize);\n        \n          /** Scale Variations */\n          scale(xx,yy,zz) // OR:\n          //scale(1, yy, 1) // etc...\n\t\t\t\t\t\n          /** Box Variations */\n          box(xx * boxSize, yy * boxSize, zz * boxSize);\n\n          scale(1, 1 / yy, 1)\n          translate(0, (boxSize * 10) - y * (boxSize * 2), 0)\n          fill(xx * 255 - (5 - y) * 20 - 110,\n\t\t\t\t\t\t\t xx * whiteCol - (5 - y) * 20 - 110,\n\t\t\t\t\t\t\t xx * whiteCol - (5 - y) * 20 - 110);\n          box(xx * boxSize, yy * boxSize, zz * boxSize);\n          pop();\n        }\n        vCount++;\n      }\n    }\n  }\n\n  // FLOOR Element with Alpha mask\n  push();\n\ttexture(tex);\n\tambientLight(66);\n\trotateX(-HALF_PI);\n\ttranslate(-boxSize*3, -boxSize*7, boxSize*5);\n\trect(0, 0, boxSize*10);\n  pop();\n\n  rInc += 0.025;\n  aInc += 0.02;\n}\n\nwindowResized=_=> {\n  resizeCanvas(windowWidth, windowHeight);\n\tboxSize = windowWidth < windowHeight ? windowWidth / 10 : windowHeight / 10;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "WCCC20220522BRW",
+    "author": "u281256",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 16:51:39",
+    "url": "https://openprocessing.org/@u281256/1582090",
+    "code": "// === Tab: mySketch ===\n// !!! Had to leave. Sorry !!!\n\nlet rInc = 0;\nlet aInc = 0;\nlet boxSize;\nlet tex;\n\npreload = _ => {\n  tex = loadImage('https://openprocessing.org/sketch/1582090/files/cracks.png');\n}\n\nsetup = (_) => {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  boxSize = windowWidth < windowHeight ? windowWidth / 10 : windowHeight / 10;\n\tnoStroke();\n}\n\ndraw = (_) => {\n  background(0);\n  orbitControl(1, 1, 0);\n  pointLight(255, 255, 255, 0, -500, 500);\n  ambientLight(130);\n  rotateY(rInc / 10);\n  translate(-2 * boxSize, -2 * boxSize, -2 * boxSize);\n\n  let bw = 0;\n  let vCount = 0;\n\t\n  for (z = 0; z < 5; z++) {\n    bw++;\n    for (y = 0; y < 5; y++) {\n      bw++;\n      for (x = 0; x < 5; x++) {\n        if (vCount % 2 != 0) {\n\n          xx = abs(sin(x * (PI / 5) + aInc));\n          yy = abs(sin(y * (PI / 5) + aInc));\n          zz = abs(sin(z * (PI / 5) + aInc));\n\n          // Correct the last value\n          // It should be zero but it looks like it isn't?\n          if (x === 5) xx = 0;\n          if (y === 5) yy = 0;\n          if (z === 5) zz = 0;\n\n          // Avoid near zero scale flickering\n          xx = xx < 0.02 ? xx = 0.02 : xx;\n          yy = yy < 0.02 ? yy = 0.02 : yy;\n          zz = zz < 0.02 ? zz = 0.02 : zz;\n        \n          push();\n\n          let whiteCol = [0, 255][bw++ % 2];\n          fill(255,whiteCol,whiteCol);\n\n          translate(x * boxSize, y * boxSize, z * boxSize);\n        \n          /** Scale Variations */\n          scale(xx,yy,zz) // OR:\n          //scale(1, yy, 1) // etc...\n\t\t\t\t\t\n          /** Box Variations */\n          box(xx * boxSize, yy * boxSize, zz * boxSize);\n\n          scale(1, 1 / yy, 1)\n          translate(0, (boxSize * 10) - y * (boxSize * 2), 0)\n          fill(xx * 255 - (5 - y) * 20 - 110,\n\t\t\t\t\t\t\t xx * whiteCol - (5 - y) * 20 - 110,\n\t\t\t\t\t\t\t xx * whiteCol - (5 - y) * 20 - 110);\n          box(xx * boxSize, yy * boxSize, zz * boxSize);\n          pop();\n        }\n        vCount++;\n      }\n    }\n  }\n\n  // FLOOR Element with Alpha mask\n  push();\n\ttexture(tex);\n\tambientLight(66);\n\trotateX(-HALF_PI);\n\ttranslate(-boxSize*3, -boxSize*7, boxSize*5);\n\trect(0, 0, boxSize*10);\n  pop();\n\n  rInc += 0.025;\n  aInc += 0.02;\n}\n\nwindowResized=_=> {\n  resizeCanvas(windowWidth, windowHeight);\n\tboxSize = windowWidth < windowHeight ? windowWidth / 10 : windowHeight / 10;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 2,
+    "is_starred": false,
+    "used_in_videos": [
+        "Spatial Wash.mp4",
+        "Surgical Patterns Universe.mp4"
+    ]
 }

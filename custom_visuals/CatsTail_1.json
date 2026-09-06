@@ -1,22 +1,26 @@
 {
-  "name": "CatsTail_1",
-  "author": "u110137",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:31:08",
-  "url": "https://openprocessing.org/@u110137/2060219",
-  "code": "// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"cat\".\n// I've been having fun this week with p5's oscillators and filters,\n// which can easily make a lot of noise: https://openprocessing.org/sketch/2054759\n// A specific sound, like a cat's purring, is significantly more difficult to achieve.\n// Here, I've settled on a sawtooth wave, a low pass filter, and a slight delay.\n\nvar osc0;\nvar purring = false;\nvar purr = 0;\nvar tpurr = 0;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tconfigureSound();\n}\n\nfunction configureSound() {\n\tosc0 = new p5.Oscillator('sawtooth');\n\tfilt = new p5.LowPass();\n\tfilt.res(18);\n\tfilt.gain(0.15);\n\tdelay = new p5.Delay(0.75);\n\tosc0.disconnect();\n\tosc0.connect(filt);\n\tdelay.process(osc0, 0.1, 0.1);\n}\n\nfunction draw() {\n\tbackground(0);\n\tpurr = lerp(purr, tpurr, 0.1);\n\tfill(200 * (1 - purr));\n\tnoStroke();\n\ttextAlign(CENTER, CENTER);\n\ttextSize(height / 12);\n\ttext('click to pet the kitty!', width / 2, height / 16);\n\t// modulate frequency and amplitude of purring noise \n\tlet dv = 16 + 4 * noise(frameCount / 500);\n\tosc0.freq(16 + 8 * (abs(sin(frameCount / dv)))); \n\tosc0.amp(max(0.01, sin(frameCount / dv) / 3) * purr);\n\tdrawTail();\n}\n\nfunction drawTail() {\n\tlet colorA = color('rgba(255,165,0,0.6)');\n\tlet colorB = color('rgba(255,255,255,0.6)');\n\tfor (let y = height * 1.1; y > height / 2; y -= height / 60) {\n\t\tlet wave = map(y, height, height / 4, 0, QUARTER_PI);\n\t\tlet col = lerpColor(colorA, colorB, map(y, height, height / 3, 0, 1));\n\t\tlet len = cos(wave) * (height / 4);\n\t\tlet ang = (566/height) * (0.55 - noise( (y / 300) + frameCount / 100)) / 24;\n\t\tlet spread = 1.75 - noise((y / 1000) + frameCount / 200)*1.25;\n\t\tlet num = map(y, height, height / 2, 48, 96);\n\t\tdrawSegment(width / 2, y, ang, len, col, spread, num);\n\t}\n}\n\nfunction drawSegment(x, y, ang, len, col, spread, num) {\n\tstroke(col);\n\trotate(-ang * num / 48);\n\tfor (let a = -PI / 3; a < PI / 3; a += (Math.max(0.001, Math.abs(PI / num)) || 1)) {\n\t\tpush();\n\t\ttranslate(x, y);\n\t\trotate(a * spread);\n\t\tstrokeWeight(cos(a) * len / 120);\n\t\tline(0, 0, 0, -len * cos(a));\n\t\tpop();\n\t}\n}\n\nfunction mouseClicked() {\n\tpurring = !purring;\n\tif (purring) {\n\t\tosc0.start()\n\t\ttpurr = 1;\n\t} else {\n\t\ttpurr = 0;\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/p5@v1.8.0/lib/addons/p5.sound.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CatsTail_1",
+    "author": "u110137",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:31:08",
+    "url": "https://openprocessing.org/@u110137/2060219",
+    "code": "// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"cat\".\n// I've been having fun this week with p5's oscillators and filters,\n// which can easily make a lot of noise: https://openprocessing.org/sketch/2054759\n// A specific sound, like a cat's purring, is significantly more difficult to achieve.\n// Here, I've settled on a sawtooth wave, a low pass filter, and a slight delay.\n\nvar osc0;\nvar purring = false;\nvar purr = 0;\nvar tpurr = 0;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tconfigureSound();\n}\n\nfunction configureSound() {\n\tosc0 = new p5.Oscillator('sawtooth');\n\tfilt = new p5.LowPass();\n\tfilt.res(18);\n\tfilt.gain(0.15);\n\tdelay = new p5.Delay(0.75);\n\tosc0.disconnect();\n\tosc0.connect(filt);\n\tdelay.process(osc0, 0.1, 0.1);\n}\n\nfunction draw() {\n\tbackground(0);\n\tpurr = lerp(purr, tpurr, 0.1);\n\tfill(200 * (1 - purr));\n\tnoStroke();\n\ttextAlign(CENTER, CENTER);\n\ttextSize(height / 12);\n\ttext('click to pet the kitty!', width / 2, height / 16);\n\t// modulate frequency and amplitude of purring noise \n\tlet dv = 16 + 4 * noise(frameCount / 500);\n\tosc0.freq(16 + 8 * (abs(sin(frameCount / dv)))); \n\tosc0.amp(max(0.01, sin(frameCount / dv) / 3) * purr);\n\tdrawTail();\n}\n\nfunction drawTail() {\n\tlet colorA = color('rgba(255,165,0,0.6)');\n\tlet colorB = color('rgba(255,255,255,0.6)');\n\tfor (let y = height * 1.1; y > height / 2; y -= height / 60) {\n\t\tlet wave = map(y, height, height / 4, 0, QUARTER_PI);\n\t\tlet col = lerpColor(colorA, colorB, map(y, height, height / 3, 0, 1));\n\t\tlet len = cos(wave) * (height / 4);\n\t\tlet ang = (566/height) * (0.55 - noise( (y / 300) + frameCount / 100)) / 24;\n\t\tlet spread = 1.75 - noise((y / 1000) + frameCount / 200)*1.25;\n\t\tlet num = map(y, height, height / 2, 48, 96);\n\t\tdrawSegment(width / 2, y, ang, len, col, spread, num);\n\t}\n}\n\nfunction drawSegment(x, y, ang, len, col, spread, num) {\n\tstroke(col);\n\trotate(-ang * num / 48);\n\tfor (let a = -PI / 3; a < PI / 3; a += (Math.max(0.001, Math.abs(PI / num)) || 1)) {\n\t\tpush();\n\t\ttranslate(x, y);\n\t\trotate(a * spread);\n\t\tstrokeWeight(cos(a) * len / 120);\n\t\tline(0, 0, 0, -len * cos(a));\n\t\tpop();\n\t}\n}\n\nfunction mouseClicked() {\n\tpurring = !purring;\n\tif (purring) {\n\t\tosc0.start()\n\t\ttpurr = 1;\n\t} else {\n\t\ttpurr = 0;\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/p5@v1.8.0/lib/addons/p5.sound.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 2,
+    "is_starred": false,
+    "used_in_videos": [
+        "Quiet Hour.mp4",
+        "Empty Sphere.mp4"
+    ]
 }

@@ -1,22 +1,25 @@
 {
-  "name": "GrayScottModel",
-  "author": "u223884",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:24:40",
-  "url": "https://openprocessing.org/@u223884/1090817",
-  "code": "// === Tab: shader ===\nconst vert = `\nprecision highp float;\n\nattribute vec3 aPosition;\nattribute vec2 aTexCoord;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\n\nvarying highp vec2 vTexCoord;\n\nvoid main(void) {\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n\t\n\tvTexCoord = aTexCoord;\n}\n`;\n\nconst simulateFrag = `\nprecision highp float;\n\nuniform sampler2D uSimulator;\nuniform vec2 uResolution;\n\nvarying highp vec2 vTexCoord;\n\nconst float h = 1.0;\nconst vec2  D = vec2(0.1, 0.2);\nvar float f = 0.04;\nvar float k = 0.06;\n\nvoid main(void) {\n\tvec2 pix = 1.0 / uResolution;\n  vec2 uv0 = texture2D(uSimulator, vTexCoord).xy;\n\tvec2 uv1 = texture2D(uSimulator, vTexCoord + vec2(pix.x, 0.0)).xy;\n\tvec2 uv2 = texture2D(uSimulator, vTexCoord - vec2(pix.x, 0.0)).xy;\n\tvec2 uv3 = texture2D(uSimulator, vTexCoord + vec2(0.0, pix.y)).xy;\n\tvec2 uv4 = texture2D(uSimulator, vTexCoord - vec2(0.0, pix.y)).xy;\n\t\n\tvec2 laplacian = (uv1 + uv2 + uv3 + uv4 - 4.0 * uv0) / (h * h);\n\tfloat du = D.x * laplacian.x + uv0.x * uv0.x * uv0.y - (f + k) * uv0.x;\n\tfloat dv = D.y * laplacian.y - uv0.x * uv0.x * uv0.y + f * (1.0 - uv0.y);\n\t\n\tgl_FragColor = vec4(uv0.x + du, uv0.y + dv, 0.0, 1.0);\n}\n`;\n\nconst displayFrag = `\nprecision highp float;\n\nuniform sampler2D uTexture;\n\nvarying highp vec2 vTexCoord;\n\nvoid main(void) {\n\tfloat u = texture2D(uTexture, vTexCoord).x;\n\tgl_FragColor = vec4(vec3(2.0 * u), 1.0);\n}\n`;\n\n// === Tab: mySketch ===\nconst NUM = 100;\n\nlet simulator;\nlet simulateShader;\n\nlet displayShader;\n\nfunction setup() {\n\tcreateCanvas(800, 600, WEBGL);\n\tpixelDensity(1);\n\t\n\tsimulator = createGraphics(width, height, WEBGL);\n\tsimulator.background(0, 255, 0);\n\tsimulator.fill(0.9 * 255, 0, 0);\n\tsimulator.noStroke();\n\tfor (let i=0; i<NUM; i++) {\n\t\tconst x = random(-width/2, width/2);\n\t\tconst y = random(-height/2, height/2);\n\t\tconst d = random(2, 5);\n\t\tsimulator.circle(x, y, d);\n\t}\n\t\n\tsimulateShader = simulator.createShader(vert, simulateFrag);\n\tsimulator.shader(simulateShader);\n\tsimulateShader.setUniform('uResolution', [width, height]);\n\t\n\tdisplayShader = createShader(vert, displayFrag);\n\tshader(displayShader);\n}\n\nfunction draw() {\n\tbackground(255);\n\t\n\tfor (let i=0; i<20; i++) {\n\t\tsimulateShader.setUniform('uSimulator', simulator);\n\t\tsimulator.rect(-width/2, -height/2, width, height);\n\t}\n\t\n\tdisplayShader.setUniform('uTexture', simulator);\n\trect(-width/2, -height/2, width, height);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "GrayScottModel",
+    "author": "u223884",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:24:40",
+    "url": "https://openprocessing.org/@u223884/1090817",
+    "code": "// === Tab: shader ===\nconst vert = `\nprecision highp float;\n\nattribute vec3 aPosition;\nattribute vec2 aTexCoord;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\n\nvarying highp vec2 vTexCoord;\n\nvoid main(void) {\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n\t\n\tvTexCoord = aTexCoord;\n}\n`;\n\nconst simulateFrag = `\nprecision highp float;\n\nuniform sampler2D uSimulator;\nuniform vec2 uResolution;\n\nvarying highp vec2 vTexCoord;\n\nconst float h = 1.0;\nconst vec2  D = vec2(0.1, 0.2);\nvar float f = 0.04;\nvar float k = 0.06;\n\nvoid main(void) {\n\tvec2 pix = 1.0 / uResolution;\n  vec2 uv0 = texture2D(uSimulator, vTexCoord).xy;\n\tvec2 uv1 = texture2D(uSimulator, vTexCoord + vec2(pix.x, 0.0)).xy;\n\tvec2 uv2 = texture2D(uSimulator, vTexCoord - vec2(pix.x, 0.0)).xy;\n\tvec2 uv3 = texture2D(uSimulator, vTexCoord + vec2(0.0, pix.y)).xy;\n\tvec2 uv4 = texture2D(uSimulator, vTexCoord - vec2(0.0, pix.y)).xy;\n\t\n\tvec2 laplacian = (uv1 + uv2 + uv3 + uv4 - 4.0 * uv0) / (h * h);\n\tfloat du = D.x * laplacian.x + uv0.x * uv0.x * uv0.y - (f + k) * uv0.x;\n\tfloat dv = D.y * laplacian.y - uv0.x * uv0.x * uv0.y + f * (1.0 - uv0.y);\n\t\n\tgl_FragColor = vec4(uv0.x + du, uv0.y + dv, 0.0, 1.0);\n}\n`;\n\nconst displayFrag = `\nprecision highp float;\n\nuniform sampler2D uTexture;\n\nvarying highp vec2 vTexCoord;\n\nvoid main(void) {\n\tfloat u = texture2D(uTexture, vTexCoord).x;\n\tgl_FragColor = vec4(vec3(2.0 * u), 1.0);\n}\n`;\n\n// === Tab: mySketch ===\nconst NUM = 100;\n\nlet simulator;\nlet simulateShader;\n\nlet displayShader;\n\nfunction setup() {\n\tcreateCanvas(800, 600, WEBGL);\n\tpixelDensity(1);\n\t\n\tsimulator = createGraphics(width, height, WEBGL);\n\tsimulator.background(0, 255, 0);\n\tsimulator.fill(0.9 * 255, 0, 0);\n\tsimulator.noStroke();\n\tfor (let i=0; i<NUM; i++) {\n\t\tconst x = random(-width/2, width/2);\n\t\tconst y = random(-height/2, height/2);\n\t\tconst d = random(2, 5);\n\t\tsimulator.circle(x, y, d);\n\t}\n\t\n\tsimulateShader = simulator.createShader(vert, simulateFrag);\n\tsimulator.shader(simulateShader);\n\tsimulateShader.setUniform('uResolution', [width, height]);\n\t\n\tdisplayShader = createShader(vert, displayFrag);\n\tshader(displayShader);\n}\n\nfunction draw() {\n\tbackground(255);\n\t\n\tfor (let i=0; i<20; i++) {\n\t\tsimulateShader.setUniform('uSimulator', simulator);\n\t\tsimulator.rect(-width/2, -height/2, width, height);\n\t}\n\t\n\tdisplayShader.setUniform('uTexture', simulator);\n\trect(-width/2, -height/2, width, height);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

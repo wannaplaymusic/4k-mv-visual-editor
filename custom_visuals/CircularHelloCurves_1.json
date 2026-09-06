@@ -1,22 +1,25 @@
 {
-  "name": "CircularHelloCurves_1",
-  "author": "u65884",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:18:43",
-  "url": "https://openprocessing.org/@u65884/697891",
-  "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://www.openprocessing.org/sketch/697891\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nvar textToWrite = \"Circular Hello Curves\";\nvar SEGMENTS    = 200;\n\n//auto start variables\nvar centerX, centerY, fontSize, INNER_RADIUS, RADIUS_VARIATION;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tcenterX = windowWidth/2;\n\tcenterY = windowHeight/2;\n\t\n\tlet screenPct = min(height, width) / 1000;\n\tfontSize = screenPct * 150;\n\tINNER_RADIUS = screenPct * 200;\n\tRADIUS_VARIATION = screenPct * 200;\n\t\n\ttextFont('Helvetica');\n\ttextSize(fontSize);\n}\n\n//code adapted from @GoToLoop\n//generates a circular noise with perfect looping\n//https://forum.processing.org/one/topic/how-to-make-perlin-noise-loop.html\nfunction pointForIndex(pct) {\n\tconst NOISE_SCALE       = 1.5;\n  let angle = pct * TWO_PI;\n  let cosAngle = cos(angle);\n  let sinAngle = sin(angle);\n  let time = frameCount / 100;\n  let noiseValue = noise(NOISE_SCALE * cosAngle + NOISE_SCALE, NOISE_SCALE * sinAngle + NOISE_SCALE, time);\n  let radius = INNER_RADIUS + RADIUS_VARIATION * noiseValue;\n  return {\n\t\tx: radius * cosAngle + centerX,\n\t\ty: radius * sinAngle + centerY\n\t};\n}\n\nfunction draw() {\n  background(255);\n\tfill(0);\n  noStroke();\n\t\n\t//draw sphere\n\tbeginShape();\n\t\tfor (let i = 0; i < SEGMENTS; i++) {\n\t\t\tlet p0 = pointForIndex(i/SEGMENTS);\n\t\t\tvertex(p0.x, p0.y);\n\t\t}\n\tendShape(CLOSE);\n\t\n\t//draw text\n\tlet pct = atan2((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - centerY, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - centerX) / TWO_PI;//follow mouse\n\t//let pct = 0;//dont follow mouse\n\tlet pixToAngularPct = 1/((INNER_RADIUS+RADIUS_VARIATION/2)*TWO_PI);\n\tfor (var i = 0; i < textToWrite.length; i++) {\n\t\tlet charWidth = textWidth(textToWrite.charAt(i));\n\t\tpct += charWidth/2 * pixToAngularPct;\n\t\t\n\t\t//calculate angle\n\t\tlet leftP = pointForIndex(pct-0.01);\n\t\tlet rightP = pointForIndex(pct+0.01);\n\t\tvar angle = atan2(leftP.y - rightP.y, leftP.x - rightP.x) + PI;\n\t\t\n\t\tpush();\n\t\t\tlet p = pointForIndex(pct);\n\t\t\t//apply angle\n\t\t\ttranslate(p.x, p.y);\n\t\t\t\trotate(angle);\n\t\t\ttranslate(-p.x, -p.y);\n\t\t\n\t\t\ttext(textToWrite.charAt(i), p.x-charWidth/2, p.y);\n\t\tpop();\n\t\t\n\t\tpct += charWidth/2 * pixToAngularPct;\n\t}//for\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CircularHelloCurves_1",
+    "author": "u65884",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:18:43",
+    "url": "https://openprocessing.org/@u65884/697891",
+    "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://www.openprocessing.org/sketch/697891\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nvar textToWrite = \"Circular Hello Curves\";\nvar SEGMENTS    = 200;\n\n//auto start variables\nvar centerX, centerY, fontSize, INNER_RADIUS, RADIUS_VARIATION;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tcenterX = windowWidth/2;\n\tcenterY = windowHeight/2;\n\t\n\tlet screenPct = min(height, width) / 1000;\n\tfontSize = screenPct * 150;\n\tINNER_RADIUS = screenPct * 200;\n\tRADIUS_VARIATION = screenPct * 200;\n\t\n\ttextFont('Helvetica');\n\ttextSize(fontSize);\n}\n\n//code adapted from @GoToLoop\n//generates a circular noise with perfect looping\n//https://forum.processing.org/one/topic/how-to-make-perlin-noise-loop.html\nfunction pointForIndex(pct) {\n\tconst NOISE_SCALE       = 1.5;\n  let angle = pct * TWO_PI;\n  let cosAngle = cos(angle);\n  let sinAngle = sin(angle);\n  let time = frameCount / 100;\n  let noiseValue = noise(NOISE_SCALE * cosAngle + NOISE_SCALE, NOISE_SCALE * sinAngle + NOISE_SCALE, time);\n  let radius = INNER_RADIUS + RADIUS_VARIATION * noiseValue;\n  return {\n\t\tx: radius * cosAngle + centerX,\n\t\ty: radius * sinAngle + centerY\n\t};\n}\n\nfunction draw() {\n  background(255);\n\tfill(0);\n  noStroke();\n\t\n\t//draw sphere\n\tbeginShape();\n\t\tfor (let i = 0; i < SEGMENTS; i++) {\n\t\t\tlet p0 = pointForIndex(i/SEGMENTS);\n\t\t\tvertex(p0.x, p0.y);\n\t\t}\n\tendShape(CLOSE);\n\t\n\t//draw text\n\tlet pct = atan2((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - centerY, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - centerX) / TWO_PI;//follow mouse\n\t//let pct = 0;//dont follow mouse\n\tlet pixToAngularPct = 1/((INNER_RADIUS+RADIUS_VARIATION/2)*TWO_PI);\n\tfor (var i = 0; i < textToWrite.length; i++) {\n\t\tlet charWidth = textWidth(textToWrite.charAt(i));\n\t\tpct += charWidth/2 * pixToAngularPct;\n\t\t\n\t\t//calculate angle\n\t\tlet leftP = pointForIndex(pct-0.01);\n\t\tlet rightP = pointForIndex(pct+0.01);\n\t\tvar angle = atan2(leftP.y - rightP.y, leftP.x - rightP.x) + PI;\n\t\t\n\t\tpush();\n\t\t\tlet p = pointForIndex(pct);\n\t\t\t//apply angle\n\t\t\ttranslate(p.x, p.y);\n\t\t\t\trotate(angle);\n\t\t\ttranslate(-p.x, -p.y);\n\t\t\n\t\t\ttext(textToWrite.charAt(i), p.x-charWidth/2, p.y);\n\t\tpop();\n\t\t\n\t\tpct += charWidth/2 * pixToAngularPct;\n\t}//for\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Delay Trail Hypnosis.mp4"
+    ]
 }

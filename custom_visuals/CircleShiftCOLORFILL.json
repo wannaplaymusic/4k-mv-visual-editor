@@ -1,22 +1,25 @@
 {
-  "name": "CircleShiftCOLORFILL",
-  "author": "wangyasai",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:32:46",
-  "url": "https://openprocessing.org/@wangyasai/425051",
-  "code": "// === Tab: sketch83530 ===\nvar time = 0;\n\nfunction setup(){\n  createCanvas(600, 600);\n  noFill();\n  stroke(255);\n}\n\nfunction draw(){\n  background(242);\n  for(let i = 0; i < 360; i+=3){\n    let x = cos(radians(i)) * 50 + width / 2;\n    let y = sin(radians(i)) *100 + height / 2;\n    let w = sin(radians(time+i )) * 200;\n    w = abs(w);\n\n    let col=map(i,0,360,120,255);\n    fill(col,col,col);\n\n    noStroke();\n    fill(col,0,88);\n    ellipse(x, y, w, w);\n  }\n  time++;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CircleShiftCOLORFILL",
+    "author": "wangyasai",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:32:46",
+    "url": "https://openprocessing.org/@wangyasai/425051",
+    "code": "// === Tab: sketch83530 ===\nvar time = 0;\n\nfunction setup(){\n  createCanvas(600, 600);\n  noFill();\n  stroke(255);\n}\n\nfunction draw(){\n  background(242);\n  for(let i = 0; i < 360; i+=3){\n    let x = cos(radians(i)) * 50 + width / 2;\n    let y = sin(radians(i)) *100 + height / 2;\n    let w = sin(radians(time+i )) * 200;\n    w = abs(w);\n\n    let col=map(i,0,360,120,255);\n    fill(col,col,col);\n\n    noStroke();\n    fill(col,0,88);\n    ellipse(x, y, w, w);\n  }\n  time++;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Forward Motion Vibe.mp4"
+    ]
 }

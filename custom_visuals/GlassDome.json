@@ -1,22 +1,25 @@
 {
-  "name": "GlassDome",
-  "author": "u110137",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 22:59:38",
-  "url": "https://openprocessing.org/@u110137/1051231",
-  "code": "// === Tab: mySketch ===\nvar img;\nvar dome;\nvar sample;\nvar x, y;\nvar painting;\nvar z = -600;\nvar zvel = 30;\n\nfunction preload(){\n\timg = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/brueghel2.jpg');\n\tpainting = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/brueghel2.jpg');\n}\n\nfunction setup() {\n\timg.resize(0,windowHeight);\n\tpainting.resize(0,windowHeight);\n\t//img.filter(BLUR,1);\n\tcreateCanvas(windowWidth, img.height, WEBGL);\n\timageMode(CENTER);\n\tnoCursor();\n\tdome = height/6;\n\tsample = PI*dome;\n\tx = 0;\n\ty = height;\n}\n\nfunction draw() {\n\tbackground(0);\n\tambientLight(200);\n\tpointLight(100,100,100,width/2,-300,100);\n\tpointLight(100,100,100,-width/2,-300,100);\n\tif(frameCount>60){\n\t\tz+=zvel;\n\t\tzvel*=0.95;\n\t}\n\tif(z>250) {z-=zvel; zvel*=-1;}\n\ttranslate(0,0,z);\t\n\tx = lerp(x, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width/2, 0.1);\n\ty = lerp(y, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - height/2, 0.1);\n\trotateY(1.2*x/width);\n\trotateX(1.2*y/-height);\n\timage(img,0,0);\n\ttranslate(x,y,0);\n  noStroke();\n\tlet txt = painting.get(x+img.width/2-sample/2,y+img.height/2-dome, sample, 2*dome);\n\ttexture(txt);\n\trotateY(PI);\n\tlet domeheight = (sample-PI*dome)/8;\n\ttranslate(0,0,domeheight);\n\t//sphere(dome);\n\tellipsoid(dome, dome, dome/1.25,32,32);\n\trotateX(PI/2);\n\tspecularMaterial(171,141,63);\n\ttranslate(0,-dome/8-domeheight/2,0);\n\tcylinder(dome*1.05,(dome/4)-domeheight,32,1);\n\tif(((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) dome*=1.08;\n\tdome = lerp(dome, height/7, 0.15);\n\tsample = PI*dome;\n\tcheckKeys();\n}\n\nfunction checkKeys(){\n\tif(keyIsDown(UP_ARROW)) zvel+=1;\n\tif(keyIsDown(DOWN_ARROW)) zvel-=1;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "GlassDome",
+    "author": "u110137",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:59:38",
+    "url": "https://openprocessing.org/@u110137/1051231",
+    "code": "// === Tab: mySketch ===\nvar img;\nvar dome;\nvar sample;\nvar x, y;\nvar painting;\nvar z = -600;\nvar zvel = 30;\n\nfunction preload(){\n\timg = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/brueghel2.jpg');\n\tpainting = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/brueghel2.jpg');\n}\n\nfunction setup() {\n\timg.resize(0,windowHeight);\n\tpainting.resize(0,windowHeight);\n\t//img.filter(BLUR,1);\n\tcreateCanvas(windowWidth, img.height, WEBGL);\n\timageMode(CENTER);\n\tnoCursor();\n\tdome = height/6;\n\tsample = PI*dome;\n\tx = 0;\n\ty = height;\n}\n\nfunction draw() {\n\tbackground(0);\n\tambientLight(200);\n\tpointLight(100,100,100,width/2,-300,100);\n\tpointLight(100,100,100,-width/2,-300,100);\n\tif(frameCount>60){\n\t\tz+=zvel;\n\t\tzvel*=0.95;\n\t}\n\tif(z>250) {z-=zvel; zvel*=-1;}\n\ttranslate(0,0,z);\t\n\tx = lerp(x, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width/2, 0.1);\n\ty = lerp(y, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - height/2, 0.1);\n\trotateY(1.2*x/width);\n\trotateX(1.2*y/-height);\n\timage(img,0,0);\n\ttranslate(x,y,0);\n  noStroke();\n\tlet txt = painting.get(x+img.width/2-sample/2,y+img.height/2-dome, sample, 2*dome);\n\ttexture(txt);\n\trotateY(PI);\n\tlet domeheight = (sample-PI*dome)/8;\n\ttranslate(0,0,domeheight);\n\t//sphere(dome);\n\tellipsoid(dome, dome, dome/1.25,32,32);\n\trotateX(PI/2);\n\tspecularMaterial(171,141,63);\n\ttranslate(0,-dome/8-domeheight/2,0);\n\tcylinder(dome*1.05,(dome/4)-domeheight,32,1);\n\tif(((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) dome*=1.08;\n\tdome = lerp(dome, height/7, 0.15);\n\tsample = PI*dome;\n\tcheckKeys();\n}\n\nfunction checkKeys(){\n\tif(keyIsDown(UP_ARROW)) zvel+=1;\n\tif(keyIsDown(DOWN_ARROW)) zvel-=1;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Frozen Time.mp4"
+    ]
 }

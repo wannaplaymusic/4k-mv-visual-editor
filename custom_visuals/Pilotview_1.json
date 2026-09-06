@@ -1,22 +1,25 @@
 {
-  "name": "Pilotview_1",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 04:02:53",
-  "url": "https://openprocessing.org/@ntsutae/1245781",
-  "code": "// === Tab: mySketch ===\nconst ratio=1.1\n\nsetup=()=> {\n createCanvas(windowWidth,windowHeight)\n fill('white')\n rectMode(CENTER)\n}\n\ndraw=()=> {\n translate(width/2,height/2)\n stroke(random(256))\n rect(random(-5,5),random(-5,5),2,2)\n g=get(0,0,width,height)\n rotate(.01)\n w=width*ratio\n h=height*ratio\n image(g,-w/2,-h/2,w,h)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Pilotview_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:02:53",
+    "url": "https://openprocessing.org/@ntsutae/1245781",
+    "code": "// === Tab: mySketch ===\nconst ratio=1.1\n\nsetup=()=> {\n createCanvas(windowWidth,windowHeight)\n fill('white')\n rectMode(CENTER)\n}\n\ndraw=()=> {\n translate(width/2,height/2)\n stroke(random(256))\n rect(random(-5,5),random(-5,5),2,2)\n g=get(0,0,width,height)\n rotate(.01)\n w=width*ratio\n h=height*ratio\n image(g,-w/2,-h/2,w,h)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Steel Decay Pattern.mp4"
+    ]
 }

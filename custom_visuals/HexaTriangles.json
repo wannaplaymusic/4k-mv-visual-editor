@@ -1,22 +1,25 @@
 {
-  "name": "HexaTriangles",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:28:51",
-  "url": "https://openprocessing.org/@epi/2973683",
-  "code": "// === Tab: mySketch ===\nlet epiColors; // https://github.com/epibyte/p5-epi-colors\nlet S, shapes;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, P2D);\n\tS = ~~(max(width, height) / 11);\n\tframeRate(60);\n\n\tbackground(128);\n\tstroke(\"deeppink\");\n\tstrokeWeight(1);\n\tnoStroke();\n\tnoFill();\n\n\tconst { EpiColors } = EpiColorsPckg;\n\tepiColors = new EpiColors();\n\t// console.log(epiColors);\n\n\tinit();\n}\n\nfunction init() {\n\tepiColors.getRandomPalette();\n\n\t//\n\tshapes = [];\n\t// \n\tconst spHori = sqrt(3) * S;\n\tconst spVert = 3/2 * S;\n\tfor (let y = 0, j = 0; y < height+spVert/2; y += spVert, j++) {\n\t\tfor (let x = j % 2 == 0 ? spHori/2 : 0, i = 0; x < width+spHori/2; x += spHori, i++) {\n\t\t\tnshape(x, y, S);\n\t\t\t// hexagons.push( {x, y, r: S} );\n\t\t}\n\t}\n\tshuffle(shapes, true);\n\t\n\tloop();\n}\n\nfunction draw() {\n\t//\n\tif (!shapes.length) init();\n\n\tconst sh = shapes.shift();\n\tfill(epiColors.getRandomClr());\n\ttriangle(sh.p1.x, sh.p1.y, sh.p2.x, sh.p2.y, sh.p3.x, sh.p3.y);\n}\n\nfunction nshape(x, y, r, n = 6) {\n\tlet a = TAU/n/2;\n\tconst da = TAU/n;\n\tconst pts = [];\n\tpts.push( { x, y } );\n\t// beginShape();\n\tfor (let i = 0; i < n; i++) {\n\t\tconst vx = x + cos(a) * r;\n\t\tconst vy = y + sin(a) * r;\n\t\t// vertex(vx, vy);\n\t\tpts.push( { x: vx, y: vy } );\n\t\t// if (i == 0) circle(vx, vy, 5);\n\t\ta += da;\n\t}\n\t// endShape(CLOSE);\n\n\tshapes.push( { p1: pts[6], p2: pts[1], p3: pts[2] } );\n\tshapes.push( { p1: pts[6], p2: pts[0], p3: pts[2] } );\n\tshapes.push( { p1: pts[2], p2: pts[3], p3: pts[4] } );\n\tshapes.push( { p1: pts[2], p2: pts[0], p3: pts[4] } );\n\tshapes.push( { p1: pts[4], p2: pts[5], p3: pts[6] } );\n\tshapes.push( { p1: pts[4], p2: pts[0], p3: pts[6] } );\n}\n\nfunction windowResized() {\n\tresizeCanvas(innerWidth, innerHeight);\n\tinit();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "HexaTriangles",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:28:51",
+    "url": "https://openprocessing.org/@epi/2973683",
+    "code": "// === Tab: mySketch ===\nlet epiColors; // https://github.com/epibyte/p5-epi-colors\nlet S, shapes;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, P2D);\n\tS = ~~(max(width, height) / 11);\n\tframeRate(60);\n\n\tbackground(128);\n\tstroke(\"deeppink\");\n\tstrokeWeight(1);\n\tnoStroke();\n\tnoFill();\n\n\tconst { EpiColors } = EpiColorsPckg;\n\tepiColors = new EpiColors();\n\t// console.log(epiColors);\n\n\tinit();\n}\n\nfunction init() {\n\tepiColors.getRandomPalette();\n\n\t//\n\tshapes = [];\n\t// \n\tconst spHori = sqrt(3) * S;\n\tconst spVert = 3/2 * S;\n\tfor (let y = 0, j = 0; y < height+spVert/2; y += spVert, j++) {\n\t\tfor (let x = j % 2 == 0 ? spHori/2 : 0, i = 0; x < width+spHori/2; x += spHori, i++) {\n\t\t\tnshape(x, y, S);\n\t\t\t// hexagons.push( {x, y, r: S} );\n\t\t}\n\t}\n\tshuffle(shapes, true);\n\t\n\tloop();\n}\n\nfunction draw() {\n\t//\n\tif (!shapes.length) init();\n\n\tconst sh = shapes.shift();\n\tfill(epiColors.getRandomClr());\n\ttriangle(sh.p1.x, sh.p1.y, sh.p2.x, sh.p2.y, sh.p3.x, sh.p3.y);\n}\n\nfunction nshape(x, y, r, n = 6) {\n\tlet a = TAU/n/2;\n\tconst da = TAU/n;\n\tconst pts = [];\n\tpts.push( { x, y } );\n\t// beginShape();\n\tfor (let i = 0; i < n; i++) {\n\t\tconst vx = x + cos(a) * r;\n\t\tconst vy = y + sin(a) * r;\n\t\t// vertex(vx, vy);\n\t\tpts.push( { x: vx, y: vy } );\n\t\t// if (i == 0) circle(vx, vy, 5);\n\t\ta += da;\n\t}\n\t// endShape(CLOSE);\n\n\tshapes.push( { p1: pts[6], p2: pts[1], p3: pts[2] } );\n\tshapes.push( { p1: pts[6], p2: pts[0], p3: pts[2] } );\n\tshapes.push( { p1: pts[2], p2: pts[3], p3: pts[4] } );\n\tshapes.push( { p1: pts[2], p2: pts[0], p3: pts[4] } );\n\tshapes.push( { p1: pts[4], p2: pts[5], p3: pts[6] } );\n\tshapes.push( { p1: pts[4], p2: pts[0], p3: pts[6] } );\n}\n\nfunction windowResized() {\n\tresizeCanvas(innerWidth, innerHeight);\n\tinit();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Modern Twist Saturation.mp4"
+    ]
 }

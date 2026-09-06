@@ -1,22 +1,25 @@
 {
-  "name": "Flowfield2",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 17:27:04",
-  "url": "https://openprocessing.org/@ntsutae/1244431",
-  "code": "// === Tab: mySketch ===\nconst stars=[]\nconst blackholes=[]\n\nsetup=()=>{\n  createCanvas(800,800)\n  background(0)\n  strokeWeight(2)\n  colorMode(HSB,360)\n  \n  for(let i=2e3;i--;){\n    stars[i]={\n      x:cos(i)*300,\n      y:sin(i)*300,\n      colour:i%360\n    }\n  }\n  for(let i=4;i--;){\n    blackholes[i]={\n      x:random(-250,250),\n      y:random(-250,250)\n    }\n  }\n}\n\ndraw=()=> {\n  translate(width/2,height/2)\n\n  for(const s of stars){\n    let direction=0\n    for(const b of blackholes){\n      direction+=atan2(b.y-s.y,b.x-s.x)*2\n    }\n    stroke(s.colour,360,360)\n    line(s.x,s.y,s.x+=cos(direction)*5,s.y+=sin(direction)*5)\n  }\n}\n\nmousePressed=_=>setup()",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Flowfield2",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:27:04",
+    "url": "https://openprocessing.org/@ntsutae/1244431",
+    "code": "// === Tab: mySketch ===\nconst stars=[]\nconst blackholes=[]\n\nsetup=()=>{\n  createCanvas(800,800)\n  background(0)\n  strokeWeight(2)\n  colorMode(HSB,360)\n  \n  for(let i=2e3;i--;){\n    stars[i]={\n      x:cos(i)*300,\n      y:sin(i)*300,\n      colour:i%360\n    }\n  }\n  for(let i=4;i--;){\n    blackholes[i]={\n      x:random(-250,250),\n      y:random(-250,250)\n    }\n  }\n}\n\ndraw=()=> {\n  translate(width/2,height/2)\n\n  for(const s of stars){\n    let direction=0\n    for(const b of blackholes){\n      direction+=atan2(b.y-s.y,b.x-s.x)*2\n    }\n    stroke(s.colour,360,360)\n    line(s.x,s.y,s.x+=cos(direction)*5,s.y+=sin(direction)*5)\n  }\n}\n\nmousePressed=_=>setup()",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Echo Control Sector.mp4"
+    ]
 }

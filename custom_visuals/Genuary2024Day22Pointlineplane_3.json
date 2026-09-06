@@ -1,22 +1,25 @@
 {
-  "name": "Genuary2024Day22Pointlineplane_3",
-  "author": "u265818",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:05:34",
-  "url": "https://openprocessing.org/@u265818/2151719",
-  "code": "// === Tab: mySketch ===\nlet colors = ['#ED6A5A','#F4F1BB','#9BC1BC','#5D576B','#E6EBE0']\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n}\n\nfunction draw() {\n  background(colors[int(random(colors.length))]);\n  frameRate(1);\n  \n  for (let i=0; i<100; i++) {\n    myPlane();\n    myPoint();\n  }\n  \n    for (let i=0; i<10; i++) {\n    myLine();\n  }\n\n\n\n}\n\nfunction myPoint() {\n  push();\n\n  stroke(colors[int(random(colors.length))]);\n  rotateX(frameCount);\n  rotateY(-frameCount);\n  rotateZ(frameCount);\n  strokeWeight(width/100);\n\n  point(random(-width/2,width/2),random(-height/2,height/2));\n  pop();\n}\n\n\nfunction myLine() {\n  push();\n  rotateX(-frameCount);\n  rotateY(frameCount);\n  rotateZ(-frameCount);\n  stroke(colors[int(random(colors.length))]);\n  strokeCap(SQUARE)\n  strokeWeight(width/100);\n\n  line(random(-width/2,width/2),random(-height/2,height/2),random(-width/2,width/2),random(-height/2,height/2));\n  pop();\n}\n\nfunction myPlane() {\n  push();\n  fill(colors[int(random(colors.length))]);\n  noStroke();\n  rotateX(frameCount);\n  rotateY(frameCount);\n  rotateZ(frameCount);\n  translate(random(-width/2,width/2),random(-height/2,height/2))\n  plane(random(width/2));\n  pop();\n}\n\nfunction mousePressed(){\n  saveCanvas('gen22_point-line-plane_' + frameCount + '.jpg')\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Genuary2024Day22Pointlineplane_3",
+    "author": "u265818",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:05:34",
+    "url": "https://openprocessing.org/@u265818/2151719",
+    "code": "// === Tab: mySketch ===\nlet colors = ['#ED6A5A','#F4F1BB','#9BC1BC','#5D576B','#E6EBE0']\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n}\n\nfunction draw() {\n  background(colors[int(random(colors.length))]);\n  frameRate(1);\n  \n  for (let i=0; i<100; i++) {\n    myPlane();\n    myPoint();\n  }\n  \n    for (let i=0; i<10; i++) {\n    myLine();\n  }\n\n\n\n}\n\nfunction myPoint() {\n  push();\n\n  stroke(colors[int(random(colors.length))]);\n  rotateX(frameCount);\n  rotateY(-frameCount);\n  rotateZ(frameCount);\n  strokeWeight(width/100);\n\n  point(random(-width/2,width/2),random(-height/2,height/2));\n  pop();\n}\n\n\nfunction myLine() {\n  push();\n  rotateX(-frameCount);\n  rotateY(frameCount);\n  rotateZ(-frameCount);\n  stroke(colors[int(random(colors.length))]);\n  strokeCap(SQUARE)\n  strokeWeight(width/100);\n\n  line(random(-width/2,width/2),random(-height/2,height/2),random(-width/2,width/2),random(-height/2,height/2));\n  pop();\n}\n\nfunction myPlane() {\n  push();\n  fill(colors[int(random(colors.length))]);\n  noStroke();\n  rotateX(frameCount);\n  rotateY(frameCount);\n  rotateZ(frameCount);\n  translate(random(-width/2,width/2),random(-height/2,height/2))\n  plane(random(width/2));\n  pop();\n}\n\nfunction mousePressed(){\n  saveCanvas('gen22_point-line-plane_' + frameCount + '.jpg')\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Immersive Core Universe.mp4"
+    ]
 }

@@ -1,22 +1,25 @@
 {
-  "name": "Wires",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:06:26",
-  "url": "https://openprocessing.org/@epi/1975769",
-  "code": "// === Tab: mySketch ===\nlet conns = [];\n\nfunction setup() {\n  createCanvas(800, 600);\n  \n  for (let i = 0; i < 10; i++) {\n    conns.push(new Conn());\n  }\n}\n\nfunction draw() {\n  background(0);\n  \n  for (let c of conns) {\n    c.show();\n  }\n}\n\n\nclass Conn {\n  constructor() {\n    this.a = createVector(random(width/8 + 10), random(10, height/2));\n    this.b = createVector(random(width - width/8, width - 10), random(10, height/2));\n    \n  }\n  \n  show() {\n    push();\n\n    const f = lerp(noise(this.a.x + this.b.y + frameCount * 0.012), 0.5, 0.5); // min(1.5, max(0, map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 0, 1.5)));\n    const c = createVector(this.b.x-this.a.x, 0).mult(f).rotate(1);\n    stroke(128)\n    noFill()\n    bezier(this.a.x, this.a.y,\n           this.a.x + c.x, this.a.y + c.y,\n           this.b.x - c.x, this.b.y + c.y,\n           this.b.x, this.b.y);\n    \n    fill(32)\n    noStroke();\n    circle(this.a.x, this.a.y, 20);\n    circle(this.b.x, this.b.y, 20);\n    \n    \n    pop();\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Wires",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:06:26",
+    "url": "https://openprocessing.org/@epi/1975769",
+    "code": "// === Tab: mySketch ===\nlet conns = [];\n\nfunction setup() {\n  createCanvas(800, 600);\n  \n  for (let i = 0; i < 10; i++) {\n    conns.push(new Conn());\n  }\n}\n\nfunction draw() {\n  background(0);\n  \n  for (let c of conns) {\n    c.show();\n  }\n}\n\n\nclass Conn {\n  constructor() {\n    this.a = createVector(random(width/8 + 10), random(10, height/2));\n    this.b = createVector(random(width - width/8, width - 10), random(10, height/2));\n    \n  }\n  \n  show() {\n    push();\n\n    const f = lerp(noise(this.a.x + this.b.y + frameCount * 0.012), 0.5, 0.5); // min(1.5, max(0, map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 0, 1.5)));\n    const c = createVector(this.b.x-this.a.x, 0).mult(f).rotate(1);\n    stroke(128)\n    noFill()\n    bezier(this.a.x, this.a.y,\n           this.a.x + c.x, this.a.y + c.y,\n           this.b.x - c.x, this.b.y + c.y,\n           this.b.x, this.b.y);\n    \n    fill(32)\n    noStroke();\n    circle(this.a.x, this.a.y, 20);\n    circle(this.b.x, this.b.y, 20);\n    \n    \n    pop();\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Airy Hi-Hat Perfection.mp4"
+    ]
 }

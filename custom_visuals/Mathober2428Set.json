@@ -1,22 +1,25 @@
 {
-  "name": "Mathober2428Set",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:23:14",
-  "url": "https://openprocessing.org/@epi/2412157",
-  "code": "// === Tab: mySketch ===\n/*\nDay #28/24: Set\nhttps://openprocessing.org/sketch/2412157\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nlet S, sets, pts;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tbackground(2, 2, 8);\n\tdescribe(\"visualization of union of 2 circles with random points on dark background\");\n  \n  noFill();\n\tstroke(\"silver\");\n  strokeWeight(2);\n\tS = max(width, height);\n\tconst d = max(width, height);\n\tsets = [];\n\tsets[0] = {x: 0, y: 0, r: d * 0.25, clr: \"azure\"};\n\tsets[1] = {x: 0, y: 0, r: d * 0.25, clr: \"silver\"};\n\tif (width > height) {\n\t\tsets[0].x = width/3;\n\t\tsets[0].y = height/2;\n\t\tsets[1].x = width - width/3;\n\t\tsets[1].y = height/2;\n\t} else {\n\t\tsets[0].x = width/2\n\t\tsets[0].y = height/3;\n\t\tsets[1].x = width/2;\n\t\tsets[1].y = height - height/3;\n\t}\n\t\n\tpts = []\n\t\n  loop();\n}\n\nfunction draw() {\n\tif (frameCount % 1000 === 0) {\n\t\tbackground(\"rgb(2, 2, 8)\");\n\t\tpts = [];\n\t}\n\n\taddPoint();\n\t\n\tnoFill()\n\tstrokeWeight(2);\n\tfor (let set of sets) {\n\t\tstroke(set.clr);\n\t\tcircle(set.x, set.y, set.r*2)\n\t}\n\n\t// deactivated, wil be drawn in addPoint; activate in using background() in draw()\n\t/*\n\tfor (const p of pts) {\n\t\tstroke(p.clr);\n\t\tstrokeWeight(p.sw)\n\t\tpoint(p.x, p.y);\n\t}\n\t*/\n\t\n}\n\nfunction addPoint() {\n\tconst x = randomGaussian(width/2, width/4); // random(width);\n\tconst y = randomGaussian(height/2, height/4); // random(height);\n\tconst sw = map(dist(x, y, width/2, height/2), 0, (width+height)/2, 10, 0);\n\tconst isA = dist(x, y, sets[0].x, sets[0].y) < sets[0].r;\n\tconst isB = dist(x, y, sets[1].x, sets[1].y) < sets[1].r;\n\tlet clr = (isA && isB) ? \"cyan\" : (isA || isB) ? \"purple\" : \"gray\";\n\tpts.push({x, y, sw, clr});\n\t\n\tstroke(clr);\n\tstrokeWeight(sw)\n\tpoint(x, y);\n}\n\nfunction noisom(v1, v2) {\n\tif (v1>v2) [v1, v2] = [v2, v1];\n\tconst n = noise(v1, v2, frameCount/123);\n\treturn v1+n*(v2-v1);\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Mathober2428Set",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:23:14",
+    "url": "https://openprocessing.org/@epi/2412157",
+    "code": "// === Tab: mySketch ===\n/*\nDay #28/24: Set\nhttps://openprocessing.org/sketch/2412157\nhttps://mathober.com/\nhttps://openprocessing.org/curation/87980\n*/\n\nlet S, sets, pts;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tbackground(2, 2, 8);\n\tdescribe(\"visualization of union of 2 circles with random points on dark background\");\n  \n  noFill();\n\tstroke(\"silver\");\n  strokeWeight(2);\n\tS = max(width, height);\n\tconst d = max(width, height);\n\tsets = [];\n\tsets[0] = {x: 0, y: 0, r: d * 0.25, clr: \"azure\"};\n\tsets[1] = {x: 0, y: 0, r: d * 0.25, clr: \"silver\"};\n\tif (width > height) {\n\t\tsets[0].x = width/3;\n\t\tsets[0].y = height/2;\n\t\tsets[1].x = width - width/3;\n\t\tsets[1].y = height/2;\n\t} else {\n\t\tsets[0].x = width/2\n\t\tsets[0].y = height/3;\n\t\tsets[1].x = width/2;\n\t\tsets[1].y = height - height/3;\n\t}\n\t\n\tpts = []\n\t\n  loop();\n}\n\nfunction draw() {\n\tif (frameCount % 1000 === 0) {\n\t\tbackground(\"rgb(2, 2, 8)\");\n\t\tpts = [];\n\t}\n\n\taddPoint();\n\t\n\tnoFill()\n\tstrokeWeight(2);\n\tfor (let set of sets) {\n\t\tstroke(set.clr);\n\t\tcircle(set.x, set.y, set.r*2)\n\t}\n\n\t// deactivated, wil be drawn in addPoint; activate in using background() in draw()\n\t/*\n\tfor (const p of pts) {\n\t\tstroke(p.clr);\n\t\tstrokeWeight(p.sw)\n\t\tpoint(p.x, p.y);\n\t}\n\t*/\n\t\n}\n\nfunction addPoint() {\n\tconst x = randomGaussian(width/2, width/4); // random(width);\n\tconst y = randomGaussian(height/2, height/4); // random(height);\n\tconst sw = map(dist(x, y, width/2, height/2), 0, (width+height)/2, 10, 0);\n\tconst isA = dist(x, y, sets[0].x, sets[0].y) < sets[0].r;\n\tconst isB = dist(x, y, sets[1].x, sets[1].y) < sets[1].r;\n\tlet clr = (isA && isB) ? \"cyan\" : (isA || isB) ? \"purple\" : \"gray\";\n\tpts.push({x, y, sw, clr});\n\t\n\tstroke(clr);\n\tstrokeWeight(sw)\n\tpoint(x, y);\n}\n\nfunction noisom(v1, v2) {\n\tif (v1>v2) [v1, v2] = [v2, v1];\n\tconst n = noise(v1, v2, frameCount/123);\n\treturn v1+n*(v2-v1);\n}\n\nfunction mouseClicked() {\n  if (mouseButton === LEFT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Stark Contrast.mp4"
+    ]
 }

@@ -1,22 +1,25 @@
 {
-  "name": "WebGPUgravity",
-  "author": "davepagurek",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 03:25:30",
-  "url": "https://openprocessing.org/@davepagurek/2909418",
-  "code": "// === Tab: mySketch.js ===\nlet font\nlet particles\nlet timeStep\nlet particle\nlet drawParticles\nlet count\nlet prev, next\n\nasync function setup() {\n\tfont = await loadFont('https://fonts.gstatic.com/s/ebgaramond/v32/SlGFmQSNjdsmc35JDF1K5GRwUjcdlttVFm-rI7e8QI96WamXgXFI.ttf')\n\tawait createCanvas(windowWidth, windowHeight, WEBGPU)\n\n\tprev = createFramebuffer()\n\tnext = createFramebuffer()\n\ttextFont(font)\n\ttextSize(width / 5)\n\ttextAlign(CENTER, CENTER)\n\tlet particleData = font.textToPoints('WebGPU', 0, 0, { sampleFactor: 0.75 }).map(p => ({\n\t\tposition: createVector(p.x, p.y),\n\t\tvelocity: p5.Vector.random2D().mult(1)\n\t}))\n\tparticles = createStorage(particleData)\n\tcount = particleData.length\n\n\ttimeStep = buildComputeShader(update)\n\tdrawParticles = buildColorShader(display)\n\n\tparticle = buildGeometry(() => circle(0,0,2))\n\tbackground(0)\n}\n\nfunction update() {\n\tlet particleData = uniformStorage(particles)\n\tlet i = index.x\n\tlet pos = particleData[i].position\n\tlet vel = particleData[i].velocity\n\tfor (let j = 0; j < count; j++) {\n\t\tif (i != j) {\n\t\t\tlet toOther = particleData[j].position - pos\n\t\t\tlet sqDistToOther = dot(toOther, toOther)\n\t\t\tvel += 0.03 * toOther / max(sqrt(sqDistToOther) * sqDistToOther, 10)\n\t\t}\n\t}\n\tpos += vel\n\tparticleData[i].position = pos\n\tparticleData[i].velocity = vel\n}\n\nfunction display() {\n\tlet particleData = uniformStorage(particles)\n\tworldInputs.begin()\n\tworldInputs.position.xy += particleData[instanceID()].position\n\tworldInputs.end()\n}\n\nfunction draw() {\n\t[prev, next] = [next, prev]\n\tbackground(0)\n\tcompute(timeStep, count)\n\tnext.begin()\n\tclear()\n\tpush()\n\timageMode(CENTER)\n\ttint(255, 254)\n\timage(prev, 0, 0)\n\tpop()\n\n\tpush()\n\tnoStroke()\n\tfill(255)\n\tshader(drawParticles)\n\tmodel(particle, count)\n\tpop()\n\tnext.end()\n\n\timageMode(CENTER)\n\timage(next, 0, 0)\n}\n\nasync function mousePressed() {\n\tlet img = await get()\n\tsave(img, 'webgpu.png')\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "WebGPUgravity",
+    "author": "davepagurek",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 03:25:30",
+    "url": "https://openprocessing.org/@davepagurek/2909418",
+    "code": "// === Tab: mySketch.js ===\nlet font\nlet particles\nlet timeStep\nlet particle\nlet drawParticles\nlet count\nlet prev, next\n\nasync function setup() {\n\tfont = await loadFont('https://fonts.gstatic.com/s/ebgaramond/v32/SlGFmQSNjdsmc35JDF1K5GRwUjcdlttVFm-rI7e8QI96WamXgXFI.ttf')\n\tawait createCanvas(windowWidth, windowHeight, WEBGPU)\n\n\tprev = createFramebuffer()\n\tnext = createFramebuffer()\n\ttextFont(font)\n\ttextSize(width / 5)\n\ttextAlign(CENTER, CENTER)\n\tlet particleData = font.textToPoints('WebGPU', 0, 0, { sampleFactor: 0.75 }).map(p => ({\n\t\tposition: createVector(p.x, p.y),\n\t\tvelocity: p5.Vector.random2D().mult(1)\n\t}))\n\tparticles = createStorage(particleData)\n\tcount = particleData.length\n\n\ttimeStep = buildComputeShader(update)\n\tdrawParticles = buildColorShader(display)\n\n\tparticle = buildGeometry(() => circle(0,0,2))\n\tbackground(0)\n}\n\nfunction update() {\n\tlet particleData = uniformStorage(particles)\n\tlet i = index.x\n\tlet pos = particleData[i].position\n\tlet vel = particleData[i].velocity\n\tfor (let j = 0; j < count; j++) {\n\t\tif (i != j) {\n\t\t\tlet toOther = particleData[j].position - pos\n\t\t\tlet sqDistToOther = dot(toOther, toOther)\n\t\t\tvel += 0.03 * toOther / max(sqrt(sqDistToOther) * sqDistToOther, 10)\n\t\t}\n\t}\n\tpos += vel\n\tparticleData[i].position = pos\n\tparticleData[i].velocity = vel\n}\n\nfunction display() {\n\tlet particleData = uniformStorage(particles)\n\tworldInputs.begin()\n\tworldInputs.position.xy += particleData[instanceID()].position\n\tworldInputs.end()\n}\n\nfunction draw() {\n\t[prev, next] = [next, prev]\n\tbackground(0)\n\tcompute(timeStep, count)\n\tnext.begin()\n\tclear()\n\tpush()\n\timageMode(CENTER)\n\ttint(255, 254)\n\timage(prev, 0, 0)\n\tpop()\n\n\tpush()\n\tnoStroke()\n\tfill(255)\n\tshader(drawParticles)\n\tmodel(particle, count)\n\tpop()\n\tnext.end()\n\n\timageMode(CENTER)\n\timage(next, 0, 0)\n}\n\nasync function mousePressed() {\n\tlet img = await get()\n\tsave(img, 'webgpu.png')\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Harmonious Gap.mp4"
+    ]
 }

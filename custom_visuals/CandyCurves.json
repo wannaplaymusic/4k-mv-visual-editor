@@ -1,22 +1,25 @@
 {
-  "name": "CandyCurves",
-  "author": "u65884",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:26:13",
-  "url": "https://openprocessing.org/@u65884/1056707",
-  "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://www.openprocessing.org/sketch/1056707\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nvar size = 15;\n\nvar colors;\nvar colorCount = 0;\n\nvar pos = {};\nvar dir = 1;\nvar radius = 5;\nvar angle = 0;\n\nfunction setup() {\n\tvar size = max(windowWidth, windowHeight) * 0.75;\n\tcreateCanvas(size, size);\n\tbackground(0);\n\tstrokeWeight(2);\n\t\n\tcolors = [color(\"#2b2244\"), color(\"#581845\"), color(\"#900C3F\"), color(\"#C70039\"), color(\"#e32c36\"), color(\"#FF5733\"), color(\"#FFC30F\"), color(\"#24fffb\"), color(\"#2b2244\")];\n\t\n\tpos = {x: width/2, y: height/2};\n}\n\nfunction draw() {\n\n\tangle += 1/radius*dir;\n\n\tlet prevPosX = pos.x;\n\tlet prevPosY = pos.y;\n\tpos.x += cos(angle) * radius;\n\tpos.y += sin(angle) * radius;\n\n\t//lerp array of colors\n\tcolorCount += noise(frameCount/1000)/200;\n\tvar col = lerpColors(colorCount%1, colors);\n\t\n\t//draw\n\tnoStroke();\n\tfill(col);\n\tcircle(pos.x, pos.y, size*2);\n\n\t//countour 180 degrees around front movement area\n\tstroke(255);\n\tnoFill();\n\tbeginShape();\n\tvar f = frameCount / 10;\n\tvar aa = atan2(pos.y - prevPosY, pos.x - prevPosX) - PI/2;\n\tfor(var a = -0.2; a < PI+0.2; a+=(Math.max(0.001, Math.abs(PI/10)) || 1)){\n\t\tvertex(cos(a + aa) * (size+1) + pos.x, sin(a + aa) * (size+1) + pos.y);\n\t}\n\tendShape();\n\n\t//change direction\n\tif(pos.x < (size+10) || pos.x > width-(size+10) || pos.y < (size+10) || pos.y > height-(size+10)){\n\t\tangle += PI * dir;\n\t}else{\n\t\tif(random() < 0.05) dir *= -1;\n\t\tif(random() < 0.05) radius = random(5, 8);\n\t}\n}\n\n/**\n * lerp color from multiple color array\n * param {Integer} [t] lerp factor from 0 to 1\n * param {Array} [[color, color]] colors to lerp, minimum 2 colors in array\n */\nfunction lerpColors(t, colors)\n{\n\tlet i = Math.floor(t*(colors.length-1));\n\tif(i < 0) return colors[0];\n\tif(i >= colors.length-1) return colors[colors.length-1];\n\n\tlet percent = (t - i / (colors.length-1)) * (colors.length-1);\n\treturn color(\n\t\tcolors[i]._getRed() + percent*(colors[i+1]._getRed()-colors[i]._getRed()),\n\t\tcolors[i]._getGreen() + percent*(colors[i+1]._getGreen()-colors[i]._getGreen()),\n\t\tcolors[i]._getBlue() + percent*(colors[i+1]._getBlue()-colors[i]._getBlue())\n\t)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CandyCurves",
+    "author": "u65884",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:26:13",
+    "url": "https://openprocessing.org/@u65884/1056707",
+    "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://www.openprocessing.org/sketch/1056707\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nvar size = 15;\n\nvar colors;\nvar colorCount = 0;\n\nvar pos = {};\nvar dir = 1;\nvar radius = 5;\nvar angle = 0;\n\nfunction setup() {\n\tvar size = max(windowWidth, windowHeight) * 0.75;\n\tcreateCanvas(size, size);\n\tbackground(0);\n\tstrokeWeight(2);\n\t\n\tcolors = [color(\"#2b2244\"), color(\"#581845\"), color(\"#900C3F\"), color(\"#C70039\"), color(\"#e32c36\"), color(\"#FF5733\"), color(\"#FFC30F\"), color(\"#24fffb\"), color(\"#2b2244\")];\n\t\n\tpos = {x: width/2, y: height/2};\n}\n\nfunction draw() {\n\n\tangle += 1/radius*dir;\n\n\tlet prevPosX = pos.x;\n\tlet prevPosY = pos.y;\n\tpos.x += cos(angle) * radius;\n\tpos.y += sin(angle) * radius;\n\n\t//lerp array of colors\n\tcolorCount += noise(frameCount/1000)/200;\n\tvar col = lerpColors(colorCount%1, colors);\n\t\n\t//draw\n\tnoStroke();\n\tfill(col);\n\tcircle(pos.x, pos.y, size*2);\n\n\t//countour 180 degrees around front movement area\n\tstroke(255);\n\tnoFill();\n\tbeginShape();\n\tvar f = frameCount / 10;\n\tvar aa = atan2(pos.y - prevPosY, pos.x - prevPosX) - PI/2;\n\tfor(var a = -0.2; a < PI+0.2; a+=(Math.max(0.001, Math.abs(PI/10)) || 1)){\n\t\tvertex(cos(a + aa) * (size+1) + pos.x, sin(a + aa) * (size+1) + pos.y);\n\t}\n\tendShape();\n\n\t//change direction\n\tif(pos.x < (size+10) || pos.x > width-(size+10) || pos.y < (size+10) || pos.y > height-(size+10)){\n\t\tangle += PI * dir;\n\t}else{\n\t\tif(random() < 0.05) dir *= -1;\n\t\tif(random() < 0.05) radius = random(5, 8);\n\t}\n}\n\n/**\n * lerp color from multiple color array\n * param {Integer} [t] lerp factor from 0 to 1\n * param {Array} [[color, color]] colors to lerp, minimum 2 colors in array\n */\nfunction lerpColors(t, colors)\n{\n\tlet i = Math.floor(t*(colors.length-1));\n\tif(i < 0) return colors[0];\n\tif(i >= colors.length-1) return colors[colors.length-1];\n\n\tlet percent = (t - i / (colors.length-1)) * (colors.length-1);\n\treturn color(\n\t\tcolors[i]._getRed() + percent*(colors[i+1]._getRed()-colors[i]._getRed()),\n\t\tcolors[i]._getGreen() + percent*(colors[i+1]._getGreen()-colors[i]._getGreen()),\n\t\tcolors[i]._getBlue() + percent*(colors[i+1]._getBlue()-colors[i]._getBlue())\n\t)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

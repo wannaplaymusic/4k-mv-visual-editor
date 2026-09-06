@@ -1,22 +1,25 @@
 {
-  "name": "CarpetSymbols",
-  "author": "u137792",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:02:22",
-  "url": "https://openprocessing.org/@u137792/671037",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n\t//windowWidth = 800 ; windowHeight = 800\n\t\n\tcreateCanvas(windowWidth, windowHeight);\n\tcolorMode(HSB,256)\n\tbackground(color(180,50,50))\n\t\n\tix = 0 ; iy = 0 ; dz = 10\n\t\n\t\n\thues = [0,45,90,150]\n}\n\nfunction draw() {\n\t\n\t\n\t\n\tmx = (ix)*12*dz ; my = (iy+(ix % 2)/2)*12*dz\n\t\n\tld = -1\n\t\n\tfor(dx=0;dx<7;dx++)\n\tfor(dy=0;dy<=dx;dy++)\n\t{\n\t\tcoherence = (random(100) > 75 && ld != -1)\n\t\tif (((dist(0,0,dx,dy)*2-2)*random() < 1.75 || coherence) && dx < 6)\n\t\t{\n\t\t\tif (!coherence) {ld = color(hues[floor(random(4))]-5+random(10),140+random(20),180+random(20))}\n\t\t\tnc = ld ; //fill(ld)\n\t\t}\n\t\telse\n\t\t{\n\t\t\tld = -1 ; nc = color(170+random(20),50+random(100),50+random(10))\n\t\t\t//fill(nc)\n\t\t}\n\t\trect2(mx+dx*dz,my+dy*dz,10,10)\n\t\trect2(mx-dx*dz,my+dy*dz,10,10)\n\t\trect2(mx+dx*dz,my-dy*dz,10,10)\n\t\trect2(mx-dx*dz,my-dy*dz,10,10)\n\n\t\trect2(mx+dy*dz,my+dx*dz,10,10)\n\t\trect2(mx-dy*dz,my+dx*dz,10,10)\n\t\trect2(mx+dy*dz,my-dx*dz,10,10)\n\t\trect2(mx-dy*dz,my-dx*dz,10,10)\n\t}\n\t\n\t\n\tiy++ ; if (iy > 10) {ix++ ; iy = 0}\n\tif (ix > 30) {ix = 0 ; if (false) saveCanvas(\"carpet\",\"png\")}\n}\n\nfunction rect2(dx,dy,xz,yz) {\n\tfor(x=0;x<xz;x++)\n\t{\n\t\tstroke(lerpColor(nc,color(0),random(.1)))\n\t\tline(dx+x,dy,dx+x,dy+yz)\n\t}\n\tstroke(color(40,50,180,ld == -1 ? 30+random(40) : 80+random(80))) ; line(dx,dy,dx+3+random(),dy+3+random())\n\tstroke(color(40,50,180,ld == -1 ? 30+random(40) : 80+random(80))) ; line(dx+2,dy+4+random(),dx+5,dy+7+random())\n\tstroke(color(40,50,180,ld == -1 ? 30+random(40) : 80+random(80))) ; line(dx+4+random(),dy+2,dx+7+random(),dy+5)\n\tstroke(color(40,50,180,ld == -1 ? 30+random(40) : 80+random(80))) ; line(dx+6,dy+6,dx+9+random(),dy+9+random())\n\tstroke(color(0,0,0,50)) ; noFill()\n\trect(dx,dy,xz,yz)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CarpetSymbols",
+    "author": "u137792",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:02:22",
+    "url": "https://openprocessing.org/@u137792/671037",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\t//windowWidth = 800 ; windowHeight = 800\n\t\n\tcreateCanvas(windowWidth, windowHeight);\n\tcolorMode(HSB,256)\n\tbackground(color(180,50,50))\n\t\n\tix = 0 ; iy = 0 ; dz = 10\n\t\n\t\n\thues = [0,45,90,150]\n}\n\nfunction draw() {\n\t\n\t\n\t\n\tmx = (ix)*12*dz ; my = (iy+(ix % 2)/2)*12*dz\n\t\n\tld = -1\n\t\n\tfor(dx=0;dx<7;dx++)\n\tfor(dy=0;dy<=dx;dy++)\n\t{\n\t\tcoherence = (random(100) > 75 && ld != -1)\n\t\tif (((dist(0,0,dx,dy)*2-2)*random() < 1.75 || coherence) && dx < 6)\n\t\t{\n\t\t\tif (!coherence) {ld = color(hues[floor(random(4))]-5+random(10),140+random(20),180+random(20))}\n\t\t\tnc = ld ; //fill(ld)\n\t\t}\n\t\telse\n\t\t{\n\t\t\tld = -1 ; nc = color(170+random(20),50+random(100),50+random(10))\n\t\t\t//fill(nc)\n\t\t}\n\t\trect2(mx+dx*dz,my+dy*dz,10,10)\n\t\trect2(mx-dx*dz,my+dy*dz,10,10)\n\t\trect2(mx+dx*dz,my-dy*dz,10,10)\n\t\trect2(mx-dx*dz,my-dy*dz,10,10)\n\n\t\trect2(mx+dy*dz,my+dx*dz,10,10)\n\t\trect2(mx-dy*dz,my+dx*dz,10,10)\n\t\trect2(mx+dy*dz,my-dx*dz,10,10)\n\t\trect2(mx-dy*dz,my-dx*dz,10,10)\n\t}\n\t\n\t\n\tiy++ ; if (iy > 10) {ix++ ; iy = 0}\n\tif (ix > 30) {ix = 0 ; if (false) saveCanvas(\"carpet\",\"png\")}\n}\n\nfunction rect2(dx,dy,xz,yz) {\n\tfor(x=0;x<xz;x++)\n\t{\n\t\tstroke(lerpColor(nc,color(0),random(.1)))\n\t\tline(dx+x,dy,dx+x,dy+yz)\n\t}\n\tstroke(color(40,50,180,ld == -1 ? 30+random(40) : 80+random(80))) ; line(dx,dy,dx+3+random(),dy+3+random())\n\tstroke(color(40,50,180,ld == -1 ? 30+random(40) : 80+random(80))) ; line(dx+2,dy+4+random(),dx+5,dy+7+random())\n\tstroke(color(40,50,180,ld == -1 ? 30+random(40) : 80+random(80))) ; line(dx+4+random(),dy+2,dx+7+random(),dy+5)\n\tstroke(color(40,50,180,ld == -1 ? 30+random(40) : 80+random(80))) ; line(dx+6,dy+6,dx+9+random(),dy+9+random())\n\tstroke(color(0,0,0,50)) ; noFill()\n\trect(dx,dy,xz,yz)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Rhythmic Breath.mp4"
+    ]
 }

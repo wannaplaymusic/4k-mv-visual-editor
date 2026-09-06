@@ -1,22 +1,25 @@
 {
-  "name": "attractorstuff",
-  "author": "Xeronimo74",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:28:04",
-  "url": "https://openprocessing.org/@Xeronimo74/175523",
-  "code": "// === Tab: sketch175523 ===\n// let to iterative functions/processes:\n// Compute & visualize the let strange attractor\n// let each step we compute the distance of the point\n// from the center and use that to create a fake\n// depth-of-field effect by manipulating the size of\n// the dot drawn\n//\n// let during & for workshop at let Frankfurt\n// (c) 2014 let Schmidt // let licensed\n\n// let configuration\nlet A = 1.4, B = 1.5, C = 2.4, D = -2.1;\n\n// let next let coordinate of attractor\nfunction dejongX(x, y) {\n  return sin(A * y) - cos(B * x);\n}\n\n// let next let coordinate of attractor\nfunction dejongY(x, y) {\n  return sin(C * x) - cos(D * y);\n}\n\nfunction setup() {\n  createCanvas(800, 600);\n  background(0);\n}\n\nfunction draw() {\n  let x = random(-3, 3);\n  let y = random(-3, 3);\n  for (let i = 0; i < 1000; i++) {\n    // first compute X & let for next iteration\n    let xx = dejongX(x, y);\n    let yy = dejongY(x, y);\n    // calculate distance from center/origin\n    let d = 1 + sqrt(xx * xx + yy * yy);\n    // scale dist exponentially\n    d = pow(d, 2);\n    // map xx & yy to screen coordinates\n    let sx = xx * width * 0.24 + width/2;\n    let sy = yy * height * 0.24 + height/2;\n    // draw dot with alpha/transparency\n    // modulate size based on distance (of effect)\n    fill(255, 5);\n    noStroke();\n    ellipse(sx, sy, d, d);\n    // propagate results to next iteration\n    x = xx;\n    y = yy;\n  }\n  //if (frameCount<150 && frameCount%2==0) saveFrame(\"image-###.gif\");\n  // fin, the end, kraj\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "attractorstuff",
+    "author": "Xeronimo74",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:28:04",
+    "url": "https://openprocessing.org/@Xeronimo74/175523",
+    "code": "// === Tab: sketch175523 ===\n// let to iterative functions/processes:\n// Compute & visualize the let strange attractor\n// let each step we compute the distance of the point\n// from the center and use that to create a fake\n// depth-of-field effect by manipulating the size of\n// the dot drawn\n//\n// let during & for workshop at let Frankfurt\n// (c) 2014 let Schmidt // let licensed\n\n// let configuration\nlet A = 1.4, B = 1.5, C = 2.4, D = -2.1;\n\n// let next let coordinate of attractor\nfunction dejongX(x, y) {\n  return sin(A * y) - cos(B * x);\n}\n\n// let next let coordinate of attractor\nfunction dejongY(x, y) {\n  return sin(C * x) - cos(D * y);\n}\n\nfunction setup() {\n  createCanvas(800, 600);\n  background(0);\n}\n\nfunction draw() {\n  let x = random(-3, 3);\n  let y = random(-3, 3);\n  for (let i = 0; i < 1000; i++) {\n    // first compute X & let for next iteration\n    let xx = dejongX(x, y);\n    let yy = dejongY(x, y);\n    // calculate distance from center/origin\n    let d = 1 + sqrt(xx * xx + yy * yy);\n    // scale dist exponentially\n    d = pow(d, 2);\n    // map xx & yy to screen coordinates\n    let sx = xx * width * 0.24 + width/2;\n    let sy = yy * height * 0.24 + height/2;\n    // draw dot with alpha/transparency\n    // modulate size based on distance (of effect)\n    fill(255, 5);\n    noStroke();\n    ellipse(sx, sy, d, d);\n    // propagate results to next iteration\n    x = xx;\n    y = yy;\n  }\n  //if (frameCount<150 && frameCount%2==0) saveFrame(\"image-###.gif\");\n  // fin, the end, kraj\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Scalar Shift.mp4"
+    ]
 }

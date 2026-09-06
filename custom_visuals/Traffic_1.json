@@ -1,22 +1,25 @@
 {
-  "name": "Traffic_1",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 03:44:24",
-  "url": "https://openprocessing.org/@ntsutae/1193337",
-  "code": "// === Tab: mySketch ===\nconst carTypes=\"💃-👯‍♂️-🚀-🪂-🚁-💺-🛷-👩‍🦽-👨‍🦽-🦼-🚗-🚘-🚙-🚕-🚖-🚓-🚔-🚒-🚑-🚌-🚍-🚎-🚐-🚚-🚛-🚜-🛺-⛽-🚨-🚧-🏎-🚂-🚃-🚆-🚉-🚝-🚋-🚲-🛴-🛵\".split(\"-\").map(a=>`${a}`)\nconst num=100 // Crossing number\nlet streets=[]\nlet cars\n\nclass Cars{\n  constructor(){\n    this.cars=carTypes.map(item=>[...random(streets),1,0,item])\n  }  \n  update(){\n    this.cars.map(([start,end,progress,step,item],index,array)=>{\n      progress+=step\n      if(progress>=1){\n        progress=1\n\n        let next=[]\n        for(const [A,B] of streets)\n          end==A?next.push([A,B]):end==B&&next.push([B,A])\n\n        let newStart,newEnd\n        do\n          [newStart,newEnd]=random(next)\n        while(next.length>1&&newEnd==start)\n\n        start=newStart\n\t\t\t\tend=newEnd\n\t\t\t\tstep=sqrt((start.x-end.x)**2+(start.y-end.y)**2)/5e3\n        progress=0\n      }\n      array[index]=[start,end,progress,step,item]\n    })    \n  }\n  show(){\n    for(const [start,end,progress,step,item] of this.cars){\n      const {x,y}=p5.Vector.lerp(start,end,progress)\n      text(item,x,y)    \n    }\n  }\n}\n\nsetup=()=> {\n  createCanvas(1280, 720)\n  textSize(30)\n  textAlign(CENTER,BOTTOM)\n\n  let crossings=[]\n  for(let i=num;i--;){\n    let vector\n    do\n      vector=createVector(random(width), random(height))\n\t\twhile(crossings.some(v=>p5.Vector.dist(v,vector)<75))\n    crossings.push(vector)\n  }\n\n  streets=[]\n  crossings.forEach((A,i)=>{\n    crossings.filter((_,j)=>j<i).forEach(B=>{      \n      const distance=(A.x-B.x)**2+(A.y-B.y)**2\n      crossings.some(C=>\n        distance>(A.x-C.x)**2+(A.y-C.y)**2 && distance>(B.x-C.x)**2+(B.y-C.y)**2             \n      )||streets.push([A,B])\n    })\n  })\n\n  cars=new Cars()\n}\n\ndraw=()=> {\n  background(\"white\")\n\t\n  cars.update()\n  \n  for(const lineWeight of [18,12,2]){\n    push()\n\t\tstrokeWeight(lineWeight)\n\t\tlineWeight==18?\n\t\t\tstroke('black')\n    :lineWeight==12?\n    \tstroke('white')\n    :stroke('black')+drawingContext.setLineDash([12])\n    \n    for(const [start,end] of streets)\n      line(start.x,start.y,end.x,end.y)  \n    \n    cars.show()\n    pop()\n  }\n}\n  \nkeyPressed=()=>keyCode==32?setup():false",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Traffic_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 03:44:24",
+    "url": "https://openprocessing.org/@ntsutae/1193337",
+    "code": "// === Tab: mySketch ===\nconst carTypes=\"💃-👯‍♂️-🚀-🪂-🚁-💺-🛷-👩‍🦽-👨‍🦽-🦼-🚗-🚘-🚙-🚕-🚖-🚓-🚔-🚒-🚑-🚌-🚍-🚎-🚐-🚚-🚛-🚜-🛺-⛽-🚨-🚧-🏎-🚂-🚃-🚆-🚉-🚝-🚋-🚲-🛴-🛵\".split(\"-\").map(a=>`${a}`)\nconst num=100 // Crossing number\nlet streets=[]\nlet cars\n\nclass Cars{\n  constructor(){\n    this.cars=carTypes.map(item=>[...random(streets),1,0,item])\n  }  \n  update(){\n    this.cars.map(([start,end,progress,step,item],index,array)=>{\n      progress+=step\n      if(progress>=1){\n        progress=1\n\n        let next=[]\n        for(const [A,B] of streets)\n          end==A?next.push([A,B]):end==B&&next.push([B,A])\n\n        let newStart,newEnd\n        do\n          [newStart,newEnd]=random(next)\n        while(next.length>1&&newEnd==start)\n\n        start=newStart\n\t\t\t\tend=newEnd\n\t\t\t\tstep=sqrt((start.x-end.x)**2+(start.y-end.y)**2)/5e3\n        progress=0\n      }\n      array[index]=[start,end,progress,step,item]\n    })    \n  }\n  show(){\n    for(const [start,end,progress,step,item] of this.cars){\n      const {x,y}=p5.Vector.lerp(start,end,progress)\n      text(item,x,y)    \n    }\n  }\n}\n\nsetup=()=> {\n  createCanvas(1280, 720)\n  textSize(30)\n  textAlign(CENTER,BOTTOM)\n\n  let crossings=[]\n  for(let i=num;i--;){\n    let vector\n    do\n      vector=createVector(random(width), random(height))\n\t\twhile(crossings.some(v=>p5.Vector.dist(v,vector)<75))\n    crossings.push(vector)\n  }\n\n  streets=[]\n  crossings.forEach((A,i)=>{\n    crossings.filter((_,j)=>j<i).forEach(B=>{      \n      const distance=(A.x-B.x)**2+(A.y-B.y)**2\n      crossings.some(C=>\n        distance>(A.x-C.x)**2+(A.y-C.y)**2 && distance>(B.x-C.x)**2+(B.y-C.y)**2             \n      )||streets.push([A,B])\n    })\n  })\n\n  cars=new Cars()\n}\n\ndraw=()=> {\n  background(\"white\")\n\t\n  cars.update()\n  \n  for(const lineWeight of [18,12,2]){\n    push()\n\t\tstrokeWeight(lineWeight)\n\t\tlineWeight==18?\n\t\t\tstroke('black')\n    :lineWeight==12?\n    \tstroke('white')\n    :stroke('black')+drawingContext.setLineDash([12])\n    \n    for(const [start,end] of streets)\n      line(start.x,start.y,end.x,end.y)  \n    \n    cars.show()\n    pop()\n  }\n}\n  \nkeyPressed=()=>keyCode==32?setup():false",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Transit Zone.mp4"
+    ]
 }

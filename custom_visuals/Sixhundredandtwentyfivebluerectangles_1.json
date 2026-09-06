@@ -1,22 +1,25 @@
 {
-  "name": "Sixhundredandtwentyfivebluerectangles_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:34:08",
-  "url": "https://openprocessing.org/@ronikaufman/2394471",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\n// Made for @sableRaph's weekly creative challenge on Twitch (#WCCChallenge)\n// https://www.twitch.tv/sableraph\n// \"Blue\"\n\nconst N_ANIM = 25; // how long the animation stage lasts\nconst N_WAIT = 75; // how long the wait stage lasts\n\nlet n = 25; // size of the grid (should be an odd multiple of the length of the palette)\nlet margin = 50;\nlet colors = [...Array(n)].map((e) => Array(n));\nlet weights1 = []; // weights of first compo\nlet weights2 = []; // weights of second compo\n\nfunction setup() {\n\tcreateCanvas(500, 500);\n\tnoStroke();\n\t\n\tlet palette = [\"#203051\", \"#4464a1\", \"#62b6de\", \"#b3dce0\", \"#e2f0f3\"];\n\tlet pl = palette.length;\n\tfor (let i = 0; i < n; i++) {\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tcolors[i][j] = palette[(i+j)%pl];\n\t\t\tif (i > n/2 && j < n/2) colors[i][j] = palette[(pl-1+sq(n)-i+j)%pl];\n\t\t\tif (i < n/2 && j > n/2) colors[i][j] = palette[(pl-1+sq(n)+i-j)%pl];\n\t\t\tif (i > n/2 && j > n/2) colors[i][j] = palette[(pl-2+sq(n)-i-j)%pl];\n\t\t}\n\t}\n\t\n\tfor (let i = 0; i < n; i++) {\n\t\tlet w1 = ~~(n/2)-i+1;\n\t\tif (i > n/2) w1 = i-~~(n/2)+1;\n\t\tw1 = sq(w1)+5;\n\t\tweights1.push(w1);\n\t\tlet w2 = i+1;\n\t\tif (i > n/2) w2 = n-i;\n\t\tw2 = sq(w2)+5;\n\t\tweights2.push(w2);\n\t}\n}\n\nfunction draw() {\n\tbackground(\"#fffbe6\");\n\t\n\tlet firstHalf = frameCount%(2*N_ANIM+2*N_WAIT) < N_ANIM + N_WAIT;\n\t\n\tlet lerpedWeights = [];\n\tlet wSum = 0, hSums = [];\n\tfor (let i = 0; i < n; i++) {\n\t\tlet weightsLine = [];\n\t\t\n\t\tlet offset = 5*abs(i-n/2+1/2);\n\t\tlet t, f = (frameCount+offset)%(2*N_ANIM+2*N_WAIT);\n\t\tif (f < N_WAIT) t = 0;\n\t\telse if (f < N_ANIM+N_WAIT) t = easeInOutQuint(((f-N_WAIT)%N_ANIM)/N_ANIM);\n\t\telse if (f < N_ANIM+2*N_WAIT) t = 1;\n\t\telse t = 1-easeInOutQuint(((f-N_ANIM-2*N_WAIT)%N_ANIM)/N_ANIM);\n\t\t\n\t\tlet w = lerp(weights1[i], weights2[i], t);\n\t\twSum += w;\n\t\tlet hSum = 0;\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tlet h = lerp(weights1[j], weights2[j], t);\n\t\t\thSum += h;\n\t\t\tweightsLine.push([w, h]);\n\t\t}\n\t\thSums.push(hSum);\n\t\tlerpedWeights.push(weightsLine);\n\t}\n\t\n\tlet x = margin;\n\tlet uw = (width-2*margin)/wSum;\n\tfor (let i = 0; i < n; i++) {\n\t\tlet y = margin;\n\t\tlet uh = (height-2*margin)/hSums[i];\n\t\tvar w = lerpedWeights[i][0][0]*uw;\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tvar h = lerpedWeights[i][j][1]*uh;\n\t\t\tfill(colors[i][j]);\n\t\t\tif (firstHalf) rect(y, x, h, w);\n\t\t\telse rect(x, y, w, h);\n\t\t\ty += h;\n\t\t}\n\t\tx += w;\n\t}\n}\n\n// from easings.net\nfunction easeInOutQuint(x) {\n\treturn x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Sixhundredandtwentyfivebluerectangles_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:34:08",
+    "url": "https://openprocessing.org/@ronikaufman/2394471",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\n// Made for @sableRaph's weekly creative challenge on Twitch (#WCCChallenge)\n// https://www.twitch.tv/sableraph\n// \"Blue\"\n\nconst N_ANIM = 25; // how long the animation stage lasts\nconst N_WAIT = 75; // how long the wait stage lasts\n\nlet n = 25; // size of the grid (should be an odd multiple of the length of the palette)\nlet margin = 50;\nlet colors = [...Array(n)].map((e) => Array(n));\nlet weights1 = []; // weights of first compo\nlet weights2 = []; // weights of second compo\n\nfunction setup() {\n\tcreateCanvas(500, 500);\n\tnoStroke();\n\t\n\tlet palette = [\"#203051\", \"#4464a1\", \"#62b6de\", \"#b3dce0\", \"#e2f0f3\"];\n\tlet pl = palette.length;\n\tfor (let i = 0; i < n; i++) {\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tcolors[i][j] = palette[(i+j)%pl];\n\t\t\tif (i > n/2 && j < n/2) colors[i][j] = palette[(pl-1+sq(n)-i+j)%pl];\n\t\t\tif (i < n/2 && j > n/2) colors[i][j] = palette[(pl-1+sq(n)+i-j)%pl];\n\t\t\tif (i > n/2 && j > n/2) colors[i][j] = palette[(pl-2+sq(n)-i-j)%pl];\n\t\t}\n\t}\n\t\n\tfor (let i = 0; i < n; i++) {\n\t\tlet w1 = ~~(n/2)-i+1;\n\t\tif (i > n/2) w1 = i-~~(n/2)+1;\n\t\tw1 = sq(w1)+5;\n\t\tweights1.push(w1);\n\t\tlet w2 = i+1;\n\t\tif (i > n/2) w2 = n-i;\n\t\tw2 = sq(w2)+5;\n\t\tweights2.push(w2);\n\t}\n}\n\nfunction draw() {\n\tbackground(\"#fffbe6\");\n\t\n\tlet firstHalf = frameCount%(2*N_ANIM+2*N_WAIT) < N_ANIM + N_WAIT;\n\t\n\tlet lerpedWeights = [];\n\tlet wSum = 0, hSums = [];\n\tfor (let i = 0; i < n; i++) {\n\t\tlet weightsLine = [];\n\t\t\n\t\tlet offset = 5*abs(i-n/2+1/2);\n\t\tlet t, f = (frameCount+offset)%(2*N_ANIM+2*N_WAIT);\n\t\tif (f < N_WAIT) t = 0;\n\t\telse if (f < N_ANIM+N_WAIT) t = easeInOutQuint(((f-N_WAIT)%N_ANIM)/N_ANIM);\n\t\telse if (f < N_ANIM+2*N_WAIT) t = 1;\n\t\telse t = 1-easeInOutQuint(((f-N_ANIM-2*N_WAIT)%N_ANIM)/N_ANIM);\n\t\t\n\t\tlet w = lerp(weights1[i], weights2[i], t);\n\t\twSum += w;\n\t\tlet hSum = 0;\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tlet h = lerp(weights1[j], weights2[j], t);\n\t\t\thSum += h;\n\t\t\tweightsLine.push([w, h]);\n\t\t}\n\t\thSums.push(hSum);\n\t\tlerpedWeights.push(weightsLine);\n\t}\n\t\n\tlet x = margin;\n\tlet uw = (width-2*margin)/wSum;\n\tfor (let i = 0; i < n; i++) {\n\t\tlet y = margin;\n\t\tlet uh = (height-2*margin)/hSums[i];\n\t\tvar w = lerpedWeights[i][0][0]*uw;\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tvar h = lerpedWeights[i][j][1]*uh;\n\t\t\tfill(colors[i][j]);\n\t\t\tif (firstHalf) rect(y, x, h, w);\n\t\t\telse rect(x, y, w, h);\n\t\t\ty += h;\n\t\t}\n\t\tx += w;\n\t}\n}\n\n// from easings.net\nfunction easeInOutQuint(x) {\n\treturn x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Rhythmic Breath.mp4"
+    ]
 }

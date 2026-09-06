@@ -1,22 +1,25 @@
 {
-  "name": "CurbedCourbet_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 22:59:04",
-  "url": "https://openprocessing.org/@ronikaufman/2435084",
-  "code": "// === Tab: mySketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\nvar N_ANIM = 25; // how long the animation stage lasts\nvar N_WAIT = 25; // how long the wait stage lasts\n\nvar n = 20; // size of the grid (should be an odd multiple of the length of the palette)\nvar sections = [...Array(n)].map((e) => Array(n));\nvar weights1 = []; // weights of first compo\nvar weights2 = []; // weights of second compo\n\nvar img;\n\nfunction preload() {\n\timg = loadImage(\"file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/courbet.jpg\");\n}\n\nfunction setup() {\n\tcreateCanvas(img.width/2, img.height/2);\n\tnoStroke();\n\t\n\tlet w = img.width/n, h = img.height/n;\n\tfor (let i = 0; i < n; i++) {\n\t\tlet x = i*w;\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tlet y = j*h;\n\t\t\tsections[i][j] = img.get(x, y, w, h);\n\t\t}\n\t}\n\t\n\tfor (let i = 0; i < n; i++) {\n\t\tweights1.push([1, 1]);\n\t\tweights2.push([1, 1]);\n\t}\n}\n\nfunction draw() {\n\tif (frameCount%(N_ANIM+N_WAIT) == 0) {\n\t\tfor (let i = 0; i < n; i++) {\n\t\t\tweights1[i] = weights2[i];\n\t\t\tweights2[i] = [random(1, 10), random(1, 10)];\n\t\t}\n\t}\n\t\n\tlet t, f = (frameCount)%(N_ANIM+N_WAIT);\n\tif (f < N_ANIM) t = easeInOutQuint((f%N_ANIM)/N_ANIM);\n\telse if (f < N_ANIM+N_WAIT) t = 1;\n\t\n\tlet lerpedWeights = [];\n\tlet wSum = 0, hSums = [];\n\tfor (let i = 0; i < n; i++) {\n\t\tlet weightsLine = [];\n\t\t\n\t\tvar w = lerp(weights1[i][0], weights2[i][0], t);\n\t\twSum += w;\n\t\tlet hSum = 0;\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tlet h = lerp(weights1[j][1], weights2[j][1], t);\n\t\t\thSum += h;\n\t\t\tweightsLine.push([w, h]);\n\t\t}\n\t\thSums.push(hSum);\n\t\tlerpedWeights.push(weightsLine);\n\t}\n\t\n\tvar x = 0;\n\tlet uw = width/wSum;\n\tfor (let i = 0; i < n; i++) {\n\t\tvar y = 0;\n\t\tlet uh = height/hSums[i];\n\t\tvar w = lerpedWeights[i][0][0]*uw;\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tvar h = lerpedWeights[i][j][1]*uh;\n\t\t\tlet section = sections[i][j];\n\t\t\timage(section, x, y, w+1, h+1);\n\t\t\ty += h;\n\t\t}\n\t\tx += w;\n\t}\n}\n\n// from easings.net\nfunction easeInOutQuint(x) {\n\treturn x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CurbedCourbet_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:59:04",
+    "url": "https://openprocessing.org/@ronikaufman/2435084",
+    "code": "// === Tab: mySketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\nvar N_ANIM = 25; // how long the animation stage lasts\nvar N_WAIT = 25; // how long the wait stage lasts\n\nvar n = 20; // size of the grid (should be an odd multiple of the length of the palette)\nvar sections = [...Array(n)].map((e) => Array(n));\nvar weights1 = []; // weights of first compo\nvar weights2 = []; // weights of second compo\n\nvar img;\n\nfunction preload() {\n\timg = loadImage(\"file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/courbet.jpg\");\n}\n\nfunction setup() {\n\tcreateCanvas(img.width/2, img.height/2);\n\tnoStroke();\n\t\n\tlet w = img.width/n, h = img.height/n;\n\tfor (let i = 0; i < n; i++) {\n\t\tlet x = i*w;\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tlet y = j*h;\n\t\t\tsections[i][j] = img.get(x, y, w, h);\n\t\t}\n\t}\n\t\n\tfor (let i = 0; i < n; i++) {\n\t\tweights1.push([1, 1]);\n\t\tweights2.push([1, 1]);\n\t}\n}\n\nfunction draw() {\n\tif (frameCount%(N_ANIM+N_WAIT) == 0) {\n\t\tfor (let i = 0; i < n; i++) {\n\t\t\tweights1[i] = weights2[i];\n\t\t\tweights2[i] = [random(1, 10), random(1, 10)];\n\t\t}\n\t}\n\t\n\tlet t, f = (frameCount)%(N_ANIM+N_WAIT);\n\tif (f < N_ANIM) t = easeInOutQuint((f%N_ANIM)/N_ANIM);\n\telse if (f < N_ANIM+N_WAIT) t = 1;\n\t\n\tlet lerpedWeights = [];\n\tlet wSum = 0, hSums = [];\n\tfor (let i = 0; i < n; i++) {\n\t\tlet weightsLine = [];\n\t\t\n\t\tvar w = lerp(weights1[i][0], weights2[i][0], t);\n\t\twSum += w;\n\t\tlet hSum = 0;\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tlet h = lerp(weights1[j][1], weights2[j][1], t);\n\t\t\thSum += h;\n\t\t\tweightsLine.push([w, h]);\n\t\t}\n\t\thSums.push(hSum);\n\t\tlerpedWeights.push(weightsLine);\n\t}\n\t\n\tvar x = 0;\n\tlet uw = width/wSum;\n\tfor (let i = 0; i < n; i++) {\n\t\tvar y = 0;\n\t\tlet uh = height/hSums[i];\n\t\tvar w = lerpedWeights[i][0][0]*uw;\n\t\tfor (let j = 0; j < n; j++) {\n\t\t\tvar h = lerpedWeights[i][j][1]*uh;\n\t\t\tlet section = sections[i][j];\n\t\t\timage(section, x, y, w+1, h+1);\n\t\t\ty += h;\n\t\t}\n\t\tx += w;\n\t}\n}\n\n// from easings.net\nfunction easeInOutQuint(x) {\n\treturn x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Underground Tides.mp4"
+    ]
 }

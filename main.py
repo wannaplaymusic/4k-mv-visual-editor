@@ -33,6 +33,8 @@ from llm_director import LLMDirectorAgent
 from ai_incubator_tab import AIIncubatorTab
 from pixel_generator_tab import PixelModuleGeneratorTab
 from shorts_exporter_tab import ShortsExporterTab
+from surreal_collage_tab import SurrealCollageTab
+from youtube_uploader_tab import YouTubeUploaderTab
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -623,6 +625,150 @@ if (typeof window !== 'undefined') {
       configurable: true,
       enumerable: true
     });
+  }
+  
+  // Node.js CommonJS exports / module 支援
+  window.exports = window.exports || {};
+  window.module = window.module || { exports: window.exports };
+  window.require = window.require || function(mod) {
+    if (mod === '../p5' || mod === 'p5') return window.p5 || (typeof p5 !== 'undefined' ? p5 : {});
+    return window[mod] || {};
+  };
+
+  // OpenSimplexNoise / SimplexNoise 模擬護欄
+  if (typeof window.OpenSimplexNoise === 'undefined') {
+    window.OpenSimplexNoise = class OpenSimplexNoise {
+      constructor(seed) { this.seed = seed || 0; }
+      noise2D(x, y) { return Math.sin(x * 12.9898 + y * 78.233 + this.seed) * 0.5; }
+      noise3D(x, y, z) { return Math.sin(x * 12.9898 + y * 78.233 + (z || 0) * 37.719 + this.seed) * 0.5; }
+      noise4D(x, y, z, w) { return Math.sin(x * 12.9898 + y * 78.233 + (z || 0) * 37.719 + (w || 0) * 19.123 + this.seed) * 0.5; }
+      eval_2D(x, y) { return this.noise2D(x, y); }
+      eval_3D(x, y, z) { return this.noise3D(x, y, z); }
+      eval_4D(x, y, z, w) { return this.noise4D(x, y, z, w); }
+    };
+  }
+  if (typeof window.SimplexNoise === 'undefined') {
+    window.SimplexNoise = window.OpenSimplexNoise;
+  }
+
+  // kumaleon 防崩潰打樁護欄
+  if (typeof window.kumaleon === 'undefined') {
+    window.kumaleon = {
+      options: { onInit: function(){}, onUpdate: function(){}, onResize: function(){} },
+      setCanvas: function(){},
+      init: function(){},
+      update: function(){},
+      resize: function(){}
+    };
+  }
+
+  // p5ex 防崩潰打樁護欄
+  if (typeof window.p5ex === 'undefined') {
+    (function() {
+      var _mockScalableCanvas = {
+        scale: function() {},
+        cancelScale: function() {},
+        resize: function() {}
+      };
+      window.p5ex = {
+        ScalableCanvasTypes: { SQUARE640x640: 0, FULL: 1 },
+        applyRandomTexture: function() {},
+        randomIntBetween: function(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; },
+        mouseIsInCanvas: function() { return false; },
+        p5exClass: class { constructor(sketch, name) { if (typeof p5 === 'function') new p5(sketch); } }
+      };
+      if (typeof p5 !== 'undefined' && p5.prototype) {
+        p5.prototype.createScalableCanvas = function() { this.scalableCanvas = _mockScalableCanvas; return this.createCanvas(640, 640); };
+        p5.prototype.resizeScalableCanvas = function() {};
+      }
+    })();
+  }
+
+  // 全域 Tone.js 防崩潰模擬層 (防止作品呼叫 Tone.Transport / Tone.Synth / Tone.start 引發 Tone is not defined)
+  if (typeof window.Tone === 'undefined') {
+    (function() {
+      var _createMockToneNode = function() {
+        var node = function() { return _createMockToneNode(); };
+        var props = ['toDestination', 'toMaster', 'connect', 'disconnect', 'chain', 'start', 'stop', 'dispose', 'triggerAttack', 'triggerRelease', 'triggerAttackRelease', 'set', 'get', 'sync', 'unsync'];
+        props.forEach(function(p) { node[p] = function() { return node; }; });
+        node.gain = { value: 1, setValueAtTime: function(){}, linearRampToValueAtTime: function(){}, exponentialRampToValueAtTime: function(){} };
+        node.frequency = { value: 440, setValueAtTime: function(){}, linearRampToValueAtTime: function(){}, exponentialRampToValueAtTime: function(){} };
+        node.volume = { value: 0, setValueAtTime: function(){}, linearRampToValueAtTime: function(){}, exponentialRampToValueAtTime: function(){} };
+        return node;
+      };
+      var _toneHandler = {
+        get: function(target, prop) {
+          if (prop in target) return target[prop];
+          if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') return undefined;
+          return _createMockToneNode();
+        },
+        construct: function() {
+          return _createMockToneNode();
+        },
+        apply: function() {
+          return _createMockToneNode();
+        }
+      };
+      var _mockToneCore = {
+        start: function() { return Promise.resolve(); },
+        now: function() { return (typeof window.custom_time_ms !== 'undefined' ? window.custom_time_ms / 1000 : (window.currentAudioTime || 0)); },
+        context: {
+          state: 'running',
+          resume: function() { return Promise.resolve(); },
+          currentTime: 0,
+          rawContext: typeof AudioContext !== 'undefined' ? new AudioContext() : {}
+        },
+        Transport: {
+          start: function() { return this; },
+          stop: function() { return this; },
+          pause: function() { return this; },
+          schedule: function() { return 0; },
+          scheduleRepeat: function() { return 0; },
+          clear: function() {},
+          cancel: function() {},
+          bpm: { value: 120, setValueAtTime: function(){} },
+          position: 0,
+          seconds: 0,
+          state: 'started'
+        },
+        Master: _createMockToneNode(),
+        Destination: _createMockToneNode(),
+        destination: _createMockToneNode(),
+        Synth: _createMockToneNode(),
+        PolySynth: _createMockToneNode(),
+        AMSynth: _createMockToneNode(),
+        FMSynth: _createMockToneNode(),
+        DuoSynth: _createMockToneNode(),
+        MembraneSynth: _createMockToneNode(),
+        MetalSynth: _createMockToneNode(),
+        NoiseSynth: _createMockToneNode(),
+        PluckSynth: _createMockToneNode(),
+        Sampler: _createMockToneNode(),
+        Player: _createMockToneNode(),
+        Players: _createMockToneNode(),
+        UserMedia: _createMockToneNode(),
+        FeedbackDelay: _createMockToneNode(),
+        Freeverb: _createMockToneNode(),
+        JCReverb: _createMockToneNode(),
+        Reverb: _createMockToneNode(),
+        Filter: _createMockToneNode(),
+        Volume: _createMockToneNode(),
+        Gain: _createMockToneNode(),
+        Compressor: _createMockToneNode(),
+        Limiter: _createMockToneNode(),
+        Waveform: _createMockToneNode(),
+        FFT: _createMockToneNode(),
+        Meter: _createMockToneNode(),
+        Signal: _createMockToneNode(),
+        Multiply: _createMockToneNode(),
+        Add: _createMockToneNode(),
+        Scale: _createMockToneNode(),
+        Frequency: function(f) { return { toFrequency: function(){ return typeof f === 'number' ? f : 440; }, toMidi: function(){ return 69; }, toNote: function(){ return 'A4'; } }; },
+        Midi: function(m) { return { toFrequency: function(){ return 440; }, toMidi: function(){ return m || 69; }, toNote: function(){ return 'A4'; } }; },
+        Time: function(t) { return { toSeconds: function(){ return typeof t === 'number' ? t : 1; }, toMilliseconds: function(){ return 1000; }, toTicks: function(){ return 480; } }; }
+      };
+      window.Tone = new Proxy(_mockToneCore, _toneHandler);
+    })();
   }
 }
 
@@ -1534,17 +1680,41 @@ if (typeof p5 !== 'undefined') {
     if (!glProto.uniform4) glProto.uniform4 = function(loc, v0, v1, v2, v3) { return this.uniform4f(loc, v0, v1, v2, v3); };
   }
 
+  // 12b. CanvasRenderingContext2D.prototype.drawImage 防空指針/非標準來源保護
+  if (typeof CanvasRenderingContext2D !== 'undefined' && CanvasRenderingContext2D.prototype.drawImage) {
+    const _origDrawImage = CanvasRenderingContext2D.prototype.drawImage;
+    CanvasRenderingContext2D.prototype.drawImage = function(img, ...args) {
+      if (!img) return;
+      if (typeof img === 'object' && img.canvas && img.canvas instanceof Element) {
+        img = img.canvas;
+      } else if (typeof img === 'object' && img.elt && img.elt instanceof Element) {
+        img = img.elt;
+      }
+      try {
+        return _origDrawImage.call(this, img, ...args);
+      } catch(err) {
+        // 免疫不支援的圖片/畫布物件報錯
+        return;
+      }
+    };
+  }
+
   // 13. BMWalker (Generative Walker) 類別補全護欄
   if (typeof window.BMWalker === 'undefined') {
     window.BMWalker = class BMWalker {
       constructor() {
         this.pos = (typeof createVector === 'function') ? createVector(0, 0) : { x: 0, y: 0 };
         this.vel = (typeof createVector === 'function') ? createVector(0, 0) : { x: 0, y: 0 };
+        this.speed = 1;
         this.markers = [];
       }
-      walk() {}
-      display() {}
-      update() {}
+      walk() { return this; }
+      display() { return this; }
+      update() { return this; }
+      setSpeed(s) { this.speed = s || 1; return this; }
+      setPos(x, y) { this.pos = (typeof createVector === 'function') ? createVector(x, y) : { x: x||0, y: y||0 }; return this; }
+      setTarget(x, y) { this.target = { x: x||0, y: y||0 }; return this; }
+      reset() { return this; }
     };
   }
 
@@ -1554,6 +1724,16 @@ if (typeof p5 !== 'undefined') {
       fd: function() {}, bk: function() {}, rt: function() {}, lt: function() {},
       pu: function() {}, pd: function() {}, setxy: function() {}, home: function() {},
       cs: function() {}, clean: function() {}, penUp: function() {}, penDown: function() {}
+    };
+  }
+
+  // 14b. Java Processing 殘留 String 方法相容性護欄
+  if (typeof String.prototype.toCharArray === 'undefined') {
+    String.prototype.toCharArray = function() { return this.split(''); };
+  }
+  if (typeof String.prototype.equalsIgnoreCase === 'undefined') {
+    String.prototype.equalsIgnoreCase = function(other) {
+      return this.toLowerCase() === String(other).toLowerCase();
     };
   }
 
@@ -1649,6 +1829,14 @@ if (typeof p5 !== 'undefined') {
         var sz = fontSize || 12;
         return { x: x || 0, y: (y || 0) - sz, w: len * sz * 0.6, h: sz * 1.2, advance: len * sz * 0.6 };
       };
+    }
+    if (p5.Renderer && p5.Renderer.prototype) {
+      if (typeof p5.Renderer.prototype._pixelDensity === 'undefined') p5.Renderer.prototype._pixelDensity = 1;
+      if (!p5.Renderer.prototype.textures) p5.Renderer.prototype.textures = [];
+    }
+    if (p5.RendererGL && p5.RendererGL.prototype) {
+      if (typeof p5.RendererGL.prototype._pixelDensity === 'undefined') p5.RendererGL.prototype._pixelDensity = 1;
+      if (!p5.RendererGL.prototype.textures) p5.RendererGL.prototype.textures = [];
     }
   }
 
@@ -5268,6 +5456,10 @@ class StandaloneInjectorApp(QMainWindow):
         self.left_tabs.addTab(self.pixel_generator, "👾 像素視覺模組生成器")
         self.shorts_exporter = ShortsExporterTab(self)
         self.left_tabs.addTab(self.shorts_exporter, "📱 YouTube Shorts 批量匯出")
+        self.surreal_collage = SurrealCollageTab(self)
+        self.left_tabs.addTab(self.surreal_collage, "🌌 超現實拼貼引擎")
+        self.youtube_uploader = YouTubeUploaderTab(self)
+        self.left_tabs.addTab(self.youtube_uploader, "📤 YouTube 自動發布")
 
         # ----------------------------------------------------
         # Right Panel (Sandbox & Console)
@@ -6586,10 +6778,7 @@ class StandaloneInjectorApp(QMainWindow):
             """
         # 🛡️ 即時 JS 代碼語法自癒修復矩陣 (Runtime JS Sanitization & Auto-Repair)
         if code:
-            # 1. 自動修復未加引號的十六進位色碼 (防止 V8 引擎解析為 ES2022 Class Private Field #xxx 報錯)
-            code = re.sub(r'(=|:|\(|,)\s*(#[0-9a-fA-F]{3,8})\b', r'\1 "\2"', code)
-            
-            # 2. 自動修復殘留的 Java 2D 陣列宣告語法 (double[][] / float[][])
+            # 1. 自動修復殘留的 Java 2D 陣列宣告語法 (double[][] / float[][])
             code = re.sub(
                 r'\b(?:double|float|int|boolean|color|char|long|short)\s*\[\]\s*\[\]\s*(\w+)\s*=\s*new\s+\w*\[([^\]]+)\]\s*\[([^\]]+)\]\s*;',
                 r'let \1 = Array.from({length: (\2)}, () => new Array(\3).fill(0));',
@@ -6615,10 +6804,31 @@ class StandaloneInjectorApp(QMainWindow):
             code = re.sub(r'^\s*let\s+([a-zA-Z0-9_$]+)', r'var \1', code, flags=re.MULTILINE)
             code = re.sub(r'^\s*const\s+([a-zA-Z0-9_$]+)', r'var \1', code, flags=re.MULTILINE)
 
+            # 5. 自動修復宣告結尾的 ;, 或 ,; 語法錯誤 (如 let a;, b;)
+            code = re.sub(r';,', r',', code)
+            code = re.sub(r',;', r';', code)
+
+            # 6. 自動修復常見的 p5 熔接函數 (如 rectMode(...) 誤連接著 rect / noStroke 等)
+            code = re.sub(r'\brectMode(rect|noStroke|noFill|strokeWeight|shader|angleMode|translate|colorMode)\b', r'rectMode(CENTER); \1', code)
+            code = re.sub(r'\bbeginShape(normal)\b', r'beginShape(); \1', code)
+            code = re.sub(r'\bendShape(eye|noErase|pop|push)\b', r'endShape(); \1', code)
+            code = re.sub(r'\btextAlign(noStroke|noFill|strokeWeight|stroke|fill)\b', r'textAlign(CENTER, CENTER); \1', code)
+            code = re.sub(r'\bimageMode(translate|image|tint|frontLayer)\b', r'imageMode(CENTER); \1', code)
+
         has_import_export = bool(re.search(r'\b(import\s+[\{\*a-zA-Z0-9_]|export\s+(default|const|let|var|function|class))\b', code))
         is_module = has_import_export
 
-        script_tag = f'<script type="module">{code}\n{BIND_MODULE_CALLBACKS_JS}</script>' if is_module else f'<script>{code}</script>'
+        scope_guards = (
+            "if (typeof window.Tone !== 'undefined' && typeof Tone === 'undefined') { var Tone = window.Tone; }\n"
+            "if (typeof window.CENTER !== 'undefined' && typeof CENTER === 'undefined') { var CENTER = window.CENTER || 'center'; }\n"
+            "if (typeof window.back === 'undefined') { var back = '#000000'; }\n"
+            "if (typeof window.SVG === 'undefined') { var SVG = 'p2d'; }\n"
+            "if (typeof window.OpenSimplexNoise !== 'undefined' && typeof OpenSimplexNoise === 'undefined') { var OpenSimplexNoise = window.OpenSimplexNoise; }\n"
+            "if (typeof window.SimplexNoise !== 'undefined' && typeof SimplexNoise === 'undefined') { var SimplexNoise = window.SimplexNoise; }\n"
+            "if (typeof window.p5ex !== 'undefined' && typeof p5ex === 'undefined') { var p5ex = window.p5ex; }\n"
+            "if (typeof window.require !== 'undefined' && typeof require === 'undefined') { var require = window.require; }\n"
+        )
+        script_tag = f'<script type="module">{code}\n{BIND_MODULE_CALLBACKS_JS}</script>' if is_module else f'<script>{scope_guards}{code}</script>'
 
         ready_state_override_js = "Object.defineProperty(Document.prototype, 'readyState', { get: function() { return 'loading'; }, configurable: true });" if (for_thumbnail or for_rendering) else ""
         early_error_js = f"""
@@ -6634,6 +6844,14 @@ class StandaloneInjectorApp(QMainWindow):
                     }}
                   }};
                 }})();
+                if (typeof String.prototype.toCharArray === 'undefined') {{
+                  String.prototype.toCharArray = function() {{ return this.split(''); }};
+                }}
+                if (typeof String.prototype.equalsIgnoreCase === 'undefined') {{
+                  String.prototype.equalsIgnoreCase = function(other) {{
+                    return this.toLowerCase() === String(other).toLowerCase();
+                  }};
+                }}
                 window.wordsOfWisdom = window.wordsOfWisdom || ['Flow', 'Pulse', 'Vibration', 'Resonance', 'Structure', 'Echo', 'Wave', 'Core', 'Drift', 'Static', 'Horizon', 'Depth'];
                 if (typeof window.getRotatedPt === 'undefined') {{
                   window.getRotatedPt = function(x, y, angle) {{
@@ -6739,10 +6957,133 @@ class StandaloneInjectorApp(QMainWindow):
               <!--ASSET_INTERCEPTOR-->
               <script>
                 // 強力打樁：防止部分作品調用網頁 UI 庫引發 Uncaught ReferenceError
+                window.exports = window.exports || {{}};
+                window.module = window.module || {{ exports: window.exports }};
+                window.require = window.require || function(mod) {{
+                  if (mod === '../p5' || mod === 'p5') return window.p5 || (typeof p5 !== 'undefined' ? p5 : {{}});
+                  return window[mod] || {{}};
+                }};
                 window.lil = window.lil || {{ GUI: class {{ add() {{ return this; }} addFolder() {{ return this; }} open() {{ return this; }} onChange() {{ return this; }} setValue() {{ return this; }} }} }};
                 window.dat = window.dat || {{ GUI: class {{ add() {{ return this; }} addFolder() {{ return this; }} }} }};
                 window.planck = window.planck || {{ World: class {{}}, Vec2: class {{}} }};
                 window.PVector = window.PVector || class {{ constructor(x,y,z){{ this.x=x||0; this.y=y||0; this.z=z||0; }} static dist(v1,v2){{ return Math.sqrt((v1.x-v2.x)**2+(v1.y-v2.y)**2); }} }};
+                window.kumaleon = window.kumaleon || {{
+                  options: {{ onInit: function(){{}}, onUpdate: function(){{}}, onResize: function(){{}} }},
+                  setCanvas: function(){{}},
+                  init: function(){{}},
+                  update: function(){{}},
+                  resize: function(){{}}
+                }};
+                if (typeof window.OpenSimplexNoise === 'undefined') {{
+                  window.OpenSimplexNoise = class OpenSimplexNoise {{
+                    constructor(seed) {{ this.seed = seed || 0; }}
+                    noise2D(x, y) {{ return Math.sin(x * 12.9898 + y * 78.233 + this.seed) * 0.5; }}
+                    noise3D(x, y, z) {{ return Math.sin(x * 12.9898 + y * 78.233 + (z || 0) * 37.719 + this.seed) * 0.5; }}
+                    noise4D(x, y, z, w) {{ return Math.sin(x * 12.9898 + y * 78.233 + (z || 0) * 37.719 + (w || 0) * 19.123 + this.seed) * 0.5; }}
+                    eval_2D(x, y) {{ return this.noise2D(x, y); }}
+                    eval_3D(x, y, z) {{ return this.noise3D(x, y, z); }}
+                    eval_4D(x, y, z, w) {{ return this.noise4D(x, y, z, w); }}
+                  }};
+                }}
+                if (typeof window.SimplexNoise === 'undefined') {{
+                  window.SimplexNoise = window.OpenSimplexNoise;
+                }}
+                if (typeof window.p5ex === 'undefined') {{
+                  (function() {{
+                    var _mockScalableCanvas = {{
+                      scale: function() {{}},
+                      cancelScale: function() {{}},
+                      resize: function() {{}}
+                    }};
+                    window.p5ex = {{
+                      ScalableCanvasTypes: {{ SQUARE640x640: 0, FULL: 1 }},
+                      applyRandomTexture: function() {{}},
+                      randomIntBetween: function(min, max) {{ return Math.floor(Math.random() * (max - min + 1)) + min; }},
+                      mouseIsInCanvas: function() {{ return false; }},
+                      p5exClass: class {{ constructor(sketch, name) {{ if (typeof p5 === 'function') new p5(sketch); }} }}
+                    }};
+                    if (typeof p5 !== 'undefined' && p5.prototype) {{
+                      p5.prototype.createScalableCanvas = function() {{ this.scalableCanvas = _mockScalableCanvas; return this.createCanvas(640, 640); }};
+                      p5.prototype.resizeScalableCanvas = function() {{}};
+                    }}
+                  }})();
+                }}
+                if (typeof window.Tone === 'undefined') {{
+                  (function() {{
+                    var _createMockToneNode = function() {{
+                      var node = function() {{ return _createMockToneNode(); }};
+                      var props = ['toDestination', 'toMaster', 'connect', 'disconnect', 'chain', 'start', 'stop', 'dispose', 'triggerAttack', 'triggerRelease', 'triggerAttackRelease', 'set', 'get', 'sync', 'unsync'];
+                      props.forEach(function(p) {{ node[p] = function() {{ return node; }}; }});
+                      node.gain = {{ value: 1, setValueAtTime: function(){{}}, linearRampToValueAtTime: function(){{}}, exponentialRampToValueAtTime: function(){{}} }};
+                      node.frequency = {{ value: 440, setValueAtTime: function(){{}}, linearRampToValueAtTime: function(){{}}, exponentialRampToValueAtTime: function(){{}} }};
+                      node.volume = {{ value: 0, setValueAtTime: function(){{}}, linearRampToValueAtTime: function(){{}}, exponentialRampToValueAtTime: function(){{}} }};
+                      return node;
+                    }};
+                    var _toneHandler = {{
+                      get: function(target, prop) {{
+                        if (prop in target) return target[prop];
+                        if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') return undefined;
+                        return _createMockToneNode();
+                      }},
+                      construct: function() {{ return _createMockToneNode(); }},
+                      apply: function() {{ return _createMockToneNode(); }}
+                    }};
+                    var _mockToneCore = {{
+                      start: function() {{ return Promise.resolve(); }},
+                      now: function() {{ return (typeof window.custom_time_ms !== 'undefined' ? window.custom_time_ms / 1000 : (window.currentAudioTime || 0)); }},
+                      context: {{ state: 'running', resume: function() {{ return Promise.resolve(); }}, currentTime: 0, rawContext: typeof AudioContext !== 'undefined' ? new AudioContext() : {{}} }},
+                      Transport: {{
+                        start: function() {{ return this; }},
+                        stop: function() {{ return this; }},
+                        pause: function() {{ return this; }},
+                        schedule: function() {{ return 0; }},
+                        scheduleRepeat: function() {{ return 0; }},
+                        clear: function() {{}},
+                        cancel: function() {{}},
+                        bpm: {{ value: 120, setValueAtTime: function(){{}} }},
+                        position: 0,
+                        seconds: 0,
+                        state: 'started'
+                      }},
+                      Master: _createMockToneNode(),
+                      Destination: _createMockToneNode(),
+                      destination: _createMockToneNode(),
+                      Synth: _createMockToneNode(),
+                      PolySynth: _createMockToneNode(),
+                      AMSynth: _createMockToneNode(),
+                      FMSynth: _createMockToneNode(),
+                      DuoSynth: _createMockToneNode(),
+                      MembraneSynth: _createMockToneNode(),
+                      MetalSynth: _createMockToneNode(),
+                      NoiseSynth: _createMockToneNode(),
+                      PluckSynth: _createMockToneNode(),
+                      Sampler: _createMockToneNode(),
+                      Player: _createMockToneNode(),
+                      Players: _createMockToneNode(),
+                      UserMedia: _createMockToneNode(),
+                      FeedbackDelay: _createMockToneNode(),
+                      Freeverb: _createMockToneNode(),
+                      JCReverb: _createMockToneNode(),
+                      Reverb: _createMockToneNode(),
+                      Filter: _createMockToneNode(),
+                      Volume: _createMockToneNode(),
+                      Gain: _createMockToneNode(),
+                      Compressor: _createMockToneNode(),
+                      Limiter: _createMockToneNode(),
+                      Waveform: _createMockToneNode(),
+                      FFT: _createMockToneNode(),
+                      Meter: _createMockToneNode(),
+                      Signal: _createMockToneNode(),
+                      Multiply: _createMockToneNode(),
+                      Add: _createMockToneNode(),
+                      Scale: _createMockToneNode(),
+                      Frequency: function(f) {{ return {{ toFrequency: function(){{ return typeof f === 'number' ? f : 440; }}, toMidi: function(){{ return 69; }}, toNote: function(){{ return 'A4'; }} }}; }},
+                      Midi: function(m) {{ return {{ toFrequency: function(){{ return 440; }}, toMidi: function(){{ return m || 69; }}, toNote: function(){{ return 'A4'; }} }}; }},
+                      Time: function(t) {{ return {{ toSeconds: function(){{ return typeof t === 'number' ? t : 1; }}, toMilliseconds: function(){{ return 1000; }}, toTicks: function(){{ return 480; }} }}; }}
+                    }};
+                    window.Tone = new Proxy(_mockToneCore, _toneHandler);
+                  }})();
+                }}
                 window.BLUR = 11; window.GRAY = 14; window.WEBGL = "webgl"; window.P3D = "webgl"; window.OPENGL = "webgl"; window.P2D = "p2d"; window.JAVA2D = "p2d";
                 (function() {{
                   var _audioChannels = ['audioLow', 'audioMid', 'audioHigh', 'beatEnergy'];
@@ -6974,6 +7315,14 @@ class StandaloneInjectorApp(QMainWindow):
                       }};
                     }}
                   }}
+                  if (p5.Renderer && p5.Renderer.prototype) {{
+                    if (typeof p5.Renderer.prototype._pixelDensity === 'undefined') p5.Renderer.prototype._pixelDensity = 1;
+                    if (!p5.Renderer.prototype.textures) p5.Renderer.prototype.textures = [];
+                  }}
+                  if (p5.RendererGL && p5.RendererGL.prototype) {{
+                    if (typeof p5.RendererGL.prototype._pixelDensity === 'undefined') p5.RendererGL.prototype._pixelDensity = 1;
+                    if (!p5.RendererGL.prototype.textures) p5.RendererGL.prototype.textures = [];
+                  }}
                 }}
 
                 (function() {{
@@ -6985,6 +7334,22 @@ class StandaloneInjectorApp(QMainWindow):
                     }}
                     return orgGetContext.call(this, type, attribs);
                   }};
+                  if (typeof CanvasRenderingContext2D !== 'undefined' && CanvasRenderingContext2D.prototype.drawImage) {{
+                    const _origDrawImage = CanvasRenderingContext2D.prototype.drawImage;
+                    CanvasRenderingContext2D.prototype.drawImage = function(img, ...args) {{
+                      if (!img) return;
+                      if (typeof img === 'object' && img.canvas && img.canvas instanceof Element) {{
+                        img = img.canvas;
+                      }} else if (typeof img === 'object' && img.elt && img.elt instanceof Element) {{
+                        img = img.elt;
+                      }}
+                      try {{
+                        return _origDrawImage.call(this, img, ...args);
+                      }} catch(err) {{
+                        return;
+                      }}
+                    }};
+                  }}
                 }})();
 
                 // fxhash / fxrand compatibility layer
@@ -9431,12 +9796,16 @@ function draw() {
             fx_intensity = 0.6
 
             # 優先採用 LLM 導演指定的模組與構圖
+            cinematic_meta = {}
+            trans_style = "luma_wipe"
             if sec_idx < len(llm_shot_list):
                 shot_info = llm_shot_list[sec_idx]
                 mod_id = shot_info.get("assigned_module_id")
                 assigned_vis = modules_by_key.get(mod_id) or modules_by_name.get(mod_id)
                 fit_mode = shot_info.get("framing_mode", "fill")
                 fx_intensity = shot_info.get("target_fx_intensity", 0.6)
+                trans_style = shot_info.get("transition_style", "luma_wipe")
+                cinematic_meta = shot_info.get("cinematic_meta", {})
 
             if not assigned_vis:
                 candidates = candidates_by_sec.get(sec_name, sorted_visuals) or sorted_visuals
@@ -9456,9 +9825,12 @@ function draw() {
             sec_data['fullscreen_fit_mode'] = fit_mode
             sec_data['assigned_visual'] = assigned_vis
             sec_data['director_fx_intensity'] = fx_intensity
+            sec_data['transition_style'] = trans_style
+            sec_data['cinematic_meta'] = cinematic_meta
             last_assigned_name = assigned_vis.get('name')
             
-            self.log_to_console(f"子分鏡區段 [{sec_data['start']:.2f}s - {sec_data['end']:.2f}s] ({sec_name}) 🎬 導演指派: {assigned_vis['name']} [構圖: {fit_mode.upper()} | 後製強度: {int(fx_intensity*100)}%]")
+            cut_style_tag = f" | 剪輯: {cinematic_meta.get('cut_style', 'standard')}" if cinematic_meta else ""
+            self.log_to_console(f"子分鏡區段 [{sec_data['start']:.2f}s - {sec_data['end']:.2f}s] ({sec_name}) 🎬 導演指派: {assigned_vis['name']} [構圖: {fit_mode.upper()} | 後製: {int(fx_intensity*100)}% | 轉場: {trans_style}{cut_style_tag}]")
 
 
         times = filter_dynamics.get('times', [])

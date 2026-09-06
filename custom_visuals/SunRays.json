@@ -1,22 +1,25 @@
 {
-  "name": "SunRays",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:05:14",
-  "url": "https://openprocessing.org/@ronikaufman/815836",
-  "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n// inspired by https://www.instagram.com/p/B6Rtb0Tnwc3/?igshid=d5co693jh5wy\n\nlet nCircles = 50;\nlet nWaves = 12;\nlet inter = 10;\nlet delta;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tcolorMode(HSB, 100);\n  noFill();\n\t\n  strokeWeight(Math.max(0.1, Math.abs(inter/3)));\n  delta = TWO_PI/(4*nWaves);\n}\n\nfunction draw() {\n  background(8);\n  \n  let size = inter;\n  for (let i = 0; i <= nCircles; i++) {\n\t\tstroke(53, 84, 94);\n\t\tif (i < nCircles*2/5) {\n\t\t\tstroke(16, 100, 100);\n\t\t}\n    circle(width/2, height/2, size);\n\t\t\n    let theta = cos(frameCount/25 - i/5)/10;\n    for (let j = 0; j < nWaves*2; j++) {\n\t\t\tif (j < nWaves + 1) {\n\t\t\t\tif (j % 2 === 0) {\n\t\t\t\t\tstroke(60, 74, 64);\n\t\t\t\t} else {\n\t\t\t\t\tstroke(60, 64, 74);\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tif (j % 2 === 0) {\n\t\t\t\t\tstroke(100, 90);\n\t\t\t\t} else {\n\t\t\t\t\tstroke(100, 0);\n\t\t\t\t}\n\t\t\t}\n      arc(width/2, height/2, size, size, \n          theta - delta, theta + delta);\n      theta += TWO_PI / (2*nWaves);\n    }\n    \n    size += inter;\n    \n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SunRays",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:05:14",
+    "url": "https://openprocessing.org/@ronikaufman/815836",
+    "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n// inspired by https://www.instagram.com/p/B6Rtb0Tnwc3/?igshid=d5co693jh5wy\n\nlet nCircles = 50;\nlet nWaves = 12;\nlet inter = 10;\nlet delta;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tcolorMode(HSB, 100);\n  noFill();\n\t\n  strokeWeight(Math.max(0.1, Math.abs(inter/3)));\n  delta = TWO_PI/(4*nWaves);\n}\n\nfunction draw() {\n  background(8);\n  \n  let size = inter;\n  for (let i = 0; i <= nCircles; i++) {\n\t\tstroke(53, 84, 94);\n\t\tif (i < nCircles*2/5) {\n\t\t\tstroke(16, 100, 100);\n\t\t}\n    circle(width/2, height/2, size);\n\t\t\n    let theta = cos(frameCount/25 - i/5)/10;\n    for (let j = 0; j < nWaves*2; j++) {\n\t\t\tif (j < nWaves + 1) {\n\t\t\t\tif (j % 2 === 0) {\n\t\t\t\t\tstroke(60, 74, 64);\n\t\t\t\t} else {\n\t\t\t\t\tstroke(60, 64, 74);\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tif (j % 2 === 0) {\n\t\t\t\t\tstroke(100, 90);\n\t\t\t\t} else {\n\t\t\t\t\tstroke(100, 0);\n\t\t\t\t}\n\t\t\t}\n      arc(width/2, height/2, size, size, \n          theta - delta, theta + delta);\n      theta += TWO_PI / (2*nWaves);\n    }\n    \n    size += inter;\n    \n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Spatial Wash.mp4"
+    ]
 }

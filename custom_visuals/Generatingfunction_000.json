@@ -1,22 +1,25 @@
 {
-  "name": "Generatingfunction_000",
-  "author": "u249102",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 04:35:01",
-  "url": "https://openprocessing.org/@u249102/2331640",
-  "code": "// === Tab: mySketch ===\n\nlet colors = [ \"#000000\", \"#FF0000\", \"#0000FF\",  \"#00b2b4\", \"#00FF00\" ]\n\nconst branchingFactor = 0.025;\nconst noiseFactor = 5;\nconst agentArray = [];\nconst agentSpeed = 100;\n\nlet world;\n\n//=====\n\nfunction setup() { init() }\n\nfunction init() {\n  createCanvas(windowWidth, windowHeight);\n  \n\tbackground(255);\n\tnoFill();\n\t\n\tincr_heading = PI/3;\n\n  world = array2d();\t\t// init array width * height <= value false\n\t\n  agentArray.length = 0;\n\t\n\tfor ( let i = 0; i < 5; i++) { agentArray.push(agent(i%5)) }\n\t\n\tframeRate(60);\t\n}\n\n//===\n\nmouseClicked = () => init();\n\n//=====\n\nfunction draw() {\n\t\n\tlet agent_j;\n\t\n  for (let i = 0; i < agentSpeed; i++) {\n\t\tfor ( let j = 0; j < agentArray.length; j++ ) {\n\t\t\tagent_j = agentArray[j];\n\t\t\tagent_j.next();\n\t\t}\t\n  }\n}\n\n//=====\n\nfunction* agent(i) {\n\t\n\tlet margin, X, Y, heading, colour, newX, newY, stack, numb_pt;\n\t\n\tmargin = 50;\n\t\n  X = random(margin, width - margin);\n  Y = random(margin, height - margin);\n\t\t\t\n  heading = incr_heading;\n\tcolour = colors[i];\n\t\n  stack = [{ X, Y, heading }];\n  world.set( X, Y, colour);\n\t\n  while (stack.length) {\n\t\t\n    let { X, Y, heading } = stack.pop();\n\t\t\n    let num;\n\t\tif ( random() < branchingFactor ) { numb_pt = 2 }\n\t\telse\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t{ numb_pt = 1 }\n\t\t\t\t\n    for (i = 0; i < numb_pt; i++, heading += incr_heading) {\n\t\t\t\n    \tnewX = X;\n      newY = Y;\n\t\t\t\n      do {\n        n = noise(newX / width, newY / height) * noiseFactor;\n        newX = (newX + cos(heading + n) + width) % width;\n        newY = (newY + sin(heading + n) + height) % height;\n      } while (floor(newX) === floor(X) && floor(newY) === floor(Y));\n\t\t\t\n      if (!world.canMoveTo(newX, newY)) continue;\t\t\t\t\t\t\t\t\t\t\t// is x,y used. If yes leave FOR loop\n\t\t\t\n      stack.push({ X: newX, Y: newY, heading });\n      world.set(newX, newY, colour);\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t// in world x,y used\n      \n    }\t//\n\t\t\n\t\tyield;\t\t\n  }\n}\n\n//=====\n\nfunction array2d() {\n  const array = Array.from({ length: width }, () => Array(height).fill(false));\n\n  return {\n    canMoveTo: (x, y) => { return array[floor(x)][floor(y)] === false },\n    set: (x, y, colour) => { array[floor(x)][floor(y)] = true ; stroke (colour); rect (x, y, 1.0) },\n  };\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Generatingfunction_000",
+    "author": "u249102",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:35:01",
+    "url": "https://openprocessing.org/@u249102/2331640",
+    "code": "// === Tab: mySketch ===\n\nlet colors = [ \"#000000\", \"#FF0000\", \"#0000FF\",  \"#00b2b4\", \"#00FF00\" ]\n\nconst branchingFactor = 0.025;\nconst noiseFactor = 5;\nconst agentArray = [];\nconst agentSpeed = 100;\n\nlet world;\n\n//=====\n\nfunction setup() { init() }\n\nfunction init() {\n  createCanvas(windowWidth, windowHeight);\n  \n\tbackground(255);\n\tnoFill();\n\t\n\tincr_heading = PI/3;\n\n  world = array2d();\t\t// init array width * height <= value false\n\t\n  agentArray.length = 0;\n\t\n\tfor ( let i = 0; i < 5; i++) { agentArray.push(agent(i%5)) }\n\t\n\tframeRate(60);\t\n}\n\n//===\n\nmouseClicked = () => init();\n\n//=====\n\nfunction draw() {\n\t\n\tlet agent_j;\n\t\n  for (let i = 0; i < agentSpeed; i++) {\n\t\tfor ( let j = 0; j < agentArray.length; j++ ) {\n\t\t\tagent_j = agentArray[j];\n\t\t\tagent_j.next();\n\t\t}\t\n  }\n}\n\n//=====\n\nfunction* agent(i) {\n\t\n\tlet margin, X, Y, heading, colour, newX, newY, stack, numb_pt;\n\t\n\tmargin = 50;\n\t\n  X = random(margin, width - margin);\n  Y = random(margin, height - margin);\n\t\t\t\n  heading = incr_heading;\n\tcolour = colors[i];\n\t\n  stack = [{ X, Y, heading }];\n  world.set( X, Y, colour);\n\t\n  while (stack.length) {\n\t\t\n    let { X, Y, heading } = stack.pop();\n\t\t\n    let num;\n\t\tif ( random() < branchingFactor ) { numb_pt = 2 }\n\t\telse\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t{ numb_pt = 1 }\n\t\t\t\t\n    for (i = 0; i < numb_pt; i++, heading += incr_heading) {\n\t\t\t\n    \tnewX = X;\n      newY = Y;\n\t\t\t\n      do {\n        n = noise(newX / width, newY / height) * noiseFactor;\n        newX = (newX + cos(heading + n) + width) % width;\n        newY = (newY + sin(heading + n) + height) % height;\n      } while (floor(newX) === floor(X) && floor(newY) === floor(Y));\n\t\t\t\n      if (!world.canMoveTo(newX, newY)) continue;\t\t\t\t\t\t\t\t\t\t\t// is x,y used. If yes leave FOR loop\n\t\t\t\n      stack.push({ X: newX, Y: newY, heading });\n      world.set(newX, newY, colour);\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t// in world x,y used\n      \n    }\t//\n\t\t\n\t\tyield;\t\t\n  }\n}\n\n//=====\n\nfunction array2d() {\n  const array = Array.from({ length: width }, () => Array(height).fill(false));\n\n  return {\n    canMoveTo: (x, y) => { return array[floor(x)][floor(y)] === false },\n    set: (x, y, colour) => { array[floor(x)][floor(y)] = true ; stroke (colour); rect (x, y, 1.0) },\n  };\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Dark Signal Frame.mp4"
+    ]
 }

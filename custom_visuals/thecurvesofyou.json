@@ -1,22 +1,25 @@
 {
-  "name": "thecurvesofyou",
-  "author": "fractalkitty",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:25:47",
-  "url": "https://openprocessing.org/@fractalkitty/1746465",
-  "code": "// === Tab: mySketch ===\n//wccchallenge - shadows+math\nfunction setup() {\n  w = max(windowWidth, windowHeight) * 0.9;//90% of the minimum dimension is a dimension\n  createCanvas(windowWidth, windowHeight, WEBGL);//a finite area on which to doodle\n  noStroke();//pencils down - only paint from here on out\n  specularMaterial(255);//what isn't reflecting or emitting light is but a shadow\n}\nfunction draw() {\n  background(255);//math is made up - imagined - of the mind\n  t = frameCount / 200;//the past is but a shadow of time\n  camera(//a perspective is everything\n    w / 1.5 + w * abs(sin(t / 5)),\n    w / 1.5 + w * abs(sin(t / 2) * cos(t)),\n    w / 1.5 + w * abs(cos(t / 3))\n  );\n  pointLight(//a spotlight reveals shadows\n    255,\n    255,\n    255,\n    -2 * w * sin(t / 3),\n    2 * w * sin(t / 2),\n    2 * w * cos(t / 5)\n  );\n  pointLight(//more than one light illumines structure\n    255,\n    255,\n    255,\n    2 * w * cos(t) * cos(t),\n    2 * w * cos(t / 2),\n    2 * w * cos(t)\n  );\n  pointLight(//3 lights might just let us know dimension\n    255,\n    255,\n    255,\n    2 * w * sin(t),\n    -2 * w * sin(t),\n    2 * w * sin(t) * cos(t)\n  );\n  sphere(w / 2, 50, 50);//the curves of you\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "thecurvesofyou",
+    "author": "fractalkitty",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:25:47",
+    "url": "https://openprocessing.org/@fractalkitty/1746465",
+    "code": "// === Tab: mySketch ===\n//wccchallenge - shadows+math\nfunction setup() {\n  w = max(windowWidth, windowHeight) * 0.9;//90% of the minimum dimension is a dimension\n  createCanvas(windowWidth, windowHeight, WEBGL);//a finite area on which to doodle\n  noStroke();//pencils down - only paint from here on out\n  specularMaterial(255);//what isn't reflecting or emitting light is but a shadow\n}\nfunction draw() {\n  background(255);//math is made up - imagined - of the mind\n  t = frameCount / 200;//the past is but a shadow of time\n  camera(//a perspective is everything\n    w / 1.5 + w * abs(sin(t / 5)),\n    w / 1.5 + w * abs(sin(t / 2) * cos(t)),\n    w / 1.5 + w * abs(cos(t / 3))\n  );\n  pointLight(//a spotlight reveals shadows\n    255,\n    255,\n    255,\n    -2 * w * sin(t / 3),\n    2 * w * sin(t / 2),\n    2 * w * cos(t / 5)\n  );\n  pointLight(//more than one light illumines structure\n    255,\n    255,\n    255,\n    2 * w * cos(t) * cos(t),\n    2 * w * cos(t / 2),\n    2 * w * cos(t)\n  );\n  pointLight(//3 lights might just let us know dimension\n    255,\n    255,\n    255,\n    2 * w * sin(t),\n    -2 * w * sin(t),\n    2 * w * sin(t) * cos(t)\n  );\n  sphere(w / 2, 50, 50);//the curves of you\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Temporal Mist.mp4"
+    ]
 }

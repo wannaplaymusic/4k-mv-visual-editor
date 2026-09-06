@@ -1,22 +1,25 @@
 {
-  "name": "comingfullcircle_1",
-  "author": "fractalkitty",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:09:54",
-  "url": "https://openprocessing.org/@fractalkitty/2137839",
-  "code": "// === Tab: mySketch ===\n//genuary2024 - Hexagonal;\n//totally did this grid from the center\nlet hex = [];\nfunction setup() {\n  cnv = createCanvas(windowWidth * 0.9, windowHeight * 0.9);\n  rectMode(CENTER);\n  angleMode(DEGREES);\n  r = random(width / 100, width / 70);\n  hexPopulate();\n  strokeWeight(1);\n  background(10, 30, 40);\n  r1 = random(0, 40);\n  g1 = random(0, 40);\n  b1 = random(0, 40);\n  f = random(2, 9);\n  p = int(random(-4,4))\n  q = int(random(-2,2))\n}\n\nfunction draw() {\n  // background(10, 30, 40, 10);\n\n  translate(width / 2, height / 2);\n  push();\n  t = frameCount / 2;\n  scale(1 + 0.5 * sin(t));\n  rotate(t / f);\n  hexagon(r, color(10, 30, 40), color(10, 30, 40));\n  for (let j = 0; j < hex.length; j++) {\n    col1 = color(\n      10 + 100 * sin(j + t) * sin(j + t) + r1,\n      30 + 220 * sin(j + t) * sin(j + t) + g1,\n      50 + 240 * sin(j + t) * sin(j + t) + b1,\n      100 + 100 * sin(j + t)\n    );\n    col2 = color(\n      10 + 50 * cos(j + t) * cos(j + t) + r1,\n      30 + 180 * cos(j + t) * cos(j + t) + g1,\n      40 + 180 * cos(j + t) * cos(j + t) + b1\n    );\n    push();\n    // scale(1 +0.5*sin(j*t/500))\n    rotate(hex[j].angle);\n    translate(hex[j].transX + 5 * r * sin(t), hex[j].transY) + 5 * r * sin(t);\n    rotate(hex[j].angle2);\n    translate(2 * hex[j].transX, p * hex[j].transX-q*hex[j].transY);\n    hexagon(r, col1, col2);\n\n    pop();\n  }\n  pop();\n\n  border();\n}\n\nfunction hexagon(r, col1, col2) {\n  stroke(col2);\n  fill(col1);\n  beginShape();\n  for (let i = 0; i <= 6; i++) {\n    vertex(r * cos(i * 60), r * sin(i * 60));\n  }\n  endShape();\n}\n\nfunction hexPopulate() {\n  cnt = 0;\n  for (let j = 0; j < 8; j++) {\n    for (let i = 0; i < 8; i++) {\n      hex[cnt] = {\n        angle: i * 60,\n        angle2: 0,\n        transX: 0,\n        transY: r * sqrt(3) * j,\n        group: 1\n      };\n      cnt++;\n      hex[cnt] = {\n        angle: i * 60 + 30,\n        angle2: 30,\n        transX: 0,\n        transY: r * 3 * j,\n        group: 2\n      };\n      cnt++;\n      hex[cnt] = {\n        angle: i * 60,\n        angle2: 0,\n        transX: 3 * r,\n        transY: r * sqrt(3) * (j + 2),\n        group: 3\n      };\n      cnt++;\n      hex[cnt] = {\n        angle: i * 60,\n        angle2: 0,\n        transX: r * 1.5,\n        transY: (r * sqrt(3)) / 2 + r * sqrt(3) * (j + 2),\n        group: 4\n      };\n      cnt++;\n      hex[cnt] = {\n        angle: i * 60,\n        angle2: 0,\n        transX: -r * 1.5,\n        transY: (r * sqrt(3)) / 2 + r * sqrt(3) * (j + 3),\n        group: 5\n      };\n      cnt++;\n      hex[cnt] = {\n        angle: i * 60,\n        angle2: 0,\n        transX: -r * 3,\n        transY: r * sqrt(3) + r * sqrt(3) * (j + 3),\n        group: 6\n      };\n    }\n  }\n}\n\nfunction border() {\n  push();\n  noFill();\n  stroke(20, 50, 60);\n  strokeWeight(4);\n  rect(0, 0, width - 20, height - 20);\n  pop();\n}\n\nfunction mousePressed() {\n  frameCount = 0;\n  setup();\n  draw();\n}\n\nfunction keyPressed() {\n  save(cnv, \"hex\", \"jpg\");\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth * 0.9, windowHeight * 0.9);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "comingfullcircle_1",
+    "author": "fractalkitty",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:09:54",
+    "url": "https://openprocessing.org/@fractalkitty/2137839",
+    "code": "// === Tab: mySketch ===\n//genuary2024 - Hexagonal;\n//totally did this grid from the center\nlet hex = [];\nfunction setup() {\n  cnv = createCanvas(windowWidth * 0.9, windowHeight * 0.9);\n  rectMode(CENTER);\n  angleMode(DEGREES);\n  r = random(width / 100, width / 70);\n  hexPopulate();\n  strokeWeight(1);\n  background(10, 30, 40);\n  r1 = random(0, 40);\n  g1 = random(0, 40);\n  b1 = random(0, 40);\n  f = random(2, 9);\n  p = int(random(-4,4))\n  q = int(random(-2,2))\n}\n\nfunction draw() {\n  // background(10, 30, 40, 10);\n\n  translate(width / 2, height / 2);\n  push();\n  t = frameCount / 2;\n  scale(1 + 0.5 * sin(t));\n  rotate(t / f);\n  hexagon(r, color(10, 30, 40), color(10, 30, 40));\n  for (let j = 0; j < hex.length; j++) {\n    col1 = color(\n      10 + 100 * sin(j + t) * sin(j + t) + r1,\n      30 + 220 * sin(j + t) * sin(j + t) + g1,\n      50 + 240 * sin(j + t) * sin(j + t) + b1,\n      100 + 100 * sin(j + t)\n    );\n    col2 = color(\n      10 + 50 * cos(j + t) * cos(j + t) + r1,\n      30 + 180 * cos(j + t) * cos(j + t) + g1,\n      40 + 180 * cos(j + t) * cos(j + t) + b1\n    );\n    push();\n    // scale(1 +0.5*sin(j*t/500))\n    rotate(hex[j].angle);\n    translate(hex[j].transX + 5 * r * sin(t), hex[j].transY) + 5 * r * sin(t);\n    rotate(hex[j].angle2);\n    translate(2 * hex[j].transX, p * hex[j].transX-q*hex[j].transY);\n    hexagon(r, col1, col2);\n\n    pop();\n  }\n  pop();\n\n  border();\n}\n\nfunction hexagon(r, col1, col2) {\n  stroke(col2);\n  fill(col1);\n  beginShape();\n  for (let i = 0; i <= 6; i++) {\n    vertex(r * cos(i * 60), r * sin(i * 60));\n  }\n  endShape();\n}\n\nfunction hexPopulate() {\n  cnt = 0;\n  for (let j = 0; j < 8; j++) {\n    for (let i = 0; i < 8; i++) {\n      hex[cnt] = {\n        angle: i * 60,\n        angle2: 0,\n        transX: 0,\n        transY: r * sqrt(3) * j,\n        group: 1\n      };\n      cnt++;\n      hex[cnt] = {\n        angle: i * 60 + 30,\n        angle2: 30,\n        transX: 0,\n        transY: r * 3 * j,\n        group: 2\n      };\n      cnt++;\n      hex[cnt] = {\n        angle: i * 60,\n        angle2: 0,\n        transX: 3 * r,\n        transY: r * sqrt(3) * (j + 2),\n        group: 3\n      };\n      cnt++;\n      hex[cnt] = {\n        angle: i * 60,\n        angle2: 0,\n        transX: r * 1.5,\n        transY: (r * sqrt(3)) / 2 + r * sqrt(3) * (j + 2),\n        group: 4\n      };\n      cnt++;\n      hex[cnt] = {\n        angle: i * 60,\n        angle2: 0,\n        transX: -r * 1.5,\n        transY: (r * sqrt(3)) / 2 + r * sqrt(3) * (j + 3),\n        group: 5\n      };\n      cnt++;\n      hex[cnt] = {\n        angle: i * 60,\n        angle2: 0,\n        transX: -r * 3,\n        transY: r * sqrt(3) + r * sqrt(3) * (j + 3),\n        group: 6\n      };\n    }\n  }\n}\n\nfunction border() {\n  push();\n  noFill();\n  stroke(20, 50, 60);\n  strokeWeight(4);\n  rect(0, 0, width - 20, height - 20);\n  pop();\n}\n\nfunction mousePressed() {\n  frameCount = 0;\n  setup();\n  draw();\n}\n\nfunction keyPressed() {\n  save(cnv, \"hex\", \"jpg\");\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth * 0.9, windowHeight * 0.9);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Static Over Estuary.mp4"
+    ]
 }

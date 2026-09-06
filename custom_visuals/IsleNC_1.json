@@ -1,22 +1,25 @@
 {
-  "name": "IsleNC_1",
-  "author": "u137792",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:18:45",
-  "url": "https://openprocessing.org/@u137792/616375",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n\t//windowHeight = 1500 ; windowWidth = 1500\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\tbackground(100);\n\t\n\tHG = [0]\n\tCG = [0]\n\n\tpass = 0\n\tnx = 0 ; ny = 10 ; f = 0\n\tcolorMode(HSB,256)\n\tnoiseDetail(5,.5)\n\t\n\tforestcol = color(80,200,100)\n\tmaptint = color(random(255),255-random(random(255)),255-random(random(255)))\n\thorizon = floor(windowHeight*.3)\n}\n\nfunction draw() {\n\t\n\tfor(var VC=0;VC<5;VC++)\n\t{\n\t\tcolorMode(HSB,256)\n\t\tfor(ny=0;ny<horizon;ny++) //draw the sky\n\t\t{\n\t\t\t//all of this is just to figure out coordinates. Perspective doubles as zoom level\n\t\t\tperspective = (.2-ny/windowHeight/2)*32 ; dx = (nx-windowWidth/2)/perspective+windowWidth/2 ; dy = ny/perspective\n\t\t\t\n\t\t\t//cc is cloud cover. Just a lot of random noises thrown together, honestly\n\t\t\tcc = max(0,max(0,perspective-.15)*sq(sq(sq(perspective/30+noise(dx/200,dy/250+6)/2+noise(dx/200,dy/120)*noise(dx/100+5,dy/60))))*16)\n\t\t\t\n\t\t\t//then choosing colour\n\t\t\tstroke(color(130+ny/5,96-96*cc,min(240,160+100*cc)*(1-.2*abs(noise(dx/50,dy/30)-.5))))\n\t\t\tpoint(nx,ny)\n\t\t}\n\t\t\n\t\tcolorMode(RGB,256)\n\t\tfor(ny=horizon;ny<windowHeight;ny++) //draw the terrain\n\t\t{\n\t\t//all of this is just to figure out coordinates. Perspective doubles as zoom level\n\t\tdx = (nx-windowWidth/2) ; perspective = (ny/windowHeight/2-.05)*4 ;\n\t\tdx = dx/perspective/3+windowWidth/2 ; dy = windowHeight-(windowHeight-ny)/perspective/1.5\n\t\t//finally distort the coordinates by some noise\n\t\tix = dx+(noise(dx/50,dy/50+15)-.5)*25 ; iy = dy+(noise(dx/50+15,dy/50)-.5)*25\n\t\t\n\t\t//basic heightmap\n\t\th = (sqrt(noise(ix/200,iy/200))+sqrt(noise(ix/400,iy/400+3)))/2-sqrt(sq(ix-windowWidth/2)+sq(iy-windowHeight/2))/2500\n\t\t//height difference just below the coastline\n\t\th -= (h<.5)/150\n\t\t\n\t\t//biome (arid versus humid)\n\t\tf = min(45,max(-45,(noise(ix/450+3,iy/450+5)-.5)*175))\n\t\tf = abs(f/45)*f\n\t\t\n\t\t//m denotes mountainousness\n\t\tm = (noise(ix/250+1,iy/250+49)-.5)*.9\n\t\tm = lerp(0,m,m*10)\n\t\th += m*(1+abs(noise(ix/50,iy/50+3)-.5))*max(0,min(1,-5+10*h))\n\t\t\n\t\t//save height in array\n\t\tHG[nx*windowHeight+ny] = h\n\t\t\n\t\t//generate colour\n\t\t\t\t\t\t\t\t\t\t\t//this long bit just compares the current height with five other pixels\n\t\tnc = gc(h*256-128,h*5-HG[nx*windowHeight+ny-2*windowHeight-2]-HG[nx*windowHeight+ny-4*windowHeight]-HG[nx*windowHeight+ny-windowHeight]-HG[nx*windowHeight+ny-2*windowHeight]-HG[nx*windowHeight+ny-1])\n\t\t\n\t\t//save colour in array (unused)\n\t\tCG[nx*windowHeight+ny] = floor(red(window.color(nc)))+256*floor(green(window.color(nc)))+256*256*floor(blue(window.color(nc)))\n\t\t\n\t\t//draw onto screen\n\t\tstroke(nc)\n\t\tline(nx,ny-max(0,(sqrt(abs(h))-sqrt(.5))*250),nx,ny)\n\t\t}\n\t\tnx++\n\t}\n\t\n\t//draw borders (obscures bugs)\n\tfill(color(0))\n\trect(0,0,windowWidth,5)\n\trect(0,0,5,windowHeight)\n\trect(windowWidth-6,0,5,windowHeight)\n\trect(0,windowHeight-7,windowWidth,5)\n}\n\nfunction gc(h,d)\n{\n\tcolorMode(HSB,256)\n\tvar nc\n\tif (h > 0)\n\t\tnc = color((65+f)*(1-h/220),130+1.75*f-h*0.5,130-f-h/1.4+sq(h/19)) //land colours\n\telse\n\t\tnc = color(min(180,120-h*1.5),90,max(110,min(110,-40*h)+50+h)) //sea colours\n\tcolorMode(RGB,256)\n\tif ((HG[nx*windowHeight+ny] % .025)>random(.005)+(HG[nx*windowHeight+ny-2] % .025)) nc = lerpColor(nc,color(255),ny/windowHeight*.075) //light dithering\n\tnc = lerpColor(nc,color(256*(d>0)),min(.4,abs(d*(h > 0 ? 5 : 2)))) //lights and shadows\n\tif ((nx % 2) && (ny % 2)) nc = lerpColor(nc,maptint,random(.1)) //grain\n\treturn(nc)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "IsleNC_1",
+    "author": "u137792",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:18:45",
+    "url": "https://openprocessing.org/@u137792/616375",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\t//windowHeight = 1500 ; windowWidth = 1500\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\tbackground(100);\n\t\n\tHG = [0]\n\tCG = [0]\n\n\tpass = 0\n\tnx = 0 ; ny = 10 ; f = 0\n\tcolorMode(HSB,256)\n\tnoiseDetail(5,.5)\n\t\n\tforestcol = color(80,200,100)\n\tmaptint = color(random(255),255-random(random(255)),255-random(random(255)))\n\thorizon = floor(windowHeight*.3)\n}\n\nfunction draw() {\n\t\n\tfor(var VC=0;VC<5;VC++)\n\t{\n\t\tcolorMode(HSB,256)\n\t\tfor(ny=0;ny<horizon;ny++) //draw the sky\n\t\t{\n\t\t\t//all of this is just to figure out coordinates. Perspective doubles as zoom level\n\t\t\tperspective = (.2-ny/windowHeight/2)*32 ; dx = (nx-windowWidth/2)/perspective+windowWidth/2 ; dy = ny/perspective\n\t\t\t\n\t\t\t//cc is cloud cover. Just a lot of random noises thrown together, honestly\n\t\t\tcc = max(0,max(0,perspective-.15)*sq(sq(sq(perspective/30+noise(dx/200,dy/250+6)/2+noise(dx/200,dy/120)*noise(dx/100+5,dy/60))))*16)\n\t\t\t\n\t\t\t//then choosing colour\n\t\t\tstroke(color(130+ny/5,96-96*cc,min(240,160+100*cc)*(1-.2*abs(noise(dx/50,dy/30)-.5))))\n\t\t\tpoint(nx,ny)\n\t\t}\n\t\t\n\t\tcolorMode(RGB,256)\n\t\tfor(ny=horizon;ny<windowHeight;ny++) //draw the terrain\n\t\t{\n\t\t//all of this is just to figure out coordinates. Perspective doubles as zoom level\n\t\tdx = (nx-windowWidth/2) ; perspective = (ny/windowHeight/2-.05)*4 ;\n\t\tdx = dx/perspective/3+windowWidth/2 ; dy = windowHeight-(windowHeight-ny)/perspective/1.5\n\t\t//finally distort the coordinates by some noise\n\t\tix = dx+(noise(dx/50,dy/50+15)-.5)*25 ; iy = dy+(noise(dx/50+15,dy/50)-.5)*25\n\t\t\n\t\t//basic heightmap\n\t\th = (sqrt(noise(ix/200,iy/200))+sqrt(noise(ix/400,iy/400+3)))/2-sqrt(sq(ix-windowWidth/2)+sq(iy-windowHeight/2))/2500\n\t\t//height difference just below the coastline\n\t\th -= (h<.5)/150\n\t\t\n\t\t//biome (arid versus humid)\n\t\tf = min(45,max(-45,(noise(ix/450+3,iy/450+5)-.5)*175))\n\t\tf = abs(f/45)*f\n\t\t\n\t\t//m denotes mountainousness\n\t\tm = (noise(ix/250+1,iy/250+49)-.5)*.9\n\t\tm = lerp(0,m,m*10)\n\t\th += m*(1+abs(noise(ix/50,iy/50+3)-.5))*max(0,min(1,-5+10*h))\n\t\t\n\t\t//save height in array\n\t\tHG[nx*windowHeight+ny] = h\n\t\t\n\t\t//generate colour\n\t\t\t\t\t\t\t\t\t\t\t//this long bit just compares the current height with five other pixels\n\t\tnc = gc(h*256-128,h*5-HG[nx*windowHeight+ny-2*windowHeight-2]-HG[nx*windowHeight+ny-4*windowHeight]-HG[nx*windowHeight+ny-windowHeight]-HG[nx*windowHeight+ny-2*windowHeight]-HG[nx*windowHeight+ny-1])\n\t\t\n\t\t//save colour in array (unused)\n\t\tCG[nx*windowHeight+ny] = floor(red(window.color(nc)))+256*floor(green(window.color(nc)))+256*256*floor(blue(window.color(nc)))\n\t\t\n\t\t//draw onto screen\n\t\tstroke(nc)\n\t\tline(nx,ny-max(0,(sqrt(abs(h))-sqrt(.5))*250),nx,ny)\n\t\t}\n\t\tnx++\n\t}\n\t\n\t//draw borders (obscures bugs)\n\tfill(color(0))\n\trect(0,0,windowWidth,5)\n\trect(0,0,5,windowHeight)\n\trect(windowWidth-6,0,5,windowHeight)\n\trect(0,windowHeight-7,windowWidth,5)\n}\n\nfunction gc(h,d)\n{\n\tcolorMode(HSB,256)\n\tvar nc\n\tif (h > 0)\n\t\tnc = color((65+f)*(1-h/220),130+1.75*f-h*0.5,130-f-h/1.4+sq(h/19)) //land colours\n\telse\n\t\tnc = color(min(180,120-h*1.5),90,max(110,min(110,-40*h)+50+h)) //sea colours\n\tcolorMode(RGB,256)\n\tif ((HG[nx*windowHeight+ny] % .025)>random(.005)+(HG[nx*windowHeight+ny-2] % .025)) nc = lerpColor(nc,color(255),ny/windowHeight*.075) //light dithering\n\tnc = lerpColor(nc,color(256*(d>0)),min(.4,abs(d*(h > 0 ? 5 : 2)))) //lights and shadows\n\tif ((nx % 2) && (ny % 2)) nc = lerpColor(nc,maptint,random(.1)) //grain\n\treturn(nc)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Rhythmic Breath.mp4"
+    ]
 }

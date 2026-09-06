@@ -1,22 +1,25 @@
 {
-  "name": "Tentacles",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:04:40",
-  "url": "https://openprocessing.org/@epi/2592347",
-  "code": "// === Tab: Tentacle ===\nclass Tentacle {\n\tconstructor(r = null, x = null, y = null, c = null) {\n\t\tthis.x0 = (x !== null) ? x : width/2;\n\t\tthis.y0 = (y !== null) ? y : height/2;\n\t\tthis.r0 = (r !== null) ? r : random(10, max(width, height)/10);\n\t\tthis.c = c || color(\"silver\");\n\t\tthis.a0 = random(TAU);\n\t\tthis.f = 0.1;\n\t\tthis.n = random(111, 98765432);\n\t\tthis.init();\n\t}\n\t\n\tinit() {\n\t\tthis.x = this.x0;\n\t\tthis.y = this.y0;\n\t\tthis.r = this.r0;\n\t\tthis.a = this.a0;\n\t\tthis.i = 1;\n\t}\n\t\n\tupdate() {\n\t\tif (this.r < 1) return true;\n\t\t\n\t\tthis.r -= 0.15;\n\t\tthis.i += 0.05;\n\t\tthis.a += (noise(this.n + this.i, frameCount/63)-0.5)*PI/10; // random(-PI/10, PI/10);\n\t\tthis.x += cos(this.a) * this.r * this.f;\n\t\tthis.y += sin(this.a) * this.r * this.f;\n\t\t\n\t\treturn false;\n\t}\n\t\n\tshow() {\n\t\tpush();\n\t\t\n\t\tif (this.r >= 1) {\n\t\t\tfill(this.c);\n\t\t\tcircle(this.x, this.y, this.r*2)\n\t\t}\n\t\t/*\n\t\twhile(this.r >= 1) {\n\t\t\tcircle(this.x, this.y, this.r*2)\n\t\t\tthis.update();\n\t\t}\t\n\t\t*/\n\t\tpop();\n\t}\n}\n\n// === Tab: mySketch ===\nlet tentacles;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(2, 2, 12);\n\tstroke(2, 2, 12);\n\tstrokeWeight(0.75);\n\tframeRate(60);\n\t\n\ttentacles = [];\n\tconst num = (width + height) / 50;\n\tfor (let i = 0; i < num; i++) {\n\t\tconst x = random(width);\n\t\tconst y = random(height);\n\t\tconst c = color(random(300), random(300), random(300));\n\t\ttentacles.push(new Tentacle(25, x, y, c));\n\t}\n}\n\nfunction draw() {\n\t// background(2, 2, 12);\n\t\n\tif (true) {\n\t\tfor (const t of tentacles) {\n\t\t\tt.show();\n\t\t\tt.update();\n\t\t}\n\t\treturn; \n\t}\n\t\n\tfor (const t of tentacles) {\n\t\tt.init();\n\t}\n\t\n\tlet finished = false;\n\twhile(!finished) {\n\t\tfinished = true;\n\t\tfor (const t of tentacles) {\n\t\t\tt.show();\n\t\t\tfinished = finished && t.update();\n\t\t}\n\t}\n}\n\nfunction mousePressed() {\n\tsetup();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Tentacles",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:04:40",
+    "url": "https://openprocessing.org/@epi/2592347",
+    "code": "// === Tab: Tentacle ===\nclass Tentacle {\n\tconstructor(r = null, x = null, y = null, c = null) {\n\t\tthis.x0 = (x !== null) ? x : width/2;\n\t\tthis.y0 = (y !== null) ? y : height/2;\n\t\tthis.r0 = (r !== null) ? r : random(10, max(width, height)/10);\n\t\tthis.c = c || color(\"silver\");\n\t\tthis.a0 = random(TAU);\n\t\tthis.f = 0.1;\n\t\tthis.n = random(111, 98765432);\n\t\tthis.init();\n\t}\n\t\n\tinit() {\n\t\tthis.x = this.x0;\n\t\tthis.y = this.y0;\n\t\tthis.r = this.r0;\n\t\tthis.a = this.a0;\n\t\tthis.i = 1;\n\t}\n\t\n\tupdate() {\n\t\tif (this.r < 1) return true;\n\t\t\n\t\tthis.r -= 0.15;\n\t\tthis.i += 0.05;\n\t\tthis.a += (noise(this.n + this.i, frameCount/63)-0.5)*PI/10; // random(-PI/10, PI/10);\n\t\tthis.x += cos(this.a) * this.r * this.f;\n\t\tthis.y += sin(this.a) * this.r * this.f;\n\t\t\n\t\treturn false;\n\t}\n\t\n\tshow() {\n\t\tpush();\n\t\t\n\t\tif (this.r >= 1) {\n\t\t\tfill(this.c);\n\t\t\tcircle(this.x, this.y, this.r*2)\n\t\t}\n\t\t/*\n\t\twhile(this.r >= 1) {\n\t\t\tcircle(this.x, this.y, this.r*2)\n\t\t\tthis.update();\n\t\t}\t\n\t\t*/\n\t\tpop();\n\t}\n}\n\n// === Tab: mySketch ===\nlet tentacles;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(2, 2, 12);\n\tstroke(2, 2, 12);\n\tstrokeWeight(0.75);\n\tframeRate(60);\n\t\n\ttentacles = [];\n\tconst num = (width + height) / 50;\n\tfor (let i = 0; i < num; i++) {\n\t\tconst x = random(width);\n\t\tconst y = random(height);\n\t\tconst c = color(random(300), random(300), random(300));\n\t\ttentacles.push(new Tentacle(25, x, y, c));\n\t}\n}\n\nfunction draw() {\n\t// background(2, 2, 12);\n\t\n\tif (true) {\n\t\tfor (const t of tentacles) {\n\t\t\tt.show();\n\t\t\tt.update();\n\t\t}\n\t\treturn; \n\t}\n\t\n\tfor (const t of tentacles) {\n\t\tt.init();\n\t}\n\t\n\tlet finished = false;\n\twhile(!finished) {\n\t\tfinished = true;\n\t\tfor (const t of tentacles) {\n\t\t\tt.show();\n\t\t\tfinished = finished && t.update();\n\t\t}\n\t}\n}\n\nfunction mousePressed() {\n\tsetup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Monolithic Gap.mp4"
+    ]
 }

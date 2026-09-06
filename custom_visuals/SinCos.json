@@ -1,22 +1,25 @@
 {
-  "name": "SinCos",
-  "author": "Xeronimo74",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:03:26",
-  "url": "https://openprocessing.org/@Xeronimo74/387908",
-  "code": "// === Tab: mySketch ===\nvar num = 600,\n  frms = 60,\n  z = 15;\nvar angle=0, theta=0;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n}\n\nfunction draw() {\n  background(238);\n  translate(width / 2, height / 2);\n\n  var h = height/2;\n  for (var i = 0; i < z; i++) {\n    f = (i % 2 === 0) ? 238 : 34;\n    drawThing(h - (h*.95 / z * i), f, i);\n  }\n\n  theta += TWO_PI / frms;\n  //if (frameCount<frms) saveFrame(\"img/image-###.gif\");\n}\n\nfunction drawThing(diam, col, n) {\n  fill(col);\n  beginShape();\n  var d = 0;\n  for (var i = 0; i < num; i++) {\n    var offSet = PI / z * n;\n    var angle = TWO_PI / num * i;\n    var s = 0.7 + 0.4 * sin(sq(offSet) + theta + angle * 4.0);\n    d = 0.25 + 0.2 * pow(s, 0.8);\n    d += 0.08 * pow(0.5 + 0.5 + cos(4 * angle), 1.0);\n    var x = cos(angle) * d * diam;\n    var y = sin(angle) * d * diam;\n    vertex(x, y);\n  }\n  endShape(CLOSE);\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SinCos",
+    "author": "Xeronimo74",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:03:26",
+    "url": "https://openprocessing.org/@Xeronimo74/387908",
+    "code": "// === Tab: mySketch ===\nvar num = 600,\n  frms = 60,\n  z = 15;\nvar angle=0, theta=0;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n}\n\nfunction draw() {\n  background(238);\n  translate(width / 2, height / 2);\n\n  var h = height/2;\n  for (var i = 0; i < z; i++) {\n    f = (i % 2 === 0) ? 238 : 34;\n    drawThing(h - (h*.95 / z * i), f, i);\n  }\n\n  theta += TWO_PI / frms;\n  //if (frameCount<frms) saveFrame(\"img/image-###.gif\");\n}\n\nfunction drawThing(diam, col, n) {\n  fill(col);\n  beginShape();\n  var d = 0;\n  for (var i = 0; i < num; i++) {\n    var offSet = PI / z * n;\n    var angle = TWO_PI / num * i;\n    var s = 0.7 + 0.4 * sin(sq(offSet) + theta + angle * 4.0);\n    d = 0.25 + 0.2 * pow(s, 0.8);\n    d += 0.08 * pow(0.5 + 0.5 + cos(4 * angle), 1.0);\n    var x = cos(angle) * d * diam;\n    var y = sin(angle) * d * diam;\n    vertex(x, y);\n  }\n  endShape(CLOSE);\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tonal Shift.mp4"
+    ]
 }

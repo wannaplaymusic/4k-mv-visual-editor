@@ -1,22 +1,25 @@
 {
-  "name": "Machine",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 17:37:01",
-  "url": "https://openprocessing.org/@ntsutae/1246917",
-  "code": "// === Tab: mySketch ===\nlet timer=0\nconst range=28\n\nsetup=()=> {\n  createCanvas(windowWidth, windowHeight, WEBGL)\n}\n\ndraw=()=> {\n  background(0)\n  directionalLight(color('white'), 0, -1, -1);\n  let angle=timer++/120\n  rotateX(angle)\n  rotateZ(angle)\n  scale(18)\n  translate(-range/2, -range/2, -range/2)\n  for (let z=range; z--; ) {\n    for (let y=range; y--; ) {\n      for (let x=range; x--; ) {\n        if (x^y^z)continue; \n        push()\n        translate(x, y, z)\n        box(tan(x+timer/557), tan(y), tan(z+timer/787)) \n        pop()\n      }\n    }\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Machine",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:37:01",
+    "url": "https://openprocessing.org/@ntsutae/1246917",
+    "code": "// === Tab: mySketch ===\nlet timer=0\nconst range=28\n\nsetup=()=> {\n  createCanvas(windowWidth, windowHeight, WEBGL)\n}\n\ndraw=()=> {\n  background(0)\n  directionalLight(color('white'), 0, -1, -1);\n  let angle=timer++/120\n  rotateX(angle)\n  rotateZ(angle)\n  scale(18)\n  translate(-range/2, -range/2, -range/2)\n  for (let z=range; z--; ) {\n    for (let y=range; y--; ) {\n      for (let x=range; x--; ) {\n        if (x^y^z)continue; \n        push()\n        translate(x, y, z)\n        box(tan(x+timer/557), tan(y), tan(z+timer/787)) \n        pop()\n      }\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Submerged Echoes.mp4"
+    ]
 }

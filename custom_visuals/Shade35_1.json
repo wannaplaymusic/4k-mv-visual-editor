@@ -1,22 +1,25 @@
 {
-  "name": "Shade35_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:10:32",
-  "url": "https://openprocessing.org/@ronikaufman/841984",
-  "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n// inspired by https://www.instagram.com/p/B7F8Uwln0l3/?igshid=oijtmrzffmq2\n\nlet x = 0;\nlet t = 0;\n\nlet colors;\nlet resolutions;\n\nfunction setup() {\n\tcreateCanvas(600, 600);\n\t//colorMode(HSB, 100);\n\tbackground(255);\n\tnoStroke();\n\t\n\tlet alpha = 255;\n\tcolors = [color(255, 0, 0, alpha), \n\t\t\t\t\t\tcolor(0, 255, 0, alpha), \n\t\t\t\t\t\tcolor(0, 0, 255, alpha)];\n\tshuffle(colors, true);\n\t\n\tres = 1 / random(300, 1000);\n}\n\nfunction draw() {\n\tlet noice, digit;\n\tfor (let y = 0; y < height; y += 0.5) {\n\t\tblendMode(DIFFERENCE);\n\t\tfor (let j = 0; j < colors.length; j++) {\n\t\t\tfill(colors[j]);\n\t\t\tnoice = noise(x * res, y * res, j/50 + t);\n\t\t\tdigit = floor(noice * 100);\n\t\t\tif (digit % 2 === 0) {\n\t\t\t\tsquare(x, y, 0.5);\n\t\t\t}\n\t\t}\n\t\tblendMode(BLEND);\n\t\tfill(255);\n\t\tsquare(x + 1, y, 1);\n\t}\n\tx += 0.5;\n\tif (x > width) {\n\t\t//let newColors = shuffle(colors);\n\t\t//while (colors === newColors) newColors = shuffle(colors);\n\t\t//colors = newColors;\n\t\tshuffle(colors, true);\n\t\tt += 1;\n\t\tx = -1;\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Shade35_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:10:32",
+    "url": "https://openprocessing.org/@ronikaufman/841984",
+    "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n// inspired by https://www.instagram.com/p/B7F8Uwln0l3/?igshid=oijtmrzffmq2\n\nlet x = 0;\nlet t = 0;\n\nlet colors;\nlet resolutions;\n\nfunction setup() {\n\tcreateCanvas(600, 600);\n\t//colorMode(HSB, 100);\n\tbackground(255);\n\tnoStroke();\n\t\n\tlet alpha = 255;\n\tcolors = [color(255, 0, 0, alpha), \n\t\t\t\t\t\tcolor(0, 255, 0, alpha), \n\t\t\t\t\t\tcolor(0, 0, 255, alpha)];\n\tshuffle(colors, true);\n\t\n\tres = 1 / random(300, 1000);\n}\n\nfunction draw() {\n\tlet noice, digit;\n\tfor (let y = 0; y < height; y += 0.5) {\n\t\tblendMode(DIFFERENCE);\n\t\tfor (let j = 0; j < colors.length; j++) {\n\t\t\tfill(colors[j]);\n\t\t\tnoice = noise(x * res, y * res, j/50 + t);\n\t\t\tdigit = floor(noice * 100);\n\t\t\tif (digit % 2 === 0) {\n\t\t\t\tsquare(x, y, 0.5);\n\t\t\t}\n\t\t}\n\t\tblendMode(BLEND);\n\t\tfill(255);\n\t\tsquare(x + 1, y, 1);\n\t}\n\tx += 0.5;\n\tif (x > width) {\n\t\t//let newColors = shuffle(colors);\n\t\t//while (colors === newColors) newColors = shuffle(colors);\n\t\t//colors = newColors;\n\t\tshuffle(colors, true);\n\t\tt += 1;\n\t\tx = -1;\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Immersive Core Universe.mp4"
+    ]
 }

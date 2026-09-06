@@ -1,22 +1,25 @@
 {
-  "name": "Wave_1",
-  "author": "gorillasun",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:04:38",
-  "url": "https://openprocessing.org/@gorillasun/1559428",
-  "code": "// === Tab: mySketch ===\nlet pg;\nlet S = 730;\n\nfunction setup() {\n  w = max(windowWidth, windowHeight)\n  createCanvas(w, w);\n  \n  pg = createGraphics(S, S)\n  \n  pad = S/12\n  \n  gX = 25\n  gY = 25\n  \n  gsx = (S - pad * 2 ) / gX\n  gsy = (S - pad * 2 ) / gY\n  \n  loopLength = 200\n  speed = 200\n \n  \n}\n\nfunction makeWave() {\n\n  pg.background(0,0,50,20);\n  \n  \n  \n  for(let x = pad; x < S-pad+1; x+=(Math.max(0.001, Math.abs(gsx)) || 1)){\n    for(let y = pad; y < S-pad+1; y+=(Math.max(0.001, Math.abs(gsy)) || 1)){\n      \n      var d = dist(x,y,x,x)/2\n      \n      var modulator = sin(sinput + x + y + sin(sinput + d))\n      pg.strokeWeight(15 + 15 * modulator)\n            \n      \n      var colorMod = (togg, mod1, mod2) => sin(sinput + x*mod1 + y*mod2)*togg + cos(sinput + x*mod1 + y*mod2)*(1 - togg)\n      \n      var mod1 = 15\n      var mod2 = 15\n      \n      pg.stroke(127.5 + 127.5 * colorMod(1, mod1, mod2),\n              127.5 + 127.5 * colorMod(0, mod1, mod2),\n              127.5 - 127.5 * colorMod(map(sin(sinput),-1,1,0,1), mod1, mod2))\n      \n\n      var posMod = sin(sinput + x*1 + y*1 + sin(sinput + x + y))\n    \n      pg.point(x , y )\n    }\n  }\n}\n\nfunction draw(){\n\tbackground(0,0,50,40);\n\t\n  t = (frameCount%loopLength)/speed\n  sinput = map(t, 0, 1, 0, TAU)\n  \n  makeWave()\n  image(pg,0,0,w,w)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Wave_1",
+    "author": "gorillasun",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:04:38",
+    "url": "https://openprocessing.org/@gorillasun/1559428",
+    "code": "// === Tab: mySketch ===\nlet pg;\nlet S = 730;\n\nfunction setup() {\n  w = max(windowWidth, windowHeight)\n  createCanvas(w, w);\n  \n  pg = createGraphics(S, S)\n  \n  pad = S/12\n  \n  gX = 25\n  gY = 25\n  \n  gsx = (S - pad * 2 ) / gX\n  gsy = (S - pad * 2 ) / gY\n  \n  loopLength = 200\n  speed = 200\n \n  \n}\n\nfunction makeWave() {\n\n  pg.background(0,0,50,20);\n  \n  \n  \n  for(let x = pad; x < S-pad+1; x+=(Math.max(0.001, Math.abs(gsx)) || 1)){\n    for(let y = pad; y < S-pad+1; y+=(Math.max(0.001, Math.abs(gsy)) || 1)){\n      \n      var d = dist(x,y,x,x)/2\n      \n      var modulator = sin(sinput + x + y + sin(sinput + d))\n      pg.strokeWeight(15 + 15 * modulator)\n            \n      \n      var colorMod = (togg, mod1, mod2) => sin(sinput + x*mod1 + y*mod2)*togg + cos(sinput + x*mod1 + y*mod2)*(1 - togg)\n      \n      var mod1 = 15\n      var mod2 = 15\n      \n      pg.stroke(127.5 + 127.5 * colorMod(1, mod1, mod2),\n              127.5 + 127.5 * colorMod(0, mod1, mod2),\n              127.5 - 127.5 * colorMod(map(sin(sinput),-1,1,0,1), mod1, mod2))\n      \n\n      var posMod = sin(sinput + x*1 + y*1 + sin(sinput + x + y))\n    \n      pg.point(x , y )\n    }\n  }\n}\n\nfunction draw(){\n\tbackground(0,0,50,40);\n\t\n  t = (frameCount%loopLength)/speed\n  sinput = map(t, 0, 1, 0, TAU)\n  \n  makeWave()\n  image(pg,0,0,w,w)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Submerged Echoes.mp4"
+    ]
 }

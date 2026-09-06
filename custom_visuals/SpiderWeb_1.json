@@ -1,22 +1,25 @@
 {
-  "name": "SpiderWeb_1",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 16:43:54",
-  "url": "https://openprocessing.org/@ntsutae/1301972",
-  "code": "// === Tab: mySketch ===\nrows=0\ncolors=[]\n\nsetup=()=>createCanvas(windowWidth, windowHeight)\ndraw=()=>{\n  if(rows<height){\n    rows++\n    for(cols=width;cols--;){\n      x=map(cols,0,width,-.1,-.03)\n      y=map(rows,0,height,-.036,.015)\n      for(i=0;i<5;i++){\n        d=x*x+y*y\n        newx=sin(y/d+x/sqrt(5))\n        newy=sin(x/d+y/sqrt(5))\n        x=newx\n        y=newy\n        colors[i]=abs(280-(x+y)**2*128)\n      }\n      stroke(colors[2],colors[3],colors[4])\n      line(cols,rows,cols,rows+colors[3])\n    }\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SpiderWeb_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 16:43:54",
+    "url": "https://openprocessing.org/@ntsutae/1301972",
+    "code": "// === Tab: mySketch ===\nrows=0\ncolors=[]\n\nsetup=()=>createCanvas(windowWidth, windowHeight)\ndraw=()=>{\n  if(rows<height){\n    rows++\n    for(cols=width;cols--;){\n      x=map(cols,0,width,-.1,-.03)\n      y=map(rows,0,height,-.036,.015)\n      for(i=0;i<5;i++){\n        d=x*x+y*y\n        newx=sin(y/d+x/sqrt(5))\n        newy=sin(x/d+y/sqrt(5))\n        x=newx\n        y=newy\n        colors[i]=abs(280-(x+y)**2*128)\n      }\n      stroke(colors[2],colors[3],colors[4])\n      line(cols,rows,cols,rows+colors[3])\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Muted Aurora Pulse.mp4"
+    ]
 }

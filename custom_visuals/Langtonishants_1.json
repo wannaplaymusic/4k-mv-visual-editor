@@ -1,22 +1,25 @@
 {
-  "name": "Langtonishants_1",
-  "author": "u297044",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:00:47",
-  "url": "https://openprocessing.org/@u297044/2157647",
-  "code": "// === Tab: mySketch ===\nvar W = 169;\nvar H = 169;\nvar state = new Int8Array(W*H);\n\nvar ant_x = 85;\nvar ant_y = 85;\nvar ant_dir = 0;\nvar ant_state = 0;\n\nvar cellSize = 4;\n\nvar speed = 7;\nvar accummulation = 5;\n\nfunction setup() {\n  createCanvas(800,800);\n  \n  for(let i=0; i<W*H; i++){\n\t  state[i]=0;\n  }\n}\n\nfunction colorMap(v){\n\tlet val = (1-v)*100+130;\n\treturn [val,val,val];\n}\n\nfunction update(){\n\tlet i = ant_x + ant_y * W;\n\t\n\tant_state += state[i]*2-1;\n\tif(abs(ant_state)>accummulation){\n\t\tant_dir += Math.sign(ant_state);\n\t\tant_state = 0;\n\t}\n\tant_dir = (ant_dir+4)%4;\n\t\n\tstate[i] = 1-state[i];\n\t\n\tant_y += ((ant_dir+1)%2)*(ant_dir-1);\n\tant_x += ((ant_dir)%2)*(2-ant_dir);\n\tant_y = (ant_y+H)%H;\n\tant_x = (ant_x+W)%W;\n}\n\nfunction draw() {\n  background(250);\n  noStroke();\n  for(let i=0; i<W*H; i++){\n\t  fill(colorMap(state[i]));\n\t  let i_x = i%W;\n\t  let i_y = floor(i/W);\n\t  rect((i_x-W/2)*cellSize + width/2, (i_y-H/2)*cellSize + height/2, cellSize, cellSize);\n  }\n  fill('#20e050');\n  ellipse((ant_x-W/2+0.5)*cellSize + width/2, (ant_y-H/2+0.5)*cellSize + height/2, cellSize*1.6);\n  \n  for(let i=0; i<speed; i++)\n  update();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Langtonishants_1",
+    "author": "u297044",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:00:47",
+    "url": "https://openprocessing.org/@u297044/2157647",
+    "code": "// === Tab: mySketch ===\nvar W = 169;\nvar H = 169;\nvar state = new Int8Array(W*H);\n\nvar ant_x = 85;\nvar ant_y = 85;\nvar ant_dir = 0;\nvar ant_state = 0;\n\nvar cellSize = 4;\n\nvar speed = 7;\nvar accummulation = 5;\n\nfunction setup() {\n  createCanvas(800,800);\n  \n  for(let i=0; i<W*H; i++){\n\t  state[i]=0;\n  }\n}\n\nfunction colorMap(v){\n\tlet val = (1-v)*100+130;\n\treturn [val,val,val];\n}\n\nfunction update(){\n\tlet i = ant_x + ant_y * W;\n\t\n\tant_state += state[i]*2-1;\n\tif(abs(ant_state)>accummulation){\n\t\tant_dir += Math.sign(ant_state);\n\t\tant_state = 0;\n\t}\n\tant_dir = (ant_dir+4)%4;\n\t\n\tstate[i] = 1-state[i];\n\t\n\tant_y += ((ant_dir+1)%2)*(ant_dir-1);\n\tant_x += ((ant_dir)%2)*(2-ant_dir);\n\tant_y = (ant_y+H)%H;\n\tant_x = (ant_x+W)%W;\n}\n\nfunction draw() {\n  background(250);\n  noStroke();\n  for(let i=0; i<W*H; i++){\n\t  fill(colorMap(state[i]));\n\t  let i_x = i%W;\n\t  let i_y = floor(i/W);\n\t  rect((i_x-W/2)*cellSize + width/2, (i_y-H/2)*cellSize + height/2, cellSize, cellSize);\n  }\n  fill('#20e050');\n  ellipse((ant_x-W/2+0.5)*cellSize + width/2, (ant_y-H/2+0.5)*cellSize + height/2, cellSize*1.6);\n  \n  for(let i=0; i<speed; i++)\n  update();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Modern Twist Saturation.mp4"
+    ]
 }

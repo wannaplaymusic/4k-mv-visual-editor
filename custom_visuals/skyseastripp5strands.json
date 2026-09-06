@@ -1,22 +1,25 @@
 {
-  "name": "skyseastripp5strands",
-  "author": "neill",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:24:55",
-  "url": "https://openprocessing.org/@neill/2931672",
-  "code": "// === Tab: mySketch ===\n//experimenting sampling some of the sky into the sea, \n//to try to unify otherwise-unrelated random colour picks.\n//AI? no.  Practicing with p5.strands and its noise snippet.\n\nlet colours;\nlet myShader;\n\nfunction setup() {\n\tcreateCanvas(200, windowHeight, WEBGL);\n\trandomiseColours();\n\tmyShader = buildFilterShader(prepShader);\n\tsetInterval(randomiseColours, 10000)\n\tselect(\"body\").style(\"background-color\", \"#202020\");\n}\n\nfunction draw() {\n\tfilter(myShader);\n}\n\nfunction prepShader() {\n\tnoiseDetail(6);\n\tlet c1 =\n\t\tuniformVec3(() => colours[0]);\n\tlet c2 =\n\t\tuniformVec3(() => colours[1]);\n\tlet c3 =\n\t\tuniformVec3(() => colours[2]);\n\tlet c4 =\n\t\tuniformVec3(() => colours[3]);\n\n\tfilterColor.begin();\n\tlet crd = filterColor.texCoord;\n\n\t//compress towards horizon\n\tlet y2 = sqrt(sqrt(abs(0.5 - crd.y)));\n\tlet skySpeed = 0.01;\n\tlet seaSpeed = 0.04;\n\tlet whiteningY = 1 * (1 - pow(y2, 1 / 4));\n\n\tlet nSky = noise(1000 + crd.x * 0.2, 1100 + 2 * y2, 100 + skySpeed * 0.001 * millis());\n\tlet colourSky = vec4(mix(c1, c2, nSky), 1);\n\n\tif (crd.y < 0.5) {\n\t\t//top half of image - sky\n\t\tcolourSky += whiteningY;\n\t\tfilterColor.set(colourSky);\n\t} else {\n\t\t//lower half of image - water\n\t\tlet nSea = noise(crd.x * 0.1, 2 * y2, seaSpeed * 0.001 * millis());\n\t\t//two more unrelated colours! a recipe for disaster\n\t\tlet colour = vec4(mix(c3, c4, nSea), 1);\n\n\t\t// colour = colour, whiteningY,\n\t\tcolour += whiteningY;\n\t\t//how much sky colour to bring in\n\t\tconst baseReflectionAmount = 0.5;\n\t\tlet noisedReflectionAmount = baseReflectionAmount * noise(333 + crd.x * 0.1, 557 + y2, seaSpeed * 0.002 * millis())\n\t\tcolour = mix(colour, colourSky, noisedReflectionAmount);\n\t\tfilterColor.set(colour);\n\t}\n\tfilterColor.end();\n}\n\nfunction randomiseColours() {\n\tcolours = [];\n\tconst colourChoices = [\n\t\tcolor(...[0.4, 0.0, 0.4].map(v => v * 255)),\n\t\tcolor(...[0.2, 0.4, 0.3].map(v => v * 255)),\n\t\tcolor(...[0.0, 0.4, 0.6].map(v => v * 255)),\n\t\tcolor(\"cyan\"),\n\t\tcolor(\"hotpink\"),\n\t\tcolor(\"indigo\"),\n\t\tcolor(\"yellow\"),\n\t\tcolor(\"orange\"),\n\t\tcolor(\"skyblue\"),\n\t\tcolor(\"dodgerblue\"),\n\t\tcolor(\"rgb(26,26,26)\")\n\t];\n\n\tcolours = shuffle(colourChoices).slice(0, 4).map(convertColourToVec3)\n}\n\n//take a p5.Color and convert to [f,f,f] where f is 0.0 - 1.0\nfunction convertColourToVec3(c) {\n\treturn [red(window.color(c)) / 255, green(window.color(c)) / 255, blue(window.color(c)) / 255]\n}\n\nfunction keyPressed() {\n\tif (key === \"s\") {\n\t\tsave(\"seascape\");\n\t}\n}\n\nfunction mousePressed() {\n\tif (mouseButton.left) {\n\t\trandomiseColours();\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "skyseastripp5strands",
+    "author": "neill",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:24:55",
+    "url": "https://openprocessing.org/@neill/2931672",
+    "code": "// === Tab: mySketch ===\n//experimenting sampling some of the sky into the sea, \n//to try to unify otherwise-unrelated random colour picks.\n//AI? no.  Practicing with p5.strands and its noise snippet.\n\nlet colours;\nlet myShader;\n\nfunction setup() {\n\tcreateCanvas(200, windowHeight, WEBGL);\n\trandomiseColours();\n\tmyShader = buildFilterShader(prepShader);\n\tsetInterval(randomiseColours, 10000)\n\tselect(\"body\").style(\"background-color\", \"#202020\");\n}\n\nfunction draw() {\n\tfilter(myShader);\n}\n\nfunction prepShader() {\n\tnoiseDetail(6);\n\tlet c1 =\n\t\tuniformVec3(() => colours[0]);\n\tlet c2 =\n\t\tuniformVec3(() => colours[1]);\n\tlet c3 =\n\t\tuniformVec3(() => colours[2]);\n\tlet c4 =\n\t\tuniformVec3(() => colours[3]);\n\n\tfilterColor.begin();\n\tlet crd = filterColor.texCoord;\n\n\t//compress towards horizon\n\tlet y2 = sqrt(sqrt(abs(0.5 - crd.y)));\n\tlet skySpeed = 0.01;\n\tlet seaSpeed = 0.04;\n\tlet whiteningY = 1 * (1 - pow(y2, 1 / 4));\n\n\tlet nSky = noise(1000 + crd.x * 0.2, 1100 + 2 * y2, 100 + skySpeed * 0.001 * millis());\n\tlet colourSky = vec4(mix(c1, c2, nSky), 1);\n\n\tif (crd.y < 0.5) {\n\t\t//top half of image - sky\n\t\tcolourSky += whiteningY;\n\t\tfilterColor.set(colourSky);\n\t} else {\n\t\t//lower half of image - water\n\t\tlet nSea = noise(crd.x * 0.1, 2 * y2, seaSpeed * 0.001 * millis());\n\t\t//two more unrelated colours! a recipe for disaster\n\t\tlet colour = vec4(mix(c3, c4, nSea), 1);\n\n\t\t// colour = colour, whiteningY,\n\t\tcolour += whiteningY;\n\t\t//how much sky colour to bring in\n\t\tconst baseReflectionAmount = 0.5;\n\t\tlet noisedReflectionAmount = baseReflectionAmount * noise(333 + crd.x * 0.1, 557 + y2, seaSpeed * 0.002 * millis())\n\t\tcolour = mix(colour, colourSky, noisedReflectionAmount);\n\t\tfilterColor.set(colour);\n\t}\n\tfilterColor.end();\n}\n\nfunction randomiseColours() {\n\tcolours = [];\n\tconst colourChoices = [\n\t\tcolor(...[0.4, 0.0, 0.4].map(v => v * 255)),\n\t\tcolor(...[0.2, 0.4, 0.3].map(v => v * 255)),\n\t\tcolor(...[0.0, 0.4, 0.6].map(v => v * 255)),\n\t\tcolor(\"cyan\"),\n\t\tcolor(\"hotpink\"),\n\t\tcolor(\"indigo\"),\n\t\tcolor(\"yellow\"),\n\t\tcolor(\"orange\"),\n\t\tcolor(\"skyblue\"),\n\t\tcolor(\"dodgerblue\"),\n\t\tcolor(\"rgb(26,26,26)\")\n\t];\n\n\tcolours = shuffle(colourChoices).slice(0, 4).map(convertColourToVec3)\n}\n\n//take a p5.Color and convert to [f,f,f] where f is 0.0 - 1.0\nfunction convertColourToVec3(c) {\n\treturn [red(window.color(c)) / 255, green(window.color(c)) / 255, blue(window.color(c)) / 255]\n}\n\nfunction keyPressed() {\n\tif (key === \"s\") {\n\t\tsave(\"seascape\");\n\t}\n}\n\nfunction mousePressed() {\n\tif (mouseButton.left) {\n\t\trandomiseColours();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Subtle Harmonic Fade.mp4"
+    ]
 }

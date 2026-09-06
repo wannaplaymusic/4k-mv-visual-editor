@@ -1,22 +1,25 @@
 {
-  "name": "Pullblocks",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:07:04",
-  "url": "https://openprocessing.org/@ronikaufman/2036021",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\nconst N_FRAMES = 50;\nlet phase = 0;\n\nlet K = 35, tiles = [];\nlet palette = [\"#ef562f\", \"#2b67af\", \"#14976b\", \"#f9d531\", \"#14976b\", \"#f9d531\", \"#ef562f\", \"#2b67af\"];\nlet backCol = \"#fffbe6\";\n\nfunction setup() {\n  createCanvas(500, 500);\n\tstroke(5);\n\tstrokeWeight(2);\n\tstrokeJoin(ROUND);\n\t//shuffle(palette, true);\n\n\tlet margin = 4;\n\tlet t0 = {i: margin, j: margin, m: K-2*margin, n: K-2*margin, outward: true};\n\ttiles.push(t0);\n  subdivide(t0.i, t0.j, t0.m, t0.n, random() < 1/2, t0.outward);\n  for (let ti of tiles) {\n    if (ti.m == 3 && ti.n == 3) {\n      tiles.push({i: ti.i+1, j: ti.j+1, m: 1, n: 1, outward: !ti.outward});\n    }\n  }\n}\n\nfunction draw() {\n\tlet t = (frameCount%N_FRAMES)/N_FRAMES;\n\tif (frameCount%(2*N_FRAMES) == 0) for (let ti of tiles) ti.outward = !ti.outward;\n\tif (t == 0) phase++;\n\tt = easeInOutExpo(t);\n\t\n\tlet u = width / K, du;\n\tlet colOffset = 0;\n\t\n\tif (phase%4 == 0) {\n\t\tdu = t*u;\n\t\ttranslate(du-u/2, du-u/2);\n\t} else if (phase%4 == 1) {\n\t\tt = 1-t;\n\t\tdu = t*u;\n\t\ttranslate(u/2, u/2);\n\t} else if (phase%4 == 2) {\n\t\tdu = t*u;\n\t\ttranslate(u/2-du, u/2-du);\n\t\tcolOffset += 4;\n\t} else {\n\t\tt = 1-t;\n\t\tdu = t*u;\n\t\ttranslate(-u/2, -u/2);\n\t\tcolOffset += 4;\n\t}\n\t\n  background(backCol);\n\n  for (let ti of tiles) {\n\t\tlet x = ti.i*u, y = ti.j*u;\n\t\tlet w = ti.m*u, h = ti.n*u;\n\t\tfill(backCol);\n    rect(x, y, w, h);\n\t\tif (ti.outward) {\n\t\t\tfill(palette[0+colOffset]);\n\t\t\tif (phase%4 < 2) quad(x-du, y-du, x+w-du, y-du, x+w, y, x, y);\n\t\t\telse quad(x, y+h, x+w, y+h, x+w+du, y+h+du, x+du, y+h+du);\n\t\t\tfill(palette[1+colOffset]);\n\t\t\tif (phase%4 < 2) quad(x-du, y-du, x-du, y+h-du, x, y+h, x, y);\n\t\t\telse quad(x+w, y, x+w, y+h, x+w+du, y+h+du, x+w+du, y+du);\n\t\t} else {\n\t\t\tfill(palette[2+colOffset]);\n\t\t\tif (phase%4 < 2) quad(x, y+h-du, x+w-du, y+h-du, x+w, y+h, x, y+h);\n\t\t\telse quad(x, y, x+w, y, x+w, y+du, x+du, y+du);\n\t\t\tfill(palette[3+colOffset]);\n\t\t\tif (phase%4 < 2) quad(x+w-du, y, x+w-du, y+h-du, x+w, y+h, x+w, y);\n\t\t\telse quad(x, y, x, y+h, x+du, y+h, x+du, y+du);\n\t\t}\n  }\n}\n\n// frontCol, topCol, leftCol\n// if outward, create new trio that's not equal, 1-to-1\n// else assign same value\nfunction subdivide(i, j, m, n, horiz, outward) {\n  if (horiz) {\n    let m1 = 2*~~random(0, (m-3)/2) + 1;\n    let m2 = m - m1 - 3;\n\n    tiles.push({i: i+1, j: j+1, m: m1, n: n-2, outward: !outward});\n    tiles.push({i: i+m1+2, j: j+1, m: m2, n: n-2, outward: !outward});\n    \n    if (n-2 > 4) {\n      if (m1 > 2) subdivide(i+1, j+1, m1, n-2, !horiz, !outward);\n      if (m2 > 2) subdivide(i+m1+2, j+1, m2, n-2, !horiz, !outward);\n    } else if (n-2 > 2) {\n      if (m1 > 4) subdivide(i+1, j+1, m1, n-2, horiz, !outward);\n      if (m2 > 4) subdivide(i+m1+2, j+1, m2, n-2, horiz, !outward);\n    }\n  } else {\n    let n1 = 2*~~random(0, (n-3)/2) + 1;\n    let n2 = n - n1 - 3;\n\n    tiles.push({i: i+1, j: j+1, m: m-2, n: n1, outward: !outward});\n    tiles.push({i: i+1, j: j+n1+2, m: m-2, n: n2, outward: !outward});\n    \n    if (m-2 > 4) {\n      if (n1 > 2) subdivide(i+1, j+1, m-2, n1, !horiz, !outward);\n      if (n2 > 2) subdivide(i+1, j+n1+2, m-2, n2, !horiz, !outward);\n    } else if (m-2 > 2) {\n      if (n1 > 4) subdivide(i+1, j+1, m-2, n1, horiz, !outward);\n      if (n2 > 4) subdivide(i+1, j+n1+2, m-2, n2, horiz, !outward);\n    }\n  }\n}\n\n// from easings.net\nfunction easeInOutExpo(x) {\n\treturn x === 0\n\t\t? 0\n\t\t: x === 1\n\t\t? 1\n\t\t: x < 0.5 ? Math.pow(2, 20 * x - 10) / 2\n\t\t: (2 - Math.pow(2, -20 * x + 10)) / 2;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Pullblocks",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:07:04",
+    "url": "https://openprocessing.org/@ronikaufman/2036021",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\nconst N_FRAMES = 50;\nlet phase = 0;\n\nlet K = 35, tiles = [];\nlet palette = [\"#ef562f\", \"#2b67af\", \"#14976b\", \"#f9d531\", \"#14976b\", \"#f9d531\", \"#ef562f\", \"#2b67af\"];\nlet backCol = \"#fffbe6\";\n\nfunction setup() {\n  createCanvas(500, 500);\n\tstroke(5);\n\tstrokeWeight(2);\n\tstrokeJoin(ROUND);\n\t//shuffle(palette, true);\n\n\tlet margin = 4;\n\tlet t0 = {i: margin, j: margin, m: K-2*margin, n: K-2*margin, outward: true};\n\ttiles.push(t0);\n  subdivide(t0.i, t0.j, t0.m, t0.n, random() < 1/2, t0.outward);\n  for (let ti of tiles) {\n    if (ti.m == 3 && ti.n == 3) {\n      tiles.push({i: ti.i+1, j: ti.j+1, m: 1, n: 1, outward: !ti.outward});\n    }\n  }\n}\n\nfunction draw() {\n\tlet t = (frameCount%N_FRAMES)/N_FRAMES;\n\tif (frameCount%(2*N_FRAMES) == 0) for (let ti of tiles) ti.outward = !ti.outward;\n\tif (t == 0) phase++;\n\tt = easeInOutExpo(t);\n\t\n\tlet u = width / K, du;\n\tlet colOffset = 0;\n\t\n\tif (phase%4 == 0) {\n\t\tdu = t*u;\n\t\ttranslate(du-u/2, du-u/2);\n\t} else if (phase%4 == 1) {\n\t\tt = 1-t;\n\t\tdu = t*u;\n\t\ttranslate(u/2, u/2);\n\t} else if (phase%4 == 2) {\n\t\tdu = t*u;\n\t\ttranslate(u/2-du, u/2-du);\n\t\tcolOffset += 4;\n\t} else {\n\t\tt = 1-t;\n\t\tdu = t*u;\n\t\ttranslate(-u/2, -u/2);\n\t\tcolOffset += 4;\n\t}\n\t\n  background(backCol);\n\n  for (let ti of tiles) {\n\t\tlet x = ti.i*u, y = ti.j*u;\n\t\tlet w = ti.m*u, h = ti.n*u;\n\t\tfill(backCol);\n    rect(x, y, w, h);\n\t\tif (ti.outward) {\n\t\t\tfill(palette[0+colOffset]);\n\t\t\tif (phase%4 < 2) quad(x-du, y-du, x+w-du, y-du, x+w, y, x, y);\n\t\t\telse quad(x, y+h, x+w, y+h, x+w+du, y+h+du, x+du, y+h+du);\n\t\t\tfill(palette[1+colOffset]);\n\t\t\tif (phase%4 < 2) quad(x-du, y-du, x-du, y+h-du, x, y+h, x, y);\n\t\t\telse quad(x+w, y, x+w, y+h, x+w+du, y+h+du, x+w+du, y+du);\n\t\t} else {\n\t\t\tfill(palette[2+colOffset]);\n\t\t\tif (phase%4 < 2) quad(x, y+h-du, x+w-du, y+h-du, x+w, y+h, x, y+h);\n\t\t\telse quad(x, y, x+w, y, x+w, y+du, x+du, y+du);\n\t\t\tfill(palette[3+colOffset]);\n\t\t\tif (phase%4 < 2) quad(x+w-du, y, x+w-du, y+h-du, x+w, y+h, x+w, y);\n\t\t\telse quad(x, y, x, y+h, x+du, y+h, x+du, y+du);\n\t\t}\n  }\n}\n\n// frontCol, topCol, leftCol\n// if outward, create new trio that's not equal, 1-to-1\n// else assign same value\nfunction subdivide(i, j, m, n, horiz, outward) {\n  if (horiz) {\n    let m1 = 2*~~random(0, (m-3)/2) + 1;\n    let m2 = m - m1 - 3;\n\n    tiles.push({i: i+1, j: j+1, m: m1, n: n-2, outward: !outward});\n    tiles.push({i: i+m1+2, j: j+1, m: m2, n: n-2, outward: !outward});\n    \n    if (n-2 > 4) {\n      if (m1 > 2) subdivide(i+1, j+1, m1, n-2, !horiz, !outward);\n      if (m2 > 2) subdivide(i+m1+2, j+1, m2, n-2, !horiz, !outward);\n    } else if (n-2 > 2) {\n      if (m1 > 4) subdivide(i+1, j+1, m1, n-2, horiz, !outward);\n      if (m2 > 4) subdivide(i+m1+2, j+1, m2, n-2, horiz, !outward);\n    }\n  } else {\n    let n1 = 2*~~random(0, (n-3)/2) + 1;\n    let n2 = n - n1 - 3;\n\n    tiles.push({i: i+1, j: j+1, m: m-2, n: n1, outward: !outward});\n    tiles.push({i: i+1, j: j+n1+2, m: m-2, n: n2, outward: !outward});\n    \n    if (m-2 > 4) {\n      if (n1 > 2) subdivide(i+1, j+1, m-2, n1, !horiz, !outward);\n      if (n2 > 2) subdivide(i+1, j+n1+2, m-2, n2, !horiz, !outward);\n    } else if (m-2 > 2) {\n      if (n1 > 4) subdivide(i+1, j+1, m-2, n1, horiz, !outward);\n      if (n2 > 4) subdivide(i+1, j+n1+2, m-2, n2, horiz, !outward);\n    }\n  }\n}\n\n// from easings.net\nfunction easeInOutExpo(x) {\n\treturn x === 0\n\t\t? 0\n\t\t: x === 1\n\t\t? 1\n\t\t: x < 0.5 ? Math.pow(2, 20 * x - 10) / 2\n\t\t: (2 - Math.pow(2, -20 * x + 10)) / 2;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Immersive Core Universe.mp4"
+    ]
 }

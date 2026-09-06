@@ -1,22 +1,25 @@
 {
-  "name": "MathoberTangentAnimated",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 22:57:47",
-  "url": "https://openprocessing.org/@epi/2380205",
-  "code": "// === Tab: mySketch ===\nvar beziers = [];\nvar NUM_BEZ = 3; // Puedes ajustar este número para más o menos curvas\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tframeRate(30);\n  colorMode(HSB);\n  background(\"rgb(0,0,12)\");\n  noFill();\n\n  // Generar curvas con puntos de control y velocidades aleatorias\n\tbeziers = [];\n  for (let i = 0; i < NUM_BEZ; i++) {\n    const bez = {\n      p1: { x: 0, y: random(0, 0.3) * height },\n      p2: { x: random(0.25, 0.6) * width, y: random(height) },\n      p3: { x: random(0.4, 0.75) * width, y: random(height) },\n      p4: { x: width, y: random(0.7, 1) * height },\n      velocidad: {\n        p1: random(0.005, 0.02),\n        p2: random(0.005, 0.02),\n        p3: random(0.005, 0.02),\n        p4: random(0.005, 0.02),\n      },\n      offset: {\n        p1: random(TWO_PI),\n        p2: random(TWO_PI),\n        p3: random(TWO_PI),\n        p4: random(TWO_PI),\n      },\n    };\n    beziers.push(bez);\n  }\n}\n\nfunction draw() {\n  background(\"rgba(0, 0, 12, 0.06)\");\n  for (let bez of beziers) {\n    updatePoints(bez);\n    drawTangents(bez);\n  }\n}\n\nfunction updatePoints(bez) {\n  // Actualizar puntos de control con velocidades y offsets únicos\n \tbez.p1.x = 0;\n\tbez.p1.y = map(sin(frameCount * bez.velocidad.p1 + bez.offset.p1),\n    -1, 1, 0, height * 0.3);\n  bez.p2.x = map(sin(frameCount * bez.velocidad.p2 + bez.offset.p2),\n    -1, 1, width * 0.25, width * 0.6);\n  bez.p2.y = map(cos(frameCount * bez.velocidad.p2 + bez.offset.p2),\n    -1, 1, 0, height);\n  bez.p3.x = map(cos(frameCount * bez.velocidad.p3 + bez.offset.p3),\n    -1, 1, width * 0.4, width * 0.75);\n  bez.p3.y = map(sin(frameCount * bez.velocidad.p3 + bez.offset.p3),\n    -1, 1, 0, height);\n\tbez.p4.x = width-1;\n  bez.p4.y = map(cos(frameCount * bez.velocidad.p4 + bez.offset.p4),\n    -1, 1, height * 0.7, height);\n}\n\nfunction drawTangents(bez) {\n  strokeWeight(1);\n  stroke(255, 96);\n  for (let f = 0; f <= 1; f += 0.004) {\n    const x = bezierPoint(bez.p1.x, bez.p2.x, bez.p3.x, bez.p4.x, f);\n    const y = bezierPoint(bez.p1.y, bez.p2.y, bez.p3.y, bez.p4.y, f);\n    const tx = 2 * bezierTangent(bez.p1.x, bez.p2.x, bez.p3.x, bez.p4.x, f);\n    const ty = 2 * bezierTangent(bez.p1.y, bez.p2.y, bez.p3.y, bez.p4.y, f);\n    const vec = createVector(tx, ty).normalize().mult(100); // speed issue: (2 * max(width, height));\n    const ang = vec.heading();\n\t\tconst clrNoise = (noise((x+tx)/1234, (y+ty)/4321, frameCount/22)-0.5)*60;\n    const clrHue = (ang / TWO_PI * 360 + clrNoise + 360) % 360;\n\t\tstroke(clrHue, 75, 75, 0.2);\n    line(x + vec.x, y + vec.y, x - vec.x, y - vec.y);\n  }\n}\n\nfunction mousePressed() {\n  if (mouseButton === LEFT) setup(); // reset beziers\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n\tbackground(\"rgb(0, 0, 12)\");\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "MathoberTangentAnimated",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:57:47",
+    "url": "https://openprocessing.org/@epi/2380205",
+    "code": "// === Tab: mySketch ===\nvar beziers = [];\nvar NUM_BEZ = 3; // Puedes ajustar este número para más o menos curvas\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tframeRate(30);\n  colorMode(HSB);\n  background(\"rgb(0,0,12)\");\n  noFill();\n\n  // Generar curvas con puntos de control y velocidades aleatorias\n\tbeziers = [];\n  for (let i = 0; i < NUM_BEZ; i++) {\n    const bez = {\n      p1: { x: 0, y: random(0, 0.3) * height },\n      p2: { x: random(0.25, 0.6) * width, y: random(height) },\n      p3: { x: random(0.4, 0.75) * width, y: random(height) },\n      p4: { x: width, y: random(0.7, 1) * height },\n      velocidad: {\n        p1: random(0.005, 0.02),\n        p2: random(0.005, 0.02),\n        p3: random(0.005, 0.02),\n        p4: random(0.005, 0.02),\n      },\n      offset: {\n        p1: random(TWO_PI),\n        p2: random(TWO_PI),\n        p3: random(TWO_PI),\n        p4: random(TWO_PI),\n      },\n    };\n    beziers.push(bez);\n  }\n}\n\nfunction draw() {\n  background(\"rgba(0, 0, 12, 0.06)\");\n  for (let bez of beziers) {\n    updatePoints(bez);\n    drawTangents(bez);\n  }\n}\n\nfunction updatePoints(bez) {\n  // Actualizar puntos de control con velocidades y offsets únicos\n \tbez.p1.x = 0;\n\tbez.p1.y = map(sin(frameCount * bez.velocidad.p1 + bez.offset.p1),\n    -1, 1, 0, height * 0.3);\n  bez.p2.x = map(sin(frameCount * bez.velocidad.p2 + bez.offset.p2),\n    -1, 1, width * 0.25, width * 0.6);\n  bez.p2.y = map(cos(frameCount * bez.velocidad.p2 + bez.offset.p2),\n    -1, 1, 0, height);\n  bez.p3.x = map(cos(frameCount * bez.velocidad.p3 + bez.offset.p3),\n    -1, 1, width * 0.4, width * 0.75);\n  bez.p3.y = map(sin(frameCount * bez.velocidad.p3 + bez.offset.p3),\n    -1, 1, 0, height);\n\tbez.p4.x = width-1;\n  bez.p4.y = map(cos(frameCount * bez.velocidad.p4 + bez.offset.p4),\n    -1, 1, height * 0.7, height);\n}\n\nfunction drawTangents(bez) {\n  strokeWeight(1);\n  stroke(255, 96);\n  for (let f = 0; f <= 1; f += 0.004) {\n    const x = bezierPoint(bez.p1.x, bez.p2.x, bez.p3.x, bez.p4.x, f);\n    const y = bezierPoint(bez.p1.y, bez.p2.y, bez.p3.y, bez.p4.y, f);\n    const tx = 2 * bezierTangent(bez.p1.x, bez.p2.x, bez.p3.x, bez.p4.x, f);\n    const ty = 2 * bezierTangent(bez.p1.y, bez.p2.y, bez.p3.y, bez.p4.y, f);\n    const vec = createVector(tx, ty).normalize().mult(100); // speed issue: (2 * max(width, height));\n    const ang = vec.heading();\n\t\tconst clrNoise = (noise((x+tx)/1234, (y+ty)/4321, frameCount/22)-0.5)*60;\n    const clrHue = (ang / TWO_PI * 360 + clrNoise + 360) % 360;\n\t\tstroke(clrHue, 75, 75, 0.2);\n    line(x + vec.x, y + vec.y, x - vec.x, y - vec.y);\n  }\n}\n\nfunction mousePressed() {\n  if (mouseButton === LEFT) setup(); // reset beziers\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n\tbackground(\"rgb(0, 0, 12)\");\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Crisp Rimshot Fade.mp4"
+    ]
 }

@@ -1,22 +1,25 @@
 {
-  "name": "Extrude",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:06:00",
-  "url": "https://openprocessing.org/@ronikaufman/2186250",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\n// Made for @sableRaph's weekly creative challenge on Twitch (#WCCChallenge)\n// https://www.twitch.tv/sableraph\n// \"Iterations\"\n\nconst N_FRAMES = 500;\n\nfunction setup() {\n  createCanvas(400, 600);\n  noFill();\n  rectMode(CENTER);\n}\n\nfunction draw() {\n  background(\"#fffbe6\");\n  let palette = [\"#abcd5e\", \"#14976b\", \"#2b67af\", \"#62b6de\", \"#f589a3\", \"#ef562f\", \"#fc8405\", \"#f9d531\"];\n  \n  let t = TAU*(frameCount%N_FRAMES)/N_FRAMES;\n  \n  let wMargin = 80;\n  let hMargin = 120;\n  let nLines = palette.length;\n  let h = (height-2*hMargin)/(nLines-1);\n  let s = h/sqrt(2)-8;\n  for (let i = 0; i < nLines; i++) {\n    let y = hMargin + h*i;\n    \n    strokeWeight(1);\n    stroke(5, 80);\n    makeLine(wMargin, y, width-wMargin, y, s, 200, t);\n    \n    // add border squares\n    strokeWeight(3);\n    stroke(palette[i]);\n    makeLine(wMargin, y, wMargin, y, s, 1, t);\n    stroke(palette[(i+4)%palette.length]);\n    makeLine(width-wMargin, y, width-wMargin, y, s, 1, t);\n    \n    t *= -1; // flip the direction of the movement\n  }\n}\n\nfunction makeLine(x1, y1, x2, y2, s, n, t) {\n  for (let i = 0; i < n; i++) {\n    let x = map(i, 0, n, x1, x2);\n    var y = map(i, 0, n, y1, y2);\n    push();\n    translate(x, y);\n    rotate(1.5*TAU*loopNoise(x, y, t));\n    square(0, 0, s);\n    pop();\n  }\n}\n\n// noise on a cylinder, so it loops!\nfunction loopNoise(x, y, theta) {\n  let rad = 1, sc = 1/125, offset = 10; // parameters for the noise\n  return noise(\n    offset + rad*cos(x*sc+theta),\n    offset + rad*sin(x*sc+theta),\n    y*sc\n  );\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Extrude",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:06:00",
+    "url": "https://openprocessing.org/@ronikaufman/2186250",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\n// Made for @sableRaph's weekly creative challenge on Twitch (#WCCChallenge)\n// https://www.twitch.tv/sableraph\n// \"Iterations\"\n\nconst N_FRAMES = 500;\n\nfunction setup() {\n  createCanvas(400, 600);\n  noFill();\n  rectMode(CENTER);\n}\n\nfunction draw() {\n  background(\"#fffbe6\");\n  let palette = [\"#abcd5e\", \"#14976b\", \"#2b67af\", \"#62b6de\", \"#f589a3\", \"#ef562f\", \"#fc8405\", \"#f9d531\"];\n  \n  let t = TAU*(frameCount%N_FRAMES)/N_FRAMES;\n  \n  let wMargin = 80;\n  let hMargin = 120;\n  let nLines = palette.length;\n  let h = (height-2*hMargin)/(nLines-1);\n  let s = h/sqrt(2)-8;\n  for (let i = 0; i < nLines; i++) {\n    let y = hMargin + h*i;\n    \n    strokeWeight(1);\n    stroke(5, 80);\n    makeLine(wMargin, y, width-wMargin, y, s, 200, t);\n    \n    // add border squares\n    strokeWeight(3);\n    stroke(palette[i]);\n    makeLine(wMargin, y, wMargin, y, s, 1, t);\n    stroke(palette[(i+4)%palette.length]);\n    makeLine(width-wMargin, y, width-wMargin, y, s, 1, t);\n    \n    t *= -1; // flip the direction of the movement\n  }\n}\n\nfunction makeLine(x1, y1, x2, y2, s, n, t) {\n  for (let i = 0; i < n; i++) {\n    let x = map(i, 0, n, x1, x2);\n    var y = map(i, 0, n, y1, y2);\n    push();\n    translate(x, y);\n    rotate(1.5*TAU*loopNoise(x, y, t));\n    square(0, 0, s);\n    pop();\n  }\n}\n\n// noise on a cylinder, so it loops!\nfunction loopNoise(x, y, theta) {\n  let rad = 1, sc = 1/125, offset = 10; // parameters for the noise\n  return noise(\n    offset + rad*cos(x*sc+theta),\n    offset + rad*sin(x*sc+theta),\n    y*sc\n  );\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Linear Decay System.mp4"
+    ]
 }

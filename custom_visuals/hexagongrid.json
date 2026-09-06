@@ -1,22 +1,25 @@
 {
-  "name": "hexagongrid",
-  "author": "u202203",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:34:14",
-  "url": "https://openprocessing.org/@u202203/1134422",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(700, 700);\n\tcolorMode(HSB,100);\n\tbackground(0);\n\tangleMode(DEGREES);\n\tstrokeWeight(7);\n}\nlet a=0;\nlet x=350;\nlet y=350;\nlet xx=0;\nlet yy=0;\nlet aa=0;\nlet t=0;\nfunction draw() {\n\tstroke(t%100,100,100);\n\txx=x;\n\tyy=y;\n\taa=a;\n\tline(x,y,x+cos(a)*20,y+sin(a)*20);\n\tx+=cos(a)*20;\n\ty+=sin(a)*20;\n\tif (random(1)<0.5) {a+=60} else {a-=60;}\n\tif (x>700||x<0||y>700||y<0) {x=xx;y=yy;a=aa;a+=120}\n\tt++;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "hexagongrid",
+    "author": "u202203",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:34:14",
+    "url": "https://openprocessing.org/@u202203/1134422",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(700, 700);\n\tcolorMode(HSB,100);\n\tbackground(0);\n\tangleMode(DEGREES);\n\tstrokeWeight(7);\n}\nlet a=0;\nlet x=350;\nlet y=350;\nlet xx=0;\nlet yy=0;\nlet aa=0;\nlet t=0;\nfunction draw() {\n\tstroke(t%100,100,100);\n\txx=x;\n\tyy=y;\n\taa=a;\n\tline(x,y,x+cos(a)*20,y+sin(a)*20);\n\tx+=cos(a)*20;\n\ty+=sin(a)*20;\n\tif (random(1)<0.5) {a+=60} else {a-=60;}\n\tif (x>700||x<0||y>700||y<0) {x=xx;y=yy;a=aa;a+=120}\n\tt++;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Scalar Shift.mp4"
+    ]
 }

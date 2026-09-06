@@ -1,22 +1,25 @@
 {
-  "name": "RainyFoggyswamp",
-  "author": "u130883",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:23:49",
-  "url": "https://openprocessing.org/@u130883/900051",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\tnoStroke();\n\t\n\tbackground(0);\n\t\n\tcolorMode(HSL, 360, 255, 255, 1);\n\t\n\tnoiseSeed(42);\n\tnoiseDetail(6, 0.85);\n\t\n\trectMode(CENTER);\n\tellipseMode(CENTER);\n\t\n\tgenerate();\n}\n\nfunction draw() {\n\t\n}\n\nfunction generate() {\n\tnoStroke();\n\t\n\tbackground(0, 0, 255, 1);\n\t\n\tlet x = 0, y = 0;\n\tlet ystep = 1;\n\n\tfor (y = 0; y < height; y += 4) {\n\t\tlet ny = y / height;\n\t\tfor (x = 0; x < width; x += 4) {\n\t\t\tlet nx = x / width;\n\t\t\tlet n = noise(nx / 24, ny / 24);\n\t\t\tlet n2 = noise(nx / 8, ny / 8);\n\t\t\t\n\t\t\tlet yy = height / 3.9 + y - n * height;\n\t\t\tfill(60 - 30 * pow(ny, 2.25) * (n2 * abs(sin(nx * PI * 0.25 + ny * PI * 2 + 0.25))), 0, 148 + pow(ny, 1) * 100, random(0.25, 0.75));\n\t\t\tstroke(0, 0, random(0, 128), random(0,0.025));\n\t\t\tellipse(x + random(-8, 8), yy + random(-8, 8), 16, 16);\n\t\t}\n\t}\n\t\n\tfor (y = 0; y < height; y += 4) {\n\t\tvar ny = y / height;\n\t\tfor (x = 0; x < width; x += 4) {\n\t\t\tvar nx = x / width;\n\t\t\tvar n = noise(nx / 12, ny / 12);\n\t\t\tvar n2 = noise(nx * 4, ny - 4);\n\t\t\t\n\t\t\tvar yy = height - height / 24 + y - n * height;\n\t\t\t\n\t\t\tstroke(100 - 60 * pow(ny, 2.25) * (n2 * abs(sin(nx * PI * 0.25 + ny * PI * 8 + 0.25))) + random(-40, 40), 0, 170 + pow(ny, 1) * 68, 1);\n\t\t\tline(x + random(-128, 128), yy, x + random(-128, 128), yy - random(32, height));\n\t\t}\n\t}\n\t\n\tfor (y = height; y > 0; y -= 8) {\n\t\tfor (x = 0; x < width; x += 8) {\n\t\t\tif (random() > 0.85) {\n\t\t\t\tstroke(0, 0, 0, random(0, 0.25));\n\t\t\t\tlet xx = x + random(-4, 4);\n\t\t\t\tline(xx, y, xx + random(-1, 1), y + random(-1, 1));\n\t\t\t}\n\t\t}\n\t}\n\n\tfor (y = 0; y < height / 2; y += 2) {\n\t\tstroke(224, 128, 148, 1);\n\t\tstrokeWeight(1);\n\t\t\n\t\t//line(0, y, width, y);\n\t\n\t\tfor (x = 0; x < width; x += 64) {\n\t\t\tif (random() > 0.75) {\n\t\t\t\tstroke(0, 0, 255, random() * 0.05);\n\t\t\t\tvar xx = x + random(-2, 2);\n\t\t\t\tline(xx, y, xx + random(-200, 200), y + random(-1, 1));\n\t\t\t}\n\t\t}\n\t}\n\t\n\t//fill(0, 0, 0, 1);\n\t//rect(width / 2, height / 2 - height / 2.5 / 2 + 40, width / 10, height / 2.5);\n\t\n\tlet wl = 255 * (height / 976);\n\tlet m = 0; // get max y\n\tfor (y = 0; y < (height - m); y += 1) {\n\t\tvar ny = y / height;\n\t\tlet noy = noise(ny);\n\t\t\n\t\tfor (x = 0; x < width; x += 1) {\n\t\t\tvar yy = (height / 2 + noise(x / width) * 8) + y + m;\n\t\t\t\n\t\t\tvar nx = x / width;\n\t\t\tlet nox = noise(nx * 2, ny * 8);\n\t\t\tlet nox2 = (0.5 - noise(nx, ny)) * 2;\n\t\t\tlet nox3 = noise(nx / 8, ny / 8);\n\t\t\tvar n = (sin(nx * PI * 0.5 + ny * PI * 1 + nox * PI * 2.15)) / 2 * nox2;\n\t\t\t\n\t\t\tif (random() > 0.15) {\n\t\t\t\t\n\t\t\t\tvar xx = x + random(-2, 2);\n\t\t\t\tlet yh2 = random(-200, 200) * n * ny;\n\t\t\t\tnoStroke();\n\t\t\t\t\n\t\t\t\tif (random() > 0.996 && n > 0.05) {\n\t\t\t\t\tfill(64, 64, 48, 1);\n\t\t\t\t\trect(xx, yy - yh2, random(2, 8) * ny, 48 * ny);\n\t\t\t\t}\n\t\t\t\t\n\t\t\t\tstroke(128 + (nox2) * 8, 100 * nox3, (200*nox3-random(200) * n), random() * 0.45 * pow(ny, 0.3));\n\t\t\t\tline(xx, yy, xx + random(-200, 200) * n * noy * ny, yy + yh2);\n\t\t\t}\n\t\t}\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "RainyFoggyswamp",
+    "author": "u130883",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:23:49",
+    "url": "https://openprocessing.org/@u130883/900051",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\tnoStroke();\n\t\n\tbackground(0);\n\t\n\tcolorMode(HSL, 360, 255, 255, 1);\n\t\n\tnoiseSeed(42);\n\tnoiseDetail(6, 0.85);\n\t\n\trectMode(CENTER);\n\tellipseMode(CENTER);\n\t\n\tgenerate();\n}\n\nfunction draw() {\n\t\n}\n\nfunction generate() {\n\tnoStroke();\n\t\n\tbackground(0, 0, 255, 1);\n\t\n\tlet x = 0, y = 0;\n\tlet ystep = 1;\n\n\tfor (y = 0; y < height; y += 4) {\n\t\tlet ny = y / height;\n\t\tfor (x = 0; x < width; x += 4) {\n\t\t\tlet nx = x / width;\n\t\t\tlet n = noise(nx / 24, ny / 24);\n\t\t\tlet n2 = noise(nx / 8, ny / 8);\n\t\t\t\n\t\t\tlet yy = height / 3.9 + y - n * height;\n\t\t\tfill(60 - 30 * pow(ny, 2.25) * (n2 * abs(sin(nx * PI * 0.25 + ny * PI * 2 + 0.25))), 0, 148 + pow(ny, 1) * 100, random(0.25, 0.75));\n\t\t\tstroke(0, 0, random(0, 128), random(0,0.025));\n\t\t\tellipse(x + random(-8, 8), yy + random(-8, 8), 16, 16);\n\t\t}\n\t}\n\t\n\tfor (y = 0; y < height; y += 4) {\n\t\tvar ny = y / height;\n\t\tfor (x = 0; x < width; x += 4) {\n\t\t\tvar nx = x / width;\n\t\t\tvar n = noise(nx / 12, ny / 12);\n\t\t\tvar n2 = noise(nx * 4, ny - 4);\n\t\t\t\n\t\t\tvar yy = height - height / 24 + y - n * height;\n\t\t\t\n\t\t\tstroke(100 - 60 * pow(ny, 2.25) * (n2 * abs(sin(nx * PI * 0.25 + ny * PI * 8 + 0.25))) + random(-40, 40), 0, 170 + pow(ny, 1) * 68, 1);\n\t\t\tline(x + random(-128, 128), yy, x + random(-128, 128), yy - random(32, height));\n\t\t}\n\t}\n\t\n\tfor (y = height; y > 0; y -= 8) {\n\t\tfor (x = 0; x < width; x += 8) {\n\t\t\tif (random() > 0.85) {\n\t\t\t\tstroke(0, 0, 0, random(0, 0.25));\n\t\t\t\tlet xx = x + random(-4, 4);\n\t\t\t\tline(xx, y, xx + random(-1, 1), y + random(-1, 1));\n\t\t\t}\n\t\t}\n\t}\n\n\tfor (y = 0; y < height / 2; y += 2) {\n\t\tstroke(224, 128, 148, 1);\n\t\tstrokeWeight(1);\n\t\t\n\t\t//line(0, y, width, y);\n\t\n\t\tfor (x = 0; x < width; x += 64) {\n\t\t\tif (random() > 0.75) {\n\t\t\t\tstroke(0, 0, 255, random() * 0.05);\n\t\t\t\tvar xx = x + random(-2, 2);\n\t\t\t\tline(xx, y, xx + random(-200, 200), y + random(-1, 1));\n\t\t\t}\n\t\t}\n\t}\n\t\n\t//fill(0, 0, 0, 1);\n\t//rect(width / 2, height / 2 - height / 2.5 / 2 + 40, width / 10, height / 2.5);\n\t\n\tlet wl = 255 * (height / 976);\n\tlet m = 0; // get max y\n\tfor (y = 0; y < (height - m); y += 1) {\n\t\tvar ny = y / height;\n\t\tlet noy = noise(ny);\n\t\t\n\t\tfor (x = 0; x < width; x += 1) {\n\t\t\tvar yy = (height / 2 + noise(x / width) * 8) + y + m;\n\t\t\t\n\t\t\tvar nx = x / width;\n\t\t\tlet nox = noise(nx * 2, ny * 8);\n\t\t\tlet nox2 = (0.5 - noise(nx, ny)) * 2;\n\t\t\tlet nox3 = noise(nx / 8, ny / 8);\n\t\t\tvar n = (sin(nx * PI * 0.5 + ny * PI * 1 + nox * PI * 2.15)) / 2 * nox2;\n\t\t\t\n\t\t\tif (random() > 0.15) {\n\t\t\t\t\n\t\t\t\tvar xx = x + random(-2, 2);\n\t\t\t\tlet yh2 = random(-200, 200) * n * ny;\n\t\t\t\tnoStroke();\n\t\t\t\t\n\t\t\t\tif (random() > 0.996 && n > 0.05) {\n\t\t\t\t\tfill(64, 64, 48, 1);\n\t\t\t\t\trect(xx, yy - yh2, random(2, 8) * ny, 48 * ny);\n\t\t\t\t}\n\t\t\t\t\n\t\t\t\tstroke(128 + (nox2) * 8, 100 * nox3, (200*nox3-random(200) * n), random() * 0.45 * pow(ny, 0.3));\n\t\t\t\tline(xx, yy, xx + random(-200, 200) * n * noy * ny, yy + yh2);\n\t\t\t}\n\t\t}\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Frosted Windows.mp4"
+    ]
 }

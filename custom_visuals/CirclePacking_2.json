@@ -1,22 +1,25 @@
 {
-  "name": "CirclePacking_2",
-  "author": "u110137",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:13:55",
-  "url": "https://openprocessing.org/@u110137/954007",
-  "code": "// === Tab: Circles ===\nclass Circle {\n  constructor(x, y, r, hue) {\n    this.x = x;\n    this.y = y;\n    this.r = r;\n    this.hue = hue;\n    this.isgrowing = true;\n  }\n\tshow() {\n\t\tfill(this.hue);\n    noStroke();\n    ellipse(this.x, this.y, this.r * 2);\n\t}\n  grow() {\n    this.r += .5;\n\n  }\n  touchesedges() {\n    if (this.x - this.r < 0 || this.x + this.r > width || this.y + this.r > height || this.y - this.r < 0) {\n      this.isgrowing=false;\n    }\n  }\n  touchesother(other) {\n    let d = dist(this.x, this.y, other.x, other.y);\n    if (d < (this.r + other.r)) {\n      this.r-=1;\n      this.isgrowing = false;\n    }\n  }\n\n}\n\n// === Tab: mySketch ===\nvar circles = [];\nvar img;\nvar list = [];\nvar radius;\n\nfunction preload() {\n\timg = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/alex.jpg');\n}\n\nfunction setup() {\n\timg.resize(windowHeight, 0);\n\tcreateCanvas(img.width, img.height);\n\tradius = height / 2;\n}\n\nfunction draw() {\n\tif (radius > -height / 2) {\n\t\tbackground(0);\n\t\tlet pos = p5.Vector.random2D().mult(radius);\n\t\tlet x = pos.x + width / 2;\n\t\tlet y = pos.y + height / 2;\n\t\tif (overlapping(x, y) == false) {\n\t\t\tlet shade = img.get(x, y);\n\t\t\tcircles.push(new Circle(x, y, 1, shade));\n\t\t}\n\t\tfor (c of circles) {\n\t\t\tc.show();\n\t\t\tif (c.isgrowing) {\n\t\t\t\tc.grow();\n\t\t\t\tc.touchesedges();\n\t\t\t\tfor (other of circles) {\n\t\t\t\t\tif (c != other) {\n\t\t\t\t\t\tc.touchesother(other);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\tradius -= 0.2;\n}\n\nfunction overlapping(x, y) {\n\tlet overlapping = false;\n\tfor (c of circles) {\n\t\tvar d = dist(x, y, c.x, c.y);\n\t\tif (d < c.r) overlapping = true;\n\t}\n\treturn overlapping;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CirclePacking_2",
+    "author": "u110137",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:13:55",
+    "url": "https://openprocessing.org/@u110137/954007",
+    "code": "// === Tab: Circles ===\nclass Circle {\n  constructor(x, y, r, hue) {\n    this.x = x;\n    this.y = y;\n    this.r = r;\n    this.hue = hue;\n    this.isgrowing = true;\n  }\n\tshow() {\n\t\tfill(this.hue);\n    noStroke();\n    ellipse(this.x, this.y, this.r * 2);\n\t}\n  grow() {\n    this.r += .5;\n\n  }\n  touchesedges() {\n    if (this.x - this.r < 0 || this.x + this.r > width || this.y + this.r > height || this.y - this.r < 0) {\n      this.isgrowing=false;\n    }\n  }\n  touchesother(other) {\n    let d = dist(this.x, this.y, other.x, other.y);\n    if (d < (this.r + other.r)) {\n      this.r-=1;\n      this.isgrowing = false;\n    }\n  }\n\n}\n\n// === Tab: mySketch ===\nvar circles = [];\nvar img;\nvar list = [];\nvar radius;\n\nfunction preload() {\n\timg = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/alex.jpg');\n}\n\nfunction setup() {\n\timg.resize(windowHeight, 0);\n\tcreateCanvas(img.width, img.height);\n\tradius = height / 2;\n}\n\nfunction draw() {\n\tif (radius > -height / 2) {\n\t\tbackground(0);\n\t\tlet pos = p5.Vector.random2D().mult(radius);\n\t\tlet x = pos.x + width / 2;\n\t\tlet y = pos.y + height / 2;\n\t\tif (overlapping(x, y) == false) {\n\t\t\tlet shade = img.get(x, y);\n\t\t\tcircles.push(new Circle(x, y, 1, shade));\n\t\t}\n\t\tfor (c of circles) {\n\t\t\tc.show();\n\t\t\tif (c.isgrowing) {\n\t\t\t\tc.grow();\n\t\t\t\tc.touchesedges();\n\t\t\t\tfor (other of circles) {\n\t\t\t\t\tif (c != other) {\n\t\t\t\t\t\tc.touchesother(other);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\tradius -= 0.2;\n}\n\nfunction overlapping(x, y) {\n\tlet overlapping = false;\n\tfor (c of circles) {\n\t\tvar d = dist(x, y, c.x, c.y);\n\t\tif (d < c.r) overlapping = true;\n\t}\n\treturn overlapping;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Modern Twist Saturation.mp4"
+    ]
 }

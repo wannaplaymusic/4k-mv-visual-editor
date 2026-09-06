@@ -1,22 +1,26 @@
 {
-  "name": "SpiralPipeWCCChallengeDownwardSpiral4924",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:26:42",
-  "url": "https://openprocessing.org/@epi/2340318",
-  "code": "let BG_C = \"#ffffff\";\n// === Tab: mySketch ===\n/*\n\tSpiral Pipe #WCCChallenge Downward Spiral 4.9.2024\n\thttps://openprocessing.org/sketch/2340318\n\t#generativeart #creativecoding #p5js\n\n  Dear Raph and creative coding community,\n\t\n\treimplemented the sketch from a still picture and sadly forgot the source.\n\tIf anyone know, please leave a comment - thx! :-)\n\t\n\tFor the challenge altered an animation which draws from the end to the start \n\tto enable proper overlapping do draw it downward.\n\tFading from fill color, stroke color and weight increases the perspective.\n\t\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\nlet BG;\nlet NUM_REVOL;\nlet shapes, startFrame, rotAngle;\n\nfunction setup() {\n  createCanvas((S = max(windowWidth, windowHeight)), S);\n\tframeRate(60);\n  describe(\"Radial Spiral of Circles\");\n\tBG_C = color(\"rgb(212,212,212)\");\n\tFILL_C = color(\"rgb(190,203,208)\")\n\tfill(FILL_C);\n\tstrokeWeight(2);\n\tcolorMode(HSB);\n\t\n\tstartFrame = frameCount;\n\trotAngle = random(TWO_PI);\n\tshapes = makeSpirals();\n}\n\nfunction mouseClicked() {\n\tif (mouseButton === LEFT) {\n\t\tsetup();\n\t}\n}\n\nfunction draw() {\n\tbackground(BG_C);\n\tdrawSpirals(shapes, max(0, shapes.length-(frameCount-startFrame)));\n}\n\nfunction makeSpirals() {\n\tcolorMode(HSB)\n\tconst hue1 = random(360);\n\tconst hue2 = hue1 + random(60, 180) * (random() < 0.5 ? 1 : -1);\n\tconst COL1 = color(hue1, 65, 15)\n\tconst COL2 = color(hue2, 45, 15)\n\t\n  translate(width / 2, height / 2);\n\n  NUM_REVOL = random(0.7, 6);\n  let spiralRadMax = width * 0.4; // outer spiral radius\n  let spiralRadMin = width * 0.1; // outer spiral radius\n  let innerRadMax = (spiralRadMax / 2) / NUM_REVOL;\n  let innerRad = innerRadMax;\n\tlet arr = [];\n  for (let a = NUM_REVOL * TWO_PI; a >= 0; a -= 0.025) {\n\t\tconst t = a / (NUM_REVOL * TWO_PI);\n    const r = lerp(spiralRadMin, spiralRadMax, t);\n    const x = cos(a) * r;\n    const y = sin(a) * r;\n    if (random() < 0.2) innerRad = noise(x, y) * innerRadMax;\n\t\tclr = lerpColor(COL1, COL2, t)\n\t\tarr.push({x, y, d: innerRad*2.5, clr});\n  }\n\treturn arr;\n}\n\nfunction drawSpirals(arr, start) {\n\ttranslate(width / 2, height / 2);\n\trotate(rotAngle);\n\t\n\tfor (let i = start; i < arr.length; i++) {\n\t\tconst c = arr[i];\n\t\tconst f = map(i, 0, arr.length, 0.15, 1);\n\t\t\n\t\tfill(lerpColor(BG_C, FILL_C, f))\n\t\tlet b_clr = c.clr;\n\t\tb_clr.setAlpha(f)\n\t\tstroke(b_clr)\n\t\t\n\t\tstrokeWeight(f * 2);\n\t\tcircle(c.x, c.y, c.d);\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SpiralPipeWCCChallengeDownwardSpiral4924",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:26:42",
+    "url": "https://openprocessing.org/@epi/2340318",
+    "code": "let BG_C = \"#ffffff\";\n// === Tab: mySketch ===\n/*\n\tSpiral Pipe #WCCChallenge Downward Spiral 4.9.2024\n\thttps://openprocessing.org/sketch/2340318\n\t#generativeart #creativecoding #p5js\n\n  Dear Raph and creative coding community,\n\t\n\treimplemented the sketch from a still picture and sadly forgot the source.\n\tIf anyone know, please leave a comment - thx! :-)\n\t\n\tFor the challenge altered an animation which draws from the end to the start \n\tto enable proper overlapping do draw it downward.\n\tFading from fill color, stroke color and weight increases the perspective.\n\t\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\nlet BG;\nlet NUM_REVOL;\nlet shapes, startFrame, rotAngle;\n\nfunction setup() {\n  createCanvas((S = max(windowWidth, windowHeight)), S);\n\tframeRate(60);\n  describe(\"Radial Spiral of Circles\");\n\tBG_C = color(\"rgb(212,212,212)\");\n\tFILL_C = color(\"rgb(190,203,208)\")\n\tfill(FILL_C);\n\tstrokeWeight(2);\n\tcolorMode(HSB);\n\t\n\tstartFrame = frameCount;\n\trotAngle = random(TWO_PI);\n\tshapes = makeSpirals();\n}\n\nfunction mouseClicked() {\n\tif (mouseButton === LEFT) {\n\t\tsetup();\n\t}\n}\n\nfunction draw() {\n\tbackground(BG_C);\n\tdrawSpirals(shapes, max(0, shapes.length-(frameCount-startFrame)));\n}\n\nfunction makeSpirals() {\n\tcolorMode(HSB)\n\tconst hue1 = random(360);\n\tconst hue2 = hue1 + random(60, 180) * (random() < 0.5 ? 1 : -1);\n\tconst COL1 = color(hue1, 65, 15)\n\tconst COL2 = color(hue2, 45, 15)\n\t\n  translate(width / 2, height / 2);\n\n  NUM_REVOL = random(0.7, 6);\n  let spiralRadMax = width * 0.4; // outer spiral radius\n  let spiralRadMin = width * 0.1; // outer spiral radius\n  let innerRadMax = (spiralRadMax / 2) / NUM_REVOL;\n  let innerRad = innerRadMax;\n\tlet arr = [];\n  for (let a = NUM_REVOL * TWO_PI; a >= 0; a -= 0.025) {\n\t\tconst t = a / (NUM_REVOL * TWO_PI);\n    const r = lerp(spiralRadMin, spiralRadMax, t);\n    const x = cos(a) * r;\n    const y = sin(a) * r;\n    if (random() < 0.2) innerRad = noise(x, y) * innerRadMax;\n\t\tclr = lerpColor(COL1, COL2, t)\n\t\tarr.push({x, y, d: innerRad*2.5, clr});\n  }\n\treturn arr;\n}\n\nfunction drawSpirals(arr, start) {\n\ttranslate(width / 2, height / 2);\n\trotate(rotAngle);\n\t\n\tfor (let i = start; i < arr.length; i++) {\n\t\tconst c = arr[i];\n\t\tconst f = map(i, 0, arr.length, 0.15, 1);\n\t\t\n\t\tfill(lerpColor(BG_C, FILL_C, f))\n\t\tlet b_clr = c.clr;\n\t\tb_clr.setAlpha(f)\n\t\tstroke(b_clr)\n\t\t\n\t\tstrokeWeight(f * 2);\n\t\tcircle(c.x, c.y, c.d);\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 2,
+    "is_starred": false,
+    "used_in_videos": [
+        "Remote Sector.mp4",
+        "Empty Sphere.mp4"
+    ]
 }

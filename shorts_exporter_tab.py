@@ -50,6 +50,81 @@ def get_ffmpeg_path():
 
 class RenderLogParser:
     @staticmethod
+    def parse_credits_file(credits_path):
+        """Parse *_credits.txt to extract visual modules attribution info."""
+        credits = []
+        if not credits_path or not os.path.exists(credits_path):
+            return credits
+        try:
+            with open(credits_path, 'r', encoding='utf-8') as f:
+                text = f.read()
+            items = re.split(r'\[\d+\]', text)
+            for it in items[1:]:
+                lines = [l.strip() for l in it.strip().split('\n') if l.strip()]
+                if not lines:
+                    continue
+                first_line = lines[0]
+                name = 'Visual'
+                author = 'Unknown'
+                m = re.search(r'\"([^\"]+)\"\s+by\s+(.+)', first_line)
+                if m:
+                    name = m.group(1)
+                    author = m.group(2)
+                
+                orig_name = None
+                orig_author = None
+                orig_url = ''
+                lic = 'Creative Commons'
+                
+                for l in lines[1:]:
+                    if 'Inspired by original sketch:' in l:
+                        m2 = re.search(r'\"([^\"]+)\"\s+by\s+(.+)', l)
+                        if m2:
+                            orig_name = m2.group(1)
+                            orig_author = m2.group(2)
+                    elif 'Original Link:' in l or 'Link:' in l:
+                        orig_url = l.split(':', 1)[1].strip()
+                    elif 'Licensed under:' in l or 'License:' in l:
+                        lic = l.split(':', 1)[1].strip()
+                
+                credits.append({
+                    'index': len(credits),
+                    'name': name,
+                    'author': author,
+                    'inspired_by': f'"{orig_name}" by {orig_author}' if orig_name and orig_author else None,
+                    'url': orig_url,
+                    'license': lic
+                })
+        except Exception as e:
+            logger.warning(f"讀取 credits 檔案失敗 {credits_path}: {e}")
+        return credits
+
+    @staticmethod
+    def parse_social_file(social_path):
+        """Parse *_social.txt to extract official YouTube URL, Apple Music URL, genre, BPM, etc."""
+        info = {'youtube_url': '', 'apple_music_url': '', 'genre': '', 'bpm': ''}
+        if not social_path or not os.path.exists(social_path):
+            return info
+        try:
+            with open(social_path, 'r', encoding='utf-8') as f:
+                text = f.read()
+            m_yt = re.search(r'👉 YouTube:\s*(https?://[^\s\n]+)', text)
+            if m_yt:
+                info['youtube_url'] = m_yt.group(1).strip()
+            m_apple = re.search(r'👉 Apple Music:\s*(https?://[^\s\n]+)', text)
+            if m_apple:
+                info['apple_music_url'] = m_apple.group(1).strip()
+            m_genre = re.search(r'Genre:\s*(.+)', text)
+            if m_genre:
+                info['genre'] = m_genre.group(1).strip()
+            m_bpm = re.search(r'BPM:\s*(.+)', text)
+            if m_bpm:
+                info['bpm'] = m_bpm.group(1).strip()
+        except Exception as e:
+            logger.warning(f"讀取 social 檔案失敗 {social_path}: {e}")
+        return info
+
+    @staticmethod
     def parse_render_log(log_path):
         if not log_path or not os.path.exists(log_path):
             return None
@@ -60,59 +135,80 @@ class RenderLogParser:
             
             # Strategy 1: Find JSON metadata marker and parse the JSON on the next line
             marker = "=== RENDER_METADATA_JSON ==="
+            json_metadata = None
             for i, line in enumerate(lines):
                 if marker in line:
                     # The JSON is on the next line, after the logging timestamp/level prefix
                     if i + 1 < len(lines):
                         json_line = lines[i + 1].strip()
-                        # Strip logging prefix: "2025-01-01 12:00:00,000 [INFO] {...}"
                         json_match = re.search(r'\{.*\}', json_line)
                         if json_match:
                             try:
-                                return json.loads(json_match.group())
+                                json_metadata = json.loads(json_match.group())
                             except json.JSONDecodeError as e:
                                 logger.error(f"JSON 解析失敗 {log_path}: {e}")
             
-            # Strategy 2: Fallback — parse text lines for known fields
-            content = ''.join(lines)
-            result = {
+            result = json_metadata if json_metadata else {
                 "bpm": 120.0,
                 "duration": 0.0,
                 "storyboard": [],
                 "genre": "Unknown",
                 "resolution": "1920x1080",
                 "fps": 30,
-                "audio_path": ""
+                "audio_path": "",
+                "visual_credits": [],
+                "storyboard_visual_map": [],
+                "youtube_url": "",
+                "apple_music_url": ""
             }
             
-            # Parse BPM from "BPM=128" or "BPM: 128"
-            bpm_match = re.search(r'BPM[=:]\s*([\d.]+)', content, re.IGNORECASE)
-            if bpm_match:
-                result["bpm"] = float(bpm_match.group(1))
+            if not json_metadata:
+                content = ''.join(lines)
+                bpm_match = re.search(r'BPM[=:]\s*([\d.]+)', content, re.IGNORECASE)
+                if bpm_match:
+                    result["bpm"] = float(bpm_match.group(1))
+                
+                res_match = re.search(r'(\d{3,4})x(\d{3,4})@(\d+)fps', content)
+                if res_match:
+                    result["resolution"] = f"{res_match.group(1)}x{res_match.group(2)}"
+                    result["fps"] = int(res_match.group(3))
+                
+                frames_match = re.search(r'總幀數[=:]\s*(\d+)', content)
+                if frames_match and result["fps"] > 0:
+                    result["duration"] = int(frames_match.group(1)) / result["fps"]
+                
+                output_match = re.search(r'輸出:\s*(.+\.mp4)', content)
+                if output_match:
+                    mp4_path = output_match.group(1).strip()
+                    base = os.path.splitext(mp4_path)[0]
+                    for ext in ['.mp3', '.wav', '.m4a', '.flac']:
+                        if os.path.exists(base + ext):
+                            result["audio_path"] = base + ext
+                            break
             
-            # Parse resolution and fps from "解析度: 3840x2160@30fps" or "3840x2160@60fps"
-            res_match = re.search(r'(\d{3,4})x(\d{3,4})@(\d+)fps', content)
-            if res_match:
-                result["resolution"] = f"{res_match.group(1)}x{res_match.group(2)}"
-                result["fps"] = int(res_match.group(3))
+            # Always ensure visual_credits, youtube_url, apple_music_url are filled from sibling files if missing
+            log_dir = os.path.dirname(log_path)
+            log_base = os.path.basename(log_path)
+            if "_render.log" in log_base:
+                base_name = log_base.replace("_render.log", "")
+            else:
+                base_name = os.path.splitext(log_base)[0]
+                
+            if not result.get("visual_credits"):
+                credits_path = os.path.join(log_dir, f"{base_name}_credits.txt")
+                if os.path.exists(credits_path):
+                    result["visual_credits"] = RenderLogParser.parse_credits_file(credits_path)
+                    
+            if not result.get("youtube_url") or not result.get("apple_music_url"):
+                social_path = os.path.join(log_dir, f"{base_name}_social.txt")
+                if os.path.exists(social_path):
+                    soc_info = RenderLogParser.parse_social_file(social_path)
+                    if soc_info.get("youtube_url") and not result.get("youtube_url"):
+                        result["youtube_url"] = soc_info["youtube_url"]
+                    if soc_info.get("apple_music_url") and not result.get("apple_music_url"):
+                        result["apple_music_url"] = soc_info["apple_music_url"]
             
-            # Parse total frames to estimate duration
-            frames_match = re.search(r'總幀數[=:]\s*(\d+)', content)
-            if frames_match and result["fps"] > 0:
-                result["duration"] = int(frames_match.group(1)) / result["fps"]
-            
-            # Parse audio path from "輸出: /path/to/file.mp4" -> infer audio from same dir
-            output_match = re.search(r'輸出:\s*(.+\.mp4)', content)
-            if output_match:
-                mp4_path = output_match.group(1).strip()
-                # Try common audio extensions in the same directory
-                base = os.path.splitext(mp4_path)[0]
-                for ext in ['.mp3', '.wav', '.m4a', '.flac']:
-                    if os.path.exists(base + ext):
-                        result["audio_path"] = base + ext
-                        break
-            
-            return result if result["duration"] > 0 else None
+            return result if result.get("duration", 0) > 0 or json_metadata else None
         except Exception as e:
             logger.error(f"讀取 {log_path} 失敗: {e}")
             return None
@@ -232,8 +328,17 @@ class FolderScanWorker(QThread):
         
         try:
             for root, dirs, files in os.walk(self.folder_path):
+                # Skip exported shorts directories
+                dirs[:] = [d for d in dirs if d.lower() not in ["short", "shorts", ".git", ".cache", ".tmp"]]
+                
                 for file in files:
+                    if file.startswith("."):
+                        continue
                     if file.lower().endswith(".mp4"):
+                        # Skip files that are themselves exported shorts (e.g. Song_short_01.mp4)
+                        if re.search(r'_short_\d+\.mp4$', file, re.IGNORECASE):
+                            continue
+                            
                         video_path = os.path.join(root, file)
                         base_name = os.path.splitext(file)[0]
                         
@@ -479,26 +584,76 @@ class ShortsExportWorker(QThread):
         # Extract visual credits and storyboard-visual mapping from metadata
         visual_credits = []
         storyboard_visual_map = []
+        youtube_url = "https://www.youtube.com/@pohan528"
+        apple_music_url = ""
+        
         if metadata:
             visual_credits = metadata.get("visual_credits", [])
             storyboard_visual_map = metadata.get("storyboard_visual_map", [])
+            if metadata.get("youtube_url"):
+                youtube_url = metadata["youtube_url"]
+            if metadata.get("apple_music_url"):
+                apple_music_url = metadata["apple_music_url"]
         
-        def get_clip_visual_credits(clip_start, clip_end):
+        # Fallback: search for *_credits.txt and *_social.txt in video directories
+        if not visual_credits or not apple_music_url or youtube_url == "https://www.youtube.com/@pohan528":
+            search_dirs = []
+            # First check this specific track's own directory
+            curr_track_data = self.analysis_results.get(track_name, {})
+            curr_vpath = curr_track_data.get("video_path", "")
+            if curr_vpath and os.path.exists(curr_vpath):
+                search_dirs.append(os.path.dirname(curr_vpath))
+                search_dirs.append(os.path.dirname(os.path.dirname(curr_vpath)))
+                
+            for track_data in self.analysis_results.values():
+                vpath = track_data.get("video_path", "")
+                if vpath and os.path.exists(vpath):
+                    d = os.path.dirname(vpath)
+                    if d not in search_dirs:
+                        search_dirs.append(d)
+            
+            for sdir in search_dirs:
+                if not os.path.exists(sdir):
+                    continue
+                cand_cred = os.path.join(sdir, f"{track_name}_credits.txt")
+                if os.path.exists(cand_cred) and not visual_credits:
+                    visual_credits = RenderLogParser.parse_credits_file(cand_cred)
+                cand_soc = os.path.join(sdir, f"{track_name}_social.txt")
+                if os.path.exists(cand_soc):
+                    soc_info = RenderLogParser.parse_social_file(cand_soc)
+                    if soc_info.get("youtube_url") and youtube_url == "https://www.youtube.com/@pohan528":
+                        youtube_url = soc_info["youtube_url"]
+                    if soc_info.get("apple_music_url") and not apple_music_url:
+                        apple_music_url = soc_info["apple_music_url"]
+        
+        def get_clip_visual_credits(clip_idx, clip_start, clip_end):
             """Find which visual modules appear during this clip's time range."""
-            if not storyboard_visual_map or not visual_credits:
-                return visual_credits  # Fallback: return all credits
+            if not visual_credits:
+                return []
             
-            seen_indices = set()
-            for seg in storyboard_visual_map:
-                seg_start = seg.get("start", 0)
-                seg_end = seg.get("end", 0)
-                vis_idx = seg.get("visual_index", -1)
-                # Check time overlap: clip and segment intersect
-                if seg_end > clip_start and seg_start < clip_end and vis_idx >= 0:
-                    seen_indices.add(vis_idx)
-            
-            # Return only credits for modules that appear in this clip
-            return [c for c in visual_credits if c.get("index") in seen_indices]
+            if storyboard_visual_map:
+                seen_indices = set()
+                for seg in storyboard_visual_map:
+                    seg_start = seg.get("start", 0)
+                    seg_end = seg.get("end", 0)
+                    vis_idx = seg.get("visual_index", -1)
+                    if seg_end > clip_start and seg_start < clip_end and vis_idx >= 0:
+                        seen_indices.add(vis_idx)
+                
+                matched = [c for c in visual_credits if c.get("index") in seen_indices]
+                if matched:
+                    return matched
+
+            # Smart distribute: if no storyboard map, distribute visual credits across clips
+            if len(visual_credits) <= len(clips):
+                target_idx = (clip_idx - 1) % len(visual_credits)
+                return [visual_credits[target_idx]]
+            else:
+                # E.g. 10 credits across 3 clips: give 2-3 credits per clip
+                chunk_size = max(1, len(visual_credits) // len(clips))
+                start_i = (clip_idx - 1) * chunk_size
+                end_i = start_i + chunk_size if clip_idx < len(clips) else len(visual_credits)
+                return visual_credits[start_i:end_i]
         
         lines = [
             "======================================================================",
@@ -515,9 +670,9 @@ class ShortsExportWorker(QThread):
             dur = clip['end'] - clip['start']
             
             # Get visual credits for this specific clip's time range
-            clip_credits = get_clip_visual_credits(clip['start'], clip['end'])
+            clip_credits = get_clip_visual_credits(clip['index'], clip['start'], clip['end'])
             
-            lines.extend([
+            clip_desc_lines = [
                 f"--- [Clip {clip['index']}] ({dur:.0f}s) ---",
                 "",
                 "【YouTube Shorts Title】",
@@ -526,10 +681,18 @@ class ShortsExportWorker(QThread):
                 "【YouTube Shorts Description】",
                 f"Experience the immersive 4K audio-reactive generative art powered by p5.js! 🎧✨",
                 "",
-                "👉 Watch full 4K MV on our channel:",
-                f"🔗 https://www.youtube.com/@pohan528",
-                "",
-            ])
+                "🎧 Listen & Stream:",
+            ]
+            if youtube_url and "unknown" not in youtube_url.lower() and "youtube.com/@" not in youtube_url:
+                clip_desc_lines.append(f"👉 YouTube (Full MV): {youtube_url}")
+            else:
+                clip_desc_lines.append("👉 YouTube: https://www.youtube.com/@pohan528")
+                
+            if apple_music_url and "unknown" not in apple_music_url.lower():
+                clip_desc_lines.append(f"👉 Apple Music: {apple_music_url}")
+                
+            clip_desc_lines.append("")
+            lines.extend(clip_desc_lines)
             
             # Per-clip visual credits (only modules appearing in this clip)
             if clip_credits:
@@ -537,12 +700,12 @@ class ShortsExportWorker(QThread):
                 for credit in clip_credits:
                     name = credit.get("name", "Visual")
                     author = credit.get("author", "Unknown")
-                    lic = credit.get("license", "Creative Commons")
+                    lic = credit.get("license") or "Creative Commons"
                     url = credit.get("url", "")
                     lines.append(f"  - Visual: \"{name}\" by {author}")
                     if credit.get("inspired_by"):
                         lines.append(f"    * Inspired by original sketch: {credit['inspired_by']}")
-                    if url and url != "OpenProcessing":
+                    if url and url != "OpenProcessing" and url != "N/A":
                         lines.append(f"    * Link: {url}")
                     lines.append(f"    * License: {lic}")
                 lines.append("  All visual elements are licensed under Creative Commons.")
@@ -550,12 +713,17 @@ class ShortsExportWorker(QThread):
             else:
                 lines.append("🎨 Visual licensing details can be found in the full MV description.")
             
-            lines.extend([
+            ig_yt_link = youtube_url if (youtube_url and "unknown" not in youtube_url.lower() and "youtube.com/@" not in youtube_url) else "https://www.youtube.com/@pohan528"
+            ig_lines = [
                 "",
                 "【Instagram Reels Caption】",
                 f"🎧 {song} - {artist} | Audio-Reactive p5.js Visualizer ✨",
                 "Immerse yourself in precision audio-reactive generative visuals 🌊",
-                "👉 Watch Full 4K MV: https://www.youtube.com/@pohan528",
+                f"👉 Watch Full 4K MV: {ig_yt_link}",
+            ]
+            if apple_music_url and "unknown" not in apple_music_url.lower():
+                ig_lines.append(f"👉 Apple Music: {apple_music_url}")
+            ig_lines.extend([
                 "",
                 "【TikTok Caption】",
                 f"{song} - {artist} 🎧 4K Audio-Reactive p5.js Visualizer! 🤯✨ #p5js #audioreactive #visualizer #generativeart #creativecoding #shorts #fyp",
@@ -564,6 +732,7 @@ class ShortsExportWorker(QThread):
                 f"#shorts #p5js #AudioReactive #GenerativeArt #CreativeCoding #Visualizer #MusicVideo #{clean_song} #{clean_artist} #pohan528 #4KMV #VJLoop #edm #music #beat",
                 "",
             ])
+            lines.extend(ig_lines)
         
         lines.extend([
             "======================================================================",

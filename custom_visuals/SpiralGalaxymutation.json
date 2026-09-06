@@ -1,22 +1,25 @@
 {
-  "name": "SpiralGalaxymutation",
-  "author": "dotlassie",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:21:37",
-  "url": "https://openprocessing.org/@dotlassie/700",
-  "code": "// === Tab: mySketch ===\n// Spiral Galaxy Simulation\n// author : Philippe Guglielmetti (Dr. Goulu www.goulu.net)\n// 2008.04.03 PhG : my first processing program !\n//                  converted from my LUA/Demoniak 3D demo V 1.0\n//                  see http://3dmon.wordpress.com/2007/08/26/simulation-de-galaxie-spirale/\n// 2008.04.04 PhG : much faster in P3D mode : now ok with 10'000 stars !\n//                  keyboard interaction : use arrow keys to alter the galaxy\n\nwindow.tr = window.console && console.log.bind( console ) || function(){};\nfunction gauss( x ){  return Math.exp( - x * x / 2 ) / sqrt( 2 * Math.PI );  }\nfunction gaussI( z ){ // integrated gauss [0..1]\n  if( z < -8.0 )  return 0.0;\n  if( z >  8.0 )  return 1.0;\n  var sum = 0, term = z;\n  for( var i = 3; sum + term !== sum; i+= 2 ){\n    sum  += term;\n    term *= z * z / i;\n  }\n  return 0.5 + sum * gauss(z);\n}\nfunction gaussE( z ){  return gaussI( z ) * 2 - 1;  }  // gauss error func==> [-1..0..1]\nfunction randomGauss(){\n  var x = 0, y = 0, r, c;\n  do{\n    x = Math.random() * 2 - 1;\n    y = Math.random() * 2 - 1;\n    r = x * x + y * y;\n  }while( r === 0 || r > 1 );\n  c = Math.sqrt( - 2 * Math.log(r) / r );\n  return x * c;  //return [x*c, y*c];\n}\nfunction randomGaussIn( L, H, mul ){  return constrain( randomGauss() * (H-L) * mul + (L+H) / 2, L, H );  }\nfunction randomGaussAt( L, H, mul ){  return            randomGauss() * (H-L) * mul + (L+H) / 2;  }\n\n\n\nvar stars = 10000;  // only ...\nvar Rmax  = 200;    // galaxy radius\nvar speed = 0.02;   // rotation speed\n\n// stars follow elliptic orbits around the center\nvar eratio = .85;  // ellipse ratio\nvar etwist = 8.0 / Rmax;  // twisting factor (orbit axes depend on radius)\n\nvar angle  = [];\nvar radius = [];\n\nvar WW, HH;\nvar cx, cy;  //center\nvar frameTime = 1000 / 60;  // millisec\nvar pts = Date.now() - frameTime;\n\nfunction windowResized(){\n  initCanvas( false );\n}\n\nfunction initCanvas( first ){\n  WW = Math.min( 900, windowWidth );\n  HH = Math.min( 900, windowHeight );\n  ( first ? createCanvas : resizeCanvas )( WW, HH );\n  background('#000000');  // back to black\n  // begin in the center\n  cx = WW / 2;\n  cy = HH / 2;\n}\n\nfunction setup(){\n  initCanvas( true );\n  // init stars\n  for( var i = 0; i < stars; i++ ){\n    angle[i]  = Math.random() * 2 * Math.PI;\n    radius[i] = Math.abs( randomGauss()) * Rmax * 0.6 + 0.0;    // radius[i] = random( 1, Rmax );\n    //radius[i] = random(1,Rmax);\n    radius[i] = Math.abs( randomGauss()) * Rmax * 0.6 + 0.0;\n  }\n}\n\n\nfunction draw(){\n  /** /\n    background( 0, 0, 0, 128 );\n  /**/\n    var img = get();\n    img.resize( Math.round( WW * 0.25 ), Math.round( HH * 0.25 ));\n    img.resize( WW - 2, HH - 2 );\n    tint( 245, 250, 255 );\n    image( img, 1, 1 );\n  /**/\n\n  var ts = Date.now();\n  var dt = ts - pts;\n  pts = ts;\n  var fps = 1000 / dt;\n\n  //var speedMul = speed / getTargetFrameRate();\n  var speedMul = speed / fps;\n\n  //fill(0,8); rect( 0, 0, WW, HH );\n  noStroke();\n  var r, a, x, y, b, s, c, xx, yy, dd;\n  for( var i = 0; i < stars; i++ ){\n    r = radius[i];\n    a = angle[i] + speedMul * ( Rmax / r ) * 3;  // increment angle\n    angle[i] = a;\n    x = r * Math.sin( a );\n    y = r * eratio * Math.cos( a );\n    b = r * etwist;\n    s = Math.sin( b );\n    c = Math.cos( b );\n    xx = cx +   s*x + c*y;  // a bit of trigo\n    yy = cy + c*x - s*y;\n    //dd = ( r - 50.0 ) * 7.0;\n    dd = 40000.0 / r;\n    fill( dd, dd, dd * 0.9, 32 );\n    rect( xx - 1.5, yy - 1.5, 3, 3 );\n  } // for i stars\n  if( keyIsPressed )  handleKey();\n}\n\nfunction handleKey(){\n  if( keyCode === UP_ARROW )     eratio *= 1.02;\n  if( keyCode === DOWN_ARROW )   eratio /= 1.02;\n  if( keyCode === LEFT_ARROW )   etwist += 0.001;\n  if( keyCode === RIGHT_ARROW )  etwist -= 0.001;\n}\nfunction keyPressed(){\n  handleKey();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SpiralGalaxymutation",
+    "author": "dotlassie",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:21:37",
+    "url": "https://openprocessing.org/@dotlassie/700",
+    "code": "// === Tab: mySketch ===\n// Spiral Galaxy Simulation\n// author : Philippe Guglielmetti (Dr. Goulu www.goulu.net)\n// 2008.04.03 PhG : my first processing program !\n//                  converted from my LUA/Demoniak 3D demo V 1.0\n//                  see http://3dmon.wordpress.com/2007/08/26/simulation-de-galaxie-spirale/\n// 2008.04.04 PhG : much faster in P3D mode : now ok with 10'000 stars !\n//                  keyboard interaction : use arrow keys to alter the galaxy\n\nwindow.tr = window.console && console.log.bind( console ) || function(){};\nfunction gauss( x ){  return Math.exp( - x * x / 2 ) / sqrt( 2 * Math.PI );  }\nfunction gaussI( z ){ // integrated gauss [0..1]\n  if( z < -8.0 )  return 0.0;\n  if( z >  8.0 )  return 1.0;\n  var sum = 0, term = z;\n  for( var i = 3; sum + term !== sum; i+= 2 ){\n    sum  += term;\n    term *= z * z / i;\n  }\n  return 0.5 + sum * gauss(z);\n}\nfunction gaussE( z ){  return gaussI( z ) * 2 - 1;  }  // gauss error func==> [-1..0..1]\nfunction randomGauss(){\n  var x = 0, y = 0, r, c;\n  do{\n    x = Math.random() * 2 - 1;\n    y = Math.random() * 2 - 1;\n    r = x * x + y * y;\n  }while( r === 0 || r > 1 );\n  c = Math.sqrt( - 2 * Math.log(r) / r );\n  return x * c;  //return [x*c, y*c];\n}\nfunction randomGaussIn( L, H, mul ){  return constrain( randomGauss() * (H-L) * mul + (L+H) / 2, L, H );  }\nfunction randomGaussAt( L, H, mul ){  return            randomGauss() * (H-L) * mul + (L+H) / 2;  }\n\n\n\nvar stars = 10000;  // only ...\nvar Rmax  = 200;    // galaxy radius\nvar speed = 0.02;   // rotation speed\n\n// stars follow elliptic orbits around the center\nvar eratio = .85;  // ellipse ratio\nvar etwist = 8.0 / Rmax;  // twisting factor (orbit axes depend on radius)\n\nvar angle  = [];\nvar radius = [];\n\nvar WW, HH;\nvar cx, cy;  //center\nvar frameTime = 1000 / 60;  // millisec\nvar pts = Date.now() - frameTime;\n\nfunction windowResized(){\n  initCanvas( false );\n}\n\nfunction initCanvas( first ){\n  WW = Math.min( 900, windowWidth );\n  HH = Math.min( 900, windowHeight );\n  ( first ? createCanvas : resizeCanvas )( WW, HH );\n  background('#000000');  // back to black\n  // begin in the center\n  cx = WW / 2;\n  cy = HH / 2;\n}\n\nfunction setup(){\n  initCanvas( true );\n  // init stars\n  for( var i = 0; i < stars; i++ ){\n    angle[i]  = Math.random() * 2 * Math.PI;\n    radius[i] = Math.abs( randomGauss()) * Rmax * 0.6 + 0.0;    // radius[i] = random( 1, Rmax );\n    //radius[i] = random(1,Rmax);\n    radius[i] = Math.abs( randomGauss()) * Rmax * 0.6 + 0.0;\n  }\n}\n\n\nfunction draw(){\n  /** /\n    background( 0, 0, 0, 128 );\n  /**/\n    var img = get();\n    img.resize( Math.round( WW * 0.25 ), Math.round( HH * 0.25 ));\n    img.resize( WW - 2, HH - 2 );\n    tint( 245, 250, 255 );\n    image( img, 1, 1 );\n  /**/\n\n  var ts = Date.now();\n  var dt = ts - pts;\n  pts = ts;\n  var fps = 1000 / dt;\n\n  //var speedMul = speed / getTargetFrameRate();\n  var speedMul = speed / fps;\n\n  //fill(0,8); rect( 0, 0, WW, HH );\n  noStroke();\n  var r, a, x, y, b, s, c, xx, yy, dd;\n  for( var i = 0; i < stars; i++ ){\n    r = radius[i];\n    a = angle[i] + speedMul * ( Rmax / r ) * 3;  // increment angle\n    angle[i] = a;\n    x = r * Math.sin( a );\n    y = r * eratio * Math.cos( a );\n    b = r * etwist;\n    s = Math.sin( b );\n    c = Math.cos( b );\n    xx = cx +   s*x + c*y;  // a bit of trigo\n    yy = cy + c*x - s*y;\n    //dd = ( r - 50.0 ) * 7.0;\n    dd = 40000.0 / r;\n    fill( dd, dd, dd * 0.9, 32 );\n    rect( xx - 1.5, yy - 1.5, 3, 3 );\n  } // for i stars\n  if( keyIsPressed )  handleKey();\n}\n\nfunction handleKey(){\n  if( keyCode === UP_ARROW )     eratio *= 1.02;\n  if( keyCode === DOWN_ARROW )   eratio /= 1.02;\n  if( keyCode === LEFT_ARROW )   etwist += 0.001;\n  if( keyCode === RIGHT_ARROW )  etwist -= 0.001;\n}\nfunction keyPressed(){\n  handleKey();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Frozen Time.mp4"
+    ]
 }

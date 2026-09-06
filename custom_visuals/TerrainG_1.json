@@ -1,22 +1,25 @@
 {
-  "name": "TerrainG_1",
-  "author": "u77506",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 05:07:02",
-  "url": "https://openprocessing.org/@u77506/582628",
-  "code": "// === Tab: mySketch ===\nfunction setup(){createCanvas(400, 400);}\nrectMode(CENTER);\nvar y=0;\nvar r=random(100000);\nvar s=6;//size\nstrokeWeight(1);\nframeRate(0);\nvar r1=~~random(-6,-3);//-6\nvar r2=~~random(15,50);//32\nbackground(255,255,255);\ndraw = function() {\n    if(y<(350/s)){\n        y++;\n        for(var x=0;x<~~(350/s);x++){\n            var n=~~map(noise(r+x/25,y/25),0,1,r1,r2);\n            for(var k=0;k<=n;k++){\n                if(k===0){\n                    fill(77, 77, 77);\n                    stroke(0, 0, 0);\n                }\n                if(k>0){\n                    fill(207, 207, 207);\n                    stroke(179, 175, 179);\n                }\n                if(k>n-4){\n                    fill(102, 72, 13);\n                    stroke(74, 42, 8);\n                }\n                if(n<10&&k===n){\n                    for(var i=k+1;i<=(k)+(9-n);i++){\n                        fill(0, 9, 255,50);\n                        stroke(20, 37, 145,50);\n                        rect(((x*s)+5)+y*(s/8),((y*(s*0.8))-(i*s))+110,s,s);\n                    }\n                    fill(227, 187, 54);\n                    stroke(176, 144, 39);\n                }else\n                if(k===n){\n                    fill(85, 189, 47);\n                    stroke(62, 138, 29);\n                }    \n                rect(((x*s)+5)+y*(s/8),((y*(s*0.8))-(k*s))+110,s,s);\n                if(k>20&&k===n){\n                    rect(((x*s)+5)+y*(s/8),((y*(s*0.8))-(k*s))+110+(s*0.25),s,s*1.2);\n                    fill(214, 214, 214);\n                    stroke(191, 191, 191);\n                    rect(((x*s)+5)+y*(s/8),((y*(s*0.8))-(k*s))+110,s,s);\n                }\n            }    \n        }    \n    }    \n};",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "TerrainG_1",
+    "author": "u77506",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 05:07:02",
+    "url": "https://openprocessing.org/@u77506/582628",
+    "code": "// === Tab: mySketch ===\nfunction setup(){createCanvas(400, 400);}\nrectMode(CENTER);\nvar y=0;\nvar r=random(100000);\nvar s=6;//size\nstrokeWeight(1);\nframeRate(0);\nvar r1=~~random(-6,-3);//-6\nvar r2=~~random(15,50);//32\nbackground(255,255,255);\ndraw = function() {\n    if(y<(350/s)){\n        y++;\n        for(var x=0;x<~~(350/s);x++){\n            var n=~~map(noise(r+x/25,y/25),0,1,r1,r2);\n            for(var k=0;k<=n;k++){\n                if(k===0){\n                    fill(77, 77, 77);\n                    stroke(0, 0, 0);\n                }\n                if(k>0){\n                    fill(207, 207, 207);\n                    stroke(179, 175, 179);\n                }\n                if(k>n-4){\n                    fill(102, 72, 13);\n                    stroke(74, 42, 8);\n                }\n                if(n<10&&k===n){\n                    for(var i=k+1;i<=(k)+(9-n);i++){\n                        fill(0, 9, 255,50);\n                        stroke(20, 37, 145,50);\n                        rect(((x*s)+5)+y*(s/8),((y*(s*0.8))-(i*s))+110,s,s);\n                    }\n                    fill(227, 187, 54);\n                    stroke(176, 144, 39);\n                }else\n                if(k===n){\n                    fill(85, 189, 47);\n                    stroke(62, 138, 29);\n                }    \n                rect(((x*s)+5)+y*(s/8),((y*(s*0.8))-(k*s))+110,s,s);\n                if(k>20&&k===n){\n                    rect(((x*s)+5)+y*(s/8),((y*(s*0.8))-(k*s))+110+(s*0.25),s,s*1.2);\n                    fill(214, 214, 214);\n                    stroke(191, 191, 191);\n                    rect(((x*s)+5)+y*(s/8),((y*(s*0.8))-(k*s))+110,s,s);\n                }\n            }    \n        }    \n    }    \n};",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tunnel Vision.mp4"
+    ]
 }

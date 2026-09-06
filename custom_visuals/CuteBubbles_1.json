@@ -1,22 +1,25 @@
 {
-  "name": "CuteBubbles_1",
-  "author": "u74291",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:15:35",
-  "url": "https://openprocessing.org/@u74291/868184",
-  "code": "// === Tab: Bubble ===\nclass Bubble {\n\tconstructor() {\n\t\tthis.position_x = random(windowWidth);\n\t\tthis.x_disp = random(100);\n\t\tthis.position_y = windowHeight;\n\t\tthis.distance_to_mouse = 0;\n\t\tthis.reaction_vector = createVector(1, 1);\n\t\t\n\t\tvar a = random(0.01, 5);\n\t\tvar b = random(0.01, 5) > a ? a : b;\n\n\t\tthis.rise_rate = -b;\n\t\tthis.size = random(20, 100);\n\t\tthis.color = color(random(100), random(250), 255);\n\t\tthis.color_alpha = color(random(100), random(250), 255, 50);\n\t\tthis.thickness = (map(this.size, 20, 100, 1, 6));\n\t\tthis.size_mod_x = 0;\n\t\tthis.size_mod_y = 0;\n\t}\n\n\tdraw(mouse) {\n\t\tthis.size_mod_x = cos(this.x_disp * 20) * 5;\n\t\tthis.size_mod_y = sin(this.x_disp * 17) * 5;\n\n\t\tif (this.position_y < -50) {\n\t\t\tthis.position_y = windowHeight + this.size;\n\t\t}\n\n\t\tif (this.position_x < -this.size) {\n\t\t\tthis.position_x = windowWidth + this.size;\n\t\t\n\t\t} else if (this.position_x > windowWidth + this.size) {\n\t\t\tthis.position_x = -this.size;\n\t\t}\n\n\t\tthis.position_y += this.rise_rate;\n\t\tthis.x_disp += 0.01;\n\t\tthis.position_x = this.position_x + ((noise(this.x_disp) - 0.5) * 10);\n\n\t\tthis.distance_to_mouse = dist(this.position_x, this.position_y, mouse.x, mouse.y);\t\t\t// Reaction to the mouse\n\t\tif (this.distance_to_mouse < (this.size - 30)) {\n\t\t\tthis.reaction_vector.x = mouse.x - this.position_x;\n\t\t\tthis.reaction_vector.y = mouse.y - this.position_y;\n\t\t\t\n\t\t} else {\n\t\t\tthis.reaction_vector.x = 0;\n\t\t\tthis.reaction_vector.y = 0;\n\t\t}\n\t\t\n\t\tthis.reaction_vector.mult(0.8);\n\t\t\n\t\tthis.position_x = this.position_x - this.reaction_vector.x;\n\t\tthis.position_y = this.position_y - this.reaction_vector.y;\n\t\t\n\t\tstrokeWeight(this.thickness);\n\t\tstroke(this.color);\n\t\tfill(this.color_alpha);\n\t\tellipse(this.position_x, this.position_y, this.size + this.size_mod_x, this.size + this.size_mod_y);\n\t\t\n\t\tvar buffer_x = (0.2 * this.size) + (this.size_mod_x / 2);\n\t\tvar buffer_y = (0.2 * this.size) + (this.size_mod_y / 2);\n\n\t\tstroke(255);\n\t\tarc(this.position_x + buffer_x, this.position_y - buffer_y, this.size / 5, this.size / 5, TWO_PI - (PI / 2), TWO_PI);\n\t}\n}\n\n// === Tab: Main ===\nvar b;\nvar b_amount;\nvar mouse;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tellipseMode(CENTER);\n\n\tb = [];\n\tb_amount = 250;\n\t\n\tfor (var i = 0; i < b_amount; i++) {\n\t\tb[i] = new Bubble();\n\t}\n\n\tmouse = createVector(1, 1);\n}\n\nfunction draw() {\n\tbackground(0, 0, 100);\n\tmouse.x = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n\tmouse.y = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n\t\n\tfor (var i = 0; i < b_amount; i++) {\n\t\tb[i].draw(mouse);\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CuteBubbles_1",
+    "author": "u74291",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:15:35",
+    "url": "https://openprocessing.org/@u74291/868184",
+    "code": "// === Tab: Bubble ===\nclass Bubble {\n\tconstructor() {\n\t\tthis.position_x = random(windowWidth);\n\t\tthis.x_disp = random(100);\n\t\tthis.position_y = windowHeight;\n\t\tthis.distance_to_mouse = 0;\n\t\tthis.reaction_vector = createVector(1, 1);\n\t\t\n\t\tvar a = random(0.01, 5);\n\t\tvar b = random(0.01, 5) > a ? a : b;\n\n\t\tthis.rise_rate = -b;\n\t\tthis.size = random(20, 100);\n\t\tthis.color = color(random(100), random(250), 255);\n\t\tthis.color_alpha = color(random(100), random(250), 255, 50);\n\t\tthis.thickness = (map(this.size, 20, 100, 1, 6));\n\t\tthis.size_mod_x = 0;\n\t\tthis.size_mod_y = 0;\n\t}\n\n\tdraw(mouse) {\n\t\tthis.size_mod_x = cos(this.x_disp * 20) * 5;\n\t\tthis.size_mod_y = sin(this.x_disp * 17) * 5;\n\n\t\tif (this.position_y < -50) {\n\t\t\tthis.position_y = windowHeight + this.size;\n\t\t}\n\n\t\tif (this.position_x < -this.size) {\n\t\t\tthis.position_x = windowWidth + this.size;\n\t\t\n\t\t} else if (this.position_x > windowWidth + this.size) {\n\t\t\tthis.position_x = -this.size;\n\t\t}\n\n\t\tthis.position_y += this.rise_rate;\n\t\tthis.x_disp += 0.01;\n\t\tthis.position_x = this.position_x + ((noise(this.x_disp) - 0.5) * 10);\n\n\t\tthis.distance_to_mouse = dist(this.position_x, this.position_y, mouse.x, mouse.y);\t\t\t// Reaction to the mouse\n\t\tif (this.distance_to_mouse < (this.size - 30)) {\n\t\t\tthis.reaction_vector.x = mouse.x - this.position_x;\n\t\t\tthis.reaction_vector.y = mouse.y - this.position_y;\n\t\t\t\n\t\t} else {\n\t\t\tthis.reaction_vector.x = 0;\n\t\t\tthis.reaction_vector.y = 0;\n\t\t}\n\t\t\n\t\tthis.reaction_vector.mult(0.8);\n\t\t\n\t\tthis.position_x = this.position_x - this.reaction_vector.x;\n\t\tthis.position_y = this.position_y - this.reaction_vector.y;\n\t\t\n\t\tstrokeWeight(this.thickness);\n\t\tstroke(this.color);\n\t\tfill(this.color_alpha);\n\t\tellipse(this.position_x, this.position_y, this.size + this.size_mod_x, this.size + this.size_mod_y);\n\t\t\n\t\tvar buffer_x = (0.2 * this.size) + (this.size_mod_x / 2);\n\t\tvar buffer_y = (0.2 * this.size) + (this.size_mod_y / 2);\n\n\t\tstroke(255);\n\t\tarc(this.position_x + buffer_x, this.position_y - buffer_y, this.size / 5, this.size / 5, TWO_PI - (PI / 2), TWO_PI);\n\t}\n}\n\n// === Tab: Main ===\nvar b;\nvar b_amount;\nvar mouse;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tellipseMode(CENTER);\n\n\tb = [];\n\tb_amount = 250;\n\t\n\tfor (var i = 0; i < b_amount; i++) {\n\t\tb[i] = new Bubble();\n\t}\n\n\tmouse = createVector(1, 1);\n}\n\nfunction draw() {\n\tbackground(0, 0, 100);\n\tmouse.x = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n\tmouse.y = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n\t\n\tfor (var i = 0; i < b_amount; i++) {\n\t\tb[i].draw(mouse);\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Subtle Harmonic Fade.mp4"
+    ]
 }

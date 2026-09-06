@@ -1,22 +1,25 @@
 {
-  "name": "Tropical_1",
-  "author": "u352201",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:12:21",
-  "url": "https://openprocessing.org/@u352201/2261538",
-  "code": "// === Tab: mySketch ===\nlet img;\nlet time = 0;\n\nfunction preload() {\n  img = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/text.png');\n}\n\nfunction setup() {\n  createCanvas(600, 600, WEBGL);\n  noStroke();\n  \n  textureMode(NORMAL);\n  textureWrap(REPEAT);\n}\n\nfunction draw() {\n  background('#CDDC39');\n  orbitControl();\n\n  for(let i = 0; i < PI*2; i+= (Math.max(0.001, Math.abs(PI*2/6)) || 1)){\n    push();\n      translate(0,0, -PI*2/6)\n      rotate(i)\n      drawLeaf(time);\n    pop(); \n  }\n  time += 0.05;\n}\n\nfunction drawLeaf(){\n  \n  let step = 150;\n  let size = 50;\n  let len = PI;\n  let len2 = 85;\n  \n  texture(img);\n  \n  beginShape(TRIANGLE_STRIP);\n  vertex(0, 0, 0, 0,0 );\n  \n  for(let i = 0; i <= len; i+= (Math.max(0.001, Math.abs(len/step)) || 1)){\n    vertex(i * len2, sin(i) * size, (sin((i*1.5 + (time))))*75, i/len + cos(time/2), 1)\n    vertex(i * len2, -sin(i) * size,  (sin((i*1.5 +(time))))*75, i/len  + sin(time/2), 0)\n  }\n  endShape(CLOSE)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Tropical_1",
+    "author": "u352201",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:12:21",
+    "url": "https://openprocessing.org/@u352201/2261538",
+    "code": "// === Tab: mySketch ===\nlet img;\nlet time = 0;\n\nfunction preload() {\n  img = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/text.png');\n}\n\nfunction setup() {\n  createCanvas(600, 600, WEBGL);\n  noStroke();\n  \n  textureMode(NORMAL);\n  textureWrap(REPEAT);\n}\n\nfunction draw() {\n  background('#CDDC39');\n  orbitControl();\n\n  for(let i = 0; i < PI*2; i+= (Math.max(0.001, Math.abs(PI*2/6)) || 1)){\n    push();\n      translate(0,0, -PI*2/6)\n      rotate(i)\n      drawLeaf(time);\n    pop(); \n  }\n  time += 0.05;\n}\n\nfunction drawLeaf(){\n  \n  let step = 150;\n  let size = 50;\n  let len = PI;\n  let len2 = 85;\n  \n  texture(img);\n  \n  beginShape(TRIANGLE_STRIP);\n  vertex(0, 0, 0, 0,0 );\n  \n  for(let i = 0; i <= len; i+= (Math.max(0.001, Math.abs(len/step)) || 1)){\n    vertex(i * len2, sin(i) * size, (sin((i*1.5 + (time))))*75, i/len + cos(time/2), 1)\n    vertex(i * len2, -sin(i) * size,  (sin((i*1.5 +(time))))*75, i/len  + sin(time/2), 0)\n  }\n  endShape(CLOSE)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Industrial Repetition Code.mp4"
+    ]
 }

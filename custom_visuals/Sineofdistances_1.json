@@ -1,22 +1,25 @@
 {
-  "name": "Sineofdistances_1",
-  "author": "fun_pro",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 04:08:41",
-  "url": "https://openprocessing.org/@fun_pro/184813",
-  "code": "// === Tab: sketch184813 ===\nlet points;\n\nfunction setup() {\n  createCanvas(250, 250);\n  points = new Array(11);\n  for(let i=0; i<points.length; i++) {\n    points[i] = new PVector();\n  }\n}\n\nfunction draw() {\n  let f = frameCount * 0.1;\n  let d;\n  let count = points.length;\n  loadPixels();\n  for(let x=0; x<width; x++) {\n    for(let y=0; y<height; y++) {\n      d = 0;\n      for(let i=0; i<count; i++) {\n        d += sin(dist(x, y, points[i].x, points[i].y)*0.08);        \n      }\n      d /= points.length;\n      pixels[x+y*width] = floor(d * 15 + f) % 7 == 0 ? \"#ED1851\" : \"#21073E\";\n    }\n  }\n  updatePixels();\n  for(let i=0; i<points.length; i++) {\n    points[i].set(width/2 + width/2 * sin(frameCount*i*0.0011) * sin(frameCount*i*0.0017), \n      width/2 + width/2 * sin(frameCount*i*0.0013) * sin(frameCount*i*0.0019));\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Sineofdistances_1",
+    "author": "fun_pro",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:08:41",
+    "url": "https://openprocessing.org/@fun_pro/184813",
+    "code": "// === Tab: sketch184813 ===\nlet points;\n\nfunction setup() {\n  createCanvas(250, 250);\n  points = new Array(11);\n  for(let i=0; i<points.length; i++) {\n    points[i] = new PVector();\n  }\n}\n\nfunction draw() {\n  let f = frameCount * 0.1;\n  let d;\n  let count = points.length;\n  loadPixels();\n  for(let x=0; x<width; x++) {\n    for(let y=0; y<height; y++) {\n      d = 0;\n      for(let i=0; i<count; i++) {\n        d += sin(dist(x, y, points[i].x, points[i].y)*0.08);        \n      }\n      d /= points.length;\n      pixels[x+y*width] = floor(d * 15 + f) % 7 == 0 ? \"#ED1851\" : \"#21073E\";\n    }\n  }\n  updatePixels();\n  for(let i=0; i<points.length; i++) {\n    points[i].set(width/2 + width/2 * sin(frameCount*i*0.0011) * sin(frameCount*i*0.0017), \n      width/2 + width/2 * sin(frameCount*i*0.0013) * sin(frameCount*i*0.0019));\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Temporal Mist.mp4"
+    ]
 }

@@ -1,22 +1,25 @@
 {
-  "name": "LIFEvisualized_1",
-  "author": "u266498",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:02:42",
-  "url": "https://openprocessing.org/@u266498/1482427",
-  "code": "// === Tab: mySketch ===\nvar w=0 // Width of each blocks\nvar s=0 // Spacing between those blocks\nvar maxYears=80\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight)\n\tbackground(255)\n\tstroke(0)\n\tstrokeWeight(1)\n\tnoFill()\n\tw=(height/maxYears)*0.6\n\ts=w/2\n}\n\nfunction draw() {\n\ttranslate(width/2-(w+s)*26,height/2-(w+s)*maxYears/2)\n\t\n\tfor (let years=0; years<maxYears; years++) {\n\t\tfor (let weeks=0; weeks<52; weeks++) {\n\t\t\trect(0,0,w,w)\n\t\t\ttranslate(w+s,0)\n\t\t}\n\t\ttranslate(-w*52-s*52,w+s)\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "LIFEvisualized_1",
+    "author": "u266498",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:02:42",
+    "url": "https://openprocessing.org/@u266498/1482427",
+    "code": "// === Tab: mySketch ===\nvar w=0 // Width of each blocks\nvar s=0 // Spacing between those blocks\nvar maxYears=80\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight)\n\tbackground(255)\n\tstroke(0)\n\tstrokeWeight(1)\n\tnoFill()\n\tw=(height/maxYears)*0.6\n\ts=w/2\n}\n\nfunction draw() {\n\ttranslate(width/2-(w+s)*26,height/2-(w+s)*maxYears/2)\n\t\n\tfor (let years=0; years<maxYears; years++) {\n\t\tfor (let weeks=0; weeks<52; weeks++) {\n\t\t\trect(0,0,w,w)\n\t\t\ttranslate(w+s,0)\n\t\t}\n\t\ttranslate(-w*52-s*52,w+s)\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Authentic Core Thump.mp4"
+    ]
 }

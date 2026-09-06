@@ -1,0 +1,134 @@
+{
+    "name": "production_surreal_1788085947",
+    "author": "SAVAP Technical Blueprint Production Engine",
+    "license": "CC BY-SA (Transformative)",
+    "url": "https://www.pinterest.com",
+    "tags": [
+        "surreal",
+        "collage",
+        "puppet",
+        "hybrid_1296",
+        "sota_36styles",
+        "blueprint_certified"
+    ],
+    "theme_title": "🍎 符號的背叛與禁果之屋 (The Treachery of Symbols & The Forbidden Chamber)",
+    "concept_thought": "向雷內·馬格利特致敬。透過將微觀果實與宏觀建築顛倒尺度，探討『這不是一個蘋果』的符號哲學，所有物件在引力失重中圍繞核心主體旋轉。",
+    "date_added": "2026-08-30 18:32:28",
+    "frequency": 65,
+    "storyboard_weight": 95,
+    "post_fx_intensity": 85,
+    "scaling_mode": "contain",
+    "custom_html": "",
+    "custom_css": "",
+    "inline_assets": {},
+    "orchestrated_scene": {
+        "topology": "orbital",
+        "elements": [
+            {
+                "id": "conflict_element_2",
+                "keyword": "vintage antique key",
+                "role": "hero",
+                "pos": [
+                    640.0,
+                    403.20000000000005
+                ],
+                "scale": 1.0,
+                "z_depth": 0.4,
+                "mass": 1273044.6,
+                "cavity_socket": [
+                    0.35,
+                    0.45
+                ],
+                "orbit_radius": 0,
+                "angle_offset": 0,
+                "orbit_speed": 0
+            },
+            {
+                "id": "hero_element_0",
+                "keyword": "vintage bowler hat gentleman sculpture",
+                "role": "interlocked_cavity",
+                "pos": [
+                    520.0,
+                    363.20000000000005
+                ],
+                "scale": 0.85,
+                "z_depth": 0.52,
+                "mass": 892504.5,
+                "orbit_radius": 120.0,
+                "angle_offset": 2.399827721492203,
+                "orbit_speed": 0.016
+            },
+            {
+                "id": "conflict_element_3",
+                "keyword": "gothic cathedral window",
+                "role": "satellite",
+                "pos": [
+                    665.2751653968207,
+                    200.0
+                ],
+                "scale": 0.84,
+                "z_depth": 0.5900000000000001,
+                "mass": 864500.6000000001,
+                "orbit_radius": 290.0,
+                "angle_offset": 4.799655442984406,
+                "orbit_speed": 0.02
+            },
+            {
+                "id": "conflict_element_4",
+                "keyword": "floating wooden birdcage with lightning",
+                "role": "satellite",
+                "pos": [
+                    850.0226930080087,
+                    520.0
+                ],
+                "scale": 0.76,
+                "z_depth": 0.66,
+                "mass": 864500.6000000001,
+                "orbit_radius": 345.0,
+                "angle_offset": 7.199483164476609,
+                "orbit_speed": 0.024
+            },
+            {
+                "id": "conflict_element_5",
+                "keyword": "steampunk brass optical monocle",
+                "role": "satellite",
+                "pos": [
+                    246.07689879511673,
+                    316.9352519386014
+                ],
+                "scale": 0.6799999999999999,
+                "z_depth": 0.73,
+                "mass": 725956.0,
+                "orbit_radius": 400.0,
+                "angle_offset": 9.599310885968812,
+                "orbit_speed": 0.028
+            },
+            {
+                "id": "conflict_element_1",
+                "keyword": "porcelain teacup dripping clouds",
+                "role": "satellite",
+                "pos": [
+                    1023.7431078448628,
+                    208.4277804853608
+                ],
+                "scale": 0.6,
+                "z_depth": 0.8,
+                "mass": 711885.9999999999,
+                "orbit_radius": 455.0,
+                "angle_offset": 11.999138607461015,
+                "orbit_speed": 0.032
+            }
+        ],
+        "aesthetic_eval": {
+            "aesthetic_score": 9.41,
+            "balance_score": 9.13,
+            "depth_score": 7.99,
+            "is_gallery_grade": true
+        }
+    },
+    "code": "// ============================================================================\n// 🌌 超現實音畫拼貼神作 (SAVAP v3.0 Masterpiece): production_surreal_1788085947\n// 🎨 創作主題: 🍎 符號的背叛與禁果之屋 (The Treachery of Symbols & The Forbidden Chamber)\n// 🧠 哲學思維: 向雷內·馬格利特致敬。透過將微觀果實與宏觀建築顛倒尺度，探討『這不是一個蘋果』的符號哲學，所有物件在引力失重中圍繞核心主體旋轉。\n// 🏛️ 空間拓撲: orbital | 元素數量: 6\n// ============================================================================\n\nlet imgHeroHead, imgHeroTorso, imgHeroArmUL, imgHeroArmFL, imgHeroArmUR, imgHeroArmFR, imgElement_1, imgElement_2, imgElement_3, imgElement_4, imgElement_5;\n\nlet headOffsetY = 0, headVelY = 0;\nlet shockwaves = [];\nlet topologyMorph = 0.0;\nlet flashOpacity = 0;\nlet dustParticles = [];\n\nfunction preload() {\n  let base = \"custom_visuals/assets/production_surreal_1788085947/\";\n  imgHeroHead = loadImage(base + \"head.png\");\n  imgHeroTorso = loadImage(base + \"torso.png\");\n  imgHeroArmUL = loadImage(base + \"upper_arm_l.png\");\n  imgHeroArmFL = loadImage(base + \"forearm_l.png\");\n  imgHeroArmUR = loadImage(base + \"upper_arm_r.png\");\n  imgHeroArmFR = loadImage(base + \"forearm_r.png\");\n  imgElement_1 = loadImage(base + \"element_1.png\");\n  imgElement_2 = loadImage(base + \"element_2.png\");\n  imgElement_3 = loadImage(base + \"element_3.png\");\n  imgElement_4 = loadImage(base + \"element_4.png\");\n  imgElement_5 = loadImage(base + \"element_5.png\");\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  imageMode(CENTER);\n  noStroke();\n\n  for (let i = 0; i < 50; i++) {\n    dustParticles.push({\n      x: random(width),\n      y: random(height),\n      size: random(1.5, 4.0),\n      speedY: random(-0.4, -1.2),\n      seed: random(1000)\n    });\n  }\n}\n\nfunction draw() {\n  let bass = (typeof window.audioLow !== 'undefined') ? window.audioLow : 0.5;\n  let mid = (typeof window.audioMid !== 'undefined') ? window.audioMid : 0.5;\n  let high = (typeof window.audioHigh !== 'undefined') ? window.audioHigh : 0.5;\n  let isBeat = (typeof window.isBeat !== 'undefined') ? window.isBeat : false;\n  let beatEnergy = (typeof window.beatEnergy !== 'undefined') ? window.beatEnergy : 0.0;\n  let chordColorHex = window.currentChordColor || \"#6366f1\";\n\n  let targetMorph = (bass > 0.65 || (isBeat && beatEnergy > 0.7)) ? 1.0 : 0.0;\n  topologyMorph = lerp(topologyMorph, targetMorph, 0.06);\n\n  // 1. 遠景大氣流體\n  drawAtmosphere(bass, chordColorHex);\n\n  // 2. 多米諾衝擊波\n  if (isBeat) {\n    headVelY = -32.0 * (1.0 + beatEnergy);\n    shockwaves.push({\n      x: width * 0.5,\n      y: height * 0.58,\n      radius: 15,\n      maxRadius: width * 0.9,\n      energy: 1.0 + beatEnergy,\n      speed: 18 + bass * 25\n    });\n    if (high > 0.75 || beatEnergy > 0.8) flashOpacity = 160;\n  }\n\n  headVelY += 2.8;\n  headOffsetY += headVelY;\n  if (headOffsetY > 0) { headOffsetY = 0; headVelY = 0; }\n\n  drawShockwaves(chordColorHex);\n\n  // 3. 次要衝突多元素 (2 ~ 6)\n  drawElement_1(bass, mid, high, chordColorHex);\n  drawElement_2(bass, mid, high, chordColorHex);\n  drawElement_3(bass, mid, high, chordColorHex);\n  drawElement_4(bass, mid, high, chordColorHex);\n  drawElement_5(bass, mid, high, chordColorHex);\n\n  // 4. 核心焦點主體 (Hero Subject)\n  drawHeroSubject(bass, mid, high, chordColorHex);\n\n  // 5. 前景粒子與曼雷中途曝光\n  drawForegroundDust(high);\n  if (flashOpacity > 0) {\n    fill(255, 255, 255, flashOpacity);\n    rect(0, 0, width, height);\n    flashOpacity -= 14;\n  }\n}\n\nfunction drawAtmosphere(bass, chordColorHex) {\n  let c = color(chordColorHex);\n  background(red(c) * 0.08, green(c) * 0.08, blue(c) * 0.12, 220);\n  \n  let skySteps = 7;\n  for (let s = skySteps; s > 0; s--) {\n    let alphaVal = map(s, 0, skySteps, 12, 80);\n    fill(red(c) * 0.75, green(c) * 0.65, blue(c) * 0.95, alphaVal * (0.3 + bass * 0.7));\n    beginShape();\n    for (let x = 0; x <= width; x += 40) {\n      let y = height * 0.36 + sin(x * 0.004 + frameCount * 0.02 + s) * 45 * s * (0.5 + bass);\n      vertex(x, y);\n    }\n    vertex(width, height);\n    vertex(0, height);\n    endShape(CLOSE);\n  }\n}\n\nfunction drawShockwaves(chordColorHex) {\n  let c = color(chordColorHex);\n  for (let i = shockwaves.length - 1; i >= 0; i--) {\n    let sw = shockwaves[i];\n    noFill();\n    let alphaSw = map(sw.radius, 0, sw.maxRadius, 230, 0);\n    stroke(red(c), green(c), blue(c), alphaSw);\n    strokeWeight(2 + sw.energy * 2);\n    ellipse(sw.x, sw.y, sw.radius * 2);\n    sw.radius += sw.speed;\n    if (sw.radius > sw.maxRadius) {\n      shockwaves.splice(i, 1);\n    }\n  }\n}\n\nfunction drawHeroSubject(bass, mid, high, chordColorHex) {\n  let lfoX = cos(frameCount * 0.017) * 16;\n  let lfoY = sin(frameCount * 0.027) * 18;\n\n  let heroTargetX = lerp(width * 0.5, width * 0.44, topologyMorph);\n  let heroTargetY = lerp(height * 0.64, height * 0.58, topologyMorph);\n\n  push();\n  translate(heroTargetX + lfoX, heroTargetY + lfoY);\n\n  let squash = 1.0 + (bass - 0.5) * 0.32;\n  let stretch = 1.0 - (bass - 0.5) * 0.24;\n  scale(squash, stretch);\n\n  push();\n  translate(sin(frameCount * 0.03) * 18, 24);\n  tint(0, 0, 0, 140);\n  if (imgHeroTorso) image(imgHeroTorso, 0, 0);\n  pop();\n\n  let c = color(chordColorHex);\n  tint(lerp(255, red(c), 0.85 * 0.55), lerp(255, green(c), 0.85 * 0.55), lerp(255, blue(c), 0.85 * 0.55), 255);\n\n  if (imgHeroTorso) image(imgHeroTorso, 0, 0);\n\n  push();\n  translate(0, -135 + headOffsetY);\n  rotate(sin(frameCount * 0.05) * 0.12 * mid);\n  if (imgHeroHead) image(imgHeroHead, 0, 0);\n  pop();\n\n  push();\n  translate(-75, -60);\n  rotate(sin(frameCount * 0.04) * 0.7 + (mid * 1.0));\n  if (imgHeroArmUL) image(imgHeroArmUL, 0, 40);\n  translate(0, 75);\n  rotate(cos(frameCount * 0.08) * 0.9 + (high * 1.8));\n  if (imgHeroArmFL) image(imgHeroArmFL, 0, 40);\n  pop();\n\n  push();\n  translate(75, -60);\n  rotate(-sin(frameCount * 0.04) * 0.7 - (mid * 1.0));\n  if (imgHeroArmUR) image(imgHeroArmUR, 0, 40);\n  translate(0, 75);\n  rotate(-cos(frameCount * 0.08) * 0.9 - (high * 1.8));\n  if (imgHeroArmFR) image(imgHeroArmFR, 0, 40);\n  pop();\n\n  pop();\n}\n\n\nfunction drawElement_1(bass, mid, high, chordColorHex) {\n  if (!imgElement_1) return;\n  let c = color(chordColorHex);\n\n  // 拓撲位置計算\n  let totemX = width * 0.5 + sin(frameCount * 0.03 + 1) * 18;\n  let totemY = height * 0.3 - (0 * 75) + (bass - 0.5) * 20;\n\n  let orbitalAngle = frameCount * 0.016 + 2.399827721492203 + mid * 0.04;\n  let orbitalX = width * 0.5 + cos(orbitalAngle) * (120.0);\n  let orbitalY = height * 0.5 + sin(orbitalAngle * 1.5) * (66.0) + (bass - 0.5) * 35;\n\n  let posX = lerp(totemX, orbitalX, topologyMorph);\n  let posY = lerp(totemY, orbitalY, topologyMorph);\n\n  push();\n  translate(posX, posY);\n  rotate(sin(frameCount * 0.02 + 1) * 0.25);\n\n  let elemScale = 2.2 * 0.69 + (bass - 0.5) * 0.2;\n  scale(elemScale);\n\n  // 錯位投影\n  push();\n  translate(16, 22);\n  tint(0, 0, 0, 130);\n  image(imgElement_1, 0, 0);\n  pop();\n\n  // 雙色調著色\n  tint(lerp(220, red(c), 0.85), lerp(220, green(c), 0.85), lerp(220, blue(c), 0.85), 240);\n  image(imgElement_1, 0, 0);\n  pop();\n}\n\nfunction drawElement_2(bass, mid, high, chordColorHex) {\n  if (!imgElement_2) return;\n  let c = color(chordColorHex);\n\n  // 拓撲位置計算\n  let totemX = width * 0.5 + sin(frameCount * 0.03 + 2) * 18;\n  let totemY = height * 0.3 - (1 * 75) + (bass - 0.5) * 20;\n\n  let orbitalAngle = frameCount * 0.02 + 4.799655442984406 + mid * 0.04;\n  let orbitalX = width * 0.5 + cos(orbitalAngle) * (290.0);\n  let orbitalY = height * 0.5 + sin(orbitalAngle * 1.5) * (159.5) + (bass - 0.5) * 35;\n\n  let posX = lerp(totemX, orbitalX, topologyMorph);\n  let posY = lerp(totemY, orbitalY, topologyMorph);\n\n  push();\n  translate(posX, posY);\n  rotate(sin(frameCount * 0.02 + 2) * 0.25);\n\n  let elemScale = 2.2 * 0.655 + (bass - 0.5) * 0.2;\n  scale(elemScale);\n\n  // 錯位投影\n  push();\n  translate(16, 22);\n  tint(0, 0, 0, 130);\n  image(imgElement_2, 0, 0);\n  pop();\n\n  // 雙色調著色\n  tint(lerp(220, red(c), 0.85), lerp(220, green(c), 0.85), lerp(220, blue(c), 0.85), 240);\n  image(imgElement_2, 0, 0);\n  pop();\n}\n\nfunction drawElement_3(bass, mid, high, chordColorHex) {\n  if (!imgElement_3) return;\n  let c = color(chordColorHex);\n\n  // 拓撲位置計算\n  let totemX = width * 0.5 + sin(frameCount * 0.03 + 3) * 18;\n  let totemY = height * 0.3 - (2 * 75) + (bass - 0.5) * 20;\n\n  let orbitalAngle = frameCount * 0.024 + 7.199483164476609 + mid * 0.04;\n  let orbitalX = width * 0.5 + cos(orbitalAngle) * (345.0);\n  let orbitalY = height * 0.5 + sin(orbitalAngle * 1.5) * (189.75000000000003) + (bass - 0.5) * 35;\n\n  let posX = lerp(totemX, orbitalX, topologyMorph);\n  let posY = lerp(totemY, orbitalY, topologyMorph);\n\n  push();\n  translate(posX, posY);\n  rotate(sin(frameCount * 0.02 + 3) * 0.25);\n\n  let elemScale = 2.2 * 0.62 + (bass - 0.5) * 0.2;\n  scale(elemScale);\n\n  // 錯位投影\n  push();\n  translate(16, 22);\n  tint(0, 0, 0, 130);\n  image(imgElement_3, 0, 0);\n  pop();\n\n  // 雙色調著色\n  tint(lerp(220, red(c), 0.85), lerp(220, green(c), 0.85), lerp(220, blue(c), 0.85), 240);\n  image(imgElement_3, 0, 0);\n  pop();\n}\n\nfunction drawElement_4(bass, mid, high, chordColorHex) {\n  if (!imgElement_4) return;\n  let c = color(chordColorHex);\n\n  // 拓撲位置計算\n  let totemX = width * 0.5 + sin(frameCount * 0.03 + 4) * 18;\n  let totemY = height * 0.3 - (3 * 75) + (bass - 0.5) * 20;\n\n  let orbitalAngle = frameCount * 0.028 + 9.599310885968812 + mid * 0.04;\n  let orbitalX = width * 0.5 + cos(orbitalAngle) * (400.0);\n  let orbitalY = height * 0.5 + sin(orbitalAngle * 1.5) * (220.00000000000003) + (bass - 0.5) * 35;\n\n  let posX = lerp(totemX, orbitalX, topologyMorph);\n  let posY = lerp(totemY, orbitalY, topologyMorph);\n\n  push();\n  translate(posX, posY);\n  rotate(sin(frameCount * 0.02 + 4) * 0.25);\n\n  let elemScale = 2.2 * 0.585 + (bass - 0.5) * 0.2;\n  scale(elemScale);\n\n  // 錯位投影\n  push();\n  translate(16, 22);\n  tint(0, 0, 0, 130);\n  image(imgElement_4, 0, 0);\n  pop();\n\n  // 雙色調著色\n  tint(lerp(220, red(c), 0.85), lerp(220, green(c), 0.85), lerp(220, blue(c), 0.85), 240);\n  image(imgElement_4, 0, 0);\n  pop();\n}\n\nfunction drawElement_5(bass, mid, high, chordColorHex) {\n  if (!imgElement_5) return;\n  let c = color(chordColorHex);\n\n  // 拓撲位置計算\n  let totemX = width * 0.5 + sin(frameCount * 0.03 + 5) * 18;\n  let totemY = height * 0.3 - (4 * 75) + (bass - 0.5) * 20;\n\n  let orbitalAngle = frameCount * 0.032 + 11.999138607461015 + mid * 0.04;\n  let orbitalX = width * 0.5 + cos(orbitalAngle) * (455.0);\n  let orbitalY = height * 0.5 + sin(orbitalAngle * 1.5) * (250.25000000000003) + (bass - 0.5) * 35;\n\n  let posX = lerp(totemX, orbitalX, topologyMorph);\n  let posY = lerp(totemY, orbitalY, topologyMorph);\n\n  push();\n  translate(posX, posY);\n  rotate(sin(frameCount * 0.02 + 5) * 0.25);\n\n  let elemScale = 2.2 * 0.55 + (bass - 0.5) * 0.2;\n  scale(elemScale);\n\n  // 錯位投影\n  push();\n  translate(16, 22);\n  tint(0, 0, 0, 130);\n  image(imgElement_5, 0, 0);\n  pop();\n\n  // 雙色調著色\n  tint(lerp(220, red(c), 0.85), lerp(220, green(c), 0.85), lerp(220, blue(c), 0.85), 240);\n  image(imgElement_5, 0, 0);\n  pop();\n}\n\n\nfunction drawForegroundDust(high) {\n  fill(240, 240, 255, 120 + high * 80);\n  for (let p of dustParticles) {\n    p.y += p.speedY * (1.0 + high * 1.6);\n    p.x += sin(frameCount * 0.02 + p.seed) * 0.4;\n    if (p.y < 0) p.y = height;\n    ellipse(p.x, p.y, p.size, p.size);\n  }\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}\n",
+    "used_in_videos": [
+        "Forward Motion Vibe.mp4"
+    ],
+    "used_count": 1
+}

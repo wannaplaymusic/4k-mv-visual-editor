@@ -1,22 +1,25 @@
 {
-  "name": "connectedpointsstudies",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:23:41",
-  "url": "https://openprocessing.org/@epi/2327448",
-  "code": "// === Tab: mySketch ===\nconst SZE = 50;\nlet HUE, HUE_DEV = 90; // hue and deviation wil set in setup()\n\nlet pts, segments;\nlet S_H, CLR, NUMX, NUMY;\n\nfunction setup() {\n\tcreateCanvas(SZE*~~(windowWidth/SZE), SZE*~~(windowHeight/SZE));\n\tdescribe(\"grid of points connected together forming short connected lines\")\n\tframeRate(60);\n\tbackground(\"rgb(0,0,11)\");\n\tcolorMode(HSB);\n\t\n\tS_H = ~~(SZE / 2);\n\tstrokeWeight(S_H * 0.85);\n\tstrokeCap(ROUND);\n\tstrokeJoin(ROUND);\n\tnoFill();\n\t\n\t// color\n\tHUE = ~~random(360);\n\tHUE_DEV = ~~random(60, 120);\n\t\n\t// init\n\tpts = [];\n\tNUMX = ~~(width/SZE);\n\tNUMY = ~~(height/SZE);\n\tfor (let j = 0; j < NUMY; j++) {\n\t\tfor (let i = 0; i < NUMX; i++) {\n\t\t\tpts.push({i, j, seg: random() > 0.1 ? 0 : -1}); // value = segment id, -1 = forced hole in space\n\t\t}\n\t}\n\t\n\tsegments = [];\n\tsegments.push({clr: \"rgb(4,4,48)\", pts: []})\n}\n\nfunction draw() {\n\t// new seg\n\tnewSegment();\n\textendSegment();\n\t\n\tif (false) {\n\t\tfor (let p of pts) {\n\t\t\tif (p.seg < 0) {\t\n\t\t\t\tconst seg = segments[0]; // borrow color from seg[0]\n\t\t\t\tstroke(seg.clr);\n\t\t\t} else {\t\t\t\n\t\t\t\tvar seg = segments[p.seg];\n\t\t\t\tstroke(seg.clr);\n\t\t\t}\n\t\t\tpoint(p.i * SZE + S_H, p.j * SZE + S_H);\n\t\t}\n\t}\n\t\n\tfor (let i = segments.length - 1; i >= 0; i--) {\n\t\tvar seg = segments[i];\n\t\tstroke(seg.clr);\n\t\tbeginShape();\n\t\tfor (let p of seg.pts) {\n\t\t\tvertex(p.i * SZE + S_H, p.j * SZE + S_H);\n\t\t}\n\t\tendShape();\n\t}\n}\n\nfunction newSegment() {\n\tif (segments.length > min(NUMX, NUMY) * 2) return;\n\n\tconst x = ~~random(NUMX)\n\tconst y = ~~random(NUMY)\n\tconst i = y*NUMX + x; \n\tconst p = pts[i];\n\tif (p.seg === 0) {\n\t\tp.seg = segments.length;\n\t\t// const clr = lerpColor(color(\"darkred\"), color(\"navy\"), random()); // strokeJoin(ROUND);\n\t\tconst clr = color(HUE+random(-HUE_DEV, HUE_DEV), random(50, 90), random(60, 90), 0.95);\n\t\tsegments.push({clr, pts: [p]});\n\t\trandomWalk(p)\n\t}\n}\n\nfunction extendSegment() {\n\tvar seg = segments[~~random(1, segments.length)];\n\tif (seg) randomWalk(seg.pts[seg.pts.length-1]);\n}\n\nfunction randomWalk(p) {\n\tconst entropy = [];\n\tconst D = 1;\n\tfor (let j = -D; j <= D; j++) { // y\n\t\tfor (let i = -D; i <= D; i++) { // x\n\t\t\tpx = p.i + i;\n\t\t\tpy = p.j + j;\n\t\t\t// if (!(i === 0 && j === 0) && px >= 0 && px < NUMX && py >= 0 && py < NUMY) {\n\t\t\tif (i != 0 && j != 0 && px >= 0 && px < NUMX && py >= 0 && py < NUMY) {\n\t\t\t\tif (pts[py*NUMX+px].seg === 0) {\n\t\t\t\t\tentropy.push({j: py, i: px});\n\t\t\t\t}\n\t\t\t}\n\t\t}\t\t\n\t}\n\t\n\tif (entropy.length > 0) {\n\t\tconst choice = random(entropy);\n\t\tconst connPt = pts[choice.j*NUMX+choice.i];\n\t\tconnPt.seg = p.seg;\n\t\tsegments[connPt.seg].pts.push(connPt);\n\t}\n}\n\nfunction mousePressed() {\n\tsetup();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "connectedpointsstudies",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:23:41",
+    "url": "https://openprocessing.org/@epi/2327448",
+    "code": "// === Tab: mySketch ===\nconst SZE = 50;\nlet HUE, HUE_DEV = 90; // hue and deviation wil set in setup()\n\nlet pts, segments;\nlet S_H, CLR, NUMX, NUMY;\n\nfunction setup() {\n\tcreateCanvas(SZE*~~(windowWidth/SZE), SZE*~~(windowHeight/SZE));\n\tdescribe(\"grid of points connected together forming short connected lines\")\n\tframeRate(60);\n\tbackground(\"rgb(0,0,11)\");\n\tcolorMode(HSB);\n\t\n\tS_H = ~~(SZE / 2);\n\tstrokeWeight(S_H * 0.85);\n\tstrokeCap(ROUND);\n\tstrokeJoin(ROUND);\n\tnoFill();\n\t\n\t// color\n\tHUE = ~~random(360);\n\tHUE_DEV = ~~random(60, 120);\n\t\n\t// init\n\tpts = [];\n\tNUMX = ~~(width/SZE);\n\tNUMY = ~~(height/SZE);\n\tfor (let j = 0; j < NUMY; j++) {\n\t\tfor (let i = 0; i < NUMX; i++) {\n\t\t\tpts.push({i, j, seg: random() > 0.1 ? 0 : -1}); // value = segment id, -1 = forced hole in space\n\t\t}\n\t}\n\t\n\tsegments = [];\n\tsegments.push({clr: \"rgb(4,4,48)\", pts: []})\n}\n\nfunction draw() {\n\t// new seg\n\tnewSegment();\n\textendSegment();\n\t\n\tif (false) {\n\t\tfor (let p of pts) {\n\t\t\tif (p.seg < 0) {\t\n\t\t\t\tconst seg = segments[0]; // borrow color from seg[0]\n\t\t\t\tstroke(seg.clr);\n\t\t\t} else {\t\t\t\n\t\t\t\tvar seg = segments[p.seg];\n\t\t\t\tstroke(seg.clr);\n\t\t\t}\n\t\t\tpoint(p.i * SZE + S_H, p.j * SZE + S_H);\n\t\t}\n\t}\n\t\n\tfor (let i = segments.length - 1; i >= 0; i--) {\n\t\tvar seg = segments[i];\n\t\tstroke(seg.clr);\n\t\tbeginShape();\n\t\tfor (let p of seg.pts) {\n\t\t\tvertex(p.i * SZE + S_H, p.j * SZE + S_H);\n\t\t}\n\t\tendShape();\n\t}\n}\n\nfunction newSegment() {\n\tif (segments.length > min(NUMX, NUMY) * 2) return;\n\n\tconst x = ~~random(NUMX)\n\tconst y = ~~random(NUMY)\n\tconst i = y*NUMX + x; \n\tconst p = pts[i];\n\tif (p.seg === 0) {\n\t\tp.seg = segments.length;\n\t\t// const clr = lerpColor(color(\"darkred\"), color(\"navy\"), random()); // strokeJoin(ROUND);\n\t\tconst clr = color(HUE+random(-HUE_DEV, HUE_DEV), random(50, 90), random(60, 90), 0.95);\n\t\tsegments.push({clr, pts: [p]});\n\t\trandomWalk(p)\n\t}\n}\n\nfunction extendSegment() {\n\tvar seg = segments[~~random(1, segments.length)];\n\tif (seg) randomWalk(seg.pts[seg.pts.length-1]);\n}\n\nfunction randomWalk(p) {\n\tconst entropy = [];\n\tconst D = 1;\n\tfor (let j = -D; j <= D; j++) { // y\n\t\tfor (let i = -D; i <= D; i++) { // x\n\t\t\tpx = p.i + i;\n\t\t\tpy = p.j + j;\n\t\t\t// if (!(i === 0 && j === 0) && px >= 0 && px < NUMX && py >= 0 && py < NUMY) {\n\t\t\tif (i != 0 && j != 0 && px >= 0 && px < NUMX && py >= 0 && py < NUMY) {\n\t\t\t\tif (pts[py*NUMX+px].seg === 0) {\n\t\t\t\t\tentropy.push({j: py, i: px});\n\t\t\t\t}\n\t\t\t}\n\t\t}\t\t\n\t}\n\t\n\tif (entropy.length > 0) {\n\t\tconst choice = random(entropy);\n\t\tconst connPt = pts[choice.j*NUMX+choice.i];\n\t\tconnPt.seg = p.seg;\n\t\tsegments[connPt.seg].pts.push(connPt);\n\t}\n}\n\nfunction mousePressed() {\n\tsetup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Submerged City Lights.mp4"
+    ]
 }

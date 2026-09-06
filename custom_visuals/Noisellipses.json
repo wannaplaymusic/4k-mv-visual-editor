@@ -1,22 +1,25 @@
 {
-  "name": "Noisellipses",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:02:45",
-  "url": "https://openprocessing.org/@epi/2984425",
-  "code": "// === Tab: mySketch ===\nvar S;\nvar epiColors; // https://github.com/epibyte/p5-epi-colors\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tframeRate(30);\n\tellipseMode(CORNER);\n\tnoStroke();\n\tfill(212);\n\n\tconst { EpiColors } = EpiColorsPckg;\n\tepiColors = new EpiColors();\n\t\n\tinitMe();\n}\nfunction initMe() {\n\tshuffle(epiColors.palettes, true);\n\tS = ~~(max(width, height) / random(2.3, 5.1));\n}\n\nfunction draw() {\n\tbackground(16);\n\tconst t = millis() / 1000 / 3;\n\t\n\tfor (let y=0, j=0; y<height; j++) {\n\t\tconst pal = epiColors.palettes[~~(pow(noise(j), 3) * epiColors.palettes.length)];\n\t\tconst yd = pow(noise(t, j), 1.4) * S;\n\t\tfor (let x=0, i=0; x<width; i++) {\n\t\t\tconst xd = pow(noise(j+t, 5*x/width), 1.8) * S;\n\t\t\tconst clr = pal[~~(pow(noise(i+j), 3) * pal.length * 2) % pal.length];\n\t\t\tfill(clr)\n\t\t\tellipse(x, y, xd, yd);\n\t\t\tx += xd;\n\t\t}\n\t\ty += yd;\n\t}\n}\n\nfunction mousePressed() {\n\tif (!mouseButton.left) return;\n\tinitMe();\n}\n\n// === Auto Generated Stubs ===\nvar palettes = [ ['#fdfffc', '#235789', '#c1292e', '#f1d302', '#020100'], ['#0D1E40', '#224573', '#5679A6', '#F2A25C', '#D96B43'] ];",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Noisellipses",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:02:45",
+    "url": "https://openprocessing.org/@epi/2984425",
+    "code": "// === Tab: mySketch ===\nvar S;\nvar epiColors; // https://github.com/epibyte/p5-epi-colors\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tframeRate(30);\n\tellipseMode(CORNER);\n\tnoStroke();\n\tfill(212);\n\n\tconst { EpiColors } = EpiColorsPckg;\n\tepiColors = new EpiColors();\n\t\n\tinitMe();\n}\nfunction initMe() {\n\tshuffle(epiColors.palettes, true);\n\tS = ~~(max(width, height) / random(2.3, 5.1));\n}\n\nfunction draw() {\n\tbackground(16);\n\tconst t = millis() / 1000 / 3;\n\t\n\tfor (let y=0, j=0; y<height; j++) {\n\t\tconst pal = epiColors.palettes[~~(pow(noise(j), 3) * epiColors.palettes.length)];\n\t\tconst yd = pow(noise(t, j), 1.4) * S;\n\t\tfor (let x=0, i=0; x<width; i++) {\n\t\t\tconst xd = pow(noise(j+t, 5*x/width), 1.8) * S;\n\t\t\tconst clr = pal[~~(pow(noise(i+j), 3) * pal.length * 2) % pal.length];\n\t\t\tfill(clr)\n\t\t\tellipse(x, y, xd, yd);\n\t\t\tx += xd;\n\t\t}\n\t\ty += yd;\n\t}\n}\n\nfunction mousePressed() {\n\tif (!mouseButton.left) return;\n\tinitMe();\n}\n\n// === Auto Generated Stubs ===\nvar palettes = [ ['#fdfffc', '#235789', '#c1292e', '#f1d302', '#020100'], ['#0D1E40', '#224573', '#5679A6', '#F2A25C', '#D96B43'] ];",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/gh/epibyte/p5-epi-colors@v0.0.9/dist/p5-epi-colors.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Driving Essence Throws.mp4"
+    ]
 }

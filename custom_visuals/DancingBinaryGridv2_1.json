@@ -1,22 +1,25 @@
 {
-  "name": "DancingBinaryGridv2_1",
-  "author": "u65884",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:07:22",
-  "url": "https://openprocessing.org/@u65884/866580",
-  "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://www.openprocessing.org/sketch/865199\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\n//Based on a #mathchallange from Annie Perkins\n//https://twitter.com/anniek_p/status/1244220881347502080\n\nvar SIZE = 20;\nvar lineWeight = SIZE/3;\nvar row = [];\nvar column = [];\nvar points = [];\nvar mouseXIndex, mouseYIndex;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tstrokeWeight(lineWeight);\n\ttextSize(SIZE);\n\t\n\tfor(let y = 0; y < height; y += (Math.max(0.001, Math.abs(SIZE)) || 1))\n\t\trow.push(random([0, 1]));\n\t\n\tfor(let x = 0; x < width; x += (Math.max(0.001, Math.abs(SIZE)) || 1))\n\t\tcolumn.push(random([0, 1]));\n}\n\nfunction draw() {\n\tbackground(255);\n\tmouseXIndex = constrain(round(((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))-SIZE*1.5)/SIZE), 0, column.length);\n\tmouseYIndex = constrain(round(((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))-SIZE*1.5)/SIZE), 0, row.length);\n\t\n\tcolumn.forEach((value, index) => {\n\t\tif(random() < 0.01) column[index] = value == 1 ? 0 : 1;\n\t\tnoStroke();\n\t\ttext(value, index * SIZE + SIZE + SIZE/4, SIZE);\n\t\tif(index == mouseXIndex) stroke(100);\n\t\telse stroke(0);\n\t\tfor(let i = 1; i < row.length; i++)\n\t\t\tif(i % 2 == value)\n\t\t\t\tmyline(index * SIZE + SIZE + SIZE / 2,\n\t\t\t\t\t\t\t i * SIZE + SIZE / 2,\n\t\t\t\t\t\t\t index * SIZE + SIZE + SIZE / 2,\n\t\t\t\t\t\t\t i * SIZE + SIZE + SIZE / 2);\n\t});\n\t\n\trow.forEach((value, index) => {\n\t\tif(random() < 0.01) row[index] = value == 1 ? 0 : 1;\n\t\tnoStroke();\n\t\ttext(value, SIZE/2, index * SIZE + SIZE + SIZE*3/4);\n\t\tif(index == mouseYIndex) stroke(100);\n\t\telse stroke(0);\n\t\tfor(let i = 1; i < column.length; i++)\n\t\t\tif(i % 2 == value)\n\t\t\t\tmyline(SIZE / 2 + i * SIZE,\n\t\t\t\t\t\t\t index * SIZE + SIZE + SIZE / 2,\n\t\t\t\t\t\t\t SIZE / 2 + i * SIZE + SIZE,\n\t\t\t\t\t\t\t index * SIZE + SIZE + SIZE / 2);\n\t});\n}\n\nfunction mousePressed(){\n\tcolumn[mouseXIndex] = column[mouseXIndex] == 1 ? 0 : 1;\n\trow[mouseYIndex] = row[mouseYIndex] == 1 ? 0 : 1;\n}\n\nfunction myline(x1, y1, x2, y2){\n\tlet m = millis()/1000;\n\tlet nx1 = noise(y1/100 + m) * SIZE * 3;\n\tlet ny1 = noise(x1/100 + m) * SIZE * 3;\n\tlet nx2 = noise(y2/100 + m) * SIZE * 3;\n\tlet ny2 = noise(x2/100 + m) * SIZE * 3;\n\tline(x1 + nx1, y1 + ny1, x2 + nx2, y2 + ny2);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "DancingBinaryGridv2_1",
+    "author": "u65884",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:07:22",
+    "url": "https://openprocessing.org/@u65884/866580",
+    "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://www.openprocessing.org/sketch/865199\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\n//Based on a #mathchallange from Annie Perkins\n//https://twitter.com/anniek_p/status/1244220881347502080\n\nvar SIZE = 20;\nvar lineWeight = SIZE/3;\nvar row = [];\nvar column = [];\nvar points = [];\nvar mouseXIndex, mouseYIndex;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tstrokeWeight(lineWeight);\n\ttextSize(SIZE);\n\t\n\tfor(let y = 0; y < height; y += (Math.max(0.001, Math.abs(SIZE)) || 1))\n\t\trow.push(random([0, 1]));\n\t\n\tfor(let x = 0; x < width; x += (Math.max(0.001, Math.abs(SIZE)) || 1))\n\t\tcolumn.push(random([0, 1]));\n}\n\nfunction draw() {\n\tbackground(255);\n\tmouseXIndex = constrain(round(((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))-SIZE*1.5)/SIZE), 0, column.length);\n\tmouseYIndex = constrain(round(((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))-SIZE*1.5)/SIZE), 0, row.length);\n\t\n\tcolumn.forEach((value, index) => {\n\t\tif(random() < 0.01) column[index] = value == 1 ? 0 : 1;\n\t\tnoStroke();\n\t\ttext(value, index * SIZE + SIZE + SIZE/4, SIZE);\n\t\tif(index == mouseXIndex) stroke(100);\n\t\telse stroke(0);\n\t\tfor(let i = 1; i < row.length; i++)\n\t\t\tif(i % 2 == value)\n\t\t\t\tmyline(index * SIZE + SIZE + SIZE / 2,\n\t\t\t\t\t\t\t i * SIZE + SIZE / 2,\n\t\t\t\t\t\t\t index * SIZE + SIZE + SIZE / 2,\n\t\t\t\t\t\t\t i * SIZE + SIZE + SIZE / 2);\n\t});\n\t\n\trow.forEach((value, index) => {\n\t\tif(random() < 0.01) row[index] = value == 1 ? 0 : 1;\n\t\tnoStroke();\n\t\ttext(value, SIZE/2, index * SIZE + SIZE + SIZE*3/4);\n\t\tif(index == mouseYIndex) stroke(100);\n\t\telse stroke(0);\n\t\tfor(let i = 1; i < column.length; i++)\n\t\t\tif(i % 2 == value)\n\t\t\t\tmyline(SIZE / 2 + i * SIZE,\n\t\t\t\t\t\t\t index * SIZE + SIZE + SIZE / 2,\n\t\t\t\t\t\t\t SIZE / 2 + i * SIZE + SIZE,\n\t\t\t\t\t\t\t index * SIZE + SIZE + SIZE / 2);\n\t});\n}\n\nfunction mousePressed(){\n\tcolumn[mouseXIndex] = column[mouseXIndex] == 1 ? 0 : 1;\n\trow[mouseYIndex] = row[mouseYIndex] == 1 ? 0 : 1;\n}\n\nfunction myline(x1, y1, x2, y2){\n\tlet m = millis()/1000;\n\tlet nx1 = noise(y1/100 + m) * SIZE * 3;\n\tlet ny1 = noise(x1/100 + m) * SIZE * 3;\n\tlet nx2 = noise(y2/100 + m) * SIZE * 3;\n\tlet ny2 = noise(x2/100 + m) * SIZE * 3;\n\tline(x1 + nx1, y1 + ny1, x2 + nx2, y2 + ny2);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Immersive Core Universe.mp4"
+    ]
 }

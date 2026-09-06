@@ -1,22 +1,25 @@
 {
-  "name": "StructureSquareSeriesInwardsRogerCoqart",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:19:19",
-  "url": "https://openprocessing.org/@epi/2321062",
-  "code": "// === Tab: mySketch ===\n// http://recodeproject.com/artwork/v1n3structure-square-series-inwards4\n// self implementation\n\nconst PAD = 8;\nconst SZE = 50;\n\nfunction setup() {\n  let maxY = 0;\n  for (let y = PAD + SZE / 2; y <= windowHeight - SZE - PAD; y += SZE + PAD) {\n    maxY = y;\n  }\n  maxY += SZE / 2 + PAD;\n  \n  let maxX = 0;\n  for (let x = PAD + SZE / 2; x <= windowWidth - SZE - PAD; x += SZE + PAD) {\n    maxX = x\n  }\n  maxX += SZE / 2 + PAD;\n  \n  createCanvas(maxX, maxY);\n  describe(\"grid of rectangles filled with lines, more complex as distance expands from center\")\n\tframeRate(3);\n\n  stroke(\"black\");\n  strokeWeight(2);\n}\n\nfunction draw() {\n\tbackground(\"beige\");\n\t\n\tconst spotPt = {x: width / 2, y: height / 2}; // {x: (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), y: (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))};\n\tconst maxD = dist(PAD + SZE / 2, PAD + SZE / 2, spotPt.x, spotPt.y);\n  for (let y = PAD + SZE / 2; y <= height - SZE/2 - PAD; y += SZE + PAD) {\n    for (let x = PAD + SZE / 2; x <= width - SZE/2 - PAD; x += SZE + PAD) {\n      drawShape(x, y, SZE, (dist(x, y, spotPt.x, spotPt.y)) / maxD);\n    }\n  }\n}\n\nfunction drawShape(x, y, s, t) {\n  push();\n  translate(x, y);\n\n  const clrs = [\"rgb(91,14,14)\", \"rgb(16,16,87)\", \"rgb(84,54,19)\", \"rgb(15,79,15)\"]\n  const pts = [[-0.5, -0.5], [0, -0.5], [0.5, -0.5], [0.5, 0], [0.5, 0.5], [0, 0.5], [-0.5, 0.5], [-0.5, 0]];\n  const conns = [[0,4], [1,5], [2,6], [3,7], [1,3], [3,5], [5,7], [7,1]];\n\n\n  const iter = ~~(t * (conns.length));\n  for (let i = 0; i < iter; i++) {\n    if (!(conns.length > 0)) break;\n    let ci = ~~random(conns.length);\n    let c = conns[ci];\n    let p1 = pts[c[0]];\n    let p2 = pts[c[1]];\n    stroke(random(clrs));\n    line(p1[0] * s, p1[1] * s, p2[0] * s, p2[1] * s);\n    conns.splice(ci, 1);\n  }\n\n  rectMode(CENTER);\n  noFill();\n  stroke(0);\n  rect(0, 0, s, s);\n\n  pop();\n}\n\nfunction mousePressed() {\n  if (mouseButton === LEFT) setup();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "StructureSquareSeriesInwardsRogerCoqart",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:19:19",
+    "url": "https://openprocessing.org/@epi/2321062",
+    "code": "// === Tab: mySketch ===\n// http://recodeproject.com/artwork/v1n3structure-square-series-inwards4\n// self implementation\n\nconst PAD = 8;\nconst SZE = 50;\n\nfunction setup() {\n  let maxY = 0;\n  for (let y = PAD + SZE / 2; y <= windowHeight - SZE - PAD; y += SZE + PAD) {\n    maxY = y;\n  }\n  maxY += SZE / 2 + PAD;\n  \n  let maxX = 0;\n  for (let x = PAD + SZE / 2; x <= windowWidth - SZE - PAD; x += SZE + PAD) {\n    maxX = x\n  }\n  maxX += SZE / 2 + PAD;\n  \n  createCanvas(maxX, maxY);\n  describe(\"grid of rectangles filled with lines, more complex as distance expands from center\")\n\tframeRate(3);\n\n  stroke(\"black\");\n  strokeWeight(2);\n}\n\nfunction draw() {\n\tbackground(\"beige\");\n\t\n\tconst spotPt = {x: width / 2, y: height / 2}; // {x: (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), y: (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))};\n\tconst maxD = dist(PAD + SZE / 2, PAD + SZE / 2, spotPt.x, spotPt.y);\n  for (let y = PAD + SZE / 2; y <= height - SZE/2 - PAD; y += SZE + PAD) {\n    for (let x = PAD + SZE / 2; x <= width - SZE/2 - PAD; x += SZE + PAD) {\n      drawShape(x, y, SZE, (dist(x, y, spotPt.x, spotPt.y)) / maxD);\n    }\n  }\n}\n\nfunction drawShape(x, y, s, t) {\n  push();\n  translate(x, y);\n\n  const clrs = [\"rgb(91,14,14)\", \"rgb(16,16,87)\", \"rgb(84,54,19)\", \"rgb(15,79,15)\"]\n  const pts = [[-0.5, -0.5], [0, -0.5], [0.5, -0.5], [0.5, 0], [0.5, 0.5], [0, 0.5], [-0.5, 0.5], [-0.5, 0]];\n  const conns = [[0,4], [1,5], [2,6], [3,7], [1,3], [3,5], [5,7], [7,1]];\n\n\n  const iter = ~~(t * (conns.length));\n  for (let i = 0; i < iter; i++) {\n    if (!(conns.length > 0)) break;\n    let ci = ~~random(conns.length);\n    let c = conns[ci];\n    let p1 = pts[c[0]];\n    let p2 = pts[c[1]];\n    stroke(random(clrs));\n    line(p1[0] * s, p1[1] * s, p2[0] * s, p2[1] * s);\n    conns.splice(ci, 1);\n  }\n\n  rectMode(CENTER);\n  noFill();\n  stroke(0);\n  rect(0, 0, s, s);\n\n  pop();\n}\n\nfunction mousePressed() {\n  if (mouseButton === LEFT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Driving Essence Throws.mp4"
+    ]
 }

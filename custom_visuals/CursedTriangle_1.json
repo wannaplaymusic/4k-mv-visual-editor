@@ -1,22 +1,25 @@
 {
-  "name": "CursedTriangle_1",
-  "author": "u173132",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:31:39",
-  "url": "https://openprocessing.org/@u173132/740299",
-  "code": "// === Tab: mySketch ===\n// playing with recursion\n\nvar frac = 5\n\nfunction setup() {\n   createCanvas(windowHeight, windowHeight)\n   stroke(240, 250, 255, 80);\n   noFill()\n   radius = height / 3\n   scaleX = 0.8\n   sqrt3 = sqrt(3)\n   deg120 = (PI / 3) * 2\n}\n\nfunction draw() {\n   background(0)\n   for (var y = 0; y < 2; y += 1) {\n      for (var x = 0; x < 3; x += 1) {\n         recursive_triangle(x * radius * sqrt3, radius + y * height / 2, radius, PI / 6)\n         if (x != 2) recursive_triangle(x * radius * sqrt3 + radius * sqrt3 * 0.5, radius - (radius / 2) + y * height / 2, radius, PI / 6 + PI / 3)\n      }\n   }\n}\n\nfunction recursive_triangle(x, y, r, angle) {\n   push()\n   translate(x, y)\n   rotate(angle)\n   tri(0, cos(deg120) * r, sin(deg120) * r, cos(deg120 * 2) * r, sin(deg120 * 2) * r, cos(deg120 * 3) * r, sin(deg120 * 3) * r)\n   pop()\n}\n\nfunction tri(n, x1, y1, x2, y2, x3, y3) {\n   if (n == frac) {\n      triangle(x1, y1, x2, y2, x3, y3);\n      return\n   }\n   var _x1 = (x2 - x3) * scaleX + x3\n   var _y1 = (y2 - y3) * scaleX + y3\n   var _x2 = (x3 - x1) * scaleX + x1\n   var _y2 = (y3 - y1) * scaleX + y1\n   var _x3 = (x1 - x2) * scaleX + x2\n   var _y3 = (y1 - y2) * scaleX + y2\n   tri(n + 1, x1, y1, _x3, _y3, _x2, _y2)\n   tri(n + 1, x2, y2, _x1, _y1, _x3, _y3)\n   tri(n + 1, x3, y3, _x2, _y2, _x1, _y1)\n   tri(n + 1, _x1, _y1, _x2, _y2, _x3, _y3)\n}\n\nfunction mouseMoved() {\n   scaleX = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, -0.1, 0.5) + map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, -0.1, 0.7)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/p5@0.7.3/lib/addons/p5.dom.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CursedTriangle_1",
+    "author": "u173132",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:31:39",
+    "url": "https://openprocessing.org/@u173132/740299",
+    "code": "// === Tab: mySketch ===\n// playing with recursion\n\nvar frac = 5\n\nfunction setup() {\n   createCanvas(windowHeight, windowHeight)\n   stroke(240, 250, 255, 80);\n   noFill()\n   radius = height / 3\n   scaleX = 0.8\n   sqrt3 = sqrt(3)\n   deg120 = (PI / 3) * 2\n}\n\nfunction draw() {\n   background(0)\n   for (var y = 0; y < 2; y += 1) {\n      for (var x = 0; x < 3; x += 1) {\n         recursive_triangle(x * radius * sqrt3, radius + y * height / 2, radius, PI / 6)\n         if (x != 2) recursive_triangle(x * radius * sqrt3 + radius * sqrt3 * 0.5, radius - (radius / 2) + y * height / 2, radius, PI / 6 + PI / 3)\n      }\n   }\n}\n\nfunction recursive_triangle(x, y, r, angle) {\n   push()\n   translate(x, y)\n   rotate(angle)\n   tri(0, cos(deg120) * r, sin(deg120) * r, cos(deg120 * 2) * r, sin(deg120 * 2) * r, cos(deg120 * 3) * r, sin(deg120 * 3) * r)\n   pop()\n}\n\nfunction tri(n, x1, y1, x2, y2, x3, y3) {\n   if (n == frac) {\n      triangle(x1, y1, x2, y2, x3, y3);\n      return\n   }\n   var _x1 = (x2 - x3) * scaleX + x3\n   var _y1 = (y2 - y3) * scaleX + y3\n   var _x2 = (x3 - x1) * scaleX + x1\n   var _y2 = (y3 - y1) * scaleX + y1\n   var _x3 = (x1 - x2) * scaleX + x2\n   var _y3 = (y1 - y2) * scaleX + y2\n   tri(n + 1, x1, y1, _x3, _y3, _x2, _y2)\n   tri(n + 1, x2, y2, _x1, _y1, _x3, _y3)\n   tri(n + 1, x3, y3, _x2, _y2, _x1, _y1)\n   tri(n + 1, _x1, _y1, _x2, _y2, _x3, _y3)\n}\n\nfunction mouseMoved() {\n   scaleX = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, -0.1, 0.5) + map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, -0.1, 0.7)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/p5@0.7.3/lib/addons/p5.dom.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Hollow Frequency Field.mp4"
+    ]
 }

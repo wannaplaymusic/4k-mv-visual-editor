@@ -1,22 +1,25 @@
 {
-  "name": "RunningThroughTrees",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 04:43:31",
-  "url": "https://openprocessing.org/@ntsutae/1696163",
-  "code": "// === Tab: mySketch ===\nconst 木 = (x, y, z) => ({\n  x: random(width) - width / 2,\n  y: random(height / 2),\n  z: random(5),\n});\n\nconst 林 = {\n  林: [],\n\n  初期化() {\n    for (let i = 100; i--; ) {\n      this.林.push(木());\n    }\n  },\n\n  更新() {\n    for (const 木 of this.林) {\n      木.x -= ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2) * 0.025;\n      if (木.x > width / 2) 木.x = -width / 2;\n      if (木.x < -width / 2) 木.x = width / 2;\n      const my = constrain((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height);\n      木.z -= log(1 + my) / 200;\n      if (木.z < 0) 木.z = 5;\n    }\n    this.林.sort((木1, 木2) => (木1.z > 木2.z ? -1 : 1));\n  },\n\n  影を描く() {\n    fill('black');\n    noStroke();\n    for (const 木 of this.林) {\n      rect(木.x / 木.z, 50 / 木.z, (-木.y / 木.z) * 0.6, -2);\n    }\n  },\n\n  林を描く() {\n    fill('white');\n    stroke('black');\n    for (const 木 of this.林) {\n      rect(木.x / 木.z, 50 / 木.z, 16 / 木.z, -木.y / 木.z);\n    }\n  },\n\n};\n\nsetup = () => {\n  createCanvas(900, 600);\n  林.初期化();\n};\n\ndraw = (_) => {\n  background('white');\n  translate(width / 2, height / 2);\n  林.更新();\n  林.影を描く();\n  林.林を描く();\n};",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "RunningThroughTrees",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:43:31",
+    "url": "https://openprocessing.org/@ntsutae/1696163",
+    "code": "// === Tab: mySketch ===\nconst 木 = (x, y, z) => ({\n  x: random(width) - width / 2,\n  y: random(height / 2),\n  z: random(5),\n});\n\nconst 林 = {\n  林: [],\n\n  初期化() {\n    for (let i = 100; i--; ) {\n      this.林.push(木());\n    }\n  },\n\n  更新() {\n    for (const 木 of this.林) {\n      木.x -= ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2) * 0.025;\n      if (木.x > width / 2) 木.x = -width / 2;\n      if (木.x < -width / 2) 木.x = width / 2;\n      const my = constrain((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height);\n      木.z -= log(1 + my) / 200;\n      if (木.z < 0) 木.z = 5;\n    }\n    this.林.sort((木1, 木2) => (木1.z > 木2.z ? -1 : 1));\n  },\n\n  影を描く() {\n    fill('black');\n    noStroke();\n    for (const 木 of this.林) {\n      rect(木.x / 木.z, 50 / 木.z, (-木.y / 木.z) * 0.6, -2);\n    }\n  },\n\n  林を描く() {\n    fill('white');\n    stroke('black');\n    for (const 木 of this.林) {\n      rect(木.x / 木.z, 50 / 木.z, 16 / 木.z, -木.y / 木.z);\n    }\n  },\n\n};\n\nsetup = () => {\n  createCanvas(900, 600);\n  林.初期化();\n};\n\ndraw = (_) => {\n  background('white');\n  translate(width / 2, height / 2);\n  林.更新();\n  林.影を描く();\n  林.林を描く();\n};",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Negative Space.mp4"
+    ]
 }

@@ -1,22 +1,25 @@
 {
-  "name": "Tinycode20220408_1",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 16:49:06",
-  "url": "https://openprocessing.org/@ntsutae/1538820",
-  "code": "// === Tab: mySketch ===\n// Reference: https://www.dwitter.net/h/julia\nf=(x,y,n=0)=>\n  x<2\n  ? f(x*x-y*y,2*tan(2*x*y)-1/2,n+1)\n  : (cos(n/4)+1)*128\n\nY=0\nsetup=()=>{\n  createCanvas(w=windowWidth,h=windowHeight)\n//  createCanvas(w=1920,h=1080)\n}\n\ndraw=()=>{\n  if(Y<h){\n    for(X=w;X--;){\n      x=map(X,0,w,-1,1)\n      y=map(Y,0,h,-h/w,h/w)\n      stroke(f(x,y))\n      point(X,Y)\n    }\n    Y++\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Tinycode20220408_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 16:49:06",
+    "url": "https://openprocessing.org/@ntsutae/1538820",
+    "code": "// === Tab: mySketch ===\n// Reference: https://www.dwitter.net/h/julia\nf=(x,y,n=0)=>\n  x<2\n  ? f(x*x-y*y,2*tan(2*x*y)-1/2,n+1)\n  : (cos(n/4)+1)*128\n\nY=0\nsetup=()=>{\n  createCanvas(w=windowWidth,h=windowHeight)\n//  createCanvas(w=1920,h=1080)\n}\n\ndraw=()=>{\n  if(Y<h){\n    for(X=w;X--;){\n      x=map(X,0,w,-1,1)\n      y=map(Y,0,h,-h/w,h/w)\n      stroke(f(x,y))\n      point(X,Y)\n    }\n    Y++\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Frozen Time.mp4"
+    ]
 }

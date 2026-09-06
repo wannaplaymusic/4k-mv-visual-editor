@@ -1,22 +1,25 @@
 {
-  "name": "Follow2refactoredversion_1",
-  "author": "u258859",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:28:25",
-  "url": "https://openprocessing.org/@u258859/2483117",
-  "code": "// === Tab: tab2 ===\nfunction draw_line(array){\n\t\n\tfor(let i= 0; i<array.length-1; i++){\n\t\t\n\t\tlet obj = array[i];\n\t\tlet obj2 = array[i+1];\n\t\t\n\t\tlet v = createVector(obj.x-obj2.x,obj.y-obj2.y);\n\t\t\n\t\tv.rotate(PI/2);\n\t\tv.mult(i/10)\n\t\t\n\t\tstroke(50);\n\t\tline(obj.x,obj.y,obj.x+v.x,obj.y+v.y);\n\t\tline(obj.x,obj.y,obj2.x,obj2.y);\n\t\tfill(0)\n\t\tcircle(obj.x+v.x,obj.y+v.y,10);\n\t\t//line(obj2.x,obj2.y,obj.x+v.x,obj.y+v.y);\n\t\t\n\t}\n\t\n\t\n\t\n\t\n\t\n}\n\n// === Tab: mySketch ===\n// Follow 2 refactored version\n// Original code: https://p5js.org/examples/interaction-follow-2.html\n\nlet pos = [];\nconst segNum = 160;\nconst segLength = 10;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  stroke(0, 100);\n  strokeWeight(2);\n  for (let i = 0; i < segNum; i++) {\n    pos.push({ x: 0, y: 0 });\n  }\n}\n\nfunction draw() {\n  background(255);\n\n  let parent = { x: (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), y: (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) };\n  for (let child of pos) {\n    let angle = atan2(child.y - parent.y, child.x - parent.x);\n    child.x = parent.x + cos(angle) * segLength;\n    child.y = parent.y + sin(angle) * segLength;\n    line(parent.x, parent.y, child.x, child.y);\n    parent = child;\n  }\n\tdraw_line(pos)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Follow2refactoredversion_1",
+    "author": "u258859",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:28:25",
+    "url": "https://openprocessing.org/@u258859/2483117",
+    "code": "// === Tab: tab2 ===\nfunction draw_line(array){\n\t\n\tfor(let i= 0; i<array.length-1; i++){\n\t\t\n\t\tlet obj = array[i];\n\t\tlet obj2 = array[i+1];\n\t\t\n\t\tlet v = createVector(obj.x-obj2.x,obj.y-obj2.y);\n\t\t\n\t\tv.rotate(PI/2);\n\t\tv.mult(i/10)\n\t\t\n\t\tstroke(50);\n\t\tline(obj.x,obj.y,obj.x+v.x,obj.y+v.y);\n\t\tline(obj.x,obj.y,obj2.x,obj2.y);\n\t\tfill(0)\n\t\tcircle(obj.x+v.x,obj.y+v.y,10);\n\t\t//line(obj2.x,obj2.y,obj.x+v.x,obj.y+v.y);\n\t\t\n\t}\n\t\n\t\n\t\n\t\n\t\n}\n\n// === Tab: mySketch ===\n// Follow 2 refactored version\n// Original code: https://p5js.org/examples/interaction-follow-2.html\n\nlet pos = [];\nconst segNum = 160;\nconst segLength = 10;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  stroke(0, 100);\n  strokeWeight(2);\n  for (let i = 0; i < segNum; i++) {\n    pos.push({ x: 0, y: 0 });\n  }\n}\n\nfunction draw() {\n  background(255);\n\n  let parent = { x: (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), y: (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) };\n  for (let child of pos) {\n    let angle = atan2(child.y - parent.y, child.x - parent.x);\n    child.x = parent.x + cos(angle) * segLength;\n    child.y = parent.y + sin(angle) * segLength;\n    line(parent.x, parent.y, child.x, child.y);\n    parent = child;\n  }\n\tdraw_line(pos)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

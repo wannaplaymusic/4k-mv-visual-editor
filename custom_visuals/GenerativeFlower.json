@@ -1,22 +1,25 @@
 {
-  "name": "GenerativeFlower",
-  "author": "reona396",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:30:49",
-  "url": "https://openprocessing.org/@reona396/1880267",
-  "code": "// === Tab: mySketch.js ===\n// https://publicdomainq.net/hand-flower-gerbera-0045540/\n\nlet shapes = [];\nlet shapesNum = 25;\n\nlet zoff = 0;\nconst R = 180;\n\nconst palette = [\"#ff00ff\", \"#ffff00\", \"#00ffff\"];\n\nlet img;\nconst imgScale = 1.25;\nconst canvasScale = 0.815;\n\nfunction preload() {\n  img = loadImage(\"file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/img.png\");\n}\n\nfunction setup() {\n  createCanvas(\n    img.width * imgScale * canvasScale,\n    img.height * imgScale * canvasScale\n  );\n  angleMode(DEGREES);\n  strokeJoin(ROUND);\n\n  for (let i = 0; i < shapesNum; i++) {\n    shapes.push(new Shape(i));\n  }\n}\n\nfunction draw() {\n  background(\"#FEFEFE\");\n\n  push();\n  translate(\n    width / 2 - (img.width * imgScale) / 2,\n    height / 2 - (img.height * imgScale) / 2\n  );\n  push();\n  translate(img.width * imgScale, img.height * imgScale);\n  rotate(map(noise(frameCount * 0.0025), 0, 1, -4, 4));\n  translate(-img.width * imgScale, -img.height * imgScale);\n  image(img, 0, 0, img.width * imgScale, img.height * imgScale);\n\n  push();\n  fill(255, 0, 0);\n\n  translate(width * 0.5225, height * 0.45);\n  for (let i = 0; i < shapes.length; i++) {\n    shapes[i].move();\n    shapes[i].display();\n  }\n  pop();\n  pop();\n  pop();\n}\n\nclass Shape {\n  constructor(tmpIndex) {\n    this.index = tmpIndex;\n    this.zoff = this.index * 0.05;\n    this.c = color(random(palette));\n    this.c.setAlpha(80);\n    this.stw = random([2, 4, 6]);\n    this.delta = 1;\n    this.noiseMax = random([2, 2, 2, 10]);\n  }\n\n  move() {}\n\n  display() {\n    noFill();\n\n    stroke(this.c);\n    strokeWeight(this.stw);\n    beginShape();\n    for (let t = 0; t < 360; t += (Math.max(0.001, Math.abs(this.delta)) || 1)) {\n      let xoff = map(cos(t), -1, 1, 0, this.noiseMax);\n      let yoff = map(sin(t), -1, 1, 0, this.noiseMax);\n\n      let n = noise(xoff, yoff, this.zoff + frameCount * 0.0225);\n\n      let r = map(n, 0, 1, -R, R);\n      let x = r * cos(t);\n      let y = r * sin(t);\n\n      vertex(x, y);\n    }\n    endShape(CLOSE);\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "GenerativeFlower",
+    "author": "reona396",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:30:49",
+    "url": "https://openprocessing.org/@reona396/1880267",
+    "code": "// === Tab: mySketch.js ===\n// https://publicdomainq.net/hand-flower-gerbera-0045540/\n\nlet shapes = [];\nlet shapesNum = 25;\n\nlet zoff = 0;\nconst R = 180;\n\nconst palette = [\"#ff00ff\", \"#ffff00\", \"#00ffff\"];\n\nlet img;\nconst imgScale = 1.25;\nconst canvasScale = 0.815;\n\nfunction preload() {\n  img = loadImage(\"file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/img.png\");\n}\n\nfunction setup() {\n  createCanvas(\n    img.width * imgScale * canvasScale,\n    img.height * imgScale * canvasScale\n  );\n  angleMode(DEGREES);\n  strokeJoin(ROUND);\n\n  for (let i = 0; i < shapesNum; i++) {\n    shapes.push(new Shape(i));\n  }\n}\n\nfunction draw() {\n  background(\"#FEFEFE\");\n\n  push();\n  translate(\n    width / 2 - (img.width * imgScale) / 2,\n    height / 2 - (img.height * imgScale) / 2\n  );\n  push();\n  translate(img.width * imgScale, img.height * imgScale);\n  rotate(map(noise(frameCount * 0.0025), 0, 1, -4, 4));\n  translate(-img.width * imgScale, -img.height * imgScale);\n  image(img, 0, 0, img.width * imgScale, img.height * imgScale);\n\n  push();\n  fill(255, 0, 0);\n\n  translate(width * 0.5225, height * 0.45);\n  for (let i = 0; i < shapes.length; i++) {\n    shapes[i].move();\n    shapes[i].display();\n  }\n  pop();\n  pop();\n  pop();\n}\n\nclass Shape {\n  constructor(tmpIndex) {\n    this.index = tmpIndex;\n    this.zoff = this.index * 0.05;\n    this.c = color(random(palette));\n    this.c.setAlpha(80);\n    this.stw = random([2, 4, 6]);\n    this.delta = 1;\n    this.noiseMax = random([2, 2, 2, 10]);\n  }\n\n  move() {}\n\n  display() {\n    noFill();\n\n    stroke(this.c);\n    strokeWeight(this.stw);\n    beginShape();\n    for (let t = 0; t < 360; t += (Math.max(0.001, Math.abs(this.delta)) || 1)) {\n      let xoff = map(cos(t), -1, 1, 0, this.noiseMax);\n      let yoff = map(sin(t), -1, 1, 0, this.noiseMax);\n\n      let n = noise(xoff, yoff, this.zoff + frameCount * 0.0225);\n\n      let r = map(n, 0, 1, -R, R);\n      let x = r * cos(t);\n      let y = r * sin(t);\n\n      vertex(x, y);\n    }\n    endShape(CLOSE);\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tunnel Vision.mp4"
+    ]
 }

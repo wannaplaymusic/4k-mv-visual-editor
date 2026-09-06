@@ -1,22 +1,25 @@
 {
-  "name": "DotSpheres",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:16:32",
-  "url": "https://openprocessing.org/@epi/2395029",
-  "code": "// === Tab: mySketch ===\n// https://openprocessing.org/sketch/2395029\n\nlet spheres;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tdescribe(\"circle packing of rotating points on spheres\");\n\tframeRate(60);\n\t\n\tnoFill();\n\tstrokeWeight(2);\n\tstroke(\"purple\");\n\t\n\tspheres = [];\n\tconst S = max(width, height);\n\tfor (let i = 0; i < (width+height); i++) {\n\t\tconst a = random(TWO_PI);\n\t\tconst s = random(5/S, S/8);\n\t\tconst r = random(s/2, S/2-s/2);\n\t\tconst x = cos(a) * r;\n\t\tconst y = sin(a) * r;\n\t\tconst newDotSphere = new DotSphere(createVector(x, y, 0), s);\n\t\t// space filling collision detection\n\t\tlet notCollides = true;\n\t\tfor (let s of spheres) {\n\t\t\tif (dist(s.pos.x, s.pos.y, newDotSphere.pos.x, newDotSphere.pos.y) < (s.sze + newDotSphere.sze)) {\n\t\t\t\tnotCollides = false;\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t\tif (notCollides) {\n\t\t\tspheres.push(newDotSphere);\n\t\t}\n\t}\n\t// console.log(spheres);\n}\n\nfunction draw() {\n\tbackground(0, 0, 8);\n\torbitControl();\n\tlights();\n\tpointLight(255, 255, 255, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))-width/2, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))-height/2, 250);\n\tspecularMaterial(255);\n\tshininess(75);\n\tfor (let s of spheres) {\n\t\ts.draw();\n\t}\n}\n\nfunction doubleClicked() {\n\tif (mouseButton === LEFT) setup();\n}\n\n// https://x.com/i/status/1845186249377587605\nclass DotSphere {\n\tconstructor(pos, sze) {\n\t\tthis.pos = pos;\n\t\tthis.sze = sze;\n\t\tthis.rotz = random(TWO_PI);\n\t\tthis.rotzf = random(90, 270) * Math.sign(random()-0.5);\n\t\tthis.arms = ~~random(1, 6);\n\t\tthis.numh = random(3, this.sze/5);\n\t\tthis.sa = random(TWO_PI); // start angle\n\t\tthis.ra = random(30, 60) * Math.sign(random()-0.5); // rotating angle sphere\n\t\tthis.da = random(-HALF_PI, HALF_PI); // delta angle for dots\n\t\t// this.clr = lerpColor(color(\"purple\"), color(\"cyan\"), noise(this.pos.x, this.pos.y, frameCount / (this.pos.x+this.pos.y)));\n\t}\n\n\tdraw() {\n\t\tpush();\n\t\ttranslate(this.pos.x, this.pos.y, this.pos.z);\n\t\trotateZ(frameCount/this.rotzf+this.rotz)\n\t\tconst dh = this.sze / this.numh;\n\t\tstroke(lerpColor(color(\"rgb(255,64,255)\"), color(\"rgb(64,255,255)\"), noise(this.pos.x, this.pos.y, frameCount / (this.pos.x+this.pos.y))));\n\t\tstrokeWeight(dh/2);\n\t\tfor (let arm = 0; arm < this.arms; arm++) {\n\t\t\tvar a = this.sa + arm / this.arms * TWO_PI + frameCount/this.ra;\n\t\t\tfor (let h = -this.sze; h <= this.sze + dh/2; h += dh) {\n\t\t\t\tvar r = sqrt(this.sze * this.sze - h*h);\n\t\t\t\tvar x = cos(a) * abs(r);\n\t\t\t\tconst z = sin(a) * abs(r);\n\t\t\t\tconst sw = map(z, -this.sze/2, this.sze/2, 0.5, dh*0.8)\n\t\t\t\tstrokeWeight(sw);\n\t\t\t\tpoint (x, h, z)\n\t\t\t\ta += this.da;\n\t\t\t}\n\t\t}\n\t\tpop();\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "DotSpheres",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:16:32",
+    "url": "https://openprocessing.org/@epi/2395029",
+    "code": "// === Tab: mySketch ===\n// https://openprocessing.org/sketch/2395029\n\nlet spheres;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tdescribe(\"circle packing of rotating points on spheres\");\n\tframeRate(60);\n\t\n\tnoFill();\n\tstrokeWeight(2);\n\tstroke(\"purple\");\n\t\n\tspheres = [];\n\tconst S = max(width, height);\n\tfor (let i = 0; i < (width+height); i++) {\n\t\tconst a = random(TWO_PI);\n\t\tconst s = random(5/S, S/8);\n\t\tconst r = random(s/2, S/2-s/2);\n\t\tconst x = cos(a) * r;\n\t\tconst y = sin(a) * r;\n\t\tconst newDotSphere = new DotSphere(createVector(x, y, 0), s);\n\t\t// space filling collision detection\n\t\tlet notCollides = true;\n\t\tfor (let s of spheres) {\n\t\t\tif (dist(s.pos.x, s.pos.y, newDotSphere.pos.x, newDotSphere.pos.y) < (s.sze + newDotSphere.sze)) {\n\t\t\t\tnotCollides = false;\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t\tif (notCollides) {\n\t\t\tspheres.push(newDotSphere);\n\t\t}\n\t}\n\t// console.log(spheres);\n}\n\nfunction draw() {\n\tbackground(0, 0, 8);\n\torbitControl();\n\tlights();\n\tpointLight(255, 255, 255, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))-width/2, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))-height/2, 250);\n\tspecularMaterial(255);\n\tshininess(75);\n\tfor (let s of spheres) {\n\t\ts.draw();\n\t}\n}\n\nfunction doubleClicked() {\n\tif (mouseButton === LEFT) setup();\n}\n\n// https://x.com/i/status/1845186249377587605\nclass DotSphere {\n\tconstructor(pos, sze) {\n\t\tthis.pos = pos;\n\t\tthis.sze = sze;\n\t\tthis.rotz = random(TWO_PI);\n\t\tthis.rotzf = random(90, 270) * Math.sign(random()-0.5);\n\t\tthis.arms = ~~random(1, 6);\n\t\tthis.numh = random(3, this.sze/5);\n\t\tthis.sa = random(TWO_PI); // start angle\n\t\tthis.ra = random(30, 60) * Math.sign(random()-0.5); // rotating angle sphere\n\t\tthis.da = random(-HALF_PI, HALF_PI); // delta angle for dots\n\t\t// this.clr = lerpColor(color(\"purple\"), color(\"cyan\"), noise(this.pos.x, this.pos.y, frameCount / (this.pos.x+this.pos.y)));\n\t}\n\n\tdraw() {\n\t\tpush();\n\t\ttranslate(this.pos.x, this.pos.y, this.pos.z);\n\t\trotateZ(frameCount/this.rotzf+this.rotz)\n\t\tconst dh = this.sze / this.numh;\n\t\tstroke(lerpColor(color(\"rgb(255,64,255)\"), color(\"rgb(64,255,255)\"), noise(this.pos.x, this.pos.y, frameCount / (this.pos.x+this.pos.y))));\n\t\tstrokeWeight(dh/2);\n\t\tfor (let arm = 0; arm < this.arms; arm++) {\n\t\t\tvar a = this.sa + arm / this.arms * TWO_PI + frameCount/this.ra;\n\t\t\tfor (let h = -this.sze; h <= this.sze + dh/2; h += dh) {\n\t\t\t\tvar r = sqrt(this.sze * this.sze - h*h);\n\t\t\t\tvar x = cos(a) * abs(r);\n\t\t\t\tconst z = sin(a) * abs(r);\n\t\t\t\tconst sw = map(z, -this.sze/2, this.sze/2, 0.5, dh*0.8)\n\t\t\t\tstrokeWeight(sw);\n\t\t\t\tpoint (x, h, z)\n\t\t\t\ta += this.da;\n\t\t\t}\n\t\t}\n\t\tpop();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tonal Shift.mp4"
+    ]
 }

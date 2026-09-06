@@ -1,22 +1,25 @@
 {
-  "name": "LogPolarConformalWarp",
-  "author": "Kazoops",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 04:40:41",
-  "url": "https://openprocessing.org/@Kazoops/2975482",
-  "code": "// === Tab: mySketch ===\nsetup=()=>createCanvas(W=innerWidth,H=innerHeight);draw=()=>{background(0,5);R=mag(W,H)/2;T=millis()*1e-4;t=T*5%.777;noFill();stroke(255);for(i=-20;i<0;i++)for(j=14;j--;){u=(i+j%2/2)*.777+t;X=exp(u)*R;strokeWeight(X/40);circle(W/2+X*cos(v=j*.449+noise(T)*9),H/2+X*sin(v),X*.36)}}// #つぶやきprocessing",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "LogPolarConformalWarp",
+    "author": "Kazoops",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:40:41",
+    "url": "https://openprocessing.org/@Kazoops/2975482",
+    "code": "// === Tab: mySketch ===\nsetup=()=>createCanvas(W=innerWidth,H=innerHeight);draw=()=>{background(0,5);R=mag(W,H)/2;T=millis()*1e-4;t=T*5%.777;noFill();stroke(255);for(i=-20;i<0;i++)for(j=14;j--;){u=(i+j%2/2)*.777+t;X=exp(u)*R;strokeWeight(X/40);circle(W/2+X*cos(v=j*.449+noise(T)*9),H/2+X*sin(v),X*.36)}}// #つぶやきprocessing",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Hypnotic Core Drift.mp4"
+    ]
 }

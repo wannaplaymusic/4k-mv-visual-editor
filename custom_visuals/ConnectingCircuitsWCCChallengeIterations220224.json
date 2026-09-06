@@ -1,22 +1,26 @@
 {
-  "name": "ConnectingCircuitsWCCChallengeIterations220224",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:18:22",
-  "url": "https://openprocessing.org/@epi/2186056",
-  "code": "// === Tab: mySketch ===\n/*\n\tConnecting Circuits - 🧰 Iterations 22.02.2024\n\thttps://openprocessing.org/sketch/2186056\n\t#creativecoding #generativeart #p5js #WCCChallenge\n\t\n\tDear Raph and creative coding community,\n\t\n\tmade an iteration of a BirdsNest Streaming Background submission.\n\tIterating over a grid to connect the point.\n\tAdded also horizontal and vertical connections.\n\tIterating thru different pallettes for each cell thru a noise field,\n\tto avoid harsh palette changes.\n\t\n\tIterated over the word iterations as much as posible now :D\n\t\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\n// const S = 600;\nvar C = 20; // cell size\nvar F = 300; // frame count before palette change\nvar palettes = ([\n\t[\"#ff2a6d\", \"#d1f7ff\", \"#f5d9e8\", \"#005678\", \"#01012b\"],\n\t[\"#b0acb0\", \"#e2dddf\", \"#85ebd9\", \"#3d898d\", \"#2f404d\"],\n\t[\"#ff6e27\", \"#fbf665\", \"#73fffe\", \"#6287f8\", \"#383e65\"],\n\t[\"#7700a6\", \"#fe00fe\", \"#defe47\", \"#00b3fe\", \"#0016ee\"],\n\t[\"#ff184c\", \"#ff577d\", \"#ffccdc\", \"#0a9cf5\", \"#003062\"]\n]).map((p) => p.map((e) => e + \"A0\"));\nvar pIdx = 0;\n\nfunction setup() {\n  createCanvas(innerWidth, innerHeight);\n\tframeRate(60)\n\tdescribe(\"animation of randomly connecting circuits over time switching thru different palettes \");\n\tpIdx = (pIdx + 1) % palettes.length;\n  frameRate(30);\n  loop();\n}\n\nfunction draw() {\n\tif (frameCount % 300 === 0) setup(); // 5 sec\n  const S = max(width, height)\n  const D = S / C;\n  \n\t// background(\"lightgray\");\n\tbackground(222, 32)\n\tbackground(32)\n  \n\t// translate((noise(12.3+frameCount*0.0234)-0.5)*D*2, (noise(23.1+frameCount*0.0341)-0.5)*D*2)\n  strokeWeight(D / 2);\n  for (y = D; y < height; y += D) {\n    for (x = D; x < width; x += D) {\n      stroke(arr_noise(pIdx, x*x-y));\n      point(x, y);\n\t\t\tconst n = noise(252345.23 + frameCount * 0.00142 + x + y * 1.34);\n\t\t\tconst xf = noise(245.231 + frameCount * 0.0008142 + x + y * 1.34) < 0.5 ? -1 : 1;\n\t\t\tconst yf = noise(1345.123 + frameCount * 0.0009142 + x * 1.34 + y) < 0.5 ? -1 : 1;\n\t\t\tif (n < 0.1) {\n\t\t\t\t// low prob horizontal line\n        stroke(arr_noise(pIdx, x+y*y));\n        mline(x, y, x + xf * D, y);\n      } else if (n < 0.2) {\n\t\t\t\t// low prob vertical line\n        stroke(arr_noise(pIdx, x+y*y));\n        mline(x, y, x, y + yf * D);\n      } else if (n < 0.4) {\n\t\t\t\t// mid prob diagonal line\n        stroke(arr_noise(pIdx, x+y*y));\n        mline(x, y, x + xf * D, y + yf * D);\n      }\n    }\n  }\n}\n\n// draw a line, when not outside the grid\nfunction mline(x1, y1, x2, y2) {\n  if (x1 === 0 || y1 === 0 || x2 === 0 || y2 === 0) return;\n  if (x1 >= width || x2 >= width) return;\n  if (y1 >= height || y2 >= height) return;\n  line(x1, y1, x2, y2);\n}\n\n// gets a color, slightly iterating thru the palettes by comparing noise to current frame\nfunction arr_noise(aIdx, magicNum) {\n\tconst nIdx = (aIdx + 1) % palettes.length;\n  var n = noise(magicNum + frameCount * 0.001234);\n\tconst arr = palettes[(frameCount % F) / F < n ? aIdx : nIdx]\n  const i = ~~(n * arr.length);\n  return arr[i];\n}\n\nfunction mouseClicked() {\n  // if (mouseButton === LEFT) setup();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "ConnectingCircuitsWCCChallengeIterations220224",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:18:22",
+    "url": "https://openprocessing.org/@epi/2186056",
+    "code": "// === Tab: mySketch ===\n/*\n\tConnecting Circuits - 🧰 Iterations 22.02.2024\n\thttps://openprocessing.org/sketch/2186056\n\t#creativecoding #generativeart #p5js #WCCChallenge\n\t\n\tDear Raph and creative coding community,\n\t\n\tmade an iteration of a BirdsNest Streaming Background submission.\n\tIterating over a grid to connect the point.\n\tAdded also horizontal and vertical connections.\n\tIterating thru different pallettes for each cell thru a noise field,\n\tto avoid harsh palette changes.\n\t\n\tIterated over the word iterations as much as posible now :D\n\t\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\n// const S = 600;\nvar C = 20; // cell size\nvar F = 300; // frame count before palette change\nvar palettes = ([\n\t[\"#ff2a6d\", \"#d1f7ff\", \"#f5d9e8\", \"#005678\", \"#01012b\"],\n\t[\"#b0acb0\", \"#e2dddf\", \"#85ebd9\", \"#3d898d\", \"#2f404d\"],\n\t[\"#ff6e27\", \"#fbf665\", \"#73fffe\", \"#6287f8\", \"#383e65\"],\n\t[\"#7700a6\", \"#fe00fe\", \"#defe47\", \"#00b3fe\", \"#0016ee\"],\n\t[\"#ff184c\", \"#ff577d\", \"#ffccdc\", \"#0a9cf5\", \"#003062\"]\n]).map((p) => p.map((e) => e + \"A0\"));\nvar pIdx = 0;\n\nfunction setup() {\n  createCanvas(innerWidth, innerHeight);\n\tframeRate(60)\n\tdescribe(\"animation of randomly connecting circuits over time switching thru different palettes \");\n\tpIdx = (pIdx + 1) % palettes.length;\n  frameRate(30);\n  loop();\n}\n\nfunction draw() {\n\tif (frameCount % 300 === 0) setup(); // 5 sec\n  const S = max(width, height)\n  const D = S / C;\n  \n\t// background(\"lightgray\");\n\tbackground(222, 32)\n\tbackground(32)\n  \n\t// translate((noise(12.3+frameCount*0.0234)-0.5)*D*2, (noise(23.1+frameCount*0.0341)-0.5)*D*2)\n  strokeWeight(D / 2);\n  for (y = D; y < height; y += D) {\n    for (x = D; x < width; x += D) {\n      stroke(arr_noise(pIdx, x*x-y));\n      point(x, y);\n\t\t\tconst n = noise(252345.23 + frameCount * 0.00142 + x + y * 1.34);\n\t\t\tconst xf = noise(245.231 + frameCount * 0.0008142 + x + y * 1.34) < 0.5 ? -1 : 1;\n\t\t\tconst yf = noise(1345.123 + frameCount * 0.0009142 + x * 1.34 + y) < 0.5 ? -1 : 1;\n\t\t\tif (n < 0.1) {\n\t\t\t\t// low prob horizontal line\n        stroke(arr_noise(pIdx, x+y*y));\n        mline(x, y, x + xf * D, y);\n      } else if (n < 0.2) {\n\t\t\t\t// low prob vertical line\n        stroke(arr_noise(pIdx, x+y*y));\n        mline(x, y, x, y + yf * D);\n      } else if (n < 0.4) {\n\t\t\t\t// mid prob diagonal line\n        stroke(arr_noise(pIdx, x+y*y));\n        mline(x, y, x + xf * D, y + yf * D);\n      }\n    }\n  }\n}\n\n// draw a line, when not outside the grid\nfunction mline(x1, y1, x2, y2) {\n  if (x1 === 0 || y1 === 0 || x2 === 0 || y2 === 0) return;\n  if (x1 >= width || x2 >= width) return;\n  if (y1 >= height || y2 >= height) return;\n  line(x1, y1, x2, y2);\n}\n\n// gets a color, slightly iterating thru the palettes by comparing noise to current frame\nfunction arr_noise(aIdx, magicNum) {\n\tconst nIdx = (aIdx + 1) % palettes.length;\n  var n = noise(magicNum + frameCount * 0.001234);\n\tconst arr = palettes[(frameCount % F) / F < n ? aIdx : nIdx]\n  const i = ~~(n * arr.length);\n  return arr[i];\n}\n\nfunction mouseClicked() {\n  // if (mouseButton === LEFT) setup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 2,
+    "is_starred": false,
+    "used_in_videos": [
+        "Absent Skyline.mp4",
+        "Harmonious Gap.mp4"
+    ]
 }

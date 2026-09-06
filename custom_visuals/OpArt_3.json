@@ -1,22 +1,25 @@
 {
-  "name": "OpArt_3",
-  "author": "u74109",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:04:26",
-  "url": "https://openprocessing.org/@u74109/402699",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n  createCanvas(800, 800);\n}\n\nfunction draw() {\n  background(255);\n  \n  let curveWidth = 10.0;\n  let curveThickness = 10.0;\n  let angleOffset = 0.9;\n  \n  let angleIncrement = map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, 0.0, 0.2);\n  let angleA = 0.0;\n  let angleB = angleA + angleOffset;\n  \n  let k = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 2.0, 4.0);\n  \n  for (let i = 0; i < height; i += (Math.max(0.001, Math.abs(curveWidth*k)) || 1)) {\n    let waveColor = map(i, 0, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))+10, 0, 255);\n    noStroke();\n\n    push();\n    translate(0, 400);\n    fill(waveColor);\n    beginShape(QUAD_STRIP);\n    for (let x = 0; x <= width; x += 10) {\n      //let y1 = i + (sin(angleA)* curveWidth);\n      //let y2 = i + (sin(angleB)* curveWidth);\n      let y1 = i + (sin(angleB) * curveWidth);\n      let y2 = i + (cos(angleA) * curveWidth);\n      vertex(x, y1);\n      vertex(x, y2 + curveThickness);\n      angleA += angleIncrement;\n      angleB = angleA + angleOffset;\n    }\n    endShape();\n    \n    push();\n    scale(1.0, -1.0);\n    beginShape(QUAD_STRIP);\n    for (let x = 0; x <= width; x += 10) {\n      //let y1 = i + (sin(angleA)* curveWidth);\n      //let y2 = i + (sin(angleB)* curveWidth);\n      var y1 = i + (sin(angleB) * curveWidth);\n      var y2 = i + (cos(angleA) * curveWidth);\n      vertex(x, y1);\n      vertex(x, y2 + curveThickness);\n      angleA += angleIncrement;\n      angleB = angleA + angleOffset;\n    }\n    endShape();\n    pop();\n    pop();\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "OpArt_3",
+    "author": "u74109",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:04:26",
+    "url": "https://openprocessing.org/@u74109/402699",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n  createCanvas(800, 800);\n}\n\nfunction draw() {\n  background(255);\n  \n  let curveWidth = 10.0;\n  let curveThickness = 10.0;\n  let angleOffset = 0.9;\n  \n  let angleIncrement = map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, 0.0, 0.2);\n  let angleA = 0.0;\n  let angleB = angleA + angleOffset;\n  \n  let k = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 2.0, 4.0);\n  \n  for (let i = 0; i < height; i += (Math.max(0.001, Math.abs(curveWidth*k)) || 1)) {\n    let waveColor = map(i, 0, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))+10, 0, 255);\n    noStroke();\n\n    push();\n    translate(0, 400);\n    fill(waveColor);\n    beginShape(QUAD_STRIP);\n    for (let x = 0; x <= width; x += 10) {\n      //let y1 = i + (sin(angleA)* curveWidth);\n      //let y2 = i + (sin(angleB)* curveWidth);\n      let y1 = i + (sin(angleB) * curveWidth);\n      let y2 = i + (cos(angleA) * curveWidth);\n      vertex(x, y1);\n      vertex(x, y2 + curveThickness);\n      angleA += angleIncrement;\n      angleB = angleA + angleOffset;\n    }\n    endShape();\n    \n    push();\n    scale(1.0, -1.0);\n    beginShape(QUAD_STRIP);\n    for (let x = 0; x <= width; x += 10) {\n      //let y1 = i + (sin(angleA)* curveWidth);\n      //let y2 = i + (sin(angleB)* curveWidth);\n      var y1 = i + (sin(angleB) * curveWidth);\n      var y2 = i + (cos(angleA) * curveWidth);\n      vertex(x, y1);\n      vertex(x, y2 + curveThickness);\n      angleA += angleIncrement;\n      angleB = angleA + angleOffset;\n    }\n    endShape();\n    pop();\n    pop();\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Delay Trail Hypnosis.mp4"
+    ]
 }

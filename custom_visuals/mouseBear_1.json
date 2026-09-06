@@ -1,22 +1,25 @@
 {
-  "name": "mouseBear_1",
-  "author": "timgroote",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:16:54",
-  "url": "https://openprocessing.org/@timgroote/545272",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n}\n\nfunction draw() {\n\t\n\tvar mouseXD = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - (width/2);\n\tvar mouseYD = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - (height/2);\n\t\n  background(255);\n\t\n  egg(width/2, height/2,PI,1,0,100, 2, mouseXD, mouseYD); //head ?\n  egg(width/2, height/2+10,0,0.4,255,100, 4, mouseXD, mouseYD); //nose?\n\t\n\t//eyes?\n  egg(width/2-50, height/2-35,PI/3,0.08,255,100, 2, mouseXD, mouseYD);\n  egg(width/2+50, height/2-35,-PI/3,0.08,255,100, 2, mouseXD, mouseYD);\n\t\n\t//ears!\n  egg(width/2-95, height/2-65,-PI/4,0.2,0,100, -1, mouseXD, mouseYD);\n  egg(width/2+95, height/2-65, PI/4,0.2,0,100, -1, mouseXD, mouseYD);\n  \n  fill(0);\n  ellipse(width/2 + (mouseXD * 0.08), height/2-20 + (mouseYD *0.08),40,23);\n  \n\t//nostrils // todo : these need clipping.\n\tfill(255);\n\t\n  ellipse((width/2-15) + mouseXD * 0.08, (height/2-10) + mouseYD *0.08,20,20);\n  ellipse((width/2+15) + mouseXD * 0.08, (height/2-10) + mouseYD *0.08,20,20);\n  \n\tfill(0);\n  ellipse((width/2) + mouseXD *0.08,(height/2+24) + mouseYD *0.08,60,30);\n}\n\n//ref - file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/default_texture.png\n\n\nfunction egg(posx,posy,ang,size,val,x, depth) { \n  fill(val);\n  noStroke(0); \n  //egg\n  push();\n  translate(posx + ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))-(width/2)) * (depth/100), posy + ((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))-(height/2)) * (depth/100));\n  rotate(ang);\n  scale(size); \n  arc(0, 0, 2*x, 1.5*x, 0, PI);\n  arc(-x, 0, 4*x, 4*x, 7*PI*.25, 2*PI);\n  arc(x, 0, 4*x, 4*x, PI, 5*PI*.25);\n  arc(0, -x, (((2*x *sin (radians (45)))-x)/ sin (radians (45)))*2, (((2*x *sin (radians (45)))-x)/ sin (radians (45)))*2, 5*PI*.25, 7*PI*.25 );\n  pop();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "mouseBear_1",
+    "author": "timgroote",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:16:54",
+    "url": "https://openprocessing.org/@timgroote/545272",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n}\n\nfunction draw() {\n\t\n\tvar mouseXD = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - (width/2);\n\tvar mouseYD = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - (height/2);\n\t\n  background(255);\n\t\n  egg(width/2, height/2,PI,1,0,100, 2, mouseXD, mouseYD); //head ?\n  egg(width/2, height/2+10,0,0.4,255,100, 4, mouseXD, mouseYD); //nose?\n\t\n\t//eyes?\n  egg(width/2-50, height/2-35,PI/3,0.08,255,100, 2, mouseXD, mouseYD);\n  egg(width/2+50, height/2-35,-PI/3,0.08,255,100, 2, mouseXD, mouseYD);\n\t\n\t//ears!\n  egg(width/2-95, height/2-65,-PI/4,0.2,0,100, -1, mouseXD, mouseYD);\n  egg(width/2+95, height/2-65, PI/4,0.2,0,100, -1, mouseXD, mouseYD);\n  \n  fill(0);\n  ellipse(width/2 + (mouseXD * 0.08), height/2-20 + (mouseYD *0.08),40,23);\n  \n\t//nostrils // todo : these need clipping.\n\tfill(255);\n\t\n  ellipse((width/2-15) + mouseXD * 0.08, (height/2-10) + mouseYD *0.08,20,20);\n  ellipse((width/2+15) + mouseXD * 0.08, (height/2-10) + mouseYD *0.08,20,20);\n  \n\tfill(0);\n  ellipse((width/2) + mouseXD *0.08,(height/2+24) + mouseYD *0.08,60,30);\n}\n\n//ref - file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/default_texture.png\n\n\nfunction egg(posx,posy,ang,size,val,x, depth) { \n  fill(val);\n  noStroke(0); \n  //egg\n  push();\n  translate(posx + ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))-(width/2)) * (depth/100), posy + ((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))-(height/2)) * (depth/100));\n  rotate(ang);\n  scale(size); \n  arc(0, 0, 2*x, 1.5*x, 0, PI);\n  arc(-x, 0, 4*x, 4*x, 7*PI*.25, 2*PI);\n  arc(x, 0, 4*x, 4*x, PI, 5*PI*.25);\n  arc(0, -x, (((2*x *sin (radians (45)))-x)/ sin (radians (45)))*2, (((2*x *sin (radians (45)))-x)/ sin (radians (45)))*2, 5*PI*.25, 7*PI*.25 );\n  pop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Long Reverb.mp4"
+    ]
 }

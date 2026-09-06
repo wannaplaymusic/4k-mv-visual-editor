@@ -1,22 +1,25 @@
 {
-  "name": "hexagonal_1",
-  "author": "u134483",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 17:09:01",
-  "url": "https://openprocessing.org/@u134483/936370",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n  // createCanvas(windowWidth, windowHeight);\n  createCanvas(1000, 1000);\n  MAX = width > height ? width : height;\n  angleMode(DEGREES);\n  colorMode(HSB, 360)\n  // noStroke();\n  stroke(360)\n  loadNodes();\n}\nlet SPACE = 50\nlet n = [];\nlet MAX;\nlet NOISE_VAL = 0.008;\nlet NOISE_VAL2 = 0.002;\n\nfunction draw() {\n  background(0);\n  displayNodes()\n}\n\ndisplayNodes = () => {\n\n  for (let i = 0; i < MAX / SPACE; i++) {\n    for (let j = 0; j < MAX / (SPACE / 2) * sqrt(3); j++) {\n      n[i][j].move();\n      stroke((frameCount + n[i][j].a) % 360, 360, 360);\n\n      if (i < MAX / SPACE - 1) {\n        line(n[i][j].nx, n[i][j].ny, n[i + 1][j].nx, n[i + 1][j].ny)\n      }\n      if (j < MAX / (SPACE / 2) * sqrt(3) - 1) {\n        line(n[i][j].nx, n[i][j].ny, n[i][j + 1].nx, n[i][j + 1].ny)\n        if (i > 0 && i < MAX / SPACE - 1) {\n          if (j % 2 === 0) {\n            line(n[i][j].nx, n[i][j].ny, n[i + 1][j + 1].nx, n[i + 1][j + 1].ny)\n          } else {\n            line(n[i][j].nx, n[i][j].ny, n[i - 1][j + 1].nx, n[i - 1][j + 1].ny)\n\n          }\n        }\n      }\n\n    }\n  }\n  for (let i = 0; i < MAX / SPACE; i++) {\n    for (let j = 0; j < MAX / (SPACE / 2) * sqrt(3); j++) {\n\n      n[i][j].display();\n    }\n  }\n}\n\nloadNodes = () => {\n  for (let i = 0; i < MAX / SPACE; i++) {\n    row = []\n    for (let j = 0; j < MAX / (SPACE / 2) * sqrt(3); j++) {\n\n      let offset = 0;\n      if (j % 2 === 0) {\n        offset = SPACE / 2;\n      }\n      row.push(new Node(i * SPACE + offset, j * (SPACE / 2) * sqrt(3), i, j));\n\n    }\n    n.push(row)\n  }\n}\n\nclass Node {\n  constructor(x, y, i, j) {\n    this.x = x;\n    this.y = y;\n    this.nx = this.x + sin(this.a) * SPACE / 4;\n    this.ny = this.y + cos(this.a) * SPACE / 4;\n    this.a = 0\n    this.i = i;\n    this.j = j\n  }\n\n  display() {\n    this.nx = this.x + sin(this.a) * SPACE / 4;\n    this.ny = this.y + cos(this.a) * SPACE / 4;\n    let s = noise(NOISE_VAL * this.y, NOISE_VAL * this.x, NOISE_VAL * frameCount)\n\n    fill((frameCount + this.a) % 360, 360, 360);\n    stroke(360)\n    ellipse(this.nx, this.ny, SPACE / 2 * s, SPACE / 2 * s);\n\n\n  }\n  move() {\n\n    this.a += noise(NOISE_VAL2 * this.x, NOISE_VAL2 * this.y, NOISE_VAL2 * frameCount) * 4;\n  }\n\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "hexagonal_1",
+    "author": "u134483",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:09:01",
+    "url": "https://openprocessing.org/@u134483/936370",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n  // createCanvas(windowWidth, windowHeight);\n  createCanvas(1000, 1000);\n  MAX = width > height ? width : height;\n  angleMode(DEGREES);\n  colorMode(HSB, 360)\n  // noStroke();\n  stroke(360)\n  loadNodes();\n}\nlet SPACE = 50\nlet n = [];\nlet MAX;\nlet NOISE_VAL = 0.008;\nlet NOISE_VAL2 = 0.002;\n\nfunction draw() {\n  background(0);\n  displayNodes()\n}\n\ndisplayNodes = () => {\n\n  for (let i = 0; i < MAX / SPACE; i++) {\n    for (let j = 0; j < MAX / (SPACE / 2) * sqrt(3); j++) {\n      n[i][j].move();\n      stroke((frameCount + n[i][j].a) % 360, 360, 360);\n\n      if (i < MAX / SPACE - 1) {\n        line(n[i][j].nx, n[i][j].ny, n[i + 1][j].nx, n[i + 1][j].ny)\n      }\n      if (j < MAX / (SPACE / 2) * sqrt(3) - 1) {\n        line(n[i][j].nx, n[i][j].ny, n[i][j + 1].nx, n[i][j + 1].ny)\n        if (i > 0 && i < MAX / SPACE - 1) {\n          if (j % 2 === 0) {\n            line(n[i][j].nx, n[i][j].ny, n[i + 1][j + 1].nx, n[i + 1][j + 1].ny)\n          } else {\n            line(n[i][j].nx, n[i][j].ny, n[i - 1][j + 1].nx, n[i - 1][j + 1].ny)\n\n          }\n        }\n      }\n\n    }\n  }\n  for (let i = 0; i < MAX / SPACE; i++) {\n    for (let j = 0; j < MAX / (SPACE / 2) * sqrt(3); j++) {\n\n      n[i][j].display();\n    }\n  }\n}\n\nloadNodes = () => {\n  for (let i = 0; i < MAX / SPACE; i++) {\n    row = []\n    for (let j = 0; j < MAX / (SPACE / 2) * sqrt(3); j++) {\n\n      let offset = 0;\n      if (j % 2 === 0) {\n        offset = SPACE / 2;\n      }\n      row.push(new Node(i * SPACE + offset, j * (SPACE / 2) * sqrt(3), i, j));\n\n    }\n    n.push(row)\n  }\n}\n\nclass Node {\n  constructor(x, y, i, j) {\n    this.x = x;\n    this.y = y;\n    this.nx = this.x + sin(this.a) * SPACE / 4;\n    this.ny = this.y + cos(this.a) * SPACE / 4;\n    this.a = 0\n    this.i = i;\n    this.j = j\n  }\n\n  display() {\n    this.nx = this.x + sin(this.a) * SPACE / 4;\n    this.ny = this.y + cos(this.a) * SPACE / 4;\n    let s = noise(NOISE_VAL * this.y, NOISE_VAL * this.x, NOISE_VAL * frameCount)\n\n    fill((frameCount + this.a) % 360, 360, 360);\n    stroke(360)\n    ellipse(this.nx, this.ny, SPACE / 2 * s, SPACE / 2 * s);\n\n\n  }\n  move() {\n\n    this.a += noise(NOISE_VAL2 * this.x, NOISE_VAL2 * this.y, NOISE_VAL2 * frameCount) * 4;\n  }\n\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

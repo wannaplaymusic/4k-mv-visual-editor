@@ -1,22 +1,25 @@
 {
-  "name": "Genuary27Lifeform",
-  "author": "davepagurek",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:02:05",
-  "url": "https://openprocessing.org/@davepagurek/2857739",
-  "code": "// === Tab: mySketch ===\nvar frog\nvar stretch\n\nvar prev, apex, next\nvar fromTime = 1000, toTime = 1500\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL)\n\n\tfrog = buildGeometry(() => {\n\t\tfill('#44B444')\n\t\tpush()\n\t\ttranslate(0, 5)\n\t\tsphere(15)\n\t\ttranslate(0, -10, 10)\n\t\tsphere(10)\n\t\tfor (const side of [-1, 1]) {\n\t\t\tpush()\n\t\t\ttranslate(side * 5, -5)\n\t\t\tfill('yellow')\n\t\t\tsphere(6)\n\t\t\tpop()\n\t\t}\n\t\tfor (const side of [-1, 1]) {\n\t\t\tpush()\n\t\t\ttranslate(side * 12, 15, -8)\n\t\t\tscale(0.4, 1, 0.4)\n\t\t\tsphere(10)\n\t\t\tpop()\n\t\t\t\n\t\t\tpush()\n\t\t\ttranslate(side * 4, 18, 8)\n\t\t\tscale(0.4, 1, 0.4)\n\t\t\tsphere(8)\n\t\t\tpop()\n\t\t}\n\t\tpop()\n\t})\n\tprev = createVector(0, 0, 0)\n\tnext = createVector(random(-1,1)*width/2, 0, -random(width))\n\tapex = prev.copy().add(next).div(2).add(0, -prev.dist(next)*1.5, 0)\n\n\tstretch = baseMaterialShader().modify(() => {\n\t\tconst A = uniformVec3()\n\t\tconst B = uniformVec3()\n\t\tconst C = uniformVec3()\n\t\tconst t1 = uniformFloat()\n\t\tconst t2 = uniformFloat()\n\n\t\tconst getPt = (t) => A * (1-t) * (1-t) +\n\t\t\tB * 2 * (1-t) * t +\n\t\t\tC * t * t\n\t\t\n\t\tgetWorldInputs((inputs) => {\n\t\t\tconst map = (val, f1, f2, t1, t2) => (val - f1)/(f2 - f1) * (t2 - t1) + t1\n\t\t\tconst progress = 1 - map(inputs.position.y, -20, 20, 0, 1)\n\t\t\tconst off = inputs.position - [0, inputs.position.y, 0]\n\t\t\tconst t = mix(t1, t2, progress)\n\t\t\tconst newPos = getPt(t) + off + progress * [0, -40, 0]\n\n\t\t\tinputs.position = newPos\n\t\t\tdebugger\n\t\t\treturn inputs\n\t\t})\n\t})\n}\n\nfunction draw() {\n\tvar t = millis()\n\tvar off = 50\n\tconst progress1 = map(t, fromTime, toTime - off, 0, 1, true)\n\tconst progress2 = map(t, fromTime + off, toTime, 0, 1, true)\n\t\n\tbackground(255)\n\torbitControl()\n\n\tlights()\n\tnoStroke()\n\n\tpush()\n\tstretch.setUniform('A', [prev.x, prev.y, prev.z])\n\tstretch.setUniform('B', [apex.x, apex.y, apex.z])\n\tstretch.setUniform('C', [next.x, next.y, next.z])\n\tstretch.setUniform('t1', progress1)\n\tstretch.setUniform('t2', progress2)\n\tshader(stretch)\n\tmodel(frog)\n\tpop()\n\n\tif (progress2 === 1) {\n\t\tprev = next\n\t\tnext = createVector(random(-1,1)*width/2, 0, -random(width))\n\t\tapex = prev.copy().add(next).div(2).add(0, -prev.dist(next)*1.5, 0)\n\t\tfromTime = t + 1000\n\t\ttoTime = fromTime + prev.dist(next) * 0.6\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Genuary27Lifeform",
+    "author": "davepagurek",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:02:05",
+    "url": "https://openprocessing.org/@davepagurek/2857739",
+    "code": "// === Tab: mySketch ===\nvar frog\nvar stretch\n\nvar prev, apex, next\nvar fromTime = 1000, toTime = 1500\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL)\n\n\tfrog = buildGeometry(() => {\n\t\tfill('#44B444')\n\t\tpush()\n\t\ttranslate(0, 5)\n\t\tsphere(15)\n\t\ttranslate(0, -10, 10)\n\t\tsphere(10)\n\t\tfor (const side of [-1, 1]) {\n\t\t\tpush()\n\t\t\ttranslate(side * 5, -5)\n\t\t\tfill('yellow')\n\t\t\tsphere(6)\n\t\t\tpop()\n\t\t}\n\t\tfor (const side of [-1, 1]) {\n\t\t\tpush()\n\t\t\ttranslate(side * 12, 15, -8)\n\t\t\tscale(0.4, 1, 0.4)\n\t\t\tsphere(10)\n\t\t\tpop()\n\t\t\t\n\t\t\tpush()\n\t\t\ttranslate(side * 4, 18, 8)\n\t\t\tscale(0.4, 1, 0.4)\n\t\t\tsphere(8)\n\t\t\tpop()\n\t\t}\n\t\tpop()\n\t})\n\tprev = createVector(0, 0, 0)\n\tnext = createVector(random(-1,1)*width/2, 0, -random(width))\n\tapex = prev.copy().add(next).div(2).add(0, -prev.dist(next)*1.5, 0)\n\n\tstretch = baseMaterialShader().modify(() => {\n\t\tconst A = uniformVec3()\n\t\tconst B = uniformVec3()\n\t\tconst C = uniformVec3()\n\t\tconst t1 = uniformFloat()\n\t\tconst t2 = uniformFloat()\n\n\t\tconst getPt = (t) => A * (1-t) * (1-t) +\n\t\t\tB * 2 * (1-t) * t +\n\t\t\tC * t * t\n\t\t\n\t\tgetWorldInputs((inputs) => {\n\t\t\tconst map = (val, f1, f2, t1, t2) => (val - f1)/(f2 - f1) * (t2 - t1) + t1\n\t\t\tconst progress = 1 - map(inputs.position.y, -20, 20, 0, 1)\n\t\t\tconst off = inputs.position - [0, inputs.position.y, 0]\n\t\t\tconst t = mix(t1, t2, progress)\n\t\t\tconst newPos = getPt(t) + off + progress * [0, -40, 0]\n\n\t\t\tinputs.position = newPos\n\t\t\tdebugger\n\t\t\treturn inputs\n\t\t})\n\t})\n}\n\nfunction draw() {\n\tvar t = millis()\n\tvar off = 50\n\tconst progress1 = map(t, fromTime, toTime - off, 0, 1, true)\n\tconst progress2 = map(t, fromTime + off, toTime, 0, 1, true)\n\t\n\tbackground(255)\n\torbitControl()\n\n\tlights()\n\tnoStroke()\n\n\tpush()\n\tstretch.setUniform('A', [prev.x, prev.y, prev.z])\n\tstretch.setUniform('B', [apex.x, apex.y, apex.z])\n\tstretch.setUniform('C', [next.x, next.y, next.z])\n\tstretch.setUniform('t1', progress1)\n\tstretch.setUniform('t2', progress2)\n\tshader(stretch)\n\tmodel(frog)\n\tpop()\n\n\tif (progress2 === 1) {\n\t\tprev = next\n\t\tnext = createVector(random(-1,1)*width/2, 0, -random(width))\n\t\tapex = prev.copy().add(next).div(2).add(0, -prev.dist(next)*1.5, 0)\n\t\tfromTime = t + 1000\n\t\ttoTime = fromTime + prev.dist(next) * 0.6\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Driving Rhythm.mp4"
+    ]
 }

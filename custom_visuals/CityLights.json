@@ -1,22 +1,25 @@
 {
-  "name": "CityLights",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:26:16",
-  "url": "https://openprocessing.org/@epi/1830946",
-  "code": "// === Tab: mySketch ===\n// https://www.deconbatch.com/2022/01/blendmode-add.html\n\nvar w = 720;\nvar h = 480;\nvar blobNum = 20;\n\nfunction setup() {\n    createCanvas(w, h);\n    colorMode(HSB, 360, 100, 100, 100);\n    frameRate(30);\n}\n\nfunction draw() {\n\tlet frmRatio = map(frameCount % 120, 0, 120, 0, 1);\n\n\tblendMode(BLEND);\n\tbackground(240, 100, 20, 100);\n\tfor (let i = 0; i < blobNum; i++) {\n\t\tlet bTime = sin(PI * ((frmRatio + noise(10, i)) % 1));\n\t\tlet bHue  = (360 * frmRatio + noise(20, i) * 240) % 360;\n\t\tblob(i / blobNum, noise(30, i), bTime, bHue);\n\t}\n}\n\nfunction blob(_x, _y, _t, _hue) {\n\tblendMode(ADD); // SCREEN\n\tnoStroke();\n\tfor (let r = 0.0; r < 0.2; r += 0.01) {\n\t\tfill(_hue, 100, r * 3, 100);\n\t\tcircle(_x * w, _y * h, w * r * 0.5);\n\t\tfill(_hue, _t * 100, (1.0 - r) * 3, 100);\n\t\tcircle(_x * w, _y * h, w * r);\n\t}\n}\n\n/*\nCopyright (C) 2022- deconbatch\n\nThis program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation; either version 3 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see <http://www.gnu.org/licenses/>\n*/",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CityLights",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:26:16",
+    "url": "https://openprocessing.org/@epi/1830946",
+    "code": "// === Tab: mySketch ===\n// https://www.deconbatch.com/2022/01/blendmode-add.html\n\nvar w = 720;\nvar h = 480;\nvar blobNum = 20;\n\nfunction setup() {\n    createCanvas(w, h);\n    colorMode(HSB, 360, 100, 100, 100);\n    frameRate(30);\n}\n\nfunction draw() {\n\tlet frmRatio = map(frameCount % 120, 0, 120, 0, 1);\n\n\tblendMode(BLEND);\n\tbackground(240, 100, 20, 100);\n\tfor (let i = 0; i < blobNum; i++) {\n\t\tlet bTime = sin(PI * ((frmRatio + noise(10, i)) % 1));\n\t\tlet bHue  = (360 * frmRatio + noise(20, i) * 240) % 360;\n\t\tblob(i / blobNum, noise(30, i), bTime, bHue);\n\t}\n}\n\nfunction blob(_x, _y, _t, _hue) {\n\tblendMode(ADD); // SCREEN\n\tnoStroke();\n\tfor (let r = 0.0; r < 0.2; r += 0.01) {\n\t\tfill(_hue, 100, r * 3, 100);\n\t\tcircle(_x * w, _y * h, w * r * 0.5);\n\t\tfill(_hue, _t * 100, (1.0 - r) * 3, 100);\n\t\tcircle(_x * w, _y * h, w * r);\n\t}\n}\n\n/*\nCopyright (C) 2022- deconbatch\n\nThis program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation; either version 3 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see <http://www.gnu.org/licenses/>\n*/",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Submerged Echoes.mp4"
+    ]
 }

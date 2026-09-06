@@ -1,22 +1,25 @@
 {
-  "name": "Viceversa_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:24:30",
-  "url": "https://openprocessing.org/@ronikaufman/1987133",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\n// Made for @sableRaph's weekly creative challenge on Twitch (#WCCChallenge)\n// https://www.twitch.tv/sableraph\n// \"Create a circle or a square in a new way\"\n\nconst N_FRAMES = 750;\n\nfunction setup() {\n  createCanvas(500, 500);\n  strokeWeight(1.25);\n}\n\nfunction draw() {\n  background(\"#fffbe6\");\n  translate(width/2, height/2);\n  rotate(PI/4);\n  \n  let t = frameCount%N_FRAMES;\n  let transition = 1/20; // how long the transition is\n  if (t < N_FRAMES*(1/2-transition)) t = 0;\n  else if (t < N_FRAMES/2) t = easeOutElastic((t-N_FRAMES*(1/2-transition))/(transition*N_FRAMES));\n  else if (t < N_FRAMES*(1-transition)) t = 1;\n  else t = easeInElastic((N_FRAMES-t)/(transition*N_FRAMES));\n  \n  let paletteA = [\"#f589a3\", \"#ef562f\", \"#fc8405\", \"#f9d531\"];\n  let paletteB = [\"#abcd5e\", \"#14976b\", \"#2b67af\", \"#62b6de\"];\n  \n  let theta0 = 3*PI*(frameCount%N_FRAMES/N_FRAMES);\n  if (t < 1/2) theta0 = 3*PI-theta0;\n  let nPoints = 60;\n  let thetaStep = TAU/nPoints;\n  let r = 133; // base radius for the shapes\n  for (let i = 0; i < nPoints; i++) {\n    let theta = i*thetaStep;\n    \n    let r1a = sqrt(2) * r * squareRadius(theta+theta0);\n    let r1b = r * (1+sqrt(2))/2;\n    let r1 = r1a*(1-t) + r1b*t;\n    let x1 = r1*cos(theta);\n    let y1 = r1*sin(theta);\n    \n    let r2a = r;\n    let r2b = r1b * squareRadius(theta+theta0);\n    let r2 = r2a*(1-t) + r2b*t;\n    let x2 = r2*cos(theta);\n    let y2 = r2*sin(theta);\n    \n    let r3a = r * squareRadius(theta+theta0);\n    let r3b = r1b / sqrt(2);\n    let r3 = r3a*(1-t) + r3b*t;\n    let x3 = r3*cos(theta);\n    let y3 = r3*sin(theta);\n    \n    stroke(5);\n    line(x1, y1, x2, y2);\n    line(x2, y2, x3, y3);\n    \n    let colA = color(paletteA[i%paletteA.length]);\n    let colB = color(paletteB[i%paletteB.length]);\n    let col = lerpColor(colA, colB, t);\n    fill(col);\n    noStroke();\n    circle(x2, y2, 10);\n  }\n}\n\n// reference: https://math.stackexchange.com/questions/41940/is-there-an-equation-to-describe-regular-polygons#41954\nfunction squareRadius(theta) {\n  return cos(PI/4)/cos(((theta)%(TAU/4)) - PI/4);\n}\n\n// adapted from easings.net\nfunction easeOutElastic(x) {\n  const c4 = (2 * Math.PI) / 3;\n  return x === 0 ? 0 : x === 1 ? 1 : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;\n}\n\nfunction easeInElastic(x) {\n  var c4 = (2 * Math.PI) / 3;\n  return x === 0 ? 0 : x === 1 ? 1 : -Math.pow(2, 10 * x - 10) * Math.sin((x * 10 - 10.75) * c4);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Viceversa_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:24:30",
+    "url": "https://openprocessing.org/@ronikaufman/1987133",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\n// Made for @sableRaph's weekly creative challenge on Twitch (#WCCChallenge)\n// https://www.twitch.tv/sableraph\n// \"Create a circle or a square in a new way\"\n\nconst N_FRAMES = 750;\n\nfunction setup() {\n  createCanvas(500, 500);\n  strokeWeight(1.25);\n}\n\nfunction draw() {\n  background(\"#fffbe6\");\n  translate(width/2, height/2);\n  rotate(PI/4);\n  \n  let t = frameCount%N_FRAMES;\n  let transition = 1/20; // how long the transition is\n  if (t < N_FRAMES*(1/2-transition)) t = 0;\n  else if (t < N_FRAMES/2) t = easeOutElastic((t-N_FRAMES*(1/2-transition))/(transition*N_FRAMES));\n  else if (t < N_FRAMES*(1-transition)) t = 1;\n  else t = easeInElastic((N_FRAMES-t)/(transition*N_FRAMES));\n  \n  let paletteA = [\"#f589a3\", \"#ef562f\", \"#fc8405\", \"#f9d531\"];\n  let paletteB = [\"#abcd5e\", \"#14976b\", \"#2b67af\", \"#62b6de\"];\n  \n  let theta0 = 3*PI*(frameCount%N_FRAMES/N_FRAMES);\n  if (t < 1/2) theta0 = 3*PI-theta0;\n  let nPoints = 60;\n  let thetaStep = TAU/nPoints;\n  let r = 133; // base radius for the shapes\n  for (let i = 0; i < nPoints; i++) {\n    let theta = i*thetaStep;\n    \n    let r1a = sqrt(2) * r * squareRadius(theta+theta0);\n    let r1b = r * (1+sqrt(2))/2;\n    let r1 = r1a*(1-t) + r1b*t;\n    let x1 = r1*cos(theta);\n    let y1 = r1*sin(theta);\n    \n    let r2a = r;\n    let r2b = r1b * squareRadius(theta+theta0);\n    let r2 = r2a*(1-t) + r2b*t;\n    let x2 = r2*cos(theta);\n    let y2 = r2*sin(theta);\n    \n    let r3a = r * squareRadius(theta+theta0);\n    let r3b = r1b / sqrt(2);\n    let r3 = r3a*(1-t) + r3b*t;\n    let x3 = r3*cos(theta);\n    let y3 = r3*sin(theta);\n    \n    stroke(5);\n    line(x1, y1, x2, y2);\n    line(x2, y2, x3, y3);\n    \n    let colA = color(paletteA[i%paletteA.length]);\n    let colB = color(paletteB[i%paletteB.length]);\n    let col = lerpColor(colA, colB, t);\n    fill(col);\n    noStroke();\n    circle(x2, y2, 10);\n  }\n}\n\n// reference: https://math.stackexchange.com/questions/41940/is-there-an-equation-to-describe-regular-polygons#41954\nfunction squareRadius(theta) {\n  return cos(PI/4)/cos(((theta)%(TAU/4)) - PI/4);\n}\n\n// adapted from easings.net\nfunction easeOutElastic(x) {\n  const c4 = (2 * Math.PI) / 3;\n  return x === 0 ? 0 : x === 1 ? 1 : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;\n}\n\nfunction easeInElastic(x) {\n  var c4 = (2 * Math.PI) / 3;\n  return x === 0 ? 0 : x === 1 ? 1 : -Math.pow(2, 10 * x - 10) * Math.sin((x * 10 - 10.75) * c4);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Lost Signal.mp4"
+    ]
 }

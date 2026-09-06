@@ -1,22 +1,26 @@
 {
-  "name": "regularngonsapproachacircle",
-  "author": "Kazoops",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:30:19",
-  "url": "https://openprocessing.org/@Kazoops/2586450",
-  "code": "// === Tab: mySketch ===\nlet currentMaxSides = 3; // 現在表示している最大角数（最初は三角形）\nlet direction = 1; // 増加（1）または減少（-1）を表す\nlet edgeLength; // 各図形の辺の長さ\nlet rotationAngle = 0; // 全体の回転角度\nlet triangleHue = 0; // 三角形の色相（HSB）\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight); // ウィンドウサイズに合わせてキャンバスを作成\n  angleMode(DEGREES); // 角度を度数法で扱う\n  colorMode(HSB, 360, 100, 100, 100); // 色をHSBで指定（色相、彩度、明度、透明度）\n  edgeLength = max(width, height) / 20; // 辺の長さは画面の小さい方に基づく\n  triangleHue = random(360); // 三角形の色相をランダムに設定\n}\n\nfunction draw() {\n  background(0); // 背景を黒で塗りつぶす\n\n  let maxSides = int(max(width, height) / 15); // 最大の角数（画面サイズに比例）\n\n  stroke(255,50); // 線の色を白に設定\n  strokeWeight(1); // 線の太さを細く設定\n\n  // --- 回転アニメーション制御 ---\n  if (direction === 1) {\n    rotationAngle -= 0.2; // 増加中は左回転（ゆっくり）\n  } else {\n    rotationAngle += 0.4; // 減少中は右回転（早く）\n  }\n\n  push(); // 現在の描画状態を保存\n  translate(width / 2, height / 2); // 原点を画面中央に移動\n  rotate(rotationAngle); // 現在の回転角度を適用\n  translate(-width / 2, -height / 2); // 描画基準点を元に戻す\n\n  // --- 三角形の塗り設定（鮮やかな色） ---\n  fill(triangleHue, 100, 100, 4); // HSBで彩度100・明度100・透明度4%\n\n  // --- 正三角形を描画し、その頂点を取得 ---\n  let triangleVertices = drawEquilateralTriangle(width / 2, height / 2, edgeLength);\n  let sharedEdgeStart = triangleVertices[2]; // 次の図形に渡す始点\n  let sharedEdgeEnd = triangleVertices[0]; // 次の図形に渡す終点\n\n  // --- 正四角形から currentMaxSides まで描画 ---\n  for (let sides = 4; sides <= currentMaxSides; sides++) {\n    let brightness = map(sides, 4, maxSides, 90, 90); // 明度は固定（将来減衰させてもOK）\n    fill(triangleHue, 100, brightness, 4); // 三角形の色相をベースに塗り設定\n\n    let vertices = drawPolygonFromEdge(sharedEdgeStart, sharedEdgeEnd, edgeLength, sides); // 多角形を描画\n    sharedEdgeStart = vertices[vertices.length - 1]; // 次の始点を更新\n    sharedEdgeEnd = vertices[0]; // 次の終点を更新\n  }\n\n  pop(); // 描画状態を元に戻す\n\n  // --- フェーズの更新処理（成長と縮小の繰り返し） ---\n  if (frameCount % 5 === 0) { // 5フレームごとに更新\n    currentMaxSides += direction; // 角数を1増減\n\n    if (currentMaxSides >= maxSides) {\n      direction = -1; // 最大に達したら減少モードに切り替え\n    } else if (currentMaxSides <= 3) {\n      direction = 1; // 三角形に戻ったら増加モードに戻す\n      triangleHue = random(360); // 三角形の色相を新たにランダムで決定\n    }\n  }\n}\n\n/**\n * 正三角形を描画し、3つの頂点を配列で返す\n */\nfunction drawEquilateralTriangle(x, y, edgeLength) {\n  let h = (sqrt(3) / 2) * edgeLength; // 正三角形の高さを計算\n\n  let v1 = { x: x - edgeLength / 2, y: y + h / 2 }; // 左下の頂点\n  let v2 = { x: x + edgeLength / 2, y: y + h / 2 }; // 右下の頂点\n  let v3 = { x: x, y: y - h / 2 }; // 上の頂点\n\n  beginShape(); // 図形の描画開始\n  vertex(v1.x, v1.y);\n  vertex(v2.x, v2.y);\n  vertex(v3.x, v3.y);\n  endShape(CLOSE); // 図形の描画終了（閉じる）\n\n  return [v1, v2, v3]; // 頂点配列を返す\n}\n\n/**\n * 指定された辺から出発し、正多角形を描画して頂点配列を返す\n */\nfunction drawPolygonFromEdge(e, d, edgeLength, sides) {\n  let angleED = atan2(d.y - e.y, d.x - e.x); // 指定辺の角度を計算\n  var vertices = []; // 頂点リスト初期化\n  let currentX = e.x;\n  let currentY = e.y;\n  vertices.push({ x: e.x, y: e.y }); // 始点を追加\n\n  let angleStep = -360 / sides; // 頂点ごとの角度（反時計回り）\n\n  for (let i = 0; i < sides - 1; i++) { // 残りの頂点を計算\n    let angle = angleED + angleStep * i;\n    let nextX = currentX + edgeLength * cos(angle);\n    let nextY = currentY + edgeLength * sin(angle);\n    vertices.push({ x: nextX, y: nextY });\n    currentX = nextX;\n    currentY = nextY;\n  }\n\n  beginShape(); // 多角形の描画開始\n  for (let v of vertices) {\n    vertex(v.x, v.y);\n  }\n  endShape(CLOSE); // 図形を閉じる\n\n  return vertices; // 頂点配列を返す\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "regularngonsapproachacircle",
+    "author": "Kazoops",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:30:19",
+    "url": "https://openprocessing.org/@Kazoops/2586450",
+    "code": "// === Tab: mySketch ===\nlet currentMaxSides = 3; // 現在表示している最大角数（最初は三角形）\nlet direction = 1; // 増加（1）または減少（-1）を表す\nlet edgeLength; // 各図形の辺の長さ\nlet rotationAngle = 0; // 全体の回転角度\nlet triangleHue = 0; // 三角形の色相（HSB）\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight); // ウィンドウサイズに合わせてキャンバスを作成\n  angleMode(DEGREES); // 角度を度数法で扱う\n  colorMode(HSB, 360, 100, 100, 100); // 色をHSBで指定（色相、彩度、明度、透明度）\n  edgeLength = max(width, height) / 20; // 辺の長さは画面の小さい方に基づく\n  triangleHue = random(360); // 三角形の色相をランダムに設定\n}\n\nfunction draw() {\n  background(0); // 背景を黒で塗りつぶす\n\n  let maxSides = int(max(width, height) / 15); // 最大の角数（画面サイズに比例）\n\n  stroke(255,50); // 線の色を白に設定\n  strokeWeight(1); // 線の太さを細く設定\n\n  // --- 回転アニメーション制御 ---\n  if (direction === 1) {\n    rotationAngle -= 0.2; // 増加中は左回転（ゆっくり）\n  } else {\n    rotationAngle += 0.4; // 減少中は右回転（早く）\n  }\n\n  push(); // 現在の描画状態を保存\n  translate(width / 2, height / 2); // 原点を画面中央に移動\n  rotate(rotationAngle); // 現在の回転角度を適用\n  translate(-width / 2, -height / 2); // 描画基準点を元に戻す\n\n  // --- 三角形の塗り設定（鮮やかな色） ---\n  fill(triangleHue, 100, 100, 4); // HSBで彩度100・明度100・透明度4%\n\n  // --- 正三角形を描画し、その頂点を取得 ---\n  let triangleVertices = drawEquilateralTriangle(width / 2, height / 2, edgeLength);\n  let sharedEdgeStart = triangleVertices[2]; // 次の図形に渡す始点\n  let sharedEdgeEnd = triangleVertices[0]; // 次の図形に渡す終点\n\n  // --- 正四角形から currentMaxSides まで描画 ---\n  for (let sides = 4; sides <= currentMaxSides; sides++) {\n    let brightness = map(sides, 4, maxSides, 90, 90); // 明度は固定（将来減衰させてもOK）\n    fill(triangleHue, 100, brightness, 4); // 三角形の色相をベースに塗り設定\n\n    let vertices = drawPolygonFromEdge(sharedEdgeStart, sharedEdgeEnd, edgeLength, sides); // 多角形を描画\n    sharedEdgeStart = vertices[vertices.length - 1]; // 次の始点を更新\n    sharedEdgeEnd = vertices[0]; // 次の終点を更新\n  }\n\n  pop(); // 描画状態を元に戻す\n\n  // --- フェーズの更新処理（成長と縮小の繰り返し） ---\n  if (frameCount % 5 === 0) { // 5フレームごとに更新\n    currentMaxSides += direction; // 角数を1増減\n\n    if (currentMaxSides >= maxSides) {\n      direction = -1; // 最大に達したら減少モードに切り替え\n    } else if (currentMaxSides <= 3) {\n      direction = 1; // 三角形に戻ったら増加モードに戻す\n      triangleHue = random(360); // 三角形の色相を新たにランダムで決定\n    }\n  }\n}\n\n/**\n * 正三角形を描画し、3つの頂点を配列で返す\n */\nfunction drawEquilateralTriangle(x, y, edgeLength) {\n  let h = (sqrt(3) / 2) * edgeLength; // 正三角形の高さを計算\n\n  let v1 = { x: x - edgeLength / 2, y: y + h / 2 }; // 左下の頂点\n  let v2 = { x: x + edgeLength / 2, y: y + h / 2 }; // 右下の頂点\n  let v3 = { x: x, y: y - h / 2 }; // 上の頂点\n\n  beginShape(); // 図形の描画開始\n  vertex(v1.x, v1.y);\n  vertex(v2.x, v2.y);\n  vertex(v3.x, v3.y);\n  endShape(CLOSE); // 図形の描画終了（閉じる）\n\n  return [v1, v2, v3]; // 頂点配列を返す\n}\n\n/**\n * 指定された辺から出発し、正多角形を描画して頂点配列を返す\n */\nfunction drawPolygonFromEdge(e, d, edgeLength, sides) {\n  let angleED = atan2(d.y - e.y, d.x - e.x); // 指定辺の角度を計算\n  var vertices = []; // 頂点リスト初期化\n  let currentX = e.x;\n  let currentY = e.y;\n  vertices.push({ x: e.x, y: e.y }); // 始点を追加\n\n  let angleStep = -360 / sides; // 頂点ごとの角度（反時計回り）\n\n  for (let i = 0; i < sides - 1; i++) { // 残りの頂点を計算\n    let angle = angleED + angleStep * i;\n    let nextX = currentX + edgeLength * cos(angle);\n    let nextY = currentY + edgeLength * sin(angle);\n    vertices.push({ x: nextX, y: nextY });\n    currentX = nextX;\n    currentY = nextY;\n  }\n\n  beginShape(); // 多角形の描画開始\n  for (let v of vertices) {\n    vertex(v.x, v.y);\n  }\n  endShape(CLOSE); // 図形を閉じる\n\n  return vertices; // 頂点配列を返す\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 2,
+    "is_starred": false,
+    "used_in_videos": [
+        "Quiet Transmission.mp4",
+        "Empty Sphere.mp4"
+    ]
 }

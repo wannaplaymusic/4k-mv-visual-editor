@@ -1,22 +1,25 @@
 {
-  "name": "fountain",
-  "author": "reona396",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:12:23",
-  "url": "https://openprocessing.org/@reona396/1326923",
-  "code": "// === Tab: mySketch ===\nlet A, B;\nlet x, y, R;\n\nlet a = 0,\n  b = 0;\n\nlet delta;\n\nlet r = 5;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n\n  R = max(width, height) * 0.225;\n  delta = TWO_PI / (360 * r);\n\n  background(0);\n}\n\nfunction draw() {\n  background(0, 10);\n  push();\n  translate(width / 2, height);\n  rotate(radians(-90));\n\n  for (let i = 0; i < TWO_PI; i += (Math.max(0.001, Math.abs(delta)) || 1)) {\n    A = cos(a * 2 + frameCount * 0.01) + tan(sin(frameCount * 0.015));\n    B = (cos(a * 3 - frameCount * 0.013) - cos(a * 5)) / 5 - cos(cos(frameCount * 0.01));\n    x = R * (A + 1) * sin(b + B);\n    y = R * (A + 1) * cos(b + B);\n\n    a += 1.0;\n    b += 0.2;\n\n    if (a % 10 == 0) {\n      r = 5;\n      fill(\"#E5D0A6\");\n    } else {\n      r = 1;\n      fill(\"#FFFFFF\");\n    }\n\n    circle(x, y, r);\n  }\n\n  pop();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "fountain",
+    "author": "reona396",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:12:23",
+    "url": "https://openprocessing.org/@reona396/1326923",
+    "code": "// === Tab: mySketch ===\nlet A, B;\nlet x, y, R;\n\nlet a = 0,\n  b = 0;\n\nlet delta;\n\nlet r = 5;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n\n  R = max(width, height) * 0.225;\n  delta = TWO_PI / (360 * r);\n\n  background(0);\n}\n\nfunction draw() {\n  background(0, 10);\n  push();\n  translate(width / 2, height);\n  rotate(radians(-90));\n\n  for (let i = 0; i < TWO_PI; i += (Math.max(0.001, Math.abs(delta)) || 1)) {\n    A = cos(a * 2 + frameCount * 0.01) + tan(sin(frameCount * 0.015));\n    B = (cos(a * 3 - frameCount * 0.013) - cos(a * 5)) / 5 - cos(cos(frameCount * 0.01));\n    x = R * (A + 1) * sin(b + B);\n    y = R * (A + 1) * cos(b + B);\n\n    a += 1.0;\n    b += 0.2;\n\n    if (a % 10 == 0) {\n      r = 5;\n      fill(\"#E5D0A6\");\n    } else {\n      r = 1;\n      fill(\"#FFFFFF\");\n    }\n\n    circle(x, y, r);\n  }\n\n  pop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Rain Over Resonance.mp4"
+    ]
 }

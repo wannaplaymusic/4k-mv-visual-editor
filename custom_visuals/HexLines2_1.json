@@ -1,22 +1,25 @@
 {
-  "name": "HexLines2_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:29:54",
-  "url": "https://openprocessing.org/@ronikaufman/1226921",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n\nconst N_DIVS = 48; // number of divisions in each hexagon side\nconst N = 6*N_DIVS; // total number of points per hexagon\nlet hexagons = [];\n\nfunction setup() {\n  createCanvas(500, 500);\n  noFill();\n  strokeWeight(4);\n  strokeCap(SQUARE);\n  \n  for (let r = 180; r > 0; r -= 15) {\n    hexagons.push(makeHexPoints(width/2, height/2, r));\n  }\n}\n\nfunction draw() {\n  background(255);\n  \n  let off = floor(frameCount);\n  \n  for (let i = 0; i < hexagons.length; i++) {\n\t\tlet hexa = hexagons[i];\n    traceLine(hexa, (i*N_DIVS), ((i+4)*N_DIVS), -off);\n  }\n}\n\nfunction makeHexPoints(x, y, r) {\n  let points = [];\n  \n  for (let theta = 0; theta < TWO_PI; theta += (Math.max(0.001, Math.abs(PI/3)) || 1)) {\n    let x1 = x + r*cos(theta);\n    let y1 = y + r*sin(theta);\n    let x2 = x + r*cos(theta+PI/3);\n    let y2 = y + r*sin(theta+PI/3);\n    for (let t = 0; t < 1; t += (Math.max(0.001, Math.abs(1/N_DIVS)) || 1)) {\n      points.push(\n        createVector(\n          x1*(1-t) + x2*t,\n          y1*(1-t) + y2*t\n        )\n      );\n    }\n  }\n  \n  return points;\n}\n\nfunction traceLine(points, iMin, iMax, offset) {\n  beginShape();\n  for (let i = iMin; i < iMax; i++) {\n    let idx = (i + offset)%N;\n    if (idx < 0) {\n      idx += N;\n    }\n    let p = points[idx];\n    vertex(p.x, p.y);\n  }\n  endShape();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "HexLines2_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:29:54",
+    "url": "https://openprocessing.org/@ronikaufman/1226921",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n\nconst N_DIVS = 48; // number of divisions in each hexagon side\nconst N = 6*N_DIVS; // total number of points per hexagon\nlet hexagons = [];\n\nfunction setup() {\n  createCanvas(500, 500);\n  noFill();\n  strokeWeight(4);\n  strokeCap(SQUARE);\n  \n  for (let r = 180; r > 0; r -= 15) {\n    hexagons.push(makeHexPoints(width/2, height/2, r));\n  }\n}\n\nfunction draw() {\n  background(255);\n  \n  let off = floor(frameCount);\n  \n  for (let i = 0; i < hexagons.length; i++) {\n\t\tlet hexa = hexagons[i];\n    traceLine(hexa, (i*N_DIVS), ((i+4)*N_DIVS), -off);\n  }\n}\n\nfunction makeHexPoints(x, y, r) {\n  let points = [];\n  \n  for (let theta = 0; theta < TWO_PI; theta += (Math.max(0.001, Math.abs(PI/3)) || 1)) {\n    let x1 = x + r*cos(theta);\n    let y1 = y + r*sin(theta);\n    let x2 = x + r*cos(theta+PI/3);\n    let y2 = y + r*sin(theta+PI/3);\n    for (let t = 0; t < 1; t += (Math.max(0.001, Math.abs(1/N_DIVS)) || 1)) {\n      points.push(\n        createVector(\n          x1*(1-t) + x2*t,\n          y1*(1-t) + y2*t\n        )\n      );\n    }\n  }\n  \n  return points;\n}\n\nfunction traceLine(points, iMin, iMax, offset) {\n  beginShape();\n  for (let i = iMin; i < iMax; i++) {\n    let idx = (i + offset)%N;\n    if (idx < 0) {\n      idx += N;\n    }\n    let p = points[idx];\n    vertex(p.x, p.y);\n  }\n  endShape();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Terminal Echo.mp4"
+    ]
 }

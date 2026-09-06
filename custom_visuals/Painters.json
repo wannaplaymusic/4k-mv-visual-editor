@@ -1,22 +1,25 @@
 {
-  "name": "Painters",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 04:45:39",
-  "url": "https://openprocessing.org/@ntsutae/2169008",
-  "code": "// === Tab: mySketch ===\nconst agentCount = 100;\nconst agentSpeed = 1;\n\nlet _agents;\nlet pixelSize;\nlet pixelsWidth, pixelsHeight;\n\nfunction setup() {\n  pixelSize = sqrt(windowWidth * windowHeight) / 220;\n  pixelsWidth = floor(windowWidth / pixelSize);\n  pixelsHeight = floor(windowHeight / pixelSize);\n\n  createCanvas(pixelSize * pixelsWidth, pixelSize * pixelsHeight);\n  background(\"white\");\n\n  _agents = agents();\n}\n\nmouseClicked = () => setup();\n\nfunction draw() {\n  scale(pixelSize);\n  _agents.update();\n}\n\nfunction agents() {\n  const pixels = pixelsFunction();\n  const agentArray = Array.from({ length: agentCount }, () => agent(pixels));\n\n  return {\n    update: () => {\n      for (let i = 0; i < agentSpeed; i++) {\n        agentArray.forEach((agent) => agent.next());\n      }\n    },\n  };\n}\n\nfunction pixelsFunction() {\n  let pixelData = 0n;\n  index = (x, y) => BigInt(x + y * pixelsWidth);\n\n  return {\n    canMoveTo: ({ x, y }) =>\n      0 <= x &&\n      x < pixelsWidth &&\n      0 <= y &&\n      y < pixelsHeight &&\n      !((pixelData >> index(x, y)) & 1n),\n\n    set: ({ x, y }) => (pixelData |= 1n << index(x, y)),\n\n    draw: (pos1, pos2, colour) => {\n      stroke(colour);\n      line(pos1.x, pos1.y, pos2.x, pos2.y);\n    },\n  };\n}\n\nfunction* agent(pixels) {\n  const directions = shuffle([\n    { dx: +1, dy: 0 },\n    { dx: 0, dy: +1 },\n    { dx: -1, dy: 0 },\n    { dx: 0, dy: -1 },\n  ]);\n  const colour = \"#\" + hex(random(0xffffff), 6);\n  const start = {\n    x: floor(random(pixelsWidth)),\n    y: floor(random(pixelsHeight)),\n  };\n  const stack = [start];\n  pixels.set(start);\n\n  while (stack.length) {\n    const current = stack.pop();\n    for (const { dx, dy } of directions) {\n      const target = {\n        x: current.x + dx,\n        y: current.y + dy,\n      };\n      if (!pixels.canMoveTo(target)) continue;\n      stack.push(target);\n      pixels.set(target);\n      pixels.draw(current, target, colour);\n      yield;\n    }\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Painters",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:45:39",
+    "url": "https://openprocessing.org/@ntsutae/2169008",
+    "code": "// === Tab: mySketch ===\nconst agentCount = 100;\nconst agentSpeed = 1;\n\nlet _agents;\nlet pixelSize;\nlet pixelsWidth, pixelsHeight;\n\nfunction setup() {\n  pixelSize = sqrt(windowWidth * windowHeight) / 220;\n  pixelsWidth = floor(windowWidth / pixelSize);\n  pixelsHeight = floor(windowHeight / pixelSize);\n\n  createCanvas(pixelSize * pixelsWidth, pixelSize * pixelsHeight);\n  background(\"white\");\n\n  _agents = agents();\n}\n\nmouseClicked = () => setup();\n\nfunction draw() {\n  scale(pixelSize);\n  _agents.update();\n}\n\nfunction agents() {\n  const pixels = pixelsFunction();\n  const agentArray = Array.from({ length: agentCount }, () => agent(pixels));\n\n  return {\n    update: () => {\n      for (let i = 0; i < agentSpeed; i++) {\n        agentArray.forEach((agent) => agent.next());\n      }\n    },\n  };\n}\n\nfunction pixelsFunction() {\n  let pixelData = 0n;\n  index = (x, y) => BigInt(x + y * pixelsWidth);\n\n  return {\n    canMoveTo: ({ x, y }) =>\n      0 <= x &&\n      x < pixelsWidth &&\n      0 <= y &&\n      y < pixelsHeight &&\n      !((pixelData >> index(x, y)) & 1n),\n\n    set: ({ x, y }) => (pixelData |= 1n << index(x, y)),\n\n    draw: (pos1, pos2, colour) => {\n      stroke(colour);\n      line(pos1.x, pos1.y, pos2.x, pos2.y);\n    },\n  };\n}\n\nfunction* agent(pixels) {\n  const directions = shuffle([\n    { dx: +1, dy: 0 },\n    { dx: 0, dy: +1 },\n    { dx: -1, dy: 0 },\n    { dx: 0, dy: -1 },\n  ]);\n  const colour = \"#\" + hex(random(0xffffff), 6);\n  const start = {\n    x: floor(random(pixelsWidth)),\n    y: floor(random(pixelsHeight)),\n  };\n  const stack = [start];\n  pixels.set(start);\n\n  while (stack.length) {\n    const current = stack.pop();\n    for (const { dx, dy } of directions) {\n      const target = {\n        x: current.x + dx,\n        y: current.y + dy,\n      };\n      if (!pixels.canMoveTo(target)) continue;\n      stack.push(target);\n      pixels.set(target);\n      pixels.draw(current, target, colour);\n      yield;\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Scalar Shift.mp4"
+    ]
 }

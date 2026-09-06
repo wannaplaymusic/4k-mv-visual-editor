@@ -1,22 +1,25 @@
 {
-  "name": "Dragon_1",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 04:19:53",
-  "url": "https://openprocessing.org/@ntsutae/1780827",
-  "code": "// === Tab: mySketch ===\nconst agentsNum = 900;\nconst zoom = 500;\nconst agent = (d) => ({\n  degree: d,\n  radius: 1 + random(0.05),\n  x: 0,\n  y: random(-1, 1),\n  z: 0,\n});\n\nconst system = {\n  agents: [],\n  lines: [],\n  init() {\n    for (let i = agentsNum; i--; ) {\n      this.agents.push(agent(i / 175));\n    }\n  },\n  update() {\n    for (const a of this.agents) {\n      const d = a.degree + frameCount / 100;\n      a.x = cos(d);\n      a.z = a.radius * (sin(d) + 2);\n    }\n  },\n  relativeNeighborhoodGraph() {\n    for (let i = this.agents.length; i--; ) {\n      const current = this.agents[i];\n      for (let j = i; j--; ) {\n        const other = this.agents[j];\n        const d = this.distance(other, current);\n        if (\n          this.agents.every(\n            (any) =>\n              d <= this.distance(current, any) || d <= this.distance(other, any)\n          )\n        ) {\n          this.lines.push([current, other]);\n        }\n      }\n    }\n  },\n  distance(a, b) {\n    return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2;\n  },\n\n  render() {\n    translate(width / 2, height / 2);\n    fill(\"white\");\n    stroke(\"black\");\n\n    for (const [a, b] of this.lines) {\n      const ax = a.x / a.z;\n      const ay = a.y / a.z;\n      const bx = b.x / b.z;\n      const by = b.y / b.z;\n      strokeWeight(10 / (a.z * b.z));\n      line(ax * zoom * 1.5, ay * zoom, bx * zoom * 1.5, by * zoom);\n    }\n  },\n};\n\nsetup = () => {\n  createCanvas(windowWidth, windowHeight);\n  system.init();\n  system.update();\n  system.relativeNeighborhoodGraph();\n  rectMode(CENTER);\n};\n\ndraw = (_) => {\n  background(\"white\");\n  system.update();\n  system.render();\n};",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Dragon_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:19:53",
+    "url": "https://openprocessing.org/@ntsutae/1780827",
+    "code": "// === Tab: mySketch ===\nconst agentsNum = 900;\nconst zoom = 500;\nconst agent = (d) => ({\n  degree: d,\n  radius: 1 + random(0.05),\n  x: 0,\n  y: random(-1, 1),\n  z: 0,\n});\n\nconst system = {\n  agents: [],\n  lines: [],\n  init() {\n    for (let i = agentsNum; i--; ) {\n      this.agents.push(agent(i / 175));\n    }\n  },\n  update() {\n    for (const a of this.agents) {\n      const d = a.degree + frameCount / 100;\n      a.x = cos(d);\n      a.z = a.radius * (sin(d) + 2);\n    }\n  },\n  relativeNeighborhoodGraph() {\n    for (let i = this.agents.length; i--; ) {\n      const current = this.agents[i];\n      for (let j = i; j--; ) {\n        const other = this.agents[j];\n        const d = this.distance(other, current);\n        if (\n          this.agents.every(\n            (any) =>\n              d <= this.distance(current, any) || d <= this.distance(other, any)\n          )\n        ) {\n          this.lines.push([current, other]);\n        }\n      }\n    }\n  },\n  distance(a, b) {\n    return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2;\n  },\n\n  render() {\n    translate(width / 2, height / 2);\n    fill(\"white\");\n    stroke(\"black\");\n\n    for (const [a, b] of this.lines) {\n      const ax = a.x / a.z;\n      const ay = a.y / a.z;\n      const bx = b.x / b.z;\n      const by = b.y / b.z;\n      strokeWeight(10 / (a.z * b.z));\n      line(ax * zoom * 1.5, ay * zoom, bx * zoom * 1.5, by * zoom);\n    }\n  },\n};\n\nsetup = () => {\n  createCanvas(windowWidth, windowHeight);\n  system.init();\n  system.update();\n  system.relativeNeighborhoodGraph();\n  rectMode(CENTER);\n};\n\ndraw = (_) => {\n  background(\"white\");\n  system.update();\n  system.render();\n};",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

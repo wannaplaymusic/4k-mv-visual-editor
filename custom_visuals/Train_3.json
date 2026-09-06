@@ -1,22 +1,25 @@
 {
-  "name": "Train_3",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 03:10:01",
-  "url": "https://openprocessing.org/@ntsutae/1590940",
-  "code": "// === Tab: mySketch ===\nlet offsetx = 0\nlet offsety = 0\nconst iterate = 350\n\nsetup = () => {\n  createCanvas(1024, 576)\n  textAlign(CENTER, CENTER)\n  noStroke()\n}\n\ndraw = () => {\n  background('#eedcb3')\n  let x = y = 0\n  const path = []\n  for (let i = iterate; i--;) {\n    i - iterate / 2 || (offsetx = x, offsety = y)\n    const index = frameCount - i\n    const angle = noise(index / 99) * 4 - 2\n    x += cos(angle) * 6\n    y += sin(angle) * 6\n    path.push({\n      x,\n      y,\n      angle,\n      index\n    })\n  }\n\t\n  translate(width / 2 - offsetx, height / 2 - offsety)\n  for (const d of ['north', 'south']) {\n    const v = d == 'north' ? -1 : 1\n    const grid = Array.from(new Array(4), () => [])\n    for (const [i, g] of grid.entries()) {\n\t\t\tfor (const p of path.filter(e => 0 == e.index % 14)) {\n\t\t\t\tconst normalVector = p.angle + PI / 2 * v\n\t\t\t\tconst dis = i * 100 + 120 + (i == 3) * 120\n\t\t\t\tg.push({\n\t\t\t\t\tx: p.x + cos(normalVector) * dis,\n\t\t\t\t\ty: p.y + sin(normalVector) * dis,\n\t\t\t\t\tcolour: color(0, noise(p.index + i) * 256, 0)\n\t\t\t\t})\n      }\n    }\n    for (let i = grid.length - 1; i--;) {\n      for (let j = grid[i].length - 1; j--;) {\n        fill(grid[i][j].colour)\n        quad(grid[i    ][j    ].x, grid[i    ][j    ].y, \n\t\t\t\t\t\t grid[i    ][j + 1].x, grid[i    ][j + 1].y, \n\t\t\t\t\t\t grid[i + 1][j + 1].x, grid[i + 1][j + 1].y, \n\t\t\t\t\t\t grid[i + 1][j    ].x, grid[i + 1][j    ].y)\n      }\n    }\n  }\n\t\n  fill('black')\n  for (const i of ['railway&trees', 'train']) {\n    for (const [j, p] of path.entries()) {\n      push()\n      translate(p.x, p.y)\n      rotate(p.angle)\n      scale(-3, 3)\n      switch (i) {\n      case 'railway&trees':\n        p.index % 3 || text(\"#\", 0, 4)\n        p.index % 5 || text(\"🌲\", 0, p.index % 2 ? -20 : 20)\n        break;\n      case 'train':\n        j % 7 || ( \n          n = j / 7,\n          15 <= n && n <= 24 && text(n == 24 ? \"🚂\" : \"🚃\", 0, 0)\n\t\t\t\t)\n      }\n      pop()\n    }\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Train_3",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 03:10:01",
+    "url": "https://openprocessing.org/@ntsutae/1590940",
+    "code": "// === Tab: mySketch ===\nlet offsetx = 0\nlet offsety = 0\nconst iterate = 350\n\nsetup = () => {\n  createCanvas(1024, 576)\n  textAlign(CENTER, CENTER)\n  noStroke()\n}\n\ndraw = () => {\n  background('#eedcb3')\n  let x = y = 0\n  const path = []\n  for (let i = iterate; i--;) {\n    i - iterate / 2 || (offsetx = x, offsety = y)\n    const index = frameCount - i\n    const angle = noise(index / 99) * 4 - 2\n    x += cos(angle) * 6\n    y += sin(angle) * 6\n    path.push({\n      x,\n      y,\n      angle,\n      index\n    })\n  }\n\t\n  translate(width / 2 - offsetx, height / 2 - offsety)\n  for (const d of ['north', 'south']) {\n    const v = d == 'north' ? -1 : 1\n    const grid = Array.from(new Array(4), () => [])\n    for (const [i, g] of grid.entries()) {\n\t\t\tfor (const p of path.filter(e => 0 == e.index % 14)) {\n\t\t\t\tconst normalVector = p.angle + PI / 2 * v\n\t\t\t\tconst dis = i * 100 + 120 + (i == 3) * 120\n\t\t\t\tg.push({\n\t\t\t\t\tx: p.x + cos(normalVector) * dis,\n\t\t\t\t\ty: p.y + sin(normalVector) * dis,\n\t\t\t\t\tcolour: color(0, noise(p.index + i) * 256, 0)\n\t\t\t\t})\n      }\n    }\n    for (let i = grid.length - 1; i--;) {\n      for (let j = grid[i].length - 1; j--;) {\n        fill(grid[i][j].colour)\n        quad(grid[i    ][j    ].x, grid[i    ][j    ].y, \n\t\t\t\t\t\t grid[i    ][j + 1].x, grid[i    ][j + 1].y, \n\t\t\t\t\t\t grid[i + 1][j + 1].x, grid[i + 1][j + 1].y, \n\t\t\t\t\t\t grid[i + 1][j    ].x, grid[i + 1][j    ].y)\n      }\n    }\n  }\n\t\n  fill('black')\n  for (const i of ['railway&trees', 'train']) {\n    for (const [j, p] of path.entries()) {\n      push()\n      translate(p.x, p.y)\n      rotate(p.angle)\n      scale(-3, 3)\n      switch (i) {\n      case 'railway&trees':\n        p.index % 3 || text(\"#\", 0, 4)\n        p.index % 5 || text(\"🌲\", 0, p.index % 2 ? -20 : 20)\n        break;\n      case 'train':\n        j % 7 || ( \n          n = j / 7,\n          15 <= n && n <= 24 && text(n == 24 ? \"🚂\" : \"🚃\", 0, 0)\n\t\t\t\t)\n      }\n      pop()\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Dissolve into Phase.mp4"
+    ]
 }

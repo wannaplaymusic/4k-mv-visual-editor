@@ -1,22 +1,25 @@
 {
-  "name": "SpeedofLight_1",
-  "author": "gorillasun",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:18:32",
-  "url": "https://openprocessing.org/@gorillasun/1763038",
-  "code": "// === Tab: mySketch ===\n/*\n  Submission for @sableRaph's #WCCChallenge\n  Topic: Hyperspace\n  \n  Made a little speed of light warp thingy\n  Click and and hold the mouse to engage hyperspeed\n  Release to stop\n  \n  May cause motion sickness\n*/\nlet particles = []\nfunction setup() {\n  createCanvas(400, 400);\n  for(let n = 0; n < 200; n++){\n    r = 300\n    theta = random() * TAU\n    particles.push(new makeParticle(r, theta))\n  }\n}\n\nfunction draw() {\n  background(0);\n  translate(\n    200+random(-2,2)*hyperDrive,\n    200+random(-2,2)*hyperDrive)\n  stroke(255)\n  strokeWeight(2)\n  \n  for(let n = 0; n < 200; n++){\n    particles[n].move() \n    particles[n].display() \n  }\n  \n  if(hyperDrive){\n    globStep = lerp(globStep, .02, .01)\n  }else{\n    globStep = lerp(globStep, .0025, .1)\n  }\n}\n\nfunction makeParticle(rad, ang){\n  this.rad = rad \n  this.ang = ang\n  \n  this.t = random()\n  this.step = .0025\n  \n  this.weight = random(5)\n  this.transp = random(200,255)\n  \n  this.leng = random(100)\n  \n  this.move = function(){\n    this.step = lerp(this.step, globStep, .01)\n    this.t += this.step\n    if(this.t>1){\n      this.t = .15\n    }\n  }\n  \n  this.display = function(){\n    let x = this.rad*cos(this.ang)*this.t*this.t\n    let y = this.rad*sin(this.ang)*this.t*this.t\n    \n    let x2 = (this.rad-this.leng*this.t)*cos(this.ang)*this.t*this.t\n    let y2 = (this.rad-this.leng*this.t)*sin(this.ang)*this.t*this.t\n    \n    strokeWeight(this.weight)\n    \n    let beginT = map(this.t, .15, .3, 0, 1)\n    stroke(255*beginT+50, this.transp)\n    line(x, y, x2, y2)\n  }\n}\n\nlet globStep = 0.0025\nlet hyperDrive = false\nfunction mousePressed(){\n  hyperDrive = true\n}\n\nfunction mouseReleased(){\n  hyperDrive = false\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SpeedofLight_1",
+    "author": "gorillasun",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:18:32",
+    "url": "https://openprocessing.org/@gorillasun/1763038",
+    "code": "// === Tab: mySketch ===\n/*\n  Submission for @sableRaph's #WCCChallenge\n  Topic: Hyperspace\n  \n  Made a little speed of light warp thingy\n  Click and and hold the mouse to engage hyperspeed\n  Release to stop\n  \n  May cause motion sickness\n*/\nlet particles = []\nfunction setup() {\n  createCanvas(400, 400);\n  for(let n = 0; n < 200; n++){\n    r = 300\n    theta = random() * TAU\n    particles.push(new makeParticle(r, theta))\n  }\n}\n\nfunction draw() {\n  background(0);\n  translate(\n    200+random(-2,2)*hyperDrive,\n    200+random(-2,2)*hyperDrive)\n  stroke(255)\n  strokeWeight(2)\n  \n  for(let n = 0; n < 200; n++){\n    particles[n].move() \n    particles[n].display() \n  }\n  \n  if(hyperDrive){\n    globStep = lerp(globStep, .02, .01)\n  }else{\n    globStep = lerp(globStep, .0025, .1)\n  }\n}\n\nfunction makeParticle(rad, ang){\n  this.rad = rad \n  this.ang = ang\n  \n  this.t = random()\n  this.step = .0025\n  \n  this.weight = random(5)\n  this.transp = random(200,255)\n  \n  this.leng = random(100)\n  \n  this.move = function(){\n    this.step = lerp(this.step, globStep, .01)\n    this.t += this.step\n    if(this.t>1){\n      this.t = .15\n    }\n  }\n  \n  this.display = function(){\n    let x = this.rad*cos(this.ang)*this.t*this.t\n    let y = this.rad*sin(this.ang)*this.t*this.t\n    \n    let x2 = (this.rad-this.leng*this.t)*cos(this.ang)*this.t*this.t\n    let y2 = (this.rad-this.leng*this.t)*sin(this.ang)*this.t*this.t\n    \n    strokeWeight(this.weight)\n    \n    let beginT = map(this.t, .15, .3, 0, 1)\n    stroke(255*beginT+50, this.transp)\n    line(x, y, x2, y2)\n  }\n}\n\nlet globStep = 0.0025\nlet hyperDrive = false\nfunction mousePressed(){\n  hyperDrive = true\n}\n\nfunction mouseReleased(){\n  hyperDrive = false\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Empty Sphere.mp4"
+    ]
 }

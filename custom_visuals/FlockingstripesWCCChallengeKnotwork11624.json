@@ -1,22 +1,25 @@
 {
-  "name": "FlockingstripesWCCChallengeKnotwork11624",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:19:56",
-  "url": "https://openprocessing.org/@epi/2297230",
-  "code": "// === Tab: mySketch ===\n/*\n\tFlocking stripes #WCCChallenge Knotwork 11.6.24\n\thttps://openprocessing.org/sketch/2297230\n\t#generativeart #creativecoding #p5js\n\n  Dear Raph and creative coding community,\n\t\n\t\n\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\nconst FPS = 60;\nconst CNT = 25;\nconst CLRS_H = [\"purple\", \"darkred\"];\nconst CLRS_V = [\"darkgreen\", \"navy\"];\n\nconst THF = 0.8; \nlet S, TH;\nlet stripes;\nlet s_i = 0, sx_i = 0, sy_i = 0, s_h = true;\n\nfunction setup() {\n\tcreateCanvas(S=max(windowWidth, windowHeight), S);\n\tdescribe(\"stripes forming a flocking by time\")\n\tframeRate(FPS);\n\t\n\tS /= (CNT + 1);\n\tTH = S * THF;\n\ts_i = 0; sx_i = 0; sy_i = 0; s_h = true;\n\tstripes = [];\n\t// addStripe();\n\n\tbackground(\"beige\");\n\tstrokeWeight(TH);\n}\n\nfunction draw() {\n\tif (s_i > 8 * CNT) setup();\n\taddStripe();\n\t\n\tfor (let s of stripes) {\n\t\ts.move();\n\t}\n\tfor (let s of stripes) {\n\t\ts.show();\n\t}\n}\n\nfunction addStripe() {\n\tif (s_i > 2 * CNT + 1) {\n\t\ts_i++;\n\t\treturn;\n\t}\n\t\n\ts_h = s_i % 2 === 0; // is horizontal, altering every step\n\n\tlet clr, x, y, xd, yd;\n\tif (s_h) {\n\t\tclr = lerpColor(color(CLRS_H[0]), color(CLRS_H[1]), random());\n\t\tx = 0;\n\t\ty = S/2 + S * sy_i;\n\t\tsy_i++;\n\t\txd = S;\n\t\tyd = 0;\n\t} else {\n\t\tclr = lerpColor(color(CLRS_V[0]), color(CLRS_V[1]), random());\n\t\tx = S/2 + S * sx_i;\n\t\ty = 0;\n\t\tsx_i++;\n\t\txd = 0;\n\t\tyd = S;\n\t}\n\tstripes.push(new Stripe(x, y, xd/2, yd/2, S * 0.1, clr, s_i, (sx_i + sy_i) % 2 === 0))\n\t\n\ts_i++;\n}\n\n\nclass Stripe {\n\tconstructor(x, y, xd, yd, ds, clr, idx, mve) {\n\t\tthis.idx = idx;\n\t\tthis.x = x; // start position\n\t\tthis.y = y;\n\t\tthis.lx = x; // last position\n\t\tthis.ly = y;\n\t\tthis.xd = xd; // delta per step\n\t\tthis.yd = yd;\n\t\tthis.ds = ds; // adding randomness per step\n\t\tthis.clr = clr; // color of stripe\n\t\tthis.mve = mve;\n\t}\n\t\n\tmove() {\n\t\tthis.mve = !this.mve;\n\t\tif (this.mve) return;\n\t\t\n\t\tthis.lx = this.x;\n\t\tthis.ly = this.y;\n\t\tfor (let i = 0; i < 2; i++) {\t\t\t\n\t\t\tthis.x += this.xd;\n\t\t\tthis.y += this.yd;\n\n\t\t\tconst ds = random(-this.ds, this.ds)\n\t\t\tif (this.xd === 0) {\n\t\t\t\tthis.x += ds;\n\t\t\t} else {\n\t\t\t\tthis.y += ds;\t\t\t\n\t\t\t}\n\t\t}\n\t}\n\t\n\tshow() {\n\t\tif (this.mve) return;\n\t\tstroke(this.clr);\n\t\tline(this.lx, this.ly, this.x, this.y)\n\t\t// if (this.idx === 0) console.log(`${this.lx}, ${this.ly}, ${this.x}, ${this.y}`)\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "FlockingstripesWCCChallengeKnotwork11624",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:19:56",
+    "url": "https://openprocessing.org/@epi/2297230",
+    "code": "// === Tab: mySketch ===\n/*\n\tFlocking stripes #WCCChallenge Knotwork 11.6.24\n\thttps://openprocessing.org/sketch/2297230\n\t#generativeart #creativecoding #p5js\n\n  Dear Raph and creative coding community,\n\t\n\t\n\n\tJoin the Birb's Nest Discord for friendly creative coding community\n\tand future challenges and contributions: https://discord.gg/S8c7qcjw2b\n\tWCCC-Contributions: https://openprocessing.org/curation/78544\n*/\n\nconst FPS = 60;\nconst CNT = 25;\nconst CLRS_H = [\"purple\", \"darkred\"];\nconst CLRS_V = [\"darkgreen\", \"navy\"];\n\nconst THF = 0.8; \nlet S, TH;\nlet stripes;\nlet s_i = 0, sx_i = 0, sy_i = 0, s_h = true;\n\nfunction setup() {\n\tcreateCanvas(S=max(windowWidth, windowHeight), S);\n\tdescribe(\"stripes forming a flocking by time\")\n\tframeRate(FPS);\n\t\n\tS /= (CNT + 1);\n\tTH = S * THF;\n\ts_i = 0; sx_i = 0; sy_i = 0; s_h = true;\n\tstripes = [];\n\t// addStripe();\n\n\tbackground(\"beige\");\n\tstrokeWeight(TH);\n}\n\nfunction draw() {\n\tif (s_i > 8 * CNT) setup();\n\taddStripe();\n\t\n\tfor (let s of stripes) {\n\t\ts.move();\n\t}\n\tfor (let s of stripes) {\n\t\ts.show();\n\t}\n}\n\nfunction addStripe() {\n\tif (s_i > 2 * CNT + 1) {\n\t\ts_i++;\n\t\treturn;\n\t}\n\t\n\ts_h = s_i % 2 === 0; // is horizontal, altering every step\n\n\tlet clr, x, y, xd, yd;\n\tif (s_h) {\n\t\tclr = lerpColor(color(CLRS_H[0]), color(CLRS_H[1]), random());\n\t\tx = 0;\n\t\ty = S/2 + S * sy_i;\n\t\tsy_i++;\n\t\txd = S;\n\t\tyd = 0;\n\t} else {\n\t\tclr = lerpColor(color(CLRS_V[0]), color(CLRS_V[1]), random());\n\t\tx = S/2 + S * sx_i;\n\t\ty = 0;\n\t\tsx_i++;\n\t\txd = 0;\n\t\tyd = S;\n\t}\n\tstripes.push(new Stripe(x, y, xd/2, yd/2, S * 0.1, clr, s_i, (sx_i + sy_i) % 2 === 0))\n\t\n\ts_i++;\n}\n\n\nclass Stripe {\n\tconstructor(x, y, xd, yd, ds, clr, idx, mve) {\n\t\tthis.idx = idx;\n\t\tthis.x = x; // start position\n\t\tthis.y = y;\n\t\tthis.lx = x; // last position\n\t\tthis.ly = y;\n\t\tthis.xd = xd; // delta per step\n\t\tthis.yd = yd;\n\t\tthis.ds = ds; // adding randomness per step\n\t\tthis.clr = clr; // color of stripe\n\t\tthis.mve = mve;\n\t}\n\t\n\tmove() {\n\t\tthis.mve = !this.mve;\n\t\tif (this.mve) return;\n\t\t\n\t\tthis.lx = this.x;\n\t\tthis.ly = this.y;\n\t\tfor (let i = 0; i < 2; i++) {\t\t\t\n\t\t\tthis.x += this.xd;\n\t\t\tthis.y += this.yd;\n\n\t\t\tconst ds = random(-this.ds, this.ds)\n\t\t\tif (this.xd === 0) {\n\t\t\t\tthis.x += ds;\n\t\t\t} else {\n\t\t\t\tthis.y += ds;\t\t\t\n\t\t\t}\n\t\t}\n\t}\n\t\n\tshow() {\n\t\tif (this.mve) return;\n\t\tstroke(this.clr);\n\t\tline(this.lx, this.ly, this.x, this.y)\n\t\t// if (this.idx === 0) console.log(`${this.lx}, ${this.ly}, ${this.x}, ${this.y}`)\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Dark Signal Frame.mp4"
+    ]
 }

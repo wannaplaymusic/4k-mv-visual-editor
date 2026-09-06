@@ -1,22 +1,25 @@
 {
-  "name": "NeonRiver",
-  "author": "reona396",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:30:25",
-  "url": "https://openprocessing.org/@reona396/1198677",
-  "code": "// === Tab: mySketch ===\nlet objs = [];\nlet objsNum = 70;\n\nconst palette = [\"#FF00D8\", \"#FFB201\", \"#98FF00\", \"#00FFC4\", \"#0082FE\", \"#B733FF\"];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  angleMode(DEGREES);\n  noFill();\n\n  background(20);\n\n  for (let i = 0; i < objsNum; i++) {\n    objs.push(new Obj(i));\n  }\n}\n\nfunction draw() {\n  blendMode(BLEND);\n  background(20, 50);\n\n  blendMode(ADD);\n\n  for (let i = 0; i < objs.length; i++) {\n    objs[i].move();\n    objs[i].display();\n  }\n}\n\nclass Obj {\n  constructor(tmpIndex) {\n    this.index = tmpIndex;\n    this.startX = random(width);\n    this.init();\n    this.goalX = this.startX + this.rangeX;\n  }\n\n  init() {\n    this.rangeX = random(10, 200);\n    this.step = random(5, 10);\n    this.strWeight = random(1, 15);\n    this.c = color(random(palette));\n    this.c.setAlpha(50);\n  }\n\n  move() {\n    this.startX += this.step;\n    this.goalX = this.startX + this.rangeX;\n\n    if (this.startX > width) {\n      this.init();\n      this.startX = -this.rangeX;\n      this.goalX = this.startX + this.rangeX;\n    }\n  }\n\n  display() {\n    strokeWeight(this.strWeight);\n    stroke(this.c);\n    beginShape();\n    for (let x = this.startX; x <= this.goalX; x++) {\n      let y = map(noise(x * 0.001, this.index * 0.1, frameCount * 0.002), 0, 1, -height * 0.25, height * 1.25);\n      vertex(x, y);\n    }\n    endShape();\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "NeonRiver",
+    "author": "reona396",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:30:25",
+    "url": "https://openprocessing.org/@reona396/1198677",
+    "code": "// === Tab: mySketch ===\nlet objs = [];\nlet objsNum = 70;\n\nconst palette = [\"#FF00D8\", \"#FFB201\", \"#98FF00\", \"#00FFC4\", \"#0082FE\", \"#B733FF\"];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  angleMode(DEGREES);\n  noFill();\n\n  background(20);\n\n  for (let i = 0; i < objsNum; i++) {\n    objs.push(new Obj(i));\n  }\n}\n\nfunction draw() {\n  blendMode(BLEND);\n  background(20, 50);\n\n  blendMode(ADD);\n\n  for (let i = 0; i < objs.length; i++) {\n    objs[i].move();\n    objs[i].display();\n  }\n}\n\nclass Obj {\n  constructor(tmpIndex) {\n    this.index = tmpIndex;\n    this.startX = random(width);\n    this.init();\n    this.goalX = this.startX + this.rangeX;\n  }\n\n  init() {\n    this.rangeX = random(10, 200);\n    this.step = random(5, 10);\n    this.strWeight = random(1, 15);\n    this.c = color(random(palette));\n    this.c.setAlpha(50);\n  }\n\n  move() {\n    this.startX += this.step;\n    this.goalX = this.startX + this.rangeX;\n\n    if (this.startX > width) {\n      this.init();\n      this.startX = -this.rangeX;\n      this.goalX = this.startX + this.rangeX;\n    }\n  }\n\n  display() {\n    strokeWeight(this.strWeight);\n    stroke(this.c);\n    beginShape();\n    for (let x = this.startX; x <= this.goalX; x++) {\n      let y = map(noise(x * 0.001, this.index * 0.1, frameCount * 0.002), 0, 1, -height * 0.25, height * 1.25);\n      vertex(x, y);\n    }\n    endShape();\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

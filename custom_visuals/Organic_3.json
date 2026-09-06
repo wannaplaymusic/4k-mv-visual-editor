@@ -1,22 +1,25 @@
 {
-  "name": "Organic_3",
-  "author": "theRussetPotato",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 17:08:50",
-  "url": "https://openprocessing.org/@theRussetPotato/684400",
-  "code": "// === Tab: mySketch ===\n/*\nOrganic\n\nAuthor:\n  Jason Labbe\n\nSite:\n  jasonlabbe3d.com\n*/\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\nwindow.simulatedMouseX = width / 4;\n}\n\n\nfunction draw() {\n\tlet f = frameCount;\n\t\n\tbackground(0);\n\t\n\tstroke(255);\n\tstrokeWeight(0.7);\n\tnoFill();\n\t\n\ttranslate(width / 2, height / 2);\n\trotate(-f * 0.001);\n\t\n\tfor (let rad = 0; rad < TWO_PI; rad += map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 0.02, 0.1)) {\n\t\tpush();\n\t\trotate(rad);\n\t\t\n\t\t// Kill noise at start/end so they don't overlap.\n\t\tlet weight = 1;\n\t\tif (rad < QUARTER_PI) {\n\t\t\tweight = map(rad, 0, QUARTER_PI, 0, 1);\n\t\t} else if (rad > TWO_PI - QUARTER_PI) {\n\t\t\tweight = map(rad, TWO_PI - QUARTER_PI, TWO_PI, 1, 0);\n\t\t}\n\t\t\n\t\tlet n1 = map(noise(f * 0.001 + rad), 0, 1, -2, 2) * weight;\n\t\tlet n2 = map(noise((1000 + f) * 0.001 + rad), 0, 1, -2, 2) * weight;\n\t\t\n\t\tbeginShape();\n\t\tcurveVertex(0, 0);\n\t\tcurveVertex(sin(f * 0.04 - 5 + n1) * 25, 100);\n\t\tcurveVertex(cos(f * 0.04 - 2.5 + n2) * 50, 200);\n\t\tcurveVertex(sin(f * 0.04 + n1) * 75, 300);\n\t\tcurveVertex(0, 400);\n\t\tcurveVertex(0, 500);\n\t\tendShape();\n\t\t\n\t\tpop();\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Organic_3",
+    "author": "theRussetPotato",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:08:50",
+    "url": "https://openprocessing.org/@theRussetPotato/684400",
+    "code": "// === Tab: mySketch ===\n/*\nOrganic\n\nAuthor:\n  Jason Labbe\n\nSite:\n  jasonlabbe3d.com\n*/\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\nwindow.simulatedMouseX = width / 4;\n}\n\n\nfunction draw() {\n\tlet f = frameCount;\n\t\n\tbackground(0);\n\t\n\tstroke(255);\n\tstrokeWeight(0.7);\n\tnoFill();\n\t\n\ttranslate(width / 2, height / 2);\n\trotate(-f * 0.001);\n\t\n\tfor (let rad = 0; rad < TWO_PI; rad += map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 0.02, 0.1)) {\n\t\tpush();\n\t\trotate(rad);\n\t\t\n\t\t// Kill noise at start/end so they don't overlap.\n\t\tlet weight = 1;\n\t\tif (rad < QUARTER_PI) {\n\t\t\tweight = map(rad, 0, QUARTER_PI, 0, 1);\n\t\t} else if (rad > TWO_PI - QUARTER_PI) {\n\t\t\tweight = map(rad, TWO_PI - QUARTER_PI, TWO_PI, 1, 0);\n\t\t}\n\t\t\n\t\tlet n1 = map(noise(f * 0.001 + rad), 0, 1, -2, 2) * weight;\n\t\tlet n2 = map(noise((1000 + f) * 0.001 + rad), 0, 1, -2, 2) * weight;\n\t\t\n\t\tbeginShape();\n\t\tcurveVertex(0, 0);\n\t\tcurveVertex(sin(f * 0.04 - 5 + n1) * 25, 100);\n\t\tcurveVertex(cos(f * 0.04 - 2.5 + n2) * 50, 200);\n\t\tcurveVertex(sin(f * 0.04 + n1) * 75, 300);\n\t\tcurveVertex(0, 400);\n\t\tcurveVertex(0, 500);\n\t\tendShape();\n\t\t\n\t\tpop();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Driving Essence Throws.mp4"
+    ]
 }

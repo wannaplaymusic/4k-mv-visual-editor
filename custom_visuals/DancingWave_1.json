@@ -1,22 +1,25 @@
 {
-  "name": "DancingWave_1",
-  "author": "reona396",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:33:26",
-  "url": "https://openprocessing.org/@reona396/682787",
-  "code": "// === Tab: mySketch ===\nvar waves = [];\nvar wavesNum = 15;\n\nvar yoff = 0.0;\nvar themeColor;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  colorMode(HSB, 360, 100, 100, 100);\n  themeColor = random(360);\n  for (let i = 0; i < wavesNum; i++) {\n    waves.push(new Wave(i));\n  }\n}\n\nfunction draw() {\n  push();\n  colorMode(RGB, 255, 255, 255);\n  background(255);\n  pop();\n\n  for (let i = 0; i < waves.length; i++) {\n    waves[i].display();\n  }\n\n  fill(255);\n  stroke(0);\n  strokeWeight(3);\n  beginShape();\n  vertex(0, 0);\n  vertex(width, 0);\n  vertex(width, height);\n  vertex(0, height);\n\n  beginContour();\n  let xoff = 0.0;\n\n  for (let x = 0; x < width; x += 0.5) {\n    vertex(x, map(noise(xoff, yoff), 0, 1, height, 0));\n    xoff += 0.005;\n  }\n\n  for (let x = width; x > 0; x -= 0.5) {\n    vertex(x, map(noise(xoff, yoff), 0, 1, 0, height));\n    xoff += 0.005;\n  }\n\n  endContour();\n\n  yoff += 0.05;\n\n  endShape(CLOSE);\n}\n\nfunction Wave(index) {\n  this.tmpHue = themeColor;\n  this.hue = index % 2 == 0 ? this.tmpHue : (this.tmpHue + 180) % 360;\n  this.saturation = random(30, 100);\n  this.brightness = random(80, 100);\n  this.x = random(-width / 2, width / 2);\n  this.yoff = random(10.00);\n  this.yoffDelta = random(0.01, 0.05);\n  this.xoffDelta = random(0.005, 0.02);\n  this.vertexDeltaA = floor(random(1, 6));\n  this.vertexDeltaB = floor(random(1, 6));\n\n  this.display = function () {\n    push();\n    translate(this.x, 0);\n    noStroke();\n    fill(this.hue, this.saturation, this.brightness);\n    beginShape();\n    var xoff = 0.0;\n    for (let y = 0; y < height; y += (Math.max(0.001, Math.abs(this.vertexDeltaA)) || 1)) {\n      curveVertex(map(noise(xoff, this.yoff), 0, 1, 0, width), y);\n      xoff += this.xoffDelta;\n    }\n\n    for (let y = height; y > 0; y -= this.vertexDeltaB) {\n      curveVertex(map(noise(xoff, this.yoff), 0, 1, 0, width), y);\n      xoff += this.xoffDelta;\n    }\n\n    endShape();\n    pop();\n\n    this.yoff += this.yoffDelta;\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "DancingWave_1",
+    "author": "reona396",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:33:26",
+    "url": "https://openprocessing.org/@reona396/682787",
+    "code": "// === Tab: mySketch ===\nvar waves = [];\nvar wavesNum = 15;\n\nvar yoff = 0.0;\nvar themeColor;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  colorMode(HSB, 360, 100, 100, 100);\n  themeColor = random(360);\n  for (let i = 0; i < wavesNum; i++) {\n    waves.push(new Wave(i));\n  }\n}\n\nfunction draw() {\n  push();\n  colorMode(RGB, 255, 255, 255);\n  background(255);\n  pop();\n\n  for (let i = 0; i < waves.length; i++) {\n    waves[i].display();\n  }\n\n  fill(255);\n  stroke(0);\n  strokeWeight(3);\n  beginShape();\n  vertex(0, 0);\n  vertex(width, 0);\n  vertex(width, height);\n  vertex(0, height);\n\n  beginContour();\n  let xoff = 0.0;\n\n  for (let x = 0; x < width; x += 0.5) {\n    vertex(x, map(noise(xoff, yoff), 0, 1, height, 0));\n    xoff += 0.005;\n  }\n\n  for (let x = width; x > 0; x -= 0.5) {\n    vertex(x, map(noise(xoff, yoff), 0, 1, 0, height));\n    xoff += 0.005;\n  }\n\n  endContour();\n\n  yoff += 0.05;\n\n  endShape(CLOSE);\n}\n\nfunction Wave(index) {\n  this.tmpHue = themeColor;\n  this.hue = index % 2 == 0 ? this.tmpHue : (this.tmpHue + 180) % 360;\n  this.saturation = random(30, 100);\n  this.brightness = random(80, 100);\n  this.x = random(-width / 2, width / 2);\n  this.yoff = random(10.00);\n  this.yoffDelta = random(0.01, 0.05);\n  this.xoffDelta = random(0.005, 0.02);\n  this.vertexDeltaA = floor(random(1, 6));\n  this.vertexDeltaB = floor(random(1, 6));\n\n  this.display = function () {\n    push();\n    translate(this.x, 0);\n    noStroke();\n    fill(this.hue, this.saturation, this.brightness);\n    beginShape();\n    var xoff = 0.0;\n    for (let y = 0; y < height; y += (Math.max(0.001, Math.abs(this.vertexDeltaA)) || 1)) {\n      curveVertex(map(noise(xoff, this.yoff), 0, 1, 0, width), y);\n      xoff += this.xoffDelta;\n    }\n\n    for (let y = height; y > 0; y -= this.vertexDeltaB) {\n      curveVertex(map(noise(xoff, this.yoff), 0, 1, 0, width), y);\n      xoff += this.xoffDelta;\n    }\n\n    endShape();\n    pop();\n\n    this.yoff += this.yoffDelta;\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Remote Sector.mp4"
+    ]
 }

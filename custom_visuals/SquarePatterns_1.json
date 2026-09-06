@@ -1,22 +1,25 @@
 {
-  "name": "SquarePatterns_1",
-  "author": "slambeetle",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:08:32",
-  "url": "https://openprocessing.org/@slambeetle/156689",
-  "code": "// === Tab: sketch_140804a ===\nfunction setup() {\n  createCanvas(640, 640);\n  noFill();\n}\n\nfunction draw() {\n  background(255);\n  \n  let maxX = float(180)/width*(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n  let maxY = float(180)/height*(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n\n  translate(width/2, height/2);\n  for (let i = 0; i < 360; i+=5) {\n    let x = sin(radians(i)) * maxX;\n    let y = cos(radians(i)) * maxY;\n    push();\n    translate(x, y);\n    rotate(radians(i-frameCount));\n    rect(0, 0, 100, 100);\n    pop();\n    \n    push();\n    translate(-x, -y);\n    rotate(radians(i-frameCount));\n    rect(0, 0, 100, 100);\n    pop();\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SquarePatterns_1",
+    "author": "slambeetle",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:08:32",
+    "url": "https://openprocessing.org/@slambeetle/156689",
+    "code": "// === Tab: sketch_140804a ===\nfunction setup() {\n  createCanvas(640, 640);\n  noFill();\n}\n\nfunction draw() {\n  background(255);\n  \n  let maxX = float(180)/width*(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n  let maxY = float(180)/height*(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n\n  translate(width/2, height/2);\n  for (let i = 0; i < 360; i+=5) {\n    let x = sin(radians(i)) * maxX;\n    let y = cos(radians(i)) * maxY;\n    push();\n    translate(x, y);\n    rotate(radians(i-frameCount));\n    rect(0, 0, 100, 100);\n    pop();\n    \n    push();\n    translate(-x, -y);\n    rotate(radians(i-frameCount));\n    rect(0, 0, 100, 100);\n    pop();\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

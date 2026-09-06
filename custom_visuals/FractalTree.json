@@ -1,22 +1,25 @@
 {
-  "name": "FractalTree",
-  "author": "u233426",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:33:46",
-  "url": "https://openprocessing.org/@u233426/940915",
-  "code": "// === Tab: mySketch ===\nvar x,y,s,t;\nvar a=0,b=0;\n\n\tfunction setup(){\n\t\tcreateCanvas(windowWidth,windowHeight);\n\t\tbackground(255);\n\t\ts=width/2;\n\t\tt=height/2;\n\n\t}\n\n\tfunction draw(){\n\t\tstroke(0,30);\n\t\tstrokeWeight(1);\n\n\n\tfor(var i=0;i<1500;i++){\n\t var k=Math.floor(random(1,8));\n     if(k==1){\n     \n        x=0.0500*a+0.0000*b-0.0600;\n        y=0.0000*a+0.4000*b-0.4700;\n     }\n     else if(k==2){\n        x = -0.0500*a + 0.00*b-0.0600;\n        y = 0.00*a -0.4000*b-0.4700;\n     }\n     else if(k==3){\n     \t  x = 0.0300*a - 0.1400*b-0.1600;\n        y= 0.00*a + 0.2600*b-0.0100;\n\n     }\n     else if(k==4){\n     \t  x = -0.0300*a + 0.1400*b-0.1600;\n        y= 0.00*a -0.2600*b-0.0100;\n\n     }\n     else if(k==5){\n     \t  x = 0.5600*a +0.4400*b+0.3000;\n        y= -0.3700*a + 0.5100*b+0.1500;\n\n     }\n     else if(k==6){\n     \t  x = 0.1900*a +0.0700*b-0.2000;\n        y= -0.1000*a + 0.1500*b+0.2800;\n\n     }\n    else{\n\t \t   x = -0.3300*a - 0.3400*b-0.5400;\n\t\t   y= -0.3300*a + 0.3400*b + 0.3900;\n     }\n     \n     a=x;\n     b=y;\n     point(x*290+s,-(y*290-t));\n }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "FractalTree",
+    "author": "u233426",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:33:46",
+    "url": "https://openprocessing.org/@u233426/940915",
+    "code": "// === Tab: mySketch ===\nvar x,y,s,t;\nvar a=0,b=0;\n\n\tfunction setup(){\n\t\tcreateCanvas(windowWidth,windowHeight);\n\t\tbackground(255);\n\t\ts=width/2;\n\t\tt=height/2;\n\n\t}\n\n\tfunction draw(){\n\t\tstroke(0,30);\n\t\tstrokeWeight(1);\n\n\n\tfor(var i=0;i<1500;i++){\n\t var k=Math.floor(random(1,8));\n     if(k==1){\n     \n        x=0.0500*a+0.0000*b-0.0600;\n        y=0.0000*a+0.4000*b-0.4700;\n     }\n     else if(k==2){\n        x = -0.0500*a + 0.00*b-0.0600;\n        y = 0.00*a -0.4000*b-0.4700;\n     }\n     else if(k==3){\n     \t  x = 0.0300*a - 0.1400*b-0.1600;\n        y= 0.00*a + 0.2600*b-0.0100;\n\n     }\n     else if(k==4){\n     \t  x = -0.0300*a + 0.1400*b-0.1600;\n        y= 0.00*a -0.2600*b-0.0100;\n\n     }\n     else if(k==5){\n     \t  x = 0.5600*a +0.4400*b+0.3000;\n        y= -0.3700*a + 0.5100*b+0.1500;\n\n     }\n     else if(k==6){\n     \t  x = 0.1900*a +0.0700*b-0.2000;\n        y= -0.1000*a + 0.1500*b+0.2800;\n\n     }\n    else{\n\t \t   x = -0.3300*a - 0.3400*b-0.5400;\n\t\t   y= -0.3300*a + 0.3400*b + 0.3900;\n     }\n     \n     a=x;\n     b=y;\n     point(x*290+s,-(y*290-t));\n }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Quiet Transmission.mp4"
+    ]
 }

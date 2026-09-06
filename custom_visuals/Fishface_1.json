@@ -1,22 +1,25 @@
 {
-  "name": "Fishface_1",
-  "author": "marzinp",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:16:17",
-  "url": "https://openprocessing.org/@marzinp/738422",
-  "code": "// === Tab: shaders ===\nvar frag=`\n// Author Pierre MARZIN 01/2017\n\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform vec2 iResolution;\nuniform vec2 iMouse;\nuniform bool running;\nuniform float iTime;\nuniform sampler2D iImg;\nuniform float c[22];\nfloat mousefactor;\n\nfloat noise( in vec2 x )\n{\n\treturn abs(sin(1.5*x.x)*sin(1.5*x.y));\n}\nfloat map(float value, float min1, float max1, float min2, float max2) {\n  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);\n}\nvoid main() {\n\t\tvec2 mouse=iMouse/iResolution;\nvec2 p = gl_FragCoord.xy/iResolution;\nvec2 q=vec2(p.x,1.0-p.y);\nvec3 color=texture2D(iImg,vec2(q.x,q.y)).rgb;\nfloat l=length(q-mouse);\nl=pow(l,.5);\nq-=mouse;\nfloat a=2.0*atan(q.y,q.x);\nvec2 r=l*vec2(q.x*cos(a)+q.y*sin(a),q.x*sin(a)-q.y*cos(a));\nr+=mouse;\ncolor=.8*texture2D(iImg,r).rgb+.4*(1.0-l)*vec3(texture2D(iImg,r).r,0.,0.);\ngl_FragColor = vec4(color,1.);\n}\n\n`\nvar vert=`\n//standard vertex shader\n#ifdef GL_ES\n      precision highp float;\n    #endif\n\t\t#extension GL_OES_standard_derivatives : enable\n    // attributes, in\n    attribute vec3 aPosition;\n    attribute vec3 aNormal;\n    attribute vec2 aTexCoord;\n    attribute vec4 aVertexColor;\n\n    // attributes, out\n    varying vec3 var_vertPos;\n    varying vec4 var_vertCol;\n    varying vec3 var_vertNormal;\n    varying vec2 var_vertTexCoord;\n    \n    // matrices\n    uniform mat4 uModelViewMatrix;\n    uniform mat4 uProjectionMatrix;\n    uniform mat3 uNormalMatrix;\n\n    void main() {\n      gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);\n\n      // just passing things through\n      var_vertPos      = aPosition;\n      var_vertCol      = aVertexColor;\n      var_vertNormal   = aNormal;\n      var_vertTexCoord = aTexCoord;\n    }\n`;\n\n// === Tab: glitches ===\nvar gl,noctaves,c,t,lt,running;\nlet img;\nfunction preload() {\n  img = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/img.jpg');\n}\nfunction setup() {\n\tpixelDensity(1);\n\tcreateCanvas(windowWidth, windowHeight,WEBGL);\n\tgl=this.canvas.getContext('webgl');\n\tgl.disable(gl.DEPTH_TEST);\n\tnoctaves=1;\n\trunning=false;\n\tlt=random(100);\n\timg.resize(width,height);\n\tc=[];\n\tinitc();\n\ttest=createShader(vert, frag);//shaders are loaded\n  shader(test);//shaders are applied\t\n}\nfunction initc(){\n\tfor(var i=0;i<22;i++){\n\t\tc[i]=random(-2,2);\n\t}\n}\nfunction mouseMoved(){\n\tif(random(1)>.95 &&!running){\n\t\tt=millis();\n\t\tlt+=t;\n\t\tinitc();\n\t\trunning=true;\n\t}\n\trunning=true;\n}\nfunction draw() {    \n\ttest.setUniform(\"iResolution\", [width,height]);//pass some values to the shader\n  test.setUniform(\"iTime\", millis()*.001);\n\ttest.setUniform('iMouse',[(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))]);\n\ttest.setUniform(\"iImg\",img);\n\ttest.setUniform(\"c\",c);\n\t\n\tif(running){\n\t\tt++;\n\t\tif(t>=lt){\n\t\t\trunning=false;\n\t\t\tlt=random(50);\n\t\t}\n\t}\n\ttest.setUniform(\"running\",running);\n\tshader(test);\n\tbox(max(width, height));\n}\nfunction mouseReleased(){\n\tnoctaves=(noctaves>=7)?1:noctaves+2;\n\tif(noctaves==1)initc();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Fishface_1",
+    "author": "marzinp",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:16:17",
+    "url": "https://openprocessing.org/@marzinp/738422",
+    "code": "// === Tab: shaders ===\nvar frag=`\n// Author Pierre MARZIN 01/2017\n\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform vec2 iResolution;\nuniform vec2 iMouse;\nuniform bool running;\nuniform float iTime;\nuniform sampler2D iImg;\nuniform float c[22];\nfloat mousefactor;\n\nfloat noise( in vec2 x )\n{\n\treturn abs(sin(1.5*x.x)*sin(1.5*x.y));\n}\nfloat map(float value, float min1, float max1, float min2, float max2) {\n  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);\n}\nvoid main() {\n\t\tvec2 mouse=iMouse/iResolution;\nvec2 p = gl_FragCoord.xy/iResolution;\nvec2 q=vec2(p.x,1.0-p.y);\nvec3 color=texture2D(iImg,vec2(q.x,q.y)).rgb;\nfloat l=length(q-mouse);\nl=pow(l,.5);\nq-=mouse;\nfloat a=2.0*atan(q.y,q.x);\nvec2 r=l*vec2(q.x*cos(a)+q.y*sin(a),q.x*sin(a)-q.y*cos(a));\nr+=mouse;\ncolor=.8*texture2D(iImg,r).rgb+.4*(1.0-l)*vec3(texture2D(iImg,r).r,0.,0.);\ngl_FragColor = vec4(color,1.);\n}\n\n`\nvar vert=`\n//standard vertex shader\n#ifdef GL_ES\n      precision highp float;\n    #endif\n\t\t#extension GL_OES_standard_derivatives : enable\n    // attributes, in\n    attribute vec3 aPosition;\n    attribute vec3 aNormal;\n    attribute vec2 aTexCoord;\n    attribute vec4 aVertexColor;\n\n    // attributes, out\n    varying vec3 var_vertPos;\n    varying vec4 var_vertCol;\n    varying vec3 var_vertNormal;\n    varying vec2 var_vertTexCoord;\n    \n    // matrices\n    uniform mat4 uModelViewMatrix;\n    uniform mat4 uProjectionMatrix;\n    uniform mat3 uNormalMatrix;\n\n    void main() {\n      gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);\n\n      // just passing things through\n      var_vertPos      = aPosition;\n      var_vertCol      = aVertexColor;\n      var_vertNormal   = aNormal;\n      var_vertTexCoord = aTexCoord;\n    }\n`;\n\n// === Tab: glitches ===\nvar gl,noctaves,c,t,lt,running;\nlet img;\nfunction preload() {\n  img = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/img.jpg');\n}\nfunction setup() {\n\tpixelDensity(1);\n\tcreateCanvas(windowWidth, windowHeight,WEBGL);\n\tgl=this.canvas.getContext('webgl');\n\tgl.disable(gl.DEPTH_TEST);\n\tnoctaves=1;\n\trunning=false;\n\tlt=random(100);\n\timg.resize(width,height);\n\tc=[];\n\tinitc();\n\ttest=createShader(vert, frag);//shaders are loaded\n  shader(test);//shaders are applied\t\n}\nfunction initc(){\n\tfor(var i=0;i<22;i++){\n\t\tc[i]=random(-2,2);\n\t}\n}\nfunction mouseMoved(){\n\tif(random(1)>.95 &&!running){\n\t\tt=millis();\n\t\tlt+=t;\n\t\tinitc();\n\t\trunning=true;\n\t}\n\trunning=true;\n}\nfunction draw() {    \n\ttest.setUniform(\"iResolution\", [width,height]);//pass some values to the shader\n  test.setUniform(\"iTime\", millis()*.001);\n\ttest.setUniform('iMouse',[(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))]);\n\ttest.setUniform(\"iImg\",img);\n\ttest.setUniform(\"c\",c);\n\t\n\tif(running){\n\t\tt++;\n\t\tif(t>=lt){\n\t\t\trunning=false;\n\t\t\tlt=random(50);\n\t\t}\n\t}\n\ttest.setUniform(\"running\",running);\n\tshader(test);\n\tbox(max(width, height));\n}\nfunction mouseReleased(){\n\tnoctaves=(noctaves>=7)?1:noctaves+2;\n\tif(noctaves==1)initc();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Frozen Time.mp4"
+    ]
 }

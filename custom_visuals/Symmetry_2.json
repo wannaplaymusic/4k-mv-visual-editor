@@ -1,22 +1,25 @@
 {
-  "name": "Symmetry_2",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 16:49:31",
-  "url": "https://openprocessing.org/@ntsutae/1384347",
-  "code": "// === Tab: mySketch ===\nsetup=()=>{\n  createCanvas(640,640)\n  pg=createGraphics(width/4,height/4)\n}\n\ndraw=()=> {\n  t=frameCount\n  pg.background('white')\n  .loadPixels()\n  for(y=pg.height;y--;){\n    for(x=pg.width;x--;){  \n      n=noise((x-y)/60,t/120)*256\n      x+y&n-t||pg.set(x,y,color('black')) \n    }\n  }\n  pg.updatePixels()\n    \n  translate(width/2,height/2)\n  scale(2)\n  for(v of [[1,1],[-1,1],[1,-1],[-1,-1]]){\n    push()\n    scale(v)\n    image(pg,0,0)\n    pop()\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Symmetry_2",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 16:49:31",
+    "url": "https://openprocessing.org/@ntsutae/1384347",
+    "code": "// === Tab: mySketch ===\nsetup=()=>{\n  createCanvas(640,640)\n  pg=createGraphics(width/4,height/4)\n}\n\ndraw=()=> {\n  t=frameCount\n  pg.background('white')\n  .loadPixels()\n  for(y=pg.height;y--;){\n    for(x=pg.width;x--;){  \n      n=noise((x-y)/60,t/120)*256\n      x+y&n-t||pg.set(x,y,color('black')) \n    }\n  }\n  pg.updatePixels()\n    \n  translate(width/2,height/2)\n  scale(2)\n  for(v of [[1,1],[-1,1],[1,-1],[-1,-1]]){\n    push()\n    scale(v)\n    image(pg,0,0)\n    pop()\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Monolithic Gap.mp4"
+    ]
 }

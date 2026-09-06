@@ -1,22 +1,25 @@
 {
-  "name": "Demo200824",
-  "author": "cheyuwu",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:02:24",
-  "url": "https://openprocessing.org/@cheyuwu/949175",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t// background(100);\n}\n\nfunction draw() {\n\tbackground(0)\n\tfor(var i=0;i<width;i+=22){\n\t\tfor(var o=0;o<height;o+=22){\n\t\t\tpush()\n\t\t\t\ttranslate(i,o)\n\t\t\t\tstroke(255)\n\t\t\t\tlet len = sin(i/width*PI)*14\n\t\t\t\tlet angle = noise(i/1000,o/1000,frameCount/100)*20\n\t\t\t\tlet m_angle = atan2((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))-o,(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))-i)\n\t\t\t\tangle+=m_angle\n\t\t\t\tline(0,0,len*cos(angle),len*sin(angle))\n\t\t\t\t// line(0,0,)\n\t\t\tpop()\n\t\t}\n\t}\n\tfor(var cir=0;cir<9;cir++){\n\t\tlet baseR = noise(cir+10+frameCount/50)*120\n\t\tfor(var sp=0;sp<8;sp+=1){\n\t\t\tlet useR = baseR*(1+sp/(10+noise(frameCount/5,sp/10)) )\n\t\t\tpush()\n\t\t\t\ttranslate(100+cir*120+sp*10+noise(frameCount/5,cir+sp/5)*10,height/2)\n\t\t\t\tstroke(255)\n\t\t\t\tstrokeWeight(1.5)\n\t\t\t\tnoFill()\n\t\t\t\tbeginShape()\n\t\t\t\tfor(var ang=PI/6;ang<2*PI-PI/6;ang+=(Math.max(0.001, Math.abs(PI/140)) || 1)){\n\t\t\t\t\tlet finalR = useR+map(sp,0,11,100,0)\n\t\t\t\t\tif (cir==2){\n\t\t\t\t\t\tlet subAng = ang+frameCount/20\n\t\t\t\t\t\tlet wSpan = 0.5\n\t\t\t\t\t\tlet i_ang = floor(subAng/wSpan)\n\t\t\t\t\t\tlet f_ang = subAng/wSpan-i_ang\n\t\t\t\t\t\tlet r_md = (map(f_ang,0,wSpan/2,0,1,true)+map(f_ang,wSpan/2,wSpan,1,0,true))/2\n\t\t\t\t\t\tfinalR+=r_md*20\n\t\t\t\t\t}\n\t\t\t\t\tif (cir==3 ){\n\t\t\t\t\t\tfinalR+=noise(ang*50,frameCount/8,sp)*80-40\n\t\t\t\t\t}\n\t\t\t\t\tif (cir==4){\n\t\t\t\t\t\tfinalR+=noise(ang*50,frameCount/5,sp)*200-100\n\t\t\t\t\t}\n\t\t\t\t\tif (cir==5){\n\t\t\t\t\t\tfinalR+=noise(ang*50,frameCount/8,sp)*20-10\n\t\t\t\t\t}\n\t\t\t\t\tif (cir==7){\n\t\t\t\t\t\tfinalR+=sin(ang*20+frameCount/(5+sp/5)+sp,sp)*5\n\t\t\t\t\t}\n\t\t\t\t\tvertex(finalR*cos(ang)/2,finalR*sin(ang))\t\n\t\t\t\t}\n\t\t\t\tif (cir==1){\n\t\t\t\t\tstrokeWeight(2)\n\t\t\t\t}\n\t\t\t\tendShape()\n\t\t\t\t// arc(0,0,useR/2,useR,PI/5,-PI/5)\n\t\t\tpop()\n\t\t}\n\t}\n\tellipse((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 20, 20);\n}\n\nfunction mousePressed(){\n\tnoiseSeed(random(100));\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Demo200824",
+    "author": "cheyuwu",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:02:24",
+    "url": "https://openprocessing.org/@cheyuwu/949175",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t// background(100);\n}\n\nfunction draw() {\n\tbackground(0)\n\tfor(var i=0;i<width;i+=22){\n\t\tfor(var o=0;o<height;o+=22){\n\t\t\tpush()\n\t\t\t\ttranslate(i,o)\n\t\t\t\tstroke(255)\n\t\t\t\tlet len = sin(i/width*PI)*14\n\t\t\t\tlet angle = noise(i/1000,o/1000,frameCount/100)*20\n\t\t\t\tlet m_angle = atan2((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))-o,(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))-i)\n\t\t\t\tangle+=m_angle\n\t\t\t\tline(0,0,len*cos(angle),len*sin(angle))\n\t\t\t\t// line(0,0,)\n\t\t\tpop()\n\t\t}\n\t}\n\tfor(var cir=0;cir<9;cir++){\n\t\tlet baseR = noise(cir+10+frameCount/50)*120\n\t\tfor(var sp=0;sp<8;sp+=1){\n\t\t\tlet useR = baseR*(1+sp/(10+noise(frameCount/5,sp/10)) )\n\t\t\tpush()\n\t\t\t\ttranslate(100+cir*120+sp*10+noise(frameCount/5,cir+sp/5)*10,height/2)\n\t\t\t\tstroke(255)\n\t\t\t\tstrokeWeight(1.5)\n\t\t\t\tnoFill()\n\t\t\t\tbeginShape()\n\t\t\t\tfor(var ang=PI/6;ang<2*PI-PI/6;ang+=(Math.max(0.001, Math.abs(PI/140)) || 1)){\n\t\t\t\t\tlet finalR = useR+map(sp,0,11,100,0)\n\t\t\t\t\tif (cir==2){\n\t\t\t\t\t\tlet subAng = ang+frameCount/20\n\t\t\t\t\t\tlet wSpan = 0.5\n\t\t\t\t\t\tlet i_ang = floor(subAng/wSpan)\n\t\t\t\t\t\tlet f_ang = subAng/wSpan-i_ang\n\t\t\t\t\t\tlet r_md = (map(f_ang,0,wSpan/2,0,1,true)+map(f_ang,wSpan/2,wSpan,1,0,true))/2\n\t\t\t\t\t\tfinalR+=r_md*20\n\t\t\t\t\t}\n\t\t\t\t\tif (cir==3 ){\n\t\t\t\t\t\tfinalR+=noise(ang*50,frameCount/8,sp)*80-40\n\t\t\t\t\t}\n\t\t\t\t\tif (cir==4){\n\t\t\t\t\t\tfinalR+=noise(ang*50,frameCount/5,sp)*200-100\n\t\t\t\t\t}\n\t\t\t\t\tif (cir==5){\n\t\t\t\t\t\tfinalR+=noise(ang*50,frameCount/8,sp)*20-10\n\t\t\t\t\t}\n\t\t\t\t\tif (cir==7){\n\t\t\t\t\t\tfinalR+=sin(ang*20+frameCount/(5+sp/5)+sp,sp)*5\n\t\t\t\t\t}\n\t\t\t\t\tvertex(finalR*cos(ang)/2,finalR*sin(ang))\t\n\t\t\t\t}\n\t\t\t\tif (cir==1){\n\t\t\t\t\tstrokeWeight(2)\n\t\t\t\t}\n\t\t\t\tendShape()\n\t\t\t\t// arc(0,0,useR/2,useR,PI/5,-PI/5)\n\t\t\tpop()\n\t\t}\n\t}\n\tellipse((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 20, 20);\n}\n\nfunction mousePressed(){\n\tnoiseSeed(random(100));\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Monolithic Gap.mp4"
+    ]
 }

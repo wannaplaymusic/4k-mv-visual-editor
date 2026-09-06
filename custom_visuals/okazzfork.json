@@ -1,22 +1,25 @@
 {
-  "name": "okazzfork",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:33:21",
-  "url": "https://openprocessing.org/@epi/1973524",
-  "code": "// === Tab: mySketch ===\nlet min = 50;\nlet colors = [\"#ed3441\", \"#ffb03b\", \"#36acf5\", \"#ffd630\", \"#084e86\", \"#fcfeff\"];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tshuffle(colors, true);\n\tbackground(0);\n\tlet off = 0;\n\tlet p1 = createVector(off, off);\n\tlet p2 = createVector(width - off, off);\n\tlet p3 = createVector(width - off, height - off);\n\tlet p4 = createVector(off, height - off);\n\tstroke(0);\n\tdivideRect(p1, p2, p3, p4, 9);\n}\n\nfunction draw() {\n\n}\n\nfunction divideRect(p1, p2, p3, p4, n) {\n\tlet col = random(colors);\n\tn--;\n\tif (n == 0) {\n\t\tfill(col);\n\t\tstroke(col);\n\t\tbeginShape();\n\t\tvertex(p1.x, p1.y);\n\t\tvertex(p2.x, p2.y);\n\t\tvertex(p3.x, p3.y);\n\t\tvertex(p4.x, p4.y);\n\t\tendShape(CLOSE);\n\t} else if (n > 0) {\n\t\tlet w = p5.Vector.dist(p1, p2) + p5.Vector.dist(p3, p4);\n\t\tlet h = p5.Vector.dist(p1, p4) + p5.Vector.dist(p2, p3);\n\t\tlet t = 3;\n\t\tlet r1 = (1 / t) * int(random(1, t));\n\t\tlet r2 = (1 / t) * int(random(1, t));\n\t\tif (w < h) {\n\t\t\tlet v1 = p5.Vector.lerp(p1, p4, r1);\n\t\t\tlet v2 = p5.Vector.lerp(p2, p3, r2);\n\t\t\tdivideRect(p1, p2, v2, v1, n);\n\t\t\tdivideRect(v1, v2, p3, p4, n);\n\t\t} else {\n\t\t\tvar v1 = p5.Vector.lerp(p1, p2, r1);\n\t\t\tvar v2 = p5.Vector.lerp(p3, p4, r2);\n\t\t\tdivideRect(p1, v1, v2, p4, n);\n\t\t\tdivideRect(v1, p2, p3, v2, n);\n\t\t}\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "okazzfork",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:33:21",
+    "url": "https://openprocessing.org/@epi/1973524",
+    "code": "// === Tab: mySketch ===\nlet min = 50;\nlet colors = [\"#ed3441\", \"#ffb03b\", \"#36acf5\", \"#ffd630\", \"#084e86\", \"#fcfeff\"];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tshuffle(colors, true);\n\tbackground(0);\n\tlet off = 0;\n\tlet p1 = createVector(off, off);\n\tlet p2 = createVector(width - off, off);\n\tlet p3 = createVector(width - off, height - off);\n\tlet p4 = createVector(off, height - off);\n\tstroke(0);\n\tdivideRect(p1, p2, p3, p4, 9);\n}\n\nfunction draw() {\n\n}\n\nfunction divideRect(p1, p2, p3, p4, n) {\n\tlet col = random(colors);\n\tn--;\n\tif (n == 0) {\n\t\tfill(col);\n\t\tstroke(col);\n\t\tbeginShape();\n\t\tvertex(p1.x, p1.y);\n\t\tvertex(p2.x, p2.y);\n\t\tvertex(p3.x, p3.y);\n\t\tvertex(p4.x, p4.y);\n\t\tendShape(CLOSE);\n\t} else if (n > 0) {\n\t\tlet w = p5.Vector.dist(p1, p2) + p5.Vector.dist(p3, p4);\n\t\tlet h = p5.Vector.dist(p1, p4) + p5.Vector.dist(p2, p3);\n\t\tlet t = 3;\n\t\tlet r1 = (1 / t) * int(random(1, t));\n\t\tlet r2 = (1 / t) * int(random(1, t));\n\t\tif (w < h) {\n\t\t\tlet v1 = p5.Vector.lerp(p1, p4, r1);\n\t\t\tlet v2 = p5.Vector.lerp(p2, p3, r2);\n\t\t\tdivideRect(p1, p2, v2, v1, n);\n\t\t\tdivideRect(v1, v2, p3, p4, n);\n\t\t} else {\n\t\t\tvar v1 = p5.Vector.lerp(p1, p2, r1);\n\t\t\tvar v2 = p5.Vector.lerp(p3, p4, r2);\n\t\t\tdivideRect(p1, v1, v2, p4, n);\n\t\t\tdivideRect(v1, p2, p3, v2, n);\n\t\t}\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

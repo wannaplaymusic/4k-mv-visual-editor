@@ -1,22 +1,25 @@
 {
-  "name": "GoldenMosaic_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:30:40",
-  "url": "https://openprocessing.org/@ronikaufman/828091",
-  "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n// Inspired by Gustav Kimt's \"The Kiss\" (1907-1908)\n\nlet randInt = (a, b) => (floor(random(a, b)));\n\nlet margin = -80;\nlet minSize = 5;\n\nlet shapes;\nlet staticShapes; // shapes than don't grow anymore\nlet colors;\n\nlet n = 5; // number of generated squares per frame\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tnoStroke();\n\tbackground(94,36,16);\n\t\n\tshapes = [];\n\tstaticShapes = [];\n\tlet alpha = 20;\n\t/*\n\tcolors = [color(247, 243, 242, alpha),\n\t\t\t\t\t\tcolor(0, 119, 225, alpha),\n\t\t\t\t\t\tcolor(245, 210, 22, alpha),\n\t\t\t\t\t\tcolor(252, 53, 3, alpha)];\n\t*/\n\tcolors = [color(7,21,32, alpha),\n\t\t\t\t\t\tcolor(229,232,189, alpha),\n\t\t\t\t\t\tcolor(176,126,55, alpha),\n\t\t\t\t\t\tcolor(233,187,42, alpha),\n\t\t\t\t\t\tcolor(236,220,63, alpha)];\n}\n\nfunction draw() {\n\tfor (let i = 0; i < n; i++) {\n\t\tlet shape = {\n\t\t\tx: randInt(margin, width - margin - minSize),\n\t\t\ty: randInt(margin, height - margin - minSize),\n\t\t\tw: minSize,\n\t\t\th: minSize,\n\t\t\tcol: colors[floor(random(colors.length))]\n\t\t};\n\t\tif (canPutShape(shape)) {\n\t\t\tshapes.push(shape);\n\t\t}\n\t}\n\t\n\tgrowAndDrawShapes();\n}\n\nfunction canPutShape(newShape) {\n\tfor (let s of shapes) {\n\t\tif (collude(s, newShape)) {\n\t\t\treturn false;\n\t\t}\n\t}\n\tfor (let s of staticShapes) {\n\t\tif (collude(s, newShape)) {\n\t\t\treturn false;\n\t\t}\n\t}\n\treturn true;\n}\n\nfunction growAndDrawShapes() {\n\tlet i = 0;\n\tlet _wG_1 = 0; while ((i < shapes.length) && ++_wG_1 < 20000) {\n\t\tlet s = shapes[i];\n\n\t\tlet wGrowth = randInt(1, 7);\n\t\tlet hGrowth = randInt(1, 10);\n\t\tif (canGrow(i, wGrowth, hGrowth)) {\n\t\t\ts.w += wGrowth;\n\t\t\ts.h += hGrowth;\n\t\t\tfill(s.col);\n\t\t\trect(s.x, s.y, s.w, s.h);\n\t\t\ti++\n\t\t} else {\n\t\t\tshapes.splice(i, 1);\n\t\t\tstaticShapes.push(s);\n\t\t}\n\t}\n}\n\nfunction canGrow(i, wGrowth, hGrowth) {\n\tlet si = {\n\t\tx: shapes[i].x,\n\t\ty: shapes[i].y,\n\t\tw: shapes[i].w + wGrowth,\n\t\th: shapes[i].h + hGrowth\n\t};\n\t\n\t// right margin\n\tif (si.x + si.w + margin > width) {\n\t\treturn false;\n\t}\n\t\n\t// bottom margin\n\tif (si.y + si.h + margin > height) {\n\t\treturn false;\n\t}\n\t\n\tfor (let j = 0; j < shapes.length; j++) {\n\t\tlet sj = shapes[j];\n\t\tif (i != j && collude(si, sj)) {\n\t\t\treturn false;\n\t\t}\n\t}\n\tfor (let j = 0; j < staticShapes.length; j++) {\n\t\tvar sj = staticShapes[j];\n\t\tif (collude(si, sj)) {\n\t\t\treturn false;\n\t\t}\n\t}\n\treturn true;\n}\n\nfunction collude(s1, s2) {\n\tif (s1.x === s2.x || s1.y === s2.y) {\n\t\treturn true;\n\t}\n\t\n\tlet xCollude1 = (s1.x < s2.x) && (s1.x + s1.w + margin > s2.x);\n\tlet xCollude2 = (s1.x > s2.x) && (s2.x + s2.w + margin > s1.x);\n\tlet xCollude = xCollude1 || xCollude2;\n\t\n\tlet yCollude1 = (s1.y < s2.y) && (s1.y + s1.h + margin > s2.y);\n\tlet yCollude2 = (s1.y > s2.y) && (s2.y + s2.h + margin > s1.y);\n\tlet yCollude = yCollude1 || yCollude2;\n\n\treturn xCollude && yCollude;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "GoldenMosaic_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:30:40",
+    "url": "https://openprocessing.org/@ronikaufman/828091",
+    "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n// Inspired by Gustav Kimt's \"The Kiss\" (1907-1908)\n\nlet randInt = (a, b) => (floor(random(a, b)));\n\nlet margin = -80;\nlet minSize = 5;\n\nlet shapes;\nlet staticShapes; // shapes than don't grow anymore\nlet colors;\n\nlet n = 5; // number of generated squares per frame\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tnoStroke();\n\tbackground(94,36,16);\n\t\n\tshapes = [];\n\tstaticShapes = [];\n\tlet alpha = 20;\n\t/*\n\tcolors = [color(247, 243, 242, alpha),\n\t\t\t\t\t\tcolor(0, 119, 225, alpha),\n\t\t\t\t\t\tcolor(245, 210, 22, alpha),\n\t\t\t\t\t\tcolor(252, 53, 3, alpha)];\n\t*/\n\tcolors = [color(7,21,32, alpha),\n\t\t\t\t\t\tcolor(229,232,189, alpha),\n\t\t\t\t\t\tcolor(176,126,55, alpha),\n\t\t\t\t\t\tcolor(233,187,42, alpha),\n\t\t\t\t\t\tcolor(236,220,63, alpha)];\n}\n\nfunction draw() {\n\tfor (let i = 0; i < n; i++) {\n\t\tlet shape = {\n\t\t\tx: randInt(margin, width - margin - minSize),\n\t\t\ty: randInt(margin, height - margin - minSize),\n\t\t\tw: minSize,\n\t\t\th: minSize,\n\t\t\tcol: colors[floor(random(colors.length))]\n\t\t};\n\t\tif (canPutShape(shape)) {\n\t\t\tshapes.push(shape);\n\t\t}\n\t}\n\t\n\tgrowAndDrawShapes();\n}\n\nfunction canPutShape(newShape) {\n\tfor (let s of shapes) {\n\t\tif (collude(s, newShape)) {\n\t\t\treturn false;\n\t\t}\n\t}\n\tfor (let s of staticShapes) {\n\t\tif (collude(s, newShape)) {\n\t\t\treturn false;\n\t\t}\n\t}\n\treturn true;\n}\n\nfunction growAndDrawShapes() {\n\tlet i = 0;\n\tlet _wG_1 = 0; while ((i < shapes.length) && ++_wG_1 < 20000) {\n\t\tlet s = shapes[i];\n\n\t\tlet wGrowth = randInt(1, 7);\n\t\tlet hGrowth = randInt(1, 10);\n\t\tif (canGrow(i, wGrowth, hGrowth)) {\n\t\t\ts.w += wGrowth;\n\t\t\ts.h += hGrowth;\n\t\t\tfill(s.col);\n\t\t\trect(s.x, s.y, s.w, s.h);\n\t\t\ti++\n\t\t} else {\n\t\t\tshapes.splice(i, 1);\n\t\t\tstaticShapes.push(s);\n\t\t}\n\t}\n}\n\nfunction canGrow(i, wGrowth, hGrowth) {\n\tlet si = {\n\t\tx: shapes[i].x,\n\t\ty: shapes[i].y,\n\t\tw: shapes[i].w + wGrowth,\n\t\th: shapes[i].h + hGrowth\n\t};\n\t\n\t// right margin\n\tif (si.x + si.w + margin > width) {\n\t\treturn false;\n\t}\n\t\n\t// bottom margin\n\tif (si.y + si.h + margin > height) {\n\t\treturn false;\n\t}\n\t\n\tfor (let j = 0; j < shapes.length; j++) {\n\t\tlet sj = shapes[j];\n\t\tif (i != j && collude(si, sj)) {\n\t\t\treturn false;\n\t\t}\n\t}\n\tfor (let j = 0; j < staticShapes.length; j++) {\n\t\tvar sj = staticShapes[j];\n\t\tif (collude(si, sj)) {\n\t\t\treturn false;\n\t\t}\n\t}\n\treturn true;\n}\n\nfunction collude(s1, s2) {\n\tif (s1.x === s2.x || s1.y === s2.y) {\n\t\treturn true;\n\t}\n\t\n\tlet xCollude1 = (s1.x < s2.x) && (s1.x + s1.w + margin > s2.x);\n\tlet xCollude2 = (s1.x > s2.x) && (s2.x + s2.w + margin > s1.x);\n\tlet xCollude = xCollude1 || xCollude2;\n\t\n\tlet yCollude1 = (s1.y < s2.y) && (s1.y + s1.h + margin > s2.y);\n\tlet yCollude2 = (s1.y > s2.y) && (s2.y + s2.h + margin > s1.y);\n\tlet yCollude = yCollude1 || yCollude2;\n\n\treturn xCollude && yCollude;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Dark Signal Frame.mp4"
+    ]
 }

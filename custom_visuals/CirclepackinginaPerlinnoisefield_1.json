@@ -1,22 +1,25 @@
 {
-  "name": "CirclepackinginaPerlinnoisefield_1",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 05:05:56",
-  "url": "https://openprocessing.org/@ntsutae/1800599",
-  "code": "// === Tab: mySketch ===\n// Inspired by Steve's Makerspace - Rectangle Packing in a Perlin Flow Field\n// https://www.youtube.com/watch?v=oKwi8h_yTsY&t=697s\n\nvar ball;\nvar history = [];\nvar isBackgroundBlack = true;\nvar hexCurve = false;\nvar minRadius = 3;\nvar maxRadius = 100;\n\nclass Ball {\n  constructor() {\n    this.x = random(width);\n    this.y = random(height);\n    this.radius = random(minRadius, maxRadius);\n    fill(random(256), random(256), random(256));\n  }\n  show(){\n    ellipse(this.x,this.y,this.radius*2);\n  }\n  update() {\n    const n = noise(this.x / width, this.y / height);\n    const angle = hexCurve ? (int(n * 10) * PI) / 3 : n * 10;\n    this.x += cos(angle) * this.radius * 2;\n    this.y += sin(angle) * this.radius * 2;\n  }\n  isFrameOut() {\n    if (\n      this.x < -this.radius ||\n      this.y < -this.radius ||\n      this.x > width + this.radius ||\n      this.y > height + this.radius\n    )\n      return true;\n    return false;\n  }\n  isOverlapped() {\n    return history.some((h) => {\n      const d = dist(this.x, this.y, h.x, h.y);\n      if (d + 1e-10 > h.radius + this.radius) return false;\n      if (d < h.radius - this.radius) return false;\n      return true;\n    });\n  }\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  background(isBackgroundBlack ? \"black\" : \"white\");\n  isBackgroundBlack = !isBackgroundBlack;\n  noStroke();\n  noiseSeed();\n  history.length = 0;\n}\n\nfunction draw() {\n  for (i = 100; i--; ) drawOneBall();\n}\n\nfunction drawOneBall() {\n  if (!ball) ball = new Ball();\n  ball.update();\n  if (ball.isFrameOut() || ball.isOverlapped()) {\n    ball = null;\n  } else {\n\t\tcopyOfThisBall = Object.assign({}, ball) \n    history.push(copyOfThisBall);\n    ball.show();\n  }\n}\n\nmousePressed = () => {\n  hexCurve = random(2) < 1 ? true : false;\n  setup();\n};",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CirclepackinginaPerlinnoisefield_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 05:05:56",
+    "url": "https://openprocessing.org/@ntsutae/1800599",
+    "code": "// === Tab: mySketch ===\n// Inspired by Steve's Makerspace - Rectangle Packing in a Perlin Flow Field\n// https://www.youtube.com/watch?v=oKwi8h_yTsY&t=697s\n\nvar ball;\nvar history = [];\nvar isBackgroundBlack = true;\nvar hexCurve = false;\nvar minRadius = 3;\nvar maxRadius = 100;\n\nclass Ball {\n  constructor() {\n    this.x = random(width);\n    this.y = random(height);\n    this.radius = random(minRadius, maxRadius);\n    fill(random(256), random(256), random(256));\n  }\n  show(){\n    ellipse(this.x,this.y,this.radius*2);\n  }\n  update() {\n    const n = noise(this.x / width, this.y / height);\n    const angle = hexCurve ? (int(n * 10) * PI) / 3 : n * 10;\n    this.x += cos(angle) * this.radius * 2;\n    this.y += sin(angle) * this.radius * 2;\n  }\n  isFrameOut() {\n    if (\n      this.x < -this.radius ||\n      this.y < -this.radius ||\n      this.x > width + this.radius ||\n      this.y > height + this.radius\n    )\n      return true;\n    return false;\n  }\n  isOverlapped() {\n    return history.some((h) => {\n      const d = dist(this.x, this.y, h.x, h.y);\n      if (d + 1e-10 > h.radius + this.radius) return false;\n      if (d < h.radius - this.radius) return false;\n      return true;\n    });\n  }\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  background(isBackgroundBlack ? \"black\" : \"white\");\n  isBackgroundBlack = !isBackgroundBlack;\n  noStroke();\n  noiseSeed();\n  history.length = 0;\n}\n\nfunction draw() {\n  for (i = 100; i--; ) drawOneBall();\n}\n\nfunction drawOneBall() {\n  if (!ball) ball = new Ball();\n  ball.update();\n  if (ball.isFrameOut() || ball.isOverlapped()) {\n    ball = null;\n  } else {\n\t\tcopyOfThisBall = Object.assign({}, ball) \n    history.push(copyOfThisBall);\n    ball.show();\n  }\n}\n\nmousePressed = () => {\n  hexCurve = random(2) < 1 ? true : false;\n  setup();\n};",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Muffled Kick Void.mp4"
+    ]
 }

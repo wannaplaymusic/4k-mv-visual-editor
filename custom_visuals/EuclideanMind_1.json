@@ -1,22 +1,25 @@
 {
-  "name": "EuclideanMind_1",
-  "author": "u451258",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:21:41",
-  "url": "https://openprocessing.org/@u451258/2313616",
-  "code": "// === Tab: mySketch ===\nlet vertices = [];\nlet lastUpdateTime = 0;\nlet x_c = 0;\nlet pintar = true;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  generateRandomShape(); // Generar la primera forma\n  //setInterval(generateRandomShape, 5000); // Generar una nueva forma cada 5 segundo;\n  //setInterval(removeBackground,5000);\n  background(0);\n}\nfunction removeBackground(){\n background(0);\n  }\n\nfunction draw() {\n\torbitControl();\n  //background(0);\n  let rotationSpeed = millis() / 1500; // Rotar basado en el tiempo transcurrido\n\n  push();\n  //lineas horizontales\n  stroke(\"rgb(94,93,93)\");\n  line(x_c - width / 2, 0 - height / 2, x_c - width / 2, height);\n  if (x_c < width / 4 || x_c >= (width * 3) / 4) {\n    x_c = x_c + 10;\n  } else {\n    x_c = (width * 3) / 4;\n  }\n  pop();\n\n  //rotateX(rotationSpeed);\n  rotateY(rotationSpeed);\n  //rotateZ(rotationSpeed);\n\n  drawShape();\n}\n\nfunction generateRandomShape() {\n  vertices = [];\n  let vertexCount = floor(random(100, 250)); // Número de vértices aleatorios\n  for (let i = 0; i < vertexCount; i++) {\n    let angle = random(TWO_PI);\n    let x = cos(angle) * random(0, 150);\n    let y = sin(angle) * random(0, 150);\n    let z = random(-100, 100);\n    vertices.push(createVector(x, y, z));\n  }\n}\n\nfunction drawShape() {\n  //background(0);\n  stroke(255, 50);\n  fill(30, 50);\n  //noFill();\n  beginShape();\n  for (let v of vertices) {\n    let form_a = random([\"0\",\"1\"]);\n    if (form_a == \"1\") {\n      vertex(v.x, v.y, v.z);\n    } else {\n      //curveVertex(v.x, v.y, v.z);\n    }\n  }\n  endShape(CLOSE);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "EuclideanMind_1",
+    "author": "u451258",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:21:41",
+    "url": "https://openprocessing.org/@u451258/2313616",
+    "code": "// === Tab: mySketch ===\nlet vertices = [];\nlet lastUpdateTime = 0;\nlet x_c = 0;\nlet pintar = true;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  generateRandomShape(); // Generar la primera forma\n  //setInterval(generateRandomShape, 5000); // Generar una nueva forma cada 5 segundo;\n  //setInterval(removeBackground,5000);\n  background(0);\n}\nfunction removeBackground(){\n background(0);\n  }\n\nfunction draw() {\n\torbitControl();\n  //background(0);\n  let rotationSpeed = millis() / 1500; // Rotar basado en el tiempo transcurrido\n\n  push();\n  //lineas horizontales\n  stroke(\"rgb(94,93,93)\");\n  line(x_c - width / 2, 0 - height / 2, x_c - width / 2, height);\n  if (x_c < width / 4 || x_c >= (width * 3) / 4) {\n    x_c = x_c + 10;\n  } else {\n    x_c = (width * 3) / 4;\n  }\n  pop();\n\n  //rotateX(rotationSpeed);\n  rotateY(rotationSpeed);\n  //rotateZ(rotationSpeed);\n\n  drawShape();\n}\n\nfunction generateRandomShape() {\n  vertices = [];\n  let vertexCount = floor(random(100, 250)); // Número de vértices aleatorios\n  for (let i = 0; i < vertexCount; i++) {\n    let angle = random(TWO_PI);\n    let x = cos(angle) * random(0, 150);\n    let y = sin(angle) * random(0, 150);\n    let z = random(-100, 100);\n    vertices.push(createVector(x, y, z));\n  }\n}\n\nfunction drawShape() {\n  //background(0);\n  stroke(255, 50);\n  fill(30, 50);\n  //noFill();\n  beginShape();\n  for (let v of vertices) {\n    let form_a = random([\"0\",\"1\"]);\n    if (form_a == \"1\") {\n      vertex(v.x, v.y, v.z);\n    } else {\n      //curveVertex(v.x, v.y, v.z);\n    }\n  }\n  endShape(CLOSE);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Temporal Mist.mp4"
+    ]
 }

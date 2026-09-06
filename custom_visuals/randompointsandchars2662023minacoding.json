@@ -1,22 +1,25 @@
 {
-  "name": "randompointsandchars2662023minacoding",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:19:24",
-  "url": "https://openprocessing.org/@epi/1962453",
-  "code": "// === Tab: mySketch ===\n/*\n\trandom: points and chars // 26.6.2023\n\t#minacoding #p5js #creativecoding #generativeart #dailycoding\n\thttps://www.twitch.tv/videos/1856238216\n */\n\nlet r, clrs, poss, strs;\n\nfunction setup() {\n\tconst minWH = max(windowWidth, windowHeight);\n\tcreateCanvas(minWH, minWH);\n\tpixelDensity(1);\n\tclrs = [color(192, 32, 160), color(32, 192, 160), color(192, 160, 32)];\n\tstrs = [\"!\\\"§$%&/()=?+*#,.-;:_\", \"0123456789\", \"abcdefghijklmnopqrstuvwxyz\"];\n\t\n\tr = max(width, height) * 0.25;\n\tconst n = 3;\n\tposs = [];\n\tfor (let i = 0, a = -HALF_PI; i < n; i++, a += TWO_PI / n) {\n\t\tconst x = cos(a) * r;\n\t\tconst y = sin(a) * r;\n\t\tposs.push({x, y, i});\n\t}\n\tnoStroke();\n\tbackground(0, 0, 8);\n}\n\nfunction mousePressed() {\n\tif (mouseButton == LEFT) setup();\n}\nfunction windowResized() {\n\tsetup();\n}\n\nfunction draw() {\n\tblendMode(BLEND)\n\t//background(0, 0, 8, 8);\n\tblendMode(ADD)\n\n\tdrawRandPoint();\n\ttranslate(width * 0.5, height * 0.5);\n\tfor (let p of poss) {\n\t\tpush();\n\t\ttranslate(p.x, p.y);\n\t\tlet clr = random(clrs);\n\t\tclr.setAlpha(random(32, 160));\n\t\tstroke(clr)\n\t\tfill(clr)\n\t\tdrawCirclePoint(p, r);\n\t\tpop();\n\t}\n}\n\nfunction drawCirclePoint(p, maxr) {\n\tpush();\n\tlet a = random(TWO_PI)\n\tlet l = random();\n\tl = (1 - pow(l, p.i + 1)) * maxr;\n\tlet vec = createVector(l, 0).setHeading(a);\n\t// line(0, 0, vec.x, vec.y);\n\tstrokeWeight(floor(random(1, 4)))\n\tnoStroke();\n\t// point(vec.x, vec.y);\n\ttextAlign(CENTER, CENTER);\n\tchr = strs[p.i][floor(random(strs[p.i].length))];\n\ttranslate(vec.x, vec.y);\n\trotate(random(TWO_PI))\n\ttext(chr, 0, 0);\n\tpop();\n}\n\nfunction drawRandPoint() {\n\tvar x = random(width)\n\tvar y = random(height)\n\tstroke(random(100, 255));\n\tstrokeWeight(floor(random(1, 4)))\n\tpoint(x, y);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "randompointsandchars2662023minacoding",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:19:24",
+    "url": "https://openprocessing.org/@epi/1962453",
+    "code": "// === Tab: mySketch ===\n/*\n\trandom: points and chars // 26.6.2023\n\t#minacoding #p5js #creativecoding #generativeart #dailycoding\n\thttps://www.twitch.tv/videos/1856238216\n */\n\nlet r, clrs, poss, strs;\n\nfunction setup() {\n\tconst minWH = max(windowWidth, windowHeight);\n\tcreateCanvas(minWH, minWH);\n\tpixelDensity(1);\n\tclrs = [color(192, 32, 160), color(32, 192, 160), color(192, 160, 32)];\n\tstrs = [\"!\\\"§$%&/()=?+*#,.-;:_\", \"0123456789\", \"abcdefghijklmnopqrstuvwxyz\"];\n\t\n\tr = max(width, height) * 0.25;\n\tconst n = 3;\n\tposs = [];\n\tfor (let i = 0, a = -HALF_PI; i < n; i++, a += TWO_PI / n) {\n\t\tconst x = cos(a) * r;\n\t\tconst y = sin(a) * r;\n\t\tposs.push({x, y, i});\n\t}\n\tnoStroke();\n\tbackground(0, 0, 8);\n}\n\nfunction mousePressed() {\n\tif (mouseButton == LEFT) setup();\n}\nfunction windowResized() {\n\tsetup();\n}\n\nfunction draw() {\n\tblendMode(BLEND)\n\t//background(0, 0, 8, 8);\n\tblendMode(ADD)\n\n\tdrawRandPoint();\n\ttranslate(width * 0.5, height * 0.5);\n\tfor (let p of poss) {\n\t\tpush();\n\t\ttranslate(p.x, p.y);\n\t\tlet clr = random(clrs);\n\t\tclr.setAlpha(random(32, 160));\n\t\tstroke(clr)\n\t\tfill(clr)\n\t\tdrawCirclePoint(p, r);\n\t\tpop();\n\t}\n}\n\nfunction drawCirclePoint(p, maxr) {\n\tpush();\n\tlet a = random(TWO_PI)\n\tlet l = random();\n\tl = (1 - pow(l, p.i + 1)) * maxr;\n\tlet vec = createVector(l, 0).setHeading(a);\n\t// line(0, 0, vec.x, vec.y);\n\tstrokeWeight(floor(random(1, 4)))\n\tnoStroke();\n\t// point(vec.x, vec.y);\n\ttextAlign(CENTER, CENTER);\n\tchr = strs[p.i][floor(random(strs[p.i].length))];\n\ttranslate(vec.x, vec.y);\n\trotate(random(TWO_PI))\n\ttext(chr, 0, 0);\n\tpop();\n}\n\nfunction drawRandPoint() {\n\tvar x = random(width)\n\tvar y = random(height)\n\tstroke(random(100, 255));\n\tstrokeWeight(floor(random(1, 4)))\n\tpoint(x, y);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tunnel Vision.mp4"
+    ]
 }

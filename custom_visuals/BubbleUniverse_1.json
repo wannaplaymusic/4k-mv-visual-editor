@@ -1,22 +1,25 @@
 {
-  "name": "BubbleUniverse_1",
-  "author": "scruss",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:22:41",
-  "url": "https://openprocessing.org/@scruss/1745928",
-  "code": "// === Tab: Bubble Universe ===\n/*\n Bubble Universe - Paul Dunn's SpecBAS demo\n  https://github.com/ZXDunny/SpecBAS-Demos/blob/master/Graphics/bubble_universe\n ported to Processing by Toby Nelson\n  https://stardot.org.uk/forums/viewtopic.php?p=376089#p376089\n ported to OpenProcessing / p5js - scruss, 2022-11\n */\n\n\nvar t = 0.0;\nvar dt;\nvar r;\nvar n = 255;\nvar s = 1;              // scale: changed later based on window size\nvar px_size = 1;        // pixel size: changed later based on window size\nvar dimen = 1;\t\t\t\t\t// canvas size: changed later based on window size\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tcolorMode(RGB, 255);\n\tdimen = max(windowWidth, windowHeight)\n  px_size = int(dimen / 512);\n  s = 2 * dimen / 9;\n\tdt = PI / 400;\t\t// p5js's PI constant isn't defined outside \n\tr = PI * 2 / 235;\n}\n\nfunction draw() {\n  background(0);\n  translate(windowWidth / 2, windowHeight / 2);\n  let x = 0;\n  let v = 0;\n  let u = 0;\n  for (let i = 0; i < n; i++) {\n    for (let j = 0; j < n; j++) {\n      u = sin(i + v) + sin(r * i + x);\n      v = cos(i + v) + cos(r * i + x);\n      x = u + t;\n      stroke(i, j, n - (i + j) / 2);\n      rect(s * u, s * v, px_size, px_size);\n    }\n  }\n  t = t + dt;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "BubbleUniverse_1",
+    "author": "scruss",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:22:41",
+    "url": "https://openprocessing.org/@scruss/1745928",
+    "code": "// === Tab: Bubble Universe ===\n/*\n Bubble Universe - Paul Dunn's SpecBAS demo\n  https://github.com/ZXDunny/SpecBAS-Demos/blob/master/Graphics/bubble_universe\n ported to Processing by Toby Nelson\n  https://stardot.org.uk/forums/viewtopic.php?p=376089#p376089\n ported to OpenProcessing / p5js - scruss, 2022-11\n */\n\n\nvar t = 0.0;\nvar dt;\nvar r;\nvar n = 255;\nvar s = 1;              // scale: changed later based on window size\nvar px_size = 1;        // pixel size: changed later based on window size\nvar dimen = 1;\t\t\t\t\t// canvas size: changed later based on window size\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tcolorMode(RGB, 255);\n\tdimen = max(windowWidth, windowHeight)\n  px_size = int(dimen / 512);\n  s = 2 * dimen / 9;\n\tdt = PI / 400;\t\t// p5js's PI constant isn't defined outside \n\tr = PI * 2 / 235;\n}\n\nfunction draw() {\n  background(0);\n  translate(windowWidth / 2, windowHeight / 2);\n  let x = 0;\n  let v = 0;\n  let u = 0;\n  for (let i = 0; i < n; i++) {\n    for (let j = 0; j < n; j++) {\n      u = sin(i + v) + sin(r * i + x);\n      v = cos(i + v) + cos(r * i + x);\n      x = u + t;\n      stroke(i, j, n - (i + j) / 2);\n      rect(s * u, s * v, px_size, px_size);\n    }\n  }\n  t = t + dt;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

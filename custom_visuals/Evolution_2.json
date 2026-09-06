@@ -1,22 +1,25 @@
 {
-  "name": "Evolution_2",
-  "author": "Asher_Salomon",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-24 19:30:28",
-  "url": "https://openprocessing.org/@Asher_Salomon/15839",
-  "code": "// === Tab: Evolution ===\n/* let Tweak of *@*http://www.openprocessing.org/sketch/15839*@* */\n/* !do not delete the line above, required for linking your tweak if you upload again */\nfunction setup(){\n  createCanvas(600, 400);\n  reset();\n}\nfunction draw(){\n  for(let m=0;m<100000;m++){\n    // create onehundredthousand random points\n    let a = floor(random(1,width));\n    let b = floor(random(1,height));\n    if(red(window.color(get(a,b)))!=0){// if pixel is black\n      let c = floor(random(0,4));// one of 4 directions\n      let d = 0;// an x offset for direction\n      let e = 0;// an y offset for direction\n      switch(c){// assign x and y offsets\n        case 0:\n        d=1;\n        e=0;\n        break;\n        case 1:\n        d=0;\n        e=1;\n        break;\n        case 2:\n        d=-1;\n        e=0;\n        break;\n        case 3:\n        d=0;\n        e=-1;\n        break;\n      }\n      if((a+d>0)&&(b+e>0)&&\n         (a+d<width-1)&&(b+e<height-1)&&\n         // i was worried about the domain of get() or set()\n         // it will not throw an \"index out of bounds\" anyway\n       red(window.color(get(a+d,b+e)))==0){// if the target is black\n        let ram = 10;// makes the let change\n        let clr = get(a,b);//\n        let re = int(constrain(red(window.color(clr))+random(-ram,ram),1,255));\n        let gr = int(constrain(green(window.color(clr))+random(-ram,ram),1,255));\n        let bu = int(constrain(blue(window.color(clr))+random(-ram,ram),1,255));\n        set(a+d,b+e,color(re,gr,bu));\n      }\n    }\n  }\n}\nfunction keyPressed(){\n  if(key==' '){\n    reset();\n//    save(\"evolution.bmp\");\n  }\n}\nfunction reset(){\n  background(0);\n  let edge = 1;// distance from inner to outer circle\n  let diam = width/2;\n  noFill();\n  ellipseMode(CENTER);\n  stroke(\"#8800FF\");// blue\n  ellipse(width/2,height/2,diam-edge,diam-edge);\n  stroke(\"#FF8800\");// orange\n  ellipse(width/2,height/2,diam+edge,diam+edge);\n//  set(width/2,height/2,color(255));\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Evolution_2",
+    "author": "Asher_Salomon",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-24 19:30:28",
+    "url": "https://openprocessing.org/@Asher_Salomon/15839",
+    "code": "// === Tab: Evolution ===\n/* let Tweak of *@*http://www.openprocessing.org/sketch/15839*@* */\n/* !do not delete the line above, required for linking your tweak if you upload again */\nfunction setup(){\n  createCanvas(600, 400);\n  reset();\n}\nfunction draw(){\n  for(let m=0;m<100000;m++){\n    // create onehundredthousand random points\n    let a = floor(random(1,width));\n    let b = floor(random(1,height));\n    if(red(window.color(get(a,b)))!=0){// if pixel is black\n      let c = floor(random(0,4));// one of 4 directions\n      let d = 0;// an x offset for direction\n      let e = 0;// an y offset for direction\n      switch(c){// assign x and y offsets\n        case 0:\n        d=1;\n        e=0;\n        break;\n        case 1:\n        d=0;\n        e=1;\n        break;\n        case 2:\n        d=-1;\n        e=0;\n        break;\n        case 3:\n        d=0;\n        e=-1;\n        break;\n      }\n      if((a+d>0)&&(b+e>0)&&\n         (a+d<width-1)&&(b+e<height-1)&&\n         // i was worried about the domain of get() or set()\n         // it will not throw an \"index out of bounds\" anyway\n       red(window.color(get(a+d,b+e)))==0){// if the target is black\n        let ram = 10;// makes the let change\n        let clr = get(a,b);//\n        let re = int(constrain(red(window.color(clr))+random(-ram,ram),1,255));\n        let gr = int(constrain(green(window.color(clr))+random(-ram,ram),1,255));\n        let bu = int(constrain(blue(window.color(clr))+random(-ram,ram),1,255));\n        set(a+d,b+e,color(re,gr,bu));\n      }\n    }\n  }\n}\nfunction keyPressed(){\n  if(key==' '){\n    reset();\n//    save(\"evolution.bmp\");\n  }\n}\nfunction reset(){\n  background(0);\n  let edge = 1;// distance from inner to outer circle\n  let diam = width/2;\n  noFill();\n  ellipseMode(CENTER);\n  stroke(\"#8800FF\");// blue\n  ellipse(width/2,height/2,diam-edge,diam-edge);\n  stroke(\"#FF8800\");// orange\n  ellipse(width/2,height/2,diam+edge,diam+edge);\n//  set(width/2,height/2,color(255));\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Hypnotic Core Drift.mp4"
+    ]
 }

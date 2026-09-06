@@ -1,22 +1,25 @@
 {
-  "name": "SquishyStack_1",
-  "author": "u110137",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 03:11:25",
-  "url": "https://openprocessing.org/@u110137/1841591",
-  "code": "// === Tab: Layers ===\nclass Layer {\n\tconstructor(verts, h) {\n\t\tthis.verts = verts;\n\t\tthis.h = h;\n\t}\n\tjiggle() {\n\t\trotate(lean);\n\t\ttranslate(0, stretch);\n\t\tbeginShape();\n\t\tfor (let v of this.verts) {\n\t\t\tv.r += v.rv;\n\t\t\tv.rv -= (v.r - r) / 10;\n\t\t\tif (movedX != 0 || movedY != 0) {\n\t\t\t\tlet d = dist(v.pos.x, v.pos.y, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - height / 2) / 2;\n\t\t\t\tv.rv -= (height / 566) * r / max((height / 50), d);\n\t\t\t}\n\t\t\tv.rv *= 0.9;\n\t\t\tv.pos.x = v.r * cos(v.a);\n\t\t\tv.pos.y = v.basey + (v.r / this.h) * sin(v.a);\n\t\t\tcurveVertex(v.pos.x, v.pos.y);\n\t\t}\n\t\tendShape(CLOSE);\n\t}\n}\n\nclass Vert {\n\tconstructor(a, r, pos, basey) {\n\t\tthis.a = a;\n\t\tthis.r = r;\n\t\tthis.rv = 0;\n\t\tthis.pos = pos;\n\t\tthis.basey = basey;\n\t}\n}\n\n// === Tab: mySketch ===\n//For the #WCCChallenge, theme: \"squishy\"\nlet r;\nlet layers = [];\nlet bg = 255;\nlet tbg = 0;\nlet fcol;\nlet lean = 0;\nlet lvel = 0;\nlet stretch = 0;\nlet svel = -5;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tr = height / 3;\n\tfor (let y = height / 3; y > -height / 3; y -= height / 36) {\n\t\tlet h = map(y, height / 3, -height / 3, 3, 4);\n\t\tlet verts = [];\n\t\tfor (let a = 0; a <= TAU; a += TAU / 30) {\n\t\t\tverts.push(new Vert(a, r, createVector(0, 0), y));\n\t\t}\n\t\tlayers.push(new Layer(verts, h));\n\t}\n\tfcol = color(random(255), random(255), random(255), 100);\n}\n\nfunction draw() {\n\tlean += lvel;\n\tlvel += ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))) / (100 * height);\n\tlvel -= lean / 20;\n\tlvel *= 0.85;\n\tstretch += svel;\n\tsvel += ((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))) / height;\n\tsvel -= stretch / 20;\n\tsvel *= 0.9;\n\tbg = lerp(bg, tbg, 0.1);\n\tbackground(bg);\n\tfill(fcol);\n\tstroke(255, 100);\n\tstrokeWeight(height / 220);\n\ttranslate(width / 2, height / 2);\n\tfor (let l of layers) {\n\t\tl.jiggle();\n\t}\n}\n\nfunction mousePressed() {\n\ttbg = 255 - tbg;\n\tif (tbg == 0) fcol = color(random(255), random(255), random(255), 100);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SquishyStack_1",
+    "author": "u110137",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 03:11:25",
+    "url": "https://openprocessing.org/@u110137/1841591",
+    "code": "// === Tab: Layers ===\nclass Layer {\n\tconstructor(verts, h) {\n\t\tthis.verts = verts;\n\t\tthis.h = h;\n\t}\n\tjiggle() {\n\t\trotate(lean);\n\t\ttranslate(0, stretch);\n\t\tbeginShape();\n\t\tfor (let v of this.verts) {\n\t\t\tv.r += v.rv;\n\t\t\tv.rv -= (v.r - r) / 10;\n\t\t\tif (movedX != 0 || movedY != 0) {\n\t\t\t\tlet d = dist(v.pos.x, v.pos.y, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - height / 2) / 2;\n\t\t\t\tv.rv -= (height / 566) * r / max((height / 50), d);\n\t\t\t}\n\t\t\tv.rv *= 0.9;\n\t\t\tv.pos.x = v.r * cos(v.a);\n\t\t\tv.pos.y = v.basey + (v.r / this.h) * sin(v.a);\n\t\t\tcurveVertex(v.pos.x, v.pos.y);\n\t\t}\n\t\tendShape(CLOSE);\n\t}\n}\n\nclass Vert {\n\tconstructor(a, r, pos, basey) {\n\t\tthis.a = a;\n\t\tthis.r = r;\n\t\tthis.rv = 0;\n\t\tthis.pos = pos;\n\t\tthis.basey = basey;\n\t}\n}\n\n// === Tab: mySketch ===\n//For the #WCCChallenge, theme: \"squishy\"\nlet r;\nlet layers = [];\nlet bg = 255;\nlet tbg = 0;\nlet fcol;\nlet lean = 0;\nlet lvel = 0;\nlet stretch = 0;\nlet svel = -5;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tr = height / 3;\n\tfor (let y = height / 3; y > -height / 3; y -= height / 36) {\n\t\tlet h = map(y, height / 3, -height / 3, 3, 4);\n\t\tlet verts = [];\n\t\tfor (let a = 0; a <= TAU; a += TAU / 30) {\n\t\t\tverts.push(new Vert(a, r, createVector(0, 0), y));\n\t\t}\n\t\tlayers.push(new Layer(verts, h));\n\t}\n\tfcol = color(random(255), random(255), random(255), 100);\n}\n\nfunction draw() {\n\tlean += lvel;\n\tlvel += ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))) / (100 * height);\n\tlvel -= lean / 20;\n\tlvel *= 0.85;\n\tstretch += svel;\n\tsvel += ((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))) / height;\n\tsvel -= stretch / 20;\n\tsvel *= 0.9;\n\tbg = lerp(bg, tbg, 0.1);\n\tbackground(bg);\n\tfill(fcol);\n\tstroke(255, 100);\n\tstrokeWeight(height / 220);\n\ttranslate(width / 2, height / 2);\n\tfor (let l of layers) {\n\t\tl.jiggle();\n\t}\n}\n\nfunction mousePressed() {\n\ttbg = 255 - tbg;\n\tif (tbg == 0) fcol = color(random(255), random(255), random(255), 100);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tunnel Vision.mp4"
+    ]
 }

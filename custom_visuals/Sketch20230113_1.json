@@ -1,22 +1,25 @@
 {
-  "name": "Sketch20230113_1",
-  "author": "u94115",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:17:55",
-  "url": "https://openprocessing.org/@u94115/682481",
-  "code": "// === Tab: mySketch ===\nvar back_img;\nvar images01 = [];\nvar images02 = [];\nvar images03 = [];\nvar images04 = [];\nvar brands01 = [];\nvar brands02 = [];\nvar brands03 = [];\nvar brands04 = [];\nvar bubbles = [];\nvar targetx;\nvar targety;\nvar rotx = 0.0;\nvar roty = 0.0;\nfunction setup () {\n\tpixelDensity (displayDensity ());\n\tcreateCanvas (windowWidth, windowHeight, WEBGL);\n\tcolorMode (RGB, 256);\n\tbackground (0);\n}\nfunction draw () {\n\tbackground (0);\n\tambientLight (255, 255, 255);\n  pointLight (255, 0, 0, 400.0, 0.0, 400.0);\n  pointLight (255, 0, 0, -400.0, 0.0, -400.0);\n  pointLight (0, 255, 0, 0.0, 400.0, 400.0);\n  pointLight (0, 255, 0, 0.0, -400.0, -400.0);\n  pointLight (100, 0, 0, 400.0, 0.0, 400.0);\n  pointLight (100, 0, 0, -400.0, 0.0, -400.0);\n  pointLight (0, 100, 0, 0.0, 400.0, 400.0);\n  pointLight (0, 100, 0, 0.0, -400.0, -400.0);\n\tcamera (0.0, 0.0, -1200.0,\n\t\t\t\t\t0.0, 0.0, 0.0,\n\t\t\t\t\t0.0, 1.0, 0.0);\n\ttargetx = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n  targety = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n  rotx += (targetx - rotx) * 0.04;\n  roty += (targety - roty) * 0.04;\n  rotateX (rotx * 0.01);\n  rotateY (roty * 0.01);\n\tbubbles.push (new BubblesBase (random (width), 1000, random (-1000.0, 1000.0), random (20,0), random (0.1, 20.0)));\n\tfor (var i = 0; i < bubbles.length; i++) {\n\t\tbubbles[i].update ();\n\t\tbubbles[i].render ();\n\t\tif (bubbles[i].by < -1000) {\n\t\t\tbubbles.splice (i, 1);\n\t\t}\n\t}\n}\nfunction BubblesBase (x, y, z, r, up) {\n\tthis.bx = x;\n\tthis.by = y;\n\tthis.bz = z;\n\tthis.br = r;\n\tthis.update = function () {\n\t\tthis.by -= up;\n\t}\n\tthis.render = function () {\n\t\tnoStroke ();\n\t\tpush ();\n\t\ttranslate (this.bx - width / 2.0, this.by - height / 2.0, this.bz);\n\t\tsphere (this.br * 6.0);\n\t\tpop ();\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Sketch20230113_1",
+    "author": "u94115",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:17:55",
+    "url": "https://openprocessing.org/@u94115/682481",
+    "code": "// === Tab: mySketch ===\nvar back_img;\nvar images01 = [];\nvar images02 = [];\nvar images03 = [];\nvar images04 = [];\nvar brands01 = [];\nvar brands02 = [];\nvar brands03 = [];\nvar brands04 = [];\nvar bubbles = [];\nvar targetx;\nvar targety;\nvar rotx = 0.0;\nvar roty = 0.0;\nfunction setup () {\n\tpixelDensity (displayDensity ());\n\tcreateCanvas (windowWidth, windowHeight, WEBGL);\n\tcolorMode (RGB, 256);\n\tbackground (0);\n}\nfunction draw () {\n\tbackground (0);\n\tambientLight (255, 255, 255);\n  pointLight (255, 0, 0, 400.0, 0.0, 400.0);\n  pointLight (255, 0, 0, -400.0, 0.0, -400.0);\n  pointLight (0, 255, 0, 0.0, 400.0, 400.0);\n  pointLight (0, 255, 0, 0.0, -400.0, -400.0);\n  pointLight (100, 0, 0, 400.0, 0.0, 400.0);\n  pointLight (100, 0, 0, -400.0, 0.0, -400.0);\n  pointLight (0, 100, 0, 0.0, 400.0, 400.0);\n  pointLight (0, 100, 0, 0.0, -400.0, -400.0);\n\tcamera (0.0, 0.0, -1200.0,\n\t\t\t\t\t0.0, 0.0, 0.0,\n\t\t\t\t\t0.0, 1.0, 0.0);\n\ttargetx = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n  targety = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n  rotx += (targetx - rotx) * 0.04;\n  roty += (targety - roty) * 0.04;\n  rotateX (rotx * 0.01);\n  rotateY (roty * 0.01);\n\tbubbles.push (new BubblesBase (random (width), 1000, random (-1000.0, 1000.0), random (20,0), random (0.1, 20.0)));\n\tfor (var i = 0; i < bubbles.length; i++) {\n\t\tbubbles[i].update ();\n\t\tbubbles[i].render ();\n\t\tif (bubbles[i].by < -1000) {\n\t\t\tbubbles.splice (i, 1);\n\t\t}\n\t}\n}\nfunction BubblesBase (x, y, z, r, up) {\n\tthis.bx = x;\n\tthis.by = y;\n\tthis.bz = z;\n\tthis.br = r;\n\tthis.update = function () {\n\t\tthis.by -= up;\n\t}\n\tthis.render = function () {\n\t\tnoStroke ();\n\t\tpush ();\n\t\ttranslate (this.bx - width / 2.0, this.by - height / 2.0, this.bz);\n\t\tsphere (this.br * 6.0);\n\t\tpop ();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Rain Over Resonance.mp4"
+    ]
 }

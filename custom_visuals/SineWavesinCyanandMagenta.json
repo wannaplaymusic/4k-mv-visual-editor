@@ -1,22 +1,25 @@
 {
-  "name": "SineWavesinCyanandMagenta",
-  "author": "jacobjoaquin",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:32:18",
-  "url": "https://openprocessing.org/@jacobjoaquin/617085",
-  "code": "// === Tab: mySketch ===\nvar nTiles = 10;\nvar nFrames = 128;\nvar phase = 0.0;\nvar phaseInc = 1.0 / nFrames;\n\n// Draw sine wave\nfunction drawWave(w, freq, amp, phase) {\n\tpush();\n\tbeginShape();\n\tfor (var x = -w / 2.0; x < w / 2.0 + 1; x++) {\n\t\tvertex(x, sin(x / w * TAU * freq + phase) * amp);\n\t}\n\tendShape();\n\tpop();\n}\n\nfunction setup() {\n\tcreateCanvas(500, 500);\n\tnoFill();\n\tseed = random(10000);\n}\n\nfunction draw() {\n\tbackground(16);\n\tresetMatrix();\n\trandomSeed(seed);\n\tnoiseSeed(seed);\n\n\tvar w = width / nTiles;\n\tvar amp = w;\n\tvar nInc = 0.25;\n\t\n\t// Create border\n\tvar thisWidth = 400;\n\tvar thisHeight = 400;\n\tvar thisScale = thisWidth / width;\n\tvar t = (width - thisWidth) / 2.0;\n\tvar sw = w / 2.0 * thisScale;\n\ttranslate(t + sw, t + sw);\n\n\tfor (var y = 0; y < nTiles; y++) {\n\t\tvar yPos = y / nTiles * thisHeight;\n\t\tfor (var x = 0; x < nTiles; x++) {\n\t\t\tpush();\n\t\t\tvar n = noise(x * nInc, (y + 1000) * nInc);  // Add noise to phase offset\n\t\t\tvar xPos = x / nTiles * thisWidth;\n\t\t\t\n\t\t\t// Move to where sine will be drawn on screen\n\t\t\ttranslate(xPos, yPos);\n\n\t\t\t// Rotate approximately half of the sines\n\t\t\tif (random() < 0.5) {\n\t\t\t\trotate(HALF_PI);\n\t\t\t}\n\n\t\t\t// Reverse direction for approximately half of the sines\n\t\t\tvar thisPhase = phase;\n\t\t\tif (random() < 0.5) {\n\t\t\t\tthisPhase = 1.0 - thisPhase;\n\t\t\t}\n\n\t\t\t// Select between cyan and magents\n\t\t\tif (random() < 0.5) {\n\t\t\t\tstroke(64, 255, 255);\n\t\t\t} else {\n\t\t\t\tstroke(248, 64, 248);\n\t\t\t}\n\t\t\t\n\t\t\t// Select frequency / period of sine\n\t\t\tvar freq = pow(2, random(5));\n\t\t\t\n\t\t\t// Draw the wave\n\t\t\tdrawWave(w * 0.5, freq, amp * n * thisScale * 0.5, n * TAU + thisPhase * TAU);\n\n\t\t\tpop();\n\t\t}\n\t}\n\n\t// Update phasor\n\tphase += phaseInc;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SineWavesinCyanandMagenta",
+    "author": "jacobjoaquin",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:32:18",
+    "url": "https://openprocessing.org/@jacobjoaquin/617085",
+    "code": "// === Tab: mySketch ===\nvar nTiles = 10;\nvar nFrames = 128;\nvar phase = 0.0;\nvar phaseInc = 1.0 / nFrames;\n\n// Draw sine wave\nfunction drawWave(w, freq, amp, phase) {\n\tpush();\n\tbeginShape();\n\tfor (var x = -w / 2.0; x < w / 2.0 + 1; x++) {\n\t\tvertex(x, sin(x / w * TAU * freq + phase) * amp);\n\t}\n\tendShape();\n\tpop();\n}\n\nfunction setup() {\n\tcreateCanvas(500, 500);\n\tnoFill();\n\tseed = random(10000);\n}\n\nfunction draw() {\n\tbackground(16);\n\tresetMatrix();\n\trandomSeed(seed);\n\tnoiseSeed(seed);\n\n\tvar w = width / nTiles;\n\tvar amp = w;\n\tvar nInc = 0.25;\n\t\n\t// Create border\n\tvar thisWidth = 400;\n\tvar thisHeight = 400;\n\tvar thisScale = thisWidth / width;\n\tvar t = (width - thisWidth) / 2.0;\n\tvar sw = w / 2.0 * thisScale;\n\ttranslate(t + sw, t + sw);\n\n\tfor (var y = 0; y < nTiles; y++) {\n\t\tvar yPos = y / nTiles * thisHeight;\n\t\tfor (var x = 0; x < nTiles; x++) {\n\t\t\tpush();\n\t\t\tvar n = noise(x * nInc, (y + 1000) * nInc);  // Add noise to phase offset\n\t\t\tvar xPos = x / nTiles * thisWidth;\n\t\t\t\n\t\t\t// Move to where sine will be drawn on screen\n\t\t\ttranslate(xPos, yPos);\n\n\t\t\t// Rotate approximately half of the sines\n\t\t\tif (random() < 0.5) {\n\t\t\t\trotate(HALF_PI);\n\t\t\t}\n\n\t\t\t// Reverse direction for approximately half of the sines\n\t\t\tvar thisPhase = phase;\n\t\t\tif (random() < 0.5) {\n\t\t\t\tthisPhase = 1.0 - thisPhase;\n\t\t\t}\n\n\t\t\t// Select between cyan and magents\n\t\t\tif (random() < 0.5) {\n\t\t\t\tstroke(64, 255, 255);\n\t\t\t} else {\n\t\t\t\tstroke(248, 64, 248);\n\t\t\t}\n\t\t\t\n\t\t\t// Select frequency / period of sine\n\t\t\tvar freq = pow(2, random(5));\n\t\t\t\n\t\t\t// Draw the wave\n\t\t\tdrawWave(w * 0.5, freq, amp * n * thisScale * 0.5, n * TAU + thisPhase * TAU);\n\n\t\t\tpop();\n\t\t}\n\t}\n\n\t// Update phasor\n\tphase += phaseInc;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Weightless Transit.mp4"
+    ]
 }

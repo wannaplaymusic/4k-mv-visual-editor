@@ -1,16 +1,19 @@
 {
-  "name": "Residual",
-  "display_name": "Residual",
-  "author": "未知",
-  "license_mode": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:12:26",
-  "url": "https://www.xiaohongshu.com/user/profile/5baac60d69816700016342e5",
-  "code": "// === Tab: Residual ===\n// 版權與致謝宣告 (Copyright & Attribution)\n// ----------------------------------------------------\n// 程式開發與變種創作: Uncler M\n// 創意靈感來源: 小紅書創作者 @M-Codo Design (Residual)\n// 授權條款: Creative Commons BY-NC-SA 4.0 (姓名標示-非商業性-相同方式分享)\n// ----------------------------------------------------\n\nlet numCurves = 6;\nlet baseHue = 180;\n\nfunction setup() {\n  createCanvas(1280, 720);\n  colorMode(HSB, 360, 100, 100, 1.0);\n  background(0);\n}\n\nfunction draw() {\n  // 建立極低透明度背景以實現長尾餘暉 (Residual Effect)\n  background(0, 0, 0, 0.06);\n  \n  let beatVal = window.beatEnergy || 0.0;\n  let lowVal = window.audioLow || 0.0;\n  let midVal = window.audioMid || 0.0;\n  let highVal = window.audioHigh || 0.0;\n  \n  if (window.currentChordColor) {\n    let chordC = color(window.currentChordColor);\n    baseHue = hue(chordC);\n  }\n  \n  // 變種特有：高頻電流噪波因子\n  let glitchActive = (highVal > 0.65 && random(1.0) > 0.45);\n  \n  noFill();\n  \n  for (let k = 0; k < numCurves; k++) {\n    push();\n    let curveHue = (baseHue + k * 20 + sin(frameCount * 0.01) * 30) % 360;\n    \n    // 霓虹發光感疊加繪製 (多重線條繪製，模擬 glow)\n    let strokeW = 1.0 + midVal * 3.5;\n    \n    // 1. 繪製外發光\n    stroke(curveHue, 95, 100, 0.06 + beatVal * 0.08);\n    strokeWeight(strokeW * 4.5);\n    drawSingleBezierCurve(k, lowVal, midVal, glitchActive);\n    \n    // 2. 繪製核心亮線\n    stroke(curveHue, 80, 100, 0.45 + beatVal * 0.35);\n    strokeWeight(strokeW * 1.2);\n    drawSingleBezierCurve(k, lowVal, midVal, glitchActive);\n    \n    pop();\n  }\n}\n\nfunction drawSingleBezierCurve(index, lowVal, midVal, glitchActive) {\n  var beatVal = window.beatEnergy || 0.0;\n  let hOffset = height / (numCurves + 1) * (index + 1);\n  \n  // 4個控制點的動態偏移\n  let x1 = 80;\n  let y1 = hOffset + sin(frameCount * 0.015 + index) * 45;\n  \n  // 控制點 1 (受低音頻率擾動)\n  let cx1 = width * 0.33;\n  let cy1 = hOffset - 180 * lowVal - cos(frameCount * 0.02 + index * 0.5) * 80;\n  \n  // 控制點 2 (受中音頻率擾動)\n  let cx2 = width * 0.66;\n  let cy2 = hOffset + 180 * midVal + sin(frameCount * 0.02 + index * 0.7) * 80;\n  \n  let x2 = width - 80;\n  let y2 = hOffset + cos(frameCount * 0.015 + index) * 45;\n  \n  // 變種特有：鼓點瞬時收縮\n  if (beatVal > 0.5) {\n    let retract = map(beatVal, 0.5, 1.0, 0.0, 120);\n    x1 += retract;\n    x2 -= retract;\n  }\n  \n  // 變種特有：高頻電流 Glitch 斷裂噪波\n  if (glitchActive && random(1.0) > 0.5) {\n    cy1 += random(-150, 150);\n    cy2 += random(-150, 150);\n  }\n  \n  // 繪製貝氏曲線\n  bezier(x1, y1, cx1, cy1, cx2, cy2, x2, y2);\n}",
-  "custom_html": "",
-  "tags": [],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Residual",
+    "display_name": "Residual",
+    "author": "未知",
+    "license_mode": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:12:26",
+    "url": "https://www.xiaohongshu.com/user/profile/5baac60d69816700016342e5",
+    "code": "// === Tab: Residual ===\n// 版權與致謝宣告 (Copyright & Attribution)\n// ----------------------------------------------------\n// 程式開發與變種創作: Uncler M\n// 創意靈感來源: 小紅書創作者 @M-Codo Design (Residual)\n// 授權條款: Creative Commons BY-NC-SA 4.0 (姓名標示-非商業性-相同方式分享)\n// ----------------------------------------------------\n\nlet numCurves = 6;\nlet baseHue = 180;\n\nfunction setup() {\n  createCanvas(1280, 720);\n  colorMode(HSB, 360, 100, 100, 1.0);\n  background(0);\n}\n\nfunction draw() {\n  // 建立極低透明度背景以實現長尾餘暉 (Residual Effect)\n  background(0, 0, 0, 0.06);\n  \n  let beatVal = window.beatEnergy || 0.0;\n  let lowVal = window.audioLow || 0.0;\n  let midVal = window.audioMid || 0.0;\n  let highVal = window.audioHigh || 0.0;\n  \n  if (window.currentChordColor) {\n    let chordC = color(window.currentChordColor);\n    baseHue = hue(chordC);\n  }\n  \n  // 變種特有：高頻電流噪波因子\n  let glitchActive = (highVal > 0.65 && random(1.0) > 0.45);\n  \n  noFill();\n  \n  for (let k = 0; k < numCurves; k++) {\n    push();\n    let curveHue = (baseHue + k * 20 + sin(frameCount * 0.01) * 30) % 360;\n    \n    // 霓虹發光感疊加繪製 (多重線條繪製，模擬 glow)\n    let strokeW = 1.0 + midVal * 3.5;\n    \n    // 1. 繪製外發光\n    stroke(curveHue, 95, 100, 0.06 + beatVal * 0.08);\n    strokeWeight(strokeW * 4.5);\n    drawSingleBezierCurve(k, lowVal, midVal, glitchActive);\n    \n    // 2. 繪製核心亮線\n    stroke(curveHue, 80, 100, 0.45 + beatVal * 0.35);\n    strokeWeight(strokeW * 1.2);\n    drawSingleBezierCurve(k, lowVal, midVal, glitchActive);\n    \n    pop();\n  }\n}\n\nfunction drawSingleBezierCurve(index, lowVal, midVal, glitchActive) {\n  var beatVal = window.beatEnergy || 0.0;\n  let hOffset = height / (numCurves + 1) * (index + 1);\n  \n  // 4個控制點的動態偏移\n  let x1 = 80;\n  let y1 = hOffset + sin(frameCount * 0.015 + index) * 45;\n  \n  // 控制點 1 (受低音頻率擾動)\n  let cx1 = width * 0.33;\n  let cy1 = hOffset - 180 * lowVal - cos(frameCount * 0.02 + index * 0.5) * 80;\n  \n  // 控制點 2 (受中音頻率擾動)\n  let cx2 = width * 0.66;\n  let cy2 = hOffset + 180 * midVal + sin(frameCount * 0.02 + index * 0.7) * 80;\n  \n  let x2 = width - 80;\n  let y2 = hOffset + cos(frameCount * 0.015 + index) * 45;\n  \n  // 變種特有：鼓點瞬時收縮\n  if (beatVal > 0.5) {\n    let retract = map(beatVal, 0.5, 1.0, 0.0, 120);\n    x1 += retract;\n    x2 -= retract;\n  }\n  \n  // 變種特有：高頻電流 Glitch 斷裂噪波\n  if (glitchActive && random(1.0) > 0.5) {\n    cy1 += random(-150, 150);\n    cy2 += random(-150, 150);\n  }\n  \n  // 繪製貝氏曲線\n  bezier(x1, y1, cx1, cy1, cx2, cy2, x2, y2);\n}",
+    "custom_html": "",
+    "tags": [],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Terminal Echo.mp4"
+    ]
 }

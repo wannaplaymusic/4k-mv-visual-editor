@@ -1,22 +1,25 @@
 {
-  "name": "Perspectivewall_1",
-  "author": "u139968",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:05:09",
-  "url": "https://openprocessing.org/@u139968/1454857",
-  "code": "// === Tab: mySketch ===\nlet mS, x;\nlet incY, incX, altY;\nlet div;\n\nlet cor0, cor1, cor2, cor3, cor4, cor5;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\n  mS = height / 2;\n  x = 0;\n  altY = 160;\n  largX = 20;\n  incY = 10;\n  div = 6;\n\n  background(250);\n  // //chao\n  //fill(0);\n  //rect(0, mS, width, mS);\n\n  cor0 = color(\"#FC4233\"); // vermelho\n  cor1 = color(\"#FCDE00\"); // amarelo\n  cor2 = color(\"#388BDC\"); // azul\n  cor3 = color(\"#67B14F\"); // verde\n  cor4 = color(\"#FF491B\"); // laranja\n  cor5 = color(\"#5C59B0\"); // roxo\n}\n\nfunction draw() {\n  if (frameCount % 19 == 0) {\n    //paredes\n    translate(x, 0);\n    noStroke();\n\n    if (frameCount % div == 0) {\n      fill(cor0); //vermelho\n    }\n    if (frameCount % div == 1) {\n      fill(cor1); //amarelo\n    }\n    if (frameCount % div == 2) {\n      fill(cor2); //azul\n    }\n    if (frameCount % div == 3) {\n      fill(cor3); //verde\n    }\n    if (frameCount % div == 4) {\n      fill(cor4); //laranja\n    }\n    if (frameCount % div == 5) {\n      fill(cor5); //roxo\n    }\n    quad(\n      0,\n      mS - altY,\n      largX,\n      mS - altY - incY,\n      largX,\n      mS + altY + incY,\n      0,\n      mS + altY\n    );\n\n    x += largX - 1;\n    altY = altY + incY;\n    let r = random(1);\n    if (r > 0.2) {\n      largX = random(20, 200);\n    } else {\n      largX = random(2, 20);\n    }\n    incY = random(-50, 50);\n\n    if (x >= width + 200) {\n      x = 0;\n      altY = 160;\n      background(250);\n    }\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Perspectivewall_1",
+    "author": "u139968",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:05:09",
+    "url": "https://openprocessing.org/@u139968/1454857",
+    "code": "// === Tab: mySketch ===\nlet mS, x;\nlet incY, incX, altY;\nlet div;\n\nlet cor0, cor1, cor2, cor3, cor4, cor5;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\n  mS = height / 2;\n  x = 0;\n  altY = 160;\n  largX = 20;\n  incY = 10;\n  div = 6;\n\n  background(250);\n  // //chao\n  //fill(0);\n  //rect(0, mS, width, mS);\n\n  cor0 = color(\"#FC4233\"); // vermelho\n  cor1 = color(\"#FCDE00\"); // amarelo\n  cor2 = color(\"#388BDC\"); // azul\n  cor3 = color(\"#67B14F\"); // verde\n  cor4 = color(\"#FF491B\"); // laranja\n  cor5 = color(\"#5C59B0\"); // roxo\n}\n\nfunction draw() {\n  if (frameCount % 19 == 0) {\n    //paredes\n    translate(x, 0);\n    noStroke();\n\n    if (frameCount % div == 0) {\n      fill(cor0); //vermelho\n    }\n    if (frameCount % div == 1) {\n      fill(cor1); //amarelo\n    }\n    if (frameCount % div == 2) {\n      fill(cor2); //azul\n    }\n    if (frameCount % div == 3) {\n      fill(cor3); //verde\n    }\n    if (frameCount % div == 4) {\n      fill(cor4); //laranja\n    }\n    if (frameCount % div == 5) {\n      fill(cor5); //roxo\n    }\n    quad(\n      0,\n      mS - altY,\n      largX,\n      mS - altY - incY,\n      largX,\n      mS + altY + incY,\n      0,\n      mS + altY\n    );\n\n    x += largX - 1;\n    altY = altY + incY;\n    let r = random(1);\n    if (r > 0.2) {\n      largX = random(20, 200);\n    } else {\n      largX = random(2, 20);\n    }\n    incY = random(-50, 50);\n\n    if (x >= width + 200) {\n      x = 0;\n      altY = 160;\n      background(250);\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Frozen Time.mp4"
+    ]
 }

@@ -4,7 +4,7 @@
     "license": "CC BY-SA 3.0",
     "date_added": "2026-08-22 22:58:55",
     "url": "https://openprocessing.org/@epi/2159370",
-    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(600, 600);\n\tbackground(\"beige\")\n\trectModenoStroke()\n}\n\nfunction draw() {\n\ttranslate(width/2, height/2)\n\tconst num = 2;\n\tconst S = width/(num*2+1);\n\tfor (let y = -num; y <= num; y++) {\t\t\n\t\tfor (let x = -num; x <= num; x++) {\n\t\t\tfill(random([\"orange\", \"grey\", \"darkred\", \"black\"]))\n\t\t\t// fill(32)\n\t\t\tconst tpe = ~~random(3)\n\t\t\tif (tpe === 0) circle(x*S, y*S, S)\n\t\t\tif (tpe === 1) rect(x*S, y*S, S)\n\t\t\t// if (t === 2) triangle(x*S, y*S, S)\n\t\t\t// console.log(tpe)\n\t\t}\n\t}\n\t// noLoop() removed for animation\n}",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(600, 600);\n\tbackground(\"beige\")\n\trectMode(CENTER); noStroke()\n}\n\nfunction draw() {\n\ttranslate(width/2, height/2)\n\tconst num = 2;\n\tconst S = width/(num*2+1);\n\tfor (let y = -num; y <= num; y++) {\t\t\n\t\tfor (let x = -num; x <= num; x++) {\n\t\t\tfill(random([\"orange\", \"grey\", \"darkred\", \"black\"]))\n\t\t\t// fill(32)\n\t\t\tconst tpe = ~~random(3)\n\t\t\tif (tpe === 0) circle(x*S, y*S, S)\n\t\t\tif (tpe === 1) rect(x*S, y*S, S)\n\t\t\t// if (t === 2) triangle(x*S, y*S, S)\n\t\t\t// console.log(tpe)\n\t\t}\n\t}\n\t// noLoop() removed for animation\n}",
     "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
     "custom_css": "",
     "inline_assets": {},
@@ -17,6 +17,9 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 0,
-    "is_starred": false
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Dark Signal Frame.mp4"
+    ]
 }

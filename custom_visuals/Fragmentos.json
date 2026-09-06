@@ -1,22 +1,25 @@
 {
-  "name": "Fragmentos",
-  "author": "u65884",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:28:49",
-  "url": "https://openprocessing.org/@u65884/1179483",
-  "code": "// === Tab: Fragment ===\nclass Fragment\n{\n\tconstructor(x, y, width, height) {\n\t\tthis.originX = x;\n\t\tthis.originY = y;\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.w = width;\n\t\tthis.h = height;\n  }\n\n  setImage(img){\n    this.img = img.get(this.x, this.y, this.w, this.h);\n  }\n  \n  update(){\n\t\tvar diffX = width/2 - this.originX;\n\t\tvar diffY = height/2 - this.originY;\n\t\tvar angle = atan2(diffY, diffX);\n\t\tvar time = millis()/3000;\n\t\tthis.x = this.originX + cos(time + angle) * 50;\n\t\tthis.y = this.originY + sin(time + angle) * 50;\n  }\n  \n  draw(){\n    image(this.img, this.x, this.y);\n  }\n}\n\n// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://openprocessing.org/sketch/1179483\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nlet fragmentSize = 50;\nlet img, total, grid, perLine, fragments;\n\nfunction preload() {\n\timg = loadImage(\"file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/profile.jpg\");\n}\n\nfunction setup() {\n  createCanvas(img.width, img.height);\n  noStroke();\n  \n  start();\n}\n\nfunction start() {\n  total = width/fragmentSize*height/fragmentSize;\n  grid = pow(ceil(sqrt(total)), 2);\n  perLine = ceil(sqrt(total));\n  \n  fragments = [];\n  for(var i=0; i < total; i++){\n\t\tlet x = i%perLine*fragmentSize;\n\t\tlet y = floor(i/perLine)*fragmentSize;\n    fragments.push(new Fragment(x, y, fragmentSize, fragmentSize));\n  }\n  \n  setImage();\n}\n\nfunction setImage(){\n  for(var i=0; i < fragments.length; i++){\n    fragments[i].setImage(img);\n  }\n}\n\nfunction draw() {\n  background(0);\n\t\n  //draw\n  //image(img, 0, 0);\n  for(var i=0; i < fragments.length; i++){\n    fragments[i].update();\n    fragments[i].draw();\n  }\n}\n\nfunction mousePressed(){\n  fragmentSize = round(random(5, 30)) * 10;\n  start();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Fragmentos",
+    "author": "u65884",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:28:49",
+    "url": "https://openprocessing.org/@u65884/1179483",
+    "code": "// === Tab: Fragment ===\nclass Fragment\n{\n\tconstructor(x, y, width, height) {\n\t\tthis.originX = x;\n\t\tthis.originY = y;\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.w = width;\n\t\tthis.h = height;\n  }\n\n  setImage(img){\n    this.img = img.get(this.x, this.y, this.w, this.h);\n  }\n  \n  update(){\n\t\tvar diffX = width/2 - this.originX;\n\t\tvar diffY = height/2 - this.originY;\n\t\tvar angle = atan2(diffY, diffX);\n\t\tvar time = millis()/3000;\n\t\tthis.x = this.originX + cos(time + angle) * 50;\n\t\tthis.y = this.originY + sin(time + angle) * 50;\n  }\n  \n  draw(){\n    image(this.img, this.x, this.y);\n  }\n}\n\n// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://openprocessing.org/sketch/1179483\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nlet fragmentSize = 50;\nlet img, total, grid, perLine, fragments;\n\nfunction preload() {\n\timg = loadImage(\"file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/profile.jpg\");\n}\n\nfunction setup() {\n  createCanvas(img.width, img.height);\n  noStroke();\n  \n  start();\n}\n\nfunction start() {\n  total = width/fragmentSize*height/fragmentSize;\n  grid = pow(ceil(sqrt(total)), 2);\n  perLine = ceil(sqrt(total));\n  \n  fragments = [];\n  for(var i=0; i < total; i++){\n\t\tlet x = i%perLine*fragmentSize;\n\t\tlet y = floor(i/perLine)*fragmentSize;\n    fragments.push(new Fragment(x, y, fragmentSize, fragmentSize));\n  }\n  \n  setImage();\n}\n\nfunction setImage(){\n  for(var i=0; i < fragments.length; i++){\n    fragments[i].setImage(img);\n  }\n}\n\nfunction draw() {\n  background(0);\n\t\n  //draw\n  //image(img, 0, 0);\n  for(var i=0; i < fragments.length; i++){\n    fragments[i].update();\n    fragments[i].draw();\n  }\n}\n\nfunction mousePressed(){\n  fragmentSize = round(random(5, 30)) * 10;\n  start();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Transit Zone.mp4"
+    ]
 }

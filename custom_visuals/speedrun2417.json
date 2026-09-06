@@ -1,22 +1,25 @@
 {
-  "name": "speedrun2417",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:30:57",
-  "url": "https://openprocessing.org/@epi/2159369",
-  "code": "// === Tab: mySketch ===\nlet ps;\n\nfunction setup() {\n\tcreateCanvas(600, 600);\n\tlet s = 75;\n\tps = []\n\tfor (let i = 0; i < 125; i++) {\n\t\tconst x = (i * s + s/2) % width\n\t\tconst y = ~~((i * s + s/2) / width) * s\n\t\tconst c = color(random(333), random(111), random(222))\n\t\tconst t = random(\"⬡⬢⬣\".split(''))\n\t\tps.push({x, y, t, c, s})\n\t}\n\t\n\ttextAlign(CENTER, CENTER)\n\ttextSize(width * 0.1)\n\t\n\tbackground(0, 0, 12)\n}\n\nfunction draw() {\n\tbackground(0, 0, 12)\n\tfor (let p of ps) {\n\t\tstroke(p.c);\n\t\ttext(p.t, p.x, p.y)\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "speedrun2417",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:30:57",
+    "url": "https://openprocessing.org/@epi/2159369",
+    "code": "// === Tab: mySketch ===\nlet ps;\n\nfunction setup() {\n\tcreateCanvas(600, 600);\n\tlet s = 75;\n\tps = []\n\tfor (let i = 0; i < 125; i++) {\n\t\tconst x = (i * s + s/2) % width\n\t\tconst y = ~~((i * s + s/2) / width) * s\n\t\tconst c = color(random(333), random(111), random(222))\n\t\tconst t = random(\"⬡⬢⬣\".split(''))\n\t\tps.push({x, y, t, c, s})\n\t}\n\t\n\ttextAlign(CENTER, CENTER)\n\ttextSize(width * 0.1)\n\t\n\tbackground(0, 0, 12)\n}\n\nfunction draw() {\n\tbackground(0, 0, 12)\n\tfor (let p of ps) {\n\t\tstroke(p.c);\n\t\ttext(p.t, p.x, p.y)\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Lost Signal.mp4"
+    ]
 }

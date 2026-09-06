@@ -1,22 +1,25 @@
 {
-  "name": "Lines_1",
-  "author": "reona396",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:05:41",
-  "url": "https://openprocessing.org/@reona396/918484",
-  "code": "// === Tab: mySketch ===\nconst palette = [\"#3B3247\", \"#006D8E\", \"#EEDCC4\", \"#B53021\", \"#421717\"]\nlet lines = [];\nlet linesNum = 60;\n\nconst DIST = 10;\nlet MAX;\nconst GEN = 30;\n\nlet stColor;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tangleMode(DEGREES);\n\n\tMAX = width > height ? width : height;\n\tstColor = random(palette);\n\n\tfor (let i = 0; i < linesNum; i++) {\n\t\tlines.push(new MyLine());\n\t}\n}\n\nfunction draw() {\n\tbackground(235);\n\n\tnoStroke();\n\tfor (let i = 0; i < lines.length; i++) {\n\t\tpush();\n\t\ttranslate(width / 2, height / 2);\n\t\trotate(360 * i / lines.length);\n\t\tlines[i].display();\n\t\tpop();\n\t}\n\n\tfill(235);\n\tstroke(stColor);\n\tstrokeWeight(10);\n\tcircle(width / 2, height / 2, MAX * 0.2);\n}\n\nclass MyLine {\n\tconstructor() {\n\t\tthis.objs = [];\n\t\tthis.speed = random(3, 6);\n\t\tthis.h = random(2, 10);\n\t}\n\n\tdisplay() {\n\t\tif (random(100) < GEN) {\n\t\t\tif ((this.objs.length == 0) ||\n\t\t\t\t(this.objs.length > 0 && this.objs[this.objs.length - 1].hasDistance())) {\n\t\t\t\tthis.objs.push((new Obj(this.speed, this.h)));\n\t\t\t}\n\t\t}\n\n\t\tfor (let i = 0; i < this.objs.length; i++) {\n\t\t\tthis.objs[i].move();\n\t\t\tthis.objs[i].display();\n\t\t}\n\n\t\tif (this.objs.length > 0) {\n\t\t\tfor (let j = this.objs.length - 1; j >= 0; j--) {\n\t\t\t\tif (this.objs[j].isFinished()) {\n\t\t\t\t\tthis.objs.splice(j, 1);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n\nclass Obj {\n\tconstructor(tmpSpeed, tmpH) {\n\t\tthis.x = 0;\n\t\tthis.y = 0;\n\t\tthis.speed = tmpSpeed;\n\t\tthis.w = random(10, 100);\n\t\tthis.h = tmpH;\n\t\tthis.c = color(random(palette));\n\t}\n\n\tmove() {\n\t\tthis.x -= this.speed;\n\t}\n\n\tisFinished() {\n\t\tif (this.x < -MAX * 0.6 - this.w) {\n\t\t\treturn true;\n\t\t} else {\n\t\t\treturn false;\n\t\t}\n\t}\n\n\thasDistance() {\n\t\tif (this.x < -(this.w + DIST)) {\n\t\t\treturn true;\n\t\t} else {\n\t\t\treturn false;\n\t\t}\n\t}\n\n\tdisplay() {\n\t\tfill(this.c);\n\t\trect(this.x, this.y, this.w, this.h, this.h / 2);\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Lines_1",
+    "author": "reona396",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:05:41",
+    "url": "https://openprocessing.org/@reona396/918484",
+    "code": "// === Tab: mySketch ===\nconst palette = [\"#3B3247\", \"#006D8E\", \"#EEDCC4\", \"#B53021\", \"#421717\"]\nlet lines = [];\nlet linesNum = 60;\n\nconst DIST = 10;\nlet MAX;\nconst GEN = 30;\n\nlet stColor;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tangleMode(DEGREES);\n\n\tMAX = width > height ? width : height;\n\tstColor = random(palette);\n\n\tfor (let i = 0; i < linesNum; i++) {\n\t\tlines.push(new MyLine());\n\t}\n}\n\nfunction draw() {\n\tbackground(235);\n\n\tnoStroke();\n\tfor (let i = 0; i < lines.length; i++) {\n\t\tpush();\n\t\ttranslate(width / 2, height / 2);\n\t\trotate(360 * i / lines.length);\n\t\tlines[i].display();\n\t\tpop();\n\t}\n\n\tfill(235);\n\tstroke(stColor);\n\tstrokeWeight(10);\n\tcircle(width / 2, height / 2, MAX * 0.2);\n}\n\nclass MyLine {\n\tconstructor() {\n\t\tthis.objs = [];\n\t\tthis.speed = random(3, 6);\n\t\tthis.h = random(2, 10);\n\t}\n\n\tdisplay() {\n\t\tif (random(100) < GEN) {\n\t\t\tif ((this.objs.length == 0) ||\n\t\t\t\t(this.objs.length > 0 && this.objs[this.objs.length - 1].hasDistance())) {\n\t\t\t\tthis.objs.push((new Obj(this.speed, this.h)));\n\t\t\t}\n\t\t}\n\n\t\tfor (let i = 0; i < this.objs.length; i++) {\n\t\t\tthis.objs[i].move();\n\t\t\tthis.objs[i].display();\n\t\t}\n\n\t\tif (this.objs.length > 0) {\n\t\t\tfor (let j = this.objs.length - 1; j >= 0; j--) {\n\t\t\t\tif (this.objs[j].isFinished()) {\n\t\t\t\t\tthis.objs.splice(j, 1);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n\nclass Obj {\n\tconstructor(tmpSpeed, tmpH) {\n\t\tthis.x = 0;\n\t\tthis.y = 0;\n\t\tthis.speed = tmpSpeed;\n\t\tthis.w = random(10, 100);\n\t\tthis.h = tmpH;\n\t\tthis.c = color(random(palette));\n\t}\n\n\tmove() {\n\t\tthis.x -= this.speed;\n\t}\n\n\tisFinished() {\n\t\tif (this.x < -MAX * 0.6 - this.w) {\n\t\t\treturn true;\n\t\t} else {\n\t\t\treturn false;\n\t\t}\n\t}\n\n\thasDistance() {\n\t\tif (this.x < -(this.w + DIST)) {\n\t\t\treturn true;\n\t\t} else {\n\t\t\treturn false;\n\t\t}\n\t}\n\n\tdisplay() {\n\t\tfill(this.c);\n\t\trect(this.x, this.y, this.w, this.h, this.h / 2);\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tunnel Vision.mp4"
+    ]
 }

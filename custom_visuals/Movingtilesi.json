@@ -1,22 +1,25 @@
 {
-  "name": "Movingtilesi",
-  "author": "chubas",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:14:48",
-  "url": "https://openprocessing.org/@chubas/1983134",
-  "code": "// === Tab: mySketch ===\nlet T, H\nlet colors\nlet palettes = [\n  [\"#ff4f19\", \"#15084d\", \"#5ce6e6\", \"#f5f2e3\"],\n  [\"#197278\", \"#edddd4\", \"#c44536\", \"#5a3034\"],\n  [\"#fde200\", \"#ef2626\", \"#5600ae\", \"#1c0541\"],\n  [\"#044e9e\", \"#6190d3\", \"#fcf7ed\", \"#203051\"],\n  [\"#033f63\", \"#7c9885\", \"#fedc97\", \"#d6d1b4\"],\n  [\"#648381\", \"#575761\", \"#ffbf46\", \"#44473f\"],\n  [\"#102542\", \"#f87060\", \"#cdd7d6\", \"#0a0a0a\"],\n\t[\"#ed225d\", \"#3caf65\", \"#f5b800\", \"#0d40bf\"]\n]\nlet colorIndex\nlet cycle = 60 // Cycle speed\nlet cw, ch\nlet cols, rows\nlet showBorders = false\n\nfunction setup () {\n  cw = windowWidth\n  ch = windowHeight\n  createCanvas(cw, ch)\n\tT = 200\n\trecalculateMeasures()\n  angleMode(DEGREES)\n  colorIndex = floor(random(palettes.length))\n  colors = palettes[colorIndex]\n\tpixelDensity(2)\n}\n\nfunction recalculateMeasures () {\n\tH = Math.sqrt(3) * T / 2\n\tcols = ceil(ch / H) + 1\n  rows = ceil(cw / (T/2)) + 2\n  strokeWeight(T/60)\n}\n\nfunction draw () {\n  if (showBorders) {\n    stroke(colors[3] || 0)\n  } else {\n    noStroke()\n  }\n\tif (keyIsDown(DOWN_ARROW)) {\n\t\tT = max(T - 1, 50)\n\t\trecalculateMeasures()\n\t} else if (keyIsDown(UP_ARROW)) {\n\t\tT = min(T + 1, 400)\n\t\trecalculateMeasures()\n\t}\n\n  let c = floor(frameCount / cycle) // Cycle number\n  let bg = floor((c % 6) / 2)\n  background(colors[2 - bg])\n\n  push()\n  translate(-T, -H/2)\n\n  for (let j = 0; j < cols; j++) {\n    for (let i = 0; i < rows; i++) {\n      drawTile(i, j)\n    }\n  }\n  pop()\n}\n\nlet drawTile = (x, y) => {\n  var c = floor(frameCount / cycle)\n  push()\n  noFill()\n  translate(...getCenter(x, y))\n  rectMode(CENTER)\n  let isOdd = x % 2 === y % 2\n  let sc = floor((c % 6) / 2)\n  let invert = floor(c / 6) % 2 === 1\n  if (sc === 0) {\n    d(!isOdd, 0, 0, invert)\n    d(isOdd, 1, 1, invert)\n  } else if (sc === 1) {\n    d(!isOdd, 1, 0, invert)\n    d(isOdd, 0, 2, invert, T/2, H/3)\n  } else {\n    d(isOdd, 0, 1, invert)\n    d(isOdd, 1, 2, invert, T/2, H/3)\n  }\n  pop()\n}\n\nlet d = (doDraw, cycleIndex, colorIndex, invert = false, tx = 0, ty = 0) => {\n  if (!doDraw) {\n    return\n  }\n  var c = floor(frameCount / cycle)\n  let w = T/2\n  let h = H *2/3\n  push()\n  translate(tx, ty)\n  fill(colors[colorIndex])\n  let ia = floor((c % 6) / 2)\n  if (invert) {\n    ia = -ia\n  }\n  let initialAngle = ia * 60\n  let rot = 60\n  if (invert) { rot = -rot }\n\n  if (c % 2 === cycleIndex) {\n    rotate(initialAngle +\n      ease(map(frameCount % cycle, 0, cycle, 0, 1)) * rot\n    )\n\t} else {\n    if (c % 2 < cycleIndex) {\n      rotate(initialAngle)\n    } else {\n      rotate(initialAngle + rot)\n    }\n  }\n  rect(0, 0, w, h)\n  pop()\n}\n\nlet getCenter = (x, y) => {\n  return [\n    (x * T / 2) + T / 2,\n    (x + y) % 2 !== 0 ?\n    (y * H) + (H / 3) :\n    (y * H) + (H * 2 / 3)\n  ]\n}\n\nfunction mouseClicked () {\n  let nc = floor(random(palettes.length))\n  let _wG_1 = 0; while ((nc === colorIndex) && ++_wG_1 < 20000) {\n    nc = floor(random(palettes.length))\n  }\n  colorIndex = nc\n  colors = palettes[colorIndex]\n}\n\nfunction keyPressed () {\n  if (keyCode === 32) { // Space bar\n    showBorders = !showBorders\n  }\n}\n\nfunction ease(x) {\n  // Ease in out back\n  let c1 = 1.85\n  let c2 = c1 * 2.3\n\n  return x < 0.5\n    ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2\n    : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Movingtilesi",
+    "author": "chubas",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:14:48",
+    "url": "https://openprocessing.org/@chubas/1983134",
+    "code": "// === Tab: mySketch ===\nlet T, H\nlet colors\nlet palettes = [\n  [\"#ff4f19\", \"#15084d\", \"#5ce6e6\", \"#f5f2e3\"],\n  [\"#197278\", \"#edddd4\", \"#c44536\", \"#5a3034\"],\n  [\"#fde200\", \"#ef2626\", \"#5600ae\", \"#1c0541\"],\n  [\"#044e9e\", \"#6190d3\", \"#fcf7ed\", \"#203051\"],\n  [\"#033f63\", \"#7c9885\", \"#fedc97\", \"#d6d1b4\"],\n  [\"#648381\", \"#575761\", \"#ffbf46\", \"#44473f\"],\n  [\"#102542\", \"#f87060\", \"#cdd7d6\", \"#0a0a0a\"],\n\t[\"#ed225d\", \"#3caf65\", \"#f5b800\", \"#0d40bf\"]\n]\nlet colorIndex\nlet cycle = 60 // Cycle speed\nlet cw, ch\nlet cols, rows\nlet showBorders = false\n\nfunction setup () {\n  cw = windowWidth\n  ch = windowHeight\n  createCanvas(cw, ch)\n\tT = 200\n\trecalculateMeasures()\n  angleMode(DEGREES)\n  colorIndex = floor(random(palettes.length))\n  colors = palettes[colorIndex]\n\tpixelDensity(2)\n}\n\nfunction recalculateMeasures () {\n\tH = Math.sqrt(3) * T / 2\n\tcols = ceil(ch / H) + 1\n  rows = ceil(cw / (T/2)) + 2\n  strokeWeight(T/60)\n}\n\nfunction draw () {\n  if (showBorders) {\n    stroke(colors[3] || 0)\n  } else {\n    noStroke()\n  }\n\tif (keyIsDown(DOWN_ARROW)) {\n\t\tT = max(T - 1, 50)\n\t\trecalculateMeasures()\n\t} else if (keyIsDown(UP_ARROW)) {\n\t\tT = min(T + 1, 400)\n\t\trecalculateMeasures()\n\t}\n\n  let c = floor(frameCount / cycle) // Cycle number\n  let bg = floor((c % 6) / 2)\n  background(colors[2 - bg])\n\n  push()\n  translate(-T, -H/2)\n\n  for (let j = 0; j < cols; j++) {\n    for (let i = 0; i < rows; i++) {\n      drawTile(i, j)\n    }\n  }\n  pop()\n}\n\nlet drawTile = (x, y) => {\n  var c = floor(frameCount / cycle)\n  push()\n  noFill()\n  translate(...getCenter(x, y))\n  rectMode(CENTER)\n  let isOdd = x % 2 === y % 2\n  let sc = floor((c % 6) / 2)\n  let invert = floor(c / 6) % 2 === 1\n  if (sc === 0) {\n    d(!isOdd, 0, 0, invert)\n    d(isOdd, 1, 1, invert)\n  } else if (sc === 1) {\n    d(!isOdd, 1, 0, invert)\n    d(isOdd, 0, 2, invert, T/2, H/3)\n  } else {\n    d(isOdd, 0, 1, invert)\n    d(isOdd, 1, 2, invert, T/2, H/3)\n  }\n  pop()\n}\n\nlet d = (doDraw, cycleIndex, colorIndex, invert = false, tx = 0, ty = 0) => {\n  if (!doDraw) {\n    return\n  }\n  var c = floor(frameCount / cycle)\n  let w = T/2\n  let h = H *2/3\n  push()\n  translate(tx, ty)\n  fill(colors[colorIndex])\n  let ia = floor((c % 6) / 2)\n  if (invert) {\n    ia = -ia\n  }\n  let initialAngle = ia * 60\n  let rot = 60\n  if (invert) { rot = -rot }\n\n  if (c % 2 === cycleIndex) {\n    rotate(initialAngle +\n      ease(map(frameCount % cycle, 0, cycle, 0, 1)) * rot\n    )\n\t} else {\n    if (c % 2 < cycleIndex) {\n      rotate(initialAngle)\n    } else {\n      rotate(initialAngle + rot)\n    }\n  }\n  rect(0, 0, w, h)\n  pop()\n}\n\nlet getCenter = (x, y) => {\n  return [\n    (x * T / 2) + T / 2,\n    (x + y) % 2 !== 0 ?\n    (y * H) + (H / 3) :\n    (y * H) + (H * 2 / 3)\n  ]\n}\n\nfunction mouseClicked () {\n  let nc = floor(random(palettes.length))\n  let _wG_1 = 0; while ((nc === colorIndex) && ++_wG_1 < 20000) {\n    nc = floor(random(palettes.length))\n  }\n  colorIndex = nc\n  colors = palettes[colorIndex]\n}\n\nfunction keyPressed () {\n  if (keyCode === 32) { // Space bar\n    showBorders = !showBorders\n  }\n}\n\nfunction ease(x) {\n  // Ease in out back\n  let c1 = 1.85\n  let c2 = c1 * 2.3\n\n  return x < 0.5\n    ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2\n    : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Dark Signal Frame.mp4"
+    ]
 }

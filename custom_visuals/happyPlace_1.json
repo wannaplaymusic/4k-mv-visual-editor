@@ -17,9 +17,10 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 0,
+    "used_count": 1,
     "is_starred": true,
     "used_in_videos": [
-        "Airlock Reverie.mp4"
+        "Airlock Reverie.mp4",
+        "Gain Staging.mp4"
     ]
 }

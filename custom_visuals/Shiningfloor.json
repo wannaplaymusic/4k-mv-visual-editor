@@ -1,22 +1,26 @@
 {
-  "name": "Shiningfloor",
-  "author": "Haukun",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 05:02:22",
-  "url": "https://openprocessing.org/@Haukun/1771165",
-  "code": "// === Tab: mySketch ===\nvar a,vmax;\nfunction setup() {\n  createCanvas(720, 720);\n  \n  rectMode(CENTER)\n  colorMode(HSB)\n  noStroke()\n  \n  initialize()\n    \n  /* for Debug\n  textSize(8)  \n  for(x=0;x<=72;x++){\n    for(y=0;y<=72;y++){\n      a[x][y]=abs(a[x][y])\n      text(a[x][y],x*10,y*10)\n    }\n  }\n  */\n}\n\nfunction initialize(){\n  a=[]\n  t=0\n  for(x=0;x<=72;x++){\n    a[x]=[]\n    for(y=0;y<=72;y++){\n      a[x][y]=0;\n    }\n  }\n  \n  tx = int(random(73))\n  ty = int(random(73))\n  a[tx][ty]=1;\n\n  while(!fillCell())\n  {\n  }\n  //for(i=0;i<500;i++)fillCell()\n  \n  for(x=0;x<=72;x++){\n    for(y=0;y<=72;y++){\n      a[x][y]=abs(a[x][y])\n    }\n  }\n}\n\nmode=1\nt=0\nfunction draw(){\n  blendMode(BLEND)\n  background(0)\n  blendMode(ADD)\n  t+=.5\n  for(x=0;x<=72;x++){\n    for(y=0;y<=72;y++){\n      switch(mode){\n        case 1:\n          if(a[x][y]<t){\n            s = min(t-a[x][y],20)\n            r=noise(x,y)*9*TAU\n            fill(a[x][y]/vmax*360,80,100,tan(s/20)*1)\n            square(x*10+tan((s-20)/500)*cos(r),y*10+tan((s-20)/500)*sin(r),15/tan(s/20))\n          }\n          if((t-vmax)>10){\n            mode=2;\n          }\n          break;\n        case 2:\n          if(a[x][y]<t){\n            s = min(t-a[x][y],20)\n            fill(a[x][y]/vmax*360,80,150-(t-vmax)*2,tan(s/20)*1)\n            square(x*10,y*10,15/tan(s/20))\n          }          \n          break;\n      }\n    }\n  }\n  \n  if(mode == 2 && t-vmax>100){\n    initialize()\n    mode=1;\n  }\n}\n\n\nfunction fillCell(){\n  var allFill = true;\n  vmax=0\n  for(x=0;x<=72;x++){\n    for(y=0;y<=72;y++){\n      if(a[x][y]==0){\n        allFill &= false;\n        break;\n      }else{\n        vmax = max(vmax,a[x][y])\n      }\n    }\n  }\n    \n  if(!allFill){\n    for(x=0;x<=72;x++){\n      for(y=0;y<=72;y++){\n        if(a[x][y]>0){\n          v=int(random(1)*2)*2-1\n          va=random(1)>.5?v:0\n          vb=va==0?v:0\n          tx = x + va\n          ty = y + vb\n\n          if(tx>=0 && ty >= 0 && tx < 73 && ty < 73){\n            if(a[tx][ty]==0){\n              a[tx][ty]=a[x][y]+1;\n              a[x][y]*=-1\n            }\n          }\n        }else if(random(1)<.001){\n          a[x][y]*=-1;\n        }\n      }\n    }\n  }\n  \n  return allFill;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Shiningfloor",
+    "author": "Haukun",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 05:02:22",
+    "url": "https://openprocessing.org/@Haukun/1771165",
+    "code": "// === Tab: mySketch ===\nvar a,vmax;\nfunction setup() {\n  createCanvas(720, 720);\n  \n  rectMode(CENTER)\n  colorMode(HSB)\n  noStroke()\n  \n  initialize()\n    \n  /* for Debug\n  textSize(8)  \n  for(x=0;x<=72;x++){\n    for(y=0;y<=72;y++){\n      a[x][y]=abs(a[x][y])\n      text(a[x][y],x*10,y*10)\n    }\n  }\n  */\n}\n\nfunction initialize(){\n  a=[]\n  t=0\n  for(x=0;x<=72;x++){\n    a[x]=[]\n    for(y=0;y<=72;y++){\n      a[x][y]=0;\n    }\n  }\n  \n  tx = int(random(73))\n  ty = int(random(73))\n  a[tx][ty]=1;\n\n  while(!fillCell())\n  {\n  }\n  //for(i=0;i<500;i++)fillCell()\n  \n  for(x=0;x<=72;x++){\n    for(y=0;y<=72;y++){\n      a[x][y]=abs(a[x][y])\n    }\n  }\n}\n\nmode=1\nt=0\nfunction draw(){\n  blendMode(BLEND)\n  background(0)\n  blendMode(ADD)\n  t+=.5\n  for(x=0;x<=72;x++){\n    for(y=0;y<=72;y++){\n      switch(mode){\n        case 1:\n          if(a[x][y]<t){\n            s = min(t-a[x][y],20)\n            r=noise(x,y)*9*TAU\n            fill(a[x][y]/vmax*360,80,100,tan(s/20)*1)\n            square(x*10+tan((s-20)/500)*cos(r),y*10+tan((s-20)/500)*sin(r),15/tan(s/20))\n          }\n          if((t-vmax)>10){\n            mode=2;\n          }\n          break;\n        case 2:\n          if(a[x][y]<t){\n            s = min(t-a[x][y],20)\n            fill(a[x][y]/vmax*360,80,150-(t-vmax)*2,tan(s/20)*1)\n            square(x*10,y*10,15/tan(s/20))\n          }          \n          break;\n      }\n    }\n  }\n  \n  if(mode == 2 && t-vmax>100){\n    initialize()\n    mode=1;\n  }\n}\n\n\nfunction fillCell(){\n  var allFill = true;\n  vmax=0\n  for(x=0;x<=72;x++){\n    for(y=0;y<=72;y++){\n      if(a[x][y]==0){\n        allFill &= false;\n        break;\n      }else{\n        vmax = max(vmax,a[x][y])\n      }\n    }\n  }\n    \n  if(!allFill){\n    for(x=0;x<=72;x++){\n      for(y=0;y<=72;y++){\n        if(a[x][y]>0){\n          v=int(random(1)*2)*2-1\n          va=random(1)>.5?v:0\n          vb=va==0?v:0\n          tx = x + va\n          ty = y + vb\n\n          if(tx>=0 && ty >= 0 && tx < 73 && ty < 73){\n            if(a[tx][ty]==0){\n              a[tx][ty]=a[x][y]+1;\n              a[x][y]*=-1\n            }\n          }\n        }else if(random(1)<.001){\n          a[x][y]*=-1;\n        }\n      }\n    }\n  }\n  \n  return allFill;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 2,
+    "is_starred": false,
+    "used_in_videos": [
+        "Long Reverb.mp4",
+        "Concrete Jungle.mp4"
+    ]
 }

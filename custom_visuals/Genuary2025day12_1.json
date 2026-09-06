@@ -1,22 +1,25 @@
 {
-  "name": "Genuary2025day12_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:20:04",
-  "url": "https://openprocessing.org/@ronikaufman/2507401",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\n// Made for Genuary 2025\n// Day 12: Subdivision.\n\nconst N_FRAMES = 20;\nlet points;\n\nfunction setup() {\n\tcreateCanvas(500, 500);\n\tframeRate(10);\n\tnoFill();\n\tstroke(5);\n}\n\nfunction draw() {\n\tbackground(\"#fffbe6\");\n\tlet t = (frameCount%N_FRAMES)/N_FRAMES;\n\tcreateCompo(t);\n}\n\nfunction createCompo(t) {\n\tpoints = [];\n\tlet nCorners = 4, r = 150, thetaStep = TAU/nCorners;\n\tlet theta0 = t*TAU/nCorners;\n\tfor (let i = 0; i < nCorners; i++) {\n\t\tlet x1 = width/2 + r*cos(i*thetaStep+theta0);\n\t\tlet y1 = height/2 + r*sin(i*thetaStep+theta0);\n\t\tlet x2 = width/2 + r*cos((i+1)*thetaStep+theta0);\n\t\tlet y2 = height/2 + r*sin((i+1)*thetaStep+theta0);\n\t\tlet nPoints = 40;\n\t\tfor (let j = 0; j < nPoints; j++) {\n\t\t\tvar t = j/nPoints;\n\t\t\tlet x = (1-t)*x1 + t*x2;\n\t\t\tlet y = (1-t)*y1 + t*y2;\n\t\t\tpoints.push({x: x, y: y});\n\t\t}\n\t}\n\t\n\tsubdivide({\n\t\tx: 1/2,\n\t\ty: 1/2,\n\t\tw: width-1,\n\t\th: height-1,\n\t\tcontains: [...Array(points.length).keys()]\n\t}, random() < 1/2);\n}\n\nfunction subdivide({x: x, y: y, w: w, h: h, contains: contains}, horizontally) {\n\tlet rectangle1, rectangle2;\n\tif (horizontally) {\n\t\tlet w1 = random(w/4, 3*w/4), w2 = w-w1;\n\t\tvar x1 = x, x2 = x+w1;\n\t\trectangle1 = {x: x1, y: y, w: w1, h: h, contains: []};\n\t\trectangle2 = {x: x2, y: y, w: w2, h: h, contains: []};\n\t} else {\n\t\tlet h1 = random(h/4, 3*h/4), h2 = h-h1;\n\t\tvar y1 = y, y2 = y+h1;\n\t\trectangle1 = {x: x, y: y1, w: w, h: h1, contains: []};\n\t\trectangle2 = {x: x, y: y2, w: w, h: h2, contains: []};\n\t}\n\t\n\tfor (let idx of contains) {\n\t\tif (pointInRectangle(points[idx], rectangle1)) rectangle1.contains.push(idx);\n\t\telse rectangle2.contains.push(idx);\n\t}\n\t\n\tif (rectangle1.contains.length > 1) subdivide(rectangle1, !horizontally);\n\telse rect(rectangle1.x, rectangle1.y, rectangle1.w, rectangle1.h);\n\tif (rectangle2.contains.length > 1) subdivide(rectangle2, !horizontally);\n\telse rect(rectangle2.x, rectangle2.y, rectangle2.w, rectangle2.h);\n}\n\nfunction pointInRectangle({x: px, y: py}, {x: rx, y: ry, w: rw, h: rh}) {\n\treturn px > rx && px < rx+rw && py > ry && py < ry+rh;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Genuary2025day12_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:20:04",
+    "url": "https://openprocessing.org/@ronikaufman/2507401",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\n// Made for Genuary 2025\n// Day 12: Subdivision.\n\nconst N_FRAMES = 20;\nlet points;\n\nfunction setup() {\n\tcreateCanvas(500, 500);\n\tframeRate(10);\n\tnoFill();\n\tstroke(5);\n}\n\nfunction draw() {\n\tbackground(\"#fffbe6\");\n\tlet t = (frameCount%N_FRAMES)/N_FRAMES;\n\tcreateCompo(t);\n}\n\nfunction createCompo(t) {\n\tpoints = [];\n\tlet nCorners = 4, r = 150, thetaStep = TAU/nCorners;\n\tlet theta0 = t*TAU/nCorners;\n\tfor (let i = 0; i < nCorners; i++) {\n\t\tlet x1 = width/2 + r*cos(i*thetaStep+theta0);\n\t\tlet y1 = height/2 + r*sin(i*thetaStep+theta0);\n\t\tlet x2 = width/2 + r*cos((i+1)*thetaStep+theta0);\n\t\tlet y2 = height/2 + r*sin((i+1)*thetaStep+theta0);\n\t\tlet nPoints = 40;\n\t\tfor (let j = 0; j < nPoints; j++) {\n\t\t\tvar t = j/nPoints;\n\t\t\tlet x = (1-t)*x1 + t*x2;\n\t\t\tlet y = (1-t)*y1 + t*y2;\n\t\t\tpoints.push({x: x, y: y});\n\t\t}\n\t}\n\t\n\tsubdivide({\n\t\tx: 1/2,\n\t\ty: 1/2,\n\t\tw: width-1,\n\t\th: height-1,\n\t\tcontains: [...Array(points.length).keys()]\n\t}, random() < 1/2);\n}\n\nfunction subdivide({x: x, y: y, w: w, h: h, contains: contains}, horizontally) {\n\tlet rectangle1, rectangle2;\n\tif (horizontally) {\n\t\tlet w1 = random(w/4, 3*w/4), w2 = w-w1;\n\t\tvar x1 = x, x2 = x+w1;\n\t\trectangle1 = {x: x1, y: y, w: w1, h: h, contains: []};\n\t\trectangle2 = {x: x2, y: y, w: w2, h: h, contains: []};\n\t} else {\n\t\tlet h1 = random(h/4, 3*h/4), h2 = h-h1;\n\t\tvar y1 = y, y2 = y+h1;\n\t\trectangle1 = {x: x, y: y1, w: w, h: h1, contains: []};\n\t\trectangle2 = {x: x, y: y2, w: w, h: h2, contains: []};\n\t}\n\t\n\tfor (let idx of contains) {\n\t\tif (pointInRectangle(points[idx], rectangle1)) rectangle1.contains.push(idx);\n\t\telse rectangle2.contains.push(idx);\n\t}\n\t\n\tif (rectangle1.contains.length > 1) subdivide(rectangle1, !horizontally);\n\telse rect(rectangle1.x, rectangle1.y, rectangle1.w, rectangle1.h);\n\tif (rectangle2.contains.length > 1) subdivide(rectangle2, !horizontally);\n\telse rect(rectangle2.x, rectangle2.y, rectangle2.w, rectangle2.h);\n}\n\nfunction pointInRectangle({x: px, y: py}, {x: rx, y: ry, w: rw, h: rh}) {\n\treturn px > rx && px < rx+rw && py > ry && py < ry+rh;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tunnel Vision.mp4"
+    ]
 }

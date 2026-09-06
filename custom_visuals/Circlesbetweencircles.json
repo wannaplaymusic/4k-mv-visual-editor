@@ -1,22 +1,25 @@
 {
-  "name": "Circlesbetweencircles",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:27:09",
-  "url": "https://openprocessing.org/@ronikaufman/1934307",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\nvar N_FRAMES = 100;\nvar eps = 0.01;\n\nvar r = 80;\nvar h = r*Math.sqrt(3)/2;\n\nvar delta = 1 - Math.sqrt(3)/2;\n\nfunction setup() {\n  createCanvas(7*r, 9*r*sqrt(3)/2);\n  noStroke();\n}\n\nfunction draw() {\n  background(\"#fffbe6\");\n  \n  let t0 = map((frameCount%N_FRAMES)/N_FRAMES, 0, 1, \n           (sqrt(32*sq(delta) + 1) + 4*delta - 1)/(8*delta), \n           (-sqrt(32*sq(delta) + 1) + 4*delta + 1)/(8*delta));\n\n  let a = \"#62b6de\", b = \"#f9d531\", c = \"#2b67af\", d = \"#abcd5e\";\n  \n  translate(width/2, height/2);\n  \n  makeLine(t0, 0, [c, b]);\n  makeLine(1-t0, TAU/6, [b, a]);\n  makeLine(t0, 2*TAU/6, [a, d]);\n  makeLine(1-t0, 3*TAU/6, [d, b]);\n  makeLine(t0, 4*TAU/6, [b, a]);\n  makeLine(1-t0, 5*TAU/6, [a, c]);\n  \n  push();\n  translate(r*3/2, h);\n  makeLine(t0, 0, [a, c]);\n  makeLine(1-t0, TAU/6, [c, d]);\n  makeLine(t0, 2*TAU/6, [d, b]);\n  makeLine(t0, 4*TAU/6, [c, d]);\n  makeLine(1-t0, 5*TAU/6, [d, a]);\n  pop();\n  \n  push();\n  translate(0, 2*h);\n  makeLine(t0, 0, [d, a]);\n  makeLine(1-t0, TAU/6, [a, b]);\n  makeLine(t0, 2*TAU/6, [b, c]);\n  makeLine(1-t0, 3*TAU/6, [c, a]);\n  pop();\n  \n  push();\n  translate(-r*3/2, h);\n  makeLine(1-t0, TAU/6, [c, d]);\n  makeLine(t0, 2*TAU/6, [d, b]);\n  makeLine(1-t0, 3*TAU/6, [b, c]);\n  makeLine(t0, 4*TAU/6, [c, d]);\n  pop();\n  \n  push();\n  translate(-r*3/2, -h);\n  makeLine(t0, 2*TAU/6, [c, a]);\n  makeLine(1-t0, 3*TAU/6, [a, d]);\n  makeLine(t0, 4*TAU/6, [d, c]);\n  makeLine(1-t0, 5*TAU/6, [c, b]);\n  pop();\n  \n  push();\n  translate(0, -2*h);\n  makeLine(t0, 0, [d, a]);\n  makeLine(1-t0, 3*TAU/6, [c, a]);\n  makeLine(t0, 4*TAU/6, [a, b]);\n  makeLine(1-t0, 5*TAU/6, [b, d]);\n  pop();\n  \n  push();\n  translate(r*3/2, -h);\n  makeLine(t0, 0, [b, d]);\n  makeLine(t0, 4*TAU/6, [d, c]);\n  makeLine(1-t0, 5*TAU/6, [c, b]);\n  pop();\n}\n\nfunction makeLine(t0, theta, colors) {\n  fill(5);\n  arc(0, 0, 2*r, 2*r, theta, theta+TAU/6, OPEN);\n  arc(2*h*cos(theta+TAU/12), 2*h*sin(theta+TAU/12), 2*r, 2*r, theta+PI, theta+PI+TAU/6, OPEN);\n  \n  let t = t0;\n  let idx = 0;\n  let _wG_1 = 0; while ((t < 1-eps) && ++_wG_1 < 20000) {\n    // draw circle\n    let [x, y] = lerpPoints(r*cos(theta), r*sin(theta), r*cos(theta+TAU/6), r*sin(theta+TAU/6), t);\n    fill(colors[idx%colors.length]);\n    idx++;\n    circle(x, y, delta*(1-sq(2*(t)-1))*2*r);\n\n    // compute new t\n    var a = t + delta*(1-sq(2*t-1));\n    let t1 = (sqrt(16*a*delta + 16*sq(delta) - 8*delta + 1) + 4*delta-1)/(8*delta);\n    t = t1;\n  }\n\n  t = t0;\n  idx = 0;\n  let _wG_2 = 0; while ((t > eps) && ++_wG_2 < 20000) {\n    // compute new t\n    var a = t - delta*(1-sq(2*t-1));\n    let t2 = (-sqrt(-16*a*delta + 16*sq(delta) + 8*delta + 1) + 4*delta+1)/(8*delta);\n    t = t2;\n\n    // draw circle\n    let [x, y] = lerpPoints(r*cos(theta), r*sin(theta), r*cos(theta+TAU/6), r*sin(theta+TAU/6), t);\n    idx++;\n    fill(colors[idx%colors.length]);\n    circle(x, y, delta*(1-sq(2*(t)-1))*2*r);\n  }\n}\n\nfunction lerpPoints(x1, y1, x2, y2, t) {\n  let x3 = (1-t)*x1 + t*x2;\n  let y3 = (1-t)*y1 + t*y2;\n  return [x3, y3];\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Circlesbetweencircles",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:27:09",
+    "url": "https://openprocessing.org/@ronikaufman/1934307",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n\nvar N_FRAMES = 100;\nvar eps = 0.01;\n\nvar r = 80;\nvar h = r*Math.sqrt(3)/2;\n\nvar delta = 1 - Math.sqrt(3)/2;\n\nfunction setup() {\n  createCanvas(7*r, 9*r*sqrt(3)/2);\n  noStroke();\n}\n\nfunction draw() {\n  background(\"#fffbe6\");\n  \n  let t0 = map((frameCount%N_FRAMES)/N_FRAMES, 0, 1, \n           (sqrt(32*sq(delta) + 1) + 4*delta - 1)/(8*delta), \n           (-sqrt(32*sq(delta) + 1) + 4*delta + 1)/(8*delta));\n\n  let a = \"#62b6de\", b = \"#f9d531\", c = \"#2b67af\", d = \"#abcd5e\";\n  \n  translate(width/2, height/2);\n  \n  makeLine(t0, 0, [c, b]);\n  makeLine(1-t0, TAU/6, [b, a]);\n  makeLine(t0, 2*TAU/6, [a, d]);\n  makeLine(1-t0, 3*TAU/6, [d, b]);\n  makeLine(t0, 4*TAU/6, [b, a]);\n  makeLine(1-t0, 5*TAU/6, [a, c]);\n  \n  push();\n  translate(r*3/2, h);\n  makeLine(t0, 0, [a, c]);\n  makeLine(1-t0, TAU/6, [c, d]);\n  makeLine(t0, 2*TAU/6, [d, b]);\n  makeLine(t0, 4*TAU/6, [c, d]);\n  makeLine(1-t0, 5*TAU/6, [d, a]);\n  pop();\n  \n  push();\n  translate(0, 2*h);\n  makeLine(t0, 0, [d, a]);\n  makeLine(1-t0, TAU/6, [a, b]);\n  makeLine(t0, 2*TAU/6, [b, c]);\n  makeLine(1-t0, 3*TAU/6, [c, a]);\n  pop();\n  \n  push();\n  translate(-r*3/2, h);\n  makeLine(1-t0, TAU/6, [c, d]);\n  makeLine(t0, 2*TAU/6, [d, b]);\n  makeLine(1-t0, 3*TAU/6, [b, c]);\n  makeLine(t0, 4*TAU/6, [c, d]);\n  pop();\n  \n  push();\n  translate(-r*3/2, -h);\n  makeLine(t0, 2*TAU/6, [c, a]);\n  makeLine(1-t0, 3*TAU/6, [a, d]);\n  makeLine(t0, 4*TAU/6, [d, c]);\n  makeLine(1-t0, 5*TAU/6, [c, b]);\n  pop();\n  \n  push();\n  translate(0, -2*h);\n  makeLine(t0, 0, [d, a]);\n  makeLine(1-t0, 3*TAU/6, [c, a]);\n  makeLine(t0, 4*TAU/6, [a, b]);\n  makeLine(1-t0, 5*TAU/6, [b, d]);\n  pop();\n  \n  push();\n  translate(r*3/2, -h);\n  makeLine(t0, 0, [b, d]);\n  makeLine(t0, 4*TAU/6, [d, c]);\n  makeLine(1-t0, 5*TAU/6, [c, b]);\n  pop();\n}\n\nfunction makeLine(t0, theta, colors) {\n  fill(5);\n  arc(0, 0, 2*r, 2*r, theta, theta+TAU/6, OPEN);\n  arc(2*h*cos(theta+TAU/12), 2*h*sin(theta+TAU/12), 2*r, 2*r, theta+PI, theta+PI+TAU/6, OPEN);\n  \n  let t = t0;\n  let idx = 0;\n  let _wG_1 = 0; while ((t < 1-eps) && ++_wG_1 < 20000) {\n    // draw circle\n    let [x, y] = lerpPoints(r*cos(theta), r*sin(theta), r*cos(theta+TAU/6), r*sin(theta+TAU/6), t);\n    fill(colors[idx%colors.length]);\n    idx++;\n    circle(x, y, delta*(1-sq(2*(t)-1))*2*r);\n\n    // compute new t\n    var a = t + delta*(1-sq(2*t-1));\n    let t1 = (sqrt(16*a*delta + 16*sq(delta) - 8*delta + 1) + 4*delta-1)/(8*delta);\n    t = t1;\n  }\n\n  t = t0;\n  idx = 0;\n  let _wG_2 = 0; while ((t > eps) && ++_wG_2 < 20000) {\n    // compute new t\n    var a = t - delta*(1-sq(2*t-1));\n    let t2 = (-sqrt(-16*a*delta + 16*sq(delta) + 8*delta + 1) + 4*delta+1)/(8*delta);\n    t = t2;\n\n    // draw circle\n    let [x, y] = lerpPoints(r*cos(theta), r*sin(theta), r*cos(theta+TAU/6), r*sin(theta+TAU/6), t);\n    idx++;\n    fill(colors[idx%colors.length]);\n    circle(x, y, delta*(1-sq(2*(t)-1))*2*r);\n  }\n}\n\nfunction lerpPoints(x1, y1, x2, y2, t) {\n  let x3 = (1-t)*x1 + t*x2;\n  let y3 = (1-t)*y1 + t*y2;\n  return [x3, y3];\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Submerged Echoes.mp4"
+    ]
 }

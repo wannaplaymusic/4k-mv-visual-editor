@@ -4,6 +4,37 @@
 
 ---
 
+## 🚀 [v1.4.0] - 2026-09-06
+### 🎨 超現實主義動態拼貼創作、AI 導演編舞與 YouTube 智慧自動上傳管線
+
+- **🖼️ 超現實主義動態拼貼生成器 (Surreal Collage Studio)**：
+  - 新增專屬分頁 `surreal_collage_tab.py`，支援智慧去背人體肢體切分（頭部、軀幹、手臂等部件）與異質素材幾何解構。
+  - **36 種超現實主義藝術風格矩陣 (`surreal_style_matrix.py` & `surreal_36_styles.py`)**：深度整合達利時鐘、馬格利特青蘋果、古典石膏像、蒸汽波幾何等跨維度概念語意庫。
+  - **超現實辯證概念與主題引擎 (`surreal_dialectics.py` & `surreal_theme_engine.py`)**：將音訊情緒與概念衝突映射為視覺張力，實現動態隱喻拼貼佈局。
+  - **SOTA 構圖與美學佈局優化器 (`sota_composition_optimizer.py` & `aesthetic_layout_optimizer.py`)**：實作黃金分割比、三分法則、動態平衡度與畫面層次智慧校準。
+  - **神經美學評分與視覺注視追蹤 (`neural_aesthetic_scorer.py` & `saliency_eyetrace_bridge.py`)**：結合視覺顯著性 (Saliency) 預測人眼注視焦點，指導動態元素空間排布。
+  - **多臂老虎機素材排定演算法 (`bandit_inventory_selector.py`)**：利用 Multi-Armed Bandit (MAB) 平衡素材探索 (Exploration) 與利用 (Exploitation)。
+  - **多元素圖層編排與物理漂浮 (`multi_element_orchestrator.py`)**：模擬多層超現實物件的重力懸浮、旋轉與音訊驅動擺動。
+  - **專屬 GLSL 氛圍調和著色器 (`shaders/surreal_atmospheric_harmonizer.frag` & `shaders/surreal_harmonizer.frag`)**：提供色調統整、暗角、噪點與膠片光暈質感。
+  - **Pinterest 視覺靈感探針 (`pinterest_scraper.py`)**：自動化收集高品質參考視覺意象。
+
+- **📺 YouTube 智慧自動排程與上傳發布套件 (YouTube Auto Uploader Suite)**：
+  - 新增專屬分頁 `youtube_uploader_tab.py`，具備視覺化批量上傳佇列、即時進度條、狀態回饋與標籤/說明欄動態管理。
+  - **YouTube Data API v3 引擎 (`youtube_uploader_engine.py`)**：支援 Google OAuth 2.0 授權、分塊斷點續傳 (Resumable Chunked Upload)、配額 (Quota) 智慧監控與頻率限流重試機制。
+  - **無縫自動上傳整合 (`youtube_auto_upload.py`)**：與 Shorts Exporter 緊密連動，可在 9:16 短片渲染完成後自動加入上傳佇列並完成發布。
+  - **API 安全與配置指南 (`YOUTUBE_API_SETUP_GUIDE.md`)**：提供 Google Cloud Console OAuth 2.0 Client 憑證設定、配額防超額機制之詳盡教學。
+  - **安全防護強化**：將 `youtube_credentials/` 與 `logs/` 列入 `.gitignore`，徹底杜絕金鑰與 OAuth Token 意外洩漏。
+
+- **🎬 AI 導演曲式編舞與系統深度集成**：
+  - **超現實 AI 導演橋接器 (`surreal_director_bridge.py` & `director_choreographer.py`)**：將動態拼貼無縫納入曲式章節（Intro, Verse, Chorus, Drop）與動態編舞。
+  - **主程式統合升級 (`main.py`)**：新增 Surreal Collage 與 YouTube Uploader 導航與信號路由，優化全系統多執行緒生命週期。
+  - **LLM 導演語意擴展 (`llm_director.py`)**：支援超現實藝術流派提示詞生成與曲式通告單調度。
+  - **短片導出聯動 (`shorts_exporter_tab.py`)**：增強豎屏短片導出管線並銜接自動上傳。
+  - **AI 導演全流程質檢腳本 (`run_full_ai_director_qc.py`)**：提供完整的通告單執行與渲染 QC 檢驗。
+  - **視覺模組庫持續修復**：修復並優化數十個自訂視覺腳本的相容性與語法錯誤。
+
+---
+
 ## 🌟 [v1.3.0] - 2026-08-30
 ### 👾 像素視覺生成器、Shorts 豎屏匯出、AI 導演通告單與全能 QC 審核
 - **👾 像素視覺模組生成器 (`pixel_generator_tab.py` & `pixel_ai_engine.py`)**：

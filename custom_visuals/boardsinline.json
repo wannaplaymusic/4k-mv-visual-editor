@@ -1,22 +1,25 @@
 {
-  "name": "boardsinline",
-  "author": "aa_debdeb",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:28:39",
-  "url": "https://openprocessing.org/@aa_debdeb/400636",
-  "code": "// === Tab: mySketch ===\n/**\n* boards in line\n*\n* @author aadebdeb\n* @date 2017/01/26\n*/\n\nfunction setup(){\n  createCanvas(640, 480);\n  rectMode(CENTER);\n  fill(20);\n  stroke(255, 251, 249);\n  strokeWeight(4);\n}\n\nfunction draw(){\n  background(255, 251, 249);\n  translate(width / 2, height / 2);\n  let num = 10;\n  let intervalX = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 40, -40);\n  let intervalY = map(abs((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2), 0, width / 2, 0, -20);\n  let rectX = 100;\n  let rectY = 200;\n  let tilt = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, -20, 20);\n  for(let i = num - 1; i > 0; i--){\n    push();\n    let rhytm = map(pow(abs(sin(frameCount * 0.03 - i * 0.3)), 50), 0, 1, 0, -50)\n                * map(abs((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2), 0, width / 2, 0, 1);\n    translate(intervalX * (i - num / 2.0), intervalY * (i - num / 2.0) + rhytm);\n    beginShape();\n    vertex(-rectX / 2.0, -rectY / 2.0 + tilt);\n    vertex(rectX / 2.0, -rectY / 2.0 - tilt);\n    vertex(rectX / 2.0, rectY / 2.0 - tilt);\n    vertex(-rectX / 2.0, rectY / 2.0 + tilt);\n    endShape(CLOSE);\n    pop();\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "boardsinline",
+    "author": "aa_debdeb",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:28:39",
+    "url": "https://openprocessing.org/@aa_debdeb/400636",
+    "code": "// === Tab: mySketch ===\n/**\n* boards in line\n*\n* @author aadebdeb\n* @date 2017/01/26\n*/\n\nfunction setup(){\n  createCanvas(640, 480);\n  rectMode(CENTER);\n  fill(20);\n  stroke(255, 251, 249);\n  strokeWeight(4);\n}\n\nfunction draw(){\n  background(255, 251, 249);\n  translate(width / 2, height / 2);\n  let num = 10;\n  let intervalX = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 40, -40);\n  let intervalY = map(abs((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2), 0, width / 2, 0, -20);\n  let rectX = 100;\n  let rectY = 200;\n  let tilt = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, -20, 20);\n  for(let i = num - 1; i > 0; i--){\n    push();\n    let rhytm = map(pow(abs(sin(frameCount * 0.03 - i * 0.3)), 50), 0, 1, 0, -50)\n                * map(abs((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2), 0, width / 2, 0, 1);\n    translate(intervalX * (i - num / 2.0), intervalY * (i - num / 2.0) + rhytm);\n    beginShape();\n    vertex(-rectX / 2.0, -rectY / 2.0 + tilt);\n    vertex(rectX / 2.0, -rectY / 2.0 - tilt);\n    vertex(rectX / 2.0, rectY / 2.0 - tilt);\n    vertex(-rectX / 2.0, rectY / 2.0 + tilt);\n    endShape(CLOSE);\n    pop();\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Frozen Time.mp4"
+    ]
 }

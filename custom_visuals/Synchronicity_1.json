@@ -1,22 +1,25 @@
 {
-  "name": "Synchronicity_1",
-  "author": "u95522",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:28:23",
-  "url": "https://openprocessing.org/@u95522/741991",
-  "code": "// === Tab: mySketch ===\nvar pens = [];\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tcolorMode(HSB);\n\tfor (var i = 0; i < 50; i++) {\n\t\tpens[i] = new Pen;\n\t}\n\tbackground(255);\n\tnoStroke();\n}\n\nfunction draw() {\n\tbackground(255, .01);\n\tpens.forEach(p => { p.drawMe(); p.update(); });\n\n}\n\nclass Pen {\n\tconstructor() {\n\t\tthis.x = random(0, width);\n\t\tthis.nx = random(0, 1.5);\n\t\tthis.y = random(0, height);\n\t\tthis.ny = random(1000, 1001.5);\n\t\tthis.r = random(10, 70);\n\t\tthis.nr = random(0, 1000);\n\t\tthis.h = random(0, 360);\n\t\tthis.hv = getBool(.5);\n\n\t}\n\tdrawMe() {\n\t\tfill(this.h, 100, 100);\n\t\tellipse(this.x, this.y, this.r);\n\t}\n\tupdate() {\n\t\tthis.x += noise(this.nx) * 20 - 9;\n\t\tthis.y += noise(this.ny) * 20 - 9;\n\t\tthis.r += noise(this.nr) * 5 - 2.4;\n\t\tif (this.x > width+this.r/2) { this.x = 0-this.r/2; }\n\t\tif (this.x < 0-this.r/2) { this.x = width+this.r/2; }\n\t\tif (this.y > height+this.r/2) { this.y = 0-this.r/2; }\n\t\tif (this.y < 0-this.r/2) { this.y = height+this.r/2; }\n\t\tif (this.r < 10) { this.r = 10; }\n\t\tif (this.r > 70) { this.r = 70; }\n\t\tif (this.h > 359) { this.h = 0; }\n\t\tif (this.h < 0) { this.h = 359; }\n\t\tthis.nx += .003;\n\t\tthis.ny += .003;\n\t\tthis.nr += .01;\n\t\tthis.h += .3 * (this.hv ? 1 : -1);\n\t}\n}\n\nfunction getBool(p) {\n\treturn random() < p ? true : false;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Synchronicity_1",
+    "author": "u95522",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:28:23",
+    "url": "https://openprocessing.org/@u95522/741991",
+    "code": "// === Tab: mySketch ===\nvar pens = [];\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tcolorMode(HSB);\n\tfor (var i = 0; i < 50; i++) {\n\t\tpens[i] = new Pen;\n\t}\n\tbackground(255);\n\tnoStroke();\n}\n\nfunction draw() {\n\tbackground(255, .01);\n\tpens.forEach(p => { p.drawMe(); p.update(); });\n\n}\n\nclass Pen {\n\tconstructor() {\n\t\tthis.x = random(0, width);\n\t\tthis.nx = random(0, 1.5);\n\t\tthis.y = random(0, height);\n\t\tthis.ny = random(1000, 1001.5);\n\t\tthis.r = random(10, 70);\n\t\tthis.nr = random(0, 1000);\n\t\tthis.h = random(0, 360);\n\t\tthis.hv = getBool(.5);\n\n\t}\n\tdrawMe() {\n\t\tfill(this.h, 100, 100);\n\t\tellipse(this.x, this.y, this.r);\n\t}\n\tupdate() {\n\t\tthis.x += noise(this.nx) * 20 - 9;\n\t\tthis.y += noise(this.ny) * 20 - 9;\n\t\tthis.r += noise(this.nr) * 5 - 2.4;\n\t\tif (this.x > width+this.r/2) { this.x = 0-this.r/2; }\n\t\tif (this.x < 0-this.r/2) { this.x = width+this.r/2; }\n\t\tif (this.y > height+this.r/2) { this.y = 0-this.r/2; }\n\t\tif (this.y < 0-this.r/2) { this.y = height+this.r/2; }\n\t\tif (this.r < 10) { this.r = 10; }\n\t\tif (this.r > 70) { this.r = 70; }\n\t\tif (this.h > 359) { this.h = 0; }\n\t\tif (this.h < 0) { this.h = 359; }\n\t\tthis.nx += .003;\n\t\tthis.ny += .003;\n\t\tthis.nr += .01;\n\t\tthis.h += .3 * (this.hv ? 1 : -1);\n\t}\n}\n\nfunction getBool(p) {\n\treturn random() < p ? true : false;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Modern Twist Saturation.mp4"
+    ]
 }

@@ -1,22 +1,25 @@
 {
-  "name": "Timeminacoding7_23",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:10:58",
-  "url": "https://openprocessing.org/@epi/1949265",
-  "code": "// === Tab: mySketch ===\n/*\n\tTime // 7.6.2023\n\t#minacoding #p5js #generativeart #dailycoding\n */\n\nlet bars, minWH, len, pallete, pInd;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tminWH = max(width, height) * 0.5;\n\tlen = minWH * 0.35;\n\tpixelDensity(1);\n\tframeRate(60);\n\tstrokeWeight(len * 0.02);\n\tnoFill();\n\t\n\t// generate bars\n\tbars = [];\n\tfor (let i = 0; i < 25; i++) {\n\t\tconst a = random(TWO_PI);\n\t\tconst r = minWH - random(random(len, minWH - len));\n\t\tbars.push({a, r, l: len});\n\t}\n\t\n\t// define colors\n\tpalette = [\n\t\t[\"white\", \"red\"],\n\t\t[color(255), lerpColor(color(255), color(32, 160, 192), 0.5), color(32, 160, 192), lerpColor(color(255), color(192, 32, 160), 0.5), color(192, 32, 160), color(192, 32, 160)],\n\t\t[\"white\", \"red\",\"red\", \"green\", \"blue\", \"blue\"]\n\t];\n\tpInd = floor(random(palette.length));\n}\n\nfunction getColor(v) {\n\treturn palette[pInd][floor(palette[pInd].length * v)];\n}\n\nfunction windowResized() {\n\tsetup();\n}\nfunction mouseClicked() {\n\tif (mouseButton === LEFT) setup();\n}\n\nfunction draw() {\n\tbackground(0, 48);\n\ttranslate(width / 2, height / 2)\n\n\tfor (let b of bars) {\n\t\tpush()\n\t\tvar a = b.a + sin(frameCount * 0.05 * fract(b.a) * abs(sin(b.a + b.r)));\n\t\tconst x = cos(a) * b.r;\n\t\tconst y = sin(a) * b.r;\n\n\t\tstroke(getColor(noise(b.a * b.r, frameCount * 0.01)));\n\t\t\n\t\ttranslate(x, y);\n\t\trotate(a)\n\t\tline(-b.l * 0.5, 0, b.l * 0.5, 0)\n\t\tpop();\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Timeminacoding7_23",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:10:58",
+    "url": "https://openprocessing.org/@epi/1949265",
+    "code": "// === Tab: mySketch ===\n/*\n\tTime // 7.6.2023\n\t#minacoding #p5js #generativeart #dailycoding\n */\n\nlet bars, minWH, len, pallete, pInd;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tminWH = max(width, height) * 0.5;\n\tlen = minWH * 0.35;\n\tpixelDensity(1);\n\tframeRate(60);\n\tstrokeWeight(len * 0.02);\n\tnoFill();\n\t\n\t// generate bars\n\tbars = [];\n\tfor (let i = 0; i < 25; i++) {\n\t\tconst a = random(TWO_PI);\n\t\tconst r = minWH - random(random(len, minWH - len));\n\t\tbars.push({a, r, l: len});\n\t}\n\t\n\t// define colors\n\tpalette = [\n\t\t[\"white\", \"red\"],\n\t\t[color(255), lerpColor(color(255), color(32, 160, 192), 0.5), color(32, 160, 192), lerpColor(color(255), color(192, 32, 160), 0.5), color(192, 32, 160), color(192, 32, 160)],\n\t\t[\"white\", \"red\",\"red\", \"green\", \"blue\", \"blue\"]\n\t];\n\tpInd = floor(random(palette.length));\n}\n\nfunction getColor(v) {\n\treturn palette[pInd][floor(palette[pInd].length * v)];\n}\n\nfunction windowResized() {\n\tsetup();\n}\nfunction mouseClicked() {\n\tif (mouseButton === LEFT) setup();\n}\n\nfunction draw() {\n\tbackground(0, 48);\n\ttranslate(width / 2, height / 2)\n\n\tfor (let b of bars) {\n\t\tpush()\n\t\tvar a = b.a + sin(frameCount * 0.05 * fract(b.a) * abs(sin(b.a + b.r)));\n\t\tconst x = cos(a) * b.r;\n\t\tconst y = sin(a) * b.r;\n\n\t\tstroke(getColor(noise(b.a * b.r, frameCount * 0.01)));\n\t\t\n\t\ttranslate(x, y);\n\t\trotate(a)\n\t\tline(-b.l * 0.5, 0, b.l * 0.5, 0)\n\t\tpop();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Temporal Mist.mp4"
+    ]
 }

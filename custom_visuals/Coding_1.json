@@ -1,22 +1,25 @@
 {
-  "name": "Coding_1",
-  "author": "u266498",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:10:41",
-  "url": "https://openprocessing.org/@u266498/1219550",
-  "code": "// === Tab: mySketch ===\nvar Ox = 0; // Origin\nvar Oy = 0;\nvar x = 0;\nvar r = false;\nvar t = 0; // T for 'tab'     :)\nvar tabd= false;\nvar col = 255;\nvar w = 20;\n\nvar c = [randomColor(), randomColor(), randomColor(), randomColor(), randomColor(), randomColor(), randomColor()];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  frameRate(60); // The faster it is, the bigger the blur is (it's because get() and image() can't keep up)\n  noStroke();\n  background(28);\n  \n  Ox = width/24;\n  Oy = height-w*3;\n  \n  x = Ox;\n}\n\nfunction draw() {\n  \n  r = (random()>0.75 && r==false);\n  \n  // Color\n  if (random()<0.2 && r) col = color(random(c))\n  else if (r) col = 255;\n  \n  if (tabd) fill(\"#FFC93C\")\n  else fill(col);\n  \n  if (x==Ox) {\n    rect(Ox+t*w-w*tabd, Oy, w, w, 30);\n  }else{\n    \n    if (r) x+=w/2\n    else rect(x-w+t*w-w*tabd,Oy, w+w, w, 30);\n\n  }\n  \n  x+=w;\n  \n  if ((random() < 0.15 && x>=5*w+t*w) || x>=width-w*3) { // New line\n    \n    if (tabd) tabd = false;\n    \n    translate(0, -(4*w/3));\n    const g = get(0, 0, width, height);\n    image(g, 0, 0, width, height);\n    x=Ox;\n    \n    if (random()<0.3) {\n      tabd = true;\n      t++;\n      x=Ox;\n    }else if ((random()<0.4 || t>=6) && t>0) t--;\n    \n  }\n  \n}",
-  "custom_html": "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.6.1/randomColor.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Coding_1",
+    "author": "u266498",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:10:41",
+    "url": "https://openprocessing.org/@u266498/1219550",
+    "code": "// === Tab: mySketch ===\nvar Ox = 0; // Origin\nvar Oy = 0;\nvar x = 0;\nvar r = false;\nvar t = 0; // T for 'tab'     :)\nvar tabd= false;\nvar col = 255;\nvar w = 20;\n\nvar c = [randomColor(), randomColor(), randomColor(), randomColor(), randomColor(), randomColor(), randomColor()];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  frameRate(60); // The faster it is, the bigger the blur is (it's because get() and image() can't keep up)\n  noStroke();\n  background(28);\n  \n  Ox = width/24;\n  Oy = height-w*3;\n  \n  x = Ox;\n}\n\nfunction draw() {\n  \n  r = (random()>0.75 && r==false);\n  \n  // Color\n  if (random()<0.2 && r) col = color(random(c))\n  else if (r) col = 255;\n  \n  if (tabd) fill(\"#FFC93C\")\n  else fill(col);\n  \n  if (x==Ox) {\n    rect(Ox+t*w-w*tabd, Oy, w, w, 30);\n  }else{\n    \n    if (r) x+=w/2\n    else rect(x-w+t*w-w*tabd,Oy, w+w, w, 30);\n\n  }\n  \n  x+=w;\n  \n  if ((random() < 0.15 && x>=5*w+t*w) || x>=width-w*3) { // New line\n    \n    if (tabd) tabd = false;\n    \n    translate(0, -(4*w/3));\n    const g = get(0, 0, width, height);\n    image(g, 0, 0, width, height);\n    x=Ox;\n    \n    if (random()<0.3) {\n      tabd = true;\n      t++;\n      x=Ox;\n    }else if ((random()<0.4 || t>=6) && t>0) t--;\n    \n  }\n  \n}",
+    "custom_html": "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.6.1/randomColor.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Muffled Kick Void.mp4"
+    ]
 }

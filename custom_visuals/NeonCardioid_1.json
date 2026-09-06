@@ -1,22 +1,25 @@
 {
-  "name": "NeonCardioid_1",
-  "author": "MathyCathy",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:17:05",
-  "url": "https://openprocessing.org/@MathyCathy/1642218",
-  "code": "// === Tab: CardioidClass ===\nclass Cardioid {\n  constructor( newX, newY, pNumberPoints, newR, factor) {\n    this.numOfPoints = pNumberPoints;\n    this.angle = 2*PI/this.numOfPoints;\n    this.arrayOfPointsOnCircle =[];\n    this.r = newR;\n    this.x = newX;\n    this.y = newY;\n    this.factor = factor;\n    this.index = 0;\n    noFill();\n  }\n\n  makeArrayOfPoints() {\n    let posArrayPoints =0;\n    for (let i = 0; i<this.numOfPoints; i++) {\n      let xCoord = this.x + this.r*cos(i*this.angle+PI);\n      let yCoord = this.y + this.r*sin(i*this.angle+PI);\n      let v = new p5.Vector(xCoord, yCoord);\n      this.arrayOfPointsOnCircle.push(v) ;\n    }\n  }\n\n  drawPoints() {\n    noFill();\n    beginShape();\n    for ( let point of this.arrayOfPointsOnCircle) {\n      vertex(point.x, point.y);\n    }\n    endShape(CLOSE);\n  }\n\n  drawLinesBetweenPoints() {\n    stroke(this.factor*100 % 360, 100, 100);\n    ellipse (this.x, this.y, 2*this.r);\n\n    if (this.index < this.arrayOfPointsOnCircle.length) {\n      line(this.arrayOfPointsOnCircle[this.index].x, this.arrayOfPointsOnCircle[this.index].y, this.arrayOfPointsOnCircle[(this.index*this.factor)%this.numOfPoints].x, this.arrayOfPointsOnCircle[(this.index*this.factor)%this.numOfPoints].y);\n      this.index++;\n    }\n  }\n}\n\n\n// === Tab: mySketch ===\nlet cardioArray = [];\nlet numPoints ;\nconst radius = 100;\n\n\nfunction setup() {\n  createCanvas(1200, 800);\n  colorMode(HSB, 360, 100, 100);\n  background(0,0,0, 50);\n  strokeWeight(1);\n  let groesse = 2*radius;\n  let gap = 20;\n  numPoints = 250;\n  for (let i=0; i<10; i++) {\n    //Cardioid(float newX, float newY, int , int newR);\n    cardioArray.push(new Cardioid((groesse+gap)*(i%5)+gap + radius, floor(i/5)*(gap+2*radius)+gap+radius, numPoints, radius, i+2));\n    }\n\n  for (let i=0; i<cardioArray.length; i++) {\n    cardioArray[i].makeArrayOfPoints();\n    cardioArray[i].drawPoints();\n  }\n}\n\nfunction draw() {\n  for (let i=0; i<cardioArray.length; i++) {\n    cardioArray[i].drawLinesBetweenPoints();\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "NeonCardioid_1",
+    "author": "MathyCathy",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:17:05",
+    "url": "https://openprocessing.org/@MathyCathy/1642218",
+    "code": "// === Tab: CardioidClass ===\nclass Cardioid {\n  constructor( newX, newY, pNumberPoints, newR, factor) {\n    this.numOfPoints = pNumberPoints;\n    this.angle = 2*PI/this.numOfPoints;\n    this.arrayOfPointsOnCircle =[];\n    this.r = newR;\n    this.x = newX;\n    this.y = newY;\n    this.factor = factor;\n    this.index = 0;\n    noFill();\n  }\n\n  makeArrayOfPoints() {\n    let posArrayPoints =0;\n    for (let i = 0; i<this.numOfPoints; i++) {\n      let xCoord = this.x + this.r*cos(i*this.angle+PI);\n      let yCoord = this.y + this.r*sin(i*this.angle+PI);\n      let v = new p5.Vector(xCoord, yCoord);\n      this.arrayOfPointsOnCircle.push(v) ;\n    }\n  }\n\n  drawPoints() {\n    noFill();\n    beginShape();\n    for ( let point of this.arrayOfPointsOnCircle) {\n      vertex(point.x, point.y);\n    }\n    endShape(CLOSE);\n  }\n\n  drawLinesBetweenPoints() {\n    stroke(this.factor*100 % 360, 100, 100);\n    ellipse (this.x, this.y, 2*this.r);\n\n    if (this.index < this.arrayOfPointsOnCircle.length) {\n      line(this.arrayOfPointsOnCircle[this.index].x, this.arrayOfPointsOnCircle[this.index].y, this.arrayOfPointsOnCircle[(this.index*this.factor)%this.numOfPoints].x, this.arrayOfPointsOnCircle[(this.index*this.factor)%this.numOfPoints].y);\n      this.index++;\n    }\n  }\n}\n\n\n// === Tab: mySketch ===\nlet cardioArray = [];\nlet numPoints ;\nconst radius = 100;\n\n\nfunction setup() {\n  createCanvas(1200, 800);\n  colorMode(HSB, 360, 100, 100);\n  background(0,0,0, 50);\n  strokeWeight(1);\n  let groesse = 2*radius;\n  let gap = 20;\n  numPoints = 250;\n  for (let i=0; i<10; i++) {\n    //Cardioid(float newX, float newY, int , int newR);\n    cardioArray.push(new Cardioid((groesse+gap)*(i%5)+gap + radius, floor(i/5)*(gap+2*radius)+gap+radius, numPoints, radius, i+2));\n    }\n\n  for (let i=0; i<cardioArray.length; i++) {\n    cardioArray[i].makeArrayOfPoints();\n    cardioArray[i].drawPoints();\n  }\n}\n\nfunction draw() {\n  for (let i=0; i<cardioArray.length; i++) {\n    cardioArray[i].drawLinesBetweenPoints();\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Remote Sector.mp4"
+    ]
 }

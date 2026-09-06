@@ -1,22 +1,25 @@
 {
-  "name": "Moir2_1",
-  "author": "Xeronimo74",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 03:43:23",
-  "url": "https://openprocessing.org/@Xeronimo74/277944",
-  "code": "// === Tab: sketch277944 ===\nlet l1;\nlet edge, frms = 600, rez;\nlet angle=PI/2;\nlet evenX, evenY;\n\nfunction setup() {\n  createCanvas(540, 540);\n  edge = width/10;\n  rez = 5;\n  drawPattern();\n}\n\nfunction draw() {\n  background(255);\n  translate(edge, edge);\n  imageMode(CORNER);\n  image(l1, 0, 0);\n  pushMatrix();\n  imageMode(CENTER);\n  translate(l1.width/2, l1.height/2);\n  let r = map(sin(angle), -1, 1, 0, radians(90));\n  rotate(r);\n  image(l1, 0, 0);\n  popMatrix();\n  angle += TWO_PI/frms;\n  //if (frameCount<=frms) saveFrame(\"image-###.gif\");\n}\n\nfunction drawPattern() {\n  l1 = createGraphics(width-edge*2, height-edge*2);\n  l1.beginDraw();\n  evenX = true;\n  evenY = false;\n  for (let x=0; x<=l1.width; x+=rez) {\n    for (let y=0; y<=l1.height; y+=rez) {\n      l1.noStroke();\n      if (evenY) {\n        l1.fill(0);\n      } else {\n        l1.noFill();\n      }\n      l1.rect(x, y, rez, rez);\n      evenY = ! evenY;\n    }\n    evenX =! evenX;\n  }\n  l1.endDraw();\n}\n\nfunction mouseReleased() {\n  drawPattern();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Moir2_1",
+    "author": "Xeronimo74",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 03:43:23",
+    "url": "https://openprocessing.org/@Xeronimo74/277944",
+    "code": "// === Tab: sketch277944 ===\nlet l1;\nlet edge, frms = 600, rez;\nlet angle=PI/2;\nlet evenX, evenY;\n\nfunction setup() {\n  createCanvas(540, 540);\n  edge = width/10;\n  rez = 5;\n  drawPattern();\n}\n\nfunction draw() {\n  background(255);\n  translate(edge, edge);\n  imageMode(CORNER);\n  image(l1, 0, 0);\n  pushMatrix();\n  imageMode(CENTER);\n  translate(l1.width/2, l1.height/2);\n  let r = map(sin(angle), -1, 1, 0, radians(90));\n  rotate(r);\n  image(l1, 0, 0);\n  popMatrix();\n  angle += TWO_PI/frms;\n  //if (frameCount<=frms) saveFrame(\"image-###.gif\");\n}\n\nfunction drawPattern() {\n  l1 = createGraphics(width-edge*2, height-edge*2);\n  l1.beginDraw();\n  evenX = true;\n  evenY = false;\n  for (let x=0; x<=l1.width; x+=rez) {\n    for (let y=0; y<=l1.height; y+=rez) {\n      l1.noStroke();\n      if (evenY) {\n        l1.fill(0);\n      } else {\n        l1.noFill();\n      }\n      l1.rect(x, y, rez, rez);\n      evenY = ! evenY;\n    }\n    evenX =! evenX;\n  }\n  l1.endDraw();\n}\n\nfunction mouseReleased() {\n  drawPattern();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

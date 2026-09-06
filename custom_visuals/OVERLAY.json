@@ -1,22 +1,25 @@
 {
-  "name": "OVERLAY",
-  "author": "reona396",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:06:40",
-  "url": "https://openprocessing.org/@reona396/1957988",
-  "code": "// === Tab: mySketch ===\nlet shapes = [];\nlet shapesNum = 100;\n\nconst palette = [\"#0276D1\", \"#011E60\", \"#79BCC9\", \"#F6F5BE\", \"#269182\"];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  angleMode(DEGREES);\n\n  for (let i = 0; i < shapesNum; i++) {\n    shapes.push(new Shape());\n  }\n  noStroke();\n  background(palette[0]);\n}\n\nfunction draw() {\n  for (let i = 0; i < shapes.length; i++) {\n    if (i < shapes.length / 3) {\n      blendMode(BLEND);\n    } else {\n      blendMode(OVERLAY);\n    }\n    shapes[i].move();\n    shapes[i].display();\n  }\n}\n\nclass Shape {\n  constructor() {\n    this.x = 0;\n    this.y = 0;\n    this.maxD = random(5, 100);\n    this.d = 0;\n    this.n = random(1000);\n    this.nx = random(1000);\n    this.ny = random(1000);\n    this.c = color(random(palette));\n    this.c.setAlpha(random(5, 30));\n    this.rotSpeed = random(3, 10) * random([-1, 1]);\n    this.shapeDelta = 360 / random([3, 6]);\n  }\n\n  move() {\n    this.d = this.maxD * abs(sin(this.n * 1000));\n\n    this.x = map(noise(this.n, this.nx), 0, 1, -width * 0.5, width * 1.5);\n    this.y = map(noise(this.n, this.ny), 0, 1, -height * 0.5, height * 1.5);\n    this.n += 0.005;\n  }\n\n  display() {\n    fill(this.c);\n    push();\n    translate(this.x, this.y);\n    rotate(frameCount * this.rotSpeed);\n    beginShape();\n    for (let i = 0; i < 360; i += (Math.max(0.001, Math.abs(this.shapeDelta)) || 1)) {\n      let x = cos(i) * this.d;\n      let y = sin(i) * this.d;\n      vertex(x, y);\n    }\n    endShape(CLOSE);\n    pop();\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "OVERLAY",
+    "author": "reona396",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:06:40",
+    "url": "https://openprocessing.org/@reona396/1957988",
+    "code": "// === Tab: mySketch ===\nlet shapes = [];\nlet shapesNum = 100;\n\nconst palette = [\"#0276D1\", \"#011E60\", \"#79BCC9\", \"#F6F5BE\", \"#269182\"];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  angleMode(DEGREES);\n\n  for (let i = 0; i < shapesNum; i++) {\n    shapes.push(new Shape());\n  }\n  noStroke();\n  background(palette[0]);\n}\n\nfunction draw() {\n  for (let i = 0; i < shapes.length; i++) {\n    if (i < shapes.length / 3) {\n      blendMode(BLEND);\n    } else {\n      blendMode(OVERLAY);\n    }\n    shapes[i].move();\n    shapes[i].display();\n  }\n}\n\nclass Shape {\n  constructor() {\n    this.x = 0;\n    this.y = 0;\n    this.maxD = random(5, 100);\n    this.d = 0;\n    this.n = random(1000);\n    this.nx = random(1000);\n    this.ny = random(1000);\n    this.c = color(random(palette));\n    this.c.setAlpha(random(5, 30));\n    this.rotSpeed = random(3, 10) * random([-1, 1]);\n    this.shapeDelta = 360 / random([3, 6]);\n  }\n\n  move() {\n    this.d = this.maxD * abs(sin(this.n * 1000));\n\n    this.x = map(noise(this.n, this.nx), 0, 1, -width * 0.5, width * 1.5);\n    this.y = map(noise(this.n, this.ny), 0, 1, -height * 0.5, height * 1.5);\n    this.n += 0.005;\n  }\n\n  display() {\n    fill(this.c);\n    push();\n    translate(this.x, this.y);\n    rotate(frameCount * this.rotSpeed);\n    beginShape();\n    for (let i = 0; i < 360; i += (Math.max(0.001, Math.abs(this.shapeDelta)) || 1)) {\n      let x = cos(i) * this.d;\n      let y = sin(i) * this.d;\n      vertex(x, y);\n    }\n    endShape(CLOSE);\n    pop();\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

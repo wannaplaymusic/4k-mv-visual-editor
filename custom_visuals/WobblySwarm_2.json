@@ -1,22 +1,26 @@
 {
-  "name": "WobblySwarm_2",
-  "author": "lungtwist",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:22:11",
-  "url": "https://openprocessing.org/@lungtwist/492096",
-  "code": "// === Tab: mySketch ===\nvar mass = [];\nvar positionX = [];\nvar positionY = [];\nvar velocityX = [];\nvar velocityY = [];\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tnoStroke();\n\tfill(64, 255, 255, 192);\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction draw() {\n\tbackground(32);\n\t\n\tfor (var particleA = 0; particleA < mass.length; particleA++) {\n\t\tvar accelerationX = 0, accelerationY = 0;\n\t\t\n\t\tfor (var particleB = 0; particleB < mass.length; particleB++) {\n\t\t\tif (particleA != particleB) {\n\t\t\t\tvar distanceX = positionX[particleB] - positionX[particleA];\n\t\t\t\tvar distanceY = positionY[particleB] - positionY[particleA];\n\n\t\t\t\tvar distance = sqrt(distanceX * distanceX + distanceY * distanceY);\n\t\t\t\tif (distance < 1) distance = 1;\n\n\t\t\t\tvar force = (distance - 320) * mass[particleB] / distance;\n\t\t\t\taccelerationX += force * distanceX;\n\t\t\t\taccelerationY += force * distanceY;\n\t\t\t}\n\t\t}\n\t\t\n\t\tvelocityX[particleA] = velocityX[particleA] * 0.99 + accelerationX * mass[particleA];\n\t\tvelocityY[particleA] = velocityY[particleA] * 0.99 + accelerationY * mass[particleA];\n\t}\n\t\n\tfor (var particle = 0; particle < mass.length; particle++) {\n\t\tpositionX[particle] += velocityX[particle];\n\t\tpositionY[particle] += velocityY[particle];\n\t\t\n\t\tellipse(positionX[particle], positionY[particle], mass[particle] * 1000, mass[particle] * 1000);\n\t}\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction addNewParticle() {\n\tmass.push(random(0.003, 0.03));\n\tpositionX.push((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))));\n\tpositionY.push((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\tvelocityX.push(0);\n\tvelocityY.push(0);\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction mouseClicked() {\n\taddNewParticle();\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction mouseDragged() {\n\taddNewParticle();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "WobblySwarm_2",
+    "author": "lungtwist",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:22:11",
+    "url": "https://openprocessing.org/@lungtwist/492096",
+    "code": "// === Tab: mySketch ===\nvar mass = [];\nvar positionX = [];\nvar positionY = [];\nvar velocityX = [];\nvar velocityY = [];\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tnoStroke();\n\tfill(64, 255, 255, 192);\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction draw() {\n\tbackground(32);\n\t\n\tfor (var particleA = 0; particleA < mass.length; particleA++) {\n\t\tvar accelerationX = 0, accelerationY = 0;\n\t\t\n\t\tfor (var particleB = 0; particleB < mass.length; particleB++) {\n\t\t\tif (particleA != particleB) {\n\t\t\t\tvar distanceX = positionX[particleB] - positionX[particleA];\n\t\t\t\tvar distanceY = positionY[particleB] - positionY[particleA];\n\n\t\t\t\tvar distance = sqrt(distanceX * distanceX + distanceY * distanceY);\n\t\t\t\tif (distance < 1) distance = 1;\n\n\t\t\t\tvar force = (distance - 320) * mass[particleB] / distance;\n\t\t\t\taccelerationX += force * distanceX;\n\t\t\t\taccelerationY += force * distanceY;\n\t\t\t}\n\t\t}\n\t\t\n\t\tvelocityX[particleA] = velocityX[particleA] * 0.99 + accelerationX * mass[particleA];\n\t\tvelocityY[particleA] = velocityY[particleA] * 0.99 + accelerationY * mass[particleA];\n\t}\n\t\n\tfor (var particle = 0; particle < mass.length; particle++) {\n\t\tpositionX[particle] += velocityX[particle];\n\t\tpositionY[particle] += velocityY[particle];\n\t\t\n\t\tellipse(positionX[particle], positionY[particle], mass[particle] * 1000, mass[particle] * 1000);\n\t}\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction addNewParticle() {\n\tmass.push(random(0.003, 0.03));\n\tpositionX.push((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))));\n\tpositionY.push((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\tvelocityX.push(0);\n\tvelocityY.push(0);\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction mouseClicked() {\n\taddNewParticle();\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction mouseDragged() {\n\taddNewParticle();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 2,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4",
+        "Harmonious Gap.mp4"
+    ]
 }

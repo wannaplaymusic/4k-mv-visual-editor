@@ -1,22 +1,25 @@
 {
-  "name": "Pilula",
-  "author": "u65884",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:19:35",
-  "url": "https://openprocessing.org/@u65884/2186979",
-  "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://openprocessing.org/sketch/2186979\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nvar pos = {};\nvar colors = [\"#FFC30F\", \"#581845\", \"#900C3F\", \"#C70039\", \"#FF5733\", \"#1AC7C4\"];\nvar seed;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\tcolors.forEach((str, i) => colors[i] = color(str));\n\tseed = random() * 10000;\n\t\n\tpos.x = width/2;\n\tpos.y = height/2;\n}\n\nfunction draw() {\n\trandomSeed(seed);\n\tbackground(255);\n\tnoStroke();\n\tfor(var i = 0; i < 6; i++){\n\t\tvar pallete = [random(colors), random(colors), random(colors), random(colors)];\n\t\tdrawPill(300*((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))+1)/width + i * 80, 150*((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))+1)/height, 42, pallete, 10);\t\t\n\t}\n}\n\nfunction mousePressed(){\n\tseed = random() * 10000;\n}\n\nfunction drawPill(w, h, size, colors, resolution){\n\tfor(var a = -PI/2; a <= 0; a += (Math.max(0.001, Math.abs(PI/20 * 1/resolution)) || 1)){\n\t\tfill(lerpColors(map(a, -PI/2, 0, 0, 0.33), colors));\n\t\tvar x = cos(a) * w/2;\n\t\tvar y = -h/2 + sin(a) * w/2 + height/2;\n\t\tcircle(x + width/2, y, size);\n\t\tcircle(-x + width/2, y, size);\n\t}\n\tfor(var yy = -h/2; yy <= h/2; yy += (Math.max(0.001, Math.abs(h/10 * 1/resolution)) || 1)) {\n\t\tfill(lerpColors(map(yy, -h/2, h/2, 0.33, 0.66), colors));\n\t\tvar x = w/2;\n\t\tvar y = yy + height/2;\n\t\tcircle(x + width/2, y, size);\n\t\tcircle(-x + width/2, y, size);\n\t}\n\tfor(var a = 0; a <= PI/2; a += (Math.max(0.001, Math.abs(PI/20 * 1/resolution)) || 1)){\n\t\tfill(lerpColors(map(a, 0, PI/2, 0.66, 1), colors));\n\t\tvar x = cos(a) * w/2;\n\t\tvar y = h/2 + sin(a) * w/2 + height/2;\n\t\tcircle(x + width/2, y, size);\n\t\tcircle(-x + width/2, y, size);\n\t}\n}\n\n/**\n * lerp color from multiple color array\n * param {Integer} [t] lerp factor from 0 to 1\n * param {Array} [[color, color]] colors to lerp, minimum 2 colors in array\n */\nfunction lerpColors(t, colors)\n{\n\tlet i = Math.floor(t*(colors.length-1));\n\tif(i < 0) return colors[0];\n\tif(i >= colors.length-1) return colors[colors.length-1];\n\n\tlet percent = (t - i / (colors.length-1)) * (colors.length-1);\n\treturn color(\n\t\tcolors[i]._getRed() + percent*(colors[i+1]._getRed()-colors[i]._getRed()),\n\t\tcolors[i]._getGreen() + percent*(colors[i+1]._getGreen()-colors[i]._getGreen()),\n\t\tcolors[i]._getBlue() + percent*(colors[i+1]._getBlue()-colors[i]._getBlue())\n\t)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Pilula",
+    "author": "u65884",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:19:35",
+    "url": "https://openprocessing.org/@u65884/2186979",
+    "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://openprocessing.org/sketch/2186979\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nvar pos = {};\nvar colors = [\"#FFC30F\", \"#581845\", \"#900C3F\", \"#C70039\", \"#FF5733\", \"#1AC7C4\"];\nvar seed;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\tcolors.forEach((str, i) => colors[i] = color(str));\n\tseed = random() * 10000;\n\t\n\tpos.x = width/2;\n\tpos.y = height/2;\n}\n\nfunction draw() {\n\trandomSeed(seed);\n\tbackground(255);\n\tnoStroke();\n\tfor(var i = 0; i < 6; i++){\n\t\tvar pallete = [random(colors), random(colors), random(colors), random(colors)];\n\t\tdrawPill(300*((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))+1)/width + i * 80, 150*((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))+1)/height, 42, pallete, 10);\t\t\n\t}\n}\n\nfunction mousePressed(){\n\tseed = random() * 10000;\n}\n\nfunction drawPill(w, h, size, colors, resolution){\n\tfor(var a = -PI/2; a <= 0; a += (Math.max(0.001, Math.abs(PI/20 * 1/resolution)) || 1)){\n\t\tfill(lerpColors(map(a, -PI/2, 0, 0, 0.33), colors));\n\t\tvar x = cos(a) * w/2;\n\t\tvar y = -h/2 + sin(a) * w/2 + height/2;\n\t\tcircle(x + width/2, y, size);\n\t\tcircle(-x + width/2, y, size);\n\t}\n\tfor(var yy = -h/2; yy <= h/2; yy += (Math.max(0.001, Math.abs(h/10 * 1/resolution)) || 1)) {\n\t\tfill(lerpColors(map(yy, -h/2, h/2, 0.33, 0.66), colors));\n\t\tvar x = w/2;\n\t\tvar y = yy + height/2;\n\t\tcircle(x + width/2, y, size);\n\t\tcircle(-x + width/2, y, size);\n\t}\n\tfor(var a = 0; a <= PI/2; a += (Math.max(0.001, Math.abs(PI/20 * 1/resolution)) || 1)){\n\t\tfill(lerpColors(map(a, 0, PI/2, 0.66, 1), colors));\n\t\tvar x = cos(a) * w/2;\n\t\tvar y = h/2 + sin(a) * w/2 + height/2;\n\t\tcircle(x + width/2, y, size);\n\t\tcircle(-x + width/2, y, size);\n\t}\n}\n\n/**\n * lerp color from multiple color array\n * param {Integer} [t] lerp factor from 0 to 1\n * param {Array} [[color, color]] colors to lerp, minimum 2 colors in array\n */\nfunction lerpColors(t, colors)\n{\n\tlet i = Math.floor(t*(colors.length-1));\n\tif(i < 0) return colors[0];\n\tif(i >= colors.length-1) return colors[colors.length-1];\n\n\tlet percent = (t - i / (colors.length-1)) * (colors.length-1);\n\treturn color(\n\t\tcolors[i]._getRed() + percent*(colors[i+1]._getRed()-colors[i]._getRed()),\n\t\tcolors[i]._getGreen() + percent*(colors[i+1]._getGreen()-colors[i]._getGreen()),\n\t\tcolors[i]._getBlue() + percent*(colors[i+1]._getBlue()-colors[i]._getBlue())\n\t)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Temporal Mist.mp4"
+    ]
 }

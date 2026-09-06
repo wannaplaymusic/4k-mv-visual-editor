@@ -1,22 +1,25 @@
 {
-  "name": "monalisa_1",
-  "author": "u172621",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:07:00",
-  "url": "https://openprocessing.org/@u172621/838218",
-  "code": "// === Tab: mySketch ===\n\n    let img\n    function preload() {\n      img = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/monalisa.jpg');\n    }\n    function setup() {\n      createCanvas(W = 800, W);\n      colorMode(HSB, 360, 100, 100, 1)\n      background(0);\n    }\n\n    let index = 0\n    function draw() {\n      background(0);\n      divide(0, 0, width, height, 6, 0, 0, width, height)\n    }\n\n    function divide(x, y, w, h, depth, ix, iy, iw, ih) {\n      if (depth > 0) {\n        const n = noise(w / width * 2, w / height * 2, frameCount / 800 * depth)\n        if (depth-- % 2 === 1) {\n          divide(x, y, w * n, h, depth,\n            ix, iy, iw / 2, ih)\n          divide(x + w * n, y, w - w * n, h, depth,\n            ix + iw / 2, iy, iw / 2, ih)\n        } else {\n          divide(x, y, w, h * n, depth,\n            ix, iy, iw, ih / 2\n          )\n          divide(x, y + h * n, w, h - h * n, depth,\n            ix, iy + ih / 2, iw, ih / 2\n          )\n        }\n      } else {\n        push()\n        noFill()\n        image(img, x, y, w, h, ix, iy, iw, ih)\n        stroke(255,0.2)\n        rect(x, y, w, h)\n        pop()\n        //text(index, x, y + 10)\n      }\n    }",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "monalisa_1",
+    "author": "u172621",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:07:00",
+    "url": "https://openprocessing.org/@u172621/838218",
+    "code": "// === Tab: mySketch ===\n\n    let img\n    function preload() {\n      img = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/monalisa.jpg');\n    }\n    function setup() {\n      createCanvas(W = 800, W);\n      colorMode(HSB, 360, 100, 100, 1)\n      background(0);\n    }\n\n    let index = 0\n    function draw() {\n      background(0);\n      divide(0, 0, width, height, 6, 0, 0, width, height)\n    }\n\n    function divide(x, y, w, h, depth, ix, iy, iw, ih) {\n      if (depth > 0) {\n        const n = noise(w / width * 2, w / height * 2, frameCount / 800 * depth)\n        if (depth-- % 2 === 1) {\n          divide(x, y, w * n, h, depth,\n            ix, iy, iw / 2, ih)\n          divide(x + w * n, y, w - w * n, h, depth,\n            ix + iw / 2, iy, iw / 2, ih)\n        } else {\n          divide(x, y, w, h * n, depth,\n            ix, iy, iw, ih / 2\n          )\n          divide(x, y + h * n, w, h - h * n, depth,\n            ix, iy + ih / 2, iw, ih / 2\n          )\n        }\n      } else {\n        push()\n        noFill()\n        image(img, x, y, w, h, ix, iy, iw, ih)\n        stroke(255,0.2)\n        rect(x, y, w, h)\n        pop()\n        //text(index, x, y + 10)\n      }\n    }",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tunnel Vision.mp4"
+    ]
 }

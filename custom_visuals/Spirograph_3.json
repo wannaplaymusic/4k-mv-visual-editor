@@ -1,22 +1,25 @@
 {
-  "name": "Spirograph_3",
-  "author": "u112615",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:20:23",
-  "url": "https://openprocessing.org/@u112615/745302",
-  "code": "// === Tab: mySketch ===\nlet NUMSINES = 100; // how many of these things can we do at once?\nlet sines = new Array(NUMSINES); // an array to hold all the current angles\nlet rad; // an initial radius value for the central sine\nlet i; // a counter variable\n\n// play with these to get a sense of what's going on:\nlet fund = 0.005; // the speed of the central sine\nlet ratio = 1; // what multiplier for speed is each additional sine?\nlet alpha = 50; // how opaque is the tracing system\n\nlet trace = false; // are we tracing?\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\n  rad = height / 4; // compute radius for central circle\n  background(204); // clear the screen\n\n  for (let i = 0; i<sines.length; i++) {\n    sines[i] = PI; // start EVERYBODY facing NORTH\n  }\n}\n\nfunction draw() {\n  if (!trace) {\n    background(204); // clear screen if showing geometry\n    stroke(0, 255); // black pen\n    noFill(); // don't fill\n  }\n\n  // MAIN ACTION\n  push(); // start a transformation matrix\n  translate(width / 2, height / 2); // move to middle of screen\n\n  for (let i = 0; i < sines.length; i++) {\n    let erad = 0; // radius for small \"point\" within circle... this is the 'pen' when tracing\n    // setup for tracing\n    if (trace) {\n      stroke(0, 0, 255 * (float(i) / sines.length), alpha); // blue\n      fill(0, 0, 255, alpha / 2); // also, um, blue\n      erad = 5.0 * (1.0 - float(i) / sines.length); // pen width will be related to which sine\n    }\n    let radius = rad / (i + 1); // radius for circle itself\n    rotate(sines[i]); // rotate circle\n    if (!trace) ellipse(0, 0, radius * 2, radius * 2); // if we're simulating, draw the sine\n    push(); // go up one level\n    translate(0, radius); // move to sine edge\n    if (!trace) ellipse(0, 0, 5, 5); // draw a little circle\n    if (trace) ellipse(0, 0, erad, erad); // draw with erad if tracing\n    pop(); // go down one level\n    translate(0, radius); // move into position for next sine\n    sines[i] = (sines[i] + (fund + (fund * i * ratio))) % TWO_PI; // update angle based on fundamental\n  }\n\n  pop(); // pop down final transformation\n\n}\n\nfunction keyReleased() {\n  if (key==' ') {\n    trace = !trace;\n    background(255);\n  }\n}\n\nfunction mousePressed() {\n  if (!trace) {\n    background(0); // clear screen if showing geometry\n    stroke(0, 255); // black pen\n    noFill(); // don't fill\n  }\n\n  // MAIN ACTION\n  push(); // start a transformation matrix\n  translate(width / 4, height / 4); // move to middle of screen\n\n  for (let i = 0; i < sines.length; i++) {\n    var erad = 0; // radius for small \"point\" within circle... this is the 'pen' when tracing\n    // setup for tracing\n    if (trace) {\n      stroke(0, 0, 255 * (float(i) / sines.length), alpha); // blue\n      fill(0, 0, 255, alpha / 2); // also, um, blue\n      erad = 5.0 * (1.0 - float(i) / sines.length); // pen width will be related to which sine\n    }\n    var radius = rad / (i + 1); // radius for circle itself\n    rotate(sines[i]); // rotate circle\n    if (!trace) ellipse(0, 0, radius * 2, radius * 2); // if we're simulating, draw the sine\n    push(); // go up one level\n    translate(0, radius); // move to sine edge\n    if (!trace) ellipse(0, 0, 5, 5); // draw a little circle\n    if (trace) ellipse(0, 0, erad, erad); // draw with erad if tracing\n    pop(); // go down one level\n    translate(0, radius); // move into position for next sine\n    sines[i] = (sines[i] + (fund + (fund * i * ratio))) % TWO_PI; // update angle based on fundamental\n  }\n\n  pop(); // pop down final transformation\n\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Spirograph_3",
+    "author": "u112615",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:20:23",
+    "url": "https://openprocessing.org/@u112615/745302",
+    "code": "// === Tab: mySketch ===\nlet NUMSINES = 100; // how many of these things can we do at once?\nlet sines = new Array(NUMSINES); // an array to hold all the current angles\nlet rad; // an initial radius value for the central sine\nlet i; // a counter variable\n\n// play with these to get a sense of what's going on:\nlet fund = 0.005; // the speed of the central sine\nlet ratio = 1; // what multiplier for speed is each additional sine?\nlet alpha = 50; // how opaque is the tracing system\n\nlet trace = false; // are we tracing?\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\n  rad = height / 4; // compute radius for central circle\n  background(204); // clear the screen\n\n  for (let i = 0; i<sines.length; i++) {\n    sines[i] = PI; // start EVERYBODY facing NORTH\n  }\n}\n\nfunction draw() {\n  if (!trace) {\n    background(204); // clear screen if showing geometry\n    stroke(0, 255); // black pen\n    noFill(); // don't fill\n  }\n\n  // MAIN ACTION\n  push(); // start a transformation matrix\n  translate(width / 2, height / 2); // move to middle of screen\n\n  for (let i = 0; i < sines.length; i++) {\n    let erad = 0; // radius for small \"point\" within circle... this is the 'pen' when tracing\n    // setup for tracing\n    if (trace) {\n      stroke(0, 0, 255 * (float(i) / sines.length), alpha); // blue\n      fill(0, 0, 255, alpha / 2); // also, um, blue\n      erad = 5.0 * (1.0 - float(i) / sines.length); // pen width will be related to which sine\n    }\n    let radius = rad / (i + 1); // radius for circle itself\n    rotate(sines[i]); // rotate circle\n    if (!trace) ellipse(0, 0, radius * 2, radius * 2); // if we're simulating, draw the sine\n    push(); // go up one level\n    translate(0, radius); // move to sine edge\n    if (!trace) ellipse(0, 0, 5, 5); // draw a little circle\n    if (trace) ellipse(0, 0, erad, erad); // draw with erad if tracing\n    pop(); // go down one level\n    translate(0, radius); // move into position for next sine\n    sines[i] = (sines[i] + (fund + (fund * i * ratio))) % TWO_PI; // update angle based on fundamental\n  }\n\n  pop(); // pop down final transformation\n\n}\n\nfunction keyReleased() {\n  if (key==' ') {\n    trace = !trace;\n    background(255);\n  }\n}\n\nfunction mousePressed() {\n  if (!trace) {\n    background(0); // clear screen if showing geometry\n    stroke(0, 255); // black pen\n    noFill(); // don't fill\n  }\n\n  // MAIN ACTION\n  push(); // start a transformation matrix\n  translate(width / 4, height / 4); // move to middle of screen\n\n  for (let i = 0; i < sines.length; i++) {\n    var erad = 0; // radius for small \"point\" within circle... this is the 'pen' when tracing\n    // setup for tracing\n    if (trace) {\n      stroke(0, 0, 255 * (float(i) / sines.length), alpha); // blue\n      fill(0, 0, 255, alpha / 2); // also, um, blue\n      erad = 5.0 * (1.0 - float(i) / sines.length); // pen width will be related to which sine\n    }\n    var radius = rad / (i + 1); // radius for circle itself\n    rotate(sines[i]); // rotate circle\n    if (!trace) ellipse(0, 0, radius * 2, radius * 2); // if we're simulating, draw the sine\n    push(); // go up one level\n    translate(0, radius); // move to sine edge\n    if (!trace) ellipse(0, 0, 5, 5); // draw a little circle\n    if (trace) ellipse(0, 0, erad, erad); // draw with erad if tracing\n    pop(); // go down one level\n    translate(0, radius); // move into position for next sine\n    sines[i] = (sines[i] + (fund + (fund * i * ratio))) % TWO_PI; // update angle based on fundamental\n  }\n\n  pop(); // pop down final transformation\n\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Transit Zone.mp4"
+    ]
 }

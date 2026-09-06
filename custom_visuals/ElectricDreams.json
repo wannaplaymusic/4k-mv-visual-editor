@@ -1,22 +1,25 @@
 {
-  "name": "ElectricDreams",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:10:43",
-  "url": "https://openprocessing.org/@ronikaufman/997636",
-  "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n\nlet particles = [];\nlet alpha;\nlet colors;\n\nlet palettes = [[\"#DCAFD0\", \"#E5998D\", \"#189A8A\", \"#5E418B\", \"#E3DB52\", \"#7798DD\"], [\"#10111C\", \"#23AECC\", \"#ECE1B4\", \"#CC3016\", \"#F2C96E\", \"#178FA6\"], ['#000090', '#0D809C', '#FFC200', '#D63826', '#FF7400','#0F4155', '#5399A1', '#8CA96B', '#FF2600', '#EFAC55', '#668065', '#DBE5EC', '#336B87', '#2A3132', '#E94D35'], [\"#072ac8\", \"#1e96fc\", \"#a2d6f9\", \"#fcf300\", \"#ffc600\"], [\"#ffdb4d\", \"#f54556\", \"#477bf5\", \"#ff9640\", \"#4ebbf5\", \"#fe84fe\", \"#ffffff\"], [\"#FFFFFF\",\"#E60011\",\"#FECF00\"], [\"#FFFFFF\", \"#008ADF\", \"#FDDF03\", \"#FF015C\"]]\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  colorMode(HSB, 100);\n  noStroke();\n  \n  background(\"#1D1A15\");\n  updateParticles();\n  alpha = random(500, 1000);\n}\n\nfunction draw() {\n  for (let p of particles) {\n    p.draw();\n    p.move();\n  }\n}\n\nfunction updateParticles() {\n  var colors = random(palettes);\n  particles = [];\n\tlet r = 1;\n\tlet n = 500;\n  for (let i = 0; i < n; i++) {\n\t\tlet theta = map(i, 0, n, -PI, PI);\n    let x_ = width/2 + r*cos(theta);\n    let y_ = height/2 + r*sin(theta);\n\t\tlet s_ = 2;\n    let c_ = random(colors)\n    particles.push(new Particle(x_, y_, s_, c_, i));\n  }\n}\n\nfunction Particle(x_, y_, s_, c_, i_) {\n  this.x = x_;\n  this.y = y_;\n  this.size = s_;\n  this.c = c_;\n\t\n  this.alpha = 100;\n  this.dist = 1;\n  this.offset = i_;\n  \n  this.move = function() {\n\t\tvar theta = atan2(this.y - height/2, this.x - width/2) + frameCount/alpha + this.offset;\n    let v = p5.Vector.fromAngle(theta, this.dist);\n    this.x += v.x;\n    this.y += v.y;\n    //this.dist *= 0.99;\n    //this.alpha *= 0.99;\n\t\t//this.size *= 0.995;\n  }\n  \n  this.draw = function() {\n    fill(this.c);\n    circle(this.x, this.y, this.size);\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "ElectricDreams",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:10:43",
+    "url": "https://openprocessing.org/@ronikaufman/997636",
+    "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n\nlet particles = [];\nlet alpha;\nlet colors;\n\nlet palettes = [[\"#DCAFD0\", \"#E5998D\", \"#189A8A\", \"#5E418B\", \"#E3DB52\", \"#7798DD\"], [\"#10111C\", \"#23AECC\", \"#ECE1B4\", \"#CC3016\", \"#F2C96E\", \"#178FA6\"], ['#000090', '#0D809C', '#FFC200', '#D63826', '#FF7400','#0F4155', '#5399A1', '#8CA96B', '#FF2600', '#EFAC55', '#668065', '#DBE5EC', '#336B87', '#2A3132', '#E94D35'], [\"#072ac8\", \"#1e96fc\", \"#a2d6f9\", \"#fcf300\", \"#ffc600\"], [\"#ffdb4d\", \"#f54556\", \"#477bf5\", \"#ff9640\", \"#4ebbf5\", \"#fe84fe\", \"#ffffff\"], [\"#FFFFFF\",\"#E60011\",\"#FECF00\"], [\"#FFFFFF\", \"#008ADF\", \"#FDDF03\", \"#FF015C\"]]\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  colorMode(HSB, 100);\n  noStroke();\n  \n  background(\"#1D1A15\");\n  updateParticles();\n  alpha = random(500, 1000);\n}\n\nfunction draw() {\n  for (let p of particles) {\n    p.draw();\n    p.move();\n  }\n}\n\nfunction updateParticles() {\n  var colors = random(palettes);\n  particles = [];\n\tlet r = 1;\n\tlet n = 500;\n  for (let i = 0; i < n; i++) {\n\t\tlet theta = map(i, 0, n, -PI, PI);\n    let x_ = width/2 + r*cos(theta);\n    let y_ = height/2 + r*sin(theta);\n\t\tlet s_ = 2;\n    let c_ = random(colors)\n    particles.push(new Particle(x_, y_, s_, c_, i));\n  }\n}\n\nfunction Particle(x_, y_, s_, c_, i_) {\n  this.x = x_;\n  this.y = y_;\n  this.size = s_;\n  this.c = c_;\n\t\n  this.alpha = 100;\n  this.dist = 1;\n  this.offset = i_;\n  \n  this.move = function() {\n\t\tvar theta = atan2(this.y - height/2, this.x - width/2) + frameCount/alpha + this.offset;\n    let v = p5.Vector.fromAngle(theta, this.dist);\n    this.x += v.x;\n    this.y += v.y;\n    //this.dist *= 0.99;\n    //this.alpha *= 0.99;\n\t\t//this.size *= 0.995;\n  }\n  \n  this.draw = function() {\n    fill(this.c);\n    circle(this.x, this.y, this.size);\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Constant Pace.mp4"
+    ]
 }

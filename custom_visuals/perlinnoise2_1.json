@@ -1,22 +1,25 @@
 {
-  "name": "perlinnoise2_1",
-  "author": "u65884",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:20:01",
-  "url": "https://openprocessing.org/@u65884/739031",
-  "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://www.openprocessing.org/sketch/739031\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nconst size = 5;\nconst moveScale = 800;\nconst space = 30;\nlet colors;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tstrokeWeight(20);\n\tstrokeCap(ROUND);\n\tbackground(\"#1a0633\");\n\tcolors = [color(\"#FFC30F\"), color(\"#581845\"), color(\"#900C3F\"), color(\"#C70039\"), color(\"#FF5733\"), color(\"#FFC30F\")];\n}\n\nfunction draw() {\n\tlet time = millis()/1000\n\tlet ini = (time*100)%space\n\tfor(let x = ini; x < width; x+=(Math.max(0.001, Math.abs(space)) || 1)){\n\t\tfor(let y = ini; y < height; y+=(Math.max(0.001, Math.abs(space)) || 1)){\n\t\t\tlet angle = noise((x-(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))) / moveScale, (y-(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))) / moveScale, time/10) * TWO_PI * 10;\n\t\t\tlet xx = cos(angle) * size;\n\t\t\tlet yy = sin(angle) * size;\n\t\t\tstroke(lerpColors(angle%TWO_PI/TWO_PI, colors));\n\t\t\tline(x-xx, y-yy, x+xx, y+yy);\n\t\t}\n\t}\n}\n\n/**\n * lerp color from multiple color array\n * param {Integer} [t] lerp factor from 0 to 1\n * param {Array} [[color, color]] colors to lerp, minimum 2 colors in array\n */\nfunction lerpColors(t, colors)\n{\n\tlet i = Math.floor(t*(colors.length-1));\n\tif(i < 0) return colors[0];\n\tif(i >= colors.length-1) return colors[colors.length-1];\n\n\tlet percent = (t - i / (colors.length-1)) * (colors.length-1);\n\treturn color(\n\t\tcolors[i]._getRed() + percent*(colors[i+1]._getRed()-colors[i]._getRed()),\n\t\tcolors[i]._getGreen() + percent*(colors[i+1]._getGreen()-colors[i]._getGreen()),\n\t\tcolors[i]._getBlue() + percent*(colors[i+1]._getBlue()-colors[i]._getBlue())\n\t)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "perlinnoise2_1",
+    "author": "u65884",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:20:01",
+    "url": "https://openprocessing.org/@u65884/739031",
+    "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://www.openprocessing.org/sketch/739031\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nconst size = 5;\nconst moveScale = 800;\nconst space = 30;\nlet colors;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tstrokeWeight(20);\n\tstrokeCap(ROUND);\n\tbackground(\"#1a0633\");\n\tcolors = [color(\"#FFC30F\"), color(\"#581845\"), color(\"#900C3F\"), color(\"#C70039\"), color(\"#FF5733\"), color(\"#FFC30F\")];\n}\n\nfunction draw() {\n\tlet time = millis()/1000\n\tlet ini = (time*100)%space\n\tfor(let x = ini; x < width; x+=(Math.max(0.001, Math.abs(space)) || 1)){\n\t\tfor(let y = ini; y < height; y+=(Math.max(0.001, Math.abs(space)) || 1)){\n\t\t\tlet angle = noise((x-(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))) / moveScale, (y-(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))) / moveScale, time/10) * TWO_PI * 10;\n\t\t\tlet xx = cos(angle) * size;\n\t\t\tlet yy = sin(angle) * size;\n\t\t\tstroke(lerpColors(angle%TWO_PI/TWO_PI, colors));\n\t\t\tline(x-xx, y-yy, x+xx, y+yy);\n\t\t}\n\t}\n}\n\n/**\n * lerp color from multiple color array\n * param {Integer} [t] lerp factor from 0 to 1\n * param {Array} [[color, color]] colors to lerp, minimum 2 colors in array\n */\nfunction lerpColors(t, colors)\n{\n\tlet i = Math.floor(t*(colors.length-1));\n\tif(i < 0) return colors[0];\n\tif(i >= colors.length-1) return colors[colors.length-1];\n\n\tlet percent = (t - i / (colors.length-1)) * (colors.length-1);\n\treturn color(\n\t\tcolors[i]._getRed() + percent*(colors[i+1]._getRed()-colors[i]._getRed()),\n\t\tcolors[i]._getGreen() + percent*(colors[i+1]._getGreen()-colors[i]._getGreen()),\n\t\tcolors[i]._getBlue() + percent*(colors[i+1]._getBlue()-colors[i]._getBlue())\n\t)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Static Over Estuary.mp4"
+    ]
 }

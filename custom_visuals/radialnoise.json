@@ -1,22 +1,25 @@
 {
-  "name": "radialnoise",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:22:27",
-  "url": "https://openprocessing.org/@epi/2225403",
-  "code": "// === Tab: mySketch ===\nconst palettes = ([\n  [\"#0098d8\", \"#0b3536\", \"#e5e7de\", \"#f54123\"],\n  [\"#bfbabe\", \"#a63e14\", \"#558a86\", \"#f1f2f0\"],\n  [\"#c7943e\", \"#fbfbfb\", \"#f67944\", \"#2677bb\"],\n  [\"#777870\", \"#ec6b2d\", \"#333333\", \"#0d0f05\"],\n  [\"#fbae17\", \"#f7772c\", \"#e4e6dd\", \"#dd6464\"],\n\t[\"#f43530\", \"#46454b\", \"#00aabb\", \"#e0e5da\"],\n\t[\"#f77e5e\", \"#303030\", \"#3dbd5d\", \"#f4f4f4\"],\n\t[\"#db2f27\", \"#e6c700\", \"#007500\", \"#008cbc\"],\n]).map((p) => p.map((e) => e + \"FF\"));\n\nlet palette, sze, minWH, nf;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpalette = random(palettes)\n\tminWH = max(width, height);\n\tsze = random(minWH * 0.07, minWH * 0.12)\n\tnoStroke()\n\tnf = random(0.001, 0.01)\n\tbackground(palette[0]);\n}\n\nfunction mousePressed() {\n\tif (mouseButton === LEFT) setup();\n}\n\nfunction draw() {\n\tconst a = random(TWO_PI);\n\tconst r = ~~random(minWH/sze/2) * sze;\n\t// const x = ~~random(width/sze) * sze;\n\t// const y = ~~random(height/sze) * sze;\n\tconst x = cos(a) * r + width/2;\n\tconst y = sin(a) * r + height/2;\n\tconst n = noise(x * nf, y * nf) < 0.5;\n\tfill(palette[n ? 0 : 1]);\n\tcircle(x, y, sze);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "radialnoise",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:22:27",
+    "url": "https://openprocessing.org/@epi/2225403",
+    "code": "// === Tab: mySketch ===\nconst palettes = ([\n  [\"#0098d8\", \"#0b3536\", \"#e5e7de\", \"#f54123\"],\n  [\"#bfbabe\", \"#a63e14\", \"#558a86\", \"#f1f2f0\"],\n  [\"#c7943e\", \"#fbfbfb\", \"#f67944\", \"#2677bb\"],\n  [\"#777870\", \"#ec6b2d\", \"#333333\", \"#0d0f05\"],\n  [\"#fbae17\", \"#f7772c\", \"#e4e6dd\", \"#dd6464\"],\n\t[\"#f43530\", \"#46454b\", \"#00aabb\", \"#e0e5da\"],\n\t[\"#f77e5e\", \"#303030\", \"#3dbd5d\", \"#f4f4f4\"],\n\t[\"#db2f27\", \"#e6c700\", \"#007500\", \"#008cbc\"],\n]).map((p) => p.map((e) => e + \"FF\"));\n\nlet palette, sze, minWH, nf;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpalette = random(palettes)\n\tminWH = max(width, height);\n\tsze = random(minWH * 0.07, minWH * 0.12)\n\tnoStroke()\n\tnf = random(0.001, 0.01)\n\tbackground(palette[0]);\n}\n\nfunction mousePressed() {\n\tif (mouseButton === LEFT) setup();\n}\n\nfunction draw() {\n\tconst a = random(TWO_PI);\n\tconst r = ~~random(minWH/sze/2) * sze;\n\t// const x = ~~random(width/sze) * sze;\n\t// const y = ~~random(height/sze) * sze;\n\tconst x = cos(a) * r + width/2;\n\tconst y = sin(a) * r + height/2;\n\tconst n = noise(x * nf, y * nf) < 0.5;\n\tfill(palette[n ? 0 : 1]);\n\tcircle(x, y, sze);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Steel Pulse Chamber.mp4"
+    ]
 }

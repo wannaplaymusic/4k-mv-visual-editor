@@ -1,22 +1,25 @@
 {
-  "name": "bezierlissajus",
-  "author": "laliki",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:20:36",
-  "url": "https://openprocessing.org/@laliki/56800",
-  "code": "// === Tab: sketch56800 ===\nlet xA, yA, xB, yB, x1,y1,x2,y2;\n\nlet sx, sy;\n\nlet angle;\nlet speed;\nlet radi;\n\nlet c,s;\n\nfunction setup() {\n  createCanvas(750, 450);\n  background(255);\n  smooth();\n\n  sx = random(5.0);\n  sy=random(5.0);\n\n  angle=0.0;\n  speed=0.01;\n  radi=300.0;\n  xA = 20;\n  yA = height/2;\n  xB = width-20;\n  yB = height/2;\n}\n\nfunction draw() {\n  \n  // dues corbes de lissajus serveixen de punts de control\n  c = cos(angle);\n  s = sin(angle/sy);\n  // c=0;s=0;\n\n  x1 = width/3+c*radi;\n  y1 = height/2+s*radi;\n\n  x2 = 2*width/3 + cos(angle/sx)*radi;\n  y2 = height/2 + sin(angle)*radi;\n//  y2 = y1 + tan(angle*sy)*radi;\n\n  // pintem la corba de bezier\n  noFill();\n  stroke(0,10);\n  bezier(xA,yA,x1,y1,x2,y2,xB,yB);\n  \n  // fem un pas\n  angle+=speed;\n}\n\nfunction neteja() {\n  background(255);\n}\n\nfunction keyPressed() {\n  switch(key) {\n    case('1'):\n    neteja();\n    sx=5.0;\n    sy=random(1);\n    break;\n    case('2'):\n    neteja();\n    sx=random(1);\n    sy=2.0;\n    break;\n    default:\n    neteja();\n      sx = random(5.0);\n  sy=random(5.0);\n\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "bezierlissajus",
+    "author": "laliki",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:20:36",
+    "url": "https://openprocessing.org/@laliki/56800",
+    "code": "// === Tab: sketch56800 ===\nlet xA, yA, xB, yB, x1,y1,x2,y2;\n\nlet sx, sy;\n\nlet angle;\nlet speed;\nlet radi;\n\nlet c,s;\n\nfunction setup() {\n  createCanvas(750, 450);\n  background(255);\n  smooth();\n\n  sx = random(5.0);\n  sy=random(5.0);\n\n  angle=0.0;\n  speed=0.01;\n  radi=300.0;\n  xA = 20;\n  yA = height/2;\n  xB = width-20;\n  yB = height/2;\n}\n\nfunction draw() {\n  \n  // dues corbes de lissajus serveixen de punts de control\n  c = cos(angle);\n  s = sin(angle/sy);\n  // c=0;s=0;\n\n  x1 = width/3+c*radi;\n  y1 = height/2+s*radi;\n\n  x2 = 2*width/3 + cos(angle/sx)*radi;\n  y2 = height/2 + sin(angle)*radi;\n//  y2 = y1 + tan(angle*sy)*radi;\n\n  // pintem la corba de bezier\n  noFill();\n  stroke(0,10);\n  bezier(xA,yA,x1,y1,x2,y2,xB,yB);\n  \n  // fem un pas\n  angle+=speed;\n}\n\nfunction neteja() {\n  background(255);\n}\n\nfunction keyPressed() {\n  switch(key) {\n    case('1'):\n    neteja();\n    sx=5.0;\n    sy=random(1);\n    break;\n    case('2'):\n    neteja();\n    sx=random(1);\n    sy=2.0;\n    break;\n    default:\n    neteja();\n      sx = random(5.0);\n  sy=random(5.0);\n\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Night Drive Propulsion.mp4"
+    ]
 }

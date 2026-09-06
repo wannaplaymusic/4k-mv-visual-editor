@@ -1,22 +1,25 @@
 {
-  "name": "WaveOscillator_1",
-  "author": "stratopeter",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:02:08",
-  "url": "https://openprocessing.org/@stratopeter/102506",
-  "code": "// === Tab: SoundWave_Visualizer ===\nfunction setup() {\ncreateCanvas(600, 400);\n\nstroke(255);\nstrokeWeight(1);\nsmooth();\n\nnoCursor();\n}\n\nvar v = 0;\nvar w = 0;\n\nfunction draw() {\nfill(0,50);\nrect(0,0,width,height);\n\nnoFill();\nbeginShape();\nfor(let x = 0; x < width; x += 1) {\n  vertex(x, height/2+(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))\n  *sin(v+(x/map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),0,width,1,100)))\n  *tan(w+(x/map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),0,width,100,400)))\n  *sin(v+(x/map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),0,height,1,100)))\n  );\n}\nendShape();\nv -= 0.02;\nw += 0.04;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "WaveOscillator_1",
+    "author": "stratopeter",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:02:08",
+    "url": "https://openprocessing.org/@stratopeter/102506",
+    "code": "// === Tab: SoundWave_Visualizer ===\nfunction setup() {\ncreateCanvas(600, 400);\n\nstroke(255);\nstrokeWeight(1);\nsmooth();\n\nnoCursor();\n}\n\nvar v = 0;\nvar w = 0;\n\nfunction draw() {\nfill(0,50);\nrect(0,0,width,height);\n\nnoFill();\nbeginShape();\nfor(let x = 0; x < width; x += 1) {\n  vertex(x, height/2+(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))\n  *sin(v+(x/map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),0,width,1,100)))\n  *tan(w+(x/map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),0,width,100,400)))\n  *sin(v+(x/map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),0,height,1,100)))\n  );\n}\nendShape();\nv -= 0.02;\nw += 0.04;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Lost Signal.mp4"
+    ]
 }

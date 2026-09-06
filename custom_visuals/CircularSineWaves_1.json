@@ -1,22 +1,25 @@
 {
-  "name": "CircularSineWaves_1",
-  "author": "sandorlevi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 04:47:32",
-  "url": "https://openprocessing.org/@sandorlevi/128188",
-  "code": "// === Tab: sketch128188 ===\nvar wave1 = new SineWave(250, 300, 10);\nvar wave2 = new SineWave(350, 150, 5);\nvar wave3 = new SineWave(50, 350, 2);\n\nfunction setup() {\n  createCanvas(500, 500);\n}\n\nfunction draw() {\n  fill(255);\n  noStroke();\n  rect(0, 0, width, height);\n  noFill();\n  stroke(0);\n  for (y = 0; y < height; y += 5) {\n    beginShape();\n    for (x = 0; x <= width; x += 5) {\n      let a = (wave1.amplitude(x, y) + wave2.amplitude(x, y) + wave3.amplitude(x, y)) * 2;\n      vertex(x, y + a);\n    }\n    endShape();\n  }\n}\n\nclass SineWave {\ncx;\ncy;\nwavelength;\n  \n  constructor(cx, cy, wavelength) {\n    this.cx = cx;\n    this.cy = cy;\n    this.wavelength = wavelength;\n  }\n  \n  amplitude(x, y) {\n    let dx = x - this.cx;\n    let dy = y - this.cy;\n    return sin((sqrt(dx * dx + dy * dy) - frameCount) / this.wavelength);\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CircularSineWaves_1",
+    "author": "sandorlevi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:47:32",
+    "url": "https://openprocessing.org/@sandorlevi/128188",
+    "code": "// === Tab: sketch128188 ===\nvar wave1 = new SineWave(250, 300, 10);\nvar wave2 = new SineWave(350, 150, 5);\nvar wave3 = new SineWave(50, 350, 2);\n\nfunction setup() {\n  createCanvas(500, 500);\n}\n\nfunction draw() {\n  fill(255);\n  noStroke();\n  rect(0, 0, width, height);\n  noFill();\n  stroke(0);\n  for (y = 0; y < height; y += 5) {\n    beginShape();\n    for (x = 0; x <= width; x += 5) {\n      let a = (wave1.amplitude(x, y) + wave2.amplitude(x, y) + wave3.amplitude(x, y)) * 2;\n      vertex(x, y + a);\n    }\n    endShape();\n  }\n}\n\nclass SineWave {\ncx;\ncy;\nwavelength;\n  \n  constructor(cx, cy, wavelength) {\n    this.cx = cx;\n    this.cy = cy;\n    this.wavelength = wavelength;\n  }\n  \n  amplitude(x, y) {\n    let dx = x - this.cx;\n    let dy = y - this.cy;\n    return sin((sqrt(dx * dx + dy * dy) - frameCount) / this.wavelength);\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Stark Contrast.mp4"
+    ]
 }

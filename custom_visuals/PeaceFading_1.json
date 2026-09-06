@@ -1,22 +1,25 @@
 {
-  "name": "PeaceFading_1",
-  "author": "msawired",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:05:37",
-  "url": "https://openprocessing.org/@msawired/2906966",
-  "code": "// === Tab: Distance Function ===\n// Found this function on Stack Overflow:\n// https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment\n\nfunction dtoS(lx1, ly1, lx2, ly2, px, py) {\n    const lx = lx2 - lx1; // Line segment vector x\n    const ly = ly2 - ly1; // Line segment vector y\n    const lineLengthSq = lx * lx + ly * ly; // Squared length of the line segment\n\n    // If the line segment has zero length, calculate distance to the single point\n    if (lineLengthSq === 0) {\n        const dx = px - lx1;\n        const dy = py - ly1;\n        return Math.sqrt(dx * dx + dy * dy);\n    }\n\n    // Calculate 't' (projection parameter). \n    // 't' indicates where the projection of the point falls on the line:\n    // t = 0 -> projection is at the start point (lx1, ly1)\n    // t = 1 -> projection is at the end point (lx2, ly2)\n    // 0 < t < 1 -> projection is within the segment\n    // t < 0 or t > 1 -> projection is outside the segment\n    const t = ((px - lx1) * lx + (py - ly1) * ly) / lineLengthSq;\n\n    let closestX, closestY;\n\n    if (t < 0) {\n        closestX = lx1;\n        closestY = ly1;\n    } else if (t > 1) {\n        closestX = lx2;\n        closestY = ly2;\n    } else {\n        closestX = lx1 + t * lx;\n        closestY = ly1 + t * ly;\n    }\n\n    // Calculate the distance between the given point (px, py) and the closest point\n    var dx = px - closestX;\n    var dy = py - closestY;\n    return Math.sqrt(dx * dx + dy * dy);\n}\n\n\n\n// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"things fall apart.\"\n\nconst dsize = 8;\nlet dots = [];\nlet together = false;\nlet peel = 0;\nlet fc = 0; //framecount\n\nfunction setup() {\n\tcreateCanvas(windowHeight, windowHeight);\n\tangleMode(DEGREES);\n\tmakeSymbol();\n\tsetTimeout(swap, 1000);\n\tsetInterval(swap, 5000);\n\tcolorMode(HSB, 360, 360, 360);\n}\n\nfunction makeSymbol() {\n\tlet count = 0;\n\tfor (let r = 300; r > 0; r -= dsize) {\n\t\tlet ring = TAU * r;\n\t\tlet num = floor(ring / dsize);\n\t\tfor (let a = 0; a < 360; a += (Math.max(0.001, Math.abs(360 / num)) || 1)) {\n\t\t\tlet x = cos(a) * r;\n\t\t\tlet y = sin(a) * r;\n\t\t\tlet add = (r >= 240) || (dtoS(0, 300, 0, -300, x, y) <= 30) || (dtoS(0, 0, cos(150) * 300, sin(150) * 300, x, y) <= 30) || (dtoS(0, 0, cos(30) * 300, sin(30) * 300, x, y) <= 30);\n\t\t\tif (!add) continue;\n\t\t\tlet d = new Dot(createVector(x, y), a + 180, count);\n\t\t\tcount++;\n\t\t\tdots.push(d);\n\t\t}\n\t}\n}\n\nfunction draw() {\n\tbackground('#000000aa');\n\ttranslate(width / 2, height / 2);\n\tscale(height / 700);\n\tfor (let d of dots) {\n\t\td.show();\n\t}\n\tfc++;\n}\n\nfunction swap() {\n\ttogether = !together;\n\tfor (let d of dots) {\n\t\tif (together) d.tpos = d.opos;\n\t\telse d.tpos = p5.Vector.random2D().mult(random(-300, 300));\n\t}\n\tpeel = (peel + 1) % 5;\n\tframeCount = 0;\n}\n\nclass Dot {\n\tconstructor(pos, ang, id) {\n\t\tthis.pos = p5.Vector.random2D().mult(random(-300, 300));\n\t\tthis.opos = createVector(pos.x, pos.y);\n\t\tthis.tpos = createVector(this.pos.x, this.pos.y);\n\t\tthis.h = ang % 360;\n\t\tthis.id = [map(pos.y, 300, -300, 0, 1000), map(id, 0, 2500, 0, 1000), map(pos.x, -300, 300, 0, 1000), map((ang+270) % 360, 0, 360, 0, 1000), floor(random(1000))];\n\t}\n\tshow() {\n\t\tif (10 * frameCount > this.id[peel] + random(20)) this.pos.lerp(this.tpos, 0.1)\n\t\tpush();\n\t\ttranslate(this.pos);\n\t\tstroke(this.h, 360, 360, (cos(fc*2)/4+0.5));\n\t\tstrokeWeight(dsize / 10 * (sin(fc*2)+3.0));\n\t\tpoint(0, 0);\n\t\tpop();\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "PeaceFading_1",
+    "author": "msawired",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:05:37",
+    "url": "https://openprocessing.org/@msawired/2906966",
+    "code": "// === Tab: Distance Function ===\n// Found this function on Stack Overflow:\n// https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment\n\nfunction dtoS(lx1, ly1, lx2, ly2, px, py) {\n    const lx = lx2 - lx1; // Line segment vector x\n    const ly = ly2 - ly1; // Line segment vector y\n    const lineLengthSq = lx * lx + ly * ly; // Squared length of the line segment\n\n    // If the line segment has zero length, calculate distance to the single point\n    if (lineLengthSq === 0) {\n        const dx = px - lx1;\n        const dy = py - ly1;\n        return Math.sqrt(dx * dx + dy * dy);\n    }\n\n    // Calculate 't' (projection parameter). \n    // 't' indicates where the projection of the point falls on the line:\n    // t = 0 -> projection is at the start point (lx1, ly1)\n    // t = 1 -> projection is at the end point (lx2, ly2)\n    // 0 < t < 1 -> projection is within the segment\n    // t < 0 or t > 1 -> projection is outside the segment\n    const t = ((px - lx1) * lx + (py - ly1) * ly) / lineLengthSq;\n\n    let closestX, closestY;\n\n    if (t < 0) {\n        closestX = lx1;\n        closestY = ly1;\n    } else if (t > 1) {\n        closestX = lx2;\n        closestY = ly2;\n    } else {\n        closestX = lx1 + t * lx;\n        closestY = ly1 + t * ly;\n    }\n\n    // Calculate the distance between the given point (px, py) and the closest point\n    var dx = px - closestX;\n    var dy = py - closestY;\n    return Math.sqrt(dx * dx + dy * dy);\n}\n\n\n\n// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"things fall apart.\"\n\nconst dsize = 8;\nlet dots = [];\nlet together = false;\nlet peel = 0;\nlet fc = 0; //framecount\n\nfunction setup() {\n\tcreateCanvas(windowHeight, windowHeight);\n\tangleMode(DEGREES);\n\tmakeSymbol();\n\tsetTimeout(swap, 1000);\n\tsetInterval(swap, 5000);\n\tcolorMode(HSB, 360, 360, 360);\n}\n\nfunction makeSymbol() {\n\tlet count = 0;\n\tfor (let r = 300; r > 0; r -= dsize) {\n\t\tlet ring = TAU * r;\n\t\tlet num = floor(ring / dsize);\n\t\tfor (let a = 0; a < 360; a += (Math.max(0.001, Math.abs(360 / num)) || 1)) {\n\t\t\tlet x = cos(a) * r;\n\t\t\tlet y = sin(a) * r;\n\t\t\tlet add = (r >= 240) || (dtoS(0, 300, 0, -300, x, y) <= 30) || (dtoS(0, 0, cos(150) * 300, sin(150) * 300, x, y) <= 30) || (dtoS(0, 0, cos(30) * 300, sin(30) * 300, x, y) <= 30);\n\t\t\tif (!add) continue;\n\t\t\tlet d = new Dot(createVector(x, y), a + 180, count);\n\t\t\tcount++;\n\t\t\tdots.push(d);\n\t\t}\n\t}\n}\n\nfunction draw() {\n\tbackground('#000000aa');\n\ttranslate(width / 2, height / 2);\n\tscale(height / 700);\n\tfor (let d of dots) {\n\t\td.show();\n\t}\n\tfc++;\n}\n\nfunction swap() {\n\ttogether = !together;\n\tfor (let d of dots) {\n\t\tif (together) d.tpos = d.opos;\n\t\telse d.tpos = p5.Vector.random2D().mult(random(-300, 300));\n\t}\n\tpeel = (peel + 1) % 5;\n\tframeCount = 0;\n}\n\nclass Dot {\n\tconstructor(pos, ang, id) {\n\t\tthis.pos = p5.Vector.random2D().mult(random(-300, 300));\n\t\tthis.opos = createVector(pos.x, pos.y);\n\t\tthis.tpos = createVector(this.pos.x, this.pos.y);\n\t\tthis.h = ang % 360;\n\t\tthis.id = [map(pos.y, 300, -300, 0, 1000), map(id, 0, 2500, 0, 1000), map(pos.x, -300, 300, 0, 1000), map((ang+270) % 360, 0, 360, 0, 1000), floor(random(1000))];\n\t}\n\tshow() {\n\t\tif (10 * frameCount > this.id[peel] + random(20)) this.pos.lerp(this.tpos, 0.1)\n\t\tpush();\n\t\ttranslate(this.pos);\n\t\tstroke(this.h, 360, 360, (cos(fc*2)/4+0.5));\n\t\tstrokeWeight(dsize / 10 * (sin(fc*2)+3.0));\n\t\tpoint(0, 0);\n\t\tpop();\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Stark Contrast.mp4"
+    ]
 }

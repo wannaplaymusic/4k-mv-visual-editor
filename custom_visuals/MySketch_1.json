@@ -1,22 +1,25 @@
 {
-  "name": "MySketch_1",
-  "author": "epi",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 22:59:54",
-  "url": "https://openprocessing.org/@epi/1985957",
-  "code": "// === Tab: mySketch ===\nvar num = 20;\nvar ts, tw, th;\nvar scl = 1;\n\nvar layer;\nvar grid;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n\tframeRate(4)\n\tts = max(width, height) / num;\n\ttw = ceil(width/ts);\n\tth = ceil(height/ts);\n  // layer = createFramebuffer();\n\tcolorModegrid = new Grid(tw, th);\n\t/*\n\tfor (let y = 0; y < th; y++) {\n\t\tgrid[y] = [];\n\t\tfor (let x = 0; x < tw; x++) {\n\t\t\tgrid[y][x] = noise(x*0.01,y*0.1) > 0.5;\n\t\t}\n\t}\n\t*/\n}\n\nfunction draw() {\n  // Start drawing to the framebuffer\n  // layer.begin();\n\n  // clear();\n  lights();\n\tambientLight(128);\n  noStroke();\n\t// stroke(0)\n\tnoFill()\n\n  // Stop drawing to the layer so we can draw to the main canvas again\n  // layer.end();\n\t\n\t\n\tgrid.clear();\n\tgrid.circle(round(grid.w*0.5), round(grid.h*0.5), frameCount * 0.0351 % min(grid.w, grid.h))\n\t\n  // Draw the layer to the main canvas\n  clear();\n  translate(-width/2, -height/2);\n\tconst sze = ts * scl;\n\tconst sze_o = sze * (0.5 + scl);\n\t\n  for (let y = 0; y < th; y++) {\n\t\tfor (let x = 0; x < tw; x++) {\n\t\t\t\n\t\t\tconst timeState = (frameCount + x * y) * 0.01;\n\t\t\tpush()\n\t\t\t\ttranslate(x * width / grid.w + sze_o, y * height / grid.h + sze_o)\n\t\t\t  rotateX(timeState);\n\t\t\t  rotateY(timeState);\n\t\t\t\t// rotateZ(timeState);\n\t\t\t\tclrStart = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 0, 360, true);\n\t\t\t\tclrEnd   = (clrStart + map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, 0, 360, true)); //  % 360;\n\t\t\t\tfill(map(x + tw * y, 0, tw * th, clrStart, clrEnd), 75, 75, 0.25); // noise(frameCount * 0.0051));\n\t\t\t  // ambientMaterial(237,34,93);\n  \t\t\t// if (grid[y][x]) box(sze);\n\t\t\t\tconst n = grid.get(x, y); // noise(x*0.01,y*0.1,frameCount*0.03);\n\t\t\t\tif (n > 0.15) box(sze * n);\n\t\t\tpop()\n\t\t\t/*\n      image(\n        layer,\n        x*width/4, y*height/4,\n        width/4, height/4\n      );\n\t\t\t*/\n    }\n  }\n}\n\nclass Grid {\n\tconstructor(w, h) {\n\t\tthis.w = w;\n\t\tthis.h = h;\n\t\tthis.grid = [];\n    for (let y = 0; y < this.h; y++) {\n\t\t\tthis.grid[y] = [];\n\t\t\tfor (let x = 0; x < this.w; x++)\n\t\t\t\tthis.grid[y][x] = 0;\n\t\t}\n\t\t\n\t}\n\t\n\tget(x, y) {\n\t\tx = constrain(x, 0, this.w);\n\t\ty = constrain(y, 0, this.h);\n\t\treturn this.grid[y][x]\n\t}\n\t\n\tclear(noice = false) {\n\t\tfor (let y = 0; y < this.h; y++)\n\t\t\tfor (let x = 0; x < this.w; x++) \n\t\t\t\tthis.grid[y][x] = noice ? noise(x*0.0082,y*0.0095,frameCount*0.0073) : 0.151;\n\t}\n\t\n\tcircle(xo, yo, rad) {\n\t\tconst u = TWO_PI * rad;\n\t\tconst da = TWO_PI / u;\n\t\tfor (let a = 0; a < TWO_PI; a += da) {\n\t\t\tconst xv = cos(a) * rad + xo;\n\t\t\tconst yv = sin(a) * rad + yo;\n\t\t\tconst x = round(xv);\n\t\t\tconst y = round(yv);\n\t\t\tif (x >= 0 && y >= 0 && x < this.w && y < this.h) {\n\t\t\t\t// fraction, 0.5 = max\n\t\t\t\tconst xf = fract(xv);\n\t\t\t\tconst yf = fract(yv);\n\t\t\t\t// intensity\n\t\t\t\tconst xi = xf - 0.5;\n\t\t\t\tconst yi = yf - 0.5;\n\t\t\t\tthis.grid[y][x] += abs(xi) + abs(yi);\n\t\t\t\tif (x > 0 && xi < 0) this.grid[y][x-1] += abs(xi - 0.5);\n\t\t\t\tif (x < this.w - 1 && xi > 0) this.grid[y][x+1] += abs(xi - 0.5);\n\t\t\t\tif (y > 0 && yi < 0) this.grid[y-1][x] += abs(yi - 0.5);\n\t\t\t\tif (y < this.h - 1 && yi > 0) this.grid[y+1][x] += abs(yi - 0.5);\n\t\t\t}\n\t\t}\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "MySketch_1",
+    "author": "epi",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:59:54",
+    "url": "https://openprocessing.org/@epi/1985957",
+    "code": "// === Tab: mySketch ===\nvar num = 20;\nvar ts, tw, th;\nvar scl = 1;\n\nvar layer;\nvar grid;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n\tframeRate(4)\n\tts = max(width, height) / num;\n\ttw = ceil(width/ts);\n\tth = ceil(height/ts);\n  // layer = createFramebuffer();\n\tcolorModegrid = new Grid(tw, th);\n\t/*\n\tfor (let y = 0; y < th; y++) {\n\t\tgrid[y] = [];\n\t\tfor (let x = 0; x < tw; x++) {\n\t\t\tgrid[y][x] = noise(x*0.01,y*0.1) > 0.5;\n\t\t}\n\t}\n\t*/\n}\n\nfunction draw() {\n  // Start drawing to the framebuffer\n  // layer.begin();\n\n  // clear();\n  lights();\n\tambientLight(128);\n  noStroke();\n\t// stroke(0)\n\tnoFill()\n\n  // Stop drawing to the layer so we can draw to the main canvas again\n  // layer.end();\n\t\n\t\n\tgrid.clear();\n\tgrid.circle(round(grid.w*0.5), round(grid.h*0.5), frameCount * 0.0351 % min(grid.w, grid.h))\n\t\n  // Draw the layer to the main canvas\n  clear();\n  translate(-width/2, -height/2);\n\tconst sze = ts * scl;\n\tconst sze_o = sze * (0.5 + scl);\n\t\n  for (let y = 0; y < th; y++) {\n\t\tfor (let x = 0; x < tw; x++) {\n\t\t\t\n\t\t\tconst timeState = (frameCount + x * y) * 0.01;\n\t\t\tpush()\n\t\t\t\ttranslate(x * width / grid.w + sze_o, y * height / grid.h + sze_o)\n\t\t\t  rotateX(timeState);\n\t\t\t  rotateY(timeState);\n\t\t\t\t// rotateZ(timeState);\n\t\t\t\tclrStart = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 0, 360, true);\n\t\t\t\tclrEnd   = (clrStart + map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, 0, 360, true)); //  % 360;\n\t\t\t\tfill(map(x + tw * y, 0, tw * th, clrStart, clrEnd), 75, 75, 0.25); // noise(frameCount * 0.0051));\n\t\t\t  // ambientMaterial(237,34,93);\n  \t\t\t// if (grid[y][x]) box(sze);\n\t\t\t\tconst n = grid.get(x, y); // noise(x*0.01,y*0.1,frameCount*0.03);\n\t\t\t\tif (n > 0.15) box(sze * n);\n\t\t\tpop()\n\t\t\t/*\n      image(\n        layer,\n        x*width/4, y*height/4,\n        width/4, height/4\n      );\n\t\t\t*/\n    }\n  }\n}\n\nclass Grid {\n\tconstructor(w, h) {\n\t\tthis.w = w;\n\t\tthis.h = h;\n\t\tthis.grid = [];\n    for (let y = 0; y < this.h; y++) {\n\t\t\tthis.grid[y] = [];\n\t\t\tfor (let x = 0; x < this.w; x++)\n\t\t\t\tthis.grid[y][x] = 0;\n\t\t}\n\t\t\n\t}\n\t\n\tget(x, y) {\n\t\tx = constrain(x, 0, this.w);\n\t\ty = constrain(y, 0, this.h);\n\t\treturn this.grid[y][x]\n\t}\n\t\n\tclear(noice = false) {\n\t\tfor (let y = 0; y < this.h; y++)\n\t\t\tfor (let x = 0; x < this.w; x++) \n\t\t\t\tthis.grid[y][x] = noice ? noise(x*0.0082,y*0.0095,frameCount*0.0073) : 0.151;\n\t}\n\t\n\tcircle(xo, yo, rad) {\n\t\tconst u = TWO_PI * rad;\n\t\tconst da = TWO_PI / u;\n\t\tfor (let a = 0; a < TWO_PI; a += da) {\n\t\t\tconst xv = cos(a) * rad + xo;\n\t\t\tconst yv = sin(a) * rad + yo;\n\t\t\tconst x = round(xv);\n\t\t\tconst y = round(yv);\n\t\t\tif (x >= 0 && y >= 0 && x < this.w && y < this.h) {\n\t\t\t\t// fraction, 0.5 = max\n\t\t\t\tconst xf = fract(xv);\n\t\t\t\tconst yf = fract(yv);\n\t\t\t\t// intensity\n\t\t\t\tconst xi = xf - 0.5;\n\t\t\t\tconst yi = yf - 0.5;\n\t\t\t\tthis.grid[y][x] += abs(xi) + abs(yi);\n\t\t\t\tif (x > 0 && xi < 0) this.grid[y][x-1] += abs(xi - 0.5);\n\t\t\t\tif (x < this.w - 1 && xi > 0) this.grid[y][x+1] += abs(xi - 0.5);\n\t\t\t\tif (y > 0 && yi < 0) this.grid[y-1][x] += abs(yi - 0.5);\n\t\t\t\tif (y < this.h - 1 && yi > 0) this.grid[y+1][x] += abs(yi - 0.5);\n\t\t\t}\n\t\t}\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Slowwave Continuum.mp4"
+    ]
 }

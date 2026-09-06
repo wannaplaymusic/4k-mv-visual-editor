@@ -1,22 +1,25 @@
 {
-  "name": "DotspiralWCCChallenge",
-  "author": "u73547",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:16:42",
-  "url": "https://openprocessing.org/@u73547/1628553",
-  "code": "let maxD, power, i;\n// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tellipseMode(RADIUS);\n\tbackground(255);\n\tnoStroke();\n}\n\nfunction draw() {\n\tmaxD = dist(height / 2, height / 2, 0, 0);\n\tpower = 1 + 5 * pow(0.5 * (1 + sin(radians(frameCount))), 3);\n\tfor (i = 0; i < 4000; i++) {\n\t\tx = random(width);\n\t\ty = random(height);\n\t\td = pow(dist(x, y, width / 2, height / 2) / maxD, 0.5);\n\t\tth = atan2(y - height / 2, x - width / 2);\n\t\tfth = (th * 3 + radians(frameCount * 2));\n\t\tfth2 = (th + radians(frameCount)) * 3;\n\t\tf = 0.5 * (1 + sin(d * TAU * 3 + fth));\n\t\tfd2 = 0.5 * (1 + sin(d * TAU * 7 + fth2 + radians(frameCount)));\n\t\tfill(255 * pow(f, power));\n\t\tcircle(x, y, 10 * pow(fd2, 1));\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "DotspiralWCCChallenge",
+    "author": "u73547",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:16:42",
+    "url": "https://openprocessing.org/@u73547/1628553",
+    "code": "let maxD, power, i;\n// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tellipseMode(RADIUS);\n\tbackground(255);\n\tnoStroke();\n}\n\nfunction draw() {\n\tmaxD = dist(height / 2, height / 2, 0, 0);\n\tpower = 1 + 5 * pow(0.5 * (1 + sin(radians(frameCount))), 3);\n\tfor (i = 0; i < 4000; i++) {\n\t\tx = random(width);\n\t\ty = random(height);\n\t\td = pow(dist(x, y, width / 2, height / 2) / maxD, 0.5);\n\t\tth = atan2(y - height / 2, x - width / 2);\n\t\tfth = (th * 3 + radians(frameCount * 2));\n\t\tfth2 = (th + radians(frameCount)) * 3;\n\t\tf = 0.5 * (1 + sin(d * TAU * 3 + fth));\n\t\tfd2 = 0.5 * (1 + sin(d * TAU * 7 + fth2 + radians(frameCount)));\n\t\tfill(255 * pow(f, power));\n\t\tcircle(x, y, 10 * pow(fd2, 1));\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Frequency Band.mp4"
+    ]
 }

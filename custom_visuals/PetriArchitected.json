@@ -1,22 +1,25 @@
 {
-  "name": "PetriArchitected",
-  "author": "fractalkitty",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 04:11:43",
-  "url": "https://openprocessing.org/@fractalkitty/1553909",
-  "code": "// === Tab: mySketch.js ===\n//click to change - #wccchallenge \"microcosm\"\nlet n = 50;\nlet n2 = 20;\nlet a, b;\nlet cArray = []; //beings\nlet sArray = []; //strands\nlet d; //wxh\nfunction setup() {\n  d = max(windowWidth, windowHeight) * 0.8;\n  createCanvas(d, d);\n  c3 = color(random(0, 55), random(0, 155), random(0, 255));\n  c4 = color(random(0, 55), random(0, 155), random(0, 255), random(10, 200));\n  a = int(random(3, 4));\n  b = int(random(5, 6));\n  for (let i = 0; i < n; i++) {\n    cArray.push(new beings());\n  }\n  for (let i = 0; i < n2; i++) {\n    sArray.push(new strands());\n  }\n}\n\nfunction draw() {\n  background(c3);\n  t = TWO_PI * sin(frameCount / 2000);\n  translate(width / 2, height / 2);\n  noStroke();\n  fill(c4);\n  circle(0, 0, width);\n  rotate(-t / 3);\n  for (i = 0; i < n; i++) {\n    cArray[i].move();\n  }\n  for (let i = 0; i < n2; i++) {\n    push();\n    rotate(t);\n    sArray[i].move();\n    for (let j = 1; j < 40; j++) {\n      strokeWeight(2);\n      stroke(i / 4 + 50, i / 5 + 50, i / 6 + 50, 30);\n      circle(\n        (d / 2) * sin((i * b * PI) / a + t),\n        (d / 2) * cos((i * a * PI) / b + t),\n        a / 3\n      );\n      stroke(255 - i * 10, 255 - i * 8, 255 - i * 5, 50);\n      point(\n        (d / 7) * sin(i * j + b * t),\n        (d / 7) * cos(i * j + b * t) * cos((t / a) * i)\n      );\n    }\n    pop();\n  }\n}\n\nfunction mousePressed() {\n  c3 = color(random(0, 55), random(0, 155), random(0, 255));\n  a = int(random(1, 20));\n  b = int(random(1, 20));\n  c4 = color(random(0, 55), random(0, 155), random(0, 255), random(10, 200));\n  d = max(windowWidth, windowHeight) * 0.8; //afterthought of size change\n  resizeCanvas(d, d);\n}\n\nclass beings {\n  constructor() {\n    this.x = random(-width / 2, width / 2);\n    this.y = random(-height / 2, height / 2);\n    this.r1 = random(10, width / 3);\n    this.r2 = this.r1 - random(10, width / 4);\n    this.color1 = color(\n      random(0, 180),\n      random(0, 210),\n      random(0, 210),\n      random(0, 50)\n    );\n    this.color2 = color(\n      random(100, 255),\n      random(150, 255),\n      random(150, 255),\n      random(0, 50)\n    );\n    this.t = 0;\n    this.dt = random(0.01, 2);\n  }\n  move() {\n    this.t = t * this.dt;\n    fill(this.color1);\n    circle(\n      this.x + (this.r1 / 4) * sin(this.t - this.y) * cos(this.t / this.x),\n      this.y + (this.r1 / 4) * cos(this.t),\n      this.r1\n    );\n    fill(this.color2);\n    circle(\n      this.x + (this.r1 / 4) * sin(this.t - this.y) * cos(t / this.x),\n      this.y + (this.r1 / 4) * cos(this.t),\n      this.r2\n    );\n  }\n}\n\nclass strands {\n  constructor() {\n    this.n = int(random(50, 200));\n    this.x = [];\n    this.y = [];\n    this.x[0] = random(-width / 2, width / 2);\n    this.y[0] = random(-height / 2, height / 2);\n    for (let i = 1; i < this.n; i++) {\n      this.x[i] = this.x[i - 1] + random(-2, 3);\n      this.y[i] = this.y[i - 1] + random(-3, 2);\n    }\n  }\n  move() {\n    for (let i = 1; i < this.n; i++) {\n      push();\n      rotate(i / 100);\n      stroke(i / 14, i + 100, i + 150, 150);\n      let xt = this.x[i] - (this.n / 40) * sin((i * t) / 20);\n      let yt = this.y[i] - (this.n / 40) * cos((i * t) / 20);\n      point(xt, yt);\n      point(yt, xt);\n      circle(\n        (d / 2) * sin((i * b * PI) / a + t),\n        (d / 2) * cos((i * a * PI) / b + t),\n        a / 3\n      );\n      pop();\n    }\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "PetriArchitected",
+    "author": "fractalkitty",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:11:43",
+    "url": "https://openprocessing.org/@fractalkitty/1553909",
+    "code": "// === Tab: mySketch.js ===\n//click to change - #wccchallenge \"microcosm\"\nlet n = 50;\nlet n2 = 20;\nlet a, b;\nlet cArray = []; //beings\nlet sArray = []; //strands\nlet d; //wxh\nfunction setup() {\n  d = max(windowWidth, windowHeight) * 0.8;\n  createCanvas(d, d);\n  c3 = color(random(0, 55), random(0, 155), random(0, 255));\n  c4 = color(random(0, 55), random(0, 155), random(0, 255), random(10, 200));\n  a = int(random(3, 4));\n  b = int(random(5, 6));\n  for (let i = 0; i < n; i++) {\n    cArray.push(new beings());\n  }\n  for (let i = 0; i < n2; i++) {\n    sArray.push(new strands());\n  }\n}\n\nfunction draw() {\n  background(c3);\n  t = TWO_PI * sin(frameCount / 2000);\n  translate(width / 2, height / 2);\n  noStroke();\n  fill(c4);\n  circle(0, 0, width);\n  rotate(-t / 3);\n  for (i = 0; i < n; i++) {\n    cArray[i].move();\n  }\n  for (let i = 0; i < n2; i++) {\n    push();\n    rotate(t);\n    sArray[i].move();\n    for (let j = 1; j < 40; j++) {\n      strokeWeight(2);\n      stroke(i / 4 + 50, i / 5 + 50, i / 6 + 50, 30);\n      circle(\n        (d / 2) * sin((i * b * PI) / a + t),\n        (d / 2) * cos((i * a * PI) / b + t),\n        a / 3\n      );\n      stroke(255 - i * 10, 255 - i * 8, 255 - i * 5, 50);\n      point(\n        (d / 7) * sin(i * j + b * t),\n        (d / 7) * cos(i * j + b * t) * cos((t / a) * i)\n      );\n    }\n    pop();\n  }\n}\n\nfunction mousePressed() {\n  c3 = color(random(0, 55), random(0, 155), random(0, 255));\n  a = int(random(1, 20));\n  b = int(random(1, 20));\n  c4 = color(random(0, 55), random(0, 155), random(0, 255), random(10, 200));\n  d = max(windowWidth, windowHeight) * 0.8; //afterthought of size change\n  resizeCanvas(d, d);\n}\n\nclass beings {\n  constructor() {\n    this.x = random(-width / 2, width / 2);\n    this.y = random(-height / 2, height / 2);\n    this.r1 = random(10, width / 3);\n    this.r2 = this.r1 - random(10, width / 4);\n    this.color1 = color(\n      random(0, 180),\n      random(0, 210),\n      random(0, 210),\n      random(0, 50)\n    );\n    this.color2 = color(\n      random(100, 255),\n      random(150, 255),\n      random(150, 255),\n      random(0, 50)\n    );\n    this.t = 0;\n    this.dt = random(0.01, 2);\n  }\n  move() {\n    this.t = t * this.dt;\n    fill(this.color1);\n    circle(\n      this.x + (this.r1 / 4) * sin(this.t - this.y) * cos(this.t / this.x),\n      this.y + (this.r1 / 4) * cos(this.t),\n      this.r1\n    );\n    fill(this.color2);\n    circle(\n      this.x + (this.r1 / 4) * sin(this.t - this.y) * cos(t / this.x),\n      this.y + (this.r1 / 4) * cos(this.t),\n      this.r2\n    );\n  }\n}\n\nclass strands {\n  constructor() {\n    this.n = int(random(50, 200));\n    this.x = [];\n    this.y = [];\n    this.x[0] = random(-width / 2, width / 2);\n    this.y[0] = random(-height / 2, height / 2);\n    for (let i = 1; i < this.n; i++) {\n      this.x[i] = this.x[i - 1] + random(-2, 3);\n      this.y[i] = this.y[i - 1] + random(-3, 2);\n    }\n  }\n  move() {\n    for (let i = 1; i < this.n; i++) {\n      push();\n      rotate(i / 100);\n      stroke(i / 14, i + 100, i + 150, 150);\n      let xt = this.x[i] - (this.n / 40) * sin((i * t) / 20);\n      let yt = this.y[i] - (this.n / 40) * cos((i * t) / 20);\n      point(xt, yt);\n      point(yt, xt);\n      circle(\n        (d / 2) * sin((i * b * PI) / a + t),\n        (d / 2) * cos((i * a * PI) / b + t),\n        a / 3\n      );\n      pop();\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n   \n\t\n\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Modern Twist Saturation.mp4"
+    ]
 }

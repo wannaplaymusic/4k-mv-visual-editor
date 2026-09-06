@@ -1,22 +1,25 @@
 {
-  "name": "Symmetry_1",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 04:50:35",
-  "url": "https://openprocessing.org/@ntsutae/1686951",
-  "code": "// === Tab: mySketch ===\nconst num = 720;\nconst x = new Float32Array(num);\nconst y = new Float32Array(num);\nconst vx = new Float32Array(num);\nconst vy = new Float32Array(num);\nconst maxDistSq = 20 ** 2;\nconst minDistSq = 16 ** 2;\n\nsetup = () => {\n  createCanvas(m=640, 640);\n  angleMode(DEGREES);\n  for (let i = num; i--; ) {\n    const a = i / 2;\n    vx[i] = cos(a);\n    vy[i] = sin(a);\n    x[i] = width / 2 + (vx[i] * width) / 2;\n    y[i] = height / 2 + (vy[i] * height) / 2;\n  }\n};\n\ndraw = () => {\n  background(\"white\");\n  stroke(\"black\");\n  for (let i = num; i--; ) {\n    for (let j = i; j--; ) {\n      d = (x[i] - x[j]) ** 2 + (y[i] - y[j]) ** 2;\n      if(minDistSq < d && d < maxDistSq)\n        line(x[i], y[i], x[j], y[j]);\n    }\n  }\n  for (let i = num; i--; ) {\n    x[i] += vx[i];\n    y[i] += vy[i];\n    if (x[i] < 0 || x[i] > width) vx[i] *= -1;\n    if (y[i] < 0 || y[i] > height) vy[i] *= -1;\n  }\n};",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Symmetry_1",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 04:50:35",
+    "url": "https://openprocessing.org/@ntsutae/1686951",
+    "code": "// === Tab: mySketch ===\nconst num = 720;\nconst x = new Float32Array(num);\nconst y = new Float32Array(num);\nconst vx = new Float32Array(num);\nconst vy = new Float32Array(num);\nconst maxDistSq = 20 ** 2;\nconst minDistSq = 16 ** 2;\n\nsetup = () => {\n  createCanvas(m=640, 640);\n  angleMode(DEGREES);\n  for (let i = num; i--; ) {\n    const a = i / 2;\n    vx[i] = cos(a);\n    vy[i] = sin(a);\n    x[i] = width / 2 + (vx[i] * width) / 2;\n    y[i] = height / 2 + (vy[i] * height) / 2;\n  }\n};\n\ndraw = () => {\n  background(\"white\");\n  stroke(\"black\");\n  for (let i = num; i--; ) {\n    for (let j = i; j--; ) {\n      d = (x[i] - x[j]) ** 2 + (y[i] - y[j]) ** 2;\n      if(minDistSq < d && d < maxDistSq)\n        line(x[i], y[i], x[j], y[j]);\n    }\n  }\n  for (let i = num; i--; ) {\n    x[i] += vx[i];\n    y[i] += vy[i];\n    if (x[i] < 0 || x[i] > width) vx[i] *= -1;\n    if (y[i] < 0 || y[i] > height) vy[i] *= -1;\n  }\n};",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tunnel Vision.mp4"
+    ]
 }

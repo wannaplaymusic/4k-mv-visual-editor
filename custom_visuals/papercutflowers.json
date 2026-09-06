@@ -1,22 +1,25 @@
 {
-  "name": "papercutflowers",
-  "author": "sihan",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:20:40",
-  "url": "https://openprocessing.org/@sihan/2562561",
-  "code": "// === Tab: mySketch ===\n//#WCCChallenge \n//Inspired by 库淑兰Ku Shulan's paper-cutting artworks. \n//Ku Shulan reminds me of my grandma, she also make beautiful paper-cut flowers and figures in her spare time.\n\nlet flower;\nfunction setup() {\n\tcreateCanvas(600,600);\n\tbackground(\"#F6DD91\");\n\tnoStroke();\n\tfor(let x=100;x<600;x+=200){\n\t\tfor(let y=100;y<600;y+=200){\n\t\t\tflower=new Flower(x,y);\n\t    flower.show();\n\t\t}\t\t\t\n\t}\n}\n\nfunction draw() {\n\t\n}\n\nclass Flower{\n\tconstructor(x,y){\n\t\tthis.pedalColors=[\"#212121\",\"#DF0909\",\"#F44141\",\"#FBC02D\",\"#ffdf3d\",\"#FA61BF\",\"#ff246d\",\"##FF558E\",\"#FF7043\"];\n\t\tthis.sunColors=[\"#34a4fa\",\"#212121\",\"#F7BB2A\",\"#F786B8\",\"#FF2F91\",\"#FF5BE2\",\"#E32323\"];\n\t\tthis.x=x;\n\t\tthis.y=y;\n\t\tthis.nPedals=int(random(6,10));\n\t\tthis.pedalRadius=int(random(100,150));\n\t\tthis.nPoints=int(random(14,30));\n\t\tthis.radius1=int(random(50,60));\n\t\tthis.radius2=int(random(20,40));\n\t}\n\t\n\tshow(){\n\t\tfill(random(this.pedalColors));\n\t\tthis.pedals(140,this.nPedals);\n\t\tfill(random(this.pedalColors));\n\t\tthis.pedals(120,this.nPedals);\n\t\tfill(random(this.pedalColors));\n\t\tthis.pedals(100,this.nPedals);\n\t\tfill(random(this.sunColors));\n\t\tthis.sun(this.x,this.y,60,40,this.nPoints);\n\t\tfill(random(this.sunColors));\n\t\tthis.sun(this.x,this.y,40,20,this.nPoints);\n\t\tfill(random(this.sunColors));\n\t\tthis.sun(this.x,this.y,30,15,this.nPoints);\n\t\tfill(random(this.pedalColors));\n\t\tcircle(this.x,this.y,random(20,30));\n\t}\n\t\n\tsun(x, y, radius1, radius2, npoints) {\n\t\tlet angle = TWO_PI / npoints;\n\t\tlet halfAngle = angle / 2.0;\n\t\tbeginShape();\n\t\tfor (let a = 0; a < TWO_PI; a += (Math.max(0.001, Math.abs(angle)) || 1)) {\n\t\t\tlet sx = x + cos(a) * radius2;\n\t\t\tlet sy = y + sin(a) * radius2;\n\t\t\tvertex(sx, sy);\n\t\t\tsx = x + cos(a + halfAngle) * radius1;\n\t\t\tsy = y + sin(a + halfAngle) * radius1;\n\t\t\tvertex(sx, sy);\n\t\t}\n\t\tendShape(CLOSE);\n\t}\n\t\n\tpedals(radius,n){\n\t\tpush();\n\t\ttranslate(this.x,this.y);\n\t\tlet degree=TWO_PI/n;\n\t\tfor(let i = 0; i < TWO_PI; i+= (Math.max(0.001, Math.abs(degree)) || 1)){\n\t\t\tellipse(20,0,radius,radius*degree/4*3);\n\t\t\trotate(degree);\n\t\t}\n\t\tpop();\n\t}\n\t\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "papercutflowers",
+    "author": "sihan",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:20:40",
+    "url": "https://openprocessing.org/@sihan/2562561",
+    "code": "// === Tab: mySketch ===\n//#WCCChallenge \n//Inspired by 库淑兰Ku Shulan's paper-cutting artworks. \n//Ku Shulan reminds me of my grandma, she also make beautiful paper-cut flowers and figures in her spare time.\n\nlet flower;\nfunction setup() {\n\tcreateCanvas(600,600);\n\tbackground(\"#F6DD91\");\n\tnoStroke();\n\tfor(let x=100;x<600;x+=200){\n\t\tfor(let y=100;y<600;y+=200){\n\t\t\tflower=new Flower(x,y);\n\t    flower.show();\n\t\t}\t\t\t\n\t}\n}\n\nfunction draw() {\n\t\n}\n\nclass Flower{\n\tconstructor(x,y){\n\t\tthis.pedalColors=[\"#212121\",\"#DF0909\",\"#F44141\",\"#FBC02D\",\"#ffdf3d\",\"#FA61BF\",\"#ff246d\",\"##FF558E\",\"#FF7043\"];\n\t\tthis.sunColors=[\"#34a4fa\",\"#212121\",\"#F7BB2A\",\"#F786B8\",\"#FF2F91\",\"#FF5BE2\",\"#E32323\"];\n\t\tthis.x=x;\n\t\tthis.y=y;\n\t\tthis.nPedals=int(random(6,10));\n\t\tthis.pedalRadius=int(random(100,150));\n\t\tthis.nPoints=int(random(14,30));\n\t\tthis.radius1=int(random(50,60));\n\t\tthis.radius2=int(random(20,40));\n\t}\n\t\n\tshow(){\n\t\tfill(random(this.pedalColors));\n\t\tthis.pedals(140,this.nPedals);\n\t\tfill(random(this.pedalColors));\n\t\tthis.pedals(120,this.nPedals);\n\t\tfill(random(this.pedalColors));\n\t\tthis.pedals(100,this.nPedals);\n\t\tfill(random(this.sunColors));\n\t\tthis.sun(this.x,this.y,60,40,this.nPoints);\n\t\tfill(random(this.sunColors));\n\t\tthis.sun(this.x,this.y,40,20,this.nPoints);\n\t\tfill(random(this.sunColors));\n\t\tthis.sun(this.x,this.y,30,15,this.nPoints);\n\t\tfill(random(this.pedalColors));\n\t\tcircle(this.x,this.y,random(20,30));\n\t}\n\t\n\tsun(x, y, radius1, radius2, npoints) {\n\t\tlet angle = TWO_PI / npoints;\n\t\tlet halfAngle = angle / 2.0;\n\t\tbeginShape();\n\t\tfor (let a = 0; a < TWO_PI; a += (Math.max(0.001, Math.abs(angle)) || 1)) {\n\t\t\tlet sx = x + cos(a) * radius2;\n\t\t\tlet sy = y + sin(a) * radius2;\n\t\t\tvertex(sx, sy);\n\t\t\tsx = x + cos(a + halfAngle) * radius1;\n\t\t\tsy = y + sin(a + halfAngle) * radius1;\n\t\t\tvertex(sx, sy);\n\t\t}\n\t\tendShape(CLOSE);\n\t}\n\t\n\tpedals(radius,n){\n\t\tpush();\n\t\ttranslate(this.x,this.y);\n\t\tlet degree=TWO_PI/n;\n\t\tfor(let i = 0; i < TWO_PI; i+= (Math.max(0.001, Math.abs(degree)) || 1)){\n\t\t\tellipse(20,0,radius,radius*degree/4*3);\n\t\t\trotate(degree);\n\t\t}\n\t\tpop();\n\t}\n\t\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Delay Trail Hypnosis.mp4"
+    ]
 }

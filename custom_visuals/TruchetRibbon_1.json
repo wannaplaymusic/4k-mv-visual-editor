@@ -1,22 +1,25 @@
 {
-  "name": "TruchetRibbon_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:25:17",
-  "url": "https://openprocessing.org/@ronikaufman/1255439",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n// https://twitter.com/KaufmanRoni\n\n// Made for @sableRaph's weekly creative challenge on Twitch (#WCCChallenge)\n// https://www.twitch.tv/sableraph\n// \"Ribbons\"\n\nlet u = 8; // size of each thin band\nlet backgrph; // rainbow background\nlet grph1, grph2; // buffers with the Truchet compositions\nlet x1, x2; // x positions of grph1 and grph2, to make them slide\nlet speed = 1.2;\n\nfunction setup() {\n  createCanvas(512, 512);\n\tx1 = 0;\n\tx2 = width;\n\t\n\tbackgrph = createGraphics(width*2, height);\n\tbackgrph.colorMode(HSB, 1);\n\tfor (let x = 0; x <= width*2; x++) {\n\t\tbackgrph.stroke(x/(2*width), 0.8, 1);\n\t\tbackgrph.line(x, 0, x, height);\n\t}\n\t\n\tgrph1 = createGraphics(width, height);\n\tgrph1.background(0);\n  grph1.stroke(255);\n\tgrph1.fill(0);\n  grph1.strokeWeight(2.5);\n  divide(0, 0, width, 1, grph1);\n\t\n\tgrph2 = createGraphics(width, height);\n\tgrph2.background(0);\n  grph2.stroke(255);\n\tgrph2.fill(0);\n  grph2.strokeWeight(2.5);\n\tdivide(0, 0, width, 1, grph2);\n}\n\nfunction draw() {\n\tblendMode(BLEND);\n\timage(backgrph, x1, 0);\n\timage(backgrph, x1-2*width, 0);\n\tblendMode(DARKEST);\n\t\n\timage(grph1, x1, 0);\n\timage(grph2, x2, 0);\n\tx1 -= speed;\n\tx2 -= speed;\n\tif (x1 < -width) {\n\t\tx1 += width*2;\n\t\tgrph1.background(0);\n\t\tdivide(0, 0, width, 1, grph1);\n\t}\n\tif (x2 < -width) {\n\t\tx2 += width*2;\n\t\tgrph2.background(0);\n\t\tdivide(0, 0, width, 1, grph2);\n\t}\n}\n\n// Recursive subdivision\nfunction divide(x, y, s, probDivide, grph) {\n  if (random() < probDivide && s > 8*u) {\n    let p = probDivide * 0.7;\n    divide(x, y, s/2, p, grph);\n    divide(x+s/2, y, s/2, p, grph);\n    divide(x, y+s/2, s/2, p, grph);\n    divide(x+s/2, y+s/2, s/2, p, grph);\n  } else {\n    makeTile(x, y, s, grph);\n  }\n}\n\n// Draw a Truchet-like tile of size s at (x, y) on the buffer grph\nfunction makeTile(x, y, s, grph) {\n  grph.push();\n\tgrph.translate(x+s/2, y+s/2);\n\tgrph.rotate(random([0, PI/2]));\n\tif (random() < 1/2) {\n\t\tfor (let z = u; z < s; z += (Math.max(0.001, Math.abs(u)) || 1)) {\n\t\t\tgrph.line(-s/2, z-s/2, s/2, z-s/2);\n\t\t}\n\t\tfor (let z = s; z > 0; z -= 2*u) {\n\t\t\tgrph.arc(0, -s/2, z, z, 0, PI);\n\t\t\tgrph.arc(0, s/2, z, z, PI, TWO_PI);\n\t\t}\n\t} else {\n\t\tfor (let z = s-u; z > 0; z -= 2*u) {\n\t\t\tgrph.circle(0, 0, z);\n\t\t}\n\t\tfor (let z = s; z > 0; z -= 2*u) {\n\t\t\tgrph.arc(-s/2, -s/2, z, z, 0, PI/2);\n\t\t\tgrph.arc(s/2, -s/2, z, z, PI/2, PI);\n\t\t\tgrph.arc(s/2, s/2, z, z, PI, 3*PI/2);\n\t\t\tgrph.arc(-s/2, s/2, z, z, 3*PI/2, TWO_PI);\n\t\t}\n\t}\n\tgrph.pop();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "TruchetRibbon_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:25:17",
+    "url": "https://openprocessing.org/@ronikaufman/1255439",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n// https://twitter.com/KaufmanRoni\n\n// Made for @sableRaph's weekly creative challenge on Twitch (#WCCChallenge)\n// https://www.twitch.tv/sableraph\n// \"Ribbons\"\n\nlet u = 8; // size of each thin band\nlet backgrph; // rainbow background\nlet grph1, grph2; // buffers with the Truchet compositions\nlet x1, x2; // x positions of grph1 and grph2, to make them slide\nlet speed = 1.2;\n\nfunction setup() {\n  createCanvas(512, 512);\n\tx1 = 0;\n\tx2 = width;\n\t\n\tbackgrph = createGraphics(width*2, height);\n\tbackgrph.colorMode(HSB, 1);\n\tfor (let x = 0; x <= width*2; x++) {\n\t\tbackgrph.stroke(x/(2*width), 0.8, 1);\n\t\tbackgrph.line(x, 0, x, height);\n\t}\n\t\n\tgrph1 = createGraphics(width, height);\n\tgrph1.background(0);\n  grph1.stroke(255);\n\tgrph1.fill(0);\n  grph1.strokeWeight(2.5);\n  divide(0, 0, width, 1, grph1);\n\t\n\tgrph2 = createGraphics(width, height);\n\tgrph2.background(0);\n  grph2.stroke(255);\n\tgrph2.fill(0);\n  grph2.strokeWeight(2.5);\n\tdivide(0, 0, width, 1, grph2);\n}\n\nfunction draw() {\n\tblendMode(BLEND);\n\timage(backgrph, x1, 0);\n\timage(backgrph, x1-2*width, 0);\n\tblendMode(DARKEST);\n\t\n\timage(grph1, x1, 0);\n\timage(grph2, x2, 0);\n\tx1 -= speed;\n\tx2 -= speed;\n\tif (x1 < -width) {\n\t\tx1 += width*2;\n\t\tgrph1.background(0);\n\t\tdivide(0, 0, width, 1, grph1);\n\t}\n\tif (x2 < -width) {\n\t\tx2 += width*2;\n\t\tgrph2.background(0);\n\t\tdivide(0, 0, width, 1, grph2);\n\t}\n}\n\n// Recursive subdivision\nfunction divide(x, y, s, probDivide, grph) {\n  if (random() < probDivide && s > 8*u) {\n    let p = probDivide * 0.7;\n    divide(x, y, s/2, p, grph);\n    divide(x+s/2, y, s/2, p, grph);\n    divide(x, y+s/2, s/2, p, grph);\n    divide(x+s/2, y+s/2, s/2, p, grph);\n  } else {\n    makeTile(x, y, s, grph);\n  }\n}\n\n// Draw a Truchet-like tile of size s at (x, y) on the buffer grph\nfunction makeTile(x, y, s, grph) {\n  grph.push();\n\tgrph.translate(x+s/2, y+s/2);\n\tgrph.rotate(random([0, PI/2]));\n\tif (random() < 1/2) {\n\t\tfor (let z = u; z < s; z += (Math.max(0.001, Math.abs(u)) || 1)) {\n\t\t\tgrph.line(-s/2, z-s/2, s/2, z-s/2);\n\t\t}\n\t\tfor (let z = s; z > 0; z -= 2*u) {\n\t\t\tgrph.arc(0, -s/2, z, z, 0, PI);\n\t\t\tgrph.arc(0, s/2, z, z, PI, TWO_PI);\n\t\t}\n\t} else {\n\t\tfor (let z = s-u; z > 0; z -= 2*u) {\n\t\t\tgrph.circle(0, 0, z);\n\t\t}\n\t\tfor (let z = s; z > 0; z -= 2*u) {\n\t\t\tgrph.arc(-s/2, -s/2, z, z, 0, PI/2);\n\t\t\tgrph.arc(s/2, -s/2, z, z, PI/2, PI);\n\t\t\tgrph.arc(s/2, s/2, z, z, PI, 3*PI/2);\n\t\t\tgrph.arc(-s/2, s/2, z, z, 3*PI/2, TWO_PI);\n\t\t}\n\t}\n\tgrph.pop();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Tunnel Vision.mp4"
+    ]
 }

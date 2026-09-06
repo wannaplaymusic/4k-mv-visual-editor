@@ -1,22 +1,25 @@
 {
-  "name": "VorticeswithMoireffect",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 02:55:45",
-  "url": "https://openprocessing.org/@ntsutae/1248332",
-  "code": "// === Tab: mySketch ===\nvar particles=[]\nvar timer=0\n\nsetup=()=>{\n  createCanvas(w=400,w)\n  noFill()\n  for(let i=5;i--;){\n    particles[i]={\n      x:random(w),\n      y:random(w),\n      vx:random(1)<.5?-2:2,\n      vy:random(1)<.5?-2:2\n    }\n  }\n}\n\ndraw=()=>{\n  timer+=.1\n  background('black')\n  stroke('white')\n\n  for(p of particles){\n    p.x+=p.vx\n    if(p.x<0||p.x>w){\n      p.vx*=-1\n      p.x+=p.vx\n    }\n    p.y+=p.vy\n    if(p.y<0||p.y>w){\n      p.vy*=-1\n      p.y+=p.vy\n    }\n  }\n\n  const step=2\n  for(let y=timer%step;y<w;y+=step){\n    beginShape()\n    for(let x=timer%step;x<w;x+=step){\n      let difx=dify=0\n      for(p of particles){\n        const dx=p.x-x\n        const dy=p.y-y\n        const distance=max((dx**2+dy**2)/400,1)\n        difx+=dx/distance\n        dify+=dy/distance\n      }\n      curveVertex(x+difx, y+dify)\n    }\n    endShape()\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "VorticeswithMoireffect",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 02:55:45",
+    "url": "https://openprocessing.org/@ntsutae/1248332",
+    "code": "// === Tab: mySketch ===\nvar particles=[]\nvar timer=0\n\nsetup=()=>{\n  createCanvas(w=400,w)\n  noFill()\n  for(let i=5;i--;){\n    particles[i]={\n      x:random(w),\n      y:random(w),\n      vx:random(1)<.5?-2:2,\n      vy:random(1)<.5?-2:2\n    }\n  }\n}\n\ndraw=()=>{\n  timer+=.1\n  background('black')\n  stroke('white')\n\n  for(p of particles){\n    p.x+=p.vx\n    if(p.x<0||p.x>w){\n      p.vx*=-1\n      p.x+=p.vx\n    }\n    p.y+=p.vy\n    if(p.y<0||p.y>w){\n      p.vy*=-1\n      p.y+=p.vy\n    }\n  }\n\n  const step=2\n  for(let y=timer%step;y<w;y+=step){\n    beginShape()\n    for(let x=timer%step;x<w;x+=step){\n      let difx=dify=0\n      for(p of particles){\n        const dx=p.x-x\n        const dy=p.y-y\n        const distance=max((dx**2+dy**2)/400,1)\n        difx+=dx/distance\n        dify+=dy/distance\n      }\n      curveVertex(x+difx, y+dify)\n    }\n    endShape()\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Spatial Wash.mp4"
+    ]
 }

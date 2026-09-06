@@ -1,22 +1,25 @@
 {
-  "name": "DayNight_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 22:58:02",
-  "url": "https://openprocessing.org/@ronikaufman/881547",
-  "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n// Inspired by https://p5art.tumblr.com/image/175770708533\n// and by Teddy Newton's Pixar short film \"Day & Night\" (2010)\n\nvar count = 0;\nvar maxCount = 100;\nvar incr = 0.3; // count increment\nvar ascending = true;\n\nvar size = 400; // real size of the sketch\nvar frontLayer; // p5.Graphics object used to separate the screen in two\n\nvar wave = (x) => (cos(x*PI)+1)/2;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  background(51);\n  colorMode(HSB, 255);\n  imageModefrontLayer = createGraphics(size, size);\n  frontLayer.background(51);\n  frontLayer.colorMode(HSB, 255);\n}\n\nfunction draw() {\n  let percent = wave(count / maxCount);\n  push();\n  render(percent, this);\n  pop();\n  render(1 - percent, frontLayer);\n  frontLayer.erase();\n  frontLayer.noStroke();\n  frontLayer.rect(0, 0, size/2, size);\n  frontLayer.noErase();\n  image(frontLayer, size/2, size/2);\n  \n  if (ascending) {\n    count += incr;\n  } else {\n    count -= incr;\n  }\n  \n  if (count > maxCount) {\n    ascending = false;\n  }\n  if (count < 0) {\n    ascending = true;\n  }\n}\n\nfunction render(percent, img) {\n  let radius = percent * size/3 + size/6;\n  let biggerRadius = radius * 1.7;\n  \n  this.translate((width - size)/2, (height - size)/2);\n  drawSquare(percent, img);\n  drawCircle(percent, radius, img);\n  drawLines(percent, biggerRadius, img);\n}\n\nfunction drawSquare(percent, img) {\n  img.noStroke();\n  img.fill(135, 240, 100 + percent*140);\n  img.square(0, 0, size);\n}\n\nfunction drawCircle(percent, r, img) {\n  img.fill(percent*39, percent*250, 140 + percent*115);\n  img.circle(size/2, size/2, r);\n}\n\nfunction drawLines(percent, r, img) {\n  img.stroke(225 + percent*30);\n  img.strokeWeight(8);\n  let margin = 25;\n  let smallWidth = size - 2*margin;\n  let nLines = 25; // number of lines\n  for (let i = 0; i <= smallWidth; i += (Math.max(0.001, Math.abs(smallWidth/nLines)) || 1)) {\n    let x = margin;\n    let y = margin + i;\n    while ((dist(x, y, size/2, size/2) > r/2) && (x < size - margin)) {\n      x += 0.5;\n    } \n    img.line(margin, y, x, y);\n    if (x < size - margin) { // finish the bottom\n      img.line(size - margin, y, size - x, y);\n    }\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "DayNight_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:58:02",
+    "url": "https://openprocessing.org/@ronikaufman/881547",
+    "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n// Inspired by https://p5art.tumblr.com/image/175770708533\n// and by Teddy Newton's Pixar short film \"Day & Night\" (2010)\n\nvar count = 0;\nvar maxCount = 100;\nvar incr = 0.3; // count increment\nvar ascending = true;\n\nvar size = 400; // real size of the sketch\nvar frontLayer; // p5.Graphics object used to separate the screen in two\n\nvar wave = (x) => (cos(x*PI)+1)/2;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  background(51);\n  colorMode(HSB, 255);\n  imageMode(CENTER); frontLayer = createGraphics(size, size);\n  frontLayer.background(51);\n  frontLayer.colorMode(HSB, 255);\n}\n\nfunction draw() {\n  let percent = wave(count / maxCount);\n  push();\n  render(percent, this);\n  pop();\n  render(1 - percent, frontLayer);\n  frontLayer.erase();\n  frontLayer.noStroke();\n  frontLayer.rect(0, 0, size/2, size);\n  frontLayer.noErase();\n  image(frontLayer, size/2, size/2);\n  \n  if (ascending) {\n    count += incr;\n  } else {\n    count -= incr;\n  }\n  \n  if (count > maxCount) {\n    ascending = false;\n  }\n  if (count < 0) {\n    ascending = true;\n  }\n}\n\nfunction render(percent, img) {\n  let radius = percent * size/3 + size/6;\n  let biggerRadius = radius * 1.7;\n  \n  this.translate((width - size)/2, (height - size)/2);\n  drawSquare(percent, img);\n  drawCircle(percent, radius, img);\n  drawLines(percent, biggerRadius, img);\n}\n\nfunction drawSquare(percent, img) {\n  img.noStroke();\n  img.fill(135, 240, 100 + percent*140);\n  img.square(0, 0, size);\n}\n\nfunction drawCircle(percent, r, img) {\n  img.fill(percent*39, percent*250, 140 + percent*115);\n  img.circle(size/2, size/2, r);\n}\n\nfunction drawLines(percent, r, img) {\n  img.stroke(225 + percent*30);\n  img.strokeWeight(8);\n  let margin = 25;\n  let smallWidth = size - 2*margin;\n  let nLines = 25; // number of lines\n  for (let i = 0; i <= smallWidth; i += (Math.max(0.001, Math.abs(smallWidth/nLines)) || 1)) {\n    let x = margin;\n    let y = margin + i;\n    while ((dist(x, y, size/2, size/2) > r/2) && (x < size - margin)) {\n      x += 0.5;\n    } \n    img.line(margin, y, x, y);\n    if (x < size - margin) { // finish the bottom\n      img.line(size - margin, y, size - x, y);\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Stark Contrast.mp4"
+    ]
 }

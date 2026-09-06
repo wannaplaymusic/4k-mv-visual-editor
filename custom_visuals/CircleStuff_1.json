@@ -1,22 +1,25 @@
 {
-  "name": "CircleStuff_1",
-  "author": "Xeronimo74",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:02:25",
-  "url": "https://openprocessing.org/@Xeronimo74/584914",
-  "code": "// === Tab: mySketch ===\nvar num = 15;\n\nfunction setup() {\n\tcreateCanvas(600, 600);\n}\n\nfunction draw() {\n\tbackground('#9590A8');\n\tstroke('white');\n\tfill('grey');\n\n\n\tfor (var i = 0; i < num; i++) {\n\t\tvar\n\t\t\tt = frameCount / 200.0 * TWO_PI,\n\t\t\tangle = TWO_PI / num * i,\n\t\t\td = map(sin(t + angle * 3), -1, 1, 100, 200),\n\t\t\tx = width / 2 + cos(angle) * d,\n\t\t\ty = height / 2 + sin(angle) * d,\n\t\t\tdd = 20;\n\t\tx2 = map(sin(t), -1, 1, width / 2 - dd, width / 2 + dd) + cos(angle) * 20,\n\t\t\ty2 = map(cos(t), -1, 1, width / 2 - dd, width / 2 + dd) + sin(angle) * 20,\n\t\t\tsz = map(sin(t + angle * 3), -1, 1, 25, 75),\n\t\t\tsz2 = map(sin(t + angle * 3), -1, 1, 0, sz * .9);\n\t\tline(x2, y2, x, y);\n\t\tnoFill();\n\t\tellipse(x, y, sz, sz);\n\t\tellipse(x, y, sz2, sz2);\n\t\tfill('white');\n\t\tellipse(x, y, 5, 5);\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "CircleStuff_1",
+    "author": "Xeronimo74",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:02:25",
+    "url": "https://openprocessing.org/@Xeronimo74/584914",
+    "code": "// === Tab: mySketch ===\nvar num = 15;\n\nfunction setup() {\n\tcreateCanvas(600, 600);\n}\n\nfunction draw() {\n\tbackground('#9590A8');\n\tstroke('white');\n\tfill('grey');\n\n\n\tfor (var i = 0; i < num; i++) {\n\t\tvar\n\t\t\tt = frameCount / 200.0 * TWO_PI,\n\t\t\tangle = TWO_PI / num * i,\n\t\t\td = map(sin(t + angle * 3), -1, 1, 100, 200),\n\t\t\tx = width / 2 + cos(angle) * d,\n\t\t\ty = height / 2 + sin(angle) * d,\n\t\t\tdd = 20;\n\t\tx2 = map(sin(t), -1, 1, width / 2 - dd, width / 2 + dd) + cos(angle) * 20,\n\t\t\ty2 = map(cos(t), -1, 1, width / 2 - dd, width / 2 + dd) + sin(angle) * 20,\n\t\t\tsz = map(sin(t + angle * 3), -1, 1, 25, 75),\n\t\t\tsz2 = map(sin(t + angle * 3), -1, 1, 0, sz * .9);\n\t\tline(x2, y2, x, y);\n\t\tnoFill();\n\t\tellipse(x, y, sz, sz);\n\t\tellipse(x, y, sz2, sz2);\n\t\tfill('white');\n\t\tellipse(x, y, 5, 5);\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Rain Over Resonance.mp4"
+    ]
 }

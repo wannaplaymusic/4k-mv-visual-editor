@@ -1,22 +1,25 @@
 {
-  "name": "Fireflies_2",
-  "author": "charmonder",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:31:56",
-  "url": "https://openprocessing.org/@charmonder/2198779",
-  "code": "// === Tab: Firefly ===\nclass Firefly{\n\tconstructor(){\n\t\tthis.light = color(255,255,0)\n\t\tthis.dim = color(55)\n\t\tthis.t = 0\n\t\tthis.x = width/2\n\t\tthis.y = height/2\n\t\tthis.a = map(sin(this.t),-1,1,0,1)\n\t\tthis.dF = random(1000)\n\t\tthis.facing = map(noise(this.dF),0,1,-TAU,TAU)\n\t\tthis.size = random(0.1,0.25)\n\t\tthis.speed = random(0.5,2) * this.size*4\n\t}\n\t\n\tupdate(){\n\t\tthis.t += this.speed * 0.1\n\t\tthis.a = map(sin(this.t),-1,1,0,1)\n\t\tthis.x += this.speed * 2 * cos(this.facing)\n\t\tthis.y += this.speed * 2 * sin(this.facing)\n\t\tif(this.x > width + 50){\n\t\t\tthis.x = -50\n\t\t}else if(this.x < -50){\n\t\t\tthis.x = width + 50\n\t\t}\n\t\tif(this.y > height + 50){\n\t\t\tthis.y = -50\n\t\t}else if(this.y < -50){\n\t\t\tthis.y = height + 50\n\t\t}\n\t\tthis.dF += 0.0025\n\t\tthis.facing = map(noise(this.dF),0,1,-TAU,TAU)\n\t}\n\t\n\tdisplay(){\t\t\n\t\tpush()\n\t\ttranslate(this.x,this.y)\n\t\trotate(this.facing)\n\t\tscale(this.size)\n\t\tstroke(35)\n\t\tstrokeWeight(2)\n\t\tline(0,0,30*cos(PI/6),30*sin(PI/6))\n\t\tline(0,0,30*cos(-PI/6),30*sin(-PI/6))\n\t\tstrokeWeight(5)\n\t\tpoint(30*cos(PI/6),30*sin(PI/6))\n\t\tpoint(30*cos(-PI/6),30*sin(-PI/6))\n\t\tnoStroke()\n\t\tfill(35)\n\t\tellipse(-5,0,40,40)\n\t\tfill(this.light)\n\t\tellipse(-50,0,100,50)\n\t\tfill(30)\n\t\tstroke(30)\n\t\trotate(-this.a)\n\t\tellipse(-50,0,100,50)\n\t\trotate(2*this.a)\n\t\tellipse(-50,0,100,50)\n\t\tpop()\n\t}\n}\n\n// === Tab: mySketch ===\nlet fireflies = []\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tfor(let i = 0; i < 10; i++){\n\t\tfireflies.push(new Firefly())\n\t}\n\n}\n\nfunction draw() {\n\tbackground(20,15,20);\n\tfireflies.forEach(firefly => {\n\t\tfirefly.update()\n\t\tfirefly.display()\n\t})\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Fireflies_2",
+    "author": "charmonder",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:31:56",
+    "url": "https://openprocessing.org/@charmonder/2198779",
+    "code": "// === Tab: Firefly ===\nclass Firefly{\n\tconstructor(){\n\t\tthis.light = color(255,255,0)\n\t\tthis.dim = color(55)\n\t\tthis.t = 0\n\t\tthis.x = width/2\n\t\tthis.y = height/2\n\t\tthis.a = map(sin(this.t),-1,1,0,1)\n\t\tthis.dF = random(1000)\n\t\tthis.facing = map(noise(this.dF),0,1,-TAU,TAU)\n\t\tthis.size = random(0.1,0.25)\n\t\tthis.speed = random(0.5,2) * this.size*4\n\t}\n\t\n\tupdate(){\n\t\tthis.t += this.speed * 0.1\n\t\tthis.a = map(sin(this.t),-1,1,0,1)\n\t\tthis.x += this.speed * 2 * cos(this.facing)\n\t\tthis.y += this.speed * 2 * sin(this.facing)\n\t\tif(this.x > width + 50){\n\t\t\tthis.x = -50\n\t\t}else if(this.x < -50){\n\t\t\tthis.x = width + 50\n\t\t}\n\t\tif(this.y > height + 50){\n\t\t\tthis.y = -50\n\t\t}else if(this.y < -50){\n\t\t\tthis.y = height + 50\n\t\t}\n\t\tthis.dF += 0.0025\n\t\tthis.facing = map(noise(this.dF),0,1,-TAU,TAU)\n\t}\n\t\n\tdisplay(){\t\t\n\t\tpush()\n\t\ttranslate(this.x,this.y)\n\t\trotate(this.facing)\n\t\tscale(this.size)\n\t\tstroke(35)\n\t\tstrokeWeight(2)\n\t\tline(0,0,30*cos(PI/6),30*sin(PI/6))\n\t\tline(0,0,30*cos(-PI/6),30*sin(-PI/6))\n\t\tstrokeWeight(5)\n\t\tpoint(30*cos(PI/6),30*sin(PI/6))\n\t\tpoint(30*cos(-PI/6),30*sin(-PI/6))\n\t\tnoStroke()\n\t\tfill(35)\n\t\tellipse(-5,0,40,40)\n\t\tfill(this.light)\n\t\tellipse(-50,0,100,50)\n\t\tfill(30)\n\t\tstroke(30)\n\t\trotate(-this.a)\n\t\tellipse(-50,0,100,50)\n\t\trotate(2*this.a)\n\t\tellipse(-50,0,100,50)\n\t\tpop()\n\t}\n}\n\n// === Tab: mySketch ===\nlet fireflies = []\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tfor(let i = 0; i < 10; i++){\n\t\tfireflies.push(new Firefly())\n\t}\n\n}\n\nfunction draw() {\n\tbackground(20,15,20);\n\tfireflies.forEach(firefly => {\n\t\tfirefly.update()\n\t\tfirefly.display()\n\t})\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Hollow Frequency Field.mp4"
+    ]
 }
