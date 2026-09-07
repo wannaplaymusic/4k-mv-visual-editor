@@ -1,22 +1,25 @@
 {
-  "name": "NinjaWarriors",
-  "author": "ntsutae",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-07-23 17:40:35",
-  "url": "https://openprocessing.org/@ntsutae/1522294",
-  "code": "// === Tab: mySketch ===\nlet robot\nsetup=()=>{\n  createCanvas(800,400)\n  noFill()\n  robot=new Robot()\n}\n\nclass Robot{\n  constructor(){\n    this.x=-100\n    this.y=0\n    this.radius=random(25,75)\n    this.status='ON'\n  }\n  update(){\n    this.x+=2\n    if(this.x>400){this.status='DYING'}\n    if(this.x>width+50){this.status='DIE'}\n    this.y=noise(frameCount/100)*300\n    if(this.status=='DYING'){\n      this.y+=this.x-400\n    }\n  }\n  show(){\n    ellipse(this.x,this.y,this.radius*2)\n  }\n  tentacles(){\n    for (let j=4; j--; ) {\n      const angle=PI/4+TWO_PI/4*j\n      let x = this.x + cos(angle) * this.radius\n      let y = this.y + sin(angle) * this.radius\n      ellipse(x, y, 5)\n    \n      let pins=[]\n      for(let i=12;i--;){\n        pins[i]=createVector(map(i,0,11,-100,width+100)+[10,-10,20,-20][j],150)\n      }\n      beginShape()\n      for (let i = 120; i--;) {\n        const angle = pins.reduce((total, e) => \n                      total +  atan2(e.y - y,e.x - x)\n                      , 0)       \n        vertex(x += cos(angle), y += sin(angle))\n        if (pins.some(p => (x - p.x) ** 2 + (y - p.y) ** 2 < 1)) break;\n      }\n      endShape()\n      ellipse(x,y,5)\n    }\n  }\n}\n\ndraw = () => {\n  background('white')\n  stroke('black')\n  line(0,150,width,150)\n\n  if(robot.status=='DIE')robot=new Robot()\n  robot.update()\n  robot.show()\n  robot.tentacles()\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "NinjaWarriors",
+    "author": "ntsutae",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-07-23 17:40:35",
+    "url": "https://openprocessing.org/@ntsutae/1522294",
+    "code": "// === Tab: mySketch ===\nlet robot\nsetup=()=>{\n  createCanvas(800,400)\n  noFill()\n  robot=new Robot()\n}\n\nclass Robot{\n  constructor(){\n    this.x=-100\n    this.y=0\n    this.radius=random(25,75)\n    this.status='ON'\n  }\n  update(){\n    this.x+=2\n    if(this.x>400){this.status='DYING'}\n    if(this.x>width+50){this.status='DIE'}\n    this.y=noise(frameCount/100)*300\n    if(this.status=='DYING'){\n      this.y+=this.x-400\n    }\n  }\n  show(){\n    ellipse(this.x,this.y,this.radius*2)\n  }\n  tentacles(){\n    for (let j=4; j--; ) {\n      const angle=PI/4+TWO_PI/4*j\n      let x = this.x + cos(angle) * this.radius\n      let y = this.y + sin(angle) * this.radius\n      ellipse(x, y, 5)\n    \n      let pins=[]\n      for(let i=12;i--;){\n        pins[i]=createVector(map(i,0,11,-100,width+100)+[10,-10,20,-20][j],150)\n      }\n      beginShape()\n      for (let i = 120; i--;) {\n        const angle = pins.reduce((total, e) => \n                      total +  atan2(e.y - y,e.x - x)\n                      , 0)       \n        vertex(x += cos(angle), y += sin(angle))\n        if (pins.some(p => (x - p.x) ** 2 + (y - p.y) ** 2 < 1)) break;\n      }\n      endShape()\n      ellipse(x,y,5)\n    }\n  }\n}\n\ndraw = () => {\n  background('white')\n  stroke('black')\n  line(0,150,width,150)\n\n  if(robot.status=='DIE')robot=new Robot()\n  robot.update()\n  robot.show()\n  robot.tentacles()\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Soft Damping.mp4"
+    ]
 }

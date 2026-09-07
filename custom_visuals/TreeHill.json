@@ -1,22 +1,25 @@
 {
-  "name": "TreeHill",
-  "author": "lilagondwana",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:05:26",
-  "url": "https://openprocessing.org/@lilagondwana/2247850",
-  "code": "// === Tab: mySketch ===\n/* #let Coding let March 16th Topic: let Lines\n   lilagondwana\n\t \n*/\n\nfunction setup(){\n  createCanvas(600, 600);\n}\n\nfunction draw(){\n  translate(width/2,height/2);\n  background(220);\n  for(let i=0; i<4; i++){\n   fractal(6,100.0,5.0);\n   rotate(TWO_PI/4);\n  }\n}\n\nfunction fractal(n, l,sw){\n  if(n==0) return;\n  else{\n    for(let i=0; i<3; i++){\n      push();\n      rotate(radians(-45+45*i+20*sin(PI/300*frameCount)));\n      strokeWeight(sw);\n      line(0,0,0,-l);\n      translate(0,-l);\n      fractal(n-1,2*l/3,sw/2);\n      pop();\n    }\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "TreeHill",
+    "author": "lilagondwana",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:05:26",
+    "url": "https://openprocessing.org/@lilagondwana/2247850",
+    "code": "// === Tab: mySketch ===\n/* #let Coding let March 16th Topic: let Lines\n   lilagondwana\n\t \n*/\n\nfunction setup(){\n  createCanvas(600, 600);\n}\n\nfunction draw(){\n  translate(width/2,height/2);\n  background(220);\n  for(let i=0; i<4; i++){\n   fractal(6,100.0,5.0);\n   rotate(TWO_PI/4);\n  }\n}\n\nfunction fractal(n, l,sw){\n  if(n==0) return;\n  else{\n    for(let i=0; i<3; i++){\n      push();\n      rotate(radians(-45+45*i+20*sin(PI/300*frameCount)));\n      strokeWeight(sw);\n      line(0,0,0,-l);\n      translate(0,-l);\n      fractal(n-1,2*l/3,sw/2);\n      pop();\n    }\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Measured Breath.mp4"
+    ]
 }

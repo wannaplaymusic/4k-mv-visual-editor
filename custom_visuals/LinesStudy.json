@@ -17,9 +17,10 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 1,
+    "used_count": 2,
     "is_starred": false,
     "used_in_videos": [
-        "Tonal Shift.mp4"
+        "Tonal Shift.mp4",
+        "Moving Parts.mp4"
     ]
 }

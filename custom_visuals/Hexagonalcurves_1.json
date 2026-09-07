@@ -1,22 +1,25 @@
 {
-  "name": "Hexagonalcurves_1",
-  "author": "jcponcemath",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:00:30",
-  "url": "https://openprocessing.org/@jcponcemath/2291132",
-  "code": "// === Tab: mySketch ===\n/*\n * Author: Juan Carlos Ponce Campuzano\n * Date: 28/May/2024\n * Site: https://www.dynamicmath.xyz\n * Video: https://youtu.be/vqGeaY188Ew\n */\n\nvar t = 0, speed = 0.004;\n\nfunction setup() {\n  createCanvas(500, 500);\n  colorMode(HSB, 1, 1, 1);\n}\n\nfunction draw() {\n  background(0);\n\n  for (let j = 1; j <= 10; j++) {\n    let hue = map(j, 1, 10, 0, 1)\n    stroke(hue, 1, 1);\n    hexagonalCurve(50, 2.5, 3, j, j * t, PI + j * t);\n  }\n\n  t += speed;\n  if(t >= TWO_PI) t = 0;\n}\n\n/*\n  Hexagonal curve\n  Defined on the interval [startT, endT]\n  Main parameters: n, k, m\n*/\nfunction hexagonalCurve(n, k, m, size, startT, endT) {\n  noFill();\n  strokeWeight(4);\n  let view = 12; \n  let x, y;\n  beginShape();\n  for (let i = startT; i <= endT; i += 0.01) {\n    let v = pow(\n      pow(cos((m * i) / 2), n) + pow(sin((m * i) / 2), n),\n      1 / (k * n)\n    );\n    x = map(cos(i) * (size / v), -view, view, 0, width);\n    y = map(sin(i) * (size / v), -view, view, height, 0);\n    vertex(x, y);\n  }\n  endShape();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Hexagonalcurves_1",
+    "author": "jcponcemath",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:00:30",
+    "url": "https://openprocessing.org/@jcponcemath/2291132",
+    "code": "// === Tab: mySketch ===\n/*\n * Author: Juan Carlos Ponce Campuzano\n * Date: 28/May/2024\n * Site: https://www.dynamicmath.xyz\n * Video: https://youtu.be/vqGeaY188Ew\n */\n\nvar t = 0, speed = 0.004;\n\nfunction setup() {\n  createCanvas(500, 500);\n  colorMode(HSB, 1, 1, 1);\n}\n\nfunction draw() {\n  background(0);\n\n  for (let j = 1; j <= 10; j++) {\n    let hue = map(j, 1, 10, 0, 1)\n    stroke(hue, 1, 1);\n    hexagonalCurve(50, 2.5, 3, j, j * t, PI + j * t);\n  }\n\n  t += speed;\n  if(t >= TWO_PI) t = 0;\n}\n\n/*\n  Hexagonal curve\n  Defined on the interval [startT, endT]\n  Main parameters: n, k, m\n*/\nfunction hexagonalCurve(n, k, m, size, startT, endT) {\n  noFill();\n  strokeWeight(4);\n  let view = 12; \n  let x, y;\n  beginShape();\n  for (let i = startT; i <= endT; i += 0.01) {\n    let v = pow(\n      pow(cos((m * i) / 2), n) + pow(sin((m * i) / 2), n),\n      1 / (k * n)\n    );\n    x = map(cos(i) * (size / v), -view, view, 0, width);\n    y = map(sin(i) * (size / v), -view, view, height, 0);\n    vertex(x, y);\n  }\n  endShape();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Signal Loss.mp4"
+    ]
 }

@@ -1,22 +1,25 @@
 {
-  "name": "ChladniPlates",
-  "author": "u110137",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:21:56",
-  "url": "https://openprocessing.org/@u110137/2333499",
-  "code": "// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"sand.\"\n// These things are amazing in real life!\n// https://en.wikipedia.org/wiki/Ernst_Chladni\n// https://paulbourke.net/geometry/chladni/\n// Sand is placed on a vibrating plate, whose deflections create beautiful patterns.\n// In this simulation, the sound frequencies have nothing to do with the distributions of the sand.\n// (The real-world frequencies needed to make these patterns are not the most pleasant to listen to.)\n// It would be neat to have a particle system here, and animate the transitions of the sand grains\n// from one frequency pattern to the next. I suspect a shader could make that happen.\n\nvar osc1, osc2;\nvar m = 0\nvar n = 0;\nvar tm = 0;\nvar tn = 0;\nvar doubler = 0;\nvar index = -1;\nvar lim, dim;\nvar vol = 0.1;\nvar tvol = 0.1;\nvar amt = 0;\n\nvar combos = [{\n\tm: 1,\n\tn: 5,\n\ta: 261.63 //C\n}, {\n\tm: 1,\n\tn: 4,\n\ta: 277.18 //Db\n}, {\n\tm: 1,\n\tn: 3,\n\ta: 293.66 //D\n}, {\n\tm: 1,\n\tn: 2,\n\ta: 311.13 //Eb\n}, {\n\tm: 2,\n\tn: 5,\n\ta: 329.63 //E\n}, {\n\tm: 2,\n\tn: 4,\n\ta: 369.99 //F#\n}, {\n\tm: 2,\n\tn: 3,\n\ta: 392.0 //G\n}, {\n\tm: 3,\n\tn: 5,\n\ta: 415.3 //Ab\n}, {\n\tm: 3,\n\tn: 4,\n\ta: 466.16 //Bb\n}, {\n\tm: 4,\n\tn: 5,\n\ta: 493.88 //B\n}]\n\nfunction setup() {\n\tlim = max(windowWidth, windowHeight);\n\tcreateCanvas(lim, lim);\n\tbackground(0)\n\tdim = lim * 0.9;\n\tosc1 = new p5.Oscillator('sawtooth');\n\tosc2 = new p5.Oscillator('sine');\n\tosc1.freq(110);\n\tosc1.amp(0.05);\n\tosc1.disconnect();\n\tosc1.start();\n\tosc2.start();\n}\n\nfunction draw() {\n\tm = lerp(m, tm, 0.1);\n\t\tn = lerp(n, tn, 0.1);\n\n\tosc2.amp(osc1); //creates distortion\n\tvol = lerp(vol, tvol, 0.1);\n\tfill(0, 2);\n\tnoStroke();\n\trect(0, 0, lim, lim);\n\tpush();\n\ttranslate(lim / 20, lim / 20);\n\tlet ang = PI * (1 + doubler);\n\tfor (let i = 0; i < 300; i++) {\n\t\tlet x = random(dim);\n\t\tlet y = random(dim);\n\t\tlet deflect = abs((cos(n * ang * x / dim) * cos(m * ang * y / dim)) - (cos(m * ang * x / dim) * cos(n * ang * y / dim)));\n\t\tlet spread = (1 - deflect) ** 2;\n\t\tstroke(255, 255 * spread);\n\t\tif (m > 0) strokeWeight(spread * dim / 300);\n\t\telse strokeWeight(random(dim / 300));\n\t\tpoint(x, y);\n\t}\n\tpop();\n\toutputVolume(vol);\n}\n\nfunction mousePressed() {\n\tbackground(0);\n\tuserStartAudio();\n\tindex = (index + 1) % combos.length;\n\tif (tm > 0 && index == 0) doubler = 1 - doubler;\n\tosc2.freq(combos[index].a * (1 + doubler) / 2, 0.5);\n\ttm = combos[index].m;\n\ttn = combos[index].n;\n}\n\nfunction keyPressed() {\n\tif (keyCode == 32) tvol = 0.1 - tvol;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/p5@1.10.0/lib/addons/p5.sound.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "ChladniPlates",
+    "author": "u110137",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:21:56",
+    "url": "https://openprocessing.org/@u110137/2333499",
+    "code": "// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"sand.\"\n// These things are amazing in real life!\n// https://en.wikipedia.org/wiki/Ernst_Chladni\n// https://paulbourke.net/geometry/chladni/\n// Sand is placed on a vibrating plate, whose deflections create beautiful patterns.\n// In this simulation, the sound frequencies have nothing to do with the distributions of the sand.\n// (The real-world frequencies needed to make these patterns are not the most pleasant to listen to.)\n// It would be neat to have a particle system here, and animate the transitions of the sand grains\n// from one frequency pattern to the next. I suspect a shader could make that happen.\n\nvar osc1, osc2;\nvar m = 0\nvar n = 0;\nvar tm = 0;\nvar tn = 0;\nvar doubler = 0;\nvar index = -1;\nvar lim, dim;\nvar vol = 0.1;\nvar tvol = 0.1;\nvar amt = 0;\n\nvar combos = [{\n\tm: 1,\n\tn: 5,\n\ta: 261.63 //C\n}, {\n\tm: 1,\n\tn: 4,\n\ta: 277.18 //Db\n}, {\n\tm: 1,\n\tn: 3,\n\ta: 293.66 //D\n}, {\n\tm: 1,\n\tn: 2,\n\ta: 311.13 //Eb\n}, {\n\tm: 2,\n\tn: 5,\n\ta: 329.63 //E\n}, {\n\tm: 2,\n\tn: 4,\n\ta: 369.99 //F#\n}, {\n\tm: 2,\n\tn: 3,\n\ta: 392.0 //G\n}, {\n\tm: 3,\n\tn: 5,\n\ta: 415.3 //Ab\n}, {\n\tm: 3,\n\tn: 4,\n\ta: 466.16 //Bb\n}, {\n\tm: 4,\n\tn: 5,\n\ta: 493.88 //B\n}]\n\nfunction setup() {\n\tlim = max(windowWidth, windowHeight);\n\tcreateCanvas(lim, lim);\n\tbackground(0)\n\tdim = lim * 0.9;\n\tosc1 = new p5.Oscillator('sawtooth');\n\tosc2 = new p5.Oscillator('sine');\n\tosc1.freq(110);\n\tosc1.amp(0.05);\n\tosc1.disconnect();\n\tosc1.start();\n\tosc2.start();\n}\n\nfunction draw() {\n\tm = lerp(m, tm, 0.1);\n\t\tn = lerp(n, tn, 0.1);\n\n\tosc2.amp(osc1); //creates distortion\n\tvol = lerp(vol, tvol, 0.1);\n\tfill(0, 2);\n\tnoStroke();\n\trect(0, 0, lim, lim);\n\tpush();\n\ttranslate(lim / 20, lim / 20);\n\tlet ang = PI * (1 + doubler);\n\tfor (let i = 0; i < 300; i++) {\n\t\tlet x = random(dim);\n\t\tlet y = random(dim);\n\t\tlet deflect = abs((cos(n * ang * x / dim) * cos(m * ang * y / dim)) - (cos(m * ang * x / dim) * cos(n * ang * y / dim)));\n\t\tlet spread = (1 - deflect) ** 2;\n\t\tstroke(255, 255 * spread);\n\t\tif (m > 0) strokeWeight(spread * dim / 300);\n\t\telse strokeWeight(random(dim / 300));\n\t\tpoint(x, y);\n\t}\n\tpop();\n\toutputVolume(vol);\n}\n\nfunction mousePressed() {\n\tbackground(0);\n\tuserStartAudio();\n\tindex = (index + 1) % combos.length;\n\tif (tm > 0 && index == 0) doubler = 1 - doubler;\n\tosc2.freq(combos[index].a * (1 + doubler) / 2, 0.5);\n\ttm = combos[index].m;\n\ttn = combos[index].n;\n}\n\nfunction keyPressed() {\n\tif (keyCode == 32) tvol = 0.1 - tvol;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/p5@1.10.0/lib/addons/p5.sound.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Measured Breath.mp4"
+    ]
 }

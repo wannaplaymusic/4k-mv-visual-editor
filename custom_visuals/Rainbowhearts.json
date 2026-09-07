@@ -1,22 +1,25 @@
 {
-  "name": "Rainbowhearts",
-  "author": "jcponcemath",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:27:14",
-  "url": "https://openprocessing.org/@jcponcemath/2484750",
-  "code": "// === Tab: mySketch ===\n/*\n\nInspired by the Tixy land: https://tixy.land/\n\nby Juan Carlos Ponce Campuzano\nDate: 12/Dec/2024\n\n\n*/\n\nlet rows = 70;\nlet cols = 70;\nlet diameter = 9;\nlet t = 0;\n\nfunction setup() {\n\tcreateCanvas(650, 650);\n\tcolorMode(HSB, 360, 100, 100); // Set color mode to HSB (hue, saturation, brightness)\n}\n\nfunction draw() {\n\tbackground(0); // Set background color to black\n\n\tfor (let i = 0; i < rows; i++) {\n\t\tfor (let j = 0; j < cols; j++) {\n\t\t\tlet x = i * (width / cols) + diameter / 2;\n\t\t\tlet y = j * (height / rows) + diameter / 2;\n\t\t\tlet patternValue = funPattern(myLog(i, -j), myAtan2(i, -j), t);\n\t\t\tlet r = funRadius(patternValue);\n\n\t\t\tif (patternValue < 0) {\n\t\t\t\t// Map patternValue to hue for rainbow effect\n\t\t\t\tlet hue = map(patternValue, -1, 0, 0, 360);\n\t\t\t\tfill(hue, 100, 100); // Rainbow color for negative pattern value\n\t\t\t} else {\n\t\t\t\tfill(\"#262626\"); // White color for hearts with positive pattern value\n\t\t\t}\n\n\t\t\tellipse(x, y, r);\n\t\t}\n\t}\n\n\tt += 0.03;\n}\nlet u = 35;\nlet v = -35;\nlet myLog = (x, y) => {\n\tx = x - u;\n\ty = y - v;\n\n\tif (x == 0 && y == 0) {\n\t\treturn 0;\n\t} else return 6 * log(sqrt(x * x + y * y));\n};\n\nlet myAtan2 = (x, y) => {\n\tx = x - u;\n\ty = y - v;\n\n\tif (x == 0 && y == 0) {\n\t\treturn 0;\n\t} else return 6 * atan2(y, x);\n};\n\nlet funPattern = (x, y, t) => {\n\tlet scale = 1;\n\treturn cos(cos(scale * x - t) + 2 * cos(scale * y - abs(sin(scale * x - t))));\n};\n\nlet funRadius = (x) => diameter * abs(2 / (1 + exp(-5 * x)) - 1);",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Rainbowhearts",
+    "author": "jcponcemath",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:27:14",
+    "url": "https://openprocessing.org/@jcponcemath/2484750",
+    "code": "// === Tab: mySketch ===\n/*\n\nInspired by the Tixy land: https://tixy.land/\n\nby Juan Carlos Ponce Campuzano\nDate: 12/Dec/2024\n\n\n*/\n\nlet rows = 70;\nlet cols = 70;\nlet diameter = 9;\nlet t = 0;\n\nfunction setup() {\n\tcreateCanvas(650, 650);\n\tcolorMode(HSB, 360, 100, 100); // Set color mode to HSB (hue, saturation, brightness)\n}\n\nfunction draw() {\n\tbackground(0); // Set background color to black\n\n\tfor (let i = 0; i < rows; i++) {\n\t\tfor (let j = 0; j < cols; j++) {\n\t\t\tlet x = i * (width / cols) + diameter / 2;\n\t\t\tlet y = j * (height / rows) + diameter / 2;\n\t\t\tlet patternValue = funPattern(myLog(i, -j), myAtan2(i, -j), t);\n\t\t\tlet r = funRadius(patternValue);\n\n\t\t\tif (patternValue < 0) {\n\t\t\t\t// Map patternValue to hue for rainbow effect\n\t\t\t\tlet hue = map(patternValue, -1, 0, 0, 360);\n\t\t\t\tfill(hue, 100, 100); // Rainbow color for negative pattern value\n\t\t\t} else {\n\t\t\t\tfill(\"#262626\"); // White color for hearts with positive pattern value\n\t\t\t}\n\n\t\t\tellipse(x, y, r);\n\t\t}\n\t}\n\n\tt += 0.03;\n}\nlet u = 35;\nlet v = -35;\nlet myLog = (x, y) => {\n\tx = x - u;\n\ty = y - v;\n\n\tif (x == 0 && y == 0) {\n\t\treturn 0;\n\t} else return 6 * log(sqrt(x * x + y * y));\n};\n\nlet myAtan2 = (x, y) => {\n\tx = x - u;\n\ty = y - v;\n\n\tif (x == 0 && y == 0) {\n\t\treturn 0;\n\t} else return 6 * atan2(y, x);\n};\n\nlet funPattern = (x, y, t) => {\n\tlet scale = 1;\n\treturn cos(cos(scale * x - t) + 2 * cos(scale * y - abs(sin(scale * x - t))));\n};\n\nlet funRadius = (x) => diameter * abs(2 / (1 + exp(-5 * x)) - 1);",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Signal Loss.mp4"
+    ]
 }
