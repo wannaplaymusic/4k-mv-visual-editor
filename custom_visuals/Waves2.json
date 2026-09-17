@@ -1,22 +1,25 @@
 {
-  "name": "Waves2",
-  "author": "gorillasun",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:07:11",
-  "url": "https://openprocessing.org/@gorillasun/1559526",
-  "code": "// === Tab: mySketch ===\n/*\n\nSubmission for @sableraph's #WCCChallenge\nTopic: Waves\n\nSome SDF shenanigans, interpolating between two different ones\nDrawing to a graphics buffer to make it look the same on different screen dimension\n\n*/\n\nlet pg;\nlet S = 730; // size of the buffer, changing this has drastic effects on the sketch\n\nfunction setup() {\n  w = max(windowWidth, windowHeight)\n  createCanvas(w, w);\n  \n  pg = createGraphics(S, S)\n  \n  pad = S/12\n  \n\t// number of rows and columns\n  gX = 25\n  gY = 25\n  \n\t// spacing of the points\n  gsx = (S - pad * 2 ) / gX\n  gsy = (S - pad * 2 ) / gY\n  \n  loopLength = 200 // number of frames\n}\n\nfunction draw(){\n  t = (frameCount%loopLength)/loopLength\n  sinput = map(t, 0, 1, 0, TAU)\n  \n  makeWave()\n  image(pg,0,-windowHeight/2,w,w)\n}\n\nfunction makeWave() {\n  pg.background(0,0,50,30);\n  \n  for(let x = pad; x < S-pad+1; x+=(Math.max(0.001, Math.abs(gsx)) || 1)){\n    for(let y = pad; y < S-pad+1; y+=(Math.max(0.001, Math.abs(gsy)) || 1)){\n      \n      \n      // A distance function\n      var d = dist(x,y,x,x)/2\n      \n      // A number that alternates between 0 <-and-> 1\n      var lerper = map(sin(sinput),-1,1,0,1)\n      \n      // Some numbers to play with\n      var Xmod = 15\n      var Ymod = 15\n      \n      \n      \n      // Shape SDF 1\n      var shapeMod1 = sinput + x + y + sin(sinput + d)\n      \n      // Shape SDF 2\n      var shapeMod2 = sinput + d + d*x/10000 + y\n      \n      // Interpolation between the two SDF functions\n      var lerpedMod = (sin(shapeMod1)*lerper + sin(shapeMod2)*(1-lerper))\n      \n      pg.strokeWeight(17 + 17 * lerpedMod)\n            \n      \n      \n      // Sinusoidal color palettes\n      \n      // Color SDF 1\n      var colorMod1 = (togg) =>\n                sin(sinput + x*Xmod + y*Ymod)*togg\n                + cos(sinput + x*Xmod + y*Ymod)*(1 - togg)\n      \n      // Color SDF 2\n      var colorMod2 = (togg) =>\n                sin(shapeMod2)*togg + cos(shapeMod2)*(1-togg)\n      \n\n      // Interpolation between the two color SDF functions\n      var lerpedColorMod = (togg) =>\n              colorMod1(togg)*lerper + colorMod2(togg)*(1-lerper)\n    \n      // Assign colors\n      pg.stroke(127.5 + 127.5 * lerpedColorMod(1),\n              127.5 + 127.5 * lerpedColorMod(0),\n              127.5 - 127.5 * lerpedColorMod(lerper))\n    \n    \n      // The actual points\n      pg.point(x, y)\n    }\n  }\n}\n\n\n\n// === Auto Generated Stubs ===\nvar palettes = [ ['#fdfffc', '#235789', '#c1292e', '#f1d302', '#020100'], ['#0D1E40', '#224573', '#5679A6', '#F2A25C', '#D96B43'] ];",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Waves2",
+    "author": "gorillasun",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:07:11",
+    "url": "https://openprocessing.org/@gorillasun/1559526",
+    "code": "// === Tab: mySketch ===\n/*\n\nSubmission for @sableraph's #WCCChallenge\nTopic: Waves\n\nSome SDF shenanigans, interpolating between two different ones\nDrawing to a graphics buffer to make it look the same on different screen dimension\n\n*/\n\nlet pg;\nlet S = 730; // size of the buffer, changing this has drastic effects on the sketch\n\nfunction setup() {\n  w = max(windowWidth, windowHeight)\n  createCanvas(w, w);\n  \n  pg = createGraphics(S, S)\n  \n  pad = S/12\n  \n\t// number of rows and columns\n  gX = 25\n  gY = 25\n  \n\t// spacing of the points\n  gsx = (S - pad * 2 ) / gX\n  gsy = (S - pad * 2 ) / gY\n  \n  loopLength = 200 // number of frames\n}\n\nfunction draw(){\n  t = (frameCount%loopLength)/loopLength\n  sinput = map(t, 0, 1, 0, TAU)\n  \n  makeWave()\n  image(pg,0,-windowHeight/2,w,w)\n}\n\nfunction makeWave() {\n  pg.background(0,0,50,30);\n  \n  for(let x = pad; x < S-pad+1; x+=(Math.max(0.001, Math.abs(gsx)) || 1)){\n    for(let y = pad; y < S-pad+1; y+=(Math.max(0.001, Math.abs(gsy)) || 1)){\n      \n      \n      // A distance function\n      var d = dist(x,y,x,x)/2\n      \n      // A number that alternates between 0 <-and-> 1\n      var lerper = map(sin(sinput),-1,1,0,1)\n      \n      // Some numbers to play with\n      var Xmod = 15\n      var Ymod = 15\n      \n      \n      \n      // Shape SDF 1\n      var shapeMod1 = sinput + x + y + sin(sinput + d)\n      \n      // Shape SDF 2\n      var shapeMod2 = sinput + d + d*x/10000 + y\n      \n      // Interpolation between the two SDF functions\n      var lerpedMod = (sin(shapeMod1)*lerper + sin(shapeMod2)*(1-lerper))\n      \n      pg.strokeWeight(17 + 17 * lerpedMod)\n            \n      \n      \n      // Sinusoidal color palettes\n      \n      // Color SDF 1\n      var colorMod1 = (togg) =>\n                sin(sinput + x*Xmod + y*Ymod)*togg\n                + cos(sinput + x*Xmod + y*Ymod)*(1 - togg)\n      \n      // Color SDF 2\n      var colorMod2 = (togg) =>\n                sin(shapeMod2)*togg + cos(shapeMod2)*(1-togg)\n      \n\n      // Interpolation between the two color SDF functions\n      var lerpedColorMod = (togg) =>\n              colorMod1(togg)*lerper + colorMod2(togg)*(1-lerper)\n    \n      // Assign colors\n      pg.stroke(127.5 + 127.5 * lerpedColorMod(1),\n              127.5 + 127.5 * lerpedColorMod(0),\n              127.5 - 127.5 * lerpedColorMod(lerper))\n    \n    \n      // The actual points\n      pg.point(x, y)\n    }\n  }\n}\n\n\n\n// === Auto Generated Stubs ===\nvar palettes = [ ['#fdfffc', '#235789', '#c1292e', '#f1d302', '#020100'], ['#0D1E40', '#224573', '#5679A6', '#F2A25C', '#D96B43'] ];",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Urban Solitude.mp4"
+    ]
 }

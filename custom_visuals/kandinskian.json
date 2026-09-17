@@ -1,22 +1,25 @@
 {
-  "name": "kandinskian",
-  "author": "garabatospr",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:27:54",
-  "url": "https://openprocessing.org/@garabatospr/1241318",
-  "code": "// === Tab: mySketch ===\n//var colors = [\"#3ec1d3\",\"#f6f7d7\",\"#f6f7d7\",\"#ff165d\"];\n\n// Okazz's palette\n\nlet colors = ['#f0101c', '#f05697', '#0b469b', '#32b6c3', '#f78000', '#fddf0e', '#9fe063', '#315423', '#16141b','#ffffff'];\n\n\nlet border = 0;\n\nfunction setup() {\n\tcreateCanvas(1000,800);\n\tbackground(255);\n\trectMode(CENTER);\n\tellipseMode(CENTER);\n\tstrokeCap(SQUARE);\n\tcolorMode(HSB, 360, 100, 100, 100);\n\t\n\t//background(0);\n\t\n\t//for(let i=0;i < 100;i++)\n\t//{\n\t\n\tfor(let i=1;i <  150;i++)\n\t{\n\t\t  push();\n\t\t  let xtemp = random(border,width-border);\n\t\t  let ytemp = random(border,height-border);\n\t\t  translate(xtemp,ytemp);\n\t\t  scale(1 + random(0,5));\n\t\t  if (random(0,1) > 0.9)\n\t\t\t{\n\t      drawFlower(0,0);\n\t\t\t}\n\t\t\tpop();\n\t}\n\t\n\n}\n\n\nfunction draw() {\n\t//\n}\n\nfunction drawFlower(x,y)\n{\n\tfor(let i=0;i < 30;i++)\n\t{\n\t\t  let xPos = x + randomGaussian();\n\t\t  let yPos = y + randomGaussian();\n\t\t  let amp = random(10,200);\n\t\t  let ang = random(-PI,PI);\n\t\t  let step = random(0.1,10);\n\t\t  let sizeX = random(5,100);\n\t\t  let sizeY = random(5,100);\n\t\t  let len   = random(5,50);\n\t\t  let thick = random(0.01,20);\n\t\t\tdrawWave(xPos,yPos,amp,ang,step,sizeX,sizeY,len,thick);\n\t}\n\t\n}\n\nfunction drawWave(xpos,ypos,amplitude,ang,step,sizeX,sizeY,len,thick)\n{\n\tpush();\n\tlet temp = generateColor(10);\n\ttranslate(xpos,ypos);\n\trotate(ang);\n\tstrokeWeight(thick);\n\tfill(temp);\n\tnoStroke();\n\tellipse(0,0,sizeX/2,sizeX/2);\n\tstroke(temp);\n\tbeginShape(TRIANGLE_STRIP);\n\tfor(let xx =0; xx < len;xx+=(Math.max(0.001, Math.abs(step)) || 1))\n\t{\n\t\tamplitude -= 0.1;\n\t\tlet yy = amplitude*cos(xx*PI*0.005);\n\t\tcurveVertex(xx,yy);\n\t\tsizeX *= 1.01;\n\t}\n  endShape();\n\tpop();\n}\n\nfunction generateColor(scale) {\n\t//let temp = myRandom(colors, weights);\n\t\n\tvar temp = color(colors[floor(random(0,10))]);\n\n\tmyColor = color(hue(window.color(temp)) + randomGaussian() * scale,\n\t\tsaturation(window.color(temp)) + randomGaussian() * scale,\n\t\tbrightness(window.color(temp)) + randomGaussian() * scale,\n\t\trandom(10,100));\n\treturn myColor;\n}\n\nfunction reduceBright(myColor,scale) {\n\t//let temp = myRandom(colors, weights);\n\t\n\t//let temp = color(colors[floor(random(0,10))]);\n\tnewColor = color(hue(window.color(myColor)),saturation(window.color(myColor)),brightness(window.color(myColor)) - brightness(window.color(myColor))*scale,alpha(window.color(myColor)));\n\treturn newColor;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "kandinskian",
+    "author": "garabatospr",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:27:54",
+    "url": "https://openprocessing.org/@garabatospr/1241318",
+    "code": "// === Tab: mySketch ===\n//var colors = [\"#3ec1d3\",\"#f6f7d7\",\"#f6f7d7\",\"#ff165d\"];\n\n// Okazz's palette\n\nlet colors = ['#f0101c', '#f05697', '#0b469b', '#32b6c3', '#f78000', '#fddf0e', '#9fe063', '#315423', '#16141b','#ffffff'];\n\n\nlet border = 0;\n\nfunction setup() {\n\tcreateCanvas(1000,800);\n\tbackground(255);\n\trectMode(CENTER);\n\tellipseMode(CENTER);\n\tstrokeCap(SQUARE);\n\tcolorMode(HSB, 360, 100, 100, 100);\n\t\n\t//background(0);\n\t\n\t//for(let i=0;i < 100;i++)\n\t//{\n\t\n\tfor(let i=1;i <  150;i++)\n\t{\n\t\t  push();\n\t\t  let xtemp = random(border,width-border);\n\t\t  let ytemp = random(border,height-border);\n\t\t  translate(xtemp,ytemp);\n\t\t  scale(1 + random(0,5));\n\t\t  if (random(0,1) > 0.9)\n\t\t\t{\n\t      drawFlower(0,0);\n\t\t\t}\n\t\t\tpop();\n\t}\n\t\n\n}\n\n\nfunction draw() {\n\t//\n}\n\nfunction drawFlower(x,y)\n{\n\tfor(let i=0;i < 30;i++)\n\t{\n\t\t  let xPos = x + randomGaussian();\n\t\t  let yPos = y + randomGaussian();\n\t\t  let amp = random(10,200);\n\t\t  let ang = random(-PI,PI);\n\t\t  let step = random(0.1,10);\n\t\t  let sizeX = random(5,100);\n\t\t  let sizeY = random(5,100);\n\t\t  let len   = random(5,50);\n\t\t  let thick = random(0.01,20);\n\t\t\tdrawWave(xPos,yPos,amp,ang,step,sizeX,sizeY,len,thick);\n\t}\n\t\n}\n\nfunction drawWave(xpos,ypos,amplitude,ang,step,sizeX,sizeY,len,thick)\n{\n\tpush();\n\tlet temp = generateColor(10);\n\ttranslate(xpos,ypos);\n\trotate(ang);\n\tstrokeWeight(thick);\n\tfill(temp);\n\tnoStroke();\n\tellipse(0,0,sizeX/2,sizeX/2);\n\tstroke(temp);\n\tbeginShape(TRIANGLE_STRIP);\n\tfor(let xx =0; xx < len;xx+=(Math.max(0.001, Math.abs(step)) || 1))\n\t{\n\t\tamplitude -= 0.1;\n\t\tlet yy = amplitude*cos(xx*PI*0.005);\n\t\tcurveVertex(xx,yy);\n\t\tsizeX *= 1.01;\n\t}\n  endShape();\n\tpop();\n}\n\nfunction generateColor(scale) {\n\t//let temp = myRandom(colors, weights);\n\t\n\tvar temp = color(colors[floor(random(0,10))]);\n\n\tmyColor = color(hue(window.color(temp)) + randomGaussian() * scale,\n\t\tsaturation(window.color(temp)) + randomGaussian() * scale,\n\t\tbrightness(window.color(temp)) + randomGaussian() * scale,\n\t\trandom(10,100));\n\treturn myColor;\n}\n\nfunction reduceBright(myColor,scale) {\n\t//let temp = myRandom(colors, weights);\n\t\n\t//let temp = color(colors[floor(random(0,10))]);\n\tnewColor = color(hue(window.color(myColor)),saturation(window.color(myColor)),brightness(window.color(myColor)) - brightness(window.color(myColor))*scale,alpha(window.color(myColor)));\n\treturn newColor;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Authentic Drive Vibration.mp4"
+    ]
 }

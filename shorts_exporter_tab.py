@@ -536,15 +536,24 @@ class ShortsExportWorker(QThread):
                 ]
                 
                 try:
-                    res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, timeout=300)
                     if res.returncode == 0 and self.is_valid_mp4(temp_out_path):
                         os.replace(temp_out_path, out_path)
                         processed_clips += 1
                         self.single_clip_done.emit(out_name)
                     else:
-                        logger.error(f"FFmpeg 匯出失敗或檔案損毀: {out_name}")
+                        err_tail = (res.stderr or "").strip().splitlines()[-3:] if res.stderr else []
+                        err_detail = " | ".join(err_tail)
+                        logger.error(f"FFmpeg 匯出失敗或檔案損毀: {out_name} (錯誤: {err_detail})")
                         if os.path.exists(temp_out_path):
                             os.remove(temp_out_path)
+                except subprocess.TimeoutExpired:
+                    logger.error(f"FFmpeg 匯出超時 (超過 300 秒): {out_name}")
+                    if os.path.exists(temp_out_path):
+                        try:
+                            os.remove(temp_out_path)
+                        except Exception:
+                            pass
                 except Exception as e:
                     logger.error(f"FFmpeg 錯誤 {out_name}: {e}")
                     if os.path.exists(temp_out_path):
@@ -672,11 +681,16 @@ class ShortsExportWorker(QThread):
             # Get visual credits for this specific clip's time range
             clip_credits = get_clip_visual_credits(clip['index'], clip['start'], clip['end'])
             
+            # Smart Title Generation with <= 100 character guarantee
+            from youtube_uploader_engine import MetadataParser
+            raw_shorts_title = f"{song} - {artist} | 4K Audio-Reactive p5.js Visualizer 🔥 #shorts #p5js #visualizer"
+            safe_shorts_title, _ = MetadataParser.smart_truncate_title(raw_shorts_title, 100)
+
             clip_desc_lines = [
                 f"--- [Clip {clip['index']}] ({dur:.0f}s) ---",
                 "",
                 "【YouTube Shorts Title】",
-                f"{song} - {artist} | 4K Audio-Reactive p5.js Visualizer 🔥 #shorts #p5js #visualizer",
+                safe_shorts_title,
                 "",
                 "【YouTube Shorts Description】",
                 f"Experience the immersive 4K audio-reactive generative art powered by p5.js! 🎧✨",

@@ -1,22 +1,25 @@
 {
-  "name": "TangentWaves2_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:09:42",
-  "url": "https://openprocessing.org/@ronikaufman/1228684",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n\nconst dotSize = 20;\nlet colors;\nlet dots;\n\nfunction setup() {\n  createCanvas(500, 500);\n  noStroke();\n  \n  initDots();\n  \n  let pal = shuffle([\"#fff247\", \"#47e9ff\", \"#8447ff\", \"#ff47ce\"]);\n  colors = [\n    [pal[0], pal[1], pal[2], pal[3]],\n    [pal[0], pal[2], pal[3], pal[1]],\n    [pal[3], pal[2], pal[1], pal[0]],\n    [pal[2], pal[0], pal[1], pal[3]]\n  ];\n}\n\nfunction draw() {\n  background(\"#0e0e10\");\n  \n  for (let dot of dots) {\n    dot.draw();\n  }\n}\n\nfunction initDots() {\n  dots = [];\n    \n  let countLines = 0;\n  let xSep = dotSize;\n  let ySep = xSep * sqrt(3)/2;\n  let x = 0;\n  let y = -dotSize/2;\n  let _wG_1 = 0; while ((y < height + dotSize) && ++_wG_1 < 20000) {\n    if (countLines++ % 2 === 0) {\n      x = -xSep / 2;\n    } else {\n      x = 0;\n    }\n    let id = floor(countLines/2) % 2;\n    let _wG_2 = 0; while ((x < width + dotSize) && ++_wG_2 < 20000) {\n      dots.push(new Dot(x, y, ((id++)%2)*2 + countLines%2));\n      x += xSep;\n    }\n    y += ySep;\n  }\n}\n\nfunction Dot(x_, y_, id_) {\n  this.x = x_;\n  this.y = y_;\n  this.id = id_; // determines the color and whether this dot becomes big, or disppears\n  this.distToCentre = (this.x*width/2 + this.y*height/2)/100;\n  \n  this.draw = function() {\n    let t = frameCount/100+this.y/800;\n    //let t = abs(frameCount/100-this.distToCentre/800);\n    let z = t%1;\n    if (z > 0.5) z = 1-z; // z goes up then down\n    z = sq(z*2); // *2 because we want z to go up to 1, squared because it make it look nicer\n    let size = (this.id == floor(t%4)) ? dotSize * (1+z) : dotSize * (1-z);\n    let palette = floor((t+0.5)%4);\n    fill(colors[palette][this.id]);\n    //size+=2\n    beginShape();\n    for (let theta = PI/6; theta < TWO_PI; theta += (Math.max(0.001, Math.abs(PI/3)) || 1)) {\n      vertex(this.x+size/2*cos(theta), this.y+size/2*sin(theta));\n    }\n    endShape();\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "TangentWaves2_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:09:42",
+    "url": "https://openprocessing.org/@ronikaufman/1228684",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n\nconst dotSize = 20;\nlet colors;\nlet dots;\n\nfunction setup() {\n  createCanvas(500, 500);\n  noStroke();\n  \n  initDots();\n  \n  let pal = shuffle([\"#fff247\", \"#47e9ff\", \"#8447ff\", \"#ff47ce\"]);\n  colors = [\n    [pal[0], pal[1], pal[2], pal[3]],\n    [pal[0], pal[2], pal[3], pal[1]],\n    [pal[3], pal[2], pal[1], pal[0]],\n    [pal[2], pal[0], pal[1], pal[3]]\n  ];\n}\n\nfunction draw() {\n  background(\"#0e0e10\");\n  \n  for (let dot of dots) {\n    dot.draw();\n  }\n}\n\nfunction initDots() {\n  dots = [];\n    \n  let countLines = 0;\n  let xSep = dotSize;\n  let ySep = xSep * sqrt(3)/2;\n  let x = 0;\n  let y = -dotSize/2;\n  let _wG_1 = 0; while ((y < height + dotSize) && ++_wG_1 < 20000) {\n    if (countLines++ % 2 === 0) {\n      x = -xSep / 2;\n    } else {\n      x = 0;\n    }\n    let id = floor(countLines/2) % 2;\n    let _wG_2 = 0; while ((x < width + dotSize) && ++_wG_2 < 20000) {\n      dots.push(new Dot(x, y, ((id++)%2)*2 + countLines%2));\n      x += xSep;\n    }\n    y += ySep;\n  }\n}\n\nfunction Dot(x_, y_, id_) {\n  this.x = x_;\n  this.y = y_;\n  this.id = id_; // determines the color and whether this dot becomes big, or disppears\n  this.distToCentre = (this.x*width/2 + this.y*height/2)/100;\n  \n  this.draw = function() {\n    let t = frameCount/100+this.y/800;\n    //let t = abs(frameCount/100-this.distToCentre/800);\n    let z = t%1;\n    if (z > 0.5) z = 1-z; // z goes up then down\n    z = sq(z*2); // *2 because we want z to go up to 1, squared because it make it look nicer\n    let size = (this.id == floor(t%4)) ? dotSize * (1+z) : dotSize * (1-z);\n    let palette = floor((t+0.5)%4);\n    fill(colors[palette][this.id]);\n    //size+=2\n    beginShape();\n    for (let theta = PI/6; theta < TWO_PI; theta += (Math.max(0.001, Math.abs(PI/3)) || 1)) {\n      vertex(this.x+size/2*cos(theta), this.y+size/2*sin(theta));\n    }\n    endShape();\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Highway Pulse.mp4"
+    ]
 }

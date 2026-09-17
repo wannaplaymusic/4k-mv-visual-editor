@@ -1,22 +1,25 @@
 {
-  "name": "toremindourselves",
-  "author": "fractalkitty",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:19:13",
-  "url": "https://openprocessing.org/@fractalkitty/1961851",
-  "code": "// === Tab: mySketch ===\n//a coded poem - also on medium(unmetered): //https://medium.com/@sophiawood/to-remind-ourselves-b7d66da90ca4\nfunction setup() {\n//we make these spaces for creation\n  createCanvas(600, 600);\n}\nfunction draw() {\n//in which notions of time repeat\n  aNotionofTime = abs(sin(frameCount / 500));\n//in which notions of time cease\n  aNotionofUnTime = abs(cos(frameCount / 500));\n//where magnitudes of color are relative\n  aMagnitudeofColor = random(240 - 200 * aNotionofTime);\n//we loop in the finite and infinite\n  for (let i = 0; i < 500; i++) {\n//finding points to touch\n    verticalExistence = random(0, height);\n//with creative contrasts of thought\n    bandsOfContrast =(verticalExistence * abs(sin(verticalExistence / 100))) / 3;\n    strokeWeight(random(0.5, 5));\n    stroke(50 + aMagnitudeofColor - bandsOfContrast + 30 * aNotionofTime,50 + aMagnitudeofColor - bandsOfContrast - 30 * aNotionofTime,50 + aMagnitudeofColor * 2 - bandsOfContrast - 30 * aNotionofTime,10);\n//linear footprints in a euclidean space\n    line(randomGaussian(0, width),verticalExistence,randomGaussian(0, width),verticalExistence);\n  }\n//beneath clouds of light\n  for (let i = 0; i < 5; i++) {\n    push();\n    translate(0, (-width / 2) * aNotionofUnTime);\n    rock();\n    pop();\n  }\n}\n//to remind ourselves\nfunction rock() {\n  fill(50 + 205 * aNotionofUnTime,50 + 205 * aNotionofUnTime,50 + 205 * aNotionofUnTime,2);\n  noStroke();\n  let ephemeris = createVector(random(width / 2 - 20, width / 2),random(height / 2 - 20, height / 2 + 20));\n  let aVolumeofSelf = randomGaussian(10, 200);\n  circle(ephemeris.x, ephemeris.y, aVolumeofSelf);\n}\n//to breathe",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "toremindourselves",
+    "author": "fractalkitty",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:19:13",
+    "url": "https://openprocessing.org/@fractalkitty/1961851",
+    "code": "// === Tab: mySketch ===\n//a coded poem - also on medium(unmetered): //https://medium.com/@sophiawood/to-remind-ourselves-b7d66da90ca4\nfunction setup() {\n//we make these spaces for creation\n  createCanvas(600, 600);\n}\nfunction draw() {\n//in which notions of time repeat\n  aNotionofTime = abs(sin(frameCount / 500));\n//in which notions of time cease\n  aNotionofUnTime = abs(cos(frameCount / 500));\n//where magnitudes of color are relative\n  aMagnitudeofColor = random(240 - 200 * aNotionofTime);\n//we loop in the finite and infinite\n  for (let i = 0; i < 500; i++) {\n//finding points to touch\n    verticalExistence = random(0, height);\n//with creative contrasts of thought\n    bandsOfContrast =(verticalExistence * abs(sin(verticalExistence / 100))) / 3;\n    strokeWeight(random(0.5, 5));\n    stroke(50 + aMagnitudeofColor - bandsOfContrast + 30 * aNotionofTime,50 + aMagnitudeofColor - bandsOfContrast - 30 * aNotionofTime,50 + aMagnitudeofColor * 2 - bandsOfContrast - 30 * aNotionofTime,10);\n//linear footprints in a euclidean space\n    line(randomGaussian(0, width),verticalExistence,randomGaussian(0, width),verticalExistence);\n  }\n//beneath clouds of light\n  for (let i = 0; i < 5; i++) {\n    push();\n    translate(0, (-width / 2) * aNotionofUnTime);\n    rock();\n    pop();\n  }\n}\n//to remind ourselves\nfunction rock() {\n  fill(50 + 205 * aNotionofUnTime,50 + 205 * aNotionofUnTime,50 + 205 * aNotionofUnTime,2);\n  noStroke();\n  let ephemeris = createVector(random(width / 2 - 20, width / 2),random(height / 2 - 20, height / 2 + 20));\n  let aVolumeofSelf = randomGaussian(10, 200);\n  circle(ephemeris.x, ephemeris.y, aVolumeofSelf);\n}\n//to breathe",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Headlight Beam.mp4"
+    ]
 }

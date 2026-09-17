@@ -1,22 +1,25 @@
 {
-  "name": "portalspacked_1",
-  "author": "fractalkitty",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:07:52",
-  "url": "https://openprocessing.org/@fractalkitty/2174474",
-  "code": "// === Tab: mySketch ===\n//wccchallenge\n//sorry no time for comments the week.\nlet circles = [];\nlet nCircles = 500;\nfunction setup() {\n  cnv = createCanvas(windowWidth , windowHeight );\n  circles = [];\n  rectMode(CENTER);\n  nRot = int(random(1, 10));\n  if (nRot === 4) {\n    nRot = 3;\n  }\n  r = random(50, 100);\n  g = random(50, 100);\n  b = random(50, 100);\n  noStroke();\n  circles[0] = { r: random(width / 10, width / 8), x: 0, y: 0, pr: 0, pa: 0 };\n  background(r, g, b);\n  angleMode(DEGREES);\n  cnt = 0;\n  for (let j = 0; j < nCircles; j++) {\n    x1 = random(-width / 2, width / 2);\n    y1 = random(-height / 2, height / 2);\n    minD = 10000000;\n    n = -1000;\n    inCirc = false;\n    for (let i = 0; i < circles.length; i++) {\n      d = dist(x1, y1, circles[i].x, circles[i].y);\n      if (d > circles[i].r && minD > d - circles[i].r) {\n        n = i;\n        minD = d - circles[i].r;\n      }\n      if (d <= circles[i].r) {\n        inCirc = true;\n      }\n    }\n    if (!inCirc && n >= 0) {\n      circles[cnt] = {\n        r: min(minD, width / 5),\n        x: x1,\n        y: y1,\n        pr: 0,\n        pa: random(0, 360)\n      };\n      cnt++;\n    }\n  }\n\n  fill(r + 100, g + 100, b + 100);\n}\n\nfunction draw() {\n  translate(width / 2, height / 2);\n\n  for (let i = 0; i < circles.length; i++) {\n    // circle(circles[i].x, circles[i].y, circles[i].r * 2);\n    if (\n      dist(\n        circles[i].x + circles[i].pr * cos(circles[i].pa),\n        circles[i].y + circles[i].pr * sin(circles[i].pa),\n        circles[i].x,\n        circles[i].y\n      ) < circles[i].r\n    )\n      circles[i].pr += randomGaussian(0.05, 0.1);\n    circles[i].pa += random(-1, 2);\n    push();\n    translate(circles[i].x, circles[i].y);\n    for (let k = 0; k < nRot; k++) {\n      circle(\n        circles[i].pr * cos(circles[i].pa + (k * 360) / nRot),\n        circles[i].pr * sin(circles[i].pa + (k * 360) / nRot),\n        random(0.1, 1)\n      );\n    }\n\n    pop();\n  }\n}\n\nfunction mousePressed() {\n  frameCount = 0;\n  setup();\n  draw();\n}\n\nfunction keyPressed() {\n  save(cnv, \"packed\", \"png\");\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth , windowHeight );\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "portalspacked_1",
+    "author": "fractalkitty",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:07:52",
+    "url": "https://openprocessing.org/@fractalkitty/2174474",
+    "code": "// === Tab: mySketch ===\n//wccchallenge\n//sorry no time for comments the week.\nlet circles = [];\nlet nCircles = 500;\nfunction setup() {\n  cnv = createCanvas(windowWidth , windowHeight );\n  circles = [];\n  rectMode(CENTER);\n  nRot = int(random(1, 10));\n  if (nRot === 4) {\n    nRot = 3;\n  }\n  r = random(50, 100);\n  g = random(50, 100);\n  b = random(50, 100);\n  noStroke();\n  circles[0] = { r: random(width / 10, width / 8), x: 0, y: 0, pr: 0, pa: 0 };\n  background(r, g, b);\n  angleMode(DEGREES);\n  cnt = 0;\n  for (let j = 0; j < nCircles; j++) {\n    x1 = random(-width / 2, width / 2);\n    y1 = random(-height / 2, height / 2);\n    minD = 10000000;\n    n = -1000;\n    inCirc = false;\n    for (let i = 0; i < circles.length; i++) {\n      d = dist(x1, y1, circles[i].x, circles[i].y);\n      if (d > circles[i].r && minD > d - circles[i].r) {\n        n = i;\n        minD = d - circles[i].r;\n      }\n      if (d <= circles[i].r) {\n        inCirc = true;\n      }\n    }\n    if (!inCirc && n >= 0) {\n      circles[cnt] = {\n        r: min(minD, width / 5),\n        x: x1,\n        y: y1,\n        pr: 0,\n        pa: random(0, 360)\n      };\n      cnt++;\n    }\n  }\n\n  fill(r + 100, g + 100, b + 100);\n}\n\nfunction draw() {\n  translate(width / 2, height / 2);\n\n  for (let i = 0; i < circles.length; i++) {\n    // circle(circles[i].x, circles[i].y, circles[i].r * 2);\n    if (\n      dist(\n        circles[i].x + circles[i].pr * cos(circles[i].pa),\n        circles[i].y + circles[i].pr * sin(circles[i].pa),\n        circles[i].x,\n        circles[i].y\n      ) < circles[i].r\n    )\n      circles[i].pr += randomGaussian(0.05, 0.1);\n    circles[i].pa += random(-1, 2);\n    push();\n    translate(circles[i].x, circles[i].y);\n    for (let k = 0; k < nRot; k++) {\n      circle(\n        circles[i].pr * cos(circles[i].pa + (k * 360) / nRot),\n        circles[i].pr * sin(circles[i].pa + (k * 360) / nRot),\n        random(0.1, 1)\n      );\n    }\n\n    pop();\n  }\n}\n\nfunction mousePressed() {\n  frameCount = 0;\n  setup();\n  draw();\n}\n\nfunction keyPressed() {\n  save(cnv, \"packed\", \"png\");\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth , windowHeight );\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "True North.mp4"
+    ]
 }

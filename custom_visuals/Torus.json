@@ -1,22 +1,25 @@
 {
-  "name": "Torus",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:22:17",
-  "url": "https://openprocessing.org/@ronikaufman/998834",
-  "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n\nlet particles = [];\nlet r = 75;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  colorMode(HSB, 100);\n  noStroke();\n  \n  background(0);\n  updateParticles();\n}\n\nfunction draw() {\n  for (let p of particles) {\n    p.draw();\n    p.move();\n  }\n}\n\nfunction updateParticles() {\n  particles = [];\n\tlet n = 600;\n  for (let i = 0; i < n; i++) {\n\t\tlet theta = map(i, 0, n, -PI, PI);\n    let x_ = width/2 + r*cos(theta);\n    let y_ = height/2 + r*sin(theta);\n\t\tlet s_ = 2;\n    let c_ = color(i/6, 100, i%100);\n    particles.push(new Particle(x_, y_, s_, c_, theta, true));\n  }\n  /*\n  r = 224\n  for (let i = 0; i < n; i++) {\n\tvar theta = map(i, 0, n, -PI, PI);\n    var x_ = width/2 + r*cos(theta);\n    var y_ = height/2 + r*sin(theta);\n\tvar s_ = 1;\n    var c_ = color(i%100, 100, 100);\n    //particles.push(new Particle(x_, y_, s_, c_, theta, false));\n  }\n  */\n}\n\nfunction Particle(x_, y_, s_, c_, theta_, out_) {\n  this.x = x_;\n  this.y = y_;\n  this.size = s_;\n  this.c = c_;\n  this.theta = theta_\n  this.out = out_;\n\t\n  this.alpha = 100;\n  this.dist = 1;\n  \n  this.move = function() {\n    let d = dist(this.x, this.y, width/2, height/2);\n\t\tlet angle = atan2(this.y - height/2, this.x - width/2)\n    if (this.out) {\n      angle += map(d, r*2, 0, PI*2, PI);\n    } else {\n      angle += map(d, r*2, 0, PI, PI*2);\n    }\n    let v = p5.Vector.fromAngle(angle, this.dist);\n    this.x += v.x;\n    this.y += v.y;\n    //this.dist *= 0.999;\n    //this.alpha *= 0.999;\n\t\t//this.size *= 0.999;\n    if (d > r * 3 - 1) {\n      this.out = false;\n    } else if (d < r + 1) {\n      this.out = true;\n    }\n  }\n  \n  this.draw = function() {\n    this.c.setAlpha(this.alpha);\n    fill(this.c);\n    circle(this.x, this.y, this.size);\n    this.c.setAlpha(100);\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Torus",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:22:17",
+    "url": "https://openprocessing.org/@ronikaufman/998834",
+    "code": "// === Tab: Sketch ===\n// By Roni Kaufman\n\nlet particles = [];\nlet r = 75;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  colorMode(HSB, 100);\n  noStroke();\n  \n  background(0);\n  updateParticles();\n}\n\nfunction draw() {\n  for (let p of particles) {\n    p.draw();\n    p.move();\n  }\n}\n\nfunction updateParticles() {\n  particles = [];\n\tlet n = 600;\n  for (let i = 0; i < n; i++) {\n\t\tlet theta = map(i, 0, n, -PI, PI);\n    let x_ = width/2 + r*cos(theta);\n    let y_ = height/2 + r*sin(theta);\n\t\tlet s_ = 2;\n    let c_ = color(i/6, 100, i%100);\n    particles.push(new Particle(x_, y_, s_, c_, theta, true));\n  }\n  /*\n  r = 224\n  for (let i = 0; i < n; i++) {\n\tvar theta = map(i, 0, n, -PI, PI);\n    var x_ = width/2 + r*cos(theta);\n    var y_ = height/2 + r*sin(theta);\n\tvar s_ = 1;\n    var c_ = color(i%100, 100, 100);\n    //particles.push(new Particle(x_, y_, s_, c_, theta, false));\n  }\n  */\n}\n\nfunction Particle(x_, y_, s_, c_, theta_, out_) {\n  this.x = x_;\n  this.y = y_;\n  this.size = s_;\n  this.c = c_;\n  this.theta = theta_\n  this.out = out_;\n\t\n  this.alpha = 100;\n  this.dist = 1;\n  \n  this.move = function() {\n    let d = dist(this.x, this.y, width/2, height/2);\n\t\tlet angle = atan2(this.y - height/2, this.x - width/2)\n    if (this.out) {\n      angle += map(d, r*2, 0, PI*2, PI);\n    } else {\n      angle += map(d, r*2, 0, PI, PI*2);\n    }\n    let v = p5.Vector.fromAngle(angle, this.dist);\n    this.x += v.x;\n    this.y += v.y;\n    //this.dist *= 0.999;\n    //this.alpha *= 0.999;\n\t\t//this.size *= 0.999;\n    if (d > r * 3 - 1) {\n      this.out = false;\n    } else if (d < r + 1) {\n      this.out = true;\n    }\n  }\n  \n  this.draw = function() {\n    this.c.setAlpha(this.alpha);\n    fill(this.c);\n    circle(this.x, this.y, this.size);\n    this.c.setAlpha(100);\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Metal Frame.mp4"
+    ]
 }

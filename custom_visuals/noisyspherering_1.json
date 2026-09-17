@@ -1,22 +1,25 @@
 {
-  "name": "noisyspherering_1",
-  "author": "aa_debdeb",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 22:59:36",
-  "url": "https://openprocessing.org/@aa_debdeb/375003",
-  "code": "// === Tab: sketch20160618 ===\n/**\n* noisy sphere ring\n*\n* @author aa_debdeb\n* @date 2016/06/18\n*/\n\nvar radious = 200;\nvar noiseScale = 0.01;\nvar timeScale = 0.03;\n\nfunction setup(){\n  createCanvas(500, 500, WEBGL);\n}\n\nfunction draw(){\n  background(255);\n  stroke(60);\n  noFill();\n  translate(width / 2, height / 2, -100);\n  rotateZ(map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, -PI * 2.0 / 3, PI * 2.0 / 3));\n  rotateX(map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, -PI * 2.0 / 3, PI * 2.0 / 3));\n  for(let y = -radious * 2.0 / 3; y <= radious * 2.0 / 3; y += 3){\n    let r = radious * cos(asin(abs(y / radious)));\n    beginShape();\n    for(let radian = 0; radian < TWO_PI; radian += (Math.max(0.001, Math.abs(PI / 128)) || 1)){\n      let x = r * cos(radian);\n      let z = r * sin(radian);\n      let yy = y + map(noise(x * noiseScale, frameCount * timeScale, z * noiseScale) , 0, 1, -radious / 3, radious / 3);\n      if(yy > radious){\n        yy = radious;\n      }\n      let rr = radious * cos(asin(abs(yy / radious)));\n      let xx = rr * cos(radian);\n      let zz = rr * sin(radian);\n      vertex(xx, yy, zz);\n    }\n    endShape(CLOSE);\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "noisyspherering_1",
+    "author": "aa_debdeb",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:59:36",
+    "url": "https://openprocessing.org/@aa_debdeb/375003",
+    "code": "// === Tab: sketch20160618 ===\n/**\n* noisy sphere ring\n*\n* @author aa_debdeb\n* @date 2016/06/18\n*/\n\nvar radious = 200;\nvar noiseScale = 0.01;\nvar timeScale = 0.03;\n\nfunction setup(){\n  createCanvas(500, 500, WEBGL);\n}\n\nfunction draw(){\n  background(255);\n  stroke(60);\n  noFill();\n  translate(width / 2, height / 2, -100);\n  rotateZ(map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, -PI * 2.0 / 3, PI * 2.0 / 3));\n  rotateX(map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, -PI * 2.0 / 3, PI * 2.0 / 3));\n  for(let y = -radious * 2.0 / 3; y <= radious * 2.0 / 3; y += 3){\n    let r = radious * cos(asin(abs(y / radious)));\n    beginShape();\n    for(let radian = 0; radian < TWO_PI; radian += (Math.max(0.001, Math.abs(PI / 128)) || 1)){\n      let x = r * cos(radian);\n      let z = r * sin(radian);\n      let yy = y + map(noise(x * noiseScale, frameCount * timeScale, z * noiseScale) , 0, 1, -radious / 3, radious / 3);\n      if(yy > radious){\n        yy = radious;\n      }\n      let rr = radious * cos(asin(abs(yy / radious)));\n      let xx = rr * cos(radian);\n      let zz = rr * sin(radian);\n      vertex(xx, yy, zz);\n    }\n    endShape(CLOSE);\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Concrete Echo.mp4"
+    ]
 }

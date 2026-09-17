@@ -1,22 +1,25 @@
 {
-  "name": "Wrinkles",
-  "author": "Cloudoid",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:13:52",
-  "url": "https://openprocessing.org/@Cloudoid/787162",
-  "code": "// === Tab: mySketch ===\n/* Wrinkles - Fractal bezier\n\n   Keys:\n   r    randomise\n\t d    wrinkle depth\n   1-9  wrinkle scale\n   \n   Mouse:\n   Drag control points\n\n*/\n\nvar P = [];\nvar R = [];\nvar wscale = 1;\nvar wdepth = 5;\nvar sel = -1;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\n  for(let i=0; i<4; i++) {\n    P[i] =  createVector(random(width/4)+i*width/4,\n          random(height/4)+i*height/4);\n  }\n\n  makeRandom();\n\n}\n\nfunction draw()\n{\n\n  background(200);\n  \n  // Endpoints/on-curve points\n  fill(0,100,150);\n  noStroke();\n  ellipse(P[0].x,P[0].y,9,9);\n  ellipse(P[3].x,P[3].y,9,9);\n\n  // Control/on-curve points\n  noFill();\n  stroke(0,100,150);\n  strokeWeight(2);\n  ellipse(P[1].x,P[1].y,8,8);\n  ellipse(P[2].x,P[2].y,8,8);\n  \n  // Control polygon\n  strokeWeight(1);\n  stroke(0,100,150);\n  for(let i=0;i < 3;i++) {\n    line(P[i].x,P[i].y,P[i+1].x,P[i+1].y);\n  }\n\n  fbezier(P[0],P[1],P[2],P[3],0);\n}\n\nfunction cbezier(p,q,r,s)\n{\n  bezier(p.x,p.y,q.x,q.y,r.x,r.y,s.x,s.y);\n}\n\nfunction fbezier(p,q,r,s,d)\n{\n  stroke(128);\n  strokeWeight(1);\n  cbezier(p,q,r,s);\n  let t = p5.Vector.lerp(p,q,0.5);\n  let u = p5.Vector.lerp(q,r,0.5);\n  let v = p5.Vector.lerp(r,s,0.5);\n  let w = p5.Vector.lerp(t,u,0.5);\n  let x = p5.Vector.lerp(u,v,0.5);\n\n  let l = p5.Vector.sub(x,w);\n\n  w.x -= l.y*R[d]*wscale;\n  w.y += l.x*R[d]*wscale;\n\n  x.x -= l.y*R[d]*wscale;\n  x.y += l.x*R[d]*wscale;\n\n  let y = p5.Vector.lerp(w,x,0.5);\n  \n  strokeWeight(3);\n  stroke(0);\n  if(d<wdepth) {\n    fbezier(p,t,w,y,d*2+1);\n    fbezier(y,x,v,s,d*2+2);\n  } else {\n    cbezier(p,t,w,y);\n    cbezier(y,x,v,s);\n  }\n}\n\nfunction makeRandom()\n{\n  for(let i=0; i<256;i++) {\n    R[i] = random(1)-0.5;\n  }\n}\n\nfunction mouseDragged()\n{\n  let bestd = 9999;\n  let besti = -1;\n\n  for(let i=0; i<4; i++) {\n    let dx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - P[i].x;\n    let dy = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - P[i].y;\n    let dd = sqrt(dx*dx + dy*dy);\n    if(dd<bestd) {\n      bestd = dd;\n      besti = i;\n    }\n  }\n  \n  if(bestd<10 || besti==sel) {\n\t\tsel = besti;\n    P[besti].x = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n    P[besti].y = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n  } else {\n\t\tsel = -1;\n\t}\n\treturn false;\n}\n\nfunction keyPressed()\n{\n  if(key == 'r')\n    makeRandom();\n  if(key >= '1' && key <='9')\n    wscale = (key-'0')/3.0;\n\tif(key == 'd') {\n\t\twdepth = wdepth*2 + 1\n\t\tif(wdepth > 127)\n\t\t\twdepth = 7;\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Wrinkles",
+    "author": "Cloudoid",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:13:52",
+    "url": "https://openprocessing.org/@Cloudoid/787162",
+    "code": "// === Tab: mySketch ===\n/* Wrinkles - Fractal bezier\n\n   Keys:\n   r    randomise\n\t d    wrinkle depth\n   1-9  wrinkle scale\n   \n   Mouse:\n   Drag control points\n\n*/\n\nvar P = [];\nvar R = [];\nvar wscale = 1;\nvar wdepth = 5;\nvar sel = -1;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\n  for(let i=0; i<4; i++) {\n    P[i] =  createVector(random(width/4)+i*width/4,\n          random(height/4)+i*height/4);\n  }\n\n  makeRandom();\n\n}\n\nfunction draw()\n{\n\n  background(200);\n  \n  // Endpoints/on-curve points\n  fill(0,100,150);\n  noStroke();\n  ellipse(P[0].x,P[0].y,9,9);\n  ellipse(P[3].x,P[3].y,9,9);\n\n  // Control/on-curve points\n  noFill();\n  stroke(0,100,150);\n  strokeWeight(2);\n  ellipse(P[1].x,P[1].y,8,8);\n  ellipse(P[2].x,P[2].y,8,8);\n  \n  // Control polygon\n  strokeWeight(1);\n  stroke(0,100,150);\n  for(let i=0;i < 3;i++) {\n    line(P[i].x,P[i].y,P[i+1].x,P[i+1].y);\n  }\n\n  fbezier(P[0],P[1],P[2],P[3],0);\n}\n\nfunction cbezier(p,q,r,s)\n{\n  bezier(p.x,p.y,q.x,q.y,r.x,r.y,s.x,s.y);\n}\n\nfunction fbezier(p,q,r,s,d)\n{\n  stroke(128);\n  strokeWeight(1);\n  cbezier(p,q,r,s);\n  let t = p5.Vector.lerp(p,q,0.5);\n  let u = p5.Vector.lerp(q,r,0.5);\n  let v = p5.Vector.lerp(r,s,0.5);\n  let w = p5.Vector.lerp(t,u,0.5);\n  let x = p5.Vector.lerp(u,v,0.5);\n\n  let l = p5.Vector.sub(x,w);\n\n  w.x -= l.y*R[d]*wscale;\n  w.y += l.x*R[d]*wscale;\n\n  x.x -= l.y*R[d]*wscale;\n  x.y += l.x*R[d]*wscale;\n\n  let y = p5.Vector.lerp(w,x,0.5);\n  \n  strokeWeight(3);\n  stroke(0);\n  if(d<wdepth) {\n    fbezier(p,t,w,y,d*2+1);\n    fbezier(y,x,v,s,d*2+2);\n  } else {\n    cbezier(p,t,w,y);\n    cbezier(y,x,v,s);\n  }\n}\n\nfunction makeRandom()\n{\n  for(let i=0; i<256;i++) {\n    R[i] = random(1)-0.5;\n  }\n}\n\nfunction mouseDragged()\n{\n  let bestd = 9999;\n  let besti = -1;\n\n  for(let i=0; i<4; i++) {\n    let dx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - P[i].x;\n    let dy = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - P[i].y;\n    let dd = sqrt(dx*dx + dy*dy);\n    if(dd<bestd) {\n      bestd = dd;\n      besti = i;\n    }\n  }\n  \n  if(bestd<10 || besti==sel) {\n\t\tsel = besti;\n    P[besti].x = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n    P[besti].y = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n  } else {\n\t\tsel = -1;\n\t}\n\treturn false;\n}\n\nfunction keyPressed()\n{\n  if(key == 'r')\n    makeRandom();\n  if(key >= '1' && key <='9')\n    wscale = (key-'0')/3.0;\n\tif(key == 'd') {\n\t\twdepth = wdepth*2 + 1\n\t\tif(wdepth > 127)\n\t\t\twdepth = 7;\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Level Surface.mp4"
+    ]
 }

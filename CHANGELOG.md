@@ -4,6 +4,38 @@
 
 ---
 
+## 🚀 [v1.4.1] - 2026-09-17
+### 🛡️ 全專案多角色審核修復、4K 渲染管線記憶體優化與 YouTube 金鑰池自動輪換
+
+- **🔴 YouTube 金鑰池自動輪換續傳 (`youtube_uploader_tab.py`)**：
+  - 徹底修復配額耗盡時直接中斷的缺陷，全面啟用 `cred_manager.rotate_to_next()` 自動輪替金鑰池內的 7 組 Google OAuth Client Secret 專案。
+  - 當遇到 Quota Exceeded 錯誤時，自動無感切換專案憑證並重新連線，不中斷批次佇列上傳流程。
+  - 新增多平台發布引擎 (`social_uploader_engine.py`)，支援 TikTok 與 Instagram Reels 批量排程與狀態矩陣管理。
+
+- **🔴 像素視覺生成器草稿重複類別清理 (`pixel_generator_tab.py`)**：
+  - 清理重複定義且被後續覆蓋的舊版 `PixelModuleGeneratorTab` 類別草稿，消除類別遮蔽與冗餘死碼。
+
+- **🟡 4K 渲染管線記憶體與色彩管線優化 (`main.py`)**：
+  - **色彩格式原生對接**：FFmpeg rawvideo 輸入像素格式由 `rgba` 升級為 `rgb24`，移除 Python 端每幀 33.1MB 的 RGBA 冗餘記憶體拷貝（在 4K 60FPS 下每秒釋放約 2GB/s 記憶體頻寬）。
+  - **真·記憶體釋放**：將渲染迴圈末尾無效的 `del locals()[_v]` 偽釋放升級為顯式 `None` 賦值，解除 CPython 局部槽位物件參照，防止長時間批量渲染記憶體洩漏。
+  - **快照路徑標準化**：修正硬編碼歷史 Antigravity Session 快照路徑，標準化重定向至專案內 `render_output/snapshots`。
+  - **動態 Import 提取**：將迴圈內部的 `RealtimeRenderQCAuditor` 與 `ImageEnhance` 提取至渲染前預先初始化，消除每幀重複 import 尋址開銷。
+
+- **🟡 音訊分析器工作目錄修正 (`audio_analyzer.py`)**：
+  - 修正路徑計算中的雙重 `dirname`，確保 `temp_audio` 精確建立於專案根目錄內，避免專案外部目錄污染。
+
+- **🟡 Python 3.12+ 正則 SyntaxWarning 徹底清零 (`code_injector.py` & `main.py`)**：
+  - 轉義 JS 模板中的 `\s`、`\w` 與 `\.`，全專案 `python3 -m py_compile *.py` 達成 0 語法警告、0 報錯。
+
+- **🟡 Shorts 豎屏匯出穩定性強化 (`shorts_exporter_tab.py`)**：
+  - 在 FFmpeg 子行程加入 `timeout=300` 超時保護與 `stderr=subprocess.PIPE` 管道，杜絕硬體編碼器卡死掛起，並精確捕獲匯出失敗原因。
+
+- **🟢 死碼清理與巨型歷史日誌瘦身**：
+  - 刪除完全未被引用的重複檔案 `procedural_palette_oklch.py`。
+  - 截斷 94MB 巨型 `op_import_errors.txt` 至 8.5KB，大幅釋放儲存空間。
+
+---
+
 ## 🚀 [v1.4.0] - 2026-09-06
 ### 🎨 超現實主義動態拼貼創作、AI 導演編舞與 YouTube 智慧自動上傳管線
 

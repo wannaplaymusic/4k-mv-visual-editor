@@ -1,22 +1,25 @@
 {
-  "name": "Noiseloopstudy_1",
-  "author": "ronikaufman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:15:53",
-  "url": "https://openprocessing.org/@ronikaufman/1586617",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n// https://twitter.com/KaufmanRoni\n\nlet margin = 4;\nlet N = 32;\nlet u;\nlet palette = [\"#abcd5e\", \"#14976b\", \"#2b67af\", \"#62b6de\", \"#f589a3\", \"#ef562f\", \"#fc8405\", \"#f9d531\"];\nlet N_FRAMES = 500;\nlet rad = 1, sc = 1/1000, offset = 10, theta; // parameters for the noise\n\nlet squares = [];\n\nlet randInt = (a, b) => (floor(random(a, b))); \n\nfunction setup() {\n  createCanvas(600, 600);\n\tframeRate(30);\n\tu = width / N;\n\tgap = u / 4;\n  \n  stroke(\"#2c2060\");\n  strokeWeight(1);\n\t\n\tcreateComposition();\n}\n\nfunction draw() {\n\tbackground(\"#fffbe6\");\n\t\n\ttheta = TWO_PI*(frameCount%N_FRAMES)/N_FRAMES;\n  for (let squ of squares) {\n\t\tdrawSquare(squ.i*u+gap/2, squ.j*u+gap/2, squ.s*u-gap);\n\t}\n}\n\nfunction createComposition() {\n\tfor (let i = 0; i < 1000; i++) {\n    let newSqu = generateSquare();\n    let canAdd = true;\n    for (let squ of squares) {\n      if (squaresIntersect(newSqu, squ)) {\n        canAdd = false;\n        break;\n      }\n    }\n    if (canAdd) {\n      squares.push(newSqu);\n    }\n  }\n  \n  // fill the gaps with 1x1 squares\n\tfor (let i = margin; i < N-margin; i++) {\n\t\tfor (let j = margin; j < N-margin; j++) {\n\t\t\tvar newSqu = {\n\t\t\t\ti: i,\n\t\t\t\tj: j,\n\t\t\t\ts: 1\n\t\t\t}\n\t\t\tvar canAdd = true;\n\t\t\tfor (let squ of squares) {\n\t\t\t\tif (squaresIntersect(newSqu, squ)) {\n\t\t\t\t\tcanAdd = false;\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t}\n\t\t\tif (canAdd) {\n\t\t\t\tsquares.push(newSqu);\n\t\t\t}\n\t\t}\n\t}\n}\n\nfunction squaresIntersect(squ1, squ2) {\n\treturn ((squ1.i <= squ2.i && squ1.i+squ1.s > squ2.i) || (squ2.i <= squ1.i && squ2.i+squ2.s > squ1.i)) && ((squ1.j <= squ2.j && squ1.j+squ1.s > squ2.j) || (squ2.j <= squ1.j && squ2.j+squ2.s > squ1.j))\n}\n\nfunction generateSquare() {\n  let s = 2;\n  let i = randInt(margin, N-margin-s+1);\n  let j = randInt(margin, N-margin-s+1);\n  let squ = {\n    i: i,\n    j: j,\n    s: s\n  };\n  return squ;\n}\n\nfunction drawSquare(x, y, s) {\n\tlet noice = noise(\n\t\toffset + rad*cos(x*sc+theta),\n\t\toffset + rad*sin(x*sc+theta),\n\t\ty*sc\n\t);\n\tfill(palette[floor(6*noice*palette.length)%palette.length]);\n\tsquare(x, y, s);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Noiseloopstudy_1",
+    "author": "ronikaufman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:15:53",
+    "url": "https://openprocessing.org/@ronikaufman/1586617",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n// https://twitter.com/KaufmanRoni\n\nlet margin = 4;\nlet N = 32;\nlet u;\nlet palette = [\"#abcd5e\", \"#14976b\", \"#2b67af\", \"#62b6de\", \"#f589a3\", \"#ef562f\", \"#fc8405\", \"#f9d531\"];\nlet N_FRAMES = 500;\nlet rad = 1, sc = 1/1000, offset = 10, theta; // parameters for the noise\n\nlet squares = [];\n\nlet randInt = (a, b) => (floor(random(a, b))); \n\nfunction setup() {\n  createCanvas(600, 600);\n\tframeRate(30);\n\tu = width / N;\n\tgap = u / 4;\n  \n  stroke(\"#2c2060\");\n  strokeWeight(1);\n\t\n\tcreateComposition();\n}\n\nfunction draw() {\n\tbackground(\"#fffbe6\");\n\t\n\ttheta = TWO_PI*(frameCount%N_FRAMES)/N_FRAMES;\n  for (let squ of squares) {\n\t\tdrawSquare(squ.i*u+gap/2, squ.j*u+gap/2, squ.s*u-gap);\n\t}\n}\n\nfunction createComposition() {\n\tfor (let i = 0; i < 1000; i++) {\n    let newSqu = generateSquare();\n    let canAdd = true;\n    for (let squ of squares) {\n      if (squaresIntersect(newSqu, squ)) {\n        canAdd = false;\n        break;\n      }\n    }\n    if (canAdd) {\n      squares.push(newSqu);\n    }\n  }\n  \n  // fill the gaps with 1x1 squares\n\tfor (let i = margin; i < N-margin; i++) {\n\t\tfor (let j = margin; j < N-margin; j++) {\n\t\t\tvar newSqu = {\n\t\t\t\ti: i,\n\t\t\t\tj: j,\n\t\t\t\ts: 1\n\t\t\t}\n\t\t\tvar canAdd = true;\n\t\t\tfor (let squ of squares) {\n\t\t\t\tif (squaresIntersect(newSqu, squ)) {\n\t\t\t\t\tcanAdd = false;\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t}\n\t\t\tif (canAdd) {\n\t\t\t\tsquares.push(newSqu);\n\t\t\t}\n\t\t}\n\t}\n}\n\nfunction squaresIntersect(squ1, squ2) {\n\treturn ((squ1.i <= squ2.i && squ1.i+squ1.s > squ2.i) || (squ2.i <= squ1.i && squ2.i+squ2.s > squ1.i)) && ((squ1.j <= squ2.j && squ1.j+squ1.s > squ2.j) || (squ2.j <= squ1.j && squ2.j+squ2.s > squ1.j))\n}\n\nfunction generateSquare() {\n  let s = 2;\n  let i = randInt(margin, N-margin-s+1);\n  let j = randInt(margin, N-margin-s+1);\n  let squ = {\n    i: i,\n    j: j,\n    s: s\n  };\n  return squ;\n}\n\nfunction drawSquare(x, y, s) {\n\tlet noice = noise(\n\t\toffset + rad*cos(x*sc+theta),\n\t\toffset + rad*sin(x*sc+theta),\n\t\ty*sc\n\t);\n\tfill(palette[floor(6*noice*palette.length)%palette.length]);\n\tsquare(x, y, s);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Static Architecture.mp4"
+    ]
 }

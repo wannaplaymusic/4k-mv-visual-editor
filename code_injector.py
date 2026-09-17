@@ -518,27 +518,81 @@ function draw() {
     window.audioLow = 0.5;
     window.audioMid = 0.5;
     window.audioHigh = 0.5;
+    window.chordHue = 0;
+    window.currentChordColor = '#0a0a0c';
+    window.stereoWidth = 0.5;
     window.custom_time_ms = 0;
+
+    // Universal Audio-Reactive Proxy Adapter
+    window.audioParams = new Proxy({{}}, {{
+      get: function(target, prop) {{
+        if (prop === 'bass' || prop === 'sub_bass' || prop === 'low') return window.audioLow || 0.5;
+        if (prop === 'mid' || prop === 'voice' || prop === 'vocal') return window.audioMid || 0.5;
+        if (prop === 'high' || prop === 'treble') return window.audioHigh || 0.5;
+        if (prop === 'beat' || prop === 'isBeat') return window.isBeat || false;
+        if (prop === 'energy' || prop === 'beatEnergy') return window.beatEnergy || 0.5;
+        if (prop === 'chordColor' || prop === 'chordHex') return window.currentChordColor || '#0a0a0c';
+        if (prop === 'chordHue') return window.chordHue || 0;
+        if (prop === 'section') return window.sectionName || 'Verse';
+        if (prop === 'progress') return window.sectionProgress || 0;
+        if (prop === 'synthMelody') return window.synthMelodyActive || false;
+        if (prop === 'hihat') return window.hihatTrigger || false;
+        if (prop === 'hihatDensity') return window.hihatDensity || 0;
+        if (prop === 'harmonic') return window.harmonicEnergy || 0.5;
+        if (prop === 'percussive') return window.percussiveEnergy || 0.5;
+        return target[prop] || 0.5;
+      }}
+    }});
+
+    window.getHarmonicColor = function(offsetDeg, alpha) {{
+      offsetDeg = offsetDeg || 0;
+      alpha = (typeof alpha !== 'undefined') ? alpha : 1.0;
+      let hue = ((window.chordHue || 0) + offsetDeg) % 360;
+      let sat = window.synthMelodyActive ? 85 : 65;
+      let light = window.isBeat ? 70 : 50;
+      return `hsla(${{Math.round(hue)}}, ${{sat}}%, ${{light}}%, ${{alpha}})`;
+    }};
+
+    window.getAudioPulse = function(scale) {{
+      scale = (typeof scale !== 'undefined') ? scale : 1.0;
+      return 1.0 + (window.audioLow || 0.5) * 0.3 * scale + (window.isBeat ? 0.2 * scale : 0.0);
+    }};
 
     // Smart unrelated text filter
     window.__isUnrelatedVisualText = function(content) {{
       if (content === null || content === undefined) return false;
       let str = String(content).trim();
       if (!str || str.length === 0) return false;
-      if (/^(?:fps|framerate|frame\s*rate)\s*[:=]?\s*[\d\.]*/i.test(str)) return true;
-      if (/^[\d\.]+\s*fps\b/i.test(str)) return true;
-      if (/^fps\s*$/i.test(str)) return true;
-      if (/^loading(?:\s*[\.\w]*)?$/i.test(str)) return true;
-      if (/^please\s+wait/i.test(str)) return true;
-      if (/^esperando\b/i.test(str)) return true;
-      if (/(?:drag\s+wind|tap\s+to|click\s+to|press\s+['"\w]|hit\s+space|arrow\s+keys|use\s+mouse|hold\s+mouse|scroll\s+to|snapshot|screenshot|save\s+image|controls?|instructions?|touch\s+to\s+start|press\s+any\s+key)/i.test(str)) return true;
-      if (/too\s+much\s+food|you\s+did\s+not\s+have\s+anything\s+else/i.test(str)) return true;
-      if (/^(?:speed|size|radius|color|count|frequency|volume|threshold|density|scale|zoom|particles|nodes|iteration|gravity|damping)\s*[:=]\s*[-+]?[\d\.]+/i.test(str)) return true;
-      if (/^(?:by\s+[\w\s]+|author\s*:|code\s+by|created\s+by|designed\s+by|copyright|©|\(c\))\b/i.test(str)) return true;
+      if (/^(?:fps|framerate|frame\\s*rate)\\s*[:=]?\\s*[\\d\\.]*/i.test(str)) return true;
+      if (/^[\\d\\.]+\\s*fps\\b/i.test(str)) return true;
+      if (/^fps\\s*$/i.test(str)) return true;
+      if (/^loading(?:\\s*[\\.\\w]*)?$/i.test(str)) return true;
+      if (/^please\\s+wait/i.test(str)) return true;
+      if (/^esperando\\b/i.test(str)) return true;
+      if (/(?:drag\\s+wind|tap\\s+to|click\\s+to|press\\s+['"\\w]|hit\\s+space|arrow\\s+keys|use\\s+mouse|hold\\s+mouse|scroll\\s+to|snapshot|screenshot|save\\s+image|controls?|instructions?|touch\\s+to\\s+start|press\\s+any\\s+key)/i.test(str)) return true;
+      if (/too\\s+much\\s+food|you\\s+did\\s+not\\s+have\\s+anything\\s+else/i.test(str)) return true;
+      if (/^(?:speed|size|radius|color|count|frequency|volume|threshold|density|scale|zoom|particles|nodes|iteration|gravity|damping)\\s*[:=]\\s*[-+]?[\\d\\.]+/i.test(str)) return true;
+      if (/^(?:by\\s+[\\w\\s]+|author\\s*:|code\\s+by|created\\s+by|designed\\s+by|copyright|©|\\(c\\))\\b/i.test(str)) return true;
       return false;
     }};
 
     if (typeof p5 !== 'undefined' && p5.prototype) {{
+      p5.prototype.getHarmonicColor = function(offsetDeg, alpha) {{
+        offsetDeg = offsetDeg || 0;
+        alpha = (typeof alpha !== 'undefined') ? alpha : 255;
+        let hue = ((window.chordHue || 0) + offsetDeg) % 360;
+        let sat = window.synthMelodyActive ? 85 : 65;
+        let light = window.isBeat ? 70 : 50;
+        if (typeof this.color === 'function') {{
+          return this.color(`hsla(${{Math.round(hue)}}, ${{sat}}%, ${{light}}%, ${{alpha / 255}})`);
+        }}
+        return `hsla(${{Math.round(hue)}}, ${{sat}}%, ${{light}}%, ${{alpha / 255}})`;
+      }};
+      p5.prototype.getAudioPulse = function(scale) {{
+        scale = (typeof scale !== 'undefined') ? scale : 1.0;
+        return 1.0 + (window.audioLow || 0.5) * 0.3 * scale + (window.isBeat ? 0.2 * scale : 0.0);
+      }};
+
       // Preload watchdog: auto unstick if loading stalls > 1.2s
       setTimeout(function() {{
         if (window._p5Instance && window._p5Instance._preloadCount > 0) {{
@@ -634,6 +688,58 @@ function draw() {
         }};
       }}
     }}
+
+    // Universal OPC Self-Healing Proxy
+    (function() {{
+      function patchOPCInstance() {{
+        if (typeof window.OPC === 'undefined') {{
+          window.OPC = function() {{}};
+        }}
+        var opc = window.OPC;
+        var methods = [
+          'slider', 'toggle', 'palette', 'color', 'text', 'button', 'select',
+          'label', 'title', 'header', 'separator', 'collapsed', 'bezier',
+          'initVariable', '_set', 'set', 'buttonPressed', 'buttonReleased',
+          'collapse', 'expand', 'delete', 'callParentFunction', 'getEaseFunction',
+          'setOSC', 'loadOSC', 'oscSendMessage', 'setGlobal'
+        ];
+        methods.forEach(function(m) {{
+          if (typeof opc[m] !== 'function') {{
+            opc[m] = function(name, value) {{
+              if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') {{
+                window[name] = value;
+              }}
+              return opc;
+            }};
+          }}
+        }});
+        if (!opc._isUniversalProxy && typeof Proxy !== 'undefined') {{
+          try {{
+            var handler = {{
+              get: function(target, prop) {{
+                if (prop in target) return target[prop];
+                if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') return undefined;
+                return function(name, value) {{
+                  if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') {{
+                    window[name] = value;
+                  }}
+                  return window.OPC;
+                }};
+              }}
+            }};
+            window.OPC = new Proxy(opc, handler);
+            window.OPC._isUniversalProxy = true;
+          }} catch(e) {{}}
+        }}
+      }}
+      patchOPCInstance();
+      if (typeof document !== 'undefined') {{
+        if (document.readyState === 'loading') {{
+          document.addEventListener('DOMContentLoaded', patchOPCInstance);
+        }}
+        window.addEventListener('load', patchOPCInstance);
+      }}
+    }})();
 
     // Audio-driven dummy DOM stubs
     window._activeMockButtons = [];

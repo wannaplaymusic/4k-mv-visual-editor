@@ -1,22 +1,25 @@
 {
-  "name": "BouncingCircles",
-  "author": "u95522",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:27:06",
-  "url": "https://openprocessing.org/@u95522/707334",
-  "code": "// === Tab: mySketch ===\nvar easeInElastic = function (t) { return (.04 - .04 / t) * Math.sin(25 * t) + 1 };\nvar ballCount = 30;\nvar balls = [];\n\nfunction setup() {\n\tcreateCanvas(600, 600);\n\tnoStroke();\n\tfill(255);\n\tfor (i = 0; i < ballCount; i++) {\n\t\tballs[i] = new Ball();\n\t}\n}\n\nfunction draw() {\n\tblendMode(BLEND);\n\tbackground(255);\n\tblendMode(DIFFERENCE);\n\tballs.forEach(bl => bl.updateMe());\n\tballs.forEach(bl => bl.drawMe());\n}\n\nclass Ball {\n\tconstructor() {\n\t\tthis.x = random(50, width - 50);\n\t\tthis.y = random(50, height - 50);\n\t\tthis.minR = random(10, 50);\n\t\tthis.maxR = random(100, width);\n\t\tthis.vec = getBool(.5);\n\t\tthis.vec ? this.r = this.minR:this.r = this.maxR;\n\t\tthis.easeTime = random(500, 2000);\n\t\tthis.isChange = false;\n\t\tthis.morphTime = millis();\n\t}\n\n\tupdateMe() {\n\t\tif (this.isChange) {\n\t\t\tlet t = (millis() - this.morphTime) / this.easeTime;\n\t\t\tif (millis() - this.morphTime < this.easeTime) {\n\t\t\tthis.vec ? this.r = this.minR + (easeInElastic(t) * (this.maxR - this.minR))\n\t\t\t\t:this.r = this.maxR - (easeInElastic(t) * (this.maxR - this.minR));\n\t\t\t} else {\n\t\t\t\tthis.isChange = false;\n\t\t\t\tthis.vec ? this.r = this.maxR:this.r = this.minR;\n\t\t\t\tthis.vec = !this.vec;\n\t\t\t}\n\t\t} else {\n\t\t\tif (random() < .0002) {\n\t\t\t\tthis.morphTime = millis();\n\t\t\t\tthis.isChange = true;\n\t\t\t}\n\t\t}\n\t}\n\n\tdrawMe() {\n\t\tellipse(this.x, this.y, this.r);\n\t}\n\n\tmouseClicked() {\n\t\tif (dist(this.x, this.y, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))) < this.r / 2 && this.isChange == false) {\n\t\t\tthis.morphTime = millis();\n\t\t\tthis.isChange = true;\n\t\t}\n\t}\n}\n\nfunction getBool(p) {\n\treturn random() > p ? true: false;\n}\n\nfunction mouseClicked() {\n\tballs.forEach(bl => bl.mouseClicked());\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "BouncingCircles",
+    "author": "u95522",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:27:06",
+    "url": "https://openprocessing.org/@u95522/707334",
+    "code": "// === Tab: mySketch ===\nvar easeInElastic = function (t) { return (.04 - .04 / t) * Math.sin(25 * t) + 1 };\nvar ballCount = 30;\nvar balls = [];\n\nfunction setup() {\n\tcreateCanvas(600, 600);\n\tnoStroke();\n\tfill(255);\n\tfor (i = 0; i < ballCount; i++) {\n\t\tballs[i] = new Ball();\n\t}\n}\n\nfunction draw() {\n\tblendMode(BLEND);\n\tbackground(255);\n\tblendMode(DIFFERENCE);\n\tballs.forEach(bl => bl.updateMe());\n\tballs.forEach(bl => bl.drawMe());\n}\n\nclass Ball {\n\tconstructor() {\n\t\tthis.x = random(50, width - 50);\n\t\tthis.y = random(50, height - 50);\n\t\tthis.minR = random(10, 50);\n\t\tthis.maxR = random(100, width);\n\t\tthis.vec = getBool(.5);\n\t\tthis.vec ? this.r = this.minR:this.r = this.maxR;\n\t\tthis.easeTime = random(500, 2000);\n\t\tthis.isChange = false;\n\t\tthis.morphTime = millis();\n\t}\n\n\tupdateMe() {\n\t\tif (this.isChange) {\n\t\t\tlet t = (millis() - this.morphTime) / this.easeTime;\n\t\t\tif (millis() - this.morphTime < this.easeTime) {\n\t\t\tthis.vec ? this.r = this.minR + (easeInElastic(t) * (this.maxR - this.minR))\n\t\t\t\t:this.r = this.maxR - (easeInElastic(t) * (this.maxR - this.minR));\n\t\t\t} else {\n\t\t\t\tthis.isChange = false;\n\t\t\t\tthis.vec ? this.r = this.maxR:this.r = this.minR;\n\t\t\t\tthis.vec = !this.vec;\n\t\t\t}\n\t\t} else {\n\t\t\tif (random() < .0002) {\n\t\t\t\tthis.morphTime = millis();\n\t\t\t\tthis.isChange = true;\n\t\t\t}\n\t\t}\n\t}\n\n\tdrawMe() {\n\t\tellipse(this.x, this.y, this.r);\n\t}\n\n\tmouseClicked() {\n\t\tif (dist(this.x, this.y, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))) < this.r / 2 && this.isChange == false) {\n\t\t\tthis.morphTime = millis();\n\t\t\tthis.isChange = true;\n\t\t}\n\t}\n}\n\nfunction getBool(p) {\n\treturn random() > p ? true: false;\n}\n\nfunction mouseClicked() {\n\tballs.forEach(bl => bl.mouseClicked());\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Deep Decay.mp4"
+    ]
 }

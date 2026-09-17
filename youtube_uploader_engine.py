@@ -39,6 +39,7 @@ except ImportError:
 YOUTUBE_SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube",
+    "https://www.googleapis.com/auth/youtube.force-ssl",
     "https://www.googleapis.com/auth/youtubepartner"
 ]
 
@@ -54,28 +55,59 @@ class MetadataParser:
     def smart_truncate_title(title: str, max_len: int = 100) -> Tuple[str, Optional[str]]:
         """
         Safely truncates title to max_len (YouTube limit: 100 characters).
-        Preserves complete words and delimiters without cutting mid-word.
+        Priority Strategy:
+        1. Keep core Track Name and Artist intact.
+        2. Progressively prune least important trailing hashtags (#Techno, #EDM, etc.) and tags from right to left.
+        3. Drop secondary trailers separated by '|' or '-' if still exceeding limit.
+        4. Smoothly clean up extra separators, without cutting mid-word.
         Returns: (safe_title, overflow_text_or_None)
         """
         clean_title = re.sub(r"\s+", " ", title).strip()
         if len(clean_title) <= max_len:
             return clean_title, None
 
-        # Try splitting by ' | ' to drop secondary trailer if needed
-        parts = clean_title.split(" | ")
-        if len(parts) > 1:
-            candidate = " | ".join(parts[:-1]).strip()
-            if len(candidate) <= max_len:
-                return candidate, parts[-1]
+        orig_title = clean_title
+        current = clean_title
 
-        # Break at last whitespace within max_len - 3
-        truncated = clean_title[:max_len - 3]
+        # Step 1: Remove trailing hashtags one by one (#Shorts, #music, etc.)
+        while len(current) > max_len:
+            # Look for a hashtag at or near the end
+            m_tag = re.search(r"(\s*#[\w\d_-]+\s*)$", current)
+            if m_tag:
+                current = current[:m_tag.start()].strip()
+                continue
+
+            # Look for hashtags anywhere in the trailing half
+            all_tags = list(re.finditer(r"\s*#[\w\d_-]+", current))
+            if all_tags:
+                # Remove the last hashtag found
+                last_tag = all_tags[-1]
+                current = (current[:last_tag.start()] + current[last_tag.end():]).strip()
+                # clean up double spaces
+                current = re.sub(r"\s+", " ", current)
+                continue
+            break
+
+        if len(current) <= max_len:
+            return current, orig_title
+
+        # Step 2: Split by ' | ' and drop segments from right to left (trailers/tech tags)
+        parts = [p.strip() for p in current.split(" | ") if p.strip()]
+        while len(parts) > 1 and len(" | ".join(parts)) > max_len:
+            parts.pop()  # Drop the last / least important segment
+
+        if parts:
+            candidate = " | ".join(parts).strip()
+            if len(candidate) <= max_len:
+                return candidate, orig_title
+
+        # Step 3: If still over 100 (e.g. single long segment), truncate at last clean word boundary
+        truncated = current[:max_len - 3]
         last_space = truncated.rfind(" ")
-        if last_space > 30:
+        if last_space > 25:
             truncated = truncated[:last_space]
         safe_title = truncated.strip() + "..."
-        overflow = clean_title[len(safe_title.rstrip(".")):].strip()
-        return safe_title, overflow
+        return safe_title, orig_title
 
     @staticmethod
     def parse_social_file(social_path: str, clip_idx: Optional[int] = None) -> Dict[str, Any]:
@@ -91,7 +123,9 @@ class MetadataParser:
             "artist": "",
             "genre": "",
             "bpm": "",
-            "duration": ""
+            "duration": "",
+            "instagram_caption": "",
+            "tiktok_caption": ""
         }
 
         if not os.path.exists(social_path):
@@ -181,6 +215,39 @@ class MetadataParser:
                     tags_clean = [t.strip("#").strip() for t in re.split(r"[\s,]+", raw_tags) if t.strip("#").strip()]
                     data["tags"] = tags_clean[:30]
 
+            # 4. Extract Instagram & TikTok metadata if present
+            ig_match = re.search(
+                r"【Instagram Reels Caption】\s*\n+(.*?)(?=【TikTok|\n===|\n---|$)",
+                content,
+                re.DOTALL | re.IGNORECASE
+            )
+            if not ig_match:
+                ig_match = re.search(
+                    r"--- \[3\] INSTAGRAM REEL / POST ---\s*\n+Caption:\s*\n+(.*?)(?=---|===|$)",
+                    content,
+                    re.DOTALL | re.IGNORECASE
+                )
+            if ig_match:
+                data["instagram_caption"] = ig_match.group(1).strip()
+            else:
+                data["instagram_caption"] = data["description"][:2200]
+
+            tt_match = re.search(
+                r"【TikTok Caption】\s*\n+(.*?)(?=【Hashtags|\n===|\n---|$)",
+                content,
+                re.DOTALL | re.IGNORECASE
+            )
+            if not tt_match:
+                tt_match = re.search(
+                    r"--- \[4\] TIKTOK VIDEO ---\s*\n+Caption & Hashtags:\s*\n+(.*?)(?=---|===|$)",
+                    content,
+                    re.DOTALL | re.IGNORECASE
+                )
+            if tt_match:
+                data["tiktok_caption"] = tt_match.group(1).strip()
+            else:
+                data["tiktok_caption"] = (data["title"] + " " + data["raw_hashtags"])[:2000]
+
         except Exception as e:
             print(f"[MetadataParser] Error reading {social_path}: {e}", file=sys.stderr)
 
@@ -212,13 +279,15 @@ class CredentialPoolManager:
         # Check inside credentials_dir
         if self.cred_dir.exists():
             for p in sorted(self.cred_dir.glob("*.json")):
+                if p.name.startswith("token_"):
+                    continue
                 if "client_secret" in p.name.lower() or "client_id" in p.name.lower():
                     found.append(p)
 
         # Also check root workspace
         root_dir = Path(__file__).resolve().parent
         for p in sorted(root_dir.glob("client_secrets*.json")):
-            if p not in found:
+            if not p.name.startswith("token_") and p not in found:
                 found.append(p)
 
         self.client_secrets_files = found
@@ -231,6 +300,21 @@ class CredentialPoolManager:
         if not self.client_secrets_files:
             return None
         return self.client_secrets_files[self.current_index % len(self.client_secrets_files)]
+
+    def auto_select_available(self):
+        """Automatically advances current_index to a project that still has remaining daily quota."""
+        today = datetime.now().strftime("%Y-%m-%d")
+        data = quota_tracker.usage_data.get(today, {})
+        for offset in range(len(self.client_secrets_files)):
+            idx = (self.current_index + offset) % len(self.client_secrets_files)
+            candidate = self.client_secrets_files[idx]
+            used = data.get(candidate.stem, {}).get("total_points", 0)
+            if used < 10000:
+                if self.current_index != idx:
+                    self.current_index = idx
+                    print(f"[CredentialPool] ⚡ Auto-selected project with remaining quota: {candidate.name} (used {used}/10000)")
+                return candidate
+        return self.get_active_secret_file()
 
     def rotate_to_next(self) -> bool:
         """Rotates to the next credential project in the pool. Returns True if a new project was chosen."""
@@ -258,9 +342,13 @@ class CredentialPoolManager:
         if token_file.exists():
             try:
                 creds = Credentials.from_authorized_user_file(str(token_file), YOUTUBE_SCOPES)
-            except Exception as e:
-                print(f"[CredentialPool] Existing token invalid: {e}")
-                creds = None
+            except Exception:
+                try:
+                    # Graceful fallback: reuse existing active token without forcing browser re-auth
+                    creds = Credentials.from_authorized_user_file(str(token_file))
+                except Exception as e:
+                    print(f"[CredentialPool] Existing token invalid: {e}")
+                    creds = None
 
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
@@ -301,7 +389,8 @@ class YouTubeUploaderEngine:
         self._cancel_requested = False
 
     def connect(self) -> Any:
-        """Initializes YouTube API client."""
+        """Initializes YouTube API client, automatically skipping exhausted projects."""
+        self.cred_manager.auto_select_available()
         self.service = self.cred_manager.get_authenticated_service()
         return self.service
 
@@ -419,7 +508,7 @@ class YouTubeUploaderEngine:
         return playlist_id
 
     def add_video_to_playlist(self, video_id: str, playlist_id: str, position: Optional[int] = None) -> bool:
-        """Adds a video to an existing playlist."""
+        """Adds a video to an existing playlist. Retries up to 3 times on transient errors."""
         if not self.service:
             self.connect()
 
@@ -433,18 +522,28 @@ class YouTubeUploaderEngine:
         if position is not None:
             snippet["position"] = position
 
-        try:
-            self.service.playlistItems().insert(
-                part="snippet",
-                body={"snippet": snippet}
-            ).execute()
-            proj = self.cred_manager.get_active_secret_file().stem if self.cred_manager.get_active_secret_file() else "default"
-            q = quota_tracker.record_action(proj, "playlistItems.insert")
-            logger.info(f"➕ Video {video_id} added to playlist {playlist_id} [Quota: -50, used {q['total']}/10000 on {proj}]")
-            return True
-        except Exception as e:
-            logger.error(f"Failed to add video {video_id} to playlist {playlist_id}: {e}", exc_info=True)
-            return False
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                self.service.playlistItems().insert(
+                    part="snippet",
+                    body={"snippet": snippet}
+                ).execute()
+                proj = self.cred_manager.get_active_secret_file().stem if self.cred_manager.get_active_secret_file() else "default"
+                q = quota_tracker.record_action(proj, "playlistItems.insert")
+                logger.info(f"➕ Video {video_id} added to playlist {playlist_id} [Quota: -50, used {q['total']}/10000 on {proj}]")
+                return True
+            except (TimeoutError, OSError) as e:
+                if attempt < max_retries - 1:
+                    wait_sec = 5 * (2 ** attempt)  # 5s, 10s, 20s
+                    logger.warning(f"⏳ Playlist insert timeout (attempt {attempt+1}/{max_retries}), retrying in {wait_sec}s: {e}")
+                    time.sleep(wait_sec)
+                    continue
+                logger.error(f"Failed to add video {video_id} to playlist {playlist_id} after {max_retries} retries: {e}", exc_info=True)
+                return False
+            except Exception as e:
+                logger.error(f"Failed to add video {video_id} to playlist {playlist_id}: {e}", exc_info=True)
+                return False
 
     # --------------------------------------------------------------------------
     # Thumbnail, Pinned Comment & Transcode Sentinel
@@ -628,12 +727,24 @@ class YouTubeUploaderEngine:
                 candidate_shorts_social = parent_dir / f"{prefix}_shorts_social.txt"
                 if candidate_shorts_social.exists():
                     social_file = candidate_shorts_social
+            elif not social_file.exists():
+                candidate_shorts = parent_dir / f"{stem}_shorts_social.txt"
+                if candidate_shorts.exists():
+                    social_file = candidate_shorts
+                else:
+                    # Fallback to any _shorts_social.txt or _social.txt in same directory if single pair
+                    all_shorts_social = list(parent_dir.glob("*_shorts_social.txt"))
+                    if all_shorts_social:
+                        social_file = all_shorts_social[0]
 
             metadata = MetadataParser.parse_social_file(str(social_file), clip_idx=clip_idx)
 
             # If title is empty in social, default to clean filename
             if not metadata["title"]:
                 metadata["title"] = f"{stem} | 4K Audio-Reactive MV"
+
+            raw_title = metadata["title"]
+            safe_title, _ = MetadataParser.smart_truncate_title(raw_title, 100)
 
             is_uploaded = file_name in history
             hist_info = history.get(file_name, {})
@@ -644,7 +755,8 @@ class YouTubeUploaderEngine:
                 "stem": stem,
                 "size_bytes": size_bytes,
                 "size_str": size_str,
-                "title": metadata["title"],
+                "title": safe_title,
+                "raw_title": raw_title,
                 "description": metadata["description"],
                 "tags": metadata["tags"],
                 "raw_hashtags": metadata["raw_hashtags"],
@@ -652,6 +764,8 @@ class YouTubeUploaderEngine:
                 "artist": metadata["artist"] or "POHAN",
                 "genre": metadata["genre"],
                 "bpm": metadata["bpm"],
+                "instagram_caption": metadata.get("instagram_caption", ""),
+                "tiktok_caption": metadata.get("tiktok_caption", ""),
                 "uploaded": is_uploaded,
                 "video_id": hist_info.get("video_id", ""),
                 "youtube_url": hist_info.get("url", ""),
@@ -795,17 +909,47 @@ class YouTubeUploaderEngine:
                     media_body=media
                 )
 
-                # Chunked upload loop
+                # Chunked upload loop with automatic resumable retry on network interrupts
                 response = None
                 start_time = time.time()
                 last_time = start_time
                 last_bytes = 0
+                chunk_retries = 0
+                max_chunk_retries = 10
+                bytes_uploaded = 0
 
                 while response is None:
                     if self._cancel_requested:
                         raise InterruptedError("Upload was cancelled by user.")
 
-                    status, response = request.next_chunk()
+                    try:
+                        status, response = request.next_chunk()
+                        chunk_retries = 0  # Reset retry counter on successful chunk
+                    except (HttpError, TimeoutError, OSError, ConnectionError, Exception) as chunk_err:
+                        err_str = str(chunk_err)
+                        # Check for non-recoverable client HTTP errors
+                        if isinstance(chunk_err, HttpError):
+                            # Fatal client errors or quotaExceeded need to break to outer handler
+                            if chunk_err.resp.status in (400, 401, 403, 404) or "quota" in err_str.lower():
+                                raise chunk_err
+
+                        # Transient / Network error: perform exponential backoff and resume chunk
+                        chunk_retries += 1
+                        if chunk_retries > max_chunk_retries:
+                            logger.error(f"❌ 斷點續傳重試超過 {max_chunk_retries} 次依然失敗: {chunk_err}")
+                            raise chunk_err
+
+                        backoff_sec = min(60.0, (2 ** min(chunk_retries, 6)) + (time.time() % 1.0))
+                        pct = (bytes_uploaded / file_size * 100) if file_size > 0 else 0
+                        logger.warning(
+                            f"⚠️ 網路暫態中斷 (目前完成 {pct:.1f}%, 斷點續傳重試 {chunk_retries}/{max_chunk_retries})，"
+                            f"將於 {backoff_sec:.1f} 秒後自動原點續傳: {chunk_err}"
+                        )
+                        if status_cb:
+                            status_cb(f"⚠️ 連線中斷 (已傳 {pct:.1f}%)，正在自動原點續傳 (重試 {chunk_retries}/{max_chunk_retries}，等待 {backoff_sec:.1f}s)...")
+                        time.sleep(backoff_sec)
+                        continue
+
                     if status:
                         bytes_uploaded = status.resumable_progress
                         now = time.time()

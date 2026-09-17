@@ -1,6 +1,6 @@
 # 4K MV Visual Integration Editor 🎬✨
 
-[![GitHub Release](https://img.shields.io/badge/Release-v1.4.0-blue.svg)](https://github.com/wannaplaymusic/4k-mv-visual-editor)
+[![GitHub Release](https://img.shields.io/badge/Release-v1.4.1-blue.svg)](https://github.com/wannaplaymusic/4k-mv-visual-editor)
 [![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11-green.svg)](https://python.org)
 [![GUI Framework](https://img.shields.io/badge/GUI-PyQt6-orange.svg)](https://www.riverbankcomputing.com/software/pyqt/)
 [![Aesthetic Layout](https://img.shields.io/badge/Aesthetic-Glassmorphic%20VJ%20System-purple.svg)]()
@@ -110,6 +110,26 @@ graph TD
 ---
 
 ### 📅 更新日誌 (Changelog)
+
+#### [v1.4.1] - 2026-09-17
+* **🛡️ 全專案多角色審查與自癒修復**：修復 YouTube 金鑰池配額輪替續傳、清理像素生成器重複類別草稿、修正音訊工作路徑並消除全域正則 SyntaxWarning。
+* **⚡ 4K 渲染管線記憶體優化**：FFmpeg 輸入改為原生 `rgb24`，省去每幀 33MB RGBA 記憶體拷貝，解除 CPython 局部槽位物件參照，大幅降低記憶體佔用。
+* **📱 Shorts 匯出超時與死鎖防護**：加入 300 秒超時保護與 stderr 錯誤管線，保障批次渲染穩定性。
+
+#### [v1.4.1] - 2026-09-17 (English)
+* **🛡️ Multi-Role Architectural Hardening**: Fixed YouTube quota rotation with seamless multi-credential failover, cleaned up duplicate generator classes, and resolved all SyntaxWarnings.
+* **⚡ 4K Pipeline Memory Optimization**: Ingest native `rgb24` into FFmpeg rawvideo pipe, eliminating 33MB RGBA copy per frame and releasing CPython local variable slots.
+* **📱 Shorts Exporter Stability**: Integrated 300s timeout watchdog and captured stderr pipes to prevent hardware encoder hangs.
+
+#### [v1.4.0] - 2026-09-06
+* **🖼️ 超現實主義動態拼貼生成器**：新增專屬 Tab，支援 36 種超現實主義藝術風格矩陣、肢體智慧解構、辯證隱喻引擎與視覺注視追蹤（Saliency Eye-Trace）。
+* **📺 YouTube 自動排程與上傳發布套件**：支援 Google OAuth 2.0 分塊斷點續傳、多金鑰配額輪替與自動標籤說明發布。
+* **🎬 AI 導演編舞與曲式深度整合**：結合 Walter Murch 六法則與非對稱 J/L-Cut 剪輯。
+
+#### [v1.4.0] - 2026-09-06 (English)
+* **🖼️ Surreal Collage Studio**: Dedicated tab featuring 36 surrealist art styles, limb segmentation, dialectic theme metaphors, and Saliency eye-trace guidance.
+* **📺 YouTube Auto-Uploader Suite**: Google OAuth 2.0 resumable chunked upload, multi-credential quota rotation, and companion metadata pairing.
+* **🎬 AI Director Choreography**: Hollywood Walter Murch Rule of Six and asymmetric J/L-Cut editing.
 
 #### [v1.3.0] - 2026-08-30
 * **👾 像素視覺模組生成器**：新增專屬 Tab，支援 15 種經典復古像素與點陣風格，提供 WebGL/p5.js 沙盒預覽、參數調節、調色盤映射與一鍵模組收編。

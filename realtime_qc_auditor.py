@@ -17,6 +17,7 @@ class RealtimeRenderQCAuditor:
         self.prev_sampled_np = None
         self.qc_history = []
         self.black_screen_count = 0
+        self.consecutive_black_frames = 0
         self.heat_warning_count = 0
         self.response_warning_count = 0
 
@@ -37,22 +38,30 @@ class RealtimeRenderQCAuditor:
             small_img = pil_img.resize((128, 72), Image.Resampling.NEAREST)
             img_np = np.array(small_img, dtype=np.float32)
             
-            # --- 診斷 A: 黑畫面與低亮度異常檢測 (含合成器主旋律保底) ---
+            # --- 診斷 A: 黑畫面與低亮度異常檢測 (含合成器主旋律保底與熱備援逃逸) ---
             rgb_mean = np.mean(img_np[:, :, :3])
             rgb_max = np.max(img_np[:, :, :3])
             is_synth_melody = audio_feats.get('synth_melody_active', False) if isinstance(audio_feats, dict) else False
 
             if sec_name.lower() != 'outro' and (rgb_max < 10.0 or (is_synth_melody and rgb_mean < 8.0)):
                 self.black_screen_count += 1
+                self.consecutive_black_frames += 1
                 logger.warning(
                     f"⚠️ [QC Auditor] 影格 {frame_i} (t={t:.2f}s, section={sec_name}) 畫面極暗/純黑! "
-                    f"(RGB Max: {rgb_max:.1f}, Mean: {rgb_mean:.1f}, SynthMelody: {is_synth_melody})"
+                    f"(RGB Max: {rgb_max:.1f}, Mean: {rgb_mean:.1f}, SynthMelody: {is_synth_melody}, 連續次數: {self.consecutive_black_frames})"
                 )
-                if is_synth_melody:
+                if self.consecutive_black_frames >= 3:
+                    # 連續檢測到黑屏，發出強迫熱置換與氛圍保底
+                    boost_fx['trigger_hotswap_fallback'] = True
+                    boost_fx['contrast_boost'] = 1.45
+                    boost_fx['ambient_glow_overlay'] = True
+                elif is_synth_melody:
                     # 主旋律活躍但畫面偏暗，主動要求提升 1.35x 對比與和弦微光
                     boost_fx['contrast_boost'] = 1.35
                 else:
                     boost_fx['force_hold_previous'] = True
+            else:
+                self.consecutive_black_frames = 0
 
             # --- 診斷 B: 高潮段落 (Drop / Chorus / Build-up) 熱烈度驗證 ---
             is_climax_section = any(s in sec_name.lower() for s in ('drop', 'chorus', 'build'))

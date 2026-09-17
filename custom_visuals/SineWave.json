@@ -1,22 +1,25 @@
 {
-  "name": "SineWave",
-  "author": "u274303",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 22:58:58",
-  "url": "https://openprocessing.org/@u274303/1966222",
-  "code": "// === Tab: mySketch ===\n/*For the #WCCChallenge \"Floating\"🎈\nMy first challenge submit */\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tangleMode(DEGREES);\n}\n\nfunction draw() {\n\t\n\tbackground(0)\n\t\n\trotateX(66)\n\t\n\tnoFill()\n\tstroke(255, 240, 220, 120) // soft ivory\n\t\n\tfor(var i = 0; i < 20; i++) {\n\t\tvar r = map(sin(frameCount / 2), -1, 1, 0, 255)\n\t\tvar g = map(i, 0, 20, 0, 255)\n\t\tvar b = map(cos(frameCount), -1, 1, 255, 0)\n\t\t\t\n\t\tbeginShape()\n\t\t\n\t\tfor(var j = 0; j <360; j+= 10) {\n\t\tvar rad = i * 17\n\t\tvar x = rad * cos(j)\n\t\tvar y = rad * sin(j)\n\t\tvar z = sin(frameCount * 2 + i * 12) * 50\n\t\t\n\t\tvertex(x, y, z)\n\n\t\t}\n\t\tendShape(CLOSE)\n\t}\n\t\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SineWave",
+    "author": "u274303",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 22:58:58",
+    "url": "https://openprocessing.org/@u274303/1966222",
+    "code": "// === Tab: mySketch ===\n/*For the #WCCChallenge \"Floating\"🎈\nMy first challenge submit */\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tangleMode(DEGREES);\n}\n\nfunction draw() {\n\t\n\tbackground(0)\n\t\n\trotateX(66)\n\t\n\tnoFill()\n\tstroke(255, 240, 220, 120) // soft ivory\n\t\n\tfor(var i = 0; i < 20; i++) {\n\t\tvar r = map(sin(frameCount / 2), -1, 1, 0, 255)\n\t\tvar g = map(i, 0, 20, 0, 255)\n\t\tvar b = map(cos(frameCount), -1, 1, 255, 0)\n\t\t\t\n\t\tbeginShape()\n\t\t\n\t\tfor(var j = 0; j <360; j+= 10) {\n\t\tvar rad = i * 17\n\t\tvar x = rad * cos(j)\n\t\tvar y = rad * sin(j)\n\t\tvar z = sin(frameCount * 2 + i * 12) * 50\n\t\t\n\t\tvertex(x, y, z)\n\n\t\t}\n\t\tendShape(CLOSE)\n\t}\n\t\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Concrete Echo.mp4"
+    ]
 }

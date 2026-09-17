@@ -1,22 +1,25 @@
 {
-  "name": "InfiniteLoopFlowField",
-  "author": "u268651",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:26:26",
-  "url": "https://openprocessing.org/@u268651/1177627",
-  "code": "// === Tab: mySketch ===\nconst PERIOD = 100; // number of points in each line and infinite loop size\nconst NUM = 1000; // number of flow lines\nvar particles = [NUM]; \nvar noiseXYScale=.01;\nvar noiseStrength=2;\n\nfunction setup() {\n  createCanvas(650,650);\n  background(0)  \n  for (let i=0; i<NUM; i++) { \n    particles[i]= new Particle(random(width),random(height), i);\n  }\n}\n\nfunction draw() {\n  background(0,10); // transparent black (to create ghosting and fade old points)\n  for (let i=0; i<particles.length; i++) { // draw point for each particle\n    var particleIndex = round(i + (frameCount-1))%PERIOD; //offset within each line by the particle number\n    particles[i].draw(particleIndex);\n  }  \n}\n\nclass Particle{\n  constructor(x0,y0){\n    this.x = [];\n    this.y = [];\n    this.x[0] = x0; //initialize flow line coordinate\n    this.y[0] = y0;    \n    for (let i=0; i<PERIOD; i++){\n      let angle= TWO_PI*noiseStrength*noise(this.x[i]*noiseXYScale, this.y[i]*noiseXYScale,0); // perlin noise\n      this.x[i+1] = this.x[i] + cos(angle); // move the points based on noise magnitude\n      this.y[i+1] = this.y[i] + sin(angle);\n    }\n  }\n  draw(i){\n    var colorStart = color(50,255,50,255); //light green\n    var colorEnd = color(50,50,255,255); //light blue\n    noStroke();\n    fill(lerpColor(colorStart,colorEnd,i/PERIOD));\n    ellipse(this.x[i], this.y[i], 2);\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "InfiniteLoopFlowField",
+    "author": "u268651",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:26:26",
+    "url": "https://openprocessing.org/@u268651/1177627",
+    "code": "// === Tab: mySketch ===\nconst PERIOD = 100; // number of points in each line and infinite loop size\nconst NUM = 1000; // number of flow lines\nvar particles = [NUM]; \nvar noiseXYScale=.01;\nvar noiseStrength=2;\n\nfunction setup() {\n  createCanvas(650,650);\n  background(0)  \n  for (let i=0; i<NUM; i++) { \n    particles[i]= new Particle(random(width),random(height), i);\n  }\n}\n\nfunction draw() {\n  background(0,10); // transparent black (to create ghosting and fade old points)\n  for (let i=0; i<particles.length; i++) { // draw point for each particle\n    var particleIndex = round(i + (frameCount-1))%PERIOD; //offset within each line by the particle number\n    particles[i].draw(particleIndex);\n  }  \n}\n\nclass Particle{\n  constructor(x0,y0){\n    this.x = [];\n    this.y = [];\n    this.x[0] = x0; //initialize flow line coordinate\n    this.y[0] = y0;    \n    for (let i=0; i<PERIOD; i++){\n      let angle= TWO_PI*noiseStrength*noise(this.x[i]*noiseXYScale, this.y[i]*noiseXYScale,0); // perlin noise\n      this.x[i+1] = this.x[i] + cos(angle); // move the points based on noise magnitude\n      this.y[i+1] = this.y[i] + sin(angle);\n    }\n  }\n  draw(i){\n    var colorStart = color(50,255,50,255); //light green\n    var colorEnd = color(50,50,255,255); //light blue\n    noStroke();\n    fill(lerpColor(colorStart,colorEnd,i/PERIOD));\n    ellipse(this.x[i], this.y[i], 2);\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Sub Bass Drift.mp4"
+    ]
 }

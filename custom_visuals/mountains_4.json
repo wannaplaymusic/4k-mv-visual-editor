@@ -1,22 +1,25 @@
 {
-  "name": "mountains_4",
-  "author": "baryan",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:02:28",
-  "url": "https://openprocessing.org/@baryan/85797",
-  "code": "// === Tab: mountains ===\nvar x = 90.0;\nvar speed = 1.0;\nvar radius = 4.0;\nvar angle = 0.0;\n \nfunction setup(){\n  createCanvas(800, 500);\n  smooth();\n  noStroke(); \n\n}\n\nfunction draw() {\n  fill(0, 10);\n  stroke (255, 40);\n  angle = angle - 0.01;\n  \n  translate(x, height/1.2); //set the y coordinate of the circle\n  rotate(angle); \n\n    triangle(-50, -50, -50, -50, 30, 30); //outer white\n    triangle(-50, -50, -50, -50, 90, 30); //inner white\n    triangle(-50, -0, -20, -20, 110, 2);  //black\n  \n\nx = x + speed;\n if (x > width + radius) {\n   x = - radius;\n }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "mountains_4",
+    "author": "baryan",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:02:28",
+    "url": "https://openprocessing.org/@baryan/85797",
+    "code": "// === Tab: mountains ===\nvar x = 90.0;\nvar speed = 1.0;\nvar radius = 4.0;\nvar angle = 0.0;\n \nfunction setup(){\n  createCanvas(800, 500);\n  smooth();\n  noStroke(); \n\n}\n\nfunction draw() {\n  fill(0, 10);\n  stroke (255, 40);\n  angle = angle - 0.01;\n  \n  translate(x, height/1.2); //set the y coordinate of the circle\n  rotate(angle); \n\n    triangle(-50, -50, -50, -50, 30, 30); //outer white\n    triangle(-50, -50, -50, -50, 90, 30); //inner white\n    triangle(-50, -0, -20, -20, 110, 2);  //black\n  \n\nx = x + speed;\n if (x > width + radius) {\n   x = - radius;\n }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Simple Fact.mp4"
+    ]
 }

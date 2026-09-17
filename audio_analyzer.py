@@ -173,16 +173,29 @@ def hsl_to_hex(h_deg, s_pct, l_pct):
     return f"#{int(r*255.999):02x}{int(g*255.999):02x}{int(b*255.999):02x}"
 
 class AudioBeatDetector:
-    """離線音訊分析器：支援多頻段能量提取、和弦分析、分鏡排程與 .npz 快取"""
+    """離線音訊分析器：支援多頻段能量提取、和弦分析、三級風格辨識、分鏡排程與 .npz 快取"""
     def __init__(self, temp_dir=None):
         if temp_dir is None:
-            workspace_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) if '__file__' in locals() else os.getcwd()
+            workspace_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in locals() else os.getcwd()
             self.temp_dir = os.path.join(workspace_dir, "temp_audio")
         else:
             self.temp_dir = temp_dir
             
         os.makedirs(self.temp_dir, exist_ok=True)
         self.downloaded_files = []
+        self._fingerprint_engine = None
+
+    @property
+    def fingerprint_engine(self):
+        if self._fingerprint_engine is None:
+            try:
+                from audio_fingerprint_engine import AudioFingerprintEngine
+                self._fingerprint_engine = AudioFingerprintEngine()
+            except Exception as e:
+                logger.warning(f"AudioFingerprintEngine 延遲加載失敗或跳過: {e}")
+                self._fingerprint_engine = False
+        return self._fingerprint_engine if self._fingerprint_engine is not False else None
+
 
     def is_youtube_url(self, path_or_url: str) -> bool:
         yt_regex = r'(https?://)?(www\.)?(youtube\.com|youtu\.be)/.+$'
@@ -318,6 +331,47 @@ class AudioBeatDetector:
                 for i in range(64)
             ])
 
+            # 提取物理音色與諧波/打擊特徵 (Tier 0 DSP)
+            spectral_centroid_arr = librosa.feature.spectral_centroid(y=y, sr=sr)[0]
+            spectral_centroid_mean = float(np.mean(spectral_centroid_arr))
+            spectral_flatness_arr = librosa.feature.spectral_flatness(y=y)[0]
+            spectral_flatness_mean = float(np.mean(spectral_flatness_arr))
+            zcr_mean = float(np.mean(librosa.feature.zero_crossing_rate(y=y)))
+            
+            # Tempogram 節奏圖分析：檢測 Double-time / Half-time 律動
+            is_half_time = False
+            is_double_time = False
+            try:
+                tempogram = librosa.feature.tempogram(y=y, sr=sr, hop_length=1024)
+                mean_tg = np.mean(tempogram, axis=1)
+                tempo_freqs = librosa.tempo_frequencies(tempogram.shape[0], sr=sr, hop_length=1024)
+                valid_idx = np.where((tempo_freqs >= 40) & (tempo_freqs <= 240))[0]
+                if len(valid_idx) > 0:
+                    half_target = bpm / 2.0
+                    if half_target >= 55:
+                        half_idx = np.argmin(np.abs(tempo_freqs - half_target))
+                        if mean_tg[half_idx] > 0.75 * np.max(mean_tg[valid_idx]) and bpm >= 130:
+                            is_half_time = True
+                    double_target = bpm * 2.0
+                    if double_target <= 190:
+                        double_idx = np.argmin(np.abs(tempo_freqs - double_target))
+                        if mean_tg[double_idx] > 0.75 * np.max(mean_tg[valid_idx]) and bpm <= 90:
+                            is_double_time = True
+            except Exception as tg_err:
+                logger.debug(f"Tempogram 評估跳過: {tg_err}")
+
+            acoustic_meta = {
+                'total_energy': float(np.mean(total_energy_norm)),
+                'percussive': float(np.mean(percussive_smooth)),
+                'harmonic': float(np.mean(harmonic_smooth)),
+                'bass_ratio': float(np.mean(bass_norm)),
+                'spectral_centroid': spectral_centroid_mean,
+                'spectral_flatness': spectral_flatness_mean,
+                'zcr': zcr_mean,
+                'is_half_time': is_half_time,
+                'is_double_time': is_double_time
+            }
+
             filter_dynamics = {
                 'times': [float(t) for t in times],
                 'sub_bass_ratio': [float(v) for v in sub_bass_norm],
@@ -335,11 +389,13 @@ class AudioBeatDetector:
                 'chord_saturation': chord_saturations,
                 'chord_color_hex': chord_colors_hex,
                 'palette_style': palette_gen.style,
-                'palette_base_hue': palette_gen.base_hue
+                'palette_base_hue': palette_gen.base_hue,
+                'acoustic_meta': acoustic_meta
             }
 
-            resolved_genre = self.detect_genre(bpm, filter_dynamics) if genre in ('Auto (自動偵測)', 'auto') else genre.lower().replace(' ', '_')
-            storyboard = self.generate_storyboard(duration, filter_dynamics, resolved_genre, beat_timestamps=raw_beat_timestamps)
+            genre_telemetry = self.detect_genre_full(bpm, filter_dynamics, audio_path=audio_path, acoustic_meta=acoustic_meta)
+            resolved_genre = genre_telemetry['genre_key'] if genre in ('Auto (自動偵測)', 'auto') else genre.lower().replace(' ', '_')
+            storyboard = self.generate_storyboard(duration, filter_dynamics, resolved_genre, beat_timestamps=raw_beat_timestamps, genre_telemetry=genre_telemetry)
             
             result = {
                 'audio_path': audio_path,
@@ -349,7 +405,11 @@ class AudioBeatDetector:
                 'filter_dynamics': filter_dynamics,
                 'spectrum': S_downsampled.tolist(),
                 'storyboard': storyboard,
-                'genre': resolved_genre.capitalize()
+                'genre': genre_telemetry.get('primary_genre', resolved_genre.capitalize()),
+                'genre_key': resolved_genre,
+                'genre_telemetry': genre_telemetry,
+                'valence': genre_telemetry.get('valence', 0.0),
+                'arousal': genre_telemetry.get('arousal', 0.5)
             }
             
             # 寫入 .npz 快取
@@ -360,25 +420,90 @@ class AudioBeatDetector:
             logger.error(f"音訊分析失敗: {e}")
             raise
 
-    def detect_genre(self, bpm: float, filter_dynamics: dict) -> str:
-        percussive = filter_dynamics.get('percussive', [])
-        bass_ratio = filter_dynamics.get('bass_ratio', [])
-        avg_perc = float(np.mean(percussive)) if percussive else 0.0
-        avg_bass = float(np.mean(bass_ratio)) if bass_ratio else 0.0
+    def detect_genre(self, bpm: float, filter_dynamics: dict, audio_path: str = None, acoustic_meta: dict = None) -> str:
+        """
+        向下相容的風格偵測函式，直接返回風格關鍵字 (如 'techno', 'synthwave', 'lo-fi')
+        """
+        telemetry = self.detect_genre_full(bpm, filter_dynamics, audio_path=audio_path, acoustic_meta=acoustic_meta)
+        return telemetry.get('genre_key', 'techno')
 
-        if bpm >= 138 and avg_perc > 0.45: return 'hard_techno'
-        if bpm >= 150: return 'dnb'
-        if 115 <= bpm <= 135 and avg_bass > 0.35: return 'techno'
-        if bpm < 95: return 'lo-fi'
-        return 'ambient' if avg_perc < 0.25 else 'generic'
+    def detect_genre_full(self, bpm: float, filter_dynamics: dict, audio_path: str = None, acoustic_meta: dict = None) -> dict:
+        """
+        全維度樂曲風格與情緒遙測引擎 (三級漸進式架構)
+        - 優先呼叫 AudioFingerprintEngine (CLAP 語意或 512D 聲學流形)
+        - 若無外部引擎，無縫執行 Tier 0 + Tier 1 物理啟發式流形分析
+        """
+        meta = acoustic_meta or filter_dynamics.get('acoustic_meta', {})
+        if not meta:
+            percussive = filter_dynamics.get('percussive', [])
+            bass_ratio = filter_dynamics.get('bass_ratio', [])
+            total_energy = filter_dynamics.get('total_energy', [])
+            harmonic = filter_dynamics.get('harmonic', [])
+            meta = {
+                'percussive': float(np.mean(percussive)) if percussive else 0.4,
+                'bass_ratio': float(np.mean(bass_ratio)) if bass_ratio else 0.3,
+                'total_energy': float(np.mean(total_energy)) if total_energy else 0.5,
+                'harmonic': float(np.mean(harmonic)) if harmonic else 0.4
+            }
 
-    def generate_storyboard(self, duration: float, filter_dynamics: dict, genre: str = 'generic', beat_timestamps: list = None) -> list:
+        # 嘗試從指紋引擎獲取高維語意/聲學流形
+        engine = self.fingerprint_engine
+        if engine is not None and audio_path and os.path.exists(audio_path):
+            try:
+                telemetry = engine.classify_genre(audio_path, bpm=bpm, acoustic_meta=meta)
+                if telemetry and 'genre_key' in telemetry:
+                    return telemetry
+            except Exception as fe_err:
+                logger.warning(f"指紋引擎風格分類異常，降級至本機聲學分析器: {fe_err}")
+
+        # Tier 0/1 本地聲學流形打分回退
+        try:
+            from audio_fingerprint_engine import GenreSemanticClassifier
+            classifier = GenreSemanticClassifier(clap_model=None)
+            dummy_vec = np.zeros(512, dtype=np.float32)
+            return classifier.classify_vector(dummy_vec, bpm=bpm, acoustic_meta=meta)
+        except Exception:
+            # 絕對安全保底：增強型啟發式
+            avg_perc = meta.get('percussive', 0.4)
+            avg_bass = meta.get('bass_ratio', 0.3)
+            avg_energy = meta.get('total_energy', 0.5)
+
+            if bpm >= 155:
+                key, name, sub = 'dnb', 'Drum & Bass / Neurofunk', 'High-Energy Neurofunk'
+            elif bpm >= 142 and avg_perc > 0.45:
+                key, name, sub = 'hardstyle', 'Hardstyle / Hardcore', 'Rawstyle & Hardcore'
+            elif 124 <= bpm <= 140 and avg_bass > 0.30:
+                key, name, sub = 'techno', 'Techno / Industrial', 'Peak-Time Dark Techno'
+            elif 120 <= bpm <= 128 and avg_perc > 0.35:
+                key, name, sub = 'house', 'House / Deep House', 'Groovy Club House'
+            elif 105 <= bpm <= 125:
+                key, name, sub = 'synthwave', 'Synthwave / Retrowave', '80s Outrun & Chillwave'
+            elif bpm < 90 and avg_perc < 0.35:
+                key, name, sub = 'lo-fi', 'Lo-Fi / Chillhop', 'Dusty Vinyl Chillhop'
+            elif avg_perc < 0.25:
+                key, name, sub = 'ambient', 'Ambient / Drone', 'Cinematic Soundscape'
+            else:
+                key, name, sub = 'techno', 'Techno / Industrial', 'Peak-Time Dark Techno'
+
+            return {
+                'primary_genre': name,
+                'genre_key': key,
+                'sub_genre': sub,
+                'confidence': 0.75,
+                'valence': 0.1,
+                'arousal': float(np.clip(avg_energy * 0.7 + avg_perc * 0.3, 0.1, 0.95)),
+                'danceability': 0.8,
+                'top_candidates': [(name, 0.75)]
+            }
+
+    def generate_storyboard(self, duration: float, filter_dynamics: dict, genre: str = 'generic', beat_timestamps: list = None, genre_telemetry: dict = None) -> list:
         times = np.array(filter_dynamics['times'])
         if len(times) == 0:
-            return [{'start': 0.0, 'end': duration, 'section': 'Verse'}]
+            return [{'start': 0.0, 'end': duration, 'section': 'Verse', 'arousal': 0.5, 'valence': 0.0, 'intensity': 0.5, 'style_hint': 'Normal Verse'}]
             
         total_energy = np.array(filter_dynamics.get('total_energy', [0.0] * len(times)))
         percussive = np.array(filter_dynamics.get('percussive', [0.0] * len(times)))
+        harmonic = np.array(filter_dynamics.get('harmonic', [0.0] * len(times)))
         
         # 1. 寬視窗平滑化 (Temporal Window Smoothing - ~3 秒移動平均以消除高頻微抖動)
         win_size = max(5, int(3.0 / ((times[1] - times[0]) if len(times) > 1 else 0.046)))
@@ -387,6 +512,7 @@ class AudioBeatDetector:
         kernel = np.ones(win_size) / win_size
         smooth_energy = np.convolve(total_energy, kernel, mode='same')
         smooth_perc = np.convolve(percussive, kernel, mode='same')
+        smooth_harm = np.convolve(harmonic, kernel, mode='same')
         
         # 2. 初始樂段狀態指派 (Initial Section State Classification)
         raw_sections = []
@@ -426,7 +552,6 @@ class AudioBeatDetector:
                 cleaned_sections.append(seg)
             else:
                 if dur < min_sec_dur:
-                    # 過短片段併入前一段落
                     cleaned_sections[-1]['end'] = seg['end']
                 else:
                     if cleaned_sections[-1]['section'] == seg['section']:
@@ -434,7 +559,6 @@ class AudioBeatDetector:
                     else:
                         cleaned_sections.append(seg)
                         
-        # 再次確認最後一個段落覆蓋至 duration
         if cleaned_sections:
             cleaned_sections[-1]['end'] = float(duration)
             
@@ -443,15 +567,60 @@ class AudioBeatDetector:
             beats_arr = np.array(beat_timestamps)
             for idx in range(1, len(cleaned_sections)):
                 boundary_t = cleaned_sections[idx]['start']
-                # 尋找最近拍點
                 nearest_idx = np.argmin(np.abs(beats_arr - boundary_t))
                 snapped_t = float(beats_arr[nearest_idx])
-                # 僅在偏移小於 1.2 秒時貼齊，避免過大偏位
                 if abs(snapped_t - boundary_t) < 1.2 and snapped_t > cleaned_sections[idx - 1]['start'] + 2.0:
                     cleaned_sections[idx - 1]['end'] = snapped_t
                     cleaned_sections[idx]['start'] = snapped_t
-                    
+
+        # 6. 時序動態風格與喚醒度調製 (Sectional Style & Arousal Modulation)
+        base_valence = genre_telemetry.get('valence', 0.0) if genre_telemetry else 0.0
+        display_genre = genre_telemetry.get('primary_genre', genre.capitalize()) if genre_telemetry else genre.capitalize()
+        
+        for seg in cleaned_sections:
+            # 獲取該樂段的時間視窗掩碼
+            s_t, e_t = seg['start'], seg['end']
+            mask = (times >= s_t) & (times <= e_t)
+            if np.any(mask):
+                local_energy = float(np.mean(smooth_energy[mask]))
+                local_perc = float(np.mean(smooth_perc[mask]))
+                local_harm = float(np.mean(smooth_harm[mask]))
+            else:
+                local_energy, local_perc, local_harm = 0.5, 0.4, 0.4
+                
+            sec_type = seg['section']
+            if sec_type == 'Intro':
+                sec_arousal = min(0.40, local_energy * 0.6)
+                sec_intensity = 0.25
+                hint = f"Atmospheric / Ambient Intro ({display_genre})"
+            elif sec_type == 'Build-up':
+                sec_arousal = np.clip(local_energy * 0.8 + 0.2, 0.55, 0.85)
+                sec_intensity = 0.75
+                hint = f"Rising Energy Build-up ({display_genre})"
+            elif sec_type == 'Drop':
+                sec_arousal = np.clip(local_energy * 0.9 + local_perc * 0.2, 0.80, 1.0)
+                sec_intensity = 1.0
+                hint = f"Peak-Time Energy Drop ({display_genre})"
+            elif sec_type == 'Bridge':
+                sec_arousal = np.clip(local_energy * 0.5, 0.25, 0.55)
+                sec_intensity = 0.40
+                hint = f"Melodic Breakdown / Bridge ({display_genre})"
+            elif sec_type == 'Outro':
+                sec_arousal = max(0.15, local_energy * 0.4)
+                sec_intensity = 0.20
+                hint = f"Decay / Fadeout Outro ({display_genre})"
+            else:
+                sec_arousal = np.clip(local_energy * 0.7, 0.35, 0.65)
+                sec_intensity = 0.55
+                hint = f"Melodic Progression ({display_genre})"
+                
+            seg['arousal'] = round(float(sec_arousal), 3)
+            seg['valence'] = round(float(base_valence), 3)
+            seg['intensity'] = round(float(sec_intensity), 3)
+            seg['style_hint'] = hint
+
         return cleaned_sections
+
 
     def cleanup(self):
         for file_path in self.downloaded_files:

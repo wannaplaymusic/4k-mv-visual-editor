@@ -1,22 +1,25 @@
 {
-  "name": "Recursive_1",
-  "author": "u201401",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:05:51",
-  "url": "https://openprocessing.org/@u201401/1431372",
-  "code": "// === Tab: mySketch ===\nconst frames = 600;\nconst count = 24;\n\n// @setup\nlet size;\n\n// @draw\nlet time;\nlet steps;\nlet angle;\n\n// @recursiveRect\nconst localCoords = [];\nconst maxCoords = 100;\n\nconst clamp = (v, e1, e2) => Math.min(Math.max(v, e1), e2);\n\nconst smoothStep = (e1, e2, v) => {\n\tt = clamp((v - e1) / (e2 - e1), 0.0, 1.0);\n \treturn t * t * (3.0 - 2.0 * t);\n}\n\nconst recursiveRect = (x, y, w, h, a, i = 0) => {\n\ti++;\n\n\tstroke(i / (count - 1), 0.75, 0.75, 1);\n\tfill(i / (count - 1), 0.75, 0.75, .5);\n\n\tif (i < count) {\n\t\tpush();\n\t\t\trotate(a);\n\t\t\trect(x, y, w, h);\n\t\t\ttranslate(w, h);\n\t\t\trecursiveRect(0, 0, 0.615 * w, 0.615 * h, a, i);\n\n\t\t\tif (i === count - 1) {\n\t\t\t\t// thank you dave!\n\t\t\t\tconst matrix = drawingContext.getTransform();\n\t\t\t\tlocalCoords.push(matrix.transformPoint(new DOMPoint(y, x)));\n\t\t\t\tif (localCoords.length > maxCoords) localCoords.shift();\n\t\t\t}\n\t\tpop();\n\t}\n}\n\n\nfunction setup() {\n\tdocument.body.style.backgroundColor = 'rgb(212, 212, 212)';\n\t\n\tlet s = max(windowWidth, windowHeight);\n\tcreateCanvas(s, s);\n\t\n\tpixelDensity(1);\n\tcolorMode(HSB, 1, 1, 1, 1);\n\t\n\tstrokeCap(SQUARE);\n\t\n\tsize = 0.1875 * s;\n}\n\nfunction draw() {\n\tpush();\n\t\ttranslate(0.2875 * width, 0.5 * height);\n\t\trotate(-QUARTER_PI);\n\t\tbackground(0, 0, 0.875);\n\n\t\ttime = frameCount % frames / frames;\n\t\tsteps = [...Array(4).keys()].map((key) => smoothStep(key * 0.25, (key + 1) * 0.25, time));\n\t\tangle = steps.reduce((result, value) => result += value * HALF_PI, 0);\n\n\t\trecursiveRect(0, 0, size, size, angle);\n\tpop();\n\t\n\tnoFill();\n\tstrokeWeight(2);\n\n\tfor (const [index, coord] of localCoords.entries()) {\n\t\tif (index === 0) continue;\n\t\tstroke(0, 0, 0, index / maxCoords);\n\n\t\tconst prev = localCoords[index - 1];\n\t\tline(prev.x, prev.y, coord.x, coord.y);\n\t}\n}\n\nfunction windowResized() {\n\tvar s = max(windowWidth, windowHeight);\n\tresizeCanvas(s, s);\n\tsize = 0.1875 * s;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Recursive_1",
+    "author": "u201401",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:05:51",
+    "url": "https://openprocessing.org/@u201401/1431372",
+    "code": "// === Tab: mySketch ===\nconst frames = 600;\nconst count = 24;\n\n// @setup\nlet size;\n\n// @draw\nlet time;\nlet steps;\nlet angle;\n\n// @recursiveRect\nconst localCoords = [];\nconst maxCoords = 100;\n\nconst clamp = (v, e1, e2) => Math.min(Math.max(v, e1), e2);\n\nconst smoothStep = (e1, e2, v) => {\n\tt = clamp((v - e1) / (e2 - e1), 0.0, 1.0);\n \treturn t * t * (3.0 - 2.0 * t);\n}\n\nconst recursiveRect = (x, y, w, h, a, i = 0) => {\n\ti++;\n\n\tstroke(i / (count - 1), 0.75, 0.75, 1);\n\tfill(i / (count - 1), 0.75, 0.75, .5);\n\n\tif (i < count) {\n\t\tpush();\n\t\t\trotate(a);\n\t\t\trect(x, y, w, h);\n\t\t\ttranslate(w, h);\n\t\t\trecursiveRect(0, 0, 0.615 * w, 0.615 * h, a, i);\n\n\t\t\tif (i === count - 1) {\n\t\t\t\t// thank you dave!\n\t\t\t\tconst matrix = drawingContext.getTransform();\n\t\t\t\tlocalCoords.push(matrix.transformPoint(new DOMPoint(y, x)));\n\t\t\t\tif (localCoords.length > maxCoords) localCoords.shift();\n\t\t\t}\n\t\tpop();\n\t}\n}\n\n\nfunction setup() {\n\tdocument.body.style.backgroundColor = 'rgb(212, 212, 212)';\n\t\n\tlet s = max(windowWidth, windowHeight);\n\tcreateCanvas(s, s);\n\t\n\tpixelDensity(1);\n\tcolorMode(HSB, 1, 1, 1, 1);\n\t\n\tstrokeCap(SQUARE);\n\t\n\tsize = 0.1875 * s;\n}\n\nfunction draw() {\n\tpush();\n\t\ttranslate(0.2875 * width, 0.5 * height);\n\t\trotate(-QUARTER_PI);\n\t\tbackground(0, 0, 0.875);\n\n\t\ttime = frameCount % frames / frames;\n\t\tsteps = [...Array(4).keys()].map((key) => smoothStep(key * 0.25, (key + 1) * 0.25, time));\n\t\tangle = steps.reduce((result, value) => result += value * HALF_PI, 0);\n\n\t\trecursiveRect(0, 0, size, size, angle);\n\tpop();\n\t\n\tnoFill();\n\tstrokeWeight(2);\n\n\tfor (const [index, coord] of localCoords.entries()) {\n\t\tif (index === 0) continue;\n\t\tstroke(0, 0, 0, index / maxCoords);\n\n\t\tconst prev = localCoords[index - 1];\n\t\tline(prev.x, prev.y, coord.x, coord.y);\n\t}\n}\n\nfunction windowResized() {\n\tvar s = max(windowWidth, windowHeight);\n\tresizeCanvas(s, s);\n\tsize = 0.1875 * s;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Night Transit.mp4"
+    ]
 }

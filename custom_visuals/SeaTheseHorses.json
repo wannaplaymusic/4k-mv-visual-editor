@@ -1,22 +1,25 @@
 {
-  "name": "SeaTheseHorses",
-  "author": "charmonder",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:07:10",
-  "url": "https://openprocessing.org/@charmonder/2326835",
-  "code": "// === Tab: seahorse ===\nclass Seahorse{\n\tconstructor(horse, fin){\n\t\tthis.x = random(width)\n\t\tthis.y = random(height)\n\t\tthis.horse = horse\n\t\tthis.fin = fin\n\t\tthis.t = random(100)\n\t\tthis.bounce = random(100)\n\t\tthis.dxT = random(1000)\n\t\tthis.dyT = random(1000)\n\t\tthis.dx = map(noise(this.dxT),0,1,-1,1)\n\t\tthis.dy = map(noise(this.dyT),0,1,-1,1)\n\t\tthis.sc = random(0.7,1)\n\t\tthis.speed = random(0.2,1)\n\t}\n\t\n\tupdate(){\n\t\tthis.t+=0.1\n\t\tthis.bounce += 0.075\n\t\tthis.x += this.dx\n\t\tthis.y += this.dy\n\t\tthis.dxT += 0.003\n\t\tthis.dyT += 0.003\n\t\tthis.dx = map(noise(this.dxT),0,1,-1,1)*10*this.speed\n\t\tthis.dy = map(noise(this.dyT),0,1,-1,1)*10*this.speed\n\t\t\n\t\tif(this.x < -100){\n\t\t\tthis.x = width + 50\n\t\t}else if(this.x > width + 50){\n\t\t\tthis.x = -100\n\t\t}\n\t\t\n\t\tif(this.y < -100){\n\t\t\tthis.y = height + 50\n\t\t}else if(this.y > height + 50){\n\t\t\tthis.y = -100\n\t\t}\n\t}\n\t\n\tdisplay(){\n\t\tpush()\n\t\ttranslate(this.x,this.y)\n\t\tlet flip = constrain(this.dx*5,-1,1)\n\t\tscale(flip*this.sc,map(sin(this.bounce),-1,1,0.8,1)*this.sc)\n\t\timage(this.horse,0,0)\n\t\tpush()\n\t\ttranslate(15,55)\n\t\trotate(sin(this.t)*PI/16.0)\n\t\tstrokeWeight(1)\n\t\timage(this.fin,-27,-23)\n\t\tpop()\n\t\tpop()\n\t}\n}\n\n// === Tab: mySketch ===\n// Made for \"Unrealistic Horse\" 🐴 #WCCChallenge\n// Hello Raph and Chat\n// Did I fail the challenge?\n// Are these realistic horses?\n// \n// I saw some seahorses at my local aquarium\n// they didn't move as much as these\n// \n// They are very peculiar and remind me of how alien\n// this world is.\n// \n// What would a seahorse think if it saw a real horse?\n// do they think?\n//\n// People are too busy looking for aliens in outer space\n// that they neglect to see the aliens around them.\n//\n// These images of seahorses are not real and do not think\n// But why create it?\n// I think that is where the secrets of life and the universe are\n// \n// the ultimate truth is who created us?\n\nlet seahorses, horse, fin\nfunction preload() {\n  horse = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/horse.png');\n\tfin = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/fin.png');\n}\n\nfunction setup() {\n\tseahorses = []\n\tcreateCanvas(windowWidth, windowHeight);\n\tfor(let i = 0; i < 20; i++){\n\t\tseahorses.push(new Seahorse(horse,fin));\n\t}\n\tpg = createGraphics(width, height);\n\n  // Draw to the graphics buffer.\n  pg.background(0,51,102);\n\tpg.push()\n\tpg.translate(width/2,height/2)\n\tpg.stroke(255,5)\n\n\tpg.noFill()\n\tfor(let j = -5; j <= 5; j++){\n\t\tpg.strokeWeight(int(random(10,50)))\n\t\tlet off = random(TAU)\n\t\tpg.beginShape()\n\t\tfor(let i = -width; i < width; i++){\n\t\t\tpg.vertex(i,sin(i*0.025+off)*25 + j*100)\n\t\t}\n\t\t\tpg.endShape()\n\t}\n\tpg.pop()\n}\n\nfunction draw() {\n\timage(pg,0,0)\n\tseahorses.forEach( seahorse =>{\n\t\tseahorse.update()\n\t\tseahorse.display()\n\t}\n\t)\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "SeaTheseHorses",
+    "author": "charmonder",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:07:10",
+    "url": "https://openprocessing.org/@charmonder/2326835",
+    "code": "// === Tab: seahorse ===\nclass Seahorse{\n\tconstructor(horse, fin){\n\t\tthis.x = random(width)\n\t\tthis.y = random(height)\n\t\tthis.horse = horse\n\t\tthis.fin = fin\n\t\tthis.t = random(100)\n\t\tthis.bounce = random(100)\n\t\tthis.dxT = random(1000)\n\t\tthis.dyT = random(1000)\n\t\tthis.dx = map(noise(this.dxT),0,1,-1,1)\n\t\tthis.dy = map(noise(this.dyT),0,1,-1,1)\n\t\tthis.sc = random(0.7,1)\n\t\tthis.speed = random(0.2,1)\n\t}\n\t\n\tupdate(){\n\t\tthis.t+=0.1\n\t\tthis.bounce += 0.075\n\t\tthis.x += this.dx\n\t\tthis.y += this.dy\n\t\tthis.dxT += 0.003\n\t\tthis.dyT += 0.003\n\t\tthis.dx = map(noise(this.dxT),0,1,-1,1)*10*this.speed\n\t\tthis.dy = map(noise(this.dyT),0,1,-1,1)*10*this.speed\n\t\t\n\t\tif(this.x < -100){\n\t\t\tthis.x = width + 50\n\t\t}else if(this.x > width + 50){\n\t\t\tthis.x = -100\n\t\t}\n\t\t\n\t\tif(this.y < -100){\n\t\t\tthis.y = height + 50\n\t\t}else if(this.y > height + 50){\n\t\t\tthis.y = -100\n\t\t}\n\t}\n\t\n\tdisplay(){\n\t\tpush()\n\t\ttranslate(this.x,this.y)\n\t\tlet flip = constrain(this.dx*5,-1,1)\n\t\tscale(flip*this.sc,map(sin(this.bounce),-1,1,0.8,1)*this.sc)\n\t\timage(this.horse,0,0)\n\t\tpush()\n\t\ttranslate(15,55)\n\t\trotate(sin(this.t)*PI/16.0)\n\t\tstrokeWeight(1)\n\t\timage(this.fin,-27,-23)\n\t\tpop()\n\t\tpop()\n\t}\n}\n\n// === Tab: mySketch ===\n// Made for \"Unrealistic Horse\" 🐴 #WCCChallenge\n// Hello Raph and Chat\n// Did I fail the challenge?\n// Are these realistic horses?\n// \n// I saw some seahorses at my local aquarium\n// they didn't move as much as these\n// \n// They are very peculiar and remind me of how alien\n// this world is.\n// \n// What would a seahorse think if it saw a real horse?\n// do they think?\n//\n// People are too busy looking for aliens in outer space\n// that they neglect to see the aliens around them.\n//\n// These images of seahorses are not real and do not think\n// But why create it?\n// I think that is where the secrets of life and the universe are\n// \n// the ultimate truth is who created us?\n\nlet seahorses, horse, fin\nfunction preload() {\n  horse = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/horse.png');\n\tfin = loadImage('file:///Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/assets_cache/fin.png');\n}\n\nfunction setup() {\n\tseahorses = []\n\tcreateCanvas(windowWidth, windowHeight);\n\tfor(let i = 0; i < 20; i++){\n\t\tseahorses.push(new Seahorse(horse,fin));\n\t}\n\tpg = createGraphics(width, height);\n\n  // Draw to the graphics buffer.\n  pg.background(0,51,102);\n\tpg.push()\n\tpg.translate(width/2,height/2)\n\tpg.stroke(255,5)\n\n\tpg.noFill()\n\tfor(let j = -5; j <= 5; j++){\n\t\tpg.strokeWeight(int(random(10,50)))\n\t\tlet off = random(TAU)\n\t\tpg.beginShape()\n\t\tfor(let i = -width; i < width; i++){\n\t\t\tpg.vertex(i,sin(i*0.025+off)*25 + j*100)\n\t\t}\n\t\t\tpg.endShape()\n\t}\n\tpg.pop()\n}\n\nfunction draw() {\n\timage(pg,0,0)\n\tseahorses.forEach( seahorse =>{\n\t\tseahorse.update()\n\t\tseahorse.display()\n\t}\n\t)\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Highway Core Propulsion.mp4"
+    ]
 }

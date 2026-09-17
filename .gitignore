@@ -50,6 +50,7 @@ scratch_*.html
 test_p5_load.html
 /sandbox_screen.png
 /test_*.png
+upload_failed_videos.py
 
 # OS files
 .DS_Store

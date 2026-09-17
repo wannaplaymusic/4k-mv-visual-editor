@@ -221,19 +221,31 @@ def get_local_base_url():
 MOCK_NATIVE_AUDIO_JS = """
 // Native Web Audio API Mocking
 (function() {
+  if (typeof window !== 'undefined') {
+    window.require = window.require || function(mod) {
+      if (mod === '../p5' || mod === 'p5') return window.p5 || (typeof p5 !== 'undefined' ? p5 : {});
+      return window[mod] || {};
+    };
+  }
   const OriginalAudioContext = window.AudioContext || window.webkitAudioContext;
   if (OriginalAudioContext && typeof OriginalAudioContext === 'function') {
     
     // Helpers to create mock nodes and params with no native prototype delegation
-    function createMockNode(proto, extraProps) {
+    function createMockNode(proto, extraProps, ctx) {
+      const activeCtx = ctx || (extraProps && extraProps.context) || (typeof window !== 'undefined' ? window._currentMockAudioCtx : null) || null;
       const node = {
         _isMockNode: true,
         connect: function() { return this; },
         disconnect: function() { return this; },
+        chain: function() { return this; },
+        noGC: function() { return this; },
+        start: function() { return this; },
+        stop: function() { return this; },
+        dispose: function() { return this; },
         addEventListener: function() {},
         removeEventListener: function() {},
         dispatchEvent: function() { return true; },
-        context: null,
+        context: activeCtx,
         numberOfInputs: 1,
         numberOfOutputs: 1,
         channelCount: 2,
@@ -244,6 +256,9 @@ MOCK_NATIVE_AUDIO_JS = """
       if (extraProps) {
         Object.assign(node, extraProps);
       }
+      if (activeCtx && !node.context) {
+        node.context = activeCtx;
+      }
 
       return new Proxy(node, {
         get: function(target, prop) {
@@ -253,9 +268,19 @@ MOCK_NATIVE_AUDIO_JS = """
           if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') {
             return undefined;
           }
+          if (prop === 'destination') {
+            return target.context ? target.context.destination : null;
+          }
+          if (prop === 'noGC' || prop === 'chain' || prop === 'dispose') {
+            return function() { return this; };
+          }
           const param = createMockParam(1.0);
           target[prop] = param;
           return param;
+        },
+        set: function(target, prop, value) {
+          target[prop] = value;
+          return true;
         }
       });
     }
@@ -275,15 +300,17 @@ MOCK_NATIVE_AUDIO_JS = """
         cancelScheduledValues: function() { return this; },
         cancelAndHoldAtTime: function() { return this; },
         chain: function() { return this; },
+        noGC: function() { return this; },
         connect: function() { return this; }
       };
       return param;
     }
 
-    function createMockAnalyserNode() {
+    function createMockAnalyserNode(ctx) {
+      const activeCtx = ctx || (typeof window !== 'undefined' ? window._currentMockAudioCtx : null) || null;
       const node = Object.create(Object.prototype);
       node._isMockNode = true;
-      node.context = null;
+      node.context = activeCtx;
       node.numberOfInputs = 1;
       node.numberOfOutputs = 1;
       node.channelCount = 2;
@@ -296,6 +323,8 @@ MOCK_NATIVE_AUDIO_JS = """
       node.smoothingTimeConstant = 0.8;
       node.connect = function() { return this; };
       node.disconnect = function() { return this; };
+      node.chain = function() { return this; };
+      node.noGC = function() { return this; };
       node.getByteFrequencyData = function(array) {
         let lowVal = Math.round((window.audioLow || 0.5) * 255);
         let midVal = Math.round((window.audioMid || 0.5) * 255);
@@ -327,15 +356,28 @@ MOCK_NATIVE_AUDIO_JS = """
           if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') {
             return undefined;
           }
+          if (prop === 'destination') {
+            return target.context ? target.context.destination : null;
+          }
+          if (prop === 'noGC' || prop === 'chain' || prop === 'dispose') {
+            return function() { return this; };
+          }
           const param = createMockParam(1.0);
           target[prop] = param;
           return param;
+        },
+        set: function(target, prop, value) {
+          target[prop] = value;
+          return true;
         }
       });
     }
     
     class MockAudioContext {
       constructor() {
+        if (typeof window !== 'undefined') {
+          window._currentMockAudioCtx = this;
+        }
         this._state = 'running';
         this._sampleRate = 44100;
         this._currentTime = 0;
@@ -372,37 +414,43 @@ MOCK_NATIVE_AUDIO_JS = """
           maxChannelCount: 2,
           numberOfInputs: 1,
           numberOfOutputs: 0
-        });
+        }, this);
         this._destination = mockDestination;
+        this.destination = mockDestination;
+        this.listener = mockListener;
+        this.state = this._state;
+        this.sampleRate = this._sampleRate;
+        this.currentTime = this._currentTime;
         
         // Define all methods as own enumerable properties in the constructor
-        this.createAnalyser = () => createMockAnalyserNode();
-        this.createGain = () => createMockNode(window.GainNode ? window.GainNode.prototype : null, { gain: createMockParam(1.0) });
-        this.createDelay = () => createMockNode(window.DelayNode ? window.DelayNode.prototype : null, { delayTime: createMockParam(0.0) });
-        this.createBiquadFilter = () => createMockNode(window.BiquadFilterNode ? window.BiquadFilterNode.prototype : null, { frequency: createMockParam(350), Q: createMockParam(1) });
-        this.createDynamicsCompressor = () => createMockNode(window.DynamicsCompressorNode ? window.DynamicsCompressorNode.prototype : null, { threshold: createMockParam(-24) });
-        this.createOscillator = () => createMockNode(window.OscillatorNode ? window.OscillatorNode.prototype : null, { frequency: createMockParam(440), start: function() {}, stop: function() {} });
-        this.createMediaElementSource = () => createMockNode(null);
-        this.createMediaStreamSource = () => createMockNode(null);
-        this.createBufferSource = () => createMockNode(window.AudioBufferSourceNode ? window.AudioBufferSourceNode.prototype : null, { buffer: null, start: function() {}, stop: function() {} });
+        this.createAnalyser = () => createMockAnalyserNode(this);
+        this.createGain = () => createMockNode(window.GainNode ? window.GainNode.prototype : null, { context: this, gain: createMockParam(1.0) }, this);
+        this.createDelay = () => createMockNode(window.DelayNode ? window.DelayNode.prototype : null, { context: this, delayTime: createMockParam(0.0) }, this);
+        this.createBiquadFilter = () => createMockNode(window.BiquadFilterNode ? window.BiquadFilterNode.prototype : null, { context: this, frequency: createMockParam(350), Q: createMockParam(1) }, this);
+        this.createDynamicsCompressor = () => createMockNode(window.DynamicsCompressorNode ? window.DynamicsCompressorNode.prototype : null, { context: this, threshold: createMockParam(-24) }, this);
+        this.createOscillator = () => createMockNode(window.OscillatorNode ? window.OscillatorNode.prototype : null, { context: this, frequency: createMockParam(440), start: function() {}, stop: function() {} }, this);
+        this.createMediaElementSource = () => createMockNode(null, { context: this }, this);
+        this.createMediaStreamSource = () => createMockNode(null, { context: this }, this);
+        this.createBufferSource = () => createMockNode(window.AudioBufferSourceNode ? window.AudioBufferSourceNode.prototype : null, { context: this, buffer: null, start: function() {}, stop: function() {} }, this);
         
-        this.createConvolver = () => createMockNode(window.ConvolverNode ? window.ConvolverNode.prototype : null, { buffer: null, normalize: true });
-        this.createPanner = () => createMockNode(window.PannerNode ? window.PannerNode.prototype : null, { panningModel: 'equalpower', distanceModel: 'inverse' });
-        this.createStereoPanner = () => createMockNode(window.StereoPannerNode ? window.StereoPannerNode.prototype : null, { pan: createMockParam(0.0) });
-        this.createConstantSource = () => createMockNode(window.ConstantSourceNode ? window.ConstantSourceNode.prototype : null, { offset: createMockParam(1.0), start: function() {}, stop: function() {} });
-        this.createWaveShaper = () => createMockNode(window.WaveShaperNode ? window.WaveShaperNode.prototype : null, { curve: null, oversample: 'none' });
-        this.createChannelMerger = () => createMockNode(window.ChannelMergerNode ? window.ChannelMergerNode.prototype : null);
-        this.createChannelSplitter = () => createMockNode(window.ChannelSplitterNode ? window.ChannelSplitterNode.prototype : null);
+        this.createConvolver = () => createMockNode(window.ConvolverNode ? window.ConvolverNode.prototype : null, { context: this, buffer: null, normalize: true }, this);
+        this.createPanner = () => createMockNode(window.PannerNode ? window.PannerNode.prototype : null, { context: this, panningModel: 'equalpower', distanceModel: 'inverse' }, this);
+        this.createStereoPanner = () => createMockNode(window.StereoPannerNode ? window.StereoPannerNode.prototype : null, { context: this, pan: createMockParam(0.0) }, this);
+        this.createConstantSource = () => createMockNode(window.ConstantSourceNode ? window.ConstantSourceNode.prototype : null, { context: this, offset: createMockParam(1.0), start: function() {}, stop: function() {} }, this);
+        this.createWaveShaper = () => createMockNode(window.WaveShaperNode ? window.WaveShaperNode.prototype : null, { context: this, curve: null, oversample: 'none' }, this);
+        this.createChannelMerger = () => createMockNode(window.ChannelMergerNode ? window.ChannelMergerNode.prototype : null, { context: this }, this);
+        this.createChannelSplitter = () => createMockNode(window.ChannelSplitterNode ? window.ChannelSplitterNode.prototype : null, { context: this }, this);
         
         this.createScriptProcessor = (bufferSize, numberOfInputChannels, numberOfOutputChannels) => {
           return createMockNode(window.ScriptProcessorNode ? window.ScriptProcessorNode.prototype : null, {
+            context: this,
             bufferSize: bufferSize || 4096,
             numberOfInputs: numberOfInputChannels || 2,
             numberOfOutputs: numberOfOutputChannels || 2,
             onaudioprocess: null
-          });
+          }, this);
         };
-        this.createIIRFilter = () => createMockNode(window.IIRFilterNode ? window.IIRFilterNode.prototype : null);
+        this.createIIRFilter = () => createMockNode(window.IIRFilterNode ? window.IIRFilterNode.prototype : null, { context: this }, this);
         this.createPeriodicWave = () => ({});
         this.suspend = () => Promise.resolve();
  
@@ -440,39 +488,68 @@ MOCK_NATIVE_AUDIO_JS = """
             }
             if (typeof prop === 'string' && (prop.startsWith('create') || prop === 'decodeAudioData')) {
               return function() {
-                return createMockNode();
+                return createMockNode(null, { context: target }, target);
               };
             }
             return undefined;
+          },
+          set: function(target, prop, value) {
+            target[prop] = value;
+            if (prop === 'destination') target._destination = value;
+            if (prop === 'listener') target._listener = value;
+            if (prop === 'state') target._state = value;
+            if (prop === 'sampleRate') target._sampleRate = value;
+            if (prop === 'currentTime') target._currentTime = value;
+            return true;
           }
         });
       }
     }
  
-    // No prototype connection to avoid native getter Illegal invocation conflicts
-    Object.defineProperty(MockAudioContext.prototype, 'state', { get: function() { return this._state || 'running'; }, configurable: true });
-    Object.defineProperty(MockAudioContext.prototype, 'sampleRate', { get: function() { return this._sampleRate || 44100; }, configurable: true });
-    Object.defineProperty(MockAudioContext.prototype, 'currentTime', { get: function() { return this._currentTime || 0; }, configurable: true });
-    Object.defineProperty(MockAudioContext.prototype, 'listener', { get: function() { return this._listener; }, configurable: true });
-    Object.defineProperty(MockAudioContext.prototype, 'destination', { get: function() { return this._destination; }, configurable: true });
+    // Provide both getters and setters to avoid 'Cannot set property X which has only a getter'
+    Object.defineProperty(MockAudioContext.prototype, 'state', { 
+      get: function() { return this._state || 'running'; }, 
+      set: function(val) { this._state = val; }, 
+      configurable: true 
+    });
+    Object.defineProperty(MockAudioContext.prototype, 'sampleRate', { 
+      get: function() { return this._sampleRate || 44100; }, 
+      set: function(val) { this._sampleRate = val; }, 
+      configurable: true 
+    });
+    Object.defineProperty(MockAudioContext.prototype, 'currentTime', { 
+      get: function() { return this._currentTime || 0; }, 
+      set: function(val) { this._currentTime = val; }, 
+      configurable: true 
+    });
+    Object.defineProperty(MockAudioContext.prototype, 'listener', { 
+      get: function() { return this._listener; }, 
+      set: function(val) { this._listener = val; }, 
+      configurable: true 
+    });
+    Object.defineProperty(MockAudioContext.prototype, 'destination', { 
+      get: function() { return this._destination; }, 
+      set: function(val) { this._destination = val; }, 
+      configurable: true 
+    });
 
     // Override constructors to return mock instances and preserve native prototypes
     const constructors = [
-      { name: 'AnalyserNode', create: () => createMockAnalyserNode() },
-      { name: 'GainNode', create: () => createMockNode(window.GainNode ? window.GainNode.prototype : null, { gain: createMockParam(1.0) }) },
-      { name: 'DelayNode', create: () => createMockNode(window.DelayNode ? window.DelayNode.prototype : null, { delayTime: createMockParam(0.0) }) },
-      { name: 'BiquadFilterNode', create: () => createMockNode(window.BiquadFilterNode ? window.BiquadFilterNode.prototype : null, { frequency: createMockParam(350), Q: createMockParam(1) }) },
-      { name: 'DynamicsCompressorNode', create: () => createMockNode(window.DynamicsCompressorNode ? window.DynamicsCompressorNode.prototype : null, { threshold: createMockParam(-24) }) },
-      { name: 'OscillatorNode', create: () => createMockNode(window.OscillatorNode ? window.OscillatorNode.prototype : null, { frequency: createMockParam(440), start: function() {}, stop: function() {} }) },
-      { name: 'ConvolverNode', create: () => createMockNode(window.ConvolverNode ? window.ConvolverNode.prototype : null, { buffer: null, normalize: true }) },
-      { name: 'PannerNode', create: () => createMockNode(window.PannerNode ? window.PannerNode.prototype : null, { panningModel: 'equalpower', distanceModel: 'inverse' }) },
-      { name: 'StereoPannerNode', create: () => createMockNode(window.StereoPannerNode ? window.StereoPannerNode.prototype : null, { pan: createMockParam(0.0) }) },
-      { name: 'ConstantSourceNode', create: () => createMockNode(window.ConstantSourceNode ? window.ConstantSourceNode.prototype : null, { offset: createMockParam(1.0), start: function() {}, stop: function() {} }) },
-      { name: 'WaveShaperNode', create: () => createMockNode(window.WaveShaperNode ? window.WaveShaperNode.prototype : null, { curve: null, oversample: 'none' }) }
+      { name: 'AnalyserNode', create: (ctx) => createMockAnalyserNode(ctx) },
+      { name: 'GainNode', create: (ctx) => createMockNode(window.GainNode ? window.GainNode.prototype : null, { context: ctx, gain: createMockParam(1.0) }, ctx) },
+      { name: 'DelayNode', create: (ctx) => createMockNode(window.DelayNode ? window.DelayNode.prototype : null, { context: ctx, delayTime: createMockParam(0.0) }, ctx) },
+      { name: 'BiquadFilterNode', create: (ctx) => createMockNode(window.BiquadFilterNode ? window.BiquadFilterNode.prototype : null, { context: ctx, frequency: createMockParam(350), Q: createMockParam(1) }, ctx) },
+      { name: 'DynamicsCompressorNode', create: (ctx) => createMockNode(window.DynamicsCompressorNode ? window.DynamicsCompressorNode.prototype : null, { context: ctx, threshold: createMockParam(-24) }, ctx) },
+      { name: 'OscillatorNode', create: (ctx) => createMockNode(window.OscillatorNode ? window.OscillatorNode.prototype : null, { context: ctx, frequency: createMockParam(440), start: function() {}, stop: function() {} }, ctx) },
+      { name: 'ConvolverNode', create: (ctx) => createMockNode(window.ConvolverNode ? window.ConvolverNode.prototype : null, { context: ctx, buffer: null, normalize: true }, ctx) },
+      { name: 'PannerNode', create: (ctx) => createMockNode(window.PannerNode ? window.PannerNode.prototype : null, { context: ctx, panningModel: 'equalpower', distanceModel: 'inverse' }, ctx) },
+      { name: 'StereoPannerNode', create: (ctx) => createMockNode(window.StereoPannerNode ? window.StereoPannerNode.prototype : null, { context: ctx, pan: createMockParam(0.0) }, ctx) },
+      { name: 'ConstantSourceNode', create: (ctx) => createMockNode(window.ConstantSourceNode ? window.ConstantSourceNode.prototype : null, { context: ctx, offset: createMockParam(1.0), start: function() {}, stop: function() {} }, ctx) },
+      { name: 'WaveShaperNode', create: (ctx) => createMockNode(window.WaveShaperNode ? window.WaveShaperNode.prototype : null, { context: ctx, curve: null, oversample: 'none' }, ctx) }
     ];
 
     constructors.forEach(c => {
-      window[c.name] = function() { return c.create(); };
+      window[c.name] = function(ctx, opts) { return c.create(ctx, opts); };
     });
 
     window.AudioContext = MockAudioContext;
@@ -627,13 +704,195 @@ if (typeof window !== 'undefined') {
     });
   }
   
-  // Node.js CommonJS exports / module 支援
-  window.exports = window.exports || {};
-  window.module = window.module || { exports: window.exports };
+  // Node.js CommonJS exports / module 支援 (智慧 UMD 雙向代理相容)
+  (function() {
+    let _exports = {};
+    let _module = {
+      get exports() { return _exports; },
+      set exports(v) {
+        _exports = v;
+        if (v && (typeof v === 'object' || typeof v === 'function')) {
+          if (typeof window.c2 === 'undefined' && (v.Point && v.Voronoi || v.name === 'c2')) {
+            window.c2 = v;
+          }
+          if (v.ClipperLib) {
+            window.ClipperLib = v.ClipperLib;
+          } else if (v.Clipper || v.ClipType || v.PolyType) {
+            window.ClipperLib = v;
+            window.Clipper = v;
+          }
+          if (v.PoissonDiskSampling) {
+            window.PoissonDiskSampling = v.PoissonDiskSampling;
+          } else if (typeof v === 'function' && (v.name === 'PoissonDiskSampling' || v.name === 'Poisson')) {
+            window.PoissonDiskSampling = v;
+          }
+          for (let k of ['c2', 'Voronoi', 'Delaunay', 'Point', 'Vector', 'Polygon', 'LimitedVoronoi', 'ClipperLib', 'Clipper', 'ClipType', 'PolyType', 'PolyFillType', 'IntPoint', 'Path', 'Paths', 'PoissonDiskSampling']) {
+            if (v[k] !== undefined && typeof window[k] === 'undefined') {
+              try { window[k] = v[k]; } catch(e) {}
+            }
+          }
+        }
+      }
+    };
+    try {
+      Object.defineProperty(window, 'module', {
+        get: function() { return _module; },
+        set: function(val) {
+          if (val && typeof val === 'object' && 'exports' in val) {
+            _module.exports = val.exports;
+          }
+        },
+        configurable: true
+      });
+      Object.defineProperty(window, 'exports', {
+        get: function() { return _module.exports; },
+        set: function(val) { _module.exports = val; },
+        configurable: true
+      });
+    } catch(e) {
+      window.exports = _exports;
+      window.module = _module;
+    }
+  })();
   window.require = window.require || function(mod) {
     if (mod === '../p5' || mod === 'p5') return window.p5 || (typeof p5 !== 'undefined' ? p5 : {});
+    if (mod === 'c2' || mod === './c2' || (typeof mod === 'string' && mod.includes('c2'))) return window.c2 || (window.module && window.module.exports) || {};
+    if (mod === 'clipper' || mod === 'clipper-lib' || (typeof mod === 'string' && mod.includes('clipper'))) return window.ClipperLib || (window.module && window.module.exports) || {};
     return window[mod] || {};
   };
+
+  // 全域裸識別字相容宣告
+  if (typeof window.require !== 'undefined' && typeof require === 'undefined') { try { var require = window.require; } catch(e) {} }
+  if (typeof window.c2 !== 'undefined' && typeof c2 === 'undefined') { try { var c2 = window.c2; } catch(e) {} }
+  if (typeof window.ClipperLib !== 'undefined' && typeof ClipperLib === 'undefined') { try { var ClipperLib = window.ClipperLib; } catch(e) {} }
+  if (typeof window.PoissonDiskSampling !== 'undefined' && typeof PoissonDiskSampling === 'undefined') { try { var PoissonDiskSampling = window.PoissonDiskSampling; } catch(e) {} }
+
+  // ClipperLib 防崩潰打樁護欄
+  if (typeof window.ClipperLib === 'undefined') {
+    (function() {
+      class MockPath extends Array {}
+      class MockPaths extends Array {}
+      class MockPolyTree { constructor() { this.m_AllPolys = []; } Clear() {} Total() { return 0; } }
+      class MockClipper {
+        constructor() {}
+        AddPath() { return true; }
+        AddPaths() { return true; }
+        Execute() { return true; }
+      }
+      MockClipper.OpenPathsFromPolyTree = function() { return []; };
+      MockClipper.ClosedPathsFromPolyTree = function() { return []; };
+      window.ClipperLib = {
+        Clipper: MockClipper,
+        Paths: MockPaths,
+        Path: MockPath,
+        PolyTree: MockPolyTree,
+        PolyType: { ptSubject: 0, ptClip: 1 },
+        ClipType: { ctIntersection: 0, ctUnion: 1, ctDifference: 2, ctXor: 3 },
+        PolyFillType: { pftEvenOdd: 0, pftNonZero: 1, pftPositive: 2, pftNegative: 3 },
+        JS: { Clean: function(p) { return p || []; }, PerimeterOfPath: function() { return 100; }, AreaOfPath: function() { return 100; } }
+      };
+      window.Clipper = MockClipper;
+    })();
+  }
+
+  // PoissonDiskSampling 泊松分佈採樣防崩潰打樁護欄
+  if (typeof window.PoissonDiskSampling === 'undefined') {
+    window.PoissonDiskSampling = class PoissonDiskSampling {
+      constructor(options) {
+        this.options = options || {};
+        this.shape = options.shape || [800, 800];
+        this.minDistance = options.minDistance || 10;
+        this.maxDistance = options.maxDistance || this.minDistance;
+        this.tries = options.tries || 30;
+        this.points = [];
+      }
+      fill() {
+        if (this.points.length === 0) {
+          const w = this.shape[0] || 800;
+          const h = this.shape[1] || 800;
+          const step = Math.max(10, this.minDistance);
+          for (let x = step / 2; x < w; x += step) {
+            for (let y = step / 2; y < h; y += step) {
+              this.points.push([x + (Math.random() - 0.5) * step * 0.5, y + (Math.random() - 0.5) * step * 0.5]);
+            }
+          }
+        }
+        return this.points;
+      }
+      getAllPoints() { return this.fill(); }
+      addPoint(p) { this.points.push(p); return p; }
+      reset() { this.points = []; }
+    };
+  }
+
+  // p5play (Canvas / Sprite / Group / world) 防崩潰打樁護欄
+  if (typeof window.Canvas === 'undefined') {
+    window.Canvas = class Canvas {
+      constructor(w, h) {
+        if (typeof w === 'string' && w.includes(':')) {
+          const parts = w.split(':');
+          const ratio = parseFloat(parts[0]) / (parseFloat(parts[1]) || 1);
+          w = 800; h = 800 / ratio;
+        }
+        this.w = w || (typeof width !== 'undefined' ? width : 800);
+        this.h = h || (typeof height !== 'undefined' ? height : 800);
+        if (typeof createCanvas === 'function') {
+          createCanvas(this.w, this.h);
+        }
+        window.canvas = this;
+      }
+    };
+  }
+  if (typeof window.world === 'undefined') {
+    window.world = { gravity: { x: 0, y: 0 }, physicsTime: 0 };
+  }
+  if (typeof window.Sprite === 'undefined') {
+    window.Sprite = class Sprite {
+      constructor() {
+        this.x = 0; this.y = 0; this.w = 50; this.h = 50; this.diameter = 50;
+        this.collider = 'dynamic';
+        this.vel = { x: 0, y: 0 };
+        this.color = '#ffffff';
+        this.life = 1000;
+      }
+    };
+  }
+  if (typeof window.Group === 'undefined') {
+    window.Group = class Group extends Array {
+      constructor() {
+        super();
+        this.collider = 'dynamic';
+        this.color = '#ffffff';
+        this.vel = { x: 0, y: 0 };
+        this.Sprite = window.Sprite;
+      }
+    };
+  }
+
+  // createFont 相容護欄 (Processing 轉譯作品)
+  if (typeof window.createFont === 'undefined') {
+    window.createFont = function(name, size) {
+      if (typeof loadFont === 'function') {
+        try { return loadFont(name); } catch(e) {}
+      }
+      return typeof _createMockFont === 'function' ? _createMockFont() : { font: {}, textBounds: function() { return { x:0, y:0, w:100, h:20 }; } };
+    };
+  }
+  if (typeof window.blendModeellipse === 'undefined') {
+    window.blendModeellipse = function(...args) { if (typeof ellipse === 'function') return ellipse(...args); };
+  }
+  if (typeof window.blendModebackground === 'undefined') {
+    window.blendModebackground = function(...args) { if (typeof background === 'function') return background(...args); };
+  }
+  if (typeof window.blendModerect === 'undefined') {
+    window.blendModerect = function(...args) { if (typeof rect === 'function') return rect(...args); };
+  }
+  if (typeof window.blendModefill === 'undefined') {
+    window.blendModefill = function(...args) { if (typeof fill === 'function') return fill(...args); };
+  }
+  if (typeof window.blendModestroke === 'undefined') {
+    window.blendModestroke = function(...args) { if (typeof stroke === 'function') return stroke(...args); };
+  }
 
   // OpenSimplexNoise / SimplexNoise 模擬護欄
   if (typeof window.OpenSimplexNoise === 'undefined') {
@@ -649,6 +908,9 @@ if (typeof window !== 'undefined') {
   }
   if (typeof window.SimplexNoise === 'undefined') {
     window.SimplexNoise = window.OpenSimplexNoise;
+  }
+  if (typeof window.openSimplexNoise === 'undefined') {
+    window.openSimplexNoise = function(seed) { return new window.OpenSimplexNoise(seed); };
   }
 
   // kumaleon 防崩潰打樁護欄
@@ -709,6 +971,7 @@ if (typeof window !== 'undefined') {
           return _createMockToneNode();
         }
       };
+      var _mockToneDest = _createMockToneNode();
       var _mockToneCore = {
         start: function() { return Promise.resolve(); },
         now: function() { return (typeof window.custom_time_ms !== 'undefined' ? window.custom_time_ms / 1000 : (window.currentAudioTime || 0)); },
@@ -716,6 +979,7 @@ if (typeof window !== 'undefined') {
           state: 'running',
           resume: function() { return Promise.resolve(); },
           currentTime: 0,
+          destination: _mockToneDest,
           rawContext: typeof AudioContext !== 'undefined' ? new AudioContext() : {}
         },
         Transport: {
@@ -731,9 +995,9 @@ if (typeof window !== 'undefined') {
           seconds: 0,
           state: 'started'
         },
-        Master: _createMockToneNode(),
-        Destination: _createMockToneNode(),
-        destination: _createMockToneNode(),
+        Master: _mockToneDest,
+        Destination: _mockToneDest,
+        destination: _mockToneDest,
         Synth: _createMockToneNode(),
         PolySynth: _createMockToneNode(),
         AMSynth: _createMockToneNode(),
@@ -1035,6 +1299,22 @@ if (typeof p5 !== 'undefined') {
   // Double check and ensure p5.Graphics.prototype has all drawing functions from p5.prototype.
   // In p5.js v2.x, Graphics prototype structure changed and some legacy addon modules expect all drawing methods on p5.Graphics instances.
   if (typeof p5.Graphics !== 'undefined' && p5.Graphics.prototype) {
+    if (typeof p5.Graphics.prototype.pixelDensity === 'undefined') {
+      p5.Graphics.prototype.pixelDensity = function(v) {
+        if (typeof v === 'number') { this._pixelDensity = v; return this; }
+        return this._pixelDensity || (typeof window.pixelDensity === 'function' ? window.pixelDensity() : 1);
+      };
+    }
+    if (typeof p5.Graphics.prototype.resize === 'undefined') {
+      p5.Graphics.prototype.resize = function(w, h) {
+        if (w) this.width = w;
+        if (h) this.height = h;
+        if (this._renderer && typeof this._renderer.resize === 'function') {
+          try { this._renderer.resize(w, h); } catch(e) {}
+        }
+        return this;
+      };
+    }
     for (var gProp in p5.prototype) {
       if (typeof p5.prototype[gProp] === 'function' && typeof p5.Graphics.prototype[gProp] === 'undefined') {
         (function(funcName) {
@@ -1049,6 +1329,47 @@ if (typeof p5 !== 'undefined') {
         })(gProp);
       }
     }
+  }
+
+  if (p5.prototype) {
+    if (p5.prototype.color) {
+      const _origColor = p5.prototype.color;
+      p5.prototype.color = function(...args) {
+        if (args.length === 0 || args[0] === undefined || args[0] === null) {
+          return _origColor.call(this, 0, 0, 0, 255);
+        }
+        try {
+          const c = _origColor.apply(this, args);
+          if (c && (!c._color || !c._color.space)) {
+            c._color = c._color || {};
+            c._color.space = c._color.space || { id: 'srgb', max: [255, 255, 255, 255] };
+          }
+          return c;
+        } catch(e) {
+          return _origColor.call(this, 0, 0, 0, 255);
+        }
+      };
+    }
+    const _origRed = p5.prototype.red;
+    p5.prototype.red = function(c) {
+      if (!c) return 0;
+      try { return _origRed.call(this, c); } catch(e) { return (c.levels && c.levels[0] !== undefined) ? c.levels[0] : 0; }
+    };
+    const _origGreen = p5.prototype.green;
+    p5.prototype.green = function(c) {
+      if (!c) return 0;
+      try { return _origGreen.call(this, c); } catch(e) { return (c.levels && c.levels[1] !== undefined) ? c.levels[1] : 0; }
+    };
+    const _origBlue = p5.prototype.blue;
+    p5.prototype.blue = function(c) {
+      if (!c) return 0;
+      try { return _origBlue.call(this, c); } catch(e) { return (c.levels && c.levels[2] !== undefined) ? c.levels[2] : 0; }
+    };
+    const _origAlpha = p5.prototype.alpha;
+    p5.prototype.alpha = function(c) {
+      if (!c) return 255;
+      try { return _origAlpha.call(this, c); } catch(e) { return (c.levels && c.levels[3] !== undefined) ? c.levels[3] : 255; }
+    };
   }
 
   // Intercept createGraphics to dynamically patch any missing drawing methods on the returned graphics instance
@@ -1355,11 +1676,68 @@ if (typeof p5 !== 'undefined') {
         this.z = z || 0;
       }
       static dist(v1, v2) {
-        return Math.sqrt((v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2 + (v1.z - v2.z) ** 2);
+        return Math.sqrt(((v1.x || 0) - (v2.x || 0)) ** 2 + ((v1.y || 0) - (v2.y || 0)) ** 2 + ((v1.z || 0) - (v2.z || 0)) ** 2);
+      }
+      static sub(v1, v2, target) {
+        const x = (v1.x || 0) - (v2.x || 0);
+        const y = (v1.y || 0) - (v2.y || 0);
+        const z = (v1.z || 0) - (v2.z || 0);
+        if (target && target.set) { target.set(x, y, z); return target; }
+        return new (window.PVector || PVector)(x, y, z);
+      }
+      static add(v1, v2, target) {
+        const x = (v1.x || 0) + (v2.x || 0);
+        const y = (v1.y || 0) + (v2.y || 0);
+        const z = (v1.z || 0) + (v2.z || 0);
+        if (target && target.set) { target.set(x, y, z); return target; }
+        return new (window.PVector || PVector)(x, y, z);
+      }
+      static mult(v, n, target) {
+        const x = (v.x || 0) * n;
+        const y = (v.y || 0) * n;
+        const z = (v.z || 0) * n;
+        if (target && target.set) { target.set(x, y, z); return target; }
+        return new (window.PVector || PVector)(x, y, z);
+      }
+      static div(v, n, target) {
+        const x = n !== 0 ? (v.x || 0) / n : 0;
+        const y = n !== 0 ? (v.y || 0) / n : 0;
+        const z = n !== 0 ? (v.z || 0) / n : 0;
+        if (target && target.set) { target.set(x, y, z); return target; }
+        return new (window.PVector || PVector)(x, y, z);
+      }
+      static dot(v1, v2) {
+        return (v1.x || 0) * (v2.x || 0) + (v1.y || 0) * (v2.y || 0) + (v1.z || 0) * (v2.z || 0);
+      }
+      static cross(v1, v2, target) {
+        const x = (v1.y || 0) * (v2.z || 0) - (v1.z || 0) * (v2.y || 0);
+        const y = (v1.z || 0) * (v2.x || 0) - (v1.x || 0) * (v2.z || 0);
+        const z = (v1.x || 0) * (v2.y || 0) - (v1.y || 0) * (v2.x || 0);
+        if (target && target.set) { target.set(x, y, z); return target; }
+        return new (window.PVector || PVector)(x, y, z);
+      }
+      static fromAngle(angle, target) {
+        const x = Math.cos(angle);
+        const y = Math.sin(angle);
+        if (target && target.set) { target.set(x, y, 0); return target; }
+        return new (window.PVector || PVector)(x, y, 0);
+      }
+      static angleBetween(v1, v2) {
+        const m1 = Math.sqrt((v1.x || 0)**2 + (v1.y || 0)**2 + (v1.z || 0)**2);
+        const m2 = Math.sqrt((v2.x || 0)**2 + (v2.y || 0)**2 + (v2.z || 0)**2);
+        if (m1 === 0 || m2 === 0) return 0;
+        const dot = (v1.x || 0) * (v2.x || 0) + (v1.y || 0) * (v2.y || 0) + (v1.z || 0) * (v2.z || 0);
+        return Math.acos(Math.max(-1, Math.min(1, dot / (m1 * m2))));
       }
       static random2D() {
         const angle = Math.random() * Math.PI * 2;
-        return new PVector(Math.cos(angle), Math.sin(angle));
+        return new (window.PVector || PVector)(Math.cos(angle), Math.sin(angle));
+      }
+      static random3D() {
+        const angle = Math.random() * Math.PI * 2;
+        const z = Math.random() * 2 - 1;
+        const r = Math.sqrt(1 - z * z);
+        return new (window.PVector || PVector)(r * Math.cos(angle), r * Math.sin(angle), z);
       }
       set(x, y, z) {
         if (x instanceof PVector) {
@@ -2015,7 +2393,7 @@ if (typeof window !== 'undefined') {
    'bg','font','tex','cols','rows','pal','palette','pos','vel','acc','colors','dirs','movers','lines','curves','boxes',
    'shapes','polygons','vectors','shaderProgram','sh','dwidth','dheight','kRadiusFactor','minDistFactor','nbrParticles',
    'reference','catSpeed','tt','_shiftAmp','_shifAmp','BG_C','FG','areas','aryCornerXy','pad','nx','ny','nz','nw',
-   'allowedLetters','validWords','currentLetters','activeIndex','lettersWord','bars','frames','photo','cover','orient','ovel','start','orthoview','num',
+   'allowedLetters','validWords','currentLetters','activeIndex','lettersWord','bars','frames','photo','cover','tlogo','logo','orient','ovel','start','orthoview','num',
    'mobile','buildings','curSeed','px','py','pz','dx','dy','dz','vx','vy','vz','cx','cy','cz','sx','sy','sz','fx','fy','wx','wy','rx','ry','rz',
    'noiseGra','aryRegionRect','numRegionRect','regionClearanceRatio','minRegionX','maxRegionX','minRegionY','maxRegionY',
    '_minW','_maxW','_minWidth','_bgWidth','_points','_obj','_xy','_numObject','_clearanceRatio','_splitRatio',
@@ -2030,7 +2408,7 @@ if (typeof window !== 'undefined') {
         window[k] = _createMockFont();
       } else if (k === 'scr') {
         window[k] = window.cnv;
-      } else if (['img', 'moon', 'photo', 'cover'].includes(k)) {
+      } else if (['img', 'moon', 'photo', 'cover', 'tlogo', 'logo'].includes(k)) {
         window[k] = { width: 100, height: 100, resize: function(w,h){ if(w) this.width=w; if(h) this.height=h; return this; }, loadPixels: function(){}, updatePixels: function(){}, get: function(){ return [0,0,0,0]; }, set: function(){}, copy: function(){}, mask: function(){}, filter: function(){}, pixels: new Uint8ClampedArray(100*100*4), canvas: (typeof document !== 'undefined' ? document.createElement('canvas') : null) };
       } else if (['orient', 'ovel', 'start'].includes(k)) {
         window[k] = { x: 0, y: 0, z: 0, add: function(){ return this; }, mult: function(){ return this; }, sub: function(){ return this; } };
@@ -2911,13 +3289,15 @@ if (typeof p5 !== 'undefined') {
     typeof ConstantSourceNode !== 'undefined' ? ConstantSourceNode : null,
     typeof StereoPannerNode !== 'undefined' ? StereoPannerNode : null,
   ].forEach(NodeClass => {
-    if (NodeClass && NodeClass.prototype && !NodeClass.prototype.chain) {
-      NodeClass.prototype.chain = _toneChainPolyfill;
+    if (NodeClass && NodeClass.prototype) {
+      if (!NodeClass.prototype.chain) NodeClass.prototype.chain = _toneChainPolyfill;
+      if (!NodeClass.prototype.noGC) NodeClass.prototype.noGC = function() { return this; };
     }
   });
   // Also patch the base AudioNode prototype if available (catches all subclasses)
-  if (typeof AudioNode !== 'undefined' && AudioNode.prototype && !AudioNode.prototype.chain) {
-    AudioNode.prototype.chain = _toneChainPolyfill;
+  if (typeof AudioNode !== 'undefined' && AudioNode.prototype) {
+    if (!AudioNode.prototype.chain) AudioNode.prototype.chain = _toneChainPolyfill;
+    if (!AudioNode.prototype.noGC) AudioNode.prototype.noGC = function() { return this; };
   }
 
   // Fallback for tone/p5.sound audio context wrappers
@@ -2942,38 +3322,57 @@ if (typeof p5 !== 'undefined') {
 
 
 
-  // Inject OPC Mock APIs (OpenProcessing Control Library)
-  if (typeof window.OPC === 'undefined') {
-    const _opcDummy = function() { return window.OPC; };
-    const _opcHandler = {
-      get: function(target, prop) {
-        if (prop in target) return target[prop];
-        if (['slider', 'toggle', 'color', 'select', 'text', 'palette', 'range'].includes(prop)) {
-          return function(name, value) {
-            if (name && typeof value !== 'undefined' && typeof window[name] === 'undefined') {
+  // Inject OPC Mock / Universal Polyfill APIs (OpenProcessing Control Library)
+  (function() {
+    function wrapOPC(target) {
+      if (!target) target = function() {};
+      var methods = [
+        'slider', 'toggle', 'palette', 'color', 'text', 'button', 'select',
+        'label', 'title', 'header', 'separator', 'collapsed', 'bezier',
+        'initVariable', '_set', 'set', 'buttonPressed', 'buttonReleased',
+        'collapse', 'expand', 'delete', 'callParentFunction', 'getEaseFunction',
+        'setOSC', 'loadOSC', 'oscSendMessage', 'setGlobal'
+      ];
+      methods.forEach(function(m) {
+        if (typeof target[m] !== 'function') {
+          target[m] = function(name, value) {
+            if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') {
               window[name] = value;
             }
-            return window.OPC;
+            return target;
           };
         }
-        return function() { return window.OPC; };
+      });
+      if (typeof Proxy !== 'undefined') {
+        try {
+          return new Proxy(target, {
+            get: function(t, prop) {
+              if (prop in t) return t[prop];
+              if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') return undefined;
+              return function(name, value) {
+                if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') {
+                  window[name] = value;
+                }
+                return target;
+              };
+            }
+          });
+        } catch(e) {}
       }
-    };
-    window.OPC = new Proxy({
-      slider: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
-      button: function() { return window.OPC; },
-      toggle: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
-      color: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
-      select: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
-      text: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
-      title: function() { return window.OPC; },
-      header: function() { return window.OPC; },
-      separator: function() { return window.OPC; },
-      collapsed: function() { return window.OPC; },
-      bezier: function() { return window.OPC; },
-      setGlobal: function(name, value) { if (name) window[name] = value; }
-    }, _opcHandler);
-  }
+      return target;
+    }
+    var _opcProxy = wrapOPC(window.OPC);
+    try {
+      Object.defineProperty(window, 'OPC', {
+        get: function() { return _opcProxy; },
+        set: function(val) { _opcProxy = wrapOPC(val); },
+        configurable: true
+      });
+    } catch(e) {
+      window.OPC = _opcProxy;
+    }
+    if (typeof OPC === 'undefined') { try { var OPC = window.OPC; } catch(e) {} }
+  })();
 
   // Inject Processing Matrix Aliases (pushMatrix -> push, popMatrix -> pop)
   ['pushMatrix', 'popMatrix', 'pushStyle', 'popStyle'].forEach(alias => {
@@ -3853,6 +4252,59 @@ if (typeof p5 !== 'undefined') {
     }
     return "ok";
   };
+
+  // Universal Audio-Reactive Proxy Adapter
+  window.audioParams = new Proxy({}, {
+    get: function(target, prop) {
+      if (prop === 'bass' || prop === 'sub_bass' || prop === 'low') return window.audioLow || 0.5;
+      if (prop === 'mid' || prop === 'voice' || prop === 'vocal') return window.audioMid || 0.5;
+      if (prop === 'high' || prop === 'treble') return window.audioHigh || 0.5;
+      if (prop === 'beat' || prop === 'isBeat') return window.isBeat || false;
+      if (prop === 'energy' || prop === 'beatEnergy') return window.beatEnergy || 0.5;
+      if (prop === 'chordColor' || prop === 'chordHex') return window.currentChordColor || '#0a0a0c';
+      if (prop === 'chordHue') return window.chordHue || 0;
+      if (prop === 'section') return window.sectionName || 'Verse';
+      if (prop === 'progress') return window.sectionProgress || 0;
+      if (prop === 'synthMelody') return window.synthMelodyActive || false;
+      if (prop === 'hihat') return window.hihatTrigger || false;
+      if (prop === 'hihatDensity') return window.hihatDensity || 0;
+      if (prop === 'harmonic') return window.harmonicEnergy || 0.5;
+      if (prop === 'percussive') return window.percussiveEnergy || 0.5;
+      return target[prop] || 0.5;
+    }
+  });
+
+  window.getHarmonicColor = function(offsetDeg, alpha) {
+    offsetDeg = offsetDeg || 0;
+    alpha = (typeof alpha !== 'undefined') ? alpha : 1.0;
+    let hue = ((window.chordHue || 0) + offsetDeg) % 360;
+    let sat = window.synthMelodyActive ? 85 : 65;
+    let light = window.isBeat ? 70 : 50;
+    return `hsla(${Math.round(hue)}, ${sat}%, ${light}%, ${alpha})`;
+  };
+
+  window.getAudioPulse = function(scale) {
+    scale = (typeof scale !== 'undefined') ? scale : 1.0;
+    return 1.0 + (window.audioLow || 0.5) * 0.3 * scale + (window.isBeat ? 0.2 * scale : 0.0);
+  };
+
+  if (typeof p5 !== 'undefined' && p5.prototype) {
+    p5.prototype.getHarmonicColor = function(offsetDeg, alpha) {
+      offsetDeg = offsetDeg || 0;
+      alpha = (typeof alpha !== 'undefined') ? alpha : 255;
+      let hue = ((window.chordHue || 0) + offsetDeg) % 360;
+      let sat = window.synthMelodyActive ? 85 : 65;
+      let light = window.isBeat ? 70 : 50;
+      if (typeof this.color === 'function') {
+        return this.color(`hsla(${Math.round(hue)}, ${sat}%, ${light}%, ${alpha / 255})`);
+      }
+      return `hsla(${Math.round(hue)}, ${sat}%, ${light}%, ${alpha / 255})`;
+    };
+    p5.prototype.getAudioPulse = function(scale) {
+      scale = (typeof scale !== 'undefined') ? scale : 1.0;
+      return 1.0 + (window.audioLow || 0.5) * 0.3 * scale + (window.isBeat ? 0.2 * scale : 0.0);
+    };
+  }
 })();
 """
 
@@ -4476,29 +4928,29 @@ if (typeof p5 !== 'undefined') {
     if (!str || str.length === 0) return false;
     
     // FPS / frameRate indicators (e.g., "FPS: 60", "FPS: 59.9", "60 FPS", "frameRate: 60")
-    if (/^(?:fps|framerate|frame\s*rate)\s*[:=]?\s*[\d\.]*/i.test(str)) return true;
-    if (/^[\d\.]+\s*fps\b/i.test(str)) return true;
-    if (/^fps\s*$/i.test(str)) return true;
+    if (/^(?:fps|framerate|frame\\s*rate)\\s*[:=]?\\s*[\\d\\.]*/i.test(str)) return true;
+    if (/^[\\d\\.]+\\s*fps\\b/i.test(str)) return true;
+    if (/^fps\\s*$/i.test(str)) return true;
     
     // Loading indicators
-    if (/^loading(?:\s*[\.\w]*)?$/i.test(str)) return true;
-    if (/^please\s+wait/i.test(str)) return true;
-    if (/^esperando\b/i.test(str)) return true;
+    if (/^loading(?:\\s*[\\.\\w]*)?$/i.test(str)) return true;
+    if (/^please\\s+wait/i.test(str)) return true;
+    if (/^esperando\\b/i.test(str)) return true;
     
     // Interaction hints & instructions
-    if (/(?:drag\s+wind|tap\s+to|click\s+to|press\s+['"\w]|hit\s+space|arrow\s+keys|use\s+mouse|hold\s+mouse|scroll\s+to|snapshot|screenshot|save\s+image|controls?|instructions?|touch\s+to\s+start|press\s+any\s+key)/i.test(str)) {
+    if (/(?:drag\\s+wind|tap\\s+to|click\\s+to|press\\s+['"\\w]|hit\\s+space|arrow\\s+keys|use\\s+mouse|hold\\s+mouse|scroll\\s+to|snapshot|screenshot|save\\s+image|controls?|instructions?|touch\\s+to\\s+start|press\\s+any\\s+key)/i.test(str)) {
       return true;
     }
     // Interactive prompt warnings / game-over style dialog text
-    if (/too\s+much\s+food|you\s+did\s+not\s+have\s+anything\s+else/i.test(str)) {
+    if (/too\\s+much\\s+food|you\\s+did\\s+not\\s+have\\s+anything\\s+else/i.test(str)) {
       return true;
     }
     // Debug / Param prints: e.g. "Speed: 1.5", "Radius = 100", "Volume: 50%"
-    if (/^(?:speed|size|radius|color|count|frequency|volume|threshold|density|scale|zoom|particles|nodes|iteration|gravity|damping)\s*[:=]\s*[-+]?[\d\.]+/i.test(str)) {
+    if (/^(?:speed|size|radius|color|count|frequency|volume|threshold|density|scale|zoom|particles|nodes|iteration|gravity|damping)\\s*[:=]\\s*[-+]?[\\d\\.]+/i.test(str)) {
       return true;
     }
     // Author watermarks / credits
-    if (/^(?:by\s+[\w\s]+|author\s*:|code\s+by|created\s+by|designed\s+by|copyright|©|\(c\))\b/i.test(str)) {
+    if (/^(?:by\\s+[\\w\\s]+|author\\s*:|code\\s+by|created\\s+by|designed\\s+by|copyright|©|\\(c\\))\\b/i.test(str)) {
       return true;
     }
     return false;
@@ -5286,7 +5738,8 @@ class StandaloneInjectorApp(QMainWindow):
         "d3": "https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js",
         "dat": "https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js",
         "decomp": "https://cdn.jsdelivr.net/npm/poly-decomp@0.3.0/build/decomp.min.js",
-        "polydecomp": "https://cdn.jsdelivr.net/npm/poly-decomp@0.3.0/build/decomp.min.js"
+        "polydecomp": "https://cdn.jsdelivr.net/npm/poly-decomp@0.3.0/build/decomp.min.js",
+        "c2": "https://openprocessing.org/c2.min.js"
     }
 
     def setup_web_sandbox(self, web_view):
@@ -6224,7 +6677,7 @@ class StandaloneInjectorApp(QMainWindow):
         self.fx_cb_blueprint.setToolTip("全新維度 2: 建築藍圖與 CAD 線稿 (Blueprint Edge) — 普魯士藍圖紙、細緻 Canny 邊緣與動態毫米標尺/CAD 坐標 overlay")
 
         self.fx_cb_turing = QCheckBox("圖靈細胞", tab)
-        self.fx_cb_turing.setChecked(True)
+        self.fx_cb_turing.setChecked(False)
         self.fx_cb_turing.setToolTip("全新維度 3: 圖靈擴散與生物斑紋 (Turing Pattern) — Gray-Scott 化學反應擴散、斑馬紋與珊瑚有機細胞增殖蔓延")
 
         self.fx_cb_point_cloud = QCheckBox("點雲深度", tab)
@@ -6814,6 +7267,13 @@ class StandaloneInjectorApp(QMainWindow):
             code = re.sub(r'\bendShape(eye|noErase|pop|push)\b', r'endShape(); \1', code)
             code = re.sub(r'\btextAlign(noStroke|noFill|strokeWeight|stroke|fill)\b', r'textAlign(CENTER, CENTER); \1', code)
             code = re.sub(r'\bimageMode(translate|image|tint|frontLayer)\b', r'imageMode(CENTER); \1', code)
+            code = re.sub(r'\bangleMode(initializeSketch|background|texture|createBranch|colorModebackground)\b', r'angleMode(DEGREES); \1', code)
+
+            # 7. Processing Java 裸十六進位顏色字面量修復 (#fafaf9 -> "#fafaf9") 防止 JS 私有欄位語法錯誤
+            code = re.sub(r'(?<![\'"`a-zA-Z0-9_$])#([0-9a-fA-F]{3,8})\b', r'"#\1"', code)
+
+            # 8. 自動修復常見的 blendMode 熔接函數 (如 blendModebackground / blendModefill 等)
+            code = re.sub(r'\bblendMode(background|ellipse|rect|fill|stroke|noStroke|noFill|strokeWeight|push|pop|const|let|var|beginClip)\b', r'blendMode(BLEND); \1', code)
 
         has_import_export = bool(re.search(r'\b(import\s+[\{\*a-zA-Z0-9_]|export\s+(default|const|let|var|function|class))\b', code))
         is_module = has_import_export
@@ -6823,12 +7283,35 @@ class StandaloneInjectorApp(QMainWindow):
             "if (typeof window.CENTER !== 'undefined' && typeof CENTER === 'undefined') { var CENTER = window.CENTER || 'center'; }\n"
             "if (typeof window.back === 'undefined') { var back = '#000000'; }\n"
             "if (typeof window.SVG === 'undefined') { var SVG = 'p2d'; }\n"
+            "if (typeof window.page === 'undefined') { var page = 0; }\n"
+            "if (typeof window.it === 'undefined') { var it = 0; }\n"
             "if (typeof window.OpenSimplexNoise !== 'undefined' && typeof OpenSimplexNoise === 'undefined') { var OpenSimplexNoise = window.OpenSimplexNoise; }\n"
+            "if (typeof window.openSimplexNoise !== 'undefined' && typeof openSimplexNoise === 'undefined') { var openSimplexNoise = window.openSimplexNoise; }\n"
             "if (typeof window.SimplexNoise !== 'undefined' && typeof SimplexNoise === 'undefined') { var SimplexNoise = window.SimplexNoise; }\n"
             "if (typeof window.p5ex !== 'undefined' && typeof p5ex === 'undefined') { var p5ex = window.p5ex; }\n"
             "if (typeof window.require !== 'undefined' && typeof require === 'undefined') { var require = window.require; }\n"
+            "if (typeof window.c2 !== 'undefined' && typeof c2 === 'undefined') { var c2 = window.c2; }\n"
+            "if (typeof c2 === 'undefined' && typeof window.module !== 'undefined' && window.module.exports && (window.module.exports.Voronoi || window.module.exports.Point)) { var c2 = window.module.exports; window.c2 = c2; }\n"
+            "if (typeof c2 === 'undefined') { var c2 = { Point: class { constructor(x,y){ this.x=x||0; this.y=y||0; } }, Vector: class { constructor(x,y){ this.x=x||0; this.y=y||0; } }, Voronoi: class { constructor(){ this.regions=[]; } compute(){} }, Delaunay: class { constructor(){ this.triangles=[]; this.edges=[]; } compute(){} } }; window.c2 = c2; }\n"
+            "if (typeof window.ClipperLib !== 'undefined' && typeof ClipperLib === 'undefined') { var ClipperLib = window.ClipperLib; }\n"
+            "if (typeof ClipperLib === 'undefined' && typeof window.module !== 'undefined' && window.module.exports && (window.module.exports.ClipperLib || window.module.exports.Clipper)) { var ClipperLib = window.module.exports.ClipperLib || window.module.exports; window.ClipperLib = ClipperLib; }\n"
+            "if (typeof window.PoissonDiskSampling !== 'undefined' && typeof PoissonDiskSampling === 'undefined') { var PoissonDiskSampling = window.PoissonDiskSampling; }\n"
+            "if (typeof window.Canvas !== 'undefined' && typeof Canvas === 'undefined') { var Canvas = window.Canvas; }\n"
+            "if (typeof window.Sprite !== 'undefined' && typeof Sprite === 'undefined') { var Sprite = window.Sprite; }\n"
+            "if (typeof window.Group !== 'undefined' && typeof Group === 'undefined') { var Group = window.Group; }\n"
+            "if (typeof window.world !== 'undefined' && typeof world === 'undefined') { var world = window.world; }\n"
+            "if (typeof window.OPC !== 'undefined' && typeof OPC === 'undefined') { var OPC = window.OPC; }\n"
+            "if (typeof window.createFont !== 'undefined' && typeof createFont === 'undefined') { var createFont = window.createFont; }\n"
+            "if (typeof window.wordsOfWisdom !== 'undefined' && typeof wordsOfWisdom === 'undefined') { var wordsOfWisdom = window.wordsOfWisdom; }\n"
+            "if (typeof wordsOfWisdom === 'undefined') { var wordsOfWisdom = ['Flow', 'Pulse', 'Vibration', 'Resonance', 'Structure', 'Echo', 'Wave', 'Core', 'Drift', 'Static', 'Horizon', 'Depth']; window.wordsOfWisdom = wordsOfWisdom; }\n"
+            "if (typeof window.getRotatedPt !== 'undefined' && typeof getRotatedPt === 'undefined') { var getRotatedPt = window.getRotatedPt; }\n"
+            "if (typeof window.blendModebackground !== 'undefined' && typeof blendModebackground === 'undefined') { var blendModebackground = window.blendModebackground; }\n"
+            "if (typeof window.blendModeellipse !== 'undefined' && typeof blendModeellipse === 'undefined') { var blendModeellipse = window.blendModeellipse; }\n"
+            "if (typeof window.blendModerect !== 'undefined' && typeof blendModerect === 'undefined') { var blendModerect = window.blendModerect; }\n"
+            "if (typeof window.blendModefill !== 'undefined' && typeof blendModefill === 'undefined') { var blendModefill = window.blendModefill; }\n"
+            "if (typeof window.blendModestroke !== 'undefined' && typeof blendModestroke === 'undefined') { var blendModestroke = window.blendModestroke; }\n"
         )
-        script_tag = f'<script type="module">{code}\n{BIND_MODULE_CALLBACKS_JS}</script>' if is_module else f'<script>{scope_guards}{code}</script>'
+        script_tag = f'<script type="module">{scope_guards}{code}\n{BIND_MODULE_CALLBACKS_JS}</script>' if is_module else f'<script>{scope_guards}{code}</script>'
 
         ready_state_override_js = "Object.defineProperty(Document.prototype, 'readyState', { get: function() { return 'loading'; }, configurable: true });" if (for_thumbnail or for_rendering) else ""
         early_error_js = f"""
@@ -6956,17 +7439,212 @@ class StandaloneInjectorApp(QMainWindow):
               </script>
               <!--ASSET_INTERCEPTOR-->
               <script>
-                // 強力打樁：防止部分作品調用網頁 UI 庫引發 Uncaught ReferenceError
-                window.exports = window.exports || {{}};
-                window.module = window.module || {{ exports: window.exports }};
+                // 強力打樁：防止部分作品調用網頁 UI 庫引發 Uncaught ReferenceError (智慧 UMD 雙向代理相容)
+                (function() {{
+                  let _exports = {{}};
+                  let _module = {{
+                    get exports() {{ return _exports; }},
+                    set exports(v) {{
+                      _exports = v;
+                      if (v && (typeof v === 'object' || typeof v === 'function')) {{
+                        if (typeof window.c2 === 'undefined' && (v.Point && v.Voronoi || v.name === 'c2')) {{
+                          window.c2 = v;
+                        }}
+                        if (v.ClipperLib) {{
+                          window.ClipperLib = v.ClipperLib;
+                        }} else if (v.Clipper || v.ClipType || v.PolyType) {{
+                          window.ClipperLib = v;
+                          window.Clipper = v;
+                        }}
+                        if (v.PoissonDiskSampling) {{
+                          window.PoissonDiskSampling = v.PoissonDiskSampling;
+                        }} else if (typeof v === 'function' && (v.name === 'PoissonDiskSampling' || v.name === 'Poisson')) {{
+                          window.PoissonDiskSampling = v;
+                        }}
+                        for (let k of ['c2', 'Voronoi', 'Delaunay', 'Point', 'Vector', 'Polygon', 'LimitedVoronoi', 'ClipperLib', 'Clipper', 'ClipType', 'PolyType', 'PolyFillType', 'IntPoint', 'Path', 'Paths', 'PoissonDiskSampling']) {{
+                          if (v[k] !== undefined && typeof window[k] === 'undefined') {{
+                            try {{ window[k] = v[k]; }} catch(e) {{}}
+                          }}
+                        }}
+                      }}
+                    }}
+                  }};
+                  try {{
+                    Object.defineProperty(window, 'module', {{
+                      get: function() {{ return _module; }},
+                      set: function(val) {{
+                        if (val && typeof val === 'object' && 'exports' in val) {{
+                          _module.exports = val.exports;
+                        }}
+                      }},
+                      configurable: true
+                    }});
+                    Object.defineProperty(window, 'exports', {{
+                      get: function() {{ return _module.exports; }},
+                      set: function(val) {{ _module.exports = val; }},
+                      configurable: true
+                    }});
+                  }} catch(e) {{
+                    window.exports = _exports;
+                    window.module = _module;
+                  }}
+                }})();
                 window.require = window.require || function(mod) {{
                   if (mod === '../p5' || mod === 'p5') return window.p5 || (typeof p5 !== 'undefined' ? p5 : {{}});
+                  if (mod === 'c2' || mod === './c2' || (typeof mod === 'string' && mod.includes('c2'))) return window.c2 || (window.module && window.module.exports) || {{}};
+                  if (mod === 'clipper' || mod === 'clipper-lib' || (typeof mod === 'string' && mod.includes('clipper'))) return window.ClipperLib || (window.module && window.module.exports) || {{}};
                   return window[mod] || {{}};
                 }};
+
+                // 全域裸識別字相容宣告
+                if (typeof window.c2 !== 'undefined' && typeof c2 === 'undefined') {{ try {{ var c2 = window.c2; }} catch(e) {{}} }}
+                if (typeof window.ClipperLib !== 'undefined' && typeof ClipperLib === 'undefined') {{ try {{ var ClipperLib = window.ClipperLib; }} catch(e) {{}} }}
+                if (typeof window.PoissonDiskSampling !== 'undefined' && typeof PoissonDiskSampling === 'undefined') {{ try {{ var PoissonDiskSampling = window.PoissonDiskSampling; }} catch(e) {{}} }}
+
+                // ClipperLib 防崩潰打樁護欄
+                if (typeof window.ClipperLib === 'undefined') {{
+                  (function() {{
+                    class MockPath extends Array {{}}
+                    class MockPaths extends Array {{}}
+                    class MockPolyTree {{ constructor() {{ this.m_AllPolys = []; }} Clear() {{}} Total() {{ return 0; }} }}
+                    class MockClipper {{
+                      constructor() {{}}
+                      AddPath() {{ return true; }}
+                      AddPaths() {{ return true; }}
+                      Execute() {{ return true; }}
+                    }}
+                    MockClipper.OpenPathsFromPolyTree = function() {{ return []; }};
+                    MockClipper.ClosedPathsFromPolyTree = function() {{ return []; }};
+                    window.ClipperLib = {{
+                      Clipper: MockClipper,
+                      Paths: MockPaths,
+                      Path: MockPath,
+                      PolyTree: MockPolyTree,
+                      PolyType: {{ ptSubject: 0, ptClip: 1 }},
+                      ClipType: {{ ctIntersection: 0, ctUnion: 1, ctDifference: 2, ctXor: 3 }},
+                      PolyFillType: {{ pftEvenOdd: 0, pftNonZero: 1, pftPositive: 2, pftNegative: 3 }},
+                      JS: {{ Clean: function(p) {{ return p || []; }}, PerimeterOfPath: function() {{ return 100; }}, AreaOfPath: function() {{ return 100; }} }}
+                    }};
+                    window.Clipper = MockClipper;
+                  }})();
+                }}
+
+                // PoissonDiskSampling 泊松分佈採樣防崩潰打樁護欄
+                if (typeof window.PoissonDiskSampling === 'undefined') {{
+                  window.PoissonDiskSampling = class PoissonDiskSampling {{
+                    constructor(options) {{
+                      this.options = options || {{}};
+                      this.shape = options.shape || [800, 800];
+                      this.minDistance = options.minDistance || 10;
+                      this.maxDistance = options.maxDistance || this.minDistance;
+                      this.tries = options.tries || 30;
+                      this.points = [];
+                    }}
+                    fill() {{
+                      if (this.points.length === 0) {{
+                        const w = this.shape[0] || 800;
+                        const h = this.shape[1] || 800;
+                        const step = Math.max(10, this.minDistance);
+                        for (let x = step / 2; x < w; x += step) {{
+                          for (let y = step / 2; y < h; y += step) {{
+                            this.points.push([x + (Math.random() - 0.5) * step * 0.5, y + (Math.random() - 0.5) * step * 0.5]);
+                          }}
+                        }}
+                      }}
+                      return this.points;
+                    }}
+                    getAllPoints() {{ return this.fill(); }}
+                    addPoint(p) {{ this.points.push(p); return p; }}
+                    reset() {{ this.points = []; }}
+                  }};
+                }}
+
+                // p5play (Canvas / Sprite / Group / world) 防崩潰打樁護欄
+                if (typeof window.Canvas === 'undefined') {{
+                  window.Canvas = class Canvas {{
+                    constructor(w, h) {{
+                      if (typeof w === 'string' && w.includes(':')) {{
+                        const parts = w.split(':');
+                        const ratio = parseFloat(parts[0]) / (parseFloat(parts[1]) || 1);
+                        w = 800; h = 800 / ratio;
+                      }}
+                      this.w = w || (typeof width !== 'undefined' ? width : 800);
+                      this.h = h || (typeof height !== 'undefined' ? height : 800);
+                      if (typeof createCanvas === 'function') {{
+                        createCanvas(this.w, this.h);
+                      }}
+                      window.canvas = this;
+                    }}
+                  }};
+                }}
+                if (typeof window.world === 'undefined') {{
+                  window.world = {{ gravity: {{ x: 0, y: 0 }}, physicsTime: 0 }};
+                }}
+                if (typeof window.Sprite === 'undefined') {{
+                  window.Sprite = class Sprite {{
+                    constructor() {{
+                      this.x = 0; this.y = 0; this.w = 50; this.h = 50; this.diameter = 50;
+                      this.collider = 'dynamic';
+                      this.vel = {{ x: 0, y: 0 }};
+                      this.color = '#ffffff';
+                      this.life = 1000;
+                    }}
+                  }};
+                }}
+                if (typeof window.Group === 'undefined') {{
+                  window.Group = class Group extends Array {{
+                    constructor() {{
+                      super();
+                      this.collider = 'dynamic';
+                      this.color = '#ffffff';
+                      this.vel = {{ x: 0, y: 0 }};
+                      this.Sprite = window.Sprite;
+                    }}
+                  }};
+                }}
+
+                // createFont 相容護欄 (Processing 轉譯作品)
+                if (typeof window.createFont === 'undefined') {{
+                  window.createFont = function(name, size) {{
+                    if (typeof loadFont === 'function') {{
+                      try {{ return loadFont(name); }} catch(e) {{}}
+                    }}
+                    return typeof _createMockFont === 'function' ? _createMockFont() : {{ font: {{}}, textBounds: function() {{ return {{ x:0, y:0, w:100, h:20 }}; }} }};
+                  }};
+                }}
+                if (typeof window.blendModeellipse === 'undefined') {{
+                  window.blendModeellipse = function(...args) {{ if (typeof ellipse === 'function') return ellipse(...args); }};
+                }}
+                if (typeof window.blendModebackground === 'undefined') {{
+                  window.blendModebackground = function(...args) {{ if (typeof background === 'function') return background(...args); }};
+                }}
+                if (typeof window.blendModerect === 'undefined') {{
+                  window.blendModerect = function(...args) {{ if (typeof rect === 'function') return rect(...args); }};
+                }}
+                if (typeof window.blendModefill === 'undefined') {{
+                  window.blendModefill = function(...args) {{ if (typeof fill === 'function') return fill(...args); }};
+                }}
+                if (typeof window.blendModestroke === 'undefined') {{
+                  window.blendModestroke = function(...args) {{ if (typeof stroke === 'function') return stroke(...args); }};
+                }}
+
                 window.lil = window.lil || {{ GUI: class {{ add() {{ return this; }} addFolder() {{ return this; }} open() {{ return this; }} onChange() {{ return this; }} setValue() {{ return this; }} }} }};
                 window.dat = window.dat || {{ GUI: class {{ add() {{ return this; }} addFolder() {{ return this; }} }} }};
                 window.planck = window.planck || {{ World: class {{}}, Vec2: class {{}} }};
-                window.PVector = window.PVector || class {{ constructor(x,y,z){{ this.x=x||0; this.y=y||0; this.z=z||0; }} static dist(v1,v2){{ return Math.sqrt((v1.x-v2.x)**2+(v1.y-v2.y)**2); }} }};
+                window.PVector = window.PVector || class {{
+                  constructor(x,y,z){{ this.x=x||0; this.y=y||0; this.z=z||0; }}
+                  static dist(v1,v2){{ return Math.sqrt(((v1.x||0)-(v2.x||0))**2+((v1.y||0)-(v2.y||0))**2+(((v1.z||0)-(v2.z||0))**2)); }}
+                  static sub(v1,v2,t){{ var x=(v1.x||0)-(v2.x||0), y=(v1.y||0)-(v2.y||0), z=(v1.z||0)-(v2.z||0); if(t&&t.set){{ t.set(x,y,z); return t; }} return new (window.PVector||PVector)(x,y,z); }}
+                  static add(v1,v2,t){{ var x=(v1.x||0)+(v2.x||0), y=(v1.y||0)+(v2.y||0), z=(v1.z||0)+(v2.z||0); if(t&&t.set){{ t.set(x,y,z); return t; }} return new (window.PVector||PVector)(x,y,z); }}
+                  static mult(v,n,t){{ var x=(v.x||0)*n, y=(v.y||0)*n, z=(v.z||0)*n; if(t&&t.set){{ t.set(x,y,z); return t; }} return new (window.PVector||PVector)(x,y,z); }}
+                  static div(v,n,t){{ var x=n!==0?(v.x||0)/n:0, y=n!==0?(v.y||0)/n:0, z=n!==0?(v.z||0)/n:0; if(t&&t.set){{ t.set(x,y,z); return t; }} return new (window.PVector||PVector)(x,y,z); }}
+                  static dot(v1,v2){{ return (v1.x||0)*(v2.x||0)+(v1.y||0)*(v2.y||0)+(v1.z||0)*(v2.z||0); }}
+                  static cross(v1,v2,t){{ var x=(v1.y||0)*(v2.z||0)-(v1.z||0)*(v2.y||0), y=(v1.z||0)*(v2.x||0)-(v1.x||0)*(v2.z||0), z=(v1.x||0)*(v2.y||0)-(v1.y||0)*(v2.x||0); if(t&&t.set){{ t.set(x,y,z); return t; }} return new (window.PVector||PVector)(x,y,z); }}
+                  static fromAngle(a,t){{ var x=Math.cos(a), y=Math.sin(a); if(t&&t.set){{ t.set(x,y,0); return t; }} return new (window.PVector||PVector)(x,y,0); }}
+                  static angleBetween(v1,v2){{ var m1=Math.sqrt((v1.x||0)**2+(v1.y||0)**2+(v1.z||0)**2), m2=Math.sqrt((v2.x||0)**2+(v2.y||0)**2+(v2.z||0)**2); if(m1===0||m2===0)return 0; var d=(v1.x||0)*(v2.x||0)+(v1.y||0)*(v2.y||0)+(v1.z||0)*(v2.z||0); return Math.acos(Math.max(-1, Math.min(1, d/(m1*m2)))); }}
+                  static random2D(){{ var a=Math.random()*Math.PI*2; return new (window.PVector||PVector)(Math.cos(a),Math.sin(a)); }}
+                  static random3D(){{ var a=Math.random()*Math.PI*2, z=Math.random()*2-1, r=Math.sqrt(1-z*z); return new (window.PVector||PVector)(r*Math.cos(a),r*Math.sin(a),z); }}
+                }};
                 window.kumaleon = window.kumaleon || {{
                   options: {{ onInit: function(){{}}, onUpdate: function(){{}}, onResize: function(){{}} }},
                   setCanvas: function(){{}},
@@ -6987,6 +7665,9 @@ class StandaloneInjectorApp(QMainWindow):
                 }}
                 if (typeof window.SimplexNoise === 'undefined') {{
                   window.SimplexNoise = window.OpenSimplexNoise;
+                }}
+                if (typeof window.openSimplexNoise === 'undefined') {{
+                  window.openSimplexNoise = function(seed) {{ return new window.OpenSimplexNoise(seed); }};
                 }}
                 if (typeof window.p5ex === 'undefined') {{
                   (function() {{
@@ -7028,10 +7709,11 @@ class StandaloneInjectorApp(QMainWindow):
                       construct: function() {{ return _createMockToneNode(); }},
                       apply: function() {{ return _createMockToneNode(); }}
                     }};
+                    var _mockToneDest = _createMockToneNode();
                     var _mockToneCore = {{
                       start: function() {{ return Promise.resolve(); }},
                       now: function() {{ return (typeof window.custom_time_ms !== 'undefined' ? window.custom_time_ms / 1000 : (window.currentAudioTime || 0)); }},
-                      context: {{ state: 'running', resume: function() {{ return Promise.resolve(); }}, currentTime: 0, rawContext: typeof AudioContext !== 'undefined' ? new AudioContext() : {{}} }},
+                      context: {{ state: 'running', resume: function() {{ return Promise.resolve(); }}, currentTime: 0, destination: _mockToneDest, rawContext: typeof AudioContext !== 'undefined' ? new AudioContext() : {{}} }},
                       Transport: {{
                         start: function() {{ return this; }},
                         stop: function() {{ return this; }},
@@ -7045,9 +7727,9 @@ class StandaloneInjectorApp(QMainWindow):
                         seconds: 0,
                         state: 'started'
                       }},
-                      Master: _createMockToneNode(),
-                      Destination: _createMockToneNode(),
-                      destination: _createMockToneNode(),
+                      Master: _mockToneDest,
+                      Destination: _mockToneDest,
+                      destination: _mockToneDest,
                       Synth: _createMockToneNode(),
                       PolySynth: _createMockToneNode(),
                       AMSynth: _createMockToneNode(),
@@ -7219,9 +7901,9 @@ class StandaloneInjectorApp(QMainWindow):
                  'bg','font','tex','cols','rows','pal','palette','pos','vel','acc','colors','dirs','movers','lines','curves','boxes',
                  'shapes','polygons','vectors','shaderProgram','sh','dwidth','dheight','kRadiusFactor','minDistFactor','nbrParticles',
                  'reference','catSpeed','tt','_shiftAmp','BG_C','FG','areas','aryCornerXy','pad','nx','ny','nz','nw',
-                 'allowedLetters','validWords','currentLetters','activeIndex','lettersWord','bars','frames','photo','cover','orient','ovel','start','orthoview','num',
+                 'allowedLetters','validWords','currentLetters','activeIndex','lettersWord','bars','frames','photo','cover','tlogo','logo','orient','ovel','start','orthoview','num',
                  'mobile','buildings','curSeed','px','py','pz','dx','dy','dz','vx','vy','vz','cx','cy','cz','sx','sy','sz','fx','fy','wx','wy','rx','ry','rz',
-                 'sound','audio','song','snd','player','track','voice','mySound','sample','music','myFont','fnt','defaultFont'].forEach(k => {{
+                 'sound','audio','song','snd','player','track','voice','mySound','sample','music','myFont','fnt','defaultFont', 'page', 'it'].forEach(k => {{
                   if (typeof window[k] === 'undefined') {{
                     if (['objs','dots','points','particles','cells','stars','nodes','locations','colors','dirs','movers','lines','curves','boxes','shapes','polygons','vectors','pal','palette','circle_diams','imgs','areas','aryCornerXy','bars','frames','currentLetters','validWords','buildings'].includes(k)) {{
                       window[k] = [];
@@ -7231,7 +7913,11 @@ class StandaloneInjectorApp(QMainWindow):
                       window[k] = _createMockFont();
                     }} else if (k === 'scr') {{
                       window[k] = window.cnv;
-                    }} else if (['img', 'moon', 'photo', 'cover'].includes(k)) {{
+                    }} else if (k === 'page') {{
+                      window[k] = 0;
+                    }} else if (k === 'it') {{
+                      window[k] = 0;
+                    }} else if (['img', 'moon', 'photo', 'cover', 'tlogo', 'logo'].includes(k)) {{
                       window[k] = {{ width: 100, height: 100, resize: function(w,h){{ if(w) this.width=w; if(h) this.height=h; return this; }}, loadPixels: function(){{}}, updatePixels: function(){{}}, get: function(){{ return [0,0,0,0]; }}, set: function(){{}}, copy: function(){{}}, mask: function(){{}}, filter: function(){{}}, pixels: new Uint8ClampedArray(100*100*4), canvas: (typeof document !== 'undefined' ? document.createElement('canvas') : null) }};
                     }} else if (['orient', 'ovel', 'start'].includes(k)) {{
                       window[k] = {{ x: 0, y: 0, z: 0, add: function(){{ return this; }}, mult: function(){{ return this; }}, sub: function(){{ return this; }} }};
@@ -7305,6 +7991,56 @@ class StandaloneInjectorApp(QMainWindow):
                   }}
                   if (p5.Graphics && p5.Graphics.prototype) {{
                     if (!p5.Graphics.prototype.imageMode) p5.Graphics.prototype.imageMode = function() {{}};
+                    if (!p5.Graphics.prototype.pixelDensity) {{
+                      p5.Graphics.prototype.pixelDensity = function(v) {{
+                        if (typeof v === 'number') {{ this._pixelDensity = v; return this; }}
+                        return this._pixelDensity || (typeof window.pixelDensity === 'function' ? window.pixelDensity() : 1);
+                      }};
+                    }}
+                    if (!p5.Graphics.prototype.resize) {{
+                      p5.Graphics.prototype.resize = function(w, h) {{ if(w) this.width=w; if(h) this.height=h; return this; }};
+                    }}
+                  }}
+                  if (p5.prototype) {{
+                    if (!p5.prototype.createFont) p5.prototype.createFont = window.createFont || function() {{ return _createMockFont(); }};
+                    if (p5.prototype.color) {{
+                      const _origColor = p5.prototype.color;
+                      p5.prototype.color = function(...args) {{
+                        if (args.length === 0 || args[0] === undefined || args[0] === null) {{
+                          return _origColor.call(this, 0, 0, 0, 255);
+                        }}
+                        try {{
+                          const c = _origColor.apply(this, args);
+                          if (c && (!c._color || !c._color.space)) {{
+                            c._color = c._color || {{}};
+                            c._color.space = c._color.space || {{ id: 'srgb', max: [255, 255, 255, 255] }};
+                          }}
+                          return c;
+                        }} catch(e) {{
+                          return _origColor.call(this, 0, 0, 0, 255);
+                        }}
+                      }};
+                    }}
+                    const _origRed = p5.prototype.red;
+                    p5.prototype.red = function(c) {{
+                      if (!c) return 0;
+                      try {{ return _origRed.call(this, c); }} catch(e) {{ return (c.levels && c.levels[0] !== undefined) ? c.levels[0] : 0; }}
+                    }};
+                    const _origGreen = p5.prototype.green;
+                    p5.prototype.green = function(c) {{
+                      if (!c) return 0;
+                      try {{ return _origGreen.call(this, c); }} catch(e) {{ return (c.levels && c.levels[1] !== undefined) ? c.levels[1] : 0; }}
+                    }};
+                    const _origBlue = p5.prototype.blue;
+                    p5.prototype.blue = function(c) {{
+                      if (!c) return 0;
+                      try {{ return _origBlue.call(this, c); }} catch(e) {{ return (c.levels && c.levels[2] !== undefined) ? c.levels[2] : 0; }}
+                    }};
+                    const _origAlpha = p5.prototype.alpha;
+                    p5.prototype.alpha = function(c) {{
+                      if (!c) return 255;
+                      try {{ return _origAlpha.call(this, c); }} catch(e) {{ return (c.levels && c.levels[3] !== undefined) ? c.levels[3] : 255; }}
+                    }};
                   }}
                   if (p5.Font && p5.Font.prototype) {{
                     if (!p5.Font.prototype.textBounds) {{
@@ -7326,6 +8062,22 @@ class StandaloneInjectorApp(QMainWindow):
                 }}
 
                 (function() {{
+                  const _origQuerySelector = Document.prototype.querySelector;
+                  Document.prototype.querySelector = function(sel) {{
+                    const res = _origQuerySelector.apply(this, arguments);
+                    if (!res && typeof sel === 'string' && sel.toLowerCase().includes('canvas')) {{
+                      const cnv = document.getElementsByTagName('canvas')[0];
+                      if (cnv) return cnv;
+                      return {{
+                        getAttribute: function(attr) {{ if (attr === 'width') return 800; if (attr === 'height') return 600; return ''; }},
+                        setAttribute: function() {{}},
+                        style: {{}},
+                        width: 800,
+                        height: 600
+                      }};
+                    }}
+                    return res;
+                  }};
                   const orgGetContext = HTMLCanvasElement.prototype.getContext;
                   HTMLCanvasElement.prototype.getContext = function(type, attribs) {{
                     if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {{
@@ -7363,36 +8115,56 @@ class StandaloneInjectorApp(QMainWindow):
                 window.publishPreviewPulse = window.publishPreviewPulse || function() {{}};
 
                 // OPC stub compatibility layer (OpenProcessing Control Library)
-                if (typeof OPC === 'undefined') {{
-                  const _opcHandler = {{
-                    get: function(target, prop) {{
-                      if (prop in target) return target[prop];
-                      if (['slider', 'toggle', 'color', 'select', 'text', 'palette', 'range'].includes(prop)) {{
-                        return function(name, value) {{
-                          if (name && typeof value !== 'undefined' && typeof window[name] === 'undefined') {{
+                (function() {{
+                  function wrapOPC(target) {{
+                    if (!target) target = function() {{}};
+                    var methods = [
+                      'slider', 'toggle', 'palette', 'color', 'text', 'button', 'select',
+                      'label', 'title', 'header', 'separator', 'collapsed', 'bezier',
+                      'initVariable', '_set', 'set', 'buttonPressed', 'buttonReleased',
+                      'collapse', 'expand', 'delete', 'callParentFunction', 'getEaseFunction',
+                      'setOSC', 'loadOSC', 'oscSendMessage', 'setGlobal'
+                    ];
+                    methods.forEach(function(m) {{
+                      if (typeof target[m] !== 'function') {{
+                        target[m] = function(name, value) {{
+                          if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') {{
                             window[name] = value;
                           }}
-                          return window.OPC;
+                          return target;
                         }};
                       }}
-                      return function() {{ return window.OPC; }};
+                    }});
+                    if (typeof Proxy !== 'undefined') {{
+                      try {{
+                        return new Proxy(target, {{
+                          get: function(t, prop) {{
+                            if (prop in t) return t[prop];
+                            if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') return undefined;
+                            return function(name, value) {{
+                              if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') {{
+                                window[name] = value;
+                              }}
+                              return target;
+                            }};
+                          }}
+                        }});
+                      }} catch(e) {{}}
                     }}
-                  }};
-                  window.OPC = new Proxy({{
-                    slider: function(name, value, min, max, step) {{ if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; }},
-                    button: function() {{ return window.OPC; }},
-                    toggle: function(name, value) {{ if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; }},
-                    color: function(name, value) {{ if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; }},
-                    select: function(name, value) {{ if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; }},
-                    text: function(name, value) {{ if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; }},
-                    title: function() {{ return window.OPC; }},
-                    header: function() {{ return window.OPC; }},
-                    separator: function() {{ return window.OPC; }},
-                    collapsed: function() {{ return window.OPC; }},
-                    bezier: function() {{ return window.OPC; }},
-                    setGlobal: function(name, value) {{ if (name) window[name] = value; }}
-                  }}, _opcHandler);
-                }}
+                    return target;
+                  }}
+                  var _opcProxy = wrapOPC(window.OPC);
+                  try {{
+                    Object.defineProperty(window, 'OPC', {{
+                      get: function() {{ return _opcProxy; }},
+                      set: function(val) {{ _opcProxy = wrapOPC(val); }},
+                      configurable: true
+                    }});
+                  }} catch(e) {{
+                    window.OPC = _opcProxy;
+                  }}
+                  if (typeof OPC === 'undefined') {{ try {{ var OPC = window.OPC; }} catch(e) {{}} }}
+                }})();
 
                 // Seed compatibility
                 window.seed = window.seed || Math.floor(Math.random() * 999999);
@@ -7672,9 +8444,39 @@ class StandaloneInjectorApp(QMainWindow):
 
     def cache_and_localize_scripts(self, html_str):
         import re
+        cache_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "js_cache")
+        # Step 1: Pre-process multi-URL script tags e.g. <script src="url1; url2"></script>
+        def split_multi_script(match):
+            raw_src = match.group(2)
+            if ";" in raw_src:
+                urls = [u.strip() for u in raw_src.split(";") if u.strip()]
+                return "\n".join([f'<script src="{u}"></script>' for u in urls])
+            return match.group(0)
+        html_str = re.sub(r'(<script[^>]*?\s)src=["\']([^"\']+;[^"\']+)["\']\s*></script>', split_multi_script, html_str, flags=re.IGNORECASE)
+
         def replacer(match):
             url = match.group(2)
             if url.startswith(("http://", "https://")):
+                filename = url.split("/")[-1]
+                if not filename.endswith(".js"):
+                    filename = f"custom_lib_{abs(hash(url))}.js"
+                local_path = os.path.join(cache_dir, filename)
+                if not os.path.exists(local_path):
+                    self.get_and_cache_library(url)
+                if os.path.exists(local_path) and os.path.getsize(local_path) <= 3 * 1024 * 1024:
+                    try:
+                        with open(local_path, "r", encoding="utf-8", errors="ignore") as f:
+                            js_content = f.read()
+                        bridge_sync = ""
+                        if "c2" in filename or "c2" in js_content[:200]:
+                            bridge_sync += "\nif (typeof module !== 'undefined' && module.exports && (module.exports.Point || module.exports.Voronoi)) { window.c2 = module.exports; }\nif (typeof window.c2 !== 'undefined') { var c2 = window.c2; var Voronoi = window.Voronoi || window.c2.Voronoi; var Delaunay = window.Delaunay || window.c2.Delaunay; var Point = window.Point || window.c2.Point; }\n"
+                        if "clipper" in filename or "clipper" in js_content[:500].lower():
+                            bridge_sync += "\nif (typeof module !== 'undefined' && module.exports) { if (module.exports.ClipperLib) window.ClipperLib = module.exports.ClipperLib; else if (module.exports.Clipper || module.exports.ClipType) { window.ClipperLib = module.exports; window.Clipper = module.exports; } }\nif (typeof window.ClipperLib !== 'undefined') { var ClipperLib = window.ClipperLib; }\n"
+                        if "poisson" in filename.lower() or "poissondisksampling" in js_content[:500].lower():
+                            bridge_sync += "\nif (typeof module !== 'undefined' && module.exports) { window.PoissonDiskSampling = module.exports.PoissonDiskSampling || module.exports; }\nif (typeof window.PoissonDiskSampling !== 'undefined') { var PoissonDiskSampling = window.PoissonDiskSampling; }\n"
+                        return f'<script>/* [INLINED LOCAL] {filename} */\n{js_content}\n{bridge_sync}</script>'
+                    except Exception:
+                        pass
                 local_url = self.get_and_cache_library(url)
                 if local_url:
                     return f'{match.group(1)}src="{local_url}"'
@@ -9451,6 +10253,12 @@ function draw() {
                 'lowpass_muffle': self.fx_cb_lowpass_muffle.isChecked(),
                 'infinity_tunnel': self.fx_cb_infinity_tunnel.isChecked(),
                 'dolly_zoom': self.fx_cb_dolly_zoom.isChecked(),
+                'hologram_glitch': self.fx_cb_hologram_glitch.isChecked(),
+                'voronoi_shatter': self.fx_cb_voronoi_shatter.isChecked(),
+                'thermal_infrared': self.fx_cb_thermal_infrared.isChecked(),
+                'ascii_cyber_matrix': self.fx_cb_ascii_cyber_matrix.isChecked(),
+                'chromatic_radial_zoom': self.fx_cb_chromatic_radial_zoom.isChecked(),
+                'synthwave_grid_scan': self.fx_cb_synthwave_grid_scan.isChecked(),
                 'bypass_downscale': self.native_4k_cb.isChecked()
             }
             
@@ -9728,13 +10536,13 @@ function draw() {
         # Smart Dispatcher based on Visual Tags and Storyboard Weights
         def get_candidate_visuals_for_section(section_name, available_visuals, fallback_list):
             section_tags = {
-                'Intro': ['intro', 'start', 'ambient', 'slow', 'calm'],
-                'Verse': ['verse', 'main', 'theme'],
-                'Build-up': ['buildup', 'build-up', 'transition', 'energy'],
-                'Drop': ['drop', 'climax', 'fast', 'energetic', 'hard', 'heavy', '3d'],
-                'Chorus': ['chorus', 'climax', 'fast', 'energetic', 'vocal', 'pop', 'main'],
-                'Bridge': ['bridge', 'transition', 'slow', 'calm', 'contrast', 'melodic'],
-                'Outro': ['outro', 'end', 'ambient', 'slow', 'fade']
+                'Intro': ['intro', 'start', 'ambient', 'slow', 'calm', 'surreal', 'atmospheric', 'minimal'],
+                'Verse': ['verse', 'main', 'theme', 'surreal', 'collage', 'pixel', 'retro'],
+                'Build-up': ['buildup', 'build-up', 'transition', 'energy', 'glitch', 'accelerate'],
+                'Drop': ['drop', 'climax', 'fast', 'energetic', 'hard', 'heavy', '3d', 'masterpiece', 'hybrid_1296'],
+                'Chorus': ['chorus', 'climax', 'fast', 'energetic', 'vocal', 'pop', 'main', 'masterpiece', 'puppet'],
+                'Bridge': ['bridge', 'transition', 'slow', 'calm', 'contrast', 'melodic', 'surreal', 'ascii', 'voronoi'],
+                'Outro': ['outro', 'end', 'ambient', 'slow', 'fade', 'decay', 'surreal']
             }
             target_weights = {
                 'Intro': 30,
@@ -9941,6 +10749,8 @@ function draw() {
         logger.info(f"輸出: {output_file}")
         logger.info(f"解析度: {w}x{h}@{fps}fps, 總幀數={total_frames}, BPM={bpm}")
         logger.info(f"系統: {platform.system()} {platform.machine()}")
+        logger.info(f"視覺主題風格: [{_post_processor.selected_theme}] | 標誌核心特效: {list(_post_processor.signature_effects)} | 輔助特效: {list(_post_processor.accent_effects)}")
+        self.log_to_console(f"🎨 本曲專屬視覺風格: [{_post_processor.selected_theme}] | 標誌核心特效: {list(_post_processor.signature_effects)}")
         logger.info(f"視覺模組: {[v['name'] for v in visuals_data]}")
         logger.info(f"分鏡數: {len(storyboard)}")
 
@@ -10014,6 +10824,7 @@ function draw() {
             clipper = QWidget(self)
             clipper.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowTransparentForInput)
             clipper.setGeometry(0, 0, render_w, render_h)
+            clipper.setStyleSheet("background-color: #000000;")
             clipper.setWindowOpacity(0.01)
             clipper.show()
             clipper.lower()
@@ -10124,6 +10935,7 @@ function draw() {
         loadedA = None
         loadedB = None
         consecutive_black_frames = 0
+        fallback_blend_alpha = 0.0
         module_accumulated_time = {}
 
         def get_html_content(code, custom_css="", custom_html="", inline_assets=None, scaling_mode="auto"):
@@ -10131,7 +10943,7 @@ function draw() {
 
         def run_js_safely(view, js_code, is_first_frame=False):
             attempts = 5 if is_first_frame else 3
-            timeout_ms = 600 if is_first_frame else 120
+            timeout_ms = 800 if is_first_frame else 350
             for attempt in range(attempts):
                 loop = QEventLoop()
                 result = {"value": None}
@@ -10201,7 +11013,7 @@ function draw() {
         ffmpeg_cmd = [
             ffmpeg_bin, "-y",
             "-f", "rawvideo",
-            "-pix_fmt", "rgba",  # B3: Accept RGBA directly, avoid Python RGBA→RGB conversion
+            "-pix_fmt", "rgb24",  # B3: Accept RGB24 directly, zero-copy native streaming
             "-s", f"{render_w}x{render_h}",  # Input is the internal rendering resolution (max 1080p)
             "-r", str(fps),
             "-i", "-", # Read from stdin
@@ -10335,12 +11147,12 @@ function draw() {
                 'Drop': (2, 4),
                 'Chorus': (2, 4),
                 'Build-up': (4, 8),
-                'Bridge': (12, 24),
-                'Verse': (8, 16),
-                'Intro': (16, 32),
-                'Outro': (16, 32)
+                'Bridge': (8, 16),
+                'Verse': (6, 12),
+                'Intro': (6, 12),
+                'Outro': (8, 16)
             }
-            lo, hi = base_intervals.get(sec_name, (8, 16))
+            lo, hi = base_intervals.get(sec_name, (6, 12))
             # Genre adjustments
             if genre_str in ('lo-fi', 'jazz', 'ambient'):
                 lo = int(lo * 3.0)
@@ -10434,7 +11246,83 @@ function draw() {
 
         just_loaded_a = True
         just_loaded_b = True
-        
+        consecutive_black_frames = 0
+        consecutive_white_frames = 0
+        consecutive_solid_frames = 0
+        last_diff_check_frame = None
+        last_sec_name = None
+
+        # 預先初始化實時 QC 診斷器與圖像增強模組，避免每幀迴圈內重複 import 開銷
+        from realtime_qc_auditor import RealtimeRenderQCAuditor
+        from PIL import ImageEnhance
+        _qc_auditor = RealtimeRenderQCAuditor(sample_interval=30)
+
+        # 🌟 首影格深度預熱保護 (Pre-roll WebGL/Canvas Warm-up)
+        # 在進入 FFmpeg 串流迴圈前，預先對 ViewA 載入第一個分鏡的視覺模組，
+        # 並執行多次繪圖循環，徹底消滅影片開頭 0~2 秒因 Canvas 著色器編譯未就緒而觸發的保底光球！
+        try:
+            initial_vis = storyboard[0].get('assigned_visual', sorted_visuals[0]) if storyboard else sorted_visuals[0]
+            self.log_to_console(f"🎬 正在執行開頭視覺 [{initial_vis['name']}] 的 WebGL/Canvas 深度預熱...")
+            viewA.setHtml(get_html_content(
+                initial_vis.get('code', ''),
+                custom_css=initial_vis.get('custom_css', ''),
+                custom_html=initial_vis.get('custom_html', ''),
+                inline_assets=initial_vis.get('inline_assets', {}),
+                scaling_mode=initial_vis.get('scaling_mode', 'auto')
+            ), get_local_base_url())
+            
+            ev_preroll = QEventLoop()
+            def on_preroll_finish(ok):
+                try: ev_preroll.quit()
+                except Exception: pass
+            viewA.loadFinished.connect(on_preroll_finish)
+            timer_preroll = QTimer()
+            timer_preroll.setSingleShot(True)
+            timer_preroll.timeout.connect(ev_preroll.quit)
+            timer_preroll.start(2500)
+            ev_preroll.exec()
+            timer_preroll.stop()
+            try: viewA.loadFinished.disconnect(on_preroll_finish)
+            except Exception: pass
+            
+            # 執行 10 次連續 redraw() 確保 WebGL context 啟用且緩衝區寫入正常
+            _preroll_draw_js = """
+            (function() {
+                for (let pi = 0; pi < 10; pi++) {
+                    try {
+                        if (typeof redraw === 'function') redraw();
+                        else if (typeof window.redraw === 'function') window.redraw();
+                        else if (window._p5Instance && typeof window._p5Instance.redraw === 'function') window._p5Instance.redraw();
+                        else if (typeof draw === 'function') draw();
+                        else if (typeof window.draw === 'function') window.draw();
+                    } catch(e) {}
+                }
+                let canvases = document.querySelectorAll('canvas');
+                for (let c of canvases) {
+                    try {
+                        let gl = c.getContext('webgl2') || c.getContext('webgl');
+                        if (gl) gl.flush();
+                    } catch(e) {}
+                }
+                return 'preroll_warmed';
+            })();
+            """
+            _ev_warm_js = QEventLoop()
+            _t_warm_js = QTimer()
+            _t_warm_js.setSingleShot(True)
+            _t_warm_js.timeout.connect(_ev_warm_js.quit)
+            _t_warm_js.start(1000)
+            viewA.page().runJavaScript(_preroll_draw_js, lambda r: _ev_warm_js.quit())
+            _ev_warm_js.exec()
+            _t_warm_js.stop()
+            QApplication.processEvents()
+            
+            loadedA = initial_vis['name']
+            just_loaded_a = True
+            self.log_to_console(f"✅ 開頭視覺 [{initial_vis['name']}] 預熱完成，畫布已就緒！")
+        except Exception as e_preroll:
+            logger.warning(f"開頭視覺預熱失敗，降級為逐幀加載: {e_preroll}")
+
         for i in range(total_frames):
             if i % 5 == 0:  # Fix 4: Process events every 5 frames (was 10)
                 QApplication.processEvents()
@@ -10549,6 +11437,16 @@ function draw() {
             
             a_low, a_mid, a_high = get_telemetry_at_time(t)
             sec_data, sec_name = get_section_at_time(t)
+            
+            # 樂段邊界切換時，重置當前分鏡輪替狀態與純色計數，防止舊樂段模組死鎖污染新樂段
+            if last_sec_name is not None and sec_name != last_sec_name:
+                current_rotation_vis = None
+                prev_rotation_vis = None
+                rotation_trans_start = -1.0
+                consecutive_solid_frames = 0
+                consecutive_black_frames = 0
+                consecutive_white_frames = 0
+            last_sec_name = sec_name
             
             # Calculate segment progress
             sec_progress = 0.0
@@ -10831,7 +11729,20 @@ function draw() {
             # Calculate section progress (0.0 → 1.0)
             # Retrieve real-time chord color for dynamic background modulation
             audio_feats = get_full_telemetry_at_time(t)
+            if audio_samples_raw is not None:
+                import numpy as np
+                sample_idx = int(t * sr_raw)
+                samples_slice = audio_samples_raw[sample_idx:sample_idx + 512]
+                if len(samples_slice) < 512:
+                    pad_len = 512 - len(samples_slice)
+                    samples_slice = np.pad(samples_slice, (0, pad_len), 'constant')
+                audio_feats['audio_samples'] = samples_slice
+            else:
+                audio_feats['audio_samples'] = None
+
             chord_hex = audio_feats.get('chord_color_hex', '#0a0a0c')
+            chord_hue = audio_feats.get('chord_hue', 0.0)
+            stereo_w = audio_feats.get('stereo_width', 0.5)
             hihat_trig_str = "true" if audio_feats.get('hihat_trigger', False) else "false"
             hihat_dens_val = audio_feats.get('hihat_density', 0.0)
             synth_mel_str = "true" if audio_feats.get('synth_melody_active', False) else "false"
@@ -10840,7 +11751,7 @@ function draw() {
             
             mod_time_a = module_accumulated_time.get(active_vis['name'], 0.0)
             ps_safe = "true"  # Mandatory photosensitive protection
-            js = f"window.sectionName='{sec_name}';window.sectionProgress={sec_progress:.4f};window.currentChordColor='{chord_hex}';window.photosensitiveSafe={ps_safe};window.hihatTrigger={hihat_trig_str};window.hihatDensity={hihat_dens_val:.4f};window.synthMelodyActive={synth_mel_str};window.harmonicEnergy={harm_val:.4f};window.percussiveEnergy={perc_val:.4f};window.setFrameParams({t}, {str(is_beat).lower()}, {beat_energy:.4f}, {a_low:.4f}, {a_mid:.4f}, {a_high:.4f}, {mod_time_a:.4f})"
+            js = f"window.chordHue={chord_hue:.2f};window.stereoWidth={stereo_w:.3f};window.sectionName='{sec_name}';window.sectionProgress={sec_progress:.4f};window.currentChordColor='{chord_hex}';window.photosensitiveSafe={ps_safe};window.hihatTrigger={hihat_trig_str};window.hihatDensity={hihat_dens_val:.4f};window.synthMelodyActive={synth_mel_str};window.harmonicEnergy={harm_val:.4f};window.percussiveEnergy={perc_val:.4f};window.setFrameParams({t}, {str(is_beat).lower()}, {beat_energy:.4f}, {a_low:.4f}, {a_mid:.4f}, {a_high:.4f}, {mod_time_a:.4f})"
             
             # Draw A
             if not is_transitioning:
@@ -10863,7 +11774,7 @@ function draw() {
             
             if pilA is None:
                 ev_delay = QEventLoop()
-                delay_ms = 350 if was_just_loaded_a else 12
+                delay_ms = 400 if was_just_loaded_a else 80
                 QTimer.singleShot(delay_ms, ev_delay.quit)
                 ev_delay.exec()
                 QApplication.processEvents()
@@ -10880,11 +11791,21 @@ function draw() {
             if pilA.width != render_w or pilA.height != render_h:
                 pilA = pilA.resize((render_w, render_h), Image.Resampling.BILINEAR)
 
-            # 🛡️ 全局黑畫面終極保底防護 (Phase 2: Universal Anti-Flicker + Graceful Fallback + Linear Dark Blending)
-            black_thresh = 2 if sec_name == 'Outro' else 8
+            # 🛡️ 全局多維異常影格終極防護 (Phase 3: Universal Black/White/Solid Deadlock Guard)
+            is_intro_early = (sec_name == 'Intro' and t < 1.0 and i < 35)
+            black_thresh = 2 if (sec_name == 'Outro' or is_intro_early) else 8
             stat_a = pilA.getextrema()
             rgb_max_a = max(ext[1] for ext in stat_a[:3]) if stat_a else 0
+            rgb_min_a = min(ext[0] for ext in stat_a[:3]) if stat_a else 0
             
+            # 檢測純白畫面 (Whiteout: 所有通道最小值 > 248)
+            is_whiteout = stat_a and all(ext[0] > 248 for ext in stat_a[:3])
+            # 檢測全黑畫面 (Blackout: 所有通道最大值 < black_thresh，Intro開頭寬容自然起步)
+            is_blackout = (not is_intro_early) and stat_a and all(ext[1] < black_thresh for ext in stat_a[:3])
+            # 檢測純色畫面 (Solid color: 每個通道各自極差 <= 3 且畫面非暗區，Intro開頭寬容)
+            channel_spread_a = max(ext[1] - ext[0] for ext in stat_a[:3]) if stat_a else 999
+            is_solid = (not is_intro_early) and stat_a and (channel_spread_a <= 3) and (rgb_max_a > 15)
+
             def _get_active_fallback():
                 mod_c = module_cache_mgr.get_latest_frame(active_vis['name'])
                 if mod_c is not None:
@@ -10892,13 +11813,48 @@ function draw() {
                 elif 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None:
                     return apply_graceful_fallback(last_valid_pil_frame.copy(), t, beat_energy, a_low, chord_hex)
                 else:
-                    return song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex)
+                    return song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex, audio_feats=audio_feats)
 
-            if stat_a and all(ext[1] < black_thresh for ext in stat_a[:3]):
+            if is_blackout:
                 consecutive_black_frames += 1
                 if consecutive_black_frames == 1 or consecutive_black_frames % 30 == 0:
                     logger.warning(f"⚠️ [BlackScreenGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到全黑影格，啟動保底攔截")
-                pilA = _get_active_fallback()
+                fallback_blend_alpha = min(1.0, fallback_blend_alpha + 0.25)
+                fb_frame = _get_active_fallback()
+                if 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None and fallback_blend_alpha < 0.95:
+                    try:
+                        pilA = Image.blend(last_valid_pil_frame, fb_frame, fallback_blend_alpha)
+                    except Exception:
+                        pilA = fb_frame
+                else:
+                    pilA = fb_frame
+            elif is_whiteout:
+                consecutive_white_frames += 1
+                if consecutive_white_frames == 1 or consecutive_white_frames % 30 == 0:
+                    logger.warning(f"⚠️ [WhiteScreenGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到全白異常影格，啟動保底攔截")
+                fallback_blend_alpha = min(1.0, fallback_blend_alpha + 0.25)
+                fb_frame = _get_active_fallback()
+                if 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None and fallback_blend_alpha < 0.95:
+                    try:
+                        pilA = Image.blend(last_valid_pil_frame, fb_frame, fallback_blend_alpha)
+                    except Exception:
+                        pilA = fb_frame
+                else:
+                    pilA = fb_frame
+            elif is_solid:
+                consecutive_solid_frames += 1
+                if consecutive_solid_frames > 15:
+                    if consecutive_solid_frames % 20 == 0:
+                        logger.warning(f"⚠️ [SolidColorGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到持續死鎖純色影格 (spread={channel_spread_a})，啟動保底攔截")
+                    fallback_blend_alpha = min(1.0, fallback_blend_alpha + 0.25)
+                    fb_frame = _get_active_fallback()
+                    if 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None and fallback_blend_alpha < 0.95:
+                        try:
+                            pilA = Image.blend(last_valid_pil_frame, fb_frame, fallback_blend_alpha)
+                        except Exception:
+                            pilA = fb_frame
+                    else:
+                        pilA = fb_frame
             elif sec_name != 'Outro' and 4 <= rgb_max_a < 16:
                 # Phase 2: 臨界半暗區線性軟混合 (Linear Dark Blending)，消除生硬跳變
                 blend_w = max(0.0, min(1.0, (rgb_max_a - 4.0) / 12.0))
@@ -10909,12 +11865,33 @@ function draw() {
                     except Exception:
                         pass
                 consecutive_black_frames = 0
+                consecutive_white_frames = 0
+                consecutive_solid_frames = 0
+                fallback_blend_alpha = max(0.0, fallback_blend_alpha - 0.2)
                 module_cache_mgr.add_frame(active_vis['name'], pilA)
                 last_valid_pil_frame = pilA.copy()
             else:
                 consecutive_black_frames = 0
+                consecutive_white_frames = 0
+                consecutive_solid_frames = 0
+                fallback_blend_alpha = max(0.0, fallback_blend_alpha - 0.2)
                 module_cache_mgr.add_frame(active_vis['name'], pilA)
                 last_valid_pil_frame = pilA.copy()
+
+            # 🚨 異常逃逸機制：若某個模組連續超過 30 幀 (約 1.0 秒) 全黑、全白或純色死鎖，強制切換至同樂段其他模組
+            if (consecutive_black_frames > 30 or consecutive_white_frames > 30 or consecutive_solid_frames > 30):
+                candidates_esc = candidates_by_sec.get(sec_name, sorted_visuals)
+                if len(candidates_esc) > 1:
+                    cur_esc_idx = rotation_visual_idx.get(sec_name, 0)
+                    next_esc_idx = (cur_esc_idx + 1) % len(candidates_esc)
+                    rotation_visual_idx[sec_name] = next_esc_idx
+                    current_rotation_vis = candidates_esc[next_esc_idx]
+                    self.log_to_console(f"🚨 [異常逃逸] 模組 [{active_vis['name']}] 持續輸出死鎖或純色異常畫面，強制輪換至 [{current_rotation_vis['name']}]！")
+                    loadedA = None  # 確保 ViewA 立即觸發新模組重新加載
+                    just_loaded_a = True
+                    consecutive_black_frames = 0
+                    consecutive_white_frames = 0
+                    consecutive_solid_frames = 0
             if False:  # Cleaned legacy branch
                 consecutive_black_frames = 0
                 module_cache_mgr.add_frame(active_vis['name'], pilA)
@@ -10960,10 +11937,16 @@ function draw() {
                 if pilB.width != render_w or pilB.height != render_h:
                     pilB = pilB.resize((render_w, render_h), Image.Resampling.BILINEAR)
                 
-                # 🛡️ ViewB 黑畫面保底防護 (Phase 2: Universal Anti-Flicker + Graceful Fallback + Linear Dark Blending)
+                # 🛡️ ViewB 多維異常影格終極防護 (Phase 3: Universal Black/White/Solid Deadlock Guard)
                 black_thresh_b = 2 if sec_name == 'Outro' else 8
                 stat_b = pilB.getextrema()
                 rgb_max_b = max(ext[1] for ext in stat_b[:3]) if stat_b else 0
+                rgb_min_b = min(ext[0] for ext in stat_b[:3]) if stat_b else 0
+                
+                is_whiteout_b = stat_b and all(ext[0] > 248 for ext in stat_b[:3])
+                is_blackout_b = stat_b and all(ext[1] < black_thresh_b for ext in stat_b[:3])
+                channel_spread_b = max(ext[1] - ext[0] for ext in stat_b[:3]) if stat_b else 999
+                is_solid_b = stat_b and (channel_spread_b <= 3) and (rgb_max_b > 15)
                 
                 def _get_active_fallback_b():
                     mod_c_b = module_cache_mgr.get_latest_frame(other_vis['name'])
@@ -10972,9 +11955,9 @@ function draw() {
                     elif pilA is not None:
                         return pilA.copy()
                     else:
-                        return song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex)
+                        return song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex, audio_feats=audio_feats)
 
-                if stat_b and all(ext[1] < black_thresh_b for ext in stat_b[:3]):
+                if is_blackout_b or is_whiteout_b or is_solid_b:
                     pilB = _get_active_fallback_b()
                 elif sec_name != 'Outro' and 4 <= rgb_max_b < 16:
                     blend_w_b = max(0.0, min(1.0, (rgb_max_b - 4.0) / 12.0))
@@ -11025,35 +12008,32 @@ function draw() {
             else:
                 img_to_stream = pilA
 
-            # 🛡️ 輸出前終極防護：確保絕不向 FFmpeg 輸出未預期的純黑幀
-            final_thresh = 2 if sec_name == 'Outro' else 8
+            # 🛡️ 輸出前終極防護：確保絕不向 FFmpeg 輸出未預期的全黑、全白或純色死鎖幀
+            final_thresh = 2 if (sec_name == 'Outro' or is_intro_early) else 8
             stat_final = img_to_stream.getextrema()
-            if stat_final and all(ext[1] < final_thresh for ext in stat_final[:3]):
+            is_stream_black = (not is_intro_early) and stat_final and all(ext[1] < final_thresh for ext in stat_final[:3])
+            is_stream_white = stat_final and all(ext[0] > 248 for ext in stat_final[:3])
+            rgb_max_f = max(ext[1] for ext in stat_final[:3]) if stat_final else 0
+            rgb_min_f = min(ext[0] for ext in stat_final[:3]) if stat_final else 0
+            channel_spread_f = max(ext[1] - ext[0] for ext in stat_final[:3]) if stat_final else 999
+            is_stream_solid = (not is_intro_early) and stat_final and (channel_spread_f <= 3) and (rgb_max_f > 15) and (consecutive_solid_frames > 15)
+
+            if is_stream_black or is_stream_white or is_stream_solid:
                 if 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None:
-                    img_to_stream = last_valid_pil_frame.copy()
+                    # 只有在 last_valid_pil_frame 本身不是純色死鎖時才採用
+                    last_stat = last_valid_pil_frame.getextrema()
+                    last_spread = max(ext[1] - ext[0] for ext in last_stat[:3]) if last_stat else 999
+                    if last_spread > 3:
+                        img_to_stream = apply_graceful_fallback(last_valid_pil_frame.copy(), t, beat_energy, a_low, chord_hex)
+                    else:
+                        img_to_stream = song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex, audio_feats=audio_feats)
                 else:
-                    img_to_stream = song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex)
+                    img_to_stream = song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex, audio_feats=audio_feats)
 
             # Apply post-processing effects chain (flash, grain, throb, etc.)
-            audio_feats = get_full_telemetry_at_time(t)
-            if audio_samples_raw is not None:
-                import numpy as np
-                sample_idx = int(t * sr_raw)
-                samples_slice = audio_samples_raw[sample_idx:sample_idx + 512]
-                if len(samples_slice) < 512:
-                    pad_len = 512 - len(samples_slice)
-                    samples_slice = np.pad(samples_slice, (0, pad_len), 'constant')
-                audio_feats['audio_samples'] = samples_slice
-            else:
-                audio_feats['audio_samples'] = None
-                
             img_to_stream = apply_post_processing(img_to_stream, t, is_beat, beat_energy, audio_feats, section_name=sec_name, section_progress=sec_progress)
 
             # 🔍 實時 QC 與音視動態響應診斷器 (Real-time Quality & AV Response Auditor)
-            if '_qc_auditor' not in locals():
-                from realtime_qc_auditor import RealtimeRenderQCAuditor
-                _qc_auditor = RealtimeRenderQCAuditor(sample_interval=30)
-
             img_to_stream, qc_boost = _qc_auditor.audit_frame(
                 frame_i=i,
                 pil_img=img_to_stream,
@@ -11068,7 +12048,6 @@ function draw() {
             # 若 QC 診斷出需要補強熱烈度或響應，動態進行影格修飾
             if qc_boost:
                 if qc_boost.get('contrast_boost'):
-                    from PIL import ImageEnhance
                     enh = ImageEnhance.Contrast(img_to_stream)
                     img_to_stream = enh.enhance(qc_boost['contrast_boost'])
                 if qc_boost.get('force_hold_previous') and 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None:
@@ -11078,7 +12057,7 @@ function draw() {
             # Periodic screenshot saving for visual quality assurance and monitoring
             if i % 300 == 0 or i == 30 or i == total_frames - 30:
                 try:
-                    shot_dir = "/Users/unclerm/.gemini/antigravity/brain/2615a4fe-c83f-4142-acf6-ce1423c09edd/screenshots"
+                    shot_dir = os.path.join(workspace_dir, "render_output", "snapshots")
                     os.makedirs(shot_dir, exist_ok=True)
                     song_slug = os.path.splitext(os.path.basename(audio_path))[0]
                     shot_path = os.path.join(shot_dir, f"{song_slug}_frame_{i:05d}.png")
@@ -11101,10 +12080,10 @@ function draw() {
                 _time_mod.sleep(0.005)  # Yield 5ms to OS scheduler to avoid CPU fight with FFmpeg
 
             try:
-                # Ensure the image is in RGBA format (as expected by FFmpeg)
-                # This prevents channel mismatches and offset issues when post-processing output mode is RGB.
-                if img_to_stream.mode != "RGBA":
-                    img_to_stream = img_to_stream.convert("RGBA")
+                # Ensure the image is in native RGB format (as expected by FFmpeg rgb24)
+                # Direct RGB streaming eliminates 33.1MB alpha plane allocation per 4K frame
+                if img_to_stream.mode != "RGB":
+                    img_to_stream = img_to_stream.convert("RGB")
                 frame_bytes = img_to_stream.tobytes()
                 _frame_queue.put(frame_bytes, block=False)  # Non-blocking put to avoid main thread freeze
             except _queue_mod.Full:
@@ -11114,10 +12093,8 @@ function draw() {
                 self.log_to_console(f"寫入幀佇列時出錯: {e}", is_err=True)
                 break
 
-            # Fix 2: Explicit safe cleanup of per-frame objects
-            for _v in ['pixA', 'imgA', 'bufferA', 'pilA', 'pixB', 'imgB', 'bufferB', 'pilB', 'img_to_stream']:
-                if _v in locals():
-                    del locals()[_v]
+            # Fix 2: Explicit safe cleanup of per-frame objects by setting references to None
+            pixA = imgA = bufferA = pilA = pixB = imgB = bufferB = pilB = img_to_stream = None
 
             # Fix 2: Periodic garbage collection and HTTP Cache cleaning
             if i % 300 == 0:
@@ -11290,8 +12267,27 @@ function draw() {
                 
                 self.create_credits_file(output_file, visuals_data)
                 self.create_social_templates(output_file, audio_path, resolved_genre, bpm, duration, visuals_data)
+
+                # 🔗 自動連動 Shorts 豎屏切片與 YouTube / 社群發布佇列
+                out_dir = os.path.dirname(output_file)
+                try:
+                    if hasattr(self, 'shorts_exporter') and hasattr(self.shorts_exporter, 'src_dir_input'):
+                        self.shorts_exporter.src_dir_input.setText(out_dir)
+                        self.shorts_exporter.start_scan()
+                        self.log_to_console(f"📱 [管線連動] 已自動將輸出檔案同步至「YouTube Shorts 批量匯出」Tab！")
+                except Exception as _sync_shorts_err:
+                    logger.warning(f"同步 Shorts 資料夾失敗: {_sync_shorts_err}")
+
+                try:
+                    if hasattr(self, 'youtube_uploader') and hasattr(self.youtube_uploader, 'dir_input'):
+                        self.youtube_uploader.dir_input.setText(out_dir)
+                        self.youtube_uploader.scan_directory()
+                        self.log_to_console(f"📤 [管線連動] 已自動將 4K 成品與社群元資料同步至「YouTube 自動發布」佇列！")
+                except Exception as _sync_yt_err:
+                    logger.warning(f"同步 YouTube Uploader 失敗: {_sync_yt_err}")
+
                 if show_popups:
-                    QMessageBox.information(self, "完成", f"影片成功渲染並儲存至:\n{output_file}")
+                    QMessageBox.information(self, "完成", f"影片成功渲染並儲存至:\n{output_file}\n\n已自動同步至「Shorts 匯出」與「YouTube 自動發布」佇列！")
                 return True
             else:
                 err_output = "".join(ffmpeg_stderr_accumulator)
@@ -11557,9 +12553,13 @@ function draw() {
             content.append("")
             
             # 1. YOUTUBE LONG-FORM VIDEO
+            from youtube_uploader_engine import MetadataParser
+            raw_long_title = f"{song} - {artist} | 4K p5.js 音畫互動 MV (Audio-Reactive Visualizer / VJ Loop)"
+            safe_long_title, _ = MetadataParser.smart_truncate_title(raw_long_title, 100)
+
             content.append("--- [1] YOUTUBE LONG-FORM VIDEO ---")
             content.append("Title:")
-            content.append(f"{song} - {artist} | 4K p5.js 音畫互動 MV (Audio-Reactive Visualizer / VJ Loop)")
+            content.append(safe_long_title)
             content.append("")
             content.append("Description:")
             content.append("🎧 立即收聽 / Stream & Download:")
@@ -11625,7 +12625,6 @@ function draw() {
                     content.append(f"  * License: {license_mode}")
             content.append("")
 
-            
             clean_artist = self.clean_hashtag(artist)
             clean_song = self.clean_hashtag(song)
             
@@ -11636,9 +12635,12 @@ function draw() {
             content.append("")
             
             # 2. YOUTUBE SHORTS
+            raw_shorts_title = f"{song} - {artist} | 4K p5.js 音畫互動 #shorts #music #visualizer"
+            safe_shorts_title, _ = MetadataParser.smart_truncate_title(raw_shorts_title, 100)
+
             content.append("--- [2] YOUTUBE SHORTS ---")
             content.append("Title / Caption:")
-            content.append(f"{song} - {artist} | 4K p5.js 音畫互動 #shorts #music #visualizer")
+            content.append(safe_shorts_title)
             content.append("")
             content.append("Description:")
             content.append("Experience the immersive 4K audio-reactive visualizer! 🎧✨")
@@ -12344,15 +13346,15 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
           if (content === null || content === undefined) return false;
           let str = String(content).trim();
           if (!str || str.length === 0) return false;
-          if (/^(?:fps|framerate|frame\s*rate)\s*[:=]?\s*[\d\.]*/i.test(str)) return true;
-          if (/^[\d\.]+\s*fps\b/i.test(str)) return true;
-          if (/^fps\s*$/i.test(str)) return true;
-          if (/^loading(?:\s*[\.\w]*)?$/i.test(str)) return true;
-          if (/^please\s+wait/i.test(str)) return true;
-          if (/^esperando\b/i.test(str)) return true;
-          if (/(?:drag\s+wind|tap\s+to|click\s+to|press\s+['"\\w]|hit\s+space|arrow\s+keys|use\s+mouse|hold\s+mouse|scroll\s+to|snapshot|screenshot|save\s+image|controls?|instructions?|touch\s+to\s+start|press\s+any\s+key)/i.test(str)) return true;
-          if (/^(?:speed|size|radius|color|count|frequency|volume|threshold|density|scale|zoom|particles|nodes|iteration|gravity|damping)\s*[:=]\s*[-+]?[\d\.]+/i.test(str)) return true;
-          if (/^(?:by\s+[\w\s]+|author\s*:|code\s+by|created\s+by|designed\s+by|copyright|©|\(c\))\b/i.test(str)) return true;
+          if (/^(?:fps|framerate|frame\\s*rate)\\s*[:=]?\\s*[\\d\\.]*/i.test(str)) return true;
+          if (/^[\\d\\.]+\\s*fps\\b/i.test(str)) return true;
+          if (/^fps\\s*$/i.test(str)) return true;
+          if (/^loading(?:\\s*[\\.\\w]*)?$/i.test(str)) return true;
+          if (/^please\\s+wait/i.test(str)) return true;
+          if (/^esperando\\b/i.test(str)) return true;
+          if (/(?:drag\\s+wind|tap\\s+to|click\\s+to|press\\s+['"\\w]|hit\\s+space|arrow\\s+keys|use\\s+mouse|hold\\s+mouse|scroll\\s+to|snapshot|screenshot|save\\s+image|controls?|instructions?|touch\\s+to\\s+start|press\\s+any\\s+key)/i.test(str)) return true;
+          if (/^(?:speed|size|radius|color|count|frequency|volume|threshold|density|scale|zoom|particles|nodes|iteration|gravity|damping)\\s*[:=]\\s*[-+]?[\\d\\.]+/i.test(str)) return true;
+          if (/^(?:by\\s+[\\w\\s]+|author\\s*:|code\\s+by|created\\s+by|designed\\s+by|copyright|©|\\(c\\))\\b/i.test(str)) return true;
           return false;
         };
 
@@ -12409,7 +13411,7 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
               updatePixels: function() {},
               get: function(x, y, w, h) { return [128, 128, 200, 255]; },
               set: function() {},
-              resize: function() {},
+              resize: function(w, h) { if(w) this.width=w; if(h) this.height=h; return this; },
               mask: function() {},
               filter: function() {},
               copy: function() {},
@@ -12434,8 +13436,8 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
 
           // Robust fallback for loadFont
           const _origLoadFont = p5.prototype.loadFont;
+          const dummyFont = { font: { unitsPerEm: 1000 }, textBounds: function() { return { x:0, y:0, w:100, h:20 }; }, getPath: function() { return { commands: [] }; }, getOutline: function() { return []; }, textToPoints: function() { return []; } };
           p5.prototype.loadFont = function(path, onSuccess, onError) {
-            const dummyFont = { font: { unitsPerEm: 1000 }, textBounds: function() { return { x:0, y:0, w:100, h:20 }; } };
             if (_origLoadFont) {
               try {
                 return _origLoadFont.call(this, path, onSuccess, function(err) {
@@ -12447,6 +13449,14 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
             if (onSuccess) onSuccess(dummyFont);
             return dummyFont;
           };
+          if (!p5.prototype.createFont) {
+            p5.prototype.createFont = function(name, size) {
+              if (typeof p5.prototype.loadFont === 'function') {
+                try { return p5.prototype.loadFont.call(this, name); } catch(e) {}
+              }
+              return dummyFont;
+            };
+          }
 
           // Robust fallback for loadSound
           const _origLoadSound = p5.prototype.loadSound;
@@ -12633,36 +13643,56 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
       <script>
         // Audio Mock & OPC Mock (防止 connect/disconnect 錯誤和 OPC 未定義)
         AUDIO_MOCK_PLACEHOLDER
-        if (typeof OPC === 'undefined') {
-          const _opcHandler = {
-            get: function(target, prop) {
-              if (prop in target) return target[prop];
-              if (['slider', 'toggle', 'color', 'select', 'text', 'palette', 'range'].includes(prop)) {
-                return function(name, value) {
-                  if (name && typeof value !== 'undefined' && typeof window[name] === 'undefined') {
+        (function() {
+          function wrapOPC(target) {
+            if (!target) target = function() {};
+            var methods = [
+              'slider', 'toggle', 'palette', 'color', 'text', 'button', 'select',
+              'label', 'title', 'header', 'separator', 'collapsed', 'bezier',
+              'initVariable', '_set', 'set', 'buttonPressed', 'buttonReleased',
+              'collapse', 'expand', 'delete', 'callParentFunction', 'getEaseFunction',
+              'setOSC', 'loadOSC', 'oscSendMessage', 'setGlobal'
+            ];
+            methods.forEach(function(m) {
+              if (typeof target[m] !== 'function') {
+                target[m] = function(name, value) {
+                  if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') {
                     window[name] = value;
                   }
-                  return window.OPC;
+                  return target;
                 };
               }
-              return function() { return window.OPC; };
+            });
+            if (typeof Proxy !== 'undefined') {
+              try {
+                return new Proxy(target, {
+                  get: function(t, prop) {
+                    if (prop in t) return t[prop];
+                    if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') return undefined;
+                    return function(name, value) {
+                      if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') {
+                        window[name] = value;
+                      }
+                      return target;
+                    };
+                  }
+                });
+              } catch(e) {}
             }
-          };
-          window.OPC = new Proxy({
-            slider: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
-            button: function() { return window.OPC; },
-            toggle: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
-            color: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
-            select: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
-            text: function(name, value) { if (name && typeof value !== 'undefined') window[name] = value; return window.OPC; },
-            title: function() { return window.OPC; },
-            header: function() { return window.OPC; },
-            separator: function() { return window.OPC; },
-            collapsed: function() { return window.OPC; },
-            bezier: function() { return window.OPC; },
-            setGlobal: function(name, value) { if (name) window[name] = value; }
-          }, _opcHandler);
-        }
+            return target;
+          }
+          var _opcProxy = wrapOPC(window.OPC);
+          try {
+            Object.defineProperty(window, 'OPC', {
+              get: function() { return _opcProxy; },
+              set: function(val) { _opcProxy = wrapOPC(val); },
+              configurable: true
+            });
+          } catch(e) {
+            window.OPC = _opcProxy;
+          }
+          if (typeof OPC === 'undefined') { try { var OPC = window.OPC; } catch(e) {} }
+        })();
       </script>
       <script>
         // Periodically check DOM for control elements and loading text, and hide them

@@ -1,22 +1,25 @@
 {
-  "name": "Fallin_1",
-  "author": "oggy",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:28:09",
-  "url": "https://openprocessing.org/@oggy/1400364",
-  "code": "// === Tab: mySketch ===\nconst NB = 400;\nlet points = [];\nconst coeff = 1.025;\nlet inverted = false;\nconst c1 = 'rgba(18,18,18,';\nconst c2 = 'rgba(255,20,100,';\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpixelDensity(1);\n\tnoStroke();\n\tpoints = new Array(NB)\n    .fill(0)\n    .map((_) => new Part());\n}\n\nfunction draw() {\n  background((inverted ? c2 : c1) + '1)');\n\t\n  points.forEach((point) => point.update());\n  points.forEach((point) => point.display());\n\t\n\tlet doInvert = false;\n  for (let i = 0; i < points.length; i++) {\n    const { x, y, r } = points[i];\n    if (x < -r || x > width + r || y < -r || y > height + r) {\n      points[i] = new Part();\n    }\n\n    if (r > Math.max(height, width) / 2) {\n      const r2 = r ** 2;\n      const d1 = x ** 2 + y ** 2; // top left\n      const d2 = (x - width) ** 2 + y ** 2; // top right\n      const d3 = x ** 2 + (y - height) ** 2; // bottom left\n      const d4 = (x - width) ** 2 + (y - height) ** 2; // bottom right\n      if (d1 < r2 && d2 < r2 && d3 < r2 && d4 < r2) {\n        doInvert = true;\n        break;\n      }\n    }\n  }\n\n  if (doInvert) {\n    inverted = !inverted;\n    points = new Array(NB)\n      .fill(0)\n      .map((_) => new Part());\n  }\n}\n\nclass Part {\n  constructor() {\n    this.x = random(width);\n    this.y = random(height);\n\n    this.minR = random(0.8, 3);\n    this.r = this.minR;\n  }\n\n  update() {\n\t\tconst mx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) || width/2;\n\t\tconst my = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) || height/2;\n    if (this.r > 10000) {\n      const d = Math.sqrt((this.x - mx) ** 2 + (this.y - my) ** 2);\n      const qqqx = this.x - ((this.x - mx) / d) * this.r;\n      const qqqy = this.y - ((this.y - my) / d) * this.r;\n      this.x -= (mx - qqqx) * (coeff - 1);\n      this.y -= (my - qqqy) * (coeff - 1);\n    } else {\n      this.r *= coeff;\n      this.x = mx + (this.x - mx) * coeff;\n      this.y = my + (this.y - my) * coeff;\n    }\n  };\n\n  display() {\n    const alpha = map(this.r, this.minR, this.minR * 1.5, 0, 1);\n\t\tfill((inverted ? c1 : c2) + alpha + ')');\n    circle(this.x, this.y, this.r * 2);\n  };\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Fallin_1",
+    "author": "oggy",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:28:09",
+    "url": "https://openprocessing.org/@oggy/1400364",
+    "code": "// === Tab: mySketch ===\nconst NB = 400;\nlet points = [];\nconst coeff = 1.025;\nlet inverted = false;\nconst c1 = 'rgba(18,18,18,';\nconst c2 = 'rgba(255,20,100,';\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpixelDensity(1);\n\tnoStroke();\n\tpoints = new Array(NB)\n    .fill(0)\n    .map((_) => new Part());\n}\n\nfunction draw() {\n  background((inverted ? c2 : c1) + '1)');\n\t\n  points.forEach((point) => point.update());\n  points.forEach((point) => point.display());\n\t\n\tlet doInvert = false;\n  for (let i = 0; i < points.length; i++) {\n    const { x, y, r } = points[i];\n    if (x < -r || x > width + r || y < -r || y > height + r) {\n      points[i] = new Part();\n    }\n\n    if (r > Math.max(height, width) / 2) {\n      const r2 = r ** 2;\n      const d1 = x ** 2 + y ** 2; // top left\n      const d2 = (x - width) ** 2 + y ** 2; // top right\n      const d3 = x ** 2 + (y - height) ** 2; // bottom left\n      const d4 = (x - width) ** 2 + (y - height) ** 2; // bottom right\n      if (d1 < r2 && d2 < r2 && d3 < r2 && d4 < r2) {\n        doInvert = true;\n        break;\n      }\n    }\n  }\n\n  if (doInvert) {\n    inverted = !inverted;\n    points = new Array(NB)\n      .fill(0)\n      .map((_) => new Part());\n  }\n}\n\nclass Part {\n  constructor() {\n    this.x = random(width);\n    this.y = random(height);\n\n    this.minR = random(0.8, 3);\n    this.r = this.minR;\n  }\n\n  update() {\n\t\tconst mx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) || width/2;\n\t\tconst my = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) || height/2;\n    if (this.r > 10000) {\n      const d = Math.sqrt((this.x - mx) ** 2 + (this.y - my) ** 2);\n      const qqqx = this.x - ((this.x - mx) / d) * this.r;\n      const qqqy = this.y - ((this.y - my) / d) * this.r;\n      this.x -= (mx - qqqx) * (coeff - 1);\n      this.y -= (my - qqqy) * (coeff - 1);\n    } else {\n      this.r *= coeff;\n      this.x = mx + (this.x - mx) * coeff;\n      this.y = my + (this.y - my) * coeff;\n    }\n  };\n\n  display() {\n    const alpha = map(this.r, this.minR, this.minR * 1.5, 0, 1);\n\t\tfill((inverted ? c1 : c2) + alpha + ')');\n    circle(this.x, this.y, this.r * 2);\n  };\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Quiet Tension.mp4"
+    ]
 }

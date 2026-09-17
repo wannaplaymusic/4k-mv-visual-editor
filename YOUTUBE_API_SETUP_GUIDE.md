@@ -56,13 +56,21 @@
 
 ---
 
-## 🚀 想要突破單日 6 部上限？（多憑證自動輪換池）
+## 🚀 想要突破單日 6 部上限？（多憑證自動輪換池・支援單日 40+ 首）
 
-如果您需要單日一口氣上傳 12 部以上（例如本次 11 首全部一天傳完）：
-1. 在 Google Cloud Console 再建立第二個專案（例如 `MV-Auto-Uploader-2`）。
-2. 同樣啟用 YouTube Data API v3 並下載憑證 JSON。
-3. 命名為 `client_secrets_2.json` 放入 `youtube_credentials/`。
-4. 系統會在上傳時自動接力！當專案 1 額度用盡時，自動無縫啟用專案 2 繼續傳完，完全零中斷！
+如果您需要單日一口氣上傳 40 部以上：
+- 系統已內建 **多憑證自動輪換池 (Credential Pool)**。
+- 每個 Google Cloud 專案每日提供 10,000 點配額（約可上傳 6 部 4K 影片）。
+- 本系統現已建立並支援 7 個專案：
+  1. `client_secrets.json` (專案 1)
+  2. `client_secrets_2.json` (專案 2)
+  3. `client_secrets_3.json` (專案 3)
+  4. `client_secrets_4.json` (專案 4)
+  5. `client_secrets_5.json` (專案 5)
+  6. `client_secrets_6.json` (專案 6)
+  7. `client_secrets_7.json` (專案 7)
+- **總承載能力**：**7 個專案 × 6 首 = 42 首 / 天**！
+- 系統會在任一專案額度用罄時（回傳 `quotaExceeded` / `403`），自動無縫切換至下一個專案接力上傳，完全零中斷！
 
 ---
 

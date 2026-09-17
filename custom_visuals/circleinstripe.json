@@ -1,22 +1,25 @@
 {
-  "name": "circleinstripe",
-  "author": "aa_debdeb",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:12:04",
-  "url": "https://openprocessing.org/@aa_debdeb/434754",
-  "code": "// === Tab: mySketch ===\n/**\n * circle in stripe\n * \n * @author aadebdeb\n * @date 2017/06/18\n */\n\nvar BORDER_WIDTH = 10;\nvar ELLIPSE_SIZE = 350;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n}\n\nfunction draw() {\n  blendMode(BLEND);\n  background(255);\n  noStroke();\n  fill(0);\n  \n  var offset = -((frameCount % 30) / 30) * BORDER_WIDTH * 2;\n  for (var h = offset; h < height; h += (Math.max(0.001, Math.abs(BORDER_WIDTH * 2)) || 1)) {\n    rect(0, h, width, BORDER_WIDTH);\n  }\n  \n  blendMode(DIFFERENCE);\n  fill(255);\n  ellipse(width / 2, height / 2, ELLIPSE_SIZE, ELLIPSE_SIZE);\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "circleinstripe",
+    "author": "aa_debdeb",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:12:04",
+    "url": "https://openprocessing.org/@aa_debdeb/434754",
+    "code": "// === Tab: mySketch ===\n/**\n * circle in stripe\n * \n * @author aadebdeb\n * @date 2017/06/18\n */\n\nvar BORDER_WIDTH = 10;\nvar ELLIPSE_SIZE = 350;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n}\n\nfunction draw() {\n  blendMode(BLEND);\n  background(255);\n  noStroke();\n  fill(0);\n  \n  var offset = -((frameCount % 30) / 30) * BORDER_WIDTH * 2;\n  for (var h = offset; h < height; h += (Math.max(0.001, Math.abs(BORDER_WIDTH * 2)) || 1)) {\n    rect(0, h, width, BORDER_WIDTH);\n  }\n  \n  blendMode(DIFFERENCE);\n  fill(255);\n  ellipse(width / 2, height / 2, ELLIPSE_SIZE, ELLIPSE_SIZE);\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "The Last Echo Delay.mp4"
+    ]
 }

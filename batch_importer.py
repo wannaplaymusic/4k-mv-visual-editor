@@ -729,6 +729,113 @@ class TestRunDialog(QDialog):
         self.start_next_item()
 
 
+
+class FastSketchFetcherThread(QThread):
+    finished = pyqtSignal(list)
+    log = pyqtSignal(str)
+
+    def __init__(self, url, parent=None):
+        super().__init__(parent)
+        self.url = url
+
+    def run(self):
+        items = []
+        try:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+            resp = requests.get(self.url, headers=headers, timeout=12)
+            html = resp.text
+            seen = set()
+
+            # 1. 抓取作者頁面 (var user = {...})
+            if 'var user' in html:
+                idx = html.find('var user')
+                first_brace = html.find('{', idx)
+                if first_brace != -1:
+                    try:
+                        decoder = json.JSONDecoder()
+                        user_obj, _ = decoder.raw_decode(html[first_brace:])
+                        user_id = user_obj.get('userID')
+                        sketches = user_obj.get('sketches', [])
+                        total_expected = user_obj.get('numberOfSketches', len(sketches))
+                        
+                        for s in sketches:
+                            sid = str(s.get('visualID', s.get('id', '')))
+                            if sid and sid not in seen:
+                                seen.add(sid)
+                                items.append({
+                                    'id': sid,
+                                    'title': (s.get('title') or f'Sketch {sid}').strip(),
+                                    'url': f'https://openprocessing.org/sketch/{sid}'
+                                })
+                                
+                        # 若還有未載入作品且有 user_id，自動分頁請求
+                        if user_id and total_expected > len(items):
+                            offset = len(items)
+                            limit = 60
+                            while offset < total_expected and len(items) < 300:
+                                page_url = f'https://openprocessing.org/user/{user_id}/getSketches_ajax/{limit}/{offset}'
+                                try:
+                                    r_page = requests.get(page_url, headers=headers, timeout=8)
+                                    if r_page.status_code == 200:
+                                        p_data = r_page.json()
+                                        more_sketches = p_data.get('object', [])
+                                        if not more_sketches: break
+                                        for s in more_sketches:
+                                            sid = str(s.get('visualID', s.get('id', '')))
+                                            if sid and sid not in seen:
+                                                seen.add(sid)
+                                                items.append({
+                                                    'id': sid,
+                                                    'title': (s.get('title') or f'Sketch {sid}').strip(),
+                                                    'url': f'https://openprocessing.org/sketch/{sid}'
+                                                })
+                                        offset += len(more_sketches)
+                                    else:
+                                        break
+                                except Exception:
+                                    break
+                    except Exception:
+                        pass
+
+            # 2. 抓取單一作品 (var sketch = {...})
+            if not items and 'var sketch' in html:
+                idx = html.find('var sketch')
+                first_brace = html.find('{', idx)
+                if first_brace != -1:
+                    try:
+                        decoder = json.JSONDecoder()
+                        sketch_obj, _ = decoder.raw_decode(html[first_brace:])
+                        sid = str(sketch_obj.get('visualID', sketch_obj.get('id', '')))
+                        if sid:
+                            items.append({
+                                'id': sid,
+                                'title': (sketch_obj.get('title') or f'Sketch {sid}').strip(),
+                                'url': f'https://openprocessing.org/sketch/{sid}'
+                            })
+                    except Exception:
+                        pass
+
+            # 3. DOM 正則 fallback
+            if not items:
+                matches = re.findall(r'href=[\'"]([^\'"]*?(?:sketch|@[\w\-]+)\/(\d+)[^\'"]*?)[\'"]', html)
+                for full_h, sid in matches:
+                    if sid not in seen:
+                        seen.add(sid)
+                        items.append({
+                            'id': sid,
+                            'title': f'Sketch {sid}',
+                            'url': f'https://openprocessing.org/sketch/{sid}'
+                        })
+
+        except Exception as e:
+            self.log.emit(f"⚠️ 後台網路解析異常: {e}")
+
+        self.finished.emit(items)
+
+
 class BatchImportDialog(QDialog):
     """OpenProcessing 藝術視覺模組 - 自動化批次收編工作區"""
     def __init__(self, parent=None, refresh_callback=None):
@@ -763,7 +870,8 @@ class BatchImportDialog(QDialog):
         top_bar = QHBoxLayout()
         top_bar.addWidget(QLabel("作者首頁/分頁網址："))
         self.url_input = QLineEdit()
-        self.url_input.setPlaceholderText("例如: https://openprocessing.org/@epi/#sketches")
+        self.url_input.setPlaceholderText("例如: https://openprocessing.org/@atzedent#sketches")
+        self.url_input.returnPressed.connect(self.load_url)
         top_bar.addWidget(self.url_input)
         
         self.btn_load = QPushButton("⚡ 載入網頁")
@@ -785,6 +893,7 @@ class BatchImportDialog(QDialog):
         left_layout = QVBoxLayout(left_widget)
         left_layout.setContentsMargins(0, 0, 0, 0)
         self.web_view = QWebEngineView()
+        self.web_view.loadFinished.connect(self.on_page_load_finished)
         left_layout.addWidget(QLabel("🌐 OpenProcessing 瀏覽視窗"))
         left_layout.addWidget(self.web_view)
         splitter.addWidget(left_widget)
@@ -827,7 +936,7 @@ class BatchImportDialog(QDialog):
         self.is_expanding = False
 
     def log_to_console(self, text, is_err=False):
-        color = "#f43f5e" if is_err else "#38bdf8" if "[+]" in text else "#a1a1aa"
+        color = "#f43f5e" if is_err else "#38bdf8" if "[+]" in text or "✅" in text or "✨" in text else "#a1a1aa"
         self.console.append(f"<span style='color: {color};'>{text}</span>")
 
     def get_existing_urls(self):
@@ -853,51 +962,179 @@ class BatchImportDialog(QDialog):
         url = self.url_input.text().strip()
         if not url: return
         self.detected_sketches_map.clear()
+        self.list_widget.clear()
+        self.btn_import.setEnabled(False)
         self.log_to_console(f"正在載入: {url} ...")
         self.web_view.load(QUrl(url))
+
+    def on_page_load_finished(self, ok):
+        if not ok:
+            self.log_to_console("⚠️ 瀏覽器頁面加載受阻，自動啟動後台高速解析引擎...", True)
+            self.start_fallback_fetch(self.url_input.text().strip())
+            return
+        
+        self.log_to_console("✅ 網頁加載成功，正在自動解析作品清單...")
+        # 溫和對焦到作品區塊，避免網頁頂部空白造成視覺誤導
+        js_focus = """
+        let el = document.querySelector('#sketchesContainer') || document.querySelector('.mainSketches') || document.querySelector('#userTabs');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        """
+        self.web_view.page().runJavaScript(js_focus)
+        QTimer.singleShot(800, self.parse_sketches)
 
     def toggle_expand_sketches(self):
         if self.is_expanding:
             self.is_expanding = False
-            self.expand_timer.stop()
+            if hasattr(self, 'expand_timer'):
+                self.expand_timer.stop()
             self.btn_expand.setText("⬇️ 自動展開")
+            self.log_to_console("已停止自動展開。")
         else:
             self.is_expanding = True
             self.btn_expand.setText("⏳ 停止展開")
+            self.log_to_console("正在自動持續向下展開加載更多作品...")
             self.expand_timer = QTimer(self)
             self.expand_timer.timeout.connect(self.expand_step)
             self.expand_timer.start(2000)
 
     def expand_step(self):
         js = """
-        window.scrollTo(0, document.body.scrollHeight);
-        let btn = document.querySelector('.seeMoreButton') || document.querySelector('.showMore');
-        if (btn) btn.click();
+        (function() {
+            let btn = document.querySelector('.seeMoreButton') || document.querySelector('.showMore');
+            if (btn && btn.offsetParent !== null) {
+                btn.click();
+                btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return { action: 'clicked_more' };
+            }
+            let el = document.querySelector('#sketchesContainer') || document.querySelector('.mainSketches');
+            if (el) {
+                window.scrollBy({ top: 600, behavior: 'smooth' });
+                return { action: 'scrolled' };
+            }
+            return { action: 'none' };
+        })()
         """
-        self.web_view.page().runJavaScript(js)
+        self.web_view.page().runJavaScript(js, self._on_expand_step_done)
+
+    def _on_expand_step_done(self, res):
+        QTimer.singleShot(600, self.parse_sketches)
 
     def parse_sketches(self):
         js = """
         (function() {
             let items = [];
-            document.querySelectorAll('a').forEach(a => {
-                let m = a.href ? a.href.match(/\\/(?:sketch|@[\\w\\-]+)\\/(\\d+)/) : null;
-                if (m) {
-                    let titleEl = a.querySelector('.sketchTitle') || a.querySelector('[class*="title"]');
-                    let title = titleEl ? titleEl.textContent : a.innerText;
-                    items.push({ id: m[1], title: title.trim(), url: a.href });
+            let seen = new Set();
+            
+            // 1. 從 OpenProcessing 前端全域物件提取（不受 DOM 虛擬滾動裁切影響，完整精準）
+            try {
+                if (window.user && Array.isArray(window.user.sketches)) {
+                    let u = window.user.username || '';
+                    window.user.sketches.forEach(s => {
+                        let id = String(s.visualID || s.id || '');
+                        if (id && !seen.has(id)) {
+                            seen.add(id);
+                            items.push({
+                                id: id,
+                                title: (s.title || ('Sketch ' + id)).trim(),
+                                url: 'https://openprocessing.org/sketch/' + id
+                            });
+                        }
+                    });
                 }
-            });
+            } catch(e) {}
+
+            try {
+                if (window.curation && Array.isArray(window.curation.sketches)) {
+                    window.curation.sketches.forEach(s => {
+                        let id = String(s.visualID || s.id || '');
+                        if (id && !seen.has(id)) {
+                            seen.add(id);
+                            items.push({
+                                id: id,
+                                title: (s.title || ('Sketch ' + id)).trim(),
+                                url: 'https://openprocessing.org/sketch/' + id
+                            });
+                        }
+                    });
+                }
+            } catch(e) {}
+
+            // 2. 從 Vue 元件實例提取
+            try {
+                document.querySelectorAll('.sketchLi, sketch-li, [class*="sketch"]').forEach(el => {
+                    let s = el.__vue__?.sketch;
+                    if (s) {
+                        let id = String(s.visualID || s.id || '');
+                        if (id && !seen.has(id)) {
+                            seen.add(id);
+                            items.push({
+                                id: id,
+                                title: (s.title || ('Sketch ' + id)).trim(),
+                                url: 'https://openprocessing.org/sketch/' + id
+                            });
+                        }
+                    }
+                });
+            } catch(e) {}
+
+            // 3. 從 DOM 超連結提取備援
+            try {
+                document.querySelectorAll('a, [data-href]').forEach(a => {
+                    let href = a.href || a.getAttribute('data-href') || a.getAttribute('href') || '';
+                    let m = href.match(/\\/(?:sketch|@[\\w\\-]+)\\/(\\d+)/);
+                    if (m) {
+                        let id = m[1];
+                        if (!seen.has(id)) {
+                            seen.add(id);
+                            let titleEl = a.querySelector('.sketchTitle') || a.querySelector('[class*="title"]');
+                            let title = titleEl ? titleEl.textContent : (a.innerText || ('Sketch ' + id));
+                            items.push({
+                                id: id,
+                                title: title.trim(),
+                                url: href.startsWith('http') ? href : ('https://openprocessing.org' + href)
+                            });
+                        }
+                    }
+                });
+            } catch(e) {}
+
             return items;
         })()
         """
         self.web_view.page().runJavaScript(js, self.on_parse_finished)
 
     def on_parse_finished(self, items):
-        if not items: return
-        for it in items:
-            self.detected_sketches_map[it["id"]] = it
+        if not items:
+            self.log_to_console("⚠️ 瀏覽器頁面未擷取到作品（可能受虛擬滾動或腳本影響），立即啟用後端高速引擎備援...", True)
+            self.start_fallback_fetch(self.url_input.text().strip())
+            return
             
+        self._populate_sketches(items)
+
+    def start_fallback_fetch(self, url):
+        if not url: return
+        if hasattr(self, 'fetcher_thread') and self.fetcher_thread.isRunning():
+            return
+        self.log_to_console(f"🚀 啟動後台高速解析引擎: {url} ...")
+        self.fetcher_thread = FastSketchFetcherThread(url, self)
+        self.fetcher_thread.log.connect(lambda msg: self.log_to_console(msg, True))
+        self.fetcher_thread.finished.connect(self._populate_sketches)
+        self.fetcher_thread.start()
+
+    def _populate_sketches(self, items):
+        if not items:
+            self.log_to_console("[-] 未能在該網址找到任何作品，請確認作者名稱或網址格式是否正確。", True)
+            return
+
+        old_count = len(self.detected_sketches_map)
+        for it in items:
+            sid = str(it["id"])
+            if sid not in self.detected_sketches_map:
+                self.detected_sketches_map[sid] = it
+                
+        if len(self.detected_sketches_map) == old_count and old_count > 0:
+            return
+
         self.list_widget.clear()
         pending = 0
         for sid, it in self.detected_sketches_map.items():
@@ -914,7 +1151,7 @@ class BatchImportDialog(QDialog):
             self.list_widget.addItem(item_widget)
             
         self.btn_import.setEnabled(pending > 0)
-        self.log_to_console(f"共解析出 {len(self.detected_sketches_map)} 個作品，待收編: {pending} 個。")
+        self.log_to_console(f"✨ 成功解析出 {len(self.detected_sketches_map)} 個作品（待收編: {pending} 個，已收錄: {len(self.detected_sketches_map) - pending} 個）！")
 
     def start_batch_import(self):
         selected = []

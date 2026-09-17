@@ -1,22 +1,25 @@
 {
-  "name": "Spiral_3",
-  "author": "u428396",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:30:54",
-  "url": "https://openprocessing.org/@u428396/2344004",
-  "code": "// === Tab: mySketch ===\n// #WCCChallenge: Downward Spiral 🌀\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n}\n\nlet v = 10;\nlet steps = 20;\nlet e = 1;\nlet ne = 1;\n\nfunction draw() {\n\tbackground(250);\n\t// space between rotations\n\tv = noise(frameCount / 60 / 30, 2.5) * 15 + 15;\n\t// space scaling when further from center\n\te = noise(frameCount / 60 / 5) * 0.8 + 1;\n\tne = noise(frameCount / 60 / 7, 1.5) * 0.8 + 1;\n\t// steps per rotation\n\tsteps = noise(frameCount / 60 / 120, 3.5) * 10 + 20;\n\t// kind of spiral phase\n\tlet gth = frameCount / 60 * TWO_PI / 120;\n\t\n\tstrokeWeight(1.5);\n\tfill(0, 0, 0, 50);\n\t\n\tpush();\n\ttranslate(width / 2, height / 2);\n\tfor (let i=0;i < TWO_PI * 50;i += (Math.max(0.001, Math.abs(TWO_PI / steps)) || 1)) {\n\t\t// two points on spirals with different scaling\n\t\tlet r = v * pow(i, 1/e);\n\t\tlet x = r * cos(i);\n\t\tlet y = r * sin(i);\n\n\t\tlet ni = i + TWO_PI/steps;\n\t\tlet rr = v * pow(ni, 1/ne);\n\t\tlet nx = rr * cos(ni);\n\t\tlet ny = rr * sin(ni);\n\t\t\n\t\t// rotate points around 0 by gth\n\t\tlet rx = cos(gth) * x - sin(gth) * y;\n\t\tlet ry = sin(gth) * x + cos(gth) * y;\n\t\t\n\t\tlet rnx = cos(gth) * nx - sin(gth) * ny;\n\t\tlet rny = sin(gth) * nx + cos(gth) * ny;\n\t\t\n\t\t// stroke(250, 200, 100)\n\t\t// line(rx, ry, rnx, rny);\t\t\t\n\t\tstroke(0);\n\t\trect(rx, ry, rnx - rx, rny - ry);\n\t\trect(-rx, -ry, -rnx + rx, -rny + ry);\n\t}\n\tpop();\n\t\n\t/*\n\tstroke(255, 0, 255);\n\tfill(255, 0, 255);\n\ttextAlign(LEFT, TOP);\n\ttext(`${e.toFixed(4)} ${ne.toFixed(4)} ${v.toFixed(4)} ${steps.toFixed(2)}`, 0, 0);\n\t*/\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Spiral_3",
+    "author": "u428396",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:30:54",
+    "url": "https://openprocessing.org/@u428396/2344004",
+    "code": "// === Tab: mySketch ===\n// #WCCChallenge: Downward Spiral 🌀\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n}\n\nlet v = 10;\nlet steps = 20;\nlet e = 1;\nlet ne = 1;\n\nfunction draw() {\n\tbackground(250);\n\t// space between rotations\n\tv = noise(frameCount / 60 / 30, 2.5) * 15 + 15;\n\t// space scaling when further from center\n\te = noise(frameCount / 60 / 5) * 0.8 + 1;\n\tne = noise(frameCount / 60 / 7, 1.5) * 0.8 + 1;\n\t// steps per rotation\n\tsteps = noise(frameCount / 60 / 120, 3.5) * 10 + 20;\n\t// kind of spiral phase\n\tlet gth = frameCount / 60 * TWO_PI / 120;\n\t\n\tstrokeWeight(1.5);\n\tfill(0, 0, 0, 50);\n\t\n\tpush();\n\ttranslate(width / 2, height / 2);\n\tfor (let i=0;i < TWO_PI * 50;i += (Math.max(0.001, Math.abs(TWO_PI / steps)) || 1)) {\n\t\t// two points on spirals with different scaling\n\t\tlet r = v * pow(i, 1/e);\n\t\tlet x = r * cos(i);\n\t\tlet y = r * sin(i);\n\n\t\tlet ni = i + TWO_PI/steps;\n\t\tlet rr = v * pow(ni, 1/ne);\n\t\tlet nx = rr * cos(ni);\n\t\tlet ny = rr * sin(ni);\n\t\t\n\t\t// rotate points around 0 by gth\n\t\tlet rx = cos(gth) * x - sin(gth) * y;\n\t\tlet ry = sin(gth) * x + cos(gth) * y;\n\t\t\n\t\tlet rnx = cos(gth) * nx - sin(gth) * ny;\n\t\tlet rny = sin(gth) * nx + cos(gth) * ny;\n\t\t\n\t\t// stroke(250, 200, 100)\n\t\t// line(rx, ry, rnx, rny);\t\t\t\n\t\tstroke(0);\n\t\trect(rx, ry, rnx - rx, rny - ry);\n\t\trect(-rx, -ry, -rnx + rx, -rny + ry);\n\t}\n\tpop();\n\t\n\t/*\n\tstroke(255, 0, 255);\n\tfill(255, 0, 255);\n\ttextAlign(LEFT, TOP);\n\ttext(`${e.toFixed(4)} ${ne.toFixed(4)} ${v.toFixed(4)} ${steps.toFixed(2)}`, 0, 0);\n\t*/\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Industrial Tide Unit.mp4"
+    ]
 }

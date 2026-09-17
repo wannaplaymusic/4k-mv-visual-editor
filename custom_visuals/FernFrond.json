@@ -1,22 +1,25 @@
 {
-  "name": "FernFrond",
-  "author": "u110137",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:29:31",
-  "url": "https://openprocessing.org/@u110137/2260606",
-  "code": "// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"botanical\"\n// Ferns are amazing! https://en.wikipedia.org/wiki/Fern\n\nlet ldim;\nlet lmx;\nlet lmy = 0;\nlet mode = true;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tldim = height / 6;\n\tlmx = width;\n}\n\nfunction draw() {\n\tbackground(0, 20, 0);\n\torbitControl(0, 0, 0.5);\n\ttranslate(-ldim * 3.5, ldim, 0);\n\tif (frameCount > 20) {\n\t\tlmx = lerp(lmx, width - (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0.1);\n\t\tlmy = lerp(lmy, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0.1);\n\t}\n\tlet furl = map(lmx, 0, 3 * width / 4, -PI / 240, PI / 10);\n\trotateX(map(lmy, 0, height, HALF_PI, -HALF_PI) - 3 * QUARTER_PI);\n\trotateZ(HALF_PI);\n\tfor (let i = 0; i < 45; i++) {\n\t\trotateX(furl + (PI / 240) * cos(i * PI / 20));\n\t\trotateZ((PI / 240) * cos(i * PI / 20));\n\t\ttranslate(0, -map(i, 0, 45, ldim / 4, ldim / 12));\n\t\tpush();\n\t\tdrawLeaf(i, ldim);\n\t\tpop();\n\t}\n}\n\nfunction drawLeaf(i, dim) {\n\tlet a = map(i, 0, 48, HALF_PI, 0, true);\n\tpush();\n\tlet s = sin(a) / 2;\n\tif (i % 2 == 1) scale(-s, s, s);\n\telse scale(s, s, s);\n\tfill(0, 180, 0, 50);\n\tnoStroke();\n\trotateX(PI / 28);\n\tcylinder(dim / 12, dim / (s * 4));\n\tscale(map(lmx, width / 4, 3 * width / 4, 1, 0.08, true), map(lmx, width / 4, 3 * width / 4, 1, 0.4, true), 1);\n\tstroke(0, 180, 0, 200);\n\tif(mode) noFill();\n\trotateY(PI / 12);\n\tif (i < 5) return;\n\tbeginShape();\n\tfor (let a = 0; a < TAU; a += (Math.max(0.001, Math.abs(TAU / 36)) || 1)) {\n\t\tlet x = 2.5 * dim + 2.5 * dim * cos(a);\n\t\tlet y = dim * sin(a) * cos(a / 2.8);\n\t\tlet z = dim * sin(a) * cos(a / 3) / 3;\n\t\tvertex(x, y, z);\n\t}\n\tendShape();\n\tif(mode) curve(0, 2 * dim, 2 * dim, 0, 0, 0, 5 * dim, 0, 0, 5 * dim, -10 * dim, -4 * dim);\n\tpop();\n}\n\nfunction mousePressed(){\n\tmode=!mode;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "FernFrond",
+    "author": "u110137",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:29:31",
+    "url": "https://openprocessing.org/@u110137/2260606",
+    "code": "// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"botanical\"\n// Ferns are amazing! https://en.wikipedia.org/wiki/Fern\n\nlet ldim;\nlet lmx;\nlet lmy = 0;\nlet mode = true;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tldim = height / 6;\n\tlmx = width;\n}\n\nfunction draw() {\n\tbackground(0, 20, 0);\n\torbitControl(0, 0, 0.5);\n\ttranslate(-ldim * 3.5, ldim, 0);\n\tif (frameCount > 20) {\n\t\tlmx = lerp(lmx, width - (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0.1);\n\t\tlmy = lerp(lmy, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0.1);\n\t}\n\tlet furl = map(lmx, 0, 3 * width / 4, -PI / 240, PI / 10);\n\trotateX(map(lmy, 0, height, HALF_PI, -HALF_PI) - 3 * QUARTER_PI);\n\trotateZ(HALF_PI);\n\tfor (let i = 0; i < 45; i++) {\n\t\trotateX(furl + (PI / 240) * cos(i * PI / 20));\n\t\trotateZ((PI / 240) * cos(i * PI / 20));\n\t\ttranslate(0, -map(i, 0, 45, ldim / 4, ldim / 12));\n\t\tpush();\n\t\tdrawLeaf(i, ldim);\n\t\tpop();\n\t}\n}\n\nfunction drawLeaf(i, dim) {\n\tlet a = map(i, 0, 48, HALF_PI, 0, true);\n\tpush();\n\tlet s = sin(a) / 2;\n\tif (i % 2 == 1) scale(-s, s, s);\n\telse scale(s, s, s);\n\tfill(0, 180, 0, 50);\n\tnoStroke();\n\trotateX(PI / 28);\n\tcylinder(dim / 12, dim / (s * 4));\n\tscale(map(lmx, width / 4, 3 * width / 4, 1, 0.08, true), map(lmx, width / 4, 3 * width / 4, 1, 0.4, true), 1);\n\tstroke(0, 180, 0, 200);\n\tif(mode) noFill();\n\trotateY(PI / 12);\n\tif (i < 5) return;\n\tbeginShape();\n\tfor (let a = 0; a < TAU; a += (Math.max(0.001, Math.abs(TAU / 36)) || 1)) {\n\t\tlet x = 2.5 * dim + 2.5 * dim * cos(a);\n\t\tlet y = dim * sin(a) * cos(a / 2.8);\n\t\tlet z = dim * sin(a) * cos(a / 3) / 3;\n\t\tvertex(x, y, z);\n\t}\n\tendShape();\n\tif(mode) curve(0, 2 * dim, 2 * dim, 0, 0, 0, 5 * dim, 0, 0, 5 * dim, -10 * dim, -4 * dim);\n\tpop();\n}\n\nfunction mousePressed(){\n\tmode=!mode;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Slow Motion.mp4"
+    ]
 }

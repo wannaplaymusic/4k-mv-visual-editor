@@ -1,22 +1,25 @@
 {
-  "name": "TendrilGrass",
-  "author": "digitalColeman",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:05:20",
-  "url": "https://openprocessing.org/@digitalColeman/1163879",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n  createCanvas(1000, 1000, WEBGL);\n  angleMode(DEGREES);\n  colorMode(HSB);\n  noStroke();\n}\n\nfunction draw() {\n  background(0);\n  orbitControl();\n  pointLight(100, 20, 100, 0, -800, 200);\n  pointLight(200, 20, 100, 0, 800, 200);\n  \n  for (let x = -300; x < 360; x += 60) {\n    for (let y = -300; y < 360; y += 60) {\n      push();\n      translate(x, y, -400);\n      rotateZ(noise(x/600.0, y/600.0, (millis()/10000.0))*360.0-180.0);\n      let len = 30;\n      for (let i = 5; i > 0; i--) {\n        translate(0, 0, 0.6 * i * len);\n        rotateY(noise((x/400.0) + millis()/7000.0, y/400.0, (millis()/12000.0))*50.0-25.0);\n        translate(0, 0, 0.5 * i * len);\n        push();\n        rotateX(90);\n        shininess(5);\n        specularMaterial(70+(i*20), i*15, 80);\n        cylinder(i * 3, i * len, 7, 1, 1, 1);\n        pop();\n      }\n      pop();\n    }\n  }\n\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "TendrilGrass",
+    "author": "digitalColeman",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:05:20",
+    "url": "https://openprocessing.org/@digitalColeman/1163879",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n  createCanvas(1000, 1000, WEBGL);\n  angleMode(DEGREES);\n  colorMode(HSB);\n  noStroke();\n}\n\nfunction draw() {\n  background(0);\n  orbitControl();\n  pointLight(100, 20, 100, 0, -800, 200);\n  pointLight(200, 20, 100, 0, 800, 200);\n  \n  for (let x = -300; x < 360; x += 60) {\n    for (let y = -300; y < 360; y += 60) {\n      push();\n      translate(x, y, -400);\n      rotateZ(noise(x/600.0, y/600.0, (millis()/10000.0))*360.0-180.0);\n      let len = 30;\n      for (let i = 5; i > 0; i--) {\n        translate(0, 0, 0.6 * i * len);\n        rotateY(noise((x/400.0) + millis()/7000.0, y/400.0, (millis()/12000.0))*50.0-25.0);\n        translate(0, 0, 0.5 * i * len);\n        push();\n        rotateX(90);\n        shininess(5);\n        specularMaterial(70+(i*20), i*15, 80);\n        cylinder(i * 3, i * len, 7, 1, 1, 1);\n        pop();\n      }\n      pop();\n    }\n  }\n\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Metal Frame.mp4"
+    ]
 }

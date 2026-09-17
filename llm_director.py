@@ -223,12 +223,34 @@ class LLMDirectorAgent:
             "Output STRICT JSON without conversational text or markdown formatting."
         )
 
+        genre_val = audio_telemetry.get('genre', 'Techno')
+        genre_tel = audio_telemetry.get('genre_telemetry', {})
+        sub_genre = genre_tel.get('sub_genre', '')
+        valence = audio_telemetry.get('valence', genre_tel.get('valence', 0.0))
+        arousal = audio_telemetry.get('arousal', genre_tel.get('arousal', 0.5))
+        danceability = genre_tel.get('danceability', 0.8)
+
+        genre_display = f"{genre_val}"
+        if sub_genre:
+            genre_display += f" ({sub_genre})"
+        genre_display += f" | Affect: [Valence={valence:+.2f}, Arousal={arousal:.2f}, Danceability={danceability:.2f}]"
+
+        sec_summary = []
+        for s in storyboard_sections:
+            s_name = s.get('section', 'Section')
+            s_hint = s.get('style_hint', '')
+            s_arousal = s.get('arousal', None)
+            if s_hint and s_arousal is not None:
+                sec_summary.append(f"{s_name} (Arousal: {s_arousal:.2f}, Mood: {s_hint})")
+            else:
+                sec_summary.append(s_name)
+
         user_prompt = f"""Analyze this music telemetry and direct a cohesive 4K Music Video:
 [Track Telemetry]
-- Genre: {audio_telemetry.get('genre', 'Techno')}
+- Genre & Affect: {genre_display}
 - BPM: {audio_telemetry.get('bpm', 120):.1f}
 - Key: {audio_telemetry.get('key', 'Unknown')}
-- Storyboard: {[s.get('section') for s in storyboard_sections]}
+- Storyboard Dynamics: {sec_summary}
 
 [Contextual Bandit Pre-Allocated Module Recommendations]
 {json.dumps(modules_summary, ensure_ascii=False)}

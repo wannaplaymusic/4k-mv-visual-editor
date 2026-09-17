@@ -1,22 +1,25 @@
 {
-  "name": "PottedSucculents_1",
-  "author": "u110137",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:31:36",
-  "url": "https://openprocessing.org/@u110137/1953901",
-  "code": "// === Tab: Circles ===\nclass Circle {\n\tconstructor(x, y, r) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.r = r;\n\t\tthis.a = 255;\n\t\tthis.isgrowing = true;\n\t\tthis.alive = true;\n\t}\n\tshow() {\n\t\tstroke(200, this.a);\n\t\tstrokeWeight(height/566);\n\t\tnoFill();\n\t\tellipse(this.x, this.y, this.r * 2);\n\t}\n\tgrow() {\n\t\tthis.r += height / 200;\n\t\tif (this.r > height / 8) this.isgrowing = false;\n\t}\n\ttouchesother(other) {\n\t\tlet d = dist(this.x, this.y, other.x, other.y);\n\t\tif (d < (this.r + other.r)) {\n\t\t\tthis.isgrowing = false;\n\t\t\tif (this.r < height / 48) this.alive = false;\n\t\t}\n\t}\n}\n\nfunction overlapping(x, y) {\n\tlet overlapping = false;\n\tfor (let c of circles) {\n\t\tvar d = dist(x, y, c.x, c.y);\n\t\tif (d < c.r) overlapping = true;\n\t}\n\treturn overlapping;\n}\n\n// === Tab: mySketch ===\n//For the #WCCChallenge, theme: \"succulents\"\nlet circles;\nlet radius;\nlet sindex;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tradius = height / 2.21;\n\tbackground(0);\n\tcircles = [];\n\tcircles.push(new Circle(width / 2, height / 2, height / 120));\n\tsindex = 0;\n}\n\nfunction draw() {\n\tif (radius > height / 10) {\n\t\tdrawPot();\n\t\tmakeCircles();\n\t} else if (frameCount % 5 == 0 && sindex < circles.length) {\n\t\tdrawSucculents();\n\t}\n}\n\nfunction drawSucculents() {\n\tlet x = circles[sindex].x;\n\tlet y = circles[sindex].y;\n\tlet cycles = random(20, 40);\n\tlet r = circles[sindex].r;\n\tlet prop = random(10, 15);\n\tlet w = r / prop;\n\tlet h = r / (2 * prop);\n\tlet a = random([2, 3, 4, 5]);\n\tlet b = random([2, 3, 4, 5, 6]);\n\tlet f = color(random(100), random(50, 150), 0, 80);\n\tlet s = color(random(100), 0, 0);\n\tdrawBlossom(x, y, r, cycles, w, h, a, b, f, s);\n\tsindex += 1;\n}\n\nfunction drawBlossom(x, y, r, cycles, w, h, a, b, f, s) {\n\tlet rang = 0;\n\tpush();\n\ttranslate(x, y);\n\tstrokeWeight(r / 100);\n\tfor (let ang = 0; ang < cycles * TAU; ang += 2.4) {\n\t\tpush();\n\t\trotate(ang);\n\t\ttranslate(0, r * cos(rang));\n\t\tlet lf = color(red(window.color(f)), green(window.color(f)), blue(window.color(f)), 96 + (64 * sin(ang - QUARTER_PI)));\n\t\tlet ls = color(red(window.color(s)), green(window.color(s)), blue(window.color(s)), 96 + (64 * sin(ang - QUARTER_PI)));\n\t\tdrawLeaf(w, h, a, b, lf, ls);\n\t\tpop();\n\t\trang -= HALF_PI / (2.8 * cycles);\n\t}\n\tpop();\n}\n\nfunction drawLeaf(w, h, a, b, lf, ls) {\n\tpush();\n\tfill(lf);\n\tstroke(ls);\n\tbeginShape();\n\tfor (let t = 0; t < TAU; t += (Math.max(0.001, Math.abs(TAU / 18)) || 1)) {\n\t\tvar x = PI * (w * Math.pow(sin(t), 3));\n\t\tvar y = -PI * (h * cos(t) - (h / 3) * cos(2 * t) - 2 * cos(a * t) - cos(b * t));\n\t\tcurveVertex(x, y);\n\t}\n\tendShape(CLOSE);\n\tpop();\n}\n\nfunction drawPot() {\n\tbackground(0);\n\tnoStroke();\n\tfill('rgb(16,12,8)');\n\tellipse(width / 2, height / 2, height, height);\n\tnoFill();\n\tstroke('rgb(204,112,21)');\n\tstrokeWeight(height / 60);\n\tellipse((width / 2) - (height / 360), (height / 2) - (height / 360), height, height);\n\tstroke('rgba(82,44,6,100)');\n\tellipse((width / 2) + (height / 360), (height / 2) + (height / 360), height, height);\n}\n\nfunction makeCircles() {\n\tlet pos = p5.Vector.random2D().mult(radius);\n\tvar x = pos.x + width / 2;\n\tvar y = pos.y + height / 2;\n\tif (frameCount % 3 == 0 && overlapping(x, y) == false) {\n\t\tcircles.push(new Circle(x, y, height / 120));\n\t}\n\tcircles = circles.filter(c => c.alive);\n\tfor (let c of circles) {\n\t\tc.a = map(radius, height / 2, height / 8, 200, 0, true);\n\t\tc.show();\n\t\tif (c.isgrowing) {\n\t\t\tc.grow();\n\t\t\tfor (let other of circles) {\n\t\t\t\tif (c != other) {\n\t\t\t\t\tc.touchesother(other);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\tradius -= height / 1200;\n\tcircles.sort((a, b) => (a.r > b.r) ? 1 : -1); //Sort circles so plants are drawn smallest to largest\n}\n\nfunction mousePressed() {\n\tsetup();\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "PottedSucculents_1",
+    "author": "u110137",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:31:36",
+    "url": "https://openprocessing.org/@u110137/1953901",
+    "code": "// === Tab: Circles ===\nclass Circle {\n\tconstructor(x, y, r) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.r = r;\n\t\tthis.a = 255;\n\t\tthis.isgrowing = true;\n\t\tthis.alive = true;\n\t}\n\tshow() {\n\t\tstroke(200, this.a);\n\t\tstrokeWeight(height/566);\n\t\tnoFill();\n\t\tellipse(this.x, this.y, this.r * 2);\n\t}\n\tgrow() {\n\t\tthis.r += height / 200;\n\t\tif (this.r > height / 8) this.isgrowing = false;\n\t}\n\ttouchesother(other) {\n\t\tlet d = dist(this.x, this.y, other.x, other.y);\n\t\tif (d < (this.r + other.r)) {\n\t\t\tthis.isgrowing = false;\n\t\t\tif (this.r < height / 48) this.alive = false;\n\t\t}\n\t}\n}\n\nfunction overlapping(x, y) {\n\tlet overlapping = false;\n\tfor (let c of circles) {\n\t\tvar d = dist(x, y, c.x, c.y);\n\t\tif (d < c.r) overlapping = true;\n\t}\n\treturn overlapping;\n}\n\n// === Tab: mySketch ===\n//For the #WCCChallenge, theme: \"succulents\"\nlet circles;\nlet radius;\nlet sindex;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tradius = height / 2.21;\n\tbackground(0);\n\tcircles = [];\n\tcircles.push(new Circle(width / 2, height / 2, height / 120));\n\tsindex = 0;\n}\n\nfunction draw() {\n\tif (radius > height / 10) {\n\t\tdrawPot();\n\t\tmakeCircles();\n\t} else if (frameCount % 5 == 0 && sindex < circles.length) {\n\t\tdrawSucculents();\n\t}\n}\n\nfunction drawSucculents() {\n\tlet x = circles[sindex].x;\n\tlet y = circles[sindex].y;\n\tlet cycles = random(20, 40);\n\tlet r = circles[sindex].r;\n\tlet prop = random(10, 15);\n\tlet w = r / prop;\n\tlet h = r / (2 * prop);\n\tlet a = random([2, 3, 4, 5]);\n\tlet b = random([2, 3, 4, 5, 6]);\n\tlet f = color(random(100), random(50, 150), 0, 80);\n\tlet s = color(random(100), 0, 0);\n\tdrawBlossom(x, y, r, cycles, w, h, a, b, f, s);\n\tsindex += 1;\n}\n\nfunction drawBlossom(x, y, r, cycles, w, h, a, b, f, s) {\n\tlet rang = 0;\n\tpush();\n\ttranslate(x, y);\n\tstrokeWeight(r / 100);\n\tfor (let ang = 0; ang < cycles * TAU; ang += 2.4) {\n\t\tpush();\n\t\trotate(ang);\n\t\ttranslate(0, r * cos(rang));\n\t\tlet lf = color(red(window.color(f)), green(window.color(f)), blue(window.color(f)), 96 + (64 * sin(ang - QUARTER_PI)));\n\t\tlet ls = color(red(window.color(s)), green(window.color(s)), blue(window.color(s)), 96 + (64 * sin(ang - QUARTER_PI)));\n\t\tdrawLeaf(w, h, a, b, lf, ls);\n\t\tpop();\n\t\trang -= HALF_PI / (2.8 * cycles);\n\t}\n\tpop();\n}\n\nfunction drawLeaf(w, h, a, b, lf, ls) {\n\tpush();\n\tfill(lf);\n\tstroke(ls);\n\tbeginShape();\n\tfor (let t = 0; t < TAU; t += (Math.max(0.001, Math.abs(TAU / 18)) || 1)) {\n\t\tvar x = PI * (w * Math.pow(sin(t), 3));\n\t\tvar y = -PI * (h * cos(t) - (h / 3) * cos(2 * t) - 2 * cos(a * t) - cos(b * t));\n\t\tcurveVertex(x, y);\n\t}\n\tendShape(CLOSE);\n\tpop();\n}\n\nfunction drawPot() {\n\tbackground(0);\n\tnoStroke();\n\tfill('rgb(16,12,8)');\n\tellipse(width / 2, height / 2, height, height);\n\tnoFill();\n\tstroke('rgb(204,112,21)');\n\tstrokeWeight(height / 60);\n\tellipse((width / 2) - (height / 360), (height / 2) - (height / 360), height, height);\n\tstroke('rgba(82,44,6,100)');\n\tellipse((width / 2) + (height / 360), (height / 2) + (height / 360), height, height);\n}\n\nfunction makeCircles() {\n\tlet pos = p5.Vector.random2D().mult(radius);\n\tvar x = pos.x + width / 2;\n\tvar y = pos.y + height / 2;\n\tif (frameCount % 3 == 0 && overlapping(x, y) == false) {\n\t\tcircles.push(new Circle(x, y, height / 120));\n\t}\n\tcircles = circles.filter(c => c.alive);\n\tfor (let c of circles) {\n\t\tc.a = map(radius, height / 2, height / 8, 200, 0, true);\n\t\tc.show();\n\t\tif (c.isgrowing) {\n\t\t\tc.grow();\n\t\t\tfor (let other of circles) {\n\t\t\t\tif (c != other) {\n\t\t\t\t\tc.touchesother(other);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\tradius -= height / 1200;\n\tcircles.sort((a, b) => (a.r > b.r) ? 1 : -1); //Sort circles so plants are drawn smallest to largest\n}\n\nfunction mousePressed() {\n\tsetup();\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Sub Bass Drift.mp4"
+    ]
 }
