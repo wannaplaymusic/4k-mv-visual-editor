@@ -740,13 +740,19 @@ if (typeof window !== 'undefined') {
         set: function(val) {
           if (val && typeof val === 'object' && 'exports' in val) {
             _module.exports = val.exports;
+            if (typeof val.exports === 'function' && !window.randomColor) window.randomColor = val.exports;
+            else if (val.exports && val.exports.randomColor && !window.randomColor) window.randomColor = val.exports.randomColor;
           }
         },
         configurable: true
       });
       Object.defineProperty(window, 'exports', {
         get: function() { return _module.exports; },
-        set: function(val) { _module.exports = val; },
+        set: function(val) {
+          _module.exports = val;
+          if (typeof val === 'function' && !window.randomColor) window.randomColor = val;
+          else if (val && val.randomColor && !window.randomColor) window.randomColor = val.randomColor;
+        },
         configurable: true
       });
     } catch(e) {
@@ -758,6 +764,7 @@ if (typeof window !== 'undefined') {
     if (mod === '../p5' || mod === 'p5') return window.p5 || (typeof p5 !== 'undefined' ? p5 : {});
     if (mod === 'c2' || mod === './c2' || (typeof mod === 'string' && mod.includes('c2'))) return window.c2 || (window.module && window.module.exports) || {};
     if (mod === 'clipper' || mod === 'clipper-lib' || (typeof mod === 'string' && mod.includes('clipper'))) return window.ClipperLib || (window.module && window.module.exports) || {};
+    if (mod === 'randomcolor' || mod === 'randomColor') return window.randomColor || (window.module && window.module.exports && (window.module.exports.randomColor || window.module.exports)) || {};
     return window[mod] || {};
   };
 
@@ -766,6 +773,39 @@ if (typeof window !== 'undefined') {
   if (typeof window.c2 !== 'undefined' && typeof c2 === 'undefined') { try { var c2 = window.c2; } catch(e) {} }
   if (typeof window.ClipperLib !== 'undefined' && typeof ClipperLib === 'undefined') { try { var ClipperLib = window.ClipperLib; } catch(e) {} }
   if (typeof window.PoissonDiskSampling !== 'undefined' && typeof PoissonDiskSampling === 'undefined') { try { var PoissonDiskSampling = window.PoissonDiskSampling; } catch(e) {} }
+  if (typeof window.randomColor !== 'undefined' && typeof randomColor === 'undefined') { try { var randomColor = window.randomColor; } catch(e) {} }
+
+  // randomColor 全域通用 Polyfill / 打樁護欄 (支援 hex, rgb, hsl, count 參數)
+  if (typeof window.randomColor === 'undefined') {
+    window.randomColor = function(options) {
+      options = options || {};
+      var count = options.count;
+      function _one() {
+        var h = options.hue !== undefined ? (typeof options.hue === 'number' ? options.hue : (parseInt(options.hue, 10) || Math.floor(Math.random() * 360))) : Math.floor(Math.random() * 360);
+        var s = options.luminosity === 'light' ? 85 : (options.luminosity === 'dark' ? 55 : 70);
+        var l = options.luminosity === 'light' ? 80 : (options.luminosity === 'dark' ? 30 : 50);
+        if (options.format === 'rgb' || options.format === 'rgba') {
+          return 'rgb(' + Math.floor(Math.random()*256) + ',' + Math.floor(Math.random()*256) + ',' + Math.floor(Math.random()*256) + ')';
+        }
+        if (options.format === 'hsl' || options.format === 'hsla') {
+          return 'hsl(' + h + ',' + s + '%,' + l + '%)';
+        }
+        var hex = '#';
+        var letters = '0123456789ABCDEF';
+        for (var i = 0; i < 6; i++) hex += letters[Math.floor(Math.random() * 16)];
+        return hex;
+      }
+      if (typeof count === 'number' && count > 0) {
+        var arr = [];
+        for (var i = 0; i < count; i++) arr.push(_one());
+        return arr;
+      }
+      return _one();
+    };
+  }
+  if (typeof randomColor === 'undefined') {
+    try { var randomColor = window.randomColor; } catch(e) {}
+  }
 
   // ClipperLib 防崩潰打樁護欄
   if (typeof window.ClipperLib === 'undefined') {
@@ -1403,6 +1443,17 @@ if (typeof p5 !== 'undefined') {
             }
           };
         });
+        // Add explicit safe blendMode for graphics instance
+        g.blendMode = function(mode) {
+          if (g._renderer && typeof g._renderer.blendMode === 'function') {
+            try { return g._renderer.blendMode(mode); } catch(e) {}
+          }
+          const ctx = g.drawingContext || (g._renderer && g._renderer.drawingContext);
+          if (ctx && typeof mode === 'string') {
+            try { ctx.globalCompositeOperation = mode; } catch(e) {}
+          }
+          return g;
+        };
         // Add legacy PGraphics method stubs (beginDraw / endDraw)
         g.beginDraw = g.beginDraw || function() { return this; };
         g.endDraw = g.endDraw || function() { return this; };
@@ -1417,6 +1468,94 @@ if (typeof p5 !== 'undefined') {
         }
       }
       return g;
+    };
+  }
+
+  // 🛡️ blendMode 終極安全防護：防禦 _renderer 未建立、為 undefined 或已銷毀時拋出 Cannot read properties of undefined (reading 'blendMode')
+  if (typeof p5 !== 'undefined' && p5.prototype && p5.prototype.blendMode) {
+    const _origBlendMode = p5.prototype.blendMode;
+    p5.prototype.blendMode = function(mode) {
+      let target = (this && this._renderer) ? this : null;
+      if (!target && typeof p5.instance !== 'undefined' && p5.instance && p5.instance._renderer) {
+        target = p5.instance;
+      }
+      if (!target && typeof window !== 'undefined' && window._p5Instance && window._p5Instance._renderer) {
+        target = window._p5Instance;
+      }
+      if (!target || !target._renderer || typeof target._renderer.blendMode !== 'function') {
+        const ctx = (this && this.drawingContext) || (target && target.drawingContext) || (typeof drawingContext !== 'undefined' ? drawingContext : null);
+        if (ctx && typeof mode === 'string') {
+          try { ctx.globalCompositeOperation = mode; } catch(e) {}
+        }
+        return this;
+      }
+      try {
+        return _origBlendMode.call(target, mode);
+      } catch(err) {
+        console.warn("[P5_COMPAT] blendMode safe guard intercepted error:", err);
+        return this;
+      }
+    };
+  }
+
+  // 🛡️ p5.Graphics / Renderer blendMode 防護
+  if (typeof p5 !== 'undefined') {
+    if (p5.Graphics && p5.Graphics.prototype && p5.Graphics.prototype.blendMode) {
+      const _origGBlend = p5.Graphics.prototype.blendMode;
+      p5.Graphics.prototype.blendMode = function(mode) {
+        if (!this || !this._renderer || typeof this._renderer.blendMode !== 'function') {
+          const ctx = this.drawingContext || (this._renderer && this._renderer.drawingContext);
+          if (ctx && typeof mode === 'string') {
+            try { ctx.globalCompositeOperation = mode; } catch(e) {}
+          }
+          return this;
+        }
+        try { return _origGBlend.call(this, mode); } catch(e) { return this; }
+      };
+    }
+    if (p5.Renderer2D && p5.Renderer2D.prototype && p5.Renderer2D.prototype.blendMode) {
+      const _origR2DBlend = p5.Renderer2D.prototype.blendMode;
+      p5.Renderer2D.prototype.blendMode = function(mode) {
+        try { return _origR2DBlend.call(this, mode); } catch(e) { return this; }
+      };
+    }
+    if (p5.RendererGL && p5.RendererGL.prototype && p5.RendererGL.prototype.blendMode) {
+      const _origRGLBlend = p5.RendererGL.prototype.blendMode;
+      p5.RendererGL.prototype.blendMode = function(mode) {
+        try { return _origRGLBlend.call(this, mode); } catch(e) { return this; }
+      };
+    }
+  }
+
+  // 🛡️ window.blendMode 全域回退防護
+  if (typeof window !== 'undefined') {
+    const _origWinBlend = window.blendMode;
+    window.blendMode = function(mode) {
+      if (typeof _origWinBlend === 'function') {
+        try { return _origWinBlend(mode); } catch(e) {}
+      }
+      if (typeof p5 !== 'undefined' && p5.prototype && p5.prototype.blendMode) {
+        try {
+          return p5.prototype.blendMode.call(p5.instance || window._p5Instance || window, mode);
+        } catch(e) {}
+      }
+      const ctx = typeof drawingContext !== 'undefined' ? drawingContext : null;
+      if (ctx && typeof mode === 'string') {
+        try { ctx.globalCompositeOperation = mode; } catch(e) {}
+      }
+    };
+  }
+
+  // 🛡️ p5.prototype.filter 防護 (防止 parentRenderer.blendMode 異常)
+  if (typeof p5 !== 'undefined' && p5.prototype && p5.prototype.filter) {
+    const _origFilter = p5.prototype.filter;
+    p5.prototype.filter = function(...args) {
+      try {
+        return _origFilter.apply(this, args);
+      } catch(err) {
+        console.warn("[P5_COMPAT] filter safe guard intercepted error:", err);
+        return this;
+      }
     };
   }
   
@@ -1848,7 +1987,7 @@ if (typeof p5 !== 'undefined') {
         configurable: true,
         enumerable: true
       });
-      console.log("[P5_COMPAT] HTMLInputElement.prototype.size override applied successfully");
+      // Silently applied HTMLInputElement.prototype.size override
     } catch (e) {
       console.warn("[P5_COMPAT] Failed to override HTMLInputElement.prototype.size:", e);
     }
@@ -2208,6 +2347,22 @@ if (typeof p5 !== 'undefined') {
         return { x: x || 0, y: (y || 0) - sz, w: len * sz * 0.6, h: sz * 1.2, advance: len * sz * 0.6 };
       };
     }
+    if (p5.prototype) {
+      if (typeof p5.prototype._pixelDensity === 'undefined') p5.prototype._pixelDensity = 1;
+      if (p5.prototype.pixelDensity) {
+        var _origP5PixelDensity = p5.prototype.pixelDensity;
+        p5.prototype.pixelDensity = function(val) {
+          if (!this._renderer) {
+            if (typeof val === 'number') {
+              this._pixelDensity = val;
+              return this;
+            }
+            return this._pixelDensity || (typeof window.pixelDensity === 'function' ? window.pixelDensity() : 1);
+          }
+          return _origP5PixelDensity.apply(this, arguments);
+        };
+      }
+    }
     if (p5.Renderer && p5.Renderer.prototype) {
       if (typeof p5.Renderer.prototype._pixelDensity === 'undefined') p5.Renderer.prototype._pixelDensity = 1;
       if (!p5.Renderer.prototype.textures) p5.Renderer.prototype.textures = [];
@@ -2433,6 +2588,74 @@ if (typeof window !== 'undefined') {
       }
     }
   });
+
+  // Universal Lodash / Underscore (_) mock & polyfill (prevents ReferenceError: _ is not defined)
+  (function() {
+    var _obj = function(val) {
+      return {
+        val: val,
+        value: function() { return this.val; }
+      };
+    };
+    var utils = {
+      times: function(n, fn) {
+        var res = [];
+        n = Math.max(0, parseInt(n, 10) || 0);
+        for (var i = 0; i < n; i++) res.push(fn ? fn(i) : i);
+        return res;
+      },
+      range: function(start, stop, step) {
+        if (stop === undefined) { stop = start; start = 0; }
+        step = step || (stop < start ? -1 : 1);
+        var length = Math.max(Math.ceil((stop - start) / step), 0);
+        var res = Array(length);
+        for (var i = 0; i < length; i++, start += step) res[i] = start;
+        return res;
+      },
+      random: function(min, max, floating) {
+        if (max === undefined) { max = min; min = 0; }
+        var r = Math.random() * (max - min) + min;
+        return floating ? r : Math.floor(r);
+      },
+      clamp: function(n, lower, upper) {
+        return Math.min(Math.max(n, lower), upper);
+      },
+      map: function(arr, fn) { return Array.isArray(arr) ? arr.map(fn) : []; },
+      each: function(arr, fn) { if (Array.isArray(arr)) arr.forEach(fn); else if (arr) Object.keys(arr).forEach(function(k) { fn(arr[k], k); }); },
+      forEach: function(arr, fn) { if (Array.isArray(arr)) arr.forEach(fn); else if (arr) Object.keys(arr).forEach(function(k) { fn(arr[k], k); }); },
+      filter: function(arr, fn) { return Array.isArray(arr) ? arr.filter(fn) : []; },
+      find: function(arr, fn) { return Array.isArray(arr) ? arr.find(fn) : undefined; },
+      reduce: function(arr, fn, init) { return Array.isArray(arr) ? arr.reduce(fn, init) : init; },
+      flatten: function(arr) { return Array.isArray(arr) ? (arr.flat ? arr.flat(Infinity) : arr) : []; },
+      sample: function(arr) { return Array.isArray(arr) && arr.length ? arr[Math.floor(Math.random() * arr.length)] : undefined; },
+      shuffle: function(arr) {
+        if (!Array.isArray(arr)) return [];
+        var res = arr.slice();
+        for (var i = res.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var temp = res[i]; res[i] = res[j]; res[j] = temp;
+        }
+        return res;
+      },
+      noop: function() {},
+      isFunction: function(val) { return typeof val === 'function'; },
+      isArray: function(val) { return Array.isArray(val); },
+      isObject: function(val) { return val !== null && typeof val === 'object'; },
+      isNumber: function(val) { return typeof val === 'number' && !isNaN(val); },
+      defaults: function(obj, defs) { return Object.assign({}, defs, obj); },
+      clone: function(val) { return typeof val === 'object' && val !== null ? Object.assign({}, val) : val; },
+      now: function() { return Date.now(); }
+    };
+    Object.assign(_obj, utils);
+    if (typeof window._ === 'undefined') {
+      window._ = _obj;
+    } else {
+      for (var k in utils) {
+        if (typeof window._[k] === 'undefined') window._[k] = utils[k];
+      }
+    }
+  })();
+
   window.addEventListener('unhandledrejection', function(event) {
     event.preventDefault();
   });
@@ -3362,16 +3585,7 @@ if (typeof p5 !== 'undefined') {
       return target;
     }
     var _opcProxy = wrapOPC(window.OPC);
-    try {
-      Object.defineProperty(window, 'OPC', {
-        get: function() { return _opcProxy; },
-        set: function(val) { _opcProxy = wrapOPC(val); },
-        configurable: true
-      });
-    } catch(e) {
-      window.OPC = _opcProxy;
-    }
-    if (typeof OPC === 'undefined') { try { var OPC = window.OPC; } catch(e) {} }
+    window.OPC = _opcProxy;
   })();
 
   // Inject Processing Matrix Aliases (pushMatrix -> push, popMatrix -> pop)
@@ -7256,6 +7470,7 @@ class StandaloneInjectorApp(QMainWindow):
             # 4. 頂層 let / const 衝突修復 (防止多分頁或重新載入時發生 Identifier has already been declared)
             code = re.sub(r'^\s*let\s+([a-zA-Z0-9_$]+)', r'var \1', code, flags=re.MULTILINE)
             code = re.sub(r'^\s*const\s+([a-zA-Z0-9_$]+)', r'var \1', code, flags=re.MULTILINE)
+            code = re.sub(r'(^|[;\{\}\s])(?:const|let)\s+OPC\b', r'\1var OPC', code)
 
             # 5. 自動修復宣告結尾的 ;, 或 ,; 語法錯誤 (如 let a;, b;)
             code = re.sub(r';,', r',', code)
@@ -7279,41 +7494,41 @@ class StandaloneInjectorApp(QMainWindow):
         is_module = has_import_export
 
         scope_guards = (
-            "if (typeof window.Tone !== 'undefined' && typeof Tone === 'undefined') { var Tone = window.Tone; }\n"
-            "if (typeof window.CENTER !== 'undefined' && typeof CENTER === 'undefined') { var CENTER = window.CENTER || 'center'; }\n"
-            "if (typeof window.back === 'undefined') { var back = '#000000'; }\n"
-            "if (typeof window.SVG === 'undefined') { var SVG = 'p2d'; }\n"
-            "if (typeof window.page === 'undefined') { var page = 0; }\n"
-            "if (typeof window.it === 'undefined') { var it = 0; }\n"
-            "if (typeof window.OpenSimplexNoise !== 'undefined' && typeof OpenSimplexNoise === 'undefined') { var OpenSimplexNoise = window.OpenSimplexNoise; }\n"
-            "if (typeof window.openSimplexNoise !== 'undefined' && typeof openSimplexNoise === 'undefined') { var openSimplexNoise = window.openSimplexNoise; }\n"
-            "if (typeof window.SimplexNoise !== 'undefined' && typeof SimplexNoise === 'undefined') { var SimplexNoise = window.SimplexNoise; }\n"
-            "if (typeof window.p5ex !== 'undefined' && typeof p5ex === 'undefined') { var p5ex = window.p5ex; }\n"
-            "if (typeof window.require !== 'undefined' && typeof require === 'undefined') { var require = window.require; }\n"
-            "if (typeof window.c2 !== 'undefined' && typeof c2 === 'undefined') { var c2 = window.c2; }\n"
-            "if (typeof c2 === 'undefined' && typeof window.module !== 'undefined' && window.module.exports && (window.module.exports.Voronoi || window.module.exports.Point)) { var c2 = window.module.exports; window.c2 = c2; }\n"
-            "if (typeof c2 === 'undefined') { var c2 = { Point: class { constructor(x,y){ this.x=x||0; this.y=y||0; } }, Vector: class { constructor(x,y){ this.x=x||0; this.y=y||0; } }, Voronoi: class { constructor(){ this.regions=[]; } compute(){} }, Delaunay: class { constructor(){ this.triangles=[]; this.edges=[]; } compute(){} } }; window.c2 = c2; }\n"
-            "if (typeof window.ClipperLib !== 'undefined' && typeof ClipperLib === 'undefined') { var ClipperLib = window.ClipperLib; }\n"
-            "if (typeof ClipperLib === 'undefined' && typeof window.module !== 'undefined' && window.module.exports && (window.module.exports.ClipperLib || window.module.exports.Clipper)) { var ClipperLib = window.module.exports.ClipperLib || window.module.exports; window.ClipperLib = ClipperLib; }\n"
-            "if (typeof window.PoissonDiskSampling !== 'undefined' && typeof PoissonDiskSampling === 'undefined') { var PoissonDiskSampling = window.PoissonDiskSampling; }\n"
-            "if (typeof window.Canvas !== 'undefined' && typeof Canvas === 'undefined') { var Canvas = window.Canvas; }\n"
-            "if (typeof window.Sprite !== 'undefined' && typeof Sprite === 'undefined') { var Sprite = window.Sprite; }\n"
-            "if (typeof window.Group !== 'undefined' && typeof Group === 'undefined') { var Group = window.Group; }\n"
-            "if (typeof window.world !== 'undefined' && typeof world === 'undefined') { var world = window.world; }\n"
-            "if (typeof window.OPC !== 'undefined' && typeof OPC === 'undefined') { var OPC = window.OPC; }\n"
-            "if (typeof window.createFont !== 'undefined' && typeof createFont === 'undefined') { var createFont = window.createFont; }\n"
-            "if (typeof window.wordsOfWisdom !== 'undefined' && typeof wordsOfWisdom === 'undefined') { var wordsOfWisdom = window.wordsOfWisdom; }\n"
-            "if (typeof wordsOfWisdom === 'undefined') { var wordsOfWisdom = ['Flow', 'Pulse', 'Vibration', 'Resonance', 'Structure', 'Echo', 'Wave', 'Core', 'Drift', 'Static', 'Horizon', 'Depth']; window.wordsOfWisdom = wordsOfWisdom; }\n"
-            "if (typeof window.getRotatedPt !== 'undefined' && typeof getRotatedPt === 'undefined') { var getRotatedPt = window.getRotatedPt; }\n"
-            "if (typeof window.blendModebackground !== 'undefined' && typeof blendModebackground === 'undefined') { var blendModebackground = window.blendModebackground; }\n"
-            "if (typeof window.blendModeellipse !== 'undefined' && typeof blendModeellipse === 'undefined') { var blendModeellipse = window.blendModeellipse; }\n"
-            "if (typeof window.blendModerect !== 'undefined' && typeof blendModerect === 'undefined') { var blendModerect = window.blendModerect; }\n"
-            "if (typeof window.blendModefill !== 'undefined' && typeof blendModefill === 'undefined') { var blendModefill = window.blendModefill; }\n"
-            "if (typeof window.blendModestroke !== 'undefined' && typeof blendModestroke === 'undefined') { var blendModestroke = window.blendModestroke; }\n"
+            "if (typeof window.Tone !== 'undefined' && typeof Tone === 'undefined') { try { Tone = window.Tone; } catch(e){} }\n"
+            "if (typeof window.CENTER !== 'undefined' && typeof CENTER === 'undefined') { try { CENTER = window.CENTER || 'center'; } catch(e){} }\n"
+            "if (typeof window.back === 'undefined') { window.back = '#000000'; }\n"
+            "if (typeof window.SVG === 'undefined') { window.SVG = 'p2d'; }\n"
+            "if (typeof window.page === 'undefined') { window.page = 0; }\n"
+            "if (typeof window.it === 'undefined') { window.it = 0; }\n"
+            "if (typeof window.OpenSimplexNoise !== 'undefined' && typeof OpenSimplexNoise === 'undefined') { try { OpenSimplexNoise = window.OpenSimplexNoise; } catch(e){} }\n"
+            "if (typeof window.openSimplexNoise !== 'undefined' && typeof openSimplexNoise === 'undefined') { try { openSimplexNoise = window.openSimplexNoise; } catch(e){} }\n"
+            "if (typeof window.SimplexNoise !== 'undefined' && typeof SimplexNoise === 'undefined') { try { SimplexNoise = window.SimplexNoise; } catch(e){} }\n"
+            "if (typeof window.p5ex !== 'undefined' && typeof p5ex === 'undefined') { try { p5ex = window.p5ex; } catch(e){} }\n"
+            "if (typeof window.require !== 'undefined' && typeof require === 'undefined') { try { require = window.require; } catch(e){} }\n"
+            "if (typeof window.c2 !== 'undefined' && typeof c2 === 'undefined') { try { c2 = window.c2; } catch(e){} }\n"
+            "if (typeof c2 === 'undefined' && typeof window.module !== 'undefined' && window.module.exports && (window.module.exports.Voronoi || window.module.exports.Point)) { window.c2 = window.module.exports.c2 || window.module.exports; }\n"
+            "if (typeof c2 === 'undefined') { window.c2 = { Point: class { constructor(x,y){ this.x=x||0; this.y=y||0; } }, Vector: class { constructor(x,y){ this.x=x||0; this.y=y||0; } }, Voronoi: class { constructor(){ this.regions=[]; } compute(){} }, Delaunay: class { constructor(){ this.triangles=[]; this.edges=[]; } compute(){} } }; }\n"
+            "if (typeof window.ClipperLib !== 'undefined' && typeof ClipperLib === 'undefined') { try { ClipperLib = window.ClipperLib; } catch(e){} }\n"
+            "if (typeof ClipperLib === 'undefined' && typeof window.module !== 'undefined' && window.module.exports && (window.module.exports.ClipperLib || window.module.exports.Clipper)) { window.ClipperLib = window.module.exports.ClipperLib || window.module.exports; }\n"
+            "if (typeof window.PoissonDiskSampling !== 'undefined' && typeof PoissonDiskSampling === 'undefined') { try { PoissonDiskSampling = window.PoissonDiskSampling; } catch(e){} }\n"
+            "if (typeof window.Canvas !== 'undefined' && typeof Canvas === 'undefined') { try { Canvas = window.Canvas; } catch(e){} }\n"
+            "if (typeof window.Sprite !== 'undefined' && typeof Sprite === 'undefined') { try { Sprite = window.Sprite; } catch(e){} }\n"
+            "if (typeof window.Group !== 'undefined' && typeof Group === 'undefined') { try { Group = window.Group; } catch(e){} }\n"
+            "if (typeof window.world !== 'undefined' && typeof world === 'undefined') { try { world = window.world; } catch(e){} }\n"
+            "if (typeof window.OPC === 'undefined') { window.OPC = { slider: function(){}, button: function(){}, toggle: function(){}, collapse: function(){}, expand: function(){} }; }\n"
+            "if (typeof window.createFont !== 'undefined' && typeof createFont === 'undefined') { try { createFont = window.createFont; } catch(e){} }\n"
+            "if (typeof window.wordsOfWisdom !== 'undefined' && typeof wordsOfWisdom === 'undefined') { try { wordsOfWisdom = window.wordsOfWisdom; } catch(e){} }\n"
+            "if (typeof wordsOfWisdom === 'undefined') { window.wordsOfWisdom = ['Flow', 'Pulse', 'Vibration', 'Resonance', 'Structure', 'Echo', 'Wave', 'Core', 'Drift', 'Static', 'Horizon', 'Depth']; }\n"
+            "if (typeof window.getRotatedPt !== 'undefined' && typeof getRotatedPt === 'undefined') { try { getRotatedPt = window.getRotatedPt; } catch(e){} }\n"
+            "if (typeof window.blendModebackground !== 'undefined' && typeof blendModebackground === 'undefined') { try { blendModebackground = window.blendModebackground; } catch(e){} }\n"
+            "if (typeof window.blendModeellipse !== 'undefined' && typeof blendModeellipse === 'undefined') { try { blendModeellipse = window.blendModeellipse; } catch(e){} }\n"
+            "if (typeof window.blendModerect !== 'undefined' && typeof blendModerect === 'undefined') { try { blendModerect = window.blendModerect; } catch(e){} }\n"
+            "if (typeof window.blendModefill !== 'undefined' && typeof blendModefill === 'undefined') { try { blendModefill = window.blendModefill; } catch(e){} }\n"
+            "if (typeof window.blendModestroke !== 'undefined' && typeof blendModestroke === 'undefined') { try { blendModestroke = window.blendModestroke; } catch(e){} }\n"
         )
         script_tag = f'<script type="module">{scope_guards}{code}\n{BIND_MODULE_CALLBACKS_JS}</script>' if is_module else f'<script>{scope_guards}{code}</script>'
 
-        ready_state_override_js = "Object.defineProperty(Document.prototype, 'readyState', { get: function() { return 'loading'; }, configurable: true });" if (for_thumbnail or for_rendering) else ""
+        ready_state_override_js = "Object.defineProperty(Document.prototype, 'readyState', { get: function() { return 'loading'; }, configurable: true });" if (for_thumbnail and not for_rendering) else ""
         early_error_js = f"""
               <script>
                 (function() {{
@@ -7389,6 +7604,27 @@ class StandaloneInjectorApp(QMainWindow):
                     event.preventDefault();
                   }}
                   var reasonStr = event.reason ? (event.reason.message || String(event.reason)) : "";
+                  var absorbPatterns = [
+                    "Cannot read properties of undefined",
+                    "Cannot read properties of null",
+                    "Cannot set property",
+                    "is not a function",
+                    "is not defined",
+                    "has already been declared",
+                    "Cannot redefine property",
+                    "which has only a getter",
+                    "Cannot create property",
+                    "is not valid JSON",
+                    "JSON.parse",
+                    "Unable to create depth textures",
+                    "user gesture",
+                    "not allowed to play"
+                  ];
+                  for (var i = 0; i < absorbPatterns.length; i++) {{
+                    if (reasonStr.indexOf(absorbPatterns[i]) !== -1) {{
+                      return;
+                    }}
+                  }}
                   window.jsErrors.push({{message: "Unhandled Rejection: " + reasonStr, source: "promise", lineno: 0}});
                 }});
                 window.jsLogs = [];
@@ -7461,7 +7697,7 @@ class StandaloneInjectorApp(QMainWindow):
                         }} else if (typeof v === 'function' && (v.name === 'PoissonDiskSampling' || v.name === 'Poisson')) {{
                           window.PoissonDiskSampling = v;
                         }}
-                        for (let k of ['c2', 'Voronoi', 'Delaunay', 'Point', 'Vector', 'Polygon', 'LimitedVoronoi', 'ClipperLib', 'Clipper', 'ClipType', 'PolyType', 'PolyFillType', 'IntPoint', 'Path', 'Paths', 'PoissonDiskSampling']) {{
+                        for (let k of ['c2', 'Voronoi', 'Delaunay', 'Point', 'Vector', 'Polygon', 'LimitedVoronoi', 'ClipperLib', 'Clipper', 'ClipType', 'PolyType', 'PolyFillType', 'IntPoint', 'Path', 'Paths', 'PoissonDiskSampling', 'randomColor']) {{
                           if (v[k] !== undefined && typeof window[k] === 'undefined') {{
                             try {{ window[k] = v[k]; }} catch(e) {{}}
                           }}
@@ -7475,13 +7711,19 @@ class StandaloneInjectorApp(QMainWindow):
                       set: function(val) {{
                         if (val && typeof val === 'object' && 'exports' in val) {{
                           _module.exports = val.exports;
+                          if (typeof val.exports === 'function' && !window.randomColor) window.randomColor = val.exports;
+                          else if (val.exports && val.exports.randomColor && !window.randomColor) window.randomColor = val.exports.randomColor;
                         }}
                       }},
                       configurable: true
                     }});
                     Object.defineProperty(window, 'exports', {{
                       get: function() {{ return _module.exports; }},
-                      set: function(val) {{ _module.exports = val; }},
+                      set: function(val) {{
+                        _module.exports = val;
+                        if (typeof val === 'function' && !window.randomColor) window.randomColor = val;
+                        else if (val && val.randomColor && !window.randomColor) window.randomColor = val.randomColor;
+                      }},
                       configurable: true
                     }});
                   }} catch(e) {{
@@ -7493,6 +7735,7 @@ class StandaloneInjectorApp(QMainWindow):
                   if (mod === '../p5' || mod === 'p5') return window.p5 || (typeof p5 !== 'undefined' ? p5 : {{}});
                   if (mod === 'c2' || mod === './c2' || (typeof mod === 'string' && mod.includes('c2'))) return window.c2 || (window.module && window.module.exports) || {{}};
                   if (mod === 'clipper' || mod === 'clipper-lib' || (typeof mod === 'string' && mod.includes('clipper'))) return window.ClipperLib || (window.module && window.module.exports) || {{}};
+                  if (mod === 'randomcolor' || mod === 'randomColor') return window.randomColor || (window.module && window.module.exports && (window.module.exports.randomColor || window.module.exports)) || {{}};
                   return window[mod] || {{}};
                 }};
 
@@ -7500,6 +7743,39 @@ class StandaloneInjectorApp(QMainWindow):
                 if (typeof window.c2 !== 'undefined' && typeof c2 === 'undefined') {{ try {{ var c2 = window.c2; }} catch(e) {{}} }}
                 if (typeof window.ClipperLib !== 'undefined' && typeof ClipperLib === 'undefined') {{ try {{ var ClipperLib = window.ClipperLib; }} catch(e) {{}} }}
                 if (typeof window.PoissonDiskSampling !== 'undefined' && typeof PoissonDiskSampling === 'undefined') {{ try {{ var PoissonDiskSampling = window.PoissonDiskSampling; }} catch(e) {{}} }}
+                if (typeof window.randomColor !== 'undefined' && typeof randomColor === 'undefined') {{ try {{ var randomColor = window.randomColor; }} catch(e) {{}} }}
+
+                // randomColor 全域通用 Polyfill / 打樁護欄
+                if (typeof window.randomColor === 'undefined') {{
+                  window.randomColor = function(options) {{
+                    options = options || {{}};
+                    var count = options.count;
+                    function _one() {{
+                      var h = options.hue !== undefined ? (typeof options.hue === 'number' ? options.hue : (parseInt(options.hue, 10) || Math.floor(Math.random() * 360))) : Math.floor(Math.random() * 360);
+                      var s = options.luminosity === 'light' ? 85 : (options.luminosity === 'dark' ? 55 : 70);
+                      var l = options.luminosity === 'light' ? 80 : (options.luminosity === 'dark' ? 30 : 50);
+                      if (options.format === 'rgb' || options.format === 'rgba') {{
+                        return 'rgb(' + Math.floor(Math.random()*256) + ',' + Math.floor(Math.random()*256) + ',' + Math.floor(Math.random()*256) + ')';
+                      }}
+                      if (options.format === 'hsl' || options.format === 'hsla') {{
+                        return 'hsl(' + h + ',' + s + '%,' + l + '%)';
+                      }}
+                      var hex = '#';
+                      var letters = '0123456789ABCDEF';
+                      for (var i = 0; i < 6; i++) hex += letters[Math.floor(Math.random() * 16)];
+                      return hex;
+                    }}
+                    if (typeof count === 'number' && count > 0) {{
+                      var arr = [];
+                      for (var i = 0; i < count; i++) arr.push(_one());
+                      return arr;
+                    }}
+                    return _one();
+                  }};
+                }}
+                if (typeof randomColor === 'undefined') {{
+                  try {{ var randomColor = window.randomColor; }} catch(e) {{}}
+                }}
 
                 // ClipperLib 防崩潰打樁護欄
                 if (typeof window.ClipperLib === 'undefined') {{
@@ -8051,6 +8327,22 @@ class StandaloneInjectorApp(QMainWindow):
                       }};
                     }}
                   }}
+                  if (p5.prototype) {{
+                    if (typeof p5.prototype._pixelDensity === 'undefined') p5.prototype._pixelDensity = 1;
+                    if (p5.prototype.pixelDensity) {{
+                      var _origP5PixelDensity = p5.prototype.pixelDensity;
+                      p5.prototype.pixelDensity = function(val) {{
+                        if (!this._renderer) {{
+                          if (typeof val === 'number') {{
+                            this._pixelDensity = val;
+                            return this;
+                          }}
+                          return this._pixelDensity || (typeof window.pixelDensity === 'function' ? window.pixelDensity() : 1);
+                        }}
+                        return _origP5PixelDensity.apply(this, arguments);
+                      }};
+                    }}
+                  }}
                   if (p5.Renderer && p5.Renderer.prototype) {{
                     if (typeof p5.Renderer.prototype._pixelDensity === 'undefined') p5.Renderer.prototype._pixelDensity = 1;
                     if (!p5.Renderer.prototype.textures) p5.Renderer.prototype.textures = [];
@@ -8154,16 +8446,7 @@ class StandaloneInjectorApp(QMainWindow):
                     return target;
                   }}
                   var _opcProxy = wrapOPC(window.OPC);
-                  try {{
-                    Object.defineProperty(window, 'OPC', {{
-                      get: function() {{ return _opcProxy; }},
-                      set: function(val) {{ _opcProxy = wrapOPC(val); }},
-                      configurable: true
-                    }});
-                  }} catch(e) {{
-                    window.OPC = _opcProxy;
-                  }}
-                  if (typeof OPC === 'undefined') {{ try {{ var OPC = window.OPC; }} catch(e) {{}} }}
+                  window.OPC = _opcProxy;
                 }})();
 
                 // Seed compatibility
@@ -8474,6 +8757,8 @@ class StandaloneInjectorApp(QMainWindow):
                             bridge_sync += "\nif (typeof module !== 'undefined' && module.exports) { if (module.exports.ClipperLib) window.ClipperLib = module.exports.ClipperLib; else if (module.exports.Clipper || module.exports.ClipType) { window.ClipperLib = module.exports; window.Clipper = module.exports; } }\nif (typeof window.ClipperLib !== 'undefined') { var ClipperLib = window.ClipperLib; }\n"
                         if "poisson" in filename.lower() or "poissondisksampling" in js_content[:500].lower():
                             bridge_sync += "\nif (typeof module !== 'undefined' && module.exports) { window.PoissonDiskSampling = module.exports.PoissonDiskSampling || module.exports; }\nif (typeof window.PoissonDiskSampling !== 'undefined') { var PoissonDiskSampling = window.PoissonDiskSampling; }\n"
+                        if "randomcolor" in filename.lower() or "randomcolor" in js_content[:500].lower():
+                            bridge_sync += "\nif (typeof module !== 'undefined' && module.exports) { window.randomColor = module.exports.randomColor || module.exports; }\nif (typeof window.randomColor !== 'undefined') { var randomColor = window.randomColor; }\n"
                         return f'<script>/* [INLINED LOCAL] {filename} */\n{js_content}\n{bridge_sync}</script>'
                     except Exception:
                         pass
@@ -10874,7 +11159,7 @@ function draw() {
 
         # 模組專屬環形影格快取池 (Per-Module Ring Buffer Cache)
         class ModuleFrameCacheManager:
-            def __init__(self, max_frames_per_module=15, max_total_modules=30):
+            def __init__(self, max_frames_per_module=2, max_total_modules=20):
                 from collections import deque
                 self.max_frames_per_module = max_frames_per_module
                 self.max_total_modules = max_total_modules
@@ -10934,6 +11219,8 @@ function draw() {
         # Load states
         loadedA = None
         loadedB = None
+        last_valid_module_name = None
+        last_valid_pil_frame = None
         consecutive_black_frames = 0
         fallback_blend_alpha = 0.0
         module_accumulated_time = {}
@@ -11465,14 +11752,7 @@ function draw() {
                 music_energy = (a_low + a_mid + a_high) / 3.0
             
             def get_energy_adapted_visual(base_vis, energy, sec):
-                if energy > 0.6 and sec in ['Verse', 'Build-up', 'Bridge']:
-                    climax_candidates = candidates_by_sec.get('Drop', []) or candidates_by_sec.get('Chorus', [])
-                    if climax_candidates:
-                        return climax_candidates[0]
-                elif energy < 0.25 and sec in ['Verse', 'Drop', 'Chorus']:
-                    ambient_candidates = candidates_by_sec.get('Intro', [])
-                    if ambient_candidates:
-                        return ambient_candidates[0]
+                # 嚴格尊重導演分鏡指派與樂段獨立性，杜絕 Techno 高能量導致的單一模組覆蓋死鎖
                 return base_vis
 
             # === Beat-driven visual rotation within sections ===
@@ -11810,18 +12090,16 @@ function draw() {
                 mod_c = module_cache_mgr.get_latest_frame(active_vis['name'])
                 if mod_c is not None:
                     return apply_graceful_fallback(mod_c, t, beat_energy, a_low, chord_hex)
-                elif 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None:
-                    return apply_graceful_fallback(last_valid_pil_frame.copy(), t, beat_energy, a_low, chord_hex)
                 else:
                     return song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex, audio_feats=audio_feats)
 
             if is_blackout:
                 consecutive_black_frames += 1
-                if consecutive_black_frames == 1 or consecutive_black_frames % 30 == 0:
+                if consecutive_black_frames == 2 or (consecutive_black_frames > 2 and consecutive_black_frames % 30 == 0):
                     logger.warning(f"⚠️ [BlackScreenGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到全黑影格，啟動保底攔截")
                 fallback_blend_alpha = min(1.0, fallback_blend_alpha + 0.25)
                 fb_frame = _get_active_fallback()
-                if 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None and fallback_blend_alpha < 0.95:
+                if last_valid_pil_frame is not None and fallback_blend_alpha < 0.95 and last_valid_module_name == active_vis['name']:
                     try:
                         pilA = Image.blend(last_valid_pil_frame, fb_frame, fallback_blend_alpha)
                     except Exception:
@@ -11834,7 +12112,7 @@ function draw() {
                     logger.warning(f"⚠️ [WhiteScreenGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到全白異常影格，啟動保底攔截")
                 fallback_blend_alpha = min(1.0, fallback_blend_alpha + 0.25)
                 fb_frame = _get_active_fallback()
-                if 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None and fallback_blend_alpha < 0.95:
+                if last_valid_pil_frame is not None and fallback_blend_alpha < 0.95 and last_valid_module_name == active_vis['name']:
                     try:
                         pilA = Image.blend(last_valid_pil_frame, fb_frame, fallback_blend_alpha)
                     except Exception:
@@ -11848,7 +12126,7 @@ function draw() {
                         logger.warning(f"⚠️ [SolidColorGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到持續死鎖純色影格 (spread={channel_spread_a})，啟動保底攔截")
                     fallback_blend_alpha = min(1.0, fallback_blend_alpha + 0.25)
                     fb_frame = _get_active_fallback()
-                    if 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None and fallback_blend_alpha < 0.95:
+                    if last_valid_pil_frame is not None and fallback_blend_alpha < 0.95 and last_valid_module_name == active_vis['name']:
                         try:
                             pilA = Image.blend(last_valid_pil_frame, fb_frame, fallback_blend_alpha)
                         except Exception:
@@ -11870,6 +12148,7 @@ function draw() {
                 fallback_blend_alpha = max(0.0, fallback_blend_alpha - 0.2)
                 module_cache_mgr.add_frame(active_vis['name'], pilA)
                 last_valid_pil_frame = pilA.copy()
+                last_valid_module_name = active_vis['name']
             else:
                 consecutive_black_frames = 0
                 consecutive_white_frames = 0
@@ -11877,6 +12156,7 @@ function draw() {
                 fallback_blend_alpha = max(0.0, fallback_blend_alpha - 0.2)
                 module_cache_mgr.add_frame(active_vis['name'], pilA)
                 last_valid_pil_frame = pilA.copy()
+                last_valid_module_name = active_vis['name']
 
             # 🚨 異常逃逸機制：若某個模組連續超過 30 幀 (約 1.0 秒) 全黑、全白或純色死鎖，強制切換至同樂段其他模組
             if (consecutive_black_frames > 30 or consecutive_white_frames > 30 or consecutive_solid_frames > 30):
@@ -13682,16 +13962,7 @@ def make_test_html_cleanup(code, custom_css="", custom_html=""):
             return target;
           }
           var _opcProxy = wrapOPC(window.OPC);
-          try {
-            Object.defineProperty(window, 'OPC', {
-              get: function() { return _opcProxy; },
-              set: function(val) { _opcProxy = wrapOPC(val); },
-              configurable: true
-            });
-          } catch(e) {
-            window.OPC = _opcProxy;
-          }
-          if (typeof OPC === 'undefined') { try { var OPC = window.OPC; } catch(e) {} }
+          window.OPC = _opcProxy;
         })();
       </script>
       <script>

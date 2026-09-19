@@ -1,22 +1,25 @@
 {
-  "name": "circlerainsin",
-  "author": "u259116",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:19:42",
-  "url": "https://openprocessing.org/@u259116/1176290",
-  "code": "// === Tab: mySketch ===\n// alexthescott 4/24/21\n// my attempt at a faithful recreation of beesandbombs's\n// https://twitter.com/beesandbombs/status/1385611174704713728\n// all credit goes to Dave :)\n\n\nlet time = 0\nlet vel = NaN // TWO_PI / 300 assigned in setup()\nlet hori_count= 14\nlet vert_count = 7\nlet colors = [\"#F94144\", \"#F65A38\", \"#F3722C\",\n              \"#F68425\", \"#F8961E\", \"#F9AF37\",\n              \"#F9C74F\", \"#C5C35E\", \"#90BE6D\",\n              \"#6AB47C\", \"#43AA8B\", \"#4D908E\",\n              \"#52838F\", \"#577590\"]\n\nfunction setup() {\n  createCanvas(400, 400);\n  noFill()\n  strokeWeight(3)\n  blendMode(SCREEN)\n  vel = TWO_PI / 300\n}\n\nfunction draw() {\n  clear()\n  background(0, 0, 32);\n  for (let y = 0; y < vert_count; y++){\n    for (let t = 0; t < hori_count; t++){\n        y_pos = map(sin(time + t / 6 + y / 2), -1, 1, 75, width - 75)\n        x_pos = map(y, 0, vert_count - 1, 50, height - 50)  \n        stroke(colors[t])\n        circle(x_pos, y_pos, 35)\n    }\n  }\n  time += vel\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "circlerainsin",
+    "author": "u259116",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:19:42",
+    "url": "https://openprocessing.org/@u259116/1176290",
+    "code": "// === Tab: mySketch ===\n// alexthescott 4/24/21\n// my attempt at a faithful recreation of beesandbombs's\n// https://twitter.com/beesandbombs/status/1385611174704713728\n// all credit goes to Dave :)\n\n\nlet time = 0\nlet vel = NaN // TWO_PI / 300 assigned in setup()\nlet hori_count= 14\nlet vert_count = 7\nlet colors = [\"#F94144\", \"#F65A38\", \"#F3722C\",\n              \"#F68425\", \"#F8961E\", \"#F9AF37\",\n              \"#F9C74F\", \"#C5C35E\", \"#90BE6D\",\n              \"#6AB47C\", \"#43AA8B\", \"#4D908E\",\n              \"#52838F\", \"#577590\"]\n\nfunction setup() {\n  createCanvas(400, 400);\n  noFill()\n  strokeWeight(3)\n  blendMode(SCREEN)\n  vel = TWO_PI / 300\n}\n\nfunction draw() {\n  clear()\n  background(0, 0, 32);\n  for (let y = 0; y < vert_count; y++){\n    for (let t = 0; t < hori_count; t++){\n        y_pos = map(sin(time + t / 6 + y / 2), -1, 1, 75, width - 75)\n        x_pos = map(y, 0, vert_count - 1, 50, height - 50)  \n        stroke(colors[t])\n        circle(x_pos, y_pos, 35)\n    }\n  }\n  time += vel\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Subtle Collapse.mp4"
+    ]
 }

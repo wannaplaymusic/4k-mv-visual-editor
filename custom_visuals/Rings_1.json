@@ -1,22 +1,25 @@
 {
-  "name": "Rings_1",
-  "author": "antoinettecreates",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:11:21",
-  "url": "https://openprocessing.org/@antoinettecreates/2084733",
-  "code": "// === Tab: mySketch ===\n// Created for the #WCCChallenge - Connecting the Dots\n// Sketch by Antoinette Bumatay-Chan\n\nlet dots = [];\nlet numDots = 5;\nlet timeWarp = 0.0005;\n\n// size variables\nlet sDotMin = 20;\nlet sDotMax = 60;\nlet sCircleMin = 100;\nlet sCircleMax = 400;\nlet sVarMin = 10;\nlet sVarMax = 50;\n\n// motion variables\nlet ampMin = 0.3;\nlet ampMax = 0.5;\n\nlet pLength;\nlet hue;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  frameRate(30);\n  colorMode(HSB, 100);\n  hue = random(0, 100);\n\n  // Distribute inital positions radially from screen mid point\n\n  let inc = TWO_PI / numDots;\n  let delta = 0.3 * inc;\n\n  pLength = 0.3 * (width < height ? width : height);\n\n  for (let i = 0; i < numDots; i++) {\n    let theta = i * inc + random(-delta, delta);\n    let x = cos(theta) * pLength + 0.5 * width;\n    let y = sin(theta) * pLength + 0.5 * height;\n    let d = new Dottie(x, y);\n    dots.push(d);\n  }\n\t\n\tdescribe(\"Dots move dynamically in a sinusoidal motion on the canvas, forming connections with rings as they travel. The size and color of the dots and rings vary dynamically, adding vibrancy and unpredictability to the visualization.\")\n\t\n}\n\nfunction drawRing(a, b) {\n  let centerX = (a.position.x + b.position.x) / 2;\n  let centerY = (a.position.y + b.position.y) / 2;\n  let diameter = dist(a.position.x, a.position.y, b.position.x, b.position.y);\n\n  let c = color(hue, random(0, 100), random(20, 30), random(40, 70));\n  stroke(c);\n  strokeWeight(2);\n  noFill();\n\n  circle(centerX, centerY, diameter);\n}\n\nfunction draw() {\n\trandomSeed(90);\n  background(220, 50);\n\n\t// Update positions/size\n  dots.forEach((d) => {\n    d.run(millis());\n  });\n\n\t// Draw ring connections\n  for (let i = 0; i < dots.length; i++) {\n    let circle = dots[i];\n    let next = dots[(i + 1) % dots.length];\n    drawRing(circle, next);\n  }\n\n\t// Draw dots\n\tnoStroke();\n  dots.forEach((d) => {\n    fill(d.colorDot);\n    circle(d.position.x, d.position.y, d.sizeCircle);\n\n    fill(255);\n    circle(d.position.x, d.position.y, d.sizeDot);\n  });\n}\n\nclass Dottie {\n  constructor(x, y) {\n\t\t// init positions\n    this.origin = createVector(x, y);\n    this.position = createVector(x, y);\n\n\t\t// init sizes\n    let s = floor(random(sCircleMin, sCircleMax));\n    this.sizeCircle = s;\n    this.sizeCircleOG = s;\n    this.sizeVar = random(sVarMin, sVarMax);\n    this.sizeDot = floor(random(sDotMin, sDotMax));\n\n\t\t// init color;\n    this.colorDot = color(\n      (hue + random(-20, 20)) % 100,\n      100,\n      90,\n      random(10, 30)\n    );\n\n\t\t// init motion vars\n    let ampX = (random(0, 1) < 0.5 ? -1 : 1) * random(ampMin, ampMax) * pLength;\n    let ampY = (random(0, 1) < 0.5 ? -1 : 1) * random(ampMin, ampMax) * pLength;\n    this.amplitude = createVector(ampX, ampY);\n    this.offset = createVector(random(0, TWO_PI), random(0, TWO_PI));\n    this.frequency = random(0.5, 1.0) * timeWarp;\n  }\n\n  run(t) {\n    this.position.x =\n      this.origin.x +\n      sin(t * this.frequency + this.offset.x) * this.amplitude.x;\n    this.position.y =\n      this.origin.y +\n      cos(t * this.frequency + this.offset.y) * this.amplitude.y;\n    this.sizeCircle =\n      this.sizeCircleOG + (sin(t * 0.0003 + this.offset.x) + 1) * this.sizeVar;\n  }\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Rings_1",
+    "author": "antoinettecreates",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:11:21",
+    "url": "https://openprocessing.org/@antoinettecreates/2084733",
+    "code": "// === Tab: mySketch ===\n// Created for the #WCCChallenge - Connecting the Dots\n// Sketch by Antoinette Bumatay-Chan\n\nlet dots = [];\nlet numDots = 5;\nlet timeWarp = 0.0005;\n\n// size variables\nlet sDotMin = 20;\nlet sDotMax = 60;\nlet sCircleMin = 100;\nlet sCircleMax = 400;\nlet sVarMin = 10;\nlet sVarMax = 50;\n\n// motion variables\nlet ampMin = 0.3;\nlet ampMax = 0.5;\n\nlet pLength;\nlet hue;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  frameRate(30);\n  colorMode(HSB, 100);\n  hue = random(0, 100);\n\n  // Distribute inital positions radially from screen mid point\n\n  let inc = TWO_PI / numDots;\n  let delta = 0.3 * inc;\n\n  pLength = 0.3 * (width < height ? width : height);\n\n  for (let i = 0; i < numDots; i++) {\n    let theta = i * inc + random(-delta, delta);\n    let x = cos(theta) * pLength + 0.5 * width;\n    let y = sin(theta) * pLength + 0.5 * height;\n    let d = new Dottie(x, y);\n    dots.push(d);\n  }\n\t\n\tdescribe(\"Dots move dynamically in a sinusoidal motion on the canvas, forming connections with rings as they travel. The size and color of the dots and rings vary dynamically, adding vibrancy and unpredictability to the visualization.\")\n\t\n}\n\nfunction drawRing(a, b) {\n  let centerX = (a.position.x + b.position.x) / 2;\n  let centerY = (a.position.y + b.position.y) / 2;\n  let diameter = dist(a.position.x, a.position.y, b.position.x, b.position.y);\n\n  let c = color(hue, random(0, 100), random(20, 30), random(40, 70));\n  stroke(c);\n  strokeWeight(2);\n  noFill();\n\n  circle(centerX, centerY, diameter);\n}\n\nfunction draw() {\n\trandomSeed(90);\n  background(220, 50);\n\n\t// Update positions/size\n  dots.forEach((d) => {\n    d.run(millis());\n  });\n\n\t// Draw ring connections\n  for (let i = 0; i < dots.length; i++) {\n    let circle = dots[i];\n    let next = dots[(i + 1) % dots.length];\n    drawRing(circle, next);\n  }\n\n\t// Draw dots\n\tnoStroke();\n  dots.forEach((d) => {\n    fill(d.colorDot);\n    circle(d.position.x, d.position.y, d.sizeCircle);\n\n    fill(255);\n    circle(d.position.x, d.position.y, d.sizeDot);\n  });\n}\n\nclass Dottie {\n  constructor(x, y) {\n\t\t// init positions\n    this.origin = createVector(x, y);\n    this.position = createVector(x, y);\n\n\t\t// init sizes\n    let s = floor(random(sCircleMin, sCircleMax));\n    this.sizeCircle = s;\n    this.sizeCircleOG = s;\n    this.sizeVar = random(sVarMin, sVarMax);\n    this.sizeDot = floor(random(sDotMin, sDotMax));\n\n\t\t// init color;\n    this.colorDot = color(\n      (hue + random(-20, 20)) % 100,\n      100,\n      90,\n      random(10, 30)\n    );\n\n\t\t// init motion vars\n    let ampX = (random(0, 1) < 0.5 ? -1 : 1) * random(ampMin, ampMax) * pLength;\n    let ampY = (random(0, 1) < 0.5 ? -1 : 1) * random(ampMin, ampMax) * pLength;\n    this.amplitude = createVector(ampX, ampY);\n    this.offset = createVector(random(0, TWO_PI), random(0, TWO_PI));\n    this.frequency = random(0.5, 1.0) * timeWarp;\n  }\n\n  run(t) {\n    this.position.x =\n      this.origin.x +\n      sin(t * this.frequency + this.offset.x) * this.amplitude.x;\n    this.position.y =\n      this.origin.y +\n      cos(t * this.frequency + this.offset.y) * this.amplitude.y;\n    this.sizeCircle =\n      this.sizeCircleOG + (sin(t * 0.0003 + this.offset.x) + 1) * this.sizeVar;\n  }\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Industrial Tide Unit.mp4"
+    ]
 }

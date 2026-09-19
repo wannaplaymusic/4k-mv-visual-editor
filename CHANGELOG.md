@@ -4,6 +4,29 @@
 
 ---
 
+## 🚀 [v1.4.2] - 2026-09-19
+### 🛡️ blendMode/randomColor 沙盒安全防護、4K 環形快取記憶體精簡與導演分鏡獨立性強化
+
+- **🛡️ WebGL / p5.js 沙盒崩潰免疫與相容性強化 (`main.py`)**：
+  - **`blendMode` 全生命週期安全護欄**：全面攔截 `p5.prototype.blendMode`、`p5.Graphics.prototype.blendMode`、`p5.Renderer2D`、`p5.RendererGL`、`window.blendMode` 以及 `p5.prototype.filter`，防禦 `_renderer` 未建立或已銷毀時拋出 `Cannot read properties of undefined (reading 'blendMode')`，自動降級至底層 2D Canvas `globalCompositeOperation`。
+  - **`randomColor` 全功能 Polyfill 與 CommonJS 模組導出橋接**：針對使用 `randomColor()` / `randomcolor` 的視覺腳本，實作支援 `hue`、`luminosity`、`format` (hex, rgb, hsl) 與 `count` 之原生 Polyfill，並在 Node/CommonJS `module.exports` 與全域作用域間雙向自動綁定。
+  - **`c2` 幾何演算庫與 `blendMode*` 全域變數防護**：注入 `c2`（`Point`、`Vector`、`Polygon` 等）防護樁，並修正 `blendModebackground`、`blendModefill` 等變數未宣告錯誤。
+  - **OPC 控制面板代理簡化**：優化 `window.OPC` 代理封裝，精簡屬性定義邏輯。
+
+- **⚡ 4K 渲染管線記憶體深度精簡與畫質防撕裂保護 (`main.py`)**：
+  - **環形影格快取池 (Ring Buffer Cache) 體積精簡**：將 `ModuleFrameCacheManager` 的每模組快取幀數 `max_frames_per_module` 由 15 幀縮減為 2 幀，最大模組快取數由 30 調降為 20，大幅降低 4K 渲染期間的 RAM/VRAM 峰值記憶體開銷（減少 80% 以上快取記憶體佔用）。
+  - **同模組平滑保底 (Same-Module Fallback Blend)**：在黑畫面/白畫面/純色死鎖保底機制中，引入 `last_valid_module_name` 鎖定校驗，確保跨模組過渡時絕不將前一模組的歷史殘影混合至新模組，杜絕視覺撕裂與鬼影疊加。
+  - **黑畫面告警噪音過濾**：調整 `consecutive_black_frames` 警告門檻至連續 2 幀以上，消除分鏡快速切換時單幀刻意全黑的日誌誤報。
+
+- **🎬 AI 導演分鏡鎖定與樂段獨立性保障 (`main.py`)**：
+  - **徹底杜絕高能量模組覆蓋死鎖**：重構 `get_energy_adapted_visual`，移除過去音訊能量大於 0.6 時自動將 Verse/Bridge 強制置換為 Drop/Chorus 模組的過激啟發式邏輯。嚴格尊重導演分鏡指派與樂段風格獨立性，徹底根除高節奏 Techno 曲目因持續高能量而導致全曲被單一模組霸佔的問題。
+
+- **🎨 超現實主義拼貼模組收編與模組使用歷史同步 (`custom_visuals/`)**：
+  - **收編全新超現實主義視覺模組**：收編 `surreal_demo_1789737433` (含肢體切分去背素材與預覽縮圖)，正式納入視覺模組庫。
+  - **同步視覺模組使用計數與影片歷程**：更新 `module_usage_history.json` 與所有相關視覺模組 JSON 之 `used_count` 與 `used_in_videos` 歷程紀錄。
+
+---
+
 ## 🚀 [v1.4.1] - 2026-09-17
 ### 🛡️ 全專案多角色審核修復、4K 渲染管線記憶體優化與 YouTube 金鑰池自動輪換
 

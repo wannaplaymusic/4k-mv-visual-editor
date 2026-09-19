@@ -1,22 +1,25 @@
 {
-  "name": "Contours",
-  "author": "u94932",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:12:51",
-  "url": "https://openprocessing.org/@u94932/493853",
-  "code": "// === Tab: mySketch ===\nvar resolution = 1; //Default 1: The resoultion of the image produced; lower is more detailed but takes exponetially more time to load\nvar zoom = 350; //Default 350: How zoomed in the image is\nvar lineWidth = 1/400; //Default 1/400: The width of the lines\nvar heightIncrement = 1/30; //Default 1/30: How thick the bands are / how much space there is between the lines\nvar startHeight = 0.11; //Default 0.11: The start height/offset of the contour lines\n\nvar lines = true; //Default [starting value] true: Whether the lines are drawn. This can be toggled with any key.\n\nvar offset = startHeight;\nvar foo;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n  noStroke();\n\tbackground(255);\n\tcolorMode(HSB);\n\t\n\tif(!lines){\n\t\toffset = 0;\n\t}\n\tfoo = new Array(floor(width/resolution));\n\tfor (var i = 0; i < foo.length; i++) {\n  \tfoo[i] = new Array(floor(height/resolution));\n\t}\n}\n\nfunction draw() {\n\tif(!lines || frameCount % 2 == 0){\n\t\tif(lines){\n\t\t\toffset += lineWidth;\n\t\t}else{\n\t\t\toffset += heightIncrement;\n\t\t}\n\t\tfill(map(offset,0.27,0.72,255,0),map(offset,0.25,1,50,255),map(offset,0.25,0.75,250,50));\n\t}else{\n\t\toffset += heightIncrement;\n\t}\n\t\n\tfor(let x = 0; x < width; x += (Math.max(0.001, Math.abs(resolution)) || 1)){\n\t\tfor(let y = 0; y < height; y += (Math.max(0.001, Math.abs(resolution)) || 1)){\n\t\t\tif(noise(x/zoom, y/zoom) < offset && foo[floor(x/resolution)][floor(y/resolution)] != true){\n\t\t\t\tfoo[floor(x/resolution)][floor(y/resolution)] = true;\n\t\t\t\tif(!lines || frameCount % 2 == 0) rect(x, y, resolution, resolution);\n\t\t\t}\n\t\t}\n\t}\n}\n\nfunction mousePressed(){\n\tbackground(255);\n\tnoiseSeed(random(10000));\n\tif(lines){\n\t\toffset = startHeight;\n\t}else{\n\t\toffset = 0;\n\t}\n\tfoo = new Array(floor(width/resolution));\n\tfor (var i = 0; i < foo.length; i++) {\n  \tfoo[i] = new Array(floor(height/resolution));\n\t}\n}\n\nfunction keyPressed(){\n\tlines = !lines;\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Contours",
+    "author": "u94932",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:12:51",
+    "url": "https://openprocessing.org/@u94932/493853",
+    "code": "// === Tab: mySketch ===\nvar resolution = 1; //Default 1: The resoultion of the image produced; lower is more detailed but takes exponetially more time to load\nvar zoom = 350; //Default 350: How zoomed in the image is\nvar lineWidth = 1/400; //Default 1/400: The width of the lines\nvar heightIncrement = 1/30; //Default 1/30: How thick the bands are / how much space there is between the lines\nvar startHeight = 0.11; //Default 0.11: The start height/offset of the contour lines\n\nvar lines = true; //Default [starting value] true: Whether the lines are drawn. This can be toggled with any key.\n\nvar offset = startHeight;\nvar foo;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n  noStroke();\n\tbackground(255);\n\tcolorMode(HSB);\n\t\n\tif(!lines){\n\t\toffset = 0;\n\t}\n\tfoo = new Array(floor(width/resolution));\n\tfor (var i = 0; i < foo.length; i++) {\n  \tfoo[i] = new Array(floor(height/resolution));\n\t}\n}\n\nfunction draw() {\n\tif(!lines || frameCount % 2 == 0){\n\t\tif(lines){\n\t\t\toffset += lineWidth;\n\t\t}else{\n\t\t\toffset += heightIncrement;\n\t\t}\n\t\tfill(map(offset,0.27,0.72,255,0),map(offset,0.25,1,50,255),map(offset,0.25,0.75,250,50));\n\t}else{\n\t\toffset += heightIncrement;\n\t}\n\t\n\tfor(let x = 0; x < width; x += (Math.max(0.001, Math.abs(resolution)) || 1)){\n\t\tfor(let y = 0; y < height; y += (Math.max(0.001, Math.abs(resolution)) || 1)){\n\t\t\tif(noise(x/zoom, y/zoom) < offset && foo[floor(x/resolution)][floor(y/resolution)] != true){\n\t\t\t\tfoo[floor(x/resolution)][floor(y/resolution)] = true;\n\t\t\t\tif(!lines || frameCount % 2 == 0) rect(x, y, resolution, resolution);\n\t\t\t}\n\t\t}\n\t}\n}\n\nfunction mousePressed(){\n\tbackground(255);\n\tnoiseSeed(random(10000));\n\tif(lines){\n\t\toffset = startHeight;\n\t}else{\n\t\toffset = 0;\n\t}\n\tfoo = new Array(floor(width/resolution));\n\tfor (var i = 0; i < foo.length; i++) {\n  \tfoo[i] = new Array(floor(height/resolution));\n\t}\n}\n\nfunction keyPressed(){\n\tlines = !lines;\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "The Last Echo Delay.mp4"
+    ]
 }
