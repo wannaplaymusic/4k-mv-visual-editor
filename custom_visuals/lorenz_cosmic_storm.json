@@ -17,10 +17,48 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
         "Long Reverb.mp4",
-        "Street Lights.mp4"
-    ]
+        "Street Lights.mp4",
+        "Concrete Resonance Unit.mp4",
+        "Modern 2026 Momentum.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "lorenz_cosmic_storm",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "toxic_luminescent",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                135.0,
+                15.0
+            ],
+            "mean_lightness": 0.013,
+            "mean_chroma": 0.097,
+            "contrast_level": "polychromatic_chaos",
+            "emotional_temperature": "toxic_luminescent"
+        },
+        "dynamics": {
+            "mean_velocity": 1.47,
+            "curl_vorticity": 0.101,
+            "divergence": 0.001,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:39:12"
+    },
+    "is_new_semantic_ingested": true
 }

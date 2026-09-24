@@ -22,5 +22,7 @@
     "used_in_videos": [
         "Rhythmic Breath.mp4",
         "Soft Collapse of Time.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "ZERO_VARIANCE_WHITE_SCREEN (Frame 0 Var=0.00, Mean=255.00)"
 }

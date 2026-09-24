@@ -1,30 +1,66 @@
 {
-  "name": "Uncler M - gradation_var2",
-  "code": "\n// --- Safety Guardrails for Thumbnail and Sandbox ---\nif (typeof width === 'undefined') { var width = 1280; }\nif (typeof height === 'undefined') { var height = 720; }\n\n\n// --- Global Variables for Uncler M Variants ---\nvar uM_colors = [\"#ffffff\", \"#000000\", \"#71717a\", \"#27272a\", \"#f4f4f5\"];\nvar speedMult = 1.0;\nvar lineScale = 1.0;\nvar dynamicShift = 0;\nvar scalePulse = 1.0;\nvar rotAngle = 0;\nvar gridOffset = 0;\nvar uM_rot = 0;\n\n// === Inspired by 'gradation' by 'reona396' ===\n// Created as variant #2 by Uncler M\n// Infused with creative algorithmic modifications.\n\n// === Tab: mySketch ===\nvar shapes = [];\nvar shapesNum = 5000;\nvar sMax;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\n  sMax = max(width, height) * 0.3;\n\n  for (let i = 0; i < shapesNum; i++) {\n    shapes.push(new Shape(i));\n  }\n\n  background(\"#E7ECF2\");\n}\n\nfunction draw() {\n  // === Variant 2: Organic Lissajous Morph ===\n  scalePulse = 1.0 + 0.25 * sin(frameCount * 0.03);\n  rotAngle = frameCount * 0.015;\n  push();\n  translate(width/2, height/2);\n  rotate(rotAngle);\n  scale(scalePulse);\n  translate(-width/2, -height/2);\n\n  background(\"#E7ECF230\");\n\n  noStroke();\n  fill(0);\n\n  for (let i = 0; i < shapes.length; i++) {\n    shapes[i].move();\n    shapes[i].display();\n  }\n\n  pop();\n}\n\nclass Shape {\n  constructor(i) {\n    this.i = i * 0.01;\n    this.A = 0;\n    this.B = 0;\n    this.S = i % sMax;\n  }\n\n  move() {\n    this.S += 1;\n    if (this.S > sMax) {\n      this.S = 0;\n    }\n  }\n\n  display() {\n    this.A = (cos(this.i * 3) - cos(this.i * 6) + 9) * 0.45;\n    this.B = this.i / 2 + (sin(this.i * 3) - sin(this.i * 6)) / 3;\n\n    fill(255 * sin(this.B * 10 + frameCount * 0.1), 100, 150);\n\n    circle(\n      this.S * this.A * cos(this.B) + width / 2,\n      this.S * this.A * sin(this.B) + height / 2,\n      this.S * 0.2 * sin(this.i * 11)\n    );\n  }\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Uncler M",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "Uncler M",
-    "generative",
-    "variant",
-    "starred_gradation"
-  ],
-  "url": "https://openprocessing.org/@reona396/2797563",
-  "date_added": "2026-07-08 23:13:00",
-  "is_starred": false,
-  "used_count": 6,
-  "scaling_mode": "auto",
-  "used_in_videos": [
-    "Clear Sky.mp4",
-    "Concrete Tides.mp4",
-    "Monolithic Interval.mp4",
-    "Subfloor Transmission.mp4",
-    "Ultimate Core Patterns.mp4"
-  ]
+    "name": "Uncler M - gradation_var2",
+    "code": "\n// --- Safety Guardrails for Thumbnail and Sandbox ---\nif (typeof width === 'undefined') { var width = 1280; }\nif (typeof height === 'undefined') { var height = 720; }\n\n\n// --- Global Variables for Uncler M Variants ---\nvar uM_colors = [\"#ffffff\", \"#000000\", \"#71717a\", \"#27272a\", \"#f4f4f5\"];\nvar speedMult = 1.0;\nvar lineScale = 1.0;\nvar dynamicShift = 0;\nvar scalePulse = 1.0;\nvar rotAngle = 0;\nvar gridOffset = 0;\nvar uM_rot = 0;\n\n// === Inspired by 'gradation' by 'reona396' ===\n// Created as variant #2 by Uncler M\n// Infused with creative algorithmic modifications.\n\n// === Tab: mySketch ===\nvar shapes = [];\nvar shapesNum = 5000;\nvar sMax;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\n  sMax = max(width, height) * 0.3;\n\n  for (let i = 0; i < shapesNum; i++) {\n    shapes.push(new Shape(i));\n  }\n\n  background(\"#E7ECF2\");\n}\n\nfunction draw() {\n  // === Variant 2: Organic Lissajous Morph ===\n  scalePulse = 1.0 + 0.25 * sin(frameCount * 0.03);\n  rotAngle = frameCount * 0.015;\n  push();\n  translate(width/2, height/2);\n  rotate(rotAngle);\n  scale(scalePulse);\n  translate(-width/2, -height/2);\n\n  background(\"#E7ECF230\");\n\n  noStroke();\n  fill(0);\n\n  for (let i = 0; i < shapes.length; i++) {\n    shapes[i].move();\n    shapes[i].display();\n  }\n\n  pop();\n}\n\nclass Shape {\n  constructor(i) {\n    this.i = i * 0.01;\n    this.A = 0;\n    this.B = 0;\n    this.S = i % sMax;\n  }\n\n  move() {\n    this.S += 1;\n    if (this.S > sMax) {\n      this.S = 0;\n    }\n  }\n\n  display() {\n    this.A = (cos(this.i * 3) - cos(this.i * 6) + 9) * 0.45;\n    this.B = this.i / 2 + (sin(this.i * 3) - sin(this.i * 6)) / 3;\n\n    fill(255 * sin(this.B * 10 + frameCount * 0.1), 100, 150);\n\n    circle(\n      this.S * this.A * cos(this.B) + width / 2,\n      this.S * this.A * sin(this.B) + height / 2,\n      this.S * 0.2 * sin(this.i * 11)\n    );\n  }\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Uncler M",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "Uncler M",
+        "generative",
+        "variant",
+        "starred_gradation"
+    ],
+    "url": "https://openprocessing.org/@reona396/2797563",
+    "date_added": "2026-07-08 23:13:00",
+    "is_starred": false,
+    "used_count": 6,
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Clear Sky.mp4",
+        "Concrete Tides.mp4",
+        "Monolithic Interval.mp4",
+        "Subfloor Transmission.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "uM_variant_gradation_2",
+        "primary_psychological_state": "manic_hyperarousal",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "超新星爆發",
+            "神經元過載",
+            "秩序解構"
+        ],
+        "narrative_function": "climax_rupture",
+        "jungian_archetype": "the_trickster",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                195.0,
+                345.0
+            ],
+            "mean_lightness": 0.889,
+            "mean_chroma": 0.074,
+            "contrast_level": "complementary_clash",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 8.05,
+            "curl_vorticity": 0.795,
+            "divergence": -0.004,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:44:31"
+    },
+    "is_new_semantic_ingested": true
 }

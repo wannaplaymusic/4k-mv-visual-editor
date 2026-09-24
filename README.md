@@ -1,6 +1,6 @@
 # 4K MV Visual Integration Editor 🎬✨
 
-[![GitHub Release](https://img.shields.io/badge/Release-v1.4.1-blue.svg)](https://github.com/wannaplaymusic/4k-mv-visual-editor)
+[![GitHub Release](https://img.shields.io/badge/Release-v1.5.0-blue.svg)](https://github.com/wannaplaymusic/4k-mv-visual-editor)
 [![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11-green.svg)](https://python.org)
 [![GUI Framework](https://img.shields.io/badge/GUI-PyQt6-orange.svg)](https://www.riverbankcomputing.com/software/pyqt/)
 [![Aesthetic Layout](https://img.shields.io/badge/Aesthetic-Glassmorphic%20VJ%20System-purple.svg)]()
@@ -27,18 +27,26 @@ graph TD
     F -->|反應擴散 / 渦流場 / CRT| G[4K 最終 MV 影像輸出]
 ```
 
-*   **🎵 智能音訊分析矩陣 (`audio_analyzer.py`)**：即時分析並提取 `Sub-bass`、`Bass`、`Mid`、`High` 等子頻段的動態能量比率。利用 Chroma STFT 計算特徵向量，比對大/小/增/減和弦模板，並基於**五度圈（Circle of Fifths）**將音高關係轉化為對應的 HSL/Hex 顏色。
-*   **🛡️ p5.js / Processing 自動轉譯與防崩潰沙盒 (`batch_importer.py` & `code_injector.py`)**：自動解析 Processing 語法，將其轉譯為標準 ES6 JS 代碼。注入 Proxy 與防禦性 Stub，隔離 DOM 樣式/位置拋錯，安全攔截 `ml5.js`、`Tone.js`、`THREE.Group` 等缺失庫，防止沙盒紅字。
-*   **🌀 工業級 VJ 影像後製引擎 (`post_processor.py`)**：基於 OpenCV ndarray 運算，進行無感微幅放大、對比度激化與高動態融合，並配合音樂屬性融入情緒色調。基於**旋轉渦流場 (Vortex Field)** 模型，重拍時產生動態渦流中心，使用 `cv2.remap` 進行低延遲、高平滑的流體扭曲。
-*   **🎛️ 現代化 PyQt6 主界面應用 (`main.py`)**：`AspectRatioWidget` 確保視覺畫布在任何視窗比例下都保持完美的 16:9 MV 畫面比。下載與進度追蹤完全異步化（`QThread`），保證 4K 預覽與錄製時的 UI 流暢度。
+*   **🎵 智能音訊分析矩陣 (`audio_analyzer.py` & `audio_stem_separator.py`)**：即時分析並提取 `Sub-bass`、`Bass`、`Mid`、`High` 等子頻段的動態能量比率；支援 4-Stem 神經/物理聲學分軌與 18 大音樂風格本體識別。
+*   **🎬 CINEDANCE 鏡頭光學編譯系統 (`cinedance_compiler.py`)**：融合 Higgsfield CINEDANCE 影視級幾何光學編譯，具備鏡頭風險審計 (`ShotRiskAuditor`)、動態 H-FOV/Dolly Zoom、三層景深彈性錨定與三元光學向量求解。
+*   **🌀 12 大旗艦 VJ 特效與 PSE 光敏健康防護 (`post_processor.py`)**：包含克拉尼駐波、磁流體刺針、體積焦散、四維環面、全息莫爾、電影級失焦等 12 種音畫濾鏡；全面整合 ITU-R BT.1702 光敏性癲癇 (PSE) 實時防護。
+*   **🧠 有機心靈調變與語義軟投影 (`expressive_modulator.py` & `semantic_soft_projector.py`)**：非對稱彈道阻尼濾波（快充慢放）消除頻率生硬感；榮格原型與心靈狀態三級軟投影徹底根除選片死鎖。
+*   **🚀 VisualStudio Pro 4K 視覺神經工作站 (`visual_studio.py`)**：獨立進程視覺創作工作站，具備 AST 即時參數調控、大師美學引擎與雙緩衝沙盒。
+*   **⏳ 批次收編歷史時光機 (`batch_history_manager.py`)**：不可變基準保護與非破壞性雙向快照回溯。
+*   **🛡️ p5.js / Processing 自動轉譯與防崩潰沙盒 (`code_injector.py`)**：注入安全護欄與防護樁，隔絕崩潰。
 
 ### 📂 專案結構說明
 *   `main.py`：專案主入口，處理 PyQt6 界面與 QWebEngineView 初始化。
+*   `cinedance_compiler.py`：CINEDANCE 影視級幾何光學與鏡頭編譯系統。
+*   `visual_studio.py`：VisualStudio Pro 4K 視覺神經創作工作站。
 *   `audio_analyzer.py`：音訊核心，負責 librosa 特徵提取、和弦分析與 BPM 追蹤。
-*   `batch_importer.py`：批量轉譯引擎，將 Processing PDE 代碼轉譯為安全 p5.js 代碼。
-*   `code_injector.py`：程式碼編譯、防護 Stub 注入與沙盒預覽管理器。
-*   `post_processor.py`：VJ 特效引擎，處理反應擴散、渦流流體、CRT 噪點等 OpenCV 濾鏡。
-*   `download_all_dependencies.py`：自動化依賴庫下載指令碼。
+*   `audio_stem_separator.py`：現代 4-Stem (Drums, Bass, Vocals, Other) 音軌分離器。
+*   `batch_history_manager.py`：批次收編歷史與時光機回溯管理器。
+*   `expressive_modulator.py`：彈道生理阻尼濾波調變器。
+*   `semantic_soft_projector.py`：層級化語義軟投影與死鎖消除器。
+*   `post_processor.py`：12 大旗艦 VJ 特效、Oklab 色彩空間與 PSE 光敏防護器。
+*   `semantic_ingestion/`：VLM 多模態特徵提取與語意審核管線。
+*   `tests/`：完整單元測試與整合驗證套件。
 *   `.agents/`：開發輔助 Skills（供 Antigravity AI 助理全域調用）。
 
 ### 🛠️ 快速開始

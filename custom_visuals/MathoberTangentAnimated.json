@@ -17,10 +17,47 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
         "Crisp Rimshot Fade.mp4",
-        "Bare Reality.mp4"
-    ]
+        "Bare Reality.mp4",
+        "Concrete Resonance Unit.mp4",
+        "Pale Frequency.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "MathoberTangentAnimated",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "chaotic_brownian"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                255.0
+            ],
+            "mean_lightness": 0.086,
+            "mean_chroma": 0.386,
+            "contrast_level": "analogous_subtle",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 9.92,
+            "curl_vorticity": 1.043,
+            "divergence": 0.003,
+            "motion_energy_type": "chaotic_brownian"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:41:28"
+    },
+    "is_new_semantic_ingested": true
 }

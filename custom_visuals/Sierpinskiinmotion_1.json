@@ -1,22 +1,25 @@
 {
-  "name": "Sierpinskiinmotion_1",
-  "author": "u77518",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:18:17",
-  "url": "https://openprocessing.org/@u77518/407689",
-  "code": "// === Tab: mySketch ===\nvar wid;\nvar hei;\n\nvar NB_FRAMES;\n\nvar frame_count;\n\nfunction recurDraw(x1,y1,x2,y2,x3,y3,n) {\n    if (n<=0) {\n        return;\n    } else{\n        var t = ((frame_count)%NB_FRAMES)/NB_FRAMES;\n        stroke(255,255/3*(n-t));\n      \tvar xx1 = (x1+x2)/2;\n        var yy1 = (y1+y2)/2;\n        var xx2 = (x2+x3)/2;\n        var yy2 = (y2+y3)/2;\n        var xx3 = (x3+x1)/2;\n        var yy3 = (y3+y1)/2;\n        line(xx1,yy1,xx2,yy2);\n        line(xx3,yy3,xx2,yy2);\n        line(xx1,yy1,xx3,yy3);\n        recurDraw(x1,y1,xx1,yy1,xx3,yy3,n-1);\n        recurDraw(x2,y2,xx1,yy1,xx2,yy2,n-1);\n        recurDraw(x3,y3,xx3,yy3,xx2,yy2,n-1);\n    }\n}\n\nfunction setup() {\n  \n    smooth(16);\n  \n  \twid = 500;\n    hei = 500;\n\n    NB_FRAMES = 80;\n\n    frame_count = 0;\n    \n    createCanvas(wid,hei);\n    \n    background(0);\n}\n\nfunction draw() {\n    background(0);\n    \n    translate(0,50);\n    \n    var t = ((frame_count)%NB_FRAMES)/NB_FRAMES;\n    \n    stroke(255);\n    \n    var rad = 200;\n    \n    var offset = PI/6 + 2*PI/3*floor(frame_count/NB_FRAMES);\n\n    var x1 = width/2 + rad*cos(2*PI*0+offset);\n    var y1 = height/2 + rad*sin(2*PI*0+offset);\n    var x2 = width/2 + rad*cos(2*PI*1/3+offset);\n    var y2 = height/2 + rad*sin(2*PI*1/3+offset);\n    var x3 = width/2 + rad*cos(2*PI*2/3+offset);\n    var y3 = height/2 + rad*sin(2*PI*2/3+offset);\n    \n    line(x1,y1,x2,y2);\n    line(x2,y2,x3,y3);\n    line(x3,y3,x1,y1);\n    \n    var interp = lerp(0,0.5,(1-cos(1*PI*t))/2);\n    \n    var xx1 = lerp(x1,x2,interp);\n    var yy1 = lerp(y1,y2,interp);\n    var xx2 = lerp(x2,x3,interp);\n    var yy2 = lerp(y2,y3,interp);\n    var xx3 = lerp(x3,x1,1-interp);\n    var yy3 = lerp(y3,y1,1-interp);\n    var xx4 = lerp(x2,x1,interp);\n    var yy4 = lerp(y2,y1,interp);\n    \n    line(xx3,yy3,xx2,yy2);\n    line(xx4,yy4,xx2,yy2);\n    line(xx1,yy1,xx3,yy3);\n    \n    recurDraw(x1,y1,xx1,yy1,xx3,yy3,5);\n    recurDraw(x2,y2,xx4,yy4,xx2,yy2,5);\n    recurDraw(x3,y3,xx3,yy3,xx2,yy2,5);\n  \n  frame_count++;\n    \n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Sierpinskiinmotion_1",
+    "author": "u77518",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:18:17",
+    "url": "https://openprocessing.org/@u77518/407689",
+    "code": "// === Tab: mySketch ===\nvar wid;\nvar hei;\n\nvar NB_FRAMES;\n\nvar frame_count;\n\nfunction recurDraw(x1,y1,x2,y2,x3,y3,n) {\n    if (n<=0) {\n        return;\n    } else{\n        var t = ((frame_count)%NB_FRAMES)/NB_FRAMES;\n        stroke(255,255/3*(n-t));\n      \tvar xx1 = (x1+x2)/2;\n        var yy1 = (y1+y2)/2;\n        var xx2 = (x2+x3)/2;\n        var yy2 = (y2+y3)/2;\n        var xx3 = (x3+x1)/2;\n        var yy3 = (y3+y1)/2;\n        line(xx1,yy1,xx2,yy2);\n        line(xx3,yy3,xx2,yy2);\n        line(xx1,yy1,xx3,yy3);\n        recurDraw(x1,y1,xx1,yy1,xx3,yy3,n-1);\n        recurDraw(x2,y2,xx1,yy1,xx2,yy2,n-1);\n        recurDraw(x3,y3,xx3,yy3,xx2,yy2,n-1);\n    }\n}\n\nfunction setup() {\n  \n    smooth(16);\n  \n  \twid = 500;\n    hei = 500;\n\n    NB_FRAMES = 80;\n\n    frame_count = 0;\n    \n    createCanvas(wid,hei);\n    \n    background(0);\n}\n\nfunction draw() {\n    background(0);\n    \n    translate(0,50);\n    \n    var t = ((frame_count)%NB_FRAMES)/NB_FRAMES;\n    \n    stroke(255);\n    \n    var rad = 200;\n    \n    var offset = PI/6 + 2*PI/3*floor(frame_count/NB_FRAMES);\n\n    var x1 = width/2 + rad*cos(2*PI*0+offset);\n    var y1 = height/2 + rad*sin(2*PI*0+offset);\n    var x2 = width/2 + rad*cos(2*PI*1/3+offset);\n    var y2 = height/2 + rad*sin(2*PI*1/3+offset);\n    var x3 = width/2 + rad*cos(2*PI*2/3+offset);\n    var y3 = height/2 + rad*sin(2*PI*2/3+offset);\n    \n    line(x1,y1,x2,y2);\n    line(x2,y2,x3,y3);\n    line(x3,y3,x1,y1);\n    \n    var interp = lerp(0,0.5,(1-cos(1*PI*t))/2);\n    \n    var xx1 = lerp(x1,x2,interp);\n    var yy1 = lerp(y1,y2,interp);\n    var xx2 = lerp(x2,x3,interp);\n    var yy2 = lerp(y2,y3,interp);\n    var xx3 = lerp(x3,x1,1-interp);\n    var yy3 = lerp(y3,y1,1-interp);\n    var xx4 = lerp(x2,x1,interp);\n    var yy4 = lerp(y2,y1,interp);\n    \n    line(xx3,yy3,xx2,yy2);\n    line(xx4,yy4,xx2,yy2);\n    line(xx1,yy1,xx3,yy3);\n    \n    recurDraw(x1,y1,xx1,yy1,xx3,yy3,5);\n    recurDraw(x2,y2,xx4,yy4,xx2,yy2,5);\n    recurDraw(x3,y3,xx3,yy3,xx2,yy2,5);\n  \n  frame_count++;\n    \n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 1,
+    "is_starred": false,
+    "used_in_videos": [
+        "Harmonic Bleed.mp4"
+    ]
 }

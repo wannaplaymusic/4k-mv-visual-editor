@@ -17,10 +17,49 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 1,
+    "used_count": 4,
     "is_starred": true,
     "used_in_videos": [
         "Airlock Reverie.mp4",
-        "Muted Reflections.mp4"
-    ]
+        "Muted Reflections.mp4",
+        "Soft Collapse of Time.mp4",
+        "Controlled Pressure Energy.mp4",
+        "Perimeter Glow.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "FiguresTransformation",
+        "primary_psychological_state": "hypnotic_trance",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "時間之流",
+            "自相似分形",
+            "脈動波紋"
+        ],
+        "narrative_function": "tension_accelerator",
+        "jungian_archetype": "the_animus",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                195.0,
+                165.0
+            ],
+            "mean_lightness": 0.471,
+            "mean_chroma": 0.24,
+            "contrast_level": "analogous_subtle",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 1.34,
+            "curl_vorticity": 0.197,
+            "divergence": -0.0,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:42:53"
+    },
+    "is_new_semantic_ingested": true
 }

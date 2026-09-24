@@ -961,6 +961,12 @@ class AIIncubatorTab(QWidget):
         with open(save_path, "w", encoding="utf-8") as f:
             json.dump(preset, f, indent=4, ensure_ascii=False)
             
+        try:
+            from semantic_ingestion.hooks import trigger_semantic_ingestion
+            trigger_semantic_ingestion([name], background=True, priority="high")
+        except Exception:
+            pass
+
         if hasattr(self.app, 'refresh_presets_list'):
             self.app.cached_presets = None
             self.app.refresh_presets_list()

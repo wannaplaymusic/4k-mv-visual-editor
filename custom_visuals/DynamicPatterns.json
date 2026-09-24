@@ -17,10 +17,48 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
         "Dissolve into Phase.mp4",
-        "Filtered Noise.mp4"
-    ]
+        "Filtered Noise.mp4",
+        "Vast Depth.mp4",
+        "Perimeter Glow.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "DynamicPatterns",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "feverish_warm",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                45.0,
+                195.0
+            ],
+            "mean_lightness": 0.142,
+            "mean_chroma": 0.073,
+            "contrast_level": "complementary_clash",
+            "emotional_temperature": "feverish_warm"
+        },
+        "dynamics": {
+            "mean_velocity": 1.01,
+            "curl_vorticity": 0.053,
+            "divergence": 0.007,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:45:43"
+    },
+    "is_new_semantic_ingested": true
 }

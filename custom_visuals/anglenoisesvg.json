@@ -17,10 +17,49 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
         "Late Bound.mp4",
-        "Clear Head.mp4"
-    ]
+        "Clear Head.mp4",
+        "Controlled Pressure Energy.mp4",
+        "Modern 2026 Momentum.mp4",
+        "Perimeter Glow.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "anglenoisesvg",
+        "primary_psychological_state": "sublime_catharsis",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "破曉昇華",
+            "意識覺醒",
+            "光芒滌蕩"
+        ],
+        "narrative_function": "aftermath_resonance",
+        "jungian_archetype": "the_self",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                345.0,
+                255.0
+            ],
+            "mean_lightness": 0.827,
+            "mean_chroma": 0.009,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.75,
+            "curl_vorticity": 0.092,
+            "divergence": -0.001,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:45:15"
+    },
+    "is_new_semantic_ingested": true
 }

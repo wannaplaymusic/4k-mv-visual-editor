@@ -28,5 +28,40 @@
         "Reverb Tail Haze.mp4",
         "Vacuum Memory.mp4",
         "Ultimate Core Patterns.mp4"
-    ]
+    ],
+    "expressive_profile": {
+        "module_id": "uM_variant_240622a_3",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                255.0
+            ],
+            "mean_lightness": 0.135,
+            "mean_chroma": 0.155,
+            "contrast_level": "analogous_subtle",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 2.76,
+            "curl_vorticity": 0.088,
+            "divergence": -0.0,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:41:45"
+    },
+    "is_new_semantic_ingested": true
 }

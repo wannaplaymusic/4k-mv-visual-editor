@@ -17,9 +17,47 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 1,
+    "used_count": 3,
     "is_starred": false,
     "used_in_videos": [
-        "True North.mp4"
-    ]
+        "True North.mp4",
+        "Controlled Pressure Energy.mp4",
+        "Modern 2026 Momentum.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "NoisyStar",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                255.0,
+                315.0
+            ],
+            "mean_lightness": 0.11,
+            "mean_chroma": 0.302,
+            "contrast_level": "polychromatic_chaos",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 2.47,
+            "curl_vorticity": 0.213,
+            "divergence": -0.013,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:46:50"
+    },
+    "is_new_semantic_ingested": true
 }

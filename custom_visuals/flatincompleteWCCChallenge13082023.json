@@ -17,9 +17,48 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 1,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
-        "Roadside View.mp4"
-    ]
+        "Roadside View.mp4",
+        "Final Rest.mp4",
+        "Pale Frequency.mp4",
+        "Spatial Hypnosis Haze.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "flatincompleteWCCChallenge13082023",
+        "primary_psychological_state": "hypnotic_trance",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "時間之流",
+            "自相似分形",
+            "脈動波紋"
+        ],
+        "narrative_function": "tension_accelerator",
+        "jungian_archetype": "the_animus",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                255.0,
+                285.0
+            ],
+            "mean_lightness": 0.201,
+            "mean_chroma": 0.357,
+            "contrast_level": "analogous_subtle",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 4.01,
+            "curl_vorticity": 0.242,
+            "divergence": 0.005,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:47:06"
+    },
+    "is_new_semantic_ingested": true
 }

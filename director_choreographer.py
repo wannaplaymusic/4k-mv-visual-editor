@@ -1,17 +1,21 @@
+# -*- coding: utf-8 -*-
 import math
 import logging
 from typing import Dict, Any, List, Optional, Tuple
 from saliency_eyetrace_bridge import SaliencyEyeTraceBridge
+from cinedance_compiler import CinedanceShotCompiler
+from expressive_modulator import ExpressiveModulator
+from semantic_soft_projector import SemanticSoftProjector
 
 logger = logging.getLogger("StandaloneInjector.DirectorChoreographer")
 
 class DirectorChoreographer:
     """
     L2 微觀動態編舞器 (Micro Dynamic Choreographer)
-    - 落地好萊塢大師 Walter Murch「Rule of Six」剪輯六法則評估模型
-    - 複合張力指數 (Composite Tension Index) 即時計算
-    - J-Cut / L-Cut 視聽錯位非對稱剪輯與弱拍切分音 (Syncopated Editing) 調度
-    - 生理感知時長約束與動態相機構圖模式 (Framing & Intensity) 智慧指派
+    - 落地好萊塢大師 Walter Murch「Rule of Six」剪輯六法則心靈評估模型 (Emotion 51% 實質心靈語義對齊)
+    - 彈道生理阻尼濾波調變 (ExpressiveModulator: u_tension, u_chaos, u_sublime)
+    - 零顯存時間軸微移 J-Cut / L-Cut 視聽錯位非對稱剪輯
+    - 視線引導連續性 (Eye-Trace Centroid Continuity) 與動態光學構圖
     """
 
     # Walter Murch 剪輯權重矩陣
@@ -25,6 +29,7 @@ class DirectorChoreographer:
     def __init__(self, min_shot_sec: float = 1.25, max_shot_sec: float = 18.0):
         self.min_shot_sec = min_shot_sec
         self.max_shot_sec = max_shot_sec
+        self.modulator = ExpressiveModulator()
 
     def evaluate_murch_cut_score(
         self,
@@ -91,7 +96,7 @@ class DirectorChoreographer:
         assigned_modules: List[Dict[str, Any]]
     ) -> Tuple[List[Dict[str, Any]], List[float]]:
         """
-        依據 L1 概念與音訊特徵，微觀規劃全曲分鏡、轉場、構圖與張力曲線
+        依據 L1 心靈概念與音訊特徵，微觀規劃全曲分鏡、轉場、構圖與張力曲線
         """
         bpm = float(audio_telemetry.get("bpm", 120.0))
         total_duration = float(audio_telemetry.get("duration", 180.0))
@@ -102,6 +107,7 @@ class DirectorChoreographer:
         intensity_curve = []
         prev_centroid = {"cx": 0.5, "cy": 0.45}
         accumulated_time = 0.0
+        prev_psy_state = "alienation_void"
 
         for idx, sec in enumerate(storyboard_sections):
             sec_name = sec.get("section", "Verse")
@@ -109,6 +115,7 @@ class DirectorChoreographer:
             
             assigned = assigned_modules[idx] if idx < len(assigned_modules) else {}
             mod_id = assigned.get("assigned_module_id") or assigned.get("module_name") or "default_module"
+            curr_psy_state = assigned.get("psychological_state", "hypnotic_trance")
 
             tension = self.calculate_composite_tension(
                 section_name=sec_name,
@@ -118,48 +125,79 @@ class DirectorChoreographer:
                 duration=total_duration
             )
 
-            # J-Cut / L-Cut 錯位剪輯判定
-            # 當即將進入 Drop/Chorus 高潮時，啟用 J-Cut 提前 1 拍進入新視覺或預收縮
-            is_climax = "drop" in sec_name.lower() or "chorus" in sec_name.lower()
+            is_climax = "drop" in sec_name.lower() or "climax" in sec_name.lower() or "chorus" in sec_name.lower()
             is_build = "build" in sec_name.lower() or "pre" in sec_name.lower()
-            
+
+            # 1. 計算有機心靈著色器參數 (注入彈道阻尼平滑)
+            expressive_uniforms = self.modulator.update_expressive_uniforms(
+                raw_bass=tension * 0.9,
+                raw_energy=assigned.get("target_energy", 0.5),
+                section_tension_base=tension,
+                section_progress=accumulated_time / max(1.0, total_duration),
+                is_climax_or_drop=is_climax
+            )
+
+            # 2. 零顯存時間軸微移 J-Cut / L-Cut 錯位剪輯判定
+            # 當即將進入 Drop/Chorus 高潮時，啟用 J-Cut 提前 150~350ms 弱拍切入
             cut_offset_sec = 0.0
             cut_style = "standard_cut"
             if is_climax:
-                cut_offset_sec = -round(beat_duration, 3)  # 提前 1 拍切入 (J-Cut)
+                cut_offset_sec = -min(0.35, max(0.15, round(beat_duration * 0.5, 3)))
                 cut_style = "j_cut_anticipation"
             elif is_build:
-                cut_offset_sec = round(beat_duration * 0.5, 3)  # 延遲半拍滲入 (L-Cut)
+                cut_offset_sec = min(0.25, max(0.10, round(beat_duration * 0.25, 3)))
                 cut_style = "l_cut_suspense"
 
-            # 構圖模式動態選擇 (避免高潮單純 fill，引入對位法 Counterpoint)
-            # 默認: Drop/Build -> fill, Intro/Outro -> contain
+            # 構圖模式動態選擇
             if "intro" in sec_name.lower() or "outro" in sec_name.lower():
                 framing_mode = "contain"
             elif is_climax:
-                # 85% 機率填滿衝擊，15% 機率故意使用極簡超寬景 (Extreme Wide Negative Space Counterpoint)
                 framing_mode = "fill" if idx % 4 != 0 else "contain"
             else:
                 framing_mode = "fill"
 
             # 視線引導連續性評估
-            # 若為 Climax Drop 則啟動反對稱震撼切 (Shock Cut)
             continuity_info = SaliencyEyeTraceBridge.compute_cut_transition_continuity(
                 prev_centroid=prev_centroid,
                 is_high_tension_drop=is_climax and tension > 0.88
             )
 
-            # 計算 Walter Murch 得分
+            # 3. 升級 Walter Murch 得分: 融入心靈狀態連續性或戲劇性反差
+            # 如果是平緩樂段，情緒連續性越高得分越高；如果是 Drop，戲劇性跳躍越大得分越高
+            psy_continuity = SemanticSoftProjector.calculate_semantic_affinity(
+                target_state=prev_psy_state,
+                target_archetype="",
+                module_profile={"primary_psychological_state": curr_psy_state}
+            )
+            
+            if is_climax:
+                # 高潮樂段追求心靈爆發反差 (Contrast Catharsis)
+                emotion_cut_score = (1.0 - psy_continuity) * 0.5 + tension * 0.5
+            else:
+                # 鋪陳樂段追求心靈沉浸連續性
+                emotion_cut_score = psy_continuity * 0.5 + tension * 0.5
+
             murch_score = self.evaluate_murch_cut_score(
-                emotion_score=tension,
-                story_score=0.88 if is_climax else 0.75,
-                rhythm_score=0.92,
+                emotion_score=emotion_cut_score,
+                story_score=0.92 if is_climax else 0.78,
+                rhythm_score=0.94,
                 eye_trace_score=continuity_info["continuity_score"]
             )
 
-            # 後製特效強度曲線
             target_fx = round(tension * 0.95, 3)
             intensity_curve.append(target_fx)
+
+            # CINEDANCE 鏡頭光學與幾何編譯
+            is_counterpoint = is_climax and (framing_mode == "contain")
+            cinedance_meta = CinedanceShotCompiler.compile_cinematic_shot(
+                section_name=sec_name,
+                duration=sec_duration,
+                composite_tension=tension,
+                framing_mode=framing_mode,
+                camera_lookat_offset=continuity_info["camera_lookat_offset"],
+                energy_hint=assigned.get("target_energy", 0.5),
+                is_shock_counterpoint=is_counterpoint
+            )
 
             shot_list.append({
                 "section_index": idx,
@@ -167,22 +205,26 @@ class DirectorChoreographer:
                 "start_time": round(accumulated_time, 2),
                 "duration": round(sec_duration, 2),
                 "assigned_module_id": mod_id,
+                "psychological_state": curr_psy_state,
+                "symbolic_metaphors": assigned.get("symbolic_metaphors", []),
                 "framing_mode": framing_mode,
                 "target_fx_intensity": target_fx,
                 "transition_style": continuity_info["recommended_transition"],
+                "expressive_uniforms": expressive_uniforms,
                 "cinematic_meta": {
                     "cut_style": cut_style,
-                    "cut_offset_sec": cut_offset_sec,
+                    "timeline_nudge_sec": cut_offset_sec,
                     "murch_score": round(murch_score, 3),
                     "composite_tension": round(tension, 3),
                     "camera_lookat_offset": continuity_info["camera_lookat_offset"],
                     "is_shock_cut": continuity_info["is_shock_cut"]
-                }
+                },
+                "cinedance_optical_meta": cinedance_meta
             })
 
-            # 更新質心
             target_c = continuity_info.get("target_centroid", [0.5, 0.5])
             prev_centroid = {"cx": target_c[0], "cy": target_c[1]}
+            prev_psy_state = curr_psy_state
             accumulated_time += sec_duration
 
         return shot_list, intensity_curve

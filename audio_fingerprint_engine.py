@@ -32,7 +32,7 @@ try:
 except ImportError:
     HAS_LIBROSA = False
 
-# 16 大主流音樂風格本體庫與多模態 Prompt 集成
+# 18 大主流音樂風格本體庫與多模態 Prompt 集成 (SOTA 統一註冊表)
 GENRE_REGISTRY = {
     "techno": {
         "display_name": "Techno / Industrial",
@@ -46,7 +46,44 @@ GENRE_REGISTRY = {
         "default_arousal": 0.85,
         "danceability": 0.88,
         "bpm_range": (124, 142),
-        "ideal_bpm": 132
+        "ideal_bpm": 132,
+        "ballistic": {"attack_ms": 2.0, "release_ms": 80.0},
+        "oklch": {"l_base": 0.40, "c_base": 0.16, "harmonies": [0.0, 90.0, 180.0, 270.0]},
+        "lexicon": {"intro": "Atmospheric Intro", "build": "Modular Build-up", "peak": "Peak-Time Drop", "break": "Dark Breakdown", "outro": "Industrial Fadeout"}
+    },
+    "dub_techno": {
+        "display_name": "Dub Techno / Minimal Deep",
+        "sub_genre": "Echospace Berlin Sub-Bass",
+        "prompts": [
+            "Deep atmospheric dub techno with echoing tape delay synthesizer stabs, deep sub bass, vast reverb and minimal hypnotic rhythm",
+            "Subterranean minimal techno track with cavernous dub delay effects, warm analog hiss and steady four on the floor kick",
+            "Ethereal Detroit dub techno with deep chords drowned in tape echo and subtle filtered noise sweeps"
+        ],
+        "default_valence": -0.15,
+        "default_arousal": 0.45,
+        "danceability": 0.70,
+        "bpm_range": (112, 128),
+        "ideal_bpm": 120,
+        "ballistic": {"attack_ms": 40.0, "release_ms": 400.0},
+        "oklch": {"l_base": 0.25, "c_base": 0.05, "harmonies": [0.0, 30.0, 180.0, 210.0]},
+        "lexicon": {"intro": "Subterranean Intro", "build": "Minimal Echo Loop", "peak": "Deep Spatial Bloom", "break": "Cavernous Breakdown", "outro": "Tape Decay Outro"}
+    },
+    "hard_techno": {
+        "display_name": "Hard Techno / Schranz",
+        "sub_genre": "Industrial Rave & Schranz",
+        "prompts": [
+            "Relentless hard techno track with aggressive distorted kick drums, ferocious industrial percussion at 155 bpm",
+            "Schranz hard techno with blistering 160 bpm tempo, distorted metallic claps and dark warehouse energy",
+            "Raw industrial hard techno with pounding distorted bass, screeching synths and driving rave energy"
+        ],
+        "default_valence": -0.55,
+        "default_arousal": 0.98,
+        "danceability": 0.85,
+        "bpm_range": (145, 168),
+        "ideal_bpm": 155,
+        "ballistic": {"attack_ms": 1.0, "release_ms": 50.0},
+        "oklch": {"l_base": 0.60, "c_base": 0.24, "harmonies": [0.0, 90.0, 180.0, 270.0]},
+        "lexicon": {"intro": "Industrial Siren Intro", "build": "Relentless Build", "peak": "Ferocious Schranz Drop", "break": "Metallic Shock Break", "outro": "Abrupt Strobe Outro"}
     },
     "trance": {
         "display_name": "Trance / Progressive",
@@ -60,7 +97,10 @@ GENRE_REGISTRY = {
         "default_arousal": 0.90,
         "danceability": 0.82,
         "bpm_range": (128, 142),
-        "ideal_bpm": 136
+        "ideal_bpm": 136,
+        "ballistic": {"attack_ms": 4.0, "release_ms": 110.0},
+        "oklch": {"l_base": 0.55, "c_base": 0.22, "harmonies": [0.0, 120.0, 240.0, 60.0]},
+        "lexicon": {"intro": "Celestial Induction", "build": "Supersaw Crescendo", "peak": "Euphoric Anthem Drop", "break": "Melodic Floating Break", "outro": "Atmospheric Outro"}
     },
     "dnb": {
         "display_name": "Drum & Bass / Neurofunk",
@@ -73,8 +113,11 @@ GENRE_REGISTRY = {
         "default_valence": 0.10,
         "default_arousal": 0.95,
         "danceability": 0.80,
-        "bpm_range": (160, 182),
-        "ideal_bpm": 174
+        "bpm_range": (160, 185),
+        "ideal_bpm": 174,
+        "ballistic": {"attack_ms": 1.0, "release_ms": 45.0},
+        "oklch": {"l_base": 0.50, "c_base": 0.20, "harmonies": [0.0, 90.0, 180.0, 270.0]},
+        "lexicon": {"intro": "Amen Roller Intro", "build": "High-Tension Acceleration", "peak": "Neurofunk Reese Drop", "break": "Liquid Breakbeat Switch", "outro": "Rapid Decay Outro"}
     },
     "dubstep": {
         "display_name": "Dubstep / Bass Music",
@@ -88,7 +131,10 @@ GENRE_REGISTRY = {
         "default_arousal": 0.92,
         "danceability": 0.72,
         "bpm_range": (135, 150),
-        "ideal_bpm": 140
+        "ideal_bpm": 140,
+        "ballistic": {"attack_ms": 2.0, "release_ms": 95.0},
+        "oklch": {"l_base": 0.45, "c_base": 0.22, "harmonies": [0.0, 120.0, 240.0, 60.0]},
+        "lexicon": {"intro": "Tension Buildup Intro", "build": "Pre-Drop Vocal Silence", "peak": "Heavy Growl Bass Drop", "break": "Melodic Orchestral Break", "outro": "Impact Sub Outro"}
     },
     "house": {
         "display_name": "House / Deep House",
@@ -102,7 +148,10 @@ GENRE_REGISTRY = {
         "default_arousal": 0.75,
         "danceability": 0.92,
         "bpm_range": (120, 128),
-        "ideal_bpm": 124
+        "ideal_bpm": 124,
+        "ballistic": {"attack_ms": 5.0, "release_ms": 120.0},
+        "oklch": {"l_base": 0.50, "c_base": 0.15, "harmonies": [0.0, 120.0, 240.0, 60.0]},
+        "lexicon": {"intro": "Groovy Beat Induction", "build": "Snare Roll Transition", "peak": "Deep Bouncy Club Drop", "break": "Soulful Vocal Breakdown", "outro": "Filter Sweep Outro"}
     },
     "synthwave": {
         "display_name": "Synthwave / Retrowave",
@@ -116,7 +165,10 @@ GENRE_REGISTRY = {
         "default_arousal": 0.70,
         "danceability": 0.75,
         "bpm_range": (100, 130),
-        "ideal_bpm": 116
+        "ideal_bpm": 116,
+        "ballistic": {"attack_ms": 8.0, "release_ms": 150.0},
+        "oklch": {"l_base": 0.55, "c_base": 0.20, "harmonies": [0.0, 140.0, 210.0, 320.0]},
+        "lexicon": {"intro": "Neon Highway Intro", "build": "Arpeggiator Surge", "peak": "Gated Snare Outrun Peak", "break": "Nostalgic Solo Break", "outro": "Sunset Horizon Fadeout"}
     },
     "lo-fi": {
         "display_name": "Lo-Fi / Chillhop",
@@ -130,7 +182,10 @@ GENRE_REGISTRY = {
         "default_arousal": 0.25,
         "danceability": 0.45,
         "bpm_range": (70, 92),
-        "ideal_bpm": 80
+        "ideal_bpm": 80,
+        "ballistic": {"attack_ms": 40.0, "release_ms": 320.0},
+        "oklch": {"l_base": 0.65, "c_base": 0.09, "harmonies": [0.0, 35.0, 190.0, 220.0]},
+        "lexicon": {"intro": "Dusty Vinyl Needle Intro", "build": "Warm Rhodes Progression", "peak": "Chill Mellow Groove", "break": "Raindrop Melancholy Bridge", "outro": "Tape Stop Fadeout"}
     },
     "ambient": {
         "display_name": "Ambient / Drone",
@@ -144,7 +199,44 @@ GENRE_REGISTRY = {
         "default_arousal": 0.15,
         "danceability": 0.10,
         "bpm_range": (40, 90),
-        "ideal_bpm": 60
+        "ideal_bpm": 60,
+        "ballistic": {"attack_ms": 300.0, "release_ms": 1600.0},
+        "oklch": {"l_base": 0.35, "c_base": 0.06, "harmonies": [0.0, 40.0, 180.0, 220.0]},
+        "lexicon": {"intro": "Atmospheric Induction", "build": "Harmonic Swell", "peak": "Textural Bloom", "break": "Ethereal Void", "outro": "Infinite Dissolve"}
+    },
+    "edm": {
+        "display_name": "EDM / Festival Electro",
+        "sub_genre": "Big Room & Future Rave",
+        "prompts": [
+            "High energy festival EDM track with massive supersaw chord build-up, punchy four on the floor kick and explosive stadium drop",
+            "Big room electro house with pounding sub drops, epic melodic breakdowns and energetic festival atmosphere",
+            "Future rave dance anthem with soaring lead synthesizers, driving basslines and euphoric crowd energy at 128 bpm"
+        ],
+        "default_valence": 0.65,
+        "default_arousal": 0.95,
+        "danceability": 0.92,
+        "bpm_range": (124, 132),
+        "ideal_bpm": 128,
+        "ballistic": {"attack_ms": 3.0, "release_ms": 90.0},
+        "oklch": {"l_base": 0.65, "c_base": 0.26, "harmonies": [0.0, 120.0, 240.0, 60.0]},
+        "lexicon": {"intro": "Festival Vocal Hook Intro", "build": "Stadium Snare Riser", "peak": "Mainstage Explosive Drop", "break": "Crowd Singalong Break", "outro": "Pyrotechnic Outro"}
+    },
+    "idm": {
+        "display_name": "IDM / Braindance / Glitch",
+        "sub_genre": "Algorithmic Glitch & Braindance",
+        "prompts": [
+            "Complex intelligent dance music with fractured glitch percussion, algorithmic drill and bass patterns and delicate synth melodies",
+            "Experimental braindance electronica with intricate polyrhythmic drum programming, modular synthesis and sudden time signature shifts",
+            "Glitch hop and IDM track with micro-edited sound design, warm melodic pads and hyperactive syncopated beats"
+        ],
+        "default_valence": 0.10,
+        "default_arousal": 0.75,
+        "danceability": 0.60,
+        "bpm_range": (90, 175),
+        "ideal_bpm": 135,
+        "ballistic": {"attack_ms": 2.0, "release_ms": 60.0},
+        "oklch": {"l_base": 0.45, "c_base": 0.18, "harmonies": [0.0, 120.0, 210.0, 300.0]},
+        "lexicon": {"intro": "Generative Start", "build": "Algorithmic Glitch Mutation", "peak": "Fractured Polyrhythm Peak", "break": "Microtonal Ambient Bridge", "outro": "Deconstructive Disintegration"}
     },
     "hip-hop": {
         "display_name": "Hip-Hop / Trap",
@@ -158,7 +250,10 @@ GENRE_REGISTRY = {
         "default_arousal": 0.70,
         "danceability": 0.85,
         "bpm_range": (65, 160),
-        "ideal_bpm": 140
+        "ideal_bpm": 140,
+        "ballistic": {"attack_ms": 4.0, "release_ms": 110.0},
+        "oklch": {"l_base": 0.40, "c_base": 0.15, "harmonies": [0.0, 90.0, 180.0, 270.0]},
+        "lexicon": {"intro": "808 Sub Induction", "build": "Hi-Hat Roll Riser", "peak": "Heavy 808 Bass Drop", "break": "Soul Sample Loop Bridge", "outro": "Faded Hook Outro"}
     },
     "rock": {
         "display_name": "Rock / Alternative",
@@ -171,11 +266,14 @@ GENRE_REGISTRY = {
         "default_valence": 0.20,
         "default_arousal": 0.78,
         "danceability": 0.55,
-        "bpm_range": (105, 145),
-        "ideal_bpm": 125
+        "bpm_range": (105, 150),
+        "ideal_bpm": 125,
+        "ballistic": {"attack_ms": 5.0, "release_ms": 120.0},
+        "oklch": {"l_base": 0.50, "c_base": 0.16, "harmonies": [0.0, 120.0, 240.0, 60.0]},
+        "lexicon": {"intro": "Guitar Riff Intro", "build": "Driving Pre-Chorus", "peak": "Anthemic Chorus Blast", "break": "Guitar Solo Bridge", "outro": "Crash Cymbal Outro"}
     },
     "metal": {
-        "display_name": "Metal / Hardcore",
+        "display_name": "Metal / Heavy Hardcore",
         "sub_genre": "Djent & Heavy Metal",
         "prompts": [
             "Aggressive heavy metal track with down-tuned distorted guitars, rapid double-kick bass drums and intense harsh vocals",
@@ -186,7 +284,10 @@ GENRE_REGISTRY = {
         "default_arousal": 0.98,
         "danceability": 0.35,
         "bpm_range": (120, 200),
-        "ideal_bpm": 150
+        "ideal_bpm": 150,
+        "ballistic": {"attack_ms": 2.0, "release_ms": 70.0},
+        "oklch": {"l_base": 0.30, "c_base": 0.18, "harmonies": [0.0, 90.0, 180.0, 270.0]},
+        "lexicon": {"intro": "Distorted Feedback Intro", "build": "Double-Kick Acceleration", "peak": "Crushing Breakdown Peak", "break": "Polyrhythmic Chug Bridge", "outro": "Screaming Feedback Outro"}
     },
     "jazz": {
         "display_name": "Jazz / Funk / Soul",
@@ -199,8 +300,11 @@ GENRE_REGISTRY = {
         "default_valence": 0.60,
         "default_arousal": 0.50,
         "danceability": 0.72,
-        "bpm_range": (85, 125),
-        "ideal_bpm": 105
+        "bpm_range": (85, 130),
+        "ideal_bpm": 105,
+        "ballistic": {"attack_ms": 15.0, "release_ms": 220.0},
+        "oklch": {"l_base": 0.55, "c_base": 0.12, "harmonies": [0.0, 60.0, 180.0, 240.0]},
+        "lexicon": {"intro": "Head-In Theme Intro", "build": "Rhythm Section Comping", "peak": "Solo Improvisation Climax", "break": "Bass & Drum Interlude", "outro": "Head-Out Final Tag"}
     },
     "classical": {
         "display_name": "Classical / Cinematic",
@@ -214,7 +318,10 @@ GENRE_REGISTRY = {
         "default_arousal": 0.40,
         "danceability": 0.20,
         "bpm_range": (50, 140),
-        "ideal_bpm": 85
+        "ideal_bpm": 85,
+        "ballistic": {"attack_ms": 80.0, "release_ms": 500.0},
+        "oklch": {"l_base": 0.45, "c_base": 0.08, "harmonies": [0.0, 45.0, 180.0, 225.0]},
+        "lexicon": {"intro": "Exposition Motif Intro", "build": "Symphonic Crescendo", "peak": "Tutti Orchestral Climax", "break": "Solo Adagio Interlude", "outro": "Maestoso Finale Outro"}
     },
     "pop": {
         "display_name": "Pop / Electro-Pop",
@@ -228,21 +335,10 @@ GENRE_REGISTRY = {
         "default_arousal": 0.68,
         "danceability": 0.85,
         "bpm_range": (100, 130),
-        "ideal_bpm": 120
-    },
-    "hardstyle": {
-        "display_name": "Hardstyle / Hardcore",
-        "sub_genre": "Rawstyle & Hardcore",
-        "prompts": [
-            "High energy hardstyle track with distorted reverse bass kick, pitch-bent screeches, epic euphoric melody at 150 bpm",
-            "Hardcore techno with brutal gabber kick drums, rapid 175 bpm tempo and chaotic industrial distortion",
-            "Rawstyle electronic dance music with aggressive punchy distorted kicks and dark atmospheric synths"
-        ],
-        "default_valence": -0.10,
-        "default_arousal": 0.98,
-        "danceability": 0.75,
-        "bpm_range": (148, 175),
-        "ideal_bpm": 150
+        "ideal_bpm": 120,
+        "ballistic": {"attack_ms": 8.0, "release_ms": 140.0},
+        "oklch": {"l_base": 0.70, "c_base": 0.18, "harmonies": [0.0, 120.0, 240.0, 60.0]},
+        "lexicon": {"intro": "Catchy Hook Intro", "build": "Pre-Chorus Lift", "peak": "Anthemic Chorus Drop", "break": "Stripped-Back Bridge", "outro": "Fadeout Hook Outro"}
     },
     "downtempo": {
         "display_name": "Downtempo / Trip-Hop",
@@ -256,9 +352,116 @@ GENRE_REGISTRY = {
         "default_arousal": 0.35,
         "danceability": 0.50,
         "bpm_range": (75, 105),
-        "ideal_bpm": 90
+        "ideal_bpm": 90,
+        "ballistic": {"attack_ms": 30.0, "release_ms": 260.0},
+        "oklch": {"l_base": 0.40, "c_base": 0.08, "harmonies": [0.0, 40.0, 180.0, 220.0]},
+        "lexicon": {"intro": "Sub-Heavy Trip Intro", "build": "Slow Breakbeat Groove", "peak": "Moody Bass Climax", "break": "Dub Echo Interlude", "outro": "Atmospheric Drift Outro"}
     }
 }
+
+GENRE_KEY_ALIASES = {
+    "techno": "techno",
+    "dub techno": "dub_techno",
+    "dub_techno": "dub_techno",
+    "hard techno": "hard_techno",
+    "hard_techno": "hard_techno",
+    "trance": "trance",
+    "dnb": "dnb",
+    "drum and bass": "dnb",
+    "drum & bass": "dnb",
+    "dubstep": "dubstep",
+    "house": "house",
+    "synthwave": "synthwave",
+    "lo-fi": "lo-fi",
+    "lofi": "lo-fi",
+    "chillhop": "lo-fi",
+    "ambient": "ambient",
+    "edm": "edm",
+    "electronic dance music": "edm",
+    "idm": "idm",
+    "hip-hop": "hip-hop",
+    "hip hop": "hip-hop",
+    "trap": "hip-hop",
+    "rock": "rock",
+    "metal": "metal",
+    "hardcore": "metal",
+    "jazz": "jazz",
+    "classical": "classical",
+    "pop": "pop",
+    "downtempo": "downtempo",
+    "trip-hop": "downtempo"
+}
+
+def normalize_genre_key(genre_str: str) -> str:
+    """將任意格式的風格字串標準化為註冊表標準 Key (長度降序最長匹配)"""
+    if not genre_str or not isinstance(genre_str, str):
+        return "techno"
+    clean = genre_str.strip().lower()
+    if clean in GENRE_REGISTRY:
+        return clean
+    if clean in GENRE_KEY_ALIASES:
+        return GENRE_KEY_ALIASES[clean]
+
+    clean_normalized = clean.replace("_", " ").replace("-", " ")
+    if clean_normalized in GENRE_KEY_ALIASES:
+        return GENRE_KEY_ALIASES[clean_normalized]
+
+    # 按別名長度降序比對 (最長關鍵詞優先，防止 "techno" 攔截 "dub techno" / "hard techno")
+    sorted_aliases = sorted(GENRE_KEY_ALIASES.items(), key=lambda x: len(x[0]), reverse=True)
+    for alias_pattern, canonical in sorted_aliases:
+        alias_clean = alias_pattern.replace("_", " ").replace("-", " ")
+        if alias_clean in clean_normalized or alias_pattern in clean:
+            return canonical
+    return "techno"
+
+def get_genre_profile(genre_key: str) -> dict:
+    """安全獲取風格專屬 SOTA 規格配置"""
+    canonical = normalize_genre_key(genre_key)
+    return GENRE_REGISTRY.get(canonical, GENRE_REGISTRY["techno"])
+
+
+
+def extract_path_genre_prior(audio_path: Optional[str]) -> Optional[str]:
+    """從檔案路徑與目錄中提取風格先驗（例如 /Techno 2026-2/ -> techno）"""
+    if not audio_path or not isinstance(audio_path, str):
+        return None
+    path_lower = audio_path.lower().replace("_", " ").replace("-", " ")
+    
+    candidates = [
+        ("hard techno", "hard_techno"),
+        ("dub techno", "dub_techno"),
+        ("techno", "techno"),
+        ("drum and bass", "dnb"),
+        ("drum & bass", "dnb"),
+        ("dnb", "dnb"),
+        ("ambient", "ambient"),
+        ("drone", "ambient"),
+        ("lo fi", "lo-fi"),
+        ("lofi", "lo-fi"),
+        ("chillhop", "lo-fi"),
+        ("synthwave", "synthwave"),
+        ("retrowave", "synthwave"),
+        ("trance", "trance"),
+        ("deep house", "house"),
+        ("house", "house"),
+        ("dubstep", "dubstep"),
+        ("edm", "edm"),
+        ("electro", "edm"),
+        ("idm", "idm"),
+        ("glitch", "idm"),
+        ("jazz", "jazz"),
+        ("metal", "metal"),
+        ("rock", "rock"),
+        ("classical", "classical"),
+        ("hip hop", "hip-hop"),
+        ("trap", "hip-hop"),
+        ("downtempo", "downtempo"),
+    ]
+    import re
+    for kw, genre_key in candidates:
+        if re.search(r'(?:^|[\\/ \-_])' + re.escape(kw) + r'(?:$|[\\/ \-_])', path_lower):
+            return genre_key
+    return None
 
 
 class GenreSemanticClassifier:
@@ -296,7 +499,7 @@ class GenreSemanticClassifier:
             logger.warning(f"CLAP 文字錨點預計算異常: {e}，將啟用聲學流形模式。")
             self._text_embeddings.clear()
 
-    def classify_vector(self, audio_vec: np.ndarray, bpm: float = 120.0, acoustic_meta: Optional[dict] = None, onnx_scores: Optional[dict] = None) -> dict:
+    def classify_vector(self, audio_vec: np.ndarray, bpm: float = 120.0, acoustic_meta: Optional[dict] = None, onnx_scores: Optional[dict] = None, audio_path: Optional[str] = None) -> dict:
         """
         結合 512D 向量 (CLAP 或 聲學特徵)、ONNX 深度學習分類與聲學物理特徵
         """
@@ -312,14 +515,16 @@ class GenreSemanticClassifier:
         bass = acoustic_meta.get("bass_ratio", 0.4)
         harmonic = acoustic_meta.get("harmonic", 0.4)
 
-        # 節奏倍頻/半頻自適應校準
+        # 節奏倍頻/半頻自適應校準 (徹底解決 Octave Error)
+        # 注意：若 audio_analyzer 已經校準過，bpm 已是精確速度，嚴禁在此重複乘 2！
         eff_bpm = bpm
-        if acoustic_meta.get('is_double_time') or (bpm >= 130 and energy < 0.45 and harmonic > 0.40):
-            # 慢速音樂 (如 70-85 BPM Lo-Fi/Chillhop) 被 beat_track 識別為 2x BPM
-            eff_bpm = bpm / 2.0
-        elif acoustic_meta.get('is_half_time') or (75 <= bpm <= 95 and (perc > 0.45 or energy > 0.50)):
-            # 高速碎拍音樂 (如 160-180 BPM DnB/Breakbeat) 被 beat_track 識別為 0.5x BPM
+        onset_rate = acoustic_meta.get('onset_rate', 0.0)
+        # 僅當當前 bpm 處於慢速區間 (<= 95 BPM) 且具有高速特徵，且尚未被倍頻時才翻倍
+        if eff_bpm <= 95.0 and (acoustic_meta.get('should_double_bpm') or acoustic_meta.get('is_double_time') or (75 <= bpm <= 95 and (perc > 0.35 or energy > 0.45 or onset_rate >= 3.6))):
             eff_bpm = bpm * 2.0
+        # 僅當當前 bpm 處於高速區間 (>= 135 BPM) 且具有慢速平滑特徵，且尚未被減半時才減半
+        elif eff_bpm >= 135.0 and not acoustic_meta.get('should_double_bpm') and (acoustic_meta.get('should_half_bpm') or acoustic_meta.get('is_half_time') or (energy < 0.42 and harmonic > 0.38 and onset_rate < 3.2)):
+            eff_bpm = bpm / 2.0
 
         if len(self._text_embeddings) > 0:
             for genre_key, text_vec in self._text_embeddings.items():
@@ -333,7 +538,24 @@ class GenreSemanticClassifier:
         if onnx_scores:
             for k, onnx_val in onnx_scores.items():
                 if k in scores and onnx_val > 0.05:
-                    scores[k] = scores[k] * 0.55 + onnx_val * 1.8
+                    scores[k] = scores[k] * 0.50 + onnx_val * 2.0
+
+        # 融合路徑目錄先驗 (Path Semantic Prior)
+        target_path = audio_path or acoustic_meta.get('audio_path')
+        path_prior = extract_path_genre_prior(target_path)
+        if path_prior and path_prior in scores:
+            scores[path_prior] = scores[path_prior] * 3.5
+            # 若為衍生子風格 (例如 techno -> hard_techno, dub_techno)，同步增益並抑制互斥風格
+            if path_prior == "techno":
+                if "hard_techno" in scores:
+                    scores["hard_techno"] *= 3.0
+                if "dub_techno" in scores:
+                    scores["dub_techno"] *= 2.8
+                if "ambient" in scores:
+                    scores["ambient"] *= 0.05
+            elif path_prior == "ambient":
+                if "techno" in scores:
+                    scores["techno"] *= 0.1
 
         # 融合 BPM 與節奏懲罰/獎勵權重
         for genre_key, info in GENRE_REGISTRY.items():
@@ -351,17 +573,19 @@ class GenreSemanticClassifier:
             else:
                 # BPM 高斯衰減權重
                 bpm_diff = abs(eff_bpm - ideal)
-                bpm_weight = np.exp(- (bpm_diff ** 2) / (2 * (30.0 ** 2)))
+                bpm_weight = np.exp(- (bpm_diff ** 2) / (2 * (28.0 ** 2)))
                 
-                # 針對特殊拍速 (Half-time/Double-time) 修正
+                # 針對特殊拍速修正
                 if genre_key in ("hip-hop", "dubstep") and (65 <= eff_bpm <= 80 or 135 <= eff_bpm <= 155):
                     bpm_weight = max(bpm_weight, 0.85)
                 elif genre_key == "dnb" and (160 <= eff_bpm <= 185):
                     bpm_weight = max(bpm_weight, 0.95)
-                elif genre_key == "techno" and (124 <= eff_bpm <= 140):
+                elif genre_key in ("techno", "hard_techno") and (124 <= eff_bpm <= 165):
                     bpm_weight = max(bpm_weight, 0.90)
+                elif genre_key == "dub_techno" and (112 <= eff_bpm <= 128):
+                    bpm_weight = max(bpm_weight, 0.92)
 
-            scores[genre_key] = scores.get(genre_key, 0.1) * (0.65 + 0.35 * bpm_weight)
+            scores[genre_key] = scores.get(genre_key, 0.1) * (0.60 + 0.40 * bpm_weight)
 
         # 排序並歸一化概率
         sorted_candidates = sorted(scores.items(), key=lambda x: x[1], reverse=True)
@@ -389,62 +613,87 @@ class GenreSemanticClassifier:
             "valence": round(valence, 3),
             "arousal": round(arousal, 3),
             "danceability": top_info["danceability"],
+            "ballistic": top_info.get("ballistic", {"attack_ms": 10.0, "release_ms": 180.0}),
             "top_candidates": [(GENRE_REGISTRY[k]["display_name"], round(float(v / sum_scores), 3)) for k, v in sorted_candidates[:4]]
         }
 
     def _score_by_acoustic_heuristics(self, audio_vec: np.ndarray, bpm: float, meta: dict) -> dict:
-        """ 物理聲學統計流形特徵打分器 """
+        """ 物理聲學統計流形特徵打分器 (涵蓋 18 大風格) """
         scores = {}
         perc = meta.get("percussive", 0.4)
         bass = meta.get("bass_ratio", 0.3)
         energy = meta.get("total_energy", 0.5)
         harmonic = meta.get("harmonic", 0.4)
+        centroid = meta.get("spectral_centroid", 3000.0)
         phr = perc / (harmonic + 1e-5) # 打擊-諧波比
         
         for k, info in GENRE_REGISTRY.items():
             base = 0.5
             if k == "ambient":
-                base += (1.0 - perc) * 1.2 + (1.0 - energy) * 0.6 - phr * 0.5
-                if perc < 0.15 or bpm < 45.0:
-                    base += 1.2
+                base += (1.0 - perc) * 1.5 + (1.0 - energy) * 0.8 - phr * 0.8
+                if perc < 0.18 or bpm < 45.0:
+                    base += 1.4
+                # 高拍速 (BPM >= 120) 或密集音符擊發 (onset_rate >= 2.8) 絕非 Ambient/Drone，施加強衰減
+                if bpm >= 120.0 or meta.get('onset_rate', 0) >= 2.8:
+                    base *= 0.15
+            elif k == "dub_techno":
+                base += bass * 0.8 + (0.8 - perc * 0.4) + (0.7 if 114 <= bpm <= 128 else -0.3)
+                if centroid < 2800.0:
+                    base += 0.5
+            elif k == "hard_techno":
+                base += perc * 0.8 + energy * 0.7 + (0.8 if bpm >= 145 else -0.4)
             elif k == "lo-fi":
-                base += (0.8 - abs(bpm - 80) / 40.0) + (1.0 - energy) * 0.5 + harmonic * 0.4
-                if energy < 0.45 and harmonic > 0.35:
+                base += (0.8 - abs(bpm - 80) / 35.0) + (1.0 - energy) * 0.6 + harmonic * 0.5
+                if centroid < 3200.0 and energy < 0.50:
                     base += 0.7
+                if centroid > 4000.0 or perc > 0.42 or meta.get('onset_rate', 0) > 3.8 or bpm > 115:
+                    base *= 0.1 # 高頻明亮、劇烈打擊、高速擊發率或高速拍速絕不可為 Lo-Fi
             elif k == "techno":
-                base += perc * 0.6 + bass * 0.4 + (0.6 if 125 <= bpm <= 138 else -0.3)
-            elif k == "hardstyle":
-                base += perc * 0.7 + energy * 0.5 + (0.6 if bpm >= 145 else -0.4)
+                base += perc * 0.6 + bass * 0.5 + (0.6 if 124 <= bpm <= 138 else -0.3)
             elif k == "dnb":
-                base += perc * 0.6 + (0.8 if bpm >= 160 or (78 <= bpm <= 92 and perc > 0.45) else -0.5)
+                base += perc * 0.8 + (1.2 if (160 <= bpm <= 185) else (-0.6 if bpm < 140 else 0.2))
+                if centroid > 3200.0:
+                    base += 0.4
+                if meta.get('onset_rate', 0) >= 3.6:
+                    base += 0.5
+            elif k == "idm":
+                base += phr * 0.4 + perc * 0.6 + (0.5 if (90 <= bpm <= 175 and perc > 0.38) else -0.2)
+            elif k == "edm":
+                base += energy * 0.8 + perc * 0.6 + (0.7 if 124 <= bpm <= 132 else -0.3)
+                if centroid > 3000.0:
+                    base += 0.4
             elif k == "dubstep":
-                base += bass * 0.6 + perc * 0.4 + (0.6 if 135 <= bpm <= 150 or 68 <= bpm <= 75 else -0.3)
-                if energy < 0.45:
+                base += bass * 0.7 + perc * 0.5 + (0.7 if 135 <= bpm <= 150 or 68 <= bpm <= 75 else -0.3)
+                if energy < 0.40:
                     base *= 0.2
+            elif k == "trance":
+                base += harmonic * 0.6 + energy * 0.5 + (0.7 if 132 <= bpm <= 142 else -0.3)
             elif k == "synthwave":
-                base += harmonic * 0.4 + (0.5 if 105 <= bpm <= 128 else -0.2)
+                base += harmonic * 0.5 + (0.6 if 105 <= bpm <= 128 else -0.2)
             elif k == "house":
-                base += perc * 0.4 + (0.6 if 120 <= bpm <= 128 else -0.2)
+                base += perc * 0.5 + (0.6 if 120 <= bpm <= 128 else -0.2)
             elif k == "hip-hop":
-                base += bass * 0.5 + (0.5 if (65 <= bpm <= 95) or (130 <= bpm <= 155) else -0.2)
+                base += bass * 0.6 + (0.5 if (65 <= bpm <= 95) or (130 <= bpm <= 155) else -0.2)
             elif k == "metal":
-                base += energy * 0.6 + perc * 0.4 + (0.5 if bpm >= 130 else -0.2)
+                base += energy * 0.7 + perc * 0.5 + (0.6 if bpm >= 130 else -0.2)
             elif k == "classical":
-                base += harmonic * 0.6 + (1.0 - perc) * 0.5 - bass * 0.2
+                base += harmonic * 0.7 + (1.0 - perc) * 0.6 - bass * 0.2
             elif k == "jazz":
-                base += harmonic * 0.5 + (0.4 if 85 <= bpm <= 130 else -0.2)
+                base += harmonic * 0.6 + (0.5 if 85 <= bpm <= 130 else -0.2)
             elif k == "rock":
-                base += energy * 0.4 + harmonic * 0.4 + (0.4 if 110 <= bpm <= 145 else -0.1)
+                base += energy * 0.5 + harmonic * 0.4 + (0.5 if 110 <= bpm <= 145 else -0.1)
             elif k == "pop":
                 if perc < 0.20 or bpm < 55:
                     base = 0.05
                 else:
-                    base += 0.3 + harmonic * 0.3 + perc * 0.3
+                    base += 0.3 + harmonic * 0.4 + perc * 0.3
+            elif k == "downtempo":
+                base += bass * 0.5 + (1.0 - energy) * 0.4 + (0.5 if 75 <= bpm <= 105 else -0.2)
             else:
                 base += 0.2
 
-            if (perc < 0.18 or bpm < 50.0) and k in ("techno", "house", "dnb", "hardstyle", "dubstep", "pop", "metal", "rock"):
-                base *= 0.15
+            if ((perc < 0.18 and meta.get('onset_rate', 0) < 2.6) or bpm < 50.0) and k in ("techno", "hard_techno", "house", "dnb", "dubstep", "pop", "metal", "rock", "edm"):
+                base *= 0.12
 
             scores[k] = max(0.02, float(base))
         return scores
@@ -665,7 +914,15 @@ class AudioFingerprintEngine:
                 216: 'rock',
                 217: 'metal',
                 218: 'metal',
-                232: 'jazz'
+                220: 'metal',
+                232: 'jazz',
+                226: 'jazz',
+                239: 'dubstep',
+                244: 'trance',
+                242: 'edm',
+                236: 'edm',
+                234: 'classical',
+                241: 'idm'
             }
             res = {}
             for cls_idx, genre_k in yamnet_map.items():
@@ -684,7 +941,7 @@ class AudioFingerprintEngine:
             vector = self.extract_clap_vector(audio_path)
             
         onnx_scores = self._run_yamnet_onnx(audio_path)
-        result = self.classifier.classify_vector(vector, bpm=bpm, acoustic_meta=acoustic_meta, onnx_scores=onnx_scores)
+        result = self.classifier.classify_vector(vector, bpm=bpm, acoustic_meta=acoustic_meta, onnx_scores=onnx_scores, audio_path=audio_path)
         
         # 寫入/更新快取
         cache_file = self._get_cache_path(audio_path)

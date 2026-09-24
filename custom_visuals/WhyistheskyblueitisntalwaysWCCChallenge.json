@@ -22,5 +22,7 @@
     "used_in_videos": [
         "Taipei Nocturne.mp4",
         "Linear Path.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "STATIC_FREEZE_NO_TEMPORAL_DYNAMICS"
 }

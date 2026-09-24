@@ -17,10 +17,49 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
         "Taipei Nocturne.mp4",
-        "Quiet Night.mp4"
-    ]
+        "Quiet Night.mp4",
+        "Faint Memory.mp4",
+        "Modern 2026 Momentum.mp4",
+        "Perimeter Glow.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "Wonderingpolygonbrush",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                225.0,
+                195.0
+            ],
+            "mean_lightness": 0.093,
+            "mean_chroma": 0.039,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 1.52,
+            "curl_vorticity": 0.155,
+            "divergence": -0.007,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:46:54"
+    },
+    "is_new_semantic_ingested": true
 }

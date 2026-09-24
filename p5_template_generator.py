@@ -52,13 +52,17 @@ function drawElement_{i}(bass, mid, high, chordColorHex) {{
   if (!imgElement_{i}) return;
   let c = color(chordColorHex);
 
-  // 拓撲位置計算
-  let totemX = width * 0.5 + sin(frameCount * 0.03 + {i}) * 18;
-  let totemY = height * 0.3 - ({i - 1} * 75) + (bass - 0.5) * 20;
+  // 拓撲位置計算 (融入 CINEDANCE NDC 空間幾何錨定與彈性拉簧)
+  let springK = (window.cinedanceMeta && window.cinedanceMeta.elastic_spring_k) ? window.cinedanceMeta.elastic_spring_k : 0.8;
+  let horizonY = (window.cinedanceMeta && window.cinedanceMeta.horizon_ndc_y) ? height * window.cinedanceMeta.horizon_ndc_y : height * 0.5;
+  let anchorX = (window.cinedanceMeta && window.cinedanceMeta.subject_anchor_ndc) ? width * window.cinedanceMeta.subject_anchor_ndc[0] : width * 0.5;
+
+  let totemX = anchorX + sin(frameCount * 0.03 + {i}) * 18 * (1.5 - springK);
+  let totemY = (horizonY - 120) - ({i - 1} * 75) + (bass - 0.5) * 20 * (1.5 - springK);
 
   let orbitalAngle = frameCount * {spd} + {ang_offset} + mid * 0.04;
-  let orbitalX = width * 0.5 + cos(orbitalAngle) * ({orbit_r});
-  let orbitalY = height * 0.5 + sin(orbitalAngle * 1.5) * ({orbit_r * 0.55}) + (bass - 0.5) * 35;
+  let orbitalX = anchorX + cos(orbitalAngle) * ({orbit_r});
+  let orbitalY = horizonY + sin(orbitalAngle * 1.5) * ({orbit_r * 0.55}) + (bass - 0.5) * 35;
 
   let posX = lerp(totemX, orbitalX, topologyMorph);
   let posY = lerp(totemY, orbitalY, topologyMorph);
@@ -206,11 +210,15 @@ function drawShockwaves(chordColorHex) {{
 }}
 
 function drawHeroSubject(bass, mid, high, chordColorHex) {{
-  let lfoX = cos(frameCount * 0.017) * 16;
-  let lfoY = sin(frameCount * 0.027) * 18;
+  let heroAnchorX = (window.cinedanceMeta && window.cinedanceMeta.subject_anchor_ndc) ? width * window.cinedanceMeta.subject_anchor_ndc[0] : width * 0.5;
+  let heroAnchorY = (window.cinedanceMeta && window.cinedanceMeta.subject_anchor_ndc) ? height * window.cinedanceMeta.subject_anchor_ndc[1] : height * 0.64;
+  let springK = (window.cinedanceMeta && window.cinedanceMeta.elastic_spring_k) ? window.cinedanceMeta.elastic_spring_k : 0.8;
 
-  let heroTargetX = lerp(width * 0.5, width * 0.44, topologyMorph);
-  let heroTargetY = lerp(height * 0.64, height * 0.58, topologyMorph);
+  let lfoX = cos(frameCount * 0.017) * 16 * (1.5 - springK);
+  let lfoY = sin(frameCount * 0.027) * 18 * (1.5 - springK);
+
+  let heroTargetX = lerp(heroAnchorX, heroAnchorX - width * 0.06, topologyMorph);
+  let heroTargetY = lerp(heroAnchorY, heroAnchorY - height * 0.06, topologyMorph);
 
   push();
   translate(heroTargetX + lfoX, heroTargetY + lfoY);

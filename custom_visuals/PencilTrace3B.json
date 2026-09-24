@@ -23,5 +23,38 @@
         "Monolithic Interval.mp4",
         "Vacuum Memory.mp4",
         "Ultimate Core Patterns.mp4"
-    ]
+    ],
+    "expressive_profile": {
+        "module_id": "PencilTrace3B",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [],
+            "mean_lightness": 0.108,
+            "mean_chroma": 0.0,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.06,
+            "curl_vorticity": 0.009,
+            "divergence": 0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:47:02"
+    },
+    "is_new_semantic_ingested": true
 }

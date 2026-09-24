@@ -1,22 +1,26 @@
 {
-  "name": "Sketch20221115_1",
-  "author": "u94115",
-  "license": "CC BY-SA 3.0",
-  "date_added": "2026-08-22 23:06:02",
-  "url": "https://openprocessing.org/@u94115/590483",
-  "code": "// === Tab: mySketch ===\nvar branch = [];\nvar offset = -90.0;\nvar count;\nvar s_color;\nvar s_weight;\nfunction setup () {\n\t\n\tpixelDensity (displayDensity ());\n\tcreateCanvas (windowWidth, windowHeight);\n\tbackground (255);\n\tcolorMode (RGB, 255, 255, 255, 100);\n\tbranch.push (new CreateBranch (width / 2, height, width / 2, height - 80.0, 80.0, 0.0));\n\tcount = 0;\n\ts_color = 0;\n\ts_weight = 0;\n}\nfunction draw () {\n\tfor (var i = 0; i < branch.length; i++) {\n\t\tbranch[i].render ();\n\t\tbranch[i].update ();\n\t}\n}\nfunction CreateBranch (sx, sy, ex, ey, sl, sd) {\n\tvar startx = sx;\n\tvar starty = sy;\n\tvar endx = ex;\n\tvar endy = ey;\n\tvar length = sl;\n\tvar degree = sd;;\n\tvar nextx = startx;\n\tvar nexty = starty;\n\tvar prevx = startx;\n\tvar prevy = starty;\n\tvar next_flag = true;\n\tvar draw_flag = true;\n\tthis.update = function () {\n\t\tnextx += (endx - nextx) * 0.4;\n\t\tnexty += (endy - nexty) * 0.4;\n\t\ts_color = int (count / 10.0);\n\t\ts_weight = 3.0 / (count / 100 + 1);\n\t\tif (abs (nextx - endx) < 1.0 && abs (nexty - endy) < 1.0 && next_flag == true) {\n\t\t\tnext_flag = false;\n\t\t\tdraw_flag = false;\n\t\t\tnextx = endx;\n\t\t\tnexty = endy;\n\t\t\tvar num = int (random (2, 4));\n\t\t\tfor (var i = 0; i < num; i++) {\n\t\t\t\tvar sx = endx;\n\t\t\t\tvar sy = endy;\n\t\t\t\tvar sl = random (random (10.0, 20.0), length * 0.99);\n\t\t\t\tvar sd = random (-24.0, 24.0);\n\t\t\t\tvar ex = sx + sl * cos (radians (sd + degree + offset));\n\t\t\t\tvar ey = sy + sl * sin (radians (sd + degree + offset));\n\t\t\t\tbranch.push (new CreateBranch (sx, sy, ex, ey, sl, sd + degree));\n\t\t\t}\n\t\t\tcount += 1;\n\t\t}\n\t\tif (branch.length > 6000) {\n\t\t\tcount = 0;\n\t\t\ts_color = 0;\n\t\t\ts_weight = 0;\n\t\t\tvar sx = random (width);\n\t\t\tvar sl = random (0.0, 180.0);\n\t\t\tbranch = [];\n\t\t\tbranch.push (new CreateBranch (sx, height, sx, height - sl, sl, 0.0));\n\t\t}\n\t}\n\tthis.render = function () {\n\t\tif (draw_flag == true) {\n\t\t\tstroke (s_color);\n\t\t\tstrokeWeight (s_weight);\n\t\t\tline (prevx, prevy, nextx, nexty);\n\t\t}\n\t\tprevx = nextx;\n\t\tprevy = nexty;\n\t}\n}",
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "tags": [
-    "batch_import",
-    "openprocessing",
-    "audio_reactive",
-    "restored"
-  ],
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "used_count": 0,
-  "is_starred": false
+    "name": "Sketch20221115_1",
+    "author": "u94115",
+    "license": "CC BY-SA 3.0",
+    "date_added": "2026-08-22 23:06:02",
+    "url": "https://openprocessing.org/@u94115/590483",
+    "code": "// === Tab: mySketch ===\nvar branch = [];\nvar offset = -90.0;\nvar count;\nvar s_color;\nvar s_weight;\nfunction setup () {\n\t\n\tpixelDensity (displayDensity ());\n\tcreateCanvas (windowWidth, windowHeight);\n\tbackground (255);\n\tcolorMode (RGB, 255, 255, 255, 100);\n\tbranch.push (new CreateBranch (width / 2, height, width / 2, height - 80.0, 80.0, 0.0));\n\tcount = 0;\n\ts_color = 0;\n\ts_weight = 0;\n}\nfunction draw () {\n\tfor (var i = 0; i < branch.length; i++) {\n\t\tbranch[i].render ();\n\t\tbranch[i].update ();\n\t}\n}\nfunction CreateBranch (sx, sy, ex, ey, sl, sd) {\n\tvar startx = sx;\n\tvar starty = sy;\n\tvar endx = ex;\n\tvar endy = ey;\n\tvar length = sl;\n\tvar degree = sd;;\n\tvar nextx = startx;\n\tvar nexty = starty;\n\tvar prevx = startx;\n\tvar prevy = starty;\n\tvar next_flag = true;\n\tvar draw_flag = true;\n\tthis.update = function () {\n\t\tnextx += (endx - nextx) * 0.4;\n\t\tnexty += (endy - nexty) * 0.4;\n\t\ts_color = int (count / 10.0);\n\t\ts_weight = 3.0 / (count / 100 + 1);\n\t\tif (abs (nextx - endx) < 1.0 && abs (nexty - endy) < 1.0 && next_flag == true) {\n\t\t\tnext_flag = false;\n\t\t\tdraw_flag = false;\n\t\t\tnextx = endx;\n\t\t\tnexty = endy;\n\t\t\tvar num = int (random (2, 4));\n\t\t\tfor (var i = 0; i < num; i++) {\n\t\t\t\tvar sx = endx;\n\t\t\t\tvar sy = endy;\n\t\t\t\tvar sl = random (random (10.0, 20.0), length * 0.99);\n\t\t\t\tvar sd = random (-24.0, 24.0);\n\t\t\t\tvar ex = sx + sl * cos (radians (sd + degree + offset));\n\t\t\t\tvar ey = sy + sl * sin (radians (sd + degree + offset));\n\t\t\t\tbranch.push (new CreateBranch (sx, sy, ex, ey, sl, sd + degree));\n\t\t\t}\n\t\t\tcount += 1;\n\t\t}\n\t\tif (branch.length > 6000) {\n\t\t\tcount = 0;\n\t\t\ts_color = 0;\n\t\t\ts_weight = 0;\n\t\t\tvar sx = random (width);\n\t\t\tvar sl = random (0.0, 180.0);\n\t\t\tbranch = [];\n\t\t\tbranch.push (new CreateBranch (sx, height, sx, height - sl, sl, 0.0));\n\t\t}\n\t}\n\tthis.render = function () {\n\t\tif (draw_flag == true) {\n\t\t\tstroke (s_color);\n\t\t\tstrokeWeight (s_weight);\n\t\t\tline (prevx, prevy, nextx, nexty);\n\t\t}\n\t\tprevx = nextx;\n\t\tprevy = nexty;\n\t}\n}",
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "restored"
+    ],
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "used_count": 2,
+    "is_starred": false,
+    "used_in_videos": [
+        "Grey Equilibrium.mp4",
+        "Concrete Resonance Unit.mp4"
+    ]
 }

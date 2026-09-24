@@ -17,10 +17,49 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
         "Infinite Loop.mp4",
-        "Night Transit.mp4"
-    ]
+        "Night Transit.mp4",
+        "Concrete Resonance Unit.mp4",
+        "Pale Frequency.mp4",
+        "Spatial Hypnosis Haze.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "Myirrationalgarden_1",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                195.0,
+                15.0
+            ],
+            "mean_lightness": 0.159,
+            "mean_chroma": 0.101,
+            "contrast_level": "complementary_clash",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 0.07,
+            "curl_vorticity": 0.005,
+            "divergence": 0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:43:46"
+    },
+    "is_new_semantic_ingested": true
 }

@@ -17,9 +17,12 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 1,
+    "used_count": 2,
     "is_starred": false,
     "used_in_videos": [
-        "Bridge Crossing.mp4"
-    ]
+        "Bridge Crossing.mp4",
+        "Pure Being.mp4"
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

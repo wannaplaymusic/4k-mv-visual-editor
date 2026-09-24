@@ -17,10 +17,48 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
         "Infinite Loop.mp4",
-        "Deep Peace.mp4"
-    ]
+        "Deep Peace.mp4",
+        "Route Marker.mp4",
+        "Spatial Hypnosis Haze.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "Hexablob_1",
+        "primary_psychological_state": "sublime_catharsis",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "破曉昇華",
+            "意識覺醒",
+            "光芒滌蕩"
+        ],
+        "narrative_function": "aftermath_resonance",
+        "jungian_archetype": "the_self",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                195.0,
+                225.0
+            ],
+            "mean_lightness": 0.879,
+            "mean_chroma": 0.093,
+            "contrast_level": "analogous_subtle",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 4.87,
+            "curl_vorticity": 0.55,
+            "divergence": 0.0,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:45:51"
+    },
+    "is_new_semantic_ingested": true
 }

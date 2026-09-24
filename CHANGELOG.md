@@ -4,6 +4,74 @@
 
 ---
 
+## 🚀 [v1.5.0] - 2026-09-24
+### 🎬 CINEDANCE 影視級鏡頭光學編譯系統、12 大旗艦 VJ 音畫特效矩陣、PSE 光敏健康防護、VisualStudio Pro 4K 神經創作工作站與批次收編時光機回溯
+
+- **🎬 CINEDANCE 影視級鏡頭光學編譯系統 (`cinedance_compiler.py`, `director_choreographer.py`, `tests/`)**：
+  - **核心理念對齊**：融合 Higgsfield CINEDANCE 影視級幾何光學編譯核心理念，為 AI 導演分鏡與 4K 即時渲染注入專業鏡頭光學約束。
+  - **`ShotRiskAuditor` 鏡頭風險審計器**：靜態分析角速度、持續時間、運動對比與視場角，實施動態風險評級（低/中/高）與自動降級防翻車（Auto Mitigation），杜絕模型形變坍縮與渲染溢出。
+  - **`DynamicFOVCompiler` 動態視場角與 Dolly Zoom 編譯器**：依據樂段張力與曲式演進即時求解水平視場角（H-FOV 24°~110°），並精確計算滑軌變焦反向補償比例，實現影視級滑軌變焦特效。
+  - **`ElasticSpatialGrounder` NDC 空間幾何錨定**：支援前景、中景、遠景三層景深彈性拉簧幾何錨定與慣性阻尼，維持視覺質心（Eye-Trace）在切鏡時的連貫舒適度。
+  - **`LightTriadSolver` 空間三元光學向量求解器**：計算主體、光源與相機三維空間朝向向量與菲涅爾視線夾角，精準傳遞至著色器與光影渲染。
+  - **雙軌生成架構**：同步輸出 4K 即時渲染幾何矩陣參數與生成式 AI 視頻提示詞（Camera Prompt Ensembles）。
+
+- **⚡ 12 大旗艦級 VJ 音畫特效矩陣 & Oklab 感知色彩空間 (`post_processor.py`)**：
+  - **旗艦全域音視特效**：
+    - `apply_chladni_cymatics_custom`（克拉尼聲波駐波紋）：聲學幾何共振與幾何節線發光沙紋。
+    - `apply_ferrofluid_spikes_custom`（磁流體刺針湧動）：低音重拍爆發金屬磁針與漆黑液體流變。
+    - `apply_volumetric_caustics_custom`（體積焦散光網）：水下折射聚焦光網與空靈和弦調色。
+    - `apply_clifford_torus_warp_custom`（四維克利福德環面扭曲）：非歐幾何拓撲超曲面旋轉映射。
+    - `apply_holographic_moire_custom`（全息莫爾干涉）：高頻打擊樂微米光柵干涉與彩色虹彩。
+  - **生理光學與感知特效**：
+    - `apply_lens_defocus_custom`（鏡頭失焦散景）：大光圈呼吸感散景、移軸徑向景深與電影黑柔焦。
+    - `apply_ocular_tremor_custom`（微眼震顫眼動追蹤）：眼跳微幅抖動與注視點動態偏移。
+    - `apply_quantum_decoherence_custom`（量子退相干時空噪斑）：相干性塌縮量子雜訊與時空裂痕。
+    - `apply_latent_hallucination_custom`（神經潛在空間幻覺）：高維特徵向量流動與多重感知扭曲。
+    - `apply_tape_head_drag_custom`（磁頭拖曳類比帶磁滯）：類比磁帶磁滯拖尾與音畫失真抖晃。
+    - `apply_huffman_entropy_collapse_custom`（哈夫曼熵坍縮）：數位壓縮失真與資訊熵崩解撕裂。
+    - `apply_spectral_fractal_shear_custom`（頻譜分形剪切）：聲音諧波驅動之分形幾何剪切拉伸。
+  - **Oklab 感知一致性色彩空間**：全套原生 NumPy `srgb_to_oklab` 與 `oklab_to_srgb` 矩陣轉換。
+  - **多樣性加權無放回抽樣與歷史種子追蹤**：實作 `_weighted_sample_no_replace` 與 `_save_vj_fx_history`，杜絕連貫影格效果重複並記錄隨機歷程。
+
+- **🛡️ 國際廣播醫療標準 PSE 光敏性癲癇健康防護器 (`post_processor.py`)**：
+  - **`PhotosensitiveSafetyLimiter`**：嚴格依循 ITU-R BT.1702 國際廣播安全標準。
+  - 實時監控 3Hz~30Hz 頻率範圍內的螢幕整體亮度劇烈翻轉（Luminance Transitions）與飽和紅光閃爍（Saturated Red Flashing）。
+  - 當連續翻轉或紅光能量超標時，自動觸發 Sigmoid 軟壓制與平滑箝位，從根本上杜絕引發光敏性癲癇風險。
+
+- **🧠 有機心靈著色器調變與層級化語義軟投影 (`expressive_modulator.py`, `semantic_soft_projector.py`, `module_expressive_db.json`)**：
+  - **`ExpressiveModulator`**：引入彈道非對稱阻尼動態濾波（Attack 25ms / Release 350ms），將狂暴高頻打擊轉化為深具電影感呼吸節奏的心跳律動；輸出 `u_tension`, `u_chaos`, `u_sublime`, `u_dissolution` 心靈著色器參數。
+  - **`SemanticSoftProjector`**：消除冷門模組防疲勞限制與心靈標籤剛性過濾間的挑選死鎖，建立精確心靈狀態、榮格原型拓撲鄰域放寬與 OKLCH 色彩/幾何承接三級防禦回退機制。
+
+- **🚀 全新 VisualStudio Pro 4K 視覺神經創作工作站 (`visual_studio.py`, `visual_studio_core/`, `visual_studio_web/`)**：
+  - **桌面工作站深度整合**：主界面一鍵啟動獨立進程工作站（`launch_visual_studio_pro`）。
+  - **模組化動態設備機架**：提供動態設備機架（Device Rack）、AST 參數即時抽取與雙向調試。
+  - **大師美學核心（Maestro Engine）**：聲學鏡像、氛圍繆斯、隱喻煉金、品味分析、視覺反編譯。
+  - **雙緩衝沙盒**：雙緩衝 WebGL/p5.js 沙盒與實時雙向音訊 WebBridge 橋接。
+
+- **⏳ 批次收編歷史與時光機回溯系統 (`batch_history_manager.py`, `main.py`)**：
+  - **歷史基準不可變（Legacy Baseline Protection）**：現有 1400+ 個既有模組永久受只讀屏障保護，任何回溯操作絕不波及歷史基準。
+  - **原子交易快照（Atomic Snapshot Transactions）**：每次批次收編任務均記錄獨立 batch_id、日期時間、檔案清單與過濾設定 (`.batch_manifest/history.json`)。
+  - **非破壞性雙向回溯**：回溯時安全保存至 `rollback_backup`，可隨時一鍵復原。
+  - **GUI 交互直達**：主界面新增【收編時光機】與【試運行日誌】一鍵直達按鈕與彈出對話框。
+
+- **🎶 18 大主流風格本體庫與音訊遙測防中毒升級 (`director_choreographer.py`, `test_genre_enhancement.py`)**：
+  - 擴充至 18 大風格本體註冊表（完整包含 Prompt Ensembles、Ballistic 阻尼、OKLCH 色彩與曲式文法先驗）。
+  - 導演手動指定風格覆寫與快取隔離機制，徹底防禦 Cache Key Poisoning。
+  - 強化 DnB（174 BPM）抗折半識別能力，嚴格保證 Ambient 樂曲分鏡絕不出現 Drop 標籤。
+
+- **🎼 神經 / 物理 4-Stem 音訊分離回退管線 (`audio_stem_separator.py`)**：
+  - 支援 ONNXRuntime 載入輕量化神經分軌模型（Drums, Bass, Vocals, Other）。
+  - 內建零外部神經模型依賴之物理聲學 HPSS + Filterbank 高保真回退分離管線。
+
+- **👁️ 語意多模態攝取與 VLM 守門員架構 (`semantic_ingestion/`)**：
+  - 建立模組多模態特徵提取與語意排程管線，整合時空切片 (`spatiotemporal_tiler.py`)、視覺守門員 (`visual_gatekeeper.py`) 與 VLM 客戶端。
+
+- **🌐 沙盒防護與模組庫元資料同步 (`headless_qc_repair.py`, `custom_visuals/`)**：
+  - `headless_qc_repair.py` 增強 `p5.prototype.setup` 與 `p5.prototype.draw` try-catch 攔截樁。
+  - 全面更新 1400+ 視覺模組元資料、標籤分類與使用歷程檔案。
+
+---
+
 ## 🚀 [v1.4.2] - 2026-09-19
 ### 🛡️ blendMode/randomColor 沙盒安全防護、4K 環形快取記憶體精簡與導演分鏡獨立性強化
 

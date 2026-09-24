@@ -32,6 +32,7 @@ test_run_errors.log
 render_output/
 *.html
 !realtime_watchdog_dashboard.html
+!visual_studio_web/index.html
 black_screen_report.*
 abnormal_previews.*
 repair_report.json
@@ -41,6 +42,7 @@ harmful_security_report.json
 # Quarantined & Backups
 custom_visuals/camera_arvr_backup/
 custom_visuals/abnormal_backup/
+custom_visuals/.batch_manifest/rollback_backup/
 
 # Test media & Scratch files
 scratch/

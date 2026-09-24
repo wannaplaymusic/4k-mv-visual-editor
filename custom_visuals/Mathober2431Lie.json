@@ -17,10 +17,47 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
         "Infinite Loop.mp4",
-        "Deep Peace.mp4"
-    ]
+        "Deep Peace.mp4",
+        "Final Rest.mp4",
+        "Modern 2026 Momentum.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "Mathober2431Lie",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                255.0
+            ],
+            "mean_lightness": 0.032,
+            "mean_chroma": 0.3,
+            "contrast_level": "analogous_subtle",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 0.07,
+            "curl_vorticity": 0.012,
+            "divergence": -0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:44:14"
+    },
+    "is_new_semantic_ingested": true
 }

@@ -17,9 +17,48 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 1,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
-        "Rhythmic Breath.mp4"
-    ]
+        "Rhythmic Breath.mp4",
+        "Grey Equilibrium.mp4",
+        "Concrete Resonance Unit.mp4",
+        "Pale Frequency.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "RollingOrbits_1",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                15.0,
+                165.0
+            ],
+            "mean_lightness": 0.074,
+            "mean_chroma": 0.036,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 1.23,
+            "curl_vorticity": 0.11,
+            "divergence": 0.0,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:45:23"
+    },
+    "is_new_semantic_ingested": true
 }

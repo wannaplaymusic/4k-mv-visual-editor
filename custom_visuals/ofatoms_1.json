@@ -17,10 +17,49 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
         "Airlock Reverie.mp4",
-        "Compression Lock.mp4"
-    ]
+        "Compression Lock.mp4",
+        "The Last Echo Delay.mp4",
+        "Pale Frequency.mp4",
+        "Spatial Hypnosis Haze.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "ofatoms_1",
+        "primary_psychological_state": "hypnotic_trance",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "時間之流",
+            "自相似分形",
+            "脈動波紋"
+        ],
+        "narrative_function": "tension_accelerator",
+        "jungian_archetype": "the_animus",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                195.0,
+                165.0
+            ],
+            "mean_lightness": 0.628,
+            "mean_chroma": 0.085,
+            "contrast_level": "analogous_subtle",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 0.6,
+            "curl_vorticity": 0.068,
+            "divergence": 0.0,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:41:40"
+    },
+    "is_new_semantic_ingested": true
 }

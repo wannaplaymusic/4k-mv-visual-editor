@@ -1,28 +1,48 @@
+# -*- coding: utf-8 -*-
 import math
 import time
 import random
+import os
+import json
 import logging
 from typing import List, Dict, Any, Optional, Set
 
+from semantic_soft_projector import SemanticSoftProjector
+
 logger = logging.getLogger("StandaloneInjector.BanditInventorySelector")
+
+WORKSPACE_DIR = os.path.dirname(os.path.abspath(__file__))
+EXPRESSIVE_DB_FILE = os.path.join(WORKSPACE_DIR, "module_expressive_db.json")
 
 class BanditInventorySelector:
     """
-    基於情境多臂老虎機 (Contextual Bandit) 與審美熵 (Aesthetic Entropy) 的素材庫存動態選擇器
-    - 解決單純 used_count 階梯排序的機械化缺點
-    - 結合語意曲風相關性 (Semantic Affinity)、疲勞半衰期衰減 (Fatigue Half-life Recovery)、
-      UCB (Upper Confidence Bound) 新穎性探索紅利與全局審美香農熵約束
+    基於「心靈語義本體論 (Expressive Ontology)」與情境多臂老虎機 (Contextual Bandit) 的智慧導演挑選器
+    - 徹底告別單純次數倒排與粗暴隨機抽選
+    - 依據樂段情境動態匹配「心靈狀態、象徵隱喻、敘事功能、OKLCH 色彩情感」
+    - 採用 SemanticSoftProjector 消除冷門探索與剛性標籤的挑選死鎖
+    - UCB (Upper Confidence Bound) 與探索紅利加持，最高優先級點名冷門、新入庫與剛修復的視覺模組
+    - 全局香農熵帶寬動態約束 (2.6 <= H <= 3.6)
     """
 
     def __init__(
         self, 
-        exploration_weight: float = 0.65,
+        exploration_weight: float = 0.95,
         decay_half_life_sec: float = 120.0,
-        entropy_target_range: tuple = (2.2, 3.8)
+        entropy_target_range: tuple = (2.6, 3.6)
     ):
-        self.c = exploration_weight  # UCB 探索係數
-        self.tau = decay_half_life_sec  # 疲勞恢復半衰期 (秒或虛擬時間步)
+        self.c = exploration_weight  # UCB 探索係數 (加強探索冷門資產)
+        self.tau = decay_half_life_sec  # 疲勞恢復半衰期 (秒)
         self.entropy_min, self.entropy_max = entropy_target_range
+        self.expressive_db = self._load_expressive_db()
+
+    def _load_expressive_db(self) -> Dict[str, Any]:
+        if os.path.exists(EXPRESSIVE_DB_FILE):
+            try:
+                with open(EXPRESSIVE_DB_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
 
     def calculate_module_score(
         self,
@@ -34,60 +54,78 @@ class BanditInventorySelector:
     ) -> float:
         """
         計算單一模組在給定樂段情境下的綜合收益 (Bandit Score)
-        Score = (Affinity * EnergyFit) * FatigueFactor * GlobalPenalty + UCB_Bonus
+        Score = (SemanticAffinity * EnergyFit) * FatigueFactor * GlobalPenalty + UCB_Bonus + RepairBonus
         """
         mod_id = module.get("_filename_key") or module.get("name")
         used_count = int(module.get("used_count", 0))
         is_original = bool(module.get("license") == "Original" or "AI Incubator" in str(module.get("author", "")))
+        is_repaired = bool(module.get("restored") or module.get("is_repaired") or "repaired" in str(module.get("tags", [])))
+        is_new_ingested = bool(module.get("is_new_semantic_ingested", False))
 
-        # 1. 語意與曲風相關性 (Semantic Affinity)
-        genre = str(section_context.get("genre", "")).lower()
+        profile = module.get("expressive_profile") or self.expressive_db.get(mod_id, {})
+
         sec_name = str(section_context.get("section", "Verse")).lower()
+        genre = str(section_context.get("genre", "")).lower()
         tags = [str(t).lower() for t in module.get("tags", [])]
-        name = str(module.get("name", "")).lower()
 
-        affinity = 1.0
-        # 曲風與標籤匹配
-        if any(genre in t or t in genre for t in tags):
-            affinity += 0.4
-        
-        # 樂段專屬偏好 (如 Drop 喜好粒子、強烈、3d、glitch；Intro 喜好 ambient、fluid、wave)
-        if "drop" in sec_name or "chorus" in sec_name:
-            if any(t in ["glitch", "3d", "reactive", "kinetic", "audio", "high-energy", "neon"] for t in tags):
-                affinity += 0.5
+        # 1. 決定該樂段的目標心靈狀態與原型
+        if "drop" in sec_name or "climax" in sec_name or "chorus" in sec_name:
+            target_state = "manic_hyperarousal"
+            target_archetype = "the_trickster"
+        elif "build" in sec_name or "pre" in sec_name:
+            target_state = "claustrophobic_dread"
+            target_archetype = "the_shadow"
         elif "intro" in sec_name or "outro" in sec_name:
-            if any(t in ["ambient", "fluid", "minimal", "wave", "ethereal", "slow"] for t in tags):
-                affinity += 0.5
-        
+            target_state = "alienation_void"
+            target_archetype = "the_void"
+        else: # Verse / Bridge
+            target_state = "hypnotic_trance"
+            target_archetype = "the_self"
+
+        # 透過軟投影器計算連續親和度
+        aff_score = SemanticSoftProjector.calculate_semantic_affinity(
+            target_state=target_state,
+            target_archetype=target_archetype,
+            module_profile=profile
+        )
+        semantic_affinity = 0.6 + aff_score * 0.9
+
+        # 曲風契合加權
+        if any(genre in t or t in genre for t in tags):
+            semantic_affinity += 0.25
+
         if is_original:
-            affinity += 0.35  # 優先鼓勵原創與孵化器成果
+            semantic_affinity += 0.35
 
         # 2. 能量權重適配度 (Energy Fit)
         target_energy = section_context.get("target_energy", 0.5)
         mod_energy = float(module.get("storyboard_weight", 50)) / 100.0
-        energy_fit = 1.0 - abs(target_energy - mod_energy) * 0.4
+        energy_fit = 1.0 - abs(target_energy - mod_energy) * 0.35
         energy_fit = max(0.2, energy_fit)
 
-        # 3. 本曲近時疲勞衰減因子 (Fatigue Factor via Exponential Recovery)
+        # 3. 本曲近時疲勞衰減因子 (Fatigue Factor)
         last_time = recent_used_timestamps.get(mod_id)
         if last_time is not None:
             delta_t = max(0.0, current_time - last_time)
-            # 距離上次使用越近，衰減因子越接近 0；隨時間推移按半衰期恢復到 1.0
             fatigue_factor = 1.0 - math.exp(-delta_t / max(1.0, self.tau))
         else:
             fatigue_factor = 1.0
 
-        # 4. 全局歷史使用次數懲罰 (Global Usage Penalty)
-        global_penalty = math.exp(-used_count / 3.5)
+        # 4. 全局歷史使用次數懲罰 (使用越多，基礎收益越低)
+        global_penalty = math.exp(-used_count / 3.0)
 
-        # 5. UCB 新穎性探索紅利 (Upper Confidence Bound Bonus)
+        # 5. UCB 冷門新穎性探索紅利 (次數越少，探索紅利越高！)
         N = max(1, global_total_picks)
         n_i = used_count
         ucb_bonus = self.c * math.sqrt(math.log(N + 1) / (n_i + 1))
 
-        # 綜合得分
-        base_utility = affinity * energy_fit * fatigue_factor * global_penalty
-        final_score = base_utility + ucb_bonus
+        # 6. 新收錄與剛修復模組首秀紅利 (Repair & Fresh Ingestion Bonus)
+        repair_bonus = 0.0
+        if is_repaired or is_new_ingested or used_count == 0:
+            repair_bonus = 0.85  # 給予強力探索激勵，讓剛修復模組在符合情境時最高優先亮相！
+
+        base_utility = semantic_affinity * energy_fit * fatigue_factor * global_penalty
+        final_score = base_utility + ucb_bonus + repair_bonus
 
         return max(0.001, final_score)
 
@@ -99,31 +137,17 @@ class BanditInventorySelector:
         historical_used_counts: Optional[Dict[str, int]] = None
     ) -> List[Dict[str, Any]]:
         """
-        為整首音樂的分鏡表規劃最優模組分配
-        保證：
-        1. 每個樂段匹配風格與張力
-        2. 全曲避免同一模組連續出現
-        3. 長尾低使用率模組獲得合理探索
-        4. 審美熵維持在最佳動態區間
+        為整首音樂的分鏡表規劃具備心靈表達、象徵意義的最優模組編排
         """
         if not available_modules:
             return []
+
+        self.expressive_db = self._load_expressive_db()
 
         historical_counts = dict(historical_used_counts or {})
         recent_timestamps: Dict[str, float] = {}
         assigned_history: List[str] = []
         global_picks = sum(historical_counts.values()) + 1
-
-        # 若模組總數過大 (如 1000+)，預先篩選階梯探索池 (保證極低使用率優先，並保留隨機新穎性)
-        pool = available_modules
-        if len(pool) > 160:
-            pool = sorted(
-                pool, 
-                key=lambda m: (
-                    historical_counts.get(m.get("_filename_key") or m.get("name"), int(m.get("used_count", 0))),
-                    random.random()
-                )
-            )[:120]
 
         results = []
         simulated_time = 0.0
@@ -151,7 +175,7 @@ class BanditInventorySelector:
             }
 
             scored_candidates = []
-            for mod in pool:
+            for mod in available_modules:
                 mod_id = mod.get("_filename_key") or mod.get("name")
                 mod_copy = dict(mod)
                 mod_copy["used_count"] = historical_counts.get(mod_id, int(mod.get("used_count", 0)))
@@ -164,12 +188,11 @@ class BanditInventorySelector:
                     recent_used_timestamps=recent_timestamps
                 )
 
-                # 剛在上一個分鏡用過的模組施加防連續碰撞懲罰
+                # 防連續重複碰撞懲罰
                 if assigned_history and assigned_history[-1] == mod_id:
-                    score *= 0.1
+                    score *= 0.05
 
-                # 加上微量隨機抖動避免完全確定性
-                score *= random.uniform(0.95, 1.05)
+                score *= random.uniform(0.98, 1.02)
                 scored_candidates.append((score, mod_copy))
 
             scored_candidates.sort(key=lambda x: x[0], reverse=True)
@@ -187,23 +210,28 @@ class BanditInventorySelector:
             assigned_history.append(chosen_id)
             global_picks += 1
 
+            profile = chosen_mod.get("expressive_profile") or self.expressive_db.get(chosen_id, {})
+
             results.append({
                 "section_index": sec_idx,
                 "section_name": sec_name,
                 "assigned_module_id": chosen_id,
                 "module_name": chosen_mod.get("name"),
+                "psychological_state": profile.get("primary_psychological_state", "hypnotic_trance"),
+                "symbolic_metaphors": profile.get("symbolic_metaphors", []),
+                "narrative_function": profile.get("narrative_function", "general"),
                 "target_energy": target_energy,
                 "bandit_score": round(top_k[0][0], 3)
             })
 
         entropy = self.calculate_shannon_entropy(assigned_history)
-        logger.info(f"Bandit 素材選擇完成，全曲分鏡數: {len(results)}, 審美香農熵: {entropy:.2f}")
+        logger.info(f"✨ 語義心靈編排完成：全曲 {len(results)} 個分鏡，審美香農熵: {entropy:.2f}")
 
         return results
 
     @staticmethod
     def calculate_shannon_entropy(items: List[str]) -> float:
-        """ 計算已指派模組的香農熵 (評估視覺多樣性) """
+        """ 計算已指派模組的香農熵 """
         if not items:
             return 0.0
         counts: Dict[str, int] = {}

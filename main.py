@@ -35,6 +35,7 @@ from pixel_generator_tab import PixelModuleGeneratorTab
 from shorts_exporter_tab import ShortsExporterTab
 from surreal_collage_tab import SurrealCollageTab
 from youtube_uploader_tab import YouTubeUploaderTab
+from batch_history_manager import BatchHistoryManager
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -609,6 +610,26 @@ if (typeof window !== 'undefined') {
   window.prompt = function(msg) { console.log('[SUPPRESSED JS PROMPT]', msg); return ''; };
   window.draw = window.draw || function() {};
   
+  // 優先註冊 p5.prototype.registerMethod & registerPreloadMethod 防止 addon 庫 (如 p5.sound) 載入拋錯
+  var _registerMethodEarly = function(hookName, method) {
+    if (typeof method !== 'function') return;
+    if (typeof p5 !== 'undefined' && p5.prototype) {
+      p5.prototype._registeredMethods = p5.prototype._registeredMethods || {};
+      if (!p5.prototype._registeredMethods[hookName]) p5.prototype._registeredMethods[hookName] = [];
+      p5.prototype._registeredMethods[hookName].push(method);
+    }
+  };
+  if (typeof p5 !== 'undefined') {
+    if (p5.prototype && !p5.prototype.registerMethod) {
+      p5.prototype._registeredMethods = p5.prototype._registeredMethods || {};
+      p5.prototype.registerMethod = _registerMethodEarly;
+    }
+    if (!p5.registerMethod) p5.registerMethod = _registerMethodEarly;
+    var _registerPreloadEarly = function(methodName, prototype) {};
+    if (p5.prototype && !p5.prototype.registerPreloadMethod) p5.prototype.registerPreloadMethod = _registerPreloadEarly;
+    if (!p5.registerPreloadMethod) p5.registerPreloadMethod = _registerPreloadEarly;
+  }
+  
   // 建立全域通用的 Virtual Audio Receiver 虛擬音訊接收物件工廠
   window.createMockSoundFile = window.createMockSoundFile || function() {
     return {
@@ -985,6 +1006,41 @@ if (typeof window !== 'undefined') {
       }
     })();
   }
+
+  // OpenProcessing blob 腳本自反射與 fetch 護欄 (防止自我讀取源碼之作品拋出 Cannot read properties of null reading getAttribute)
+  try {
+    if (typeof document !== 'undefined') {
+      const _origQuerySelector = Document.prototype.querySelector;
+      Document.prototype.querySelector = function(selectors) {
+        const res = _origQuerySelector.call(this, selectors);
+        if (!res && typeof selectors === 'string' && selectors.includes('script') && selectors.includes('blob')) {
+          let dummyScript = document.createElement('script');
+          dummyScript.setAttribute('src', 'blob:mock_sketch.js');
+          return dummyScript;
+        }
+        return res;
+      };
+    }
+  } catch(e) {}
+
+  try {
+    if (typeof window !== 'undefined' && window.fetch) {
+      const _origFetch = window.fetch;
+      window.fetch = function(url, ...args) {
+        if (typeof url === 'string' && url.startsWith('blob:')) {
+          return Promise.resolve({
+            ok: true,
+            status: 200,
+            text: () => Promise.resolve("// Visual Sketch Code\\n"),
+            json: () => Promise.resolve({}),
+            blob: () => Promise.resolve(new Blob()),
+            arrayBuffer: () => Promise.resolve(new ArrayBuffer(0))
+          });
+        }
+        return _origFetch.apply(this, [url, ...args]);
+      };
+    }
+  } catch(e) {}
 
   // 全域 Tone.js 防崩潰模擬層 (防止作品呼叫 Tone.Transport / Tone.Synth / Tone.start 引發 Tone is not defined)
   if (typeof window.Tone === 'undefined') {
@@ -4330,11 +4386,14 @@ if (typeof p5 !== 'undefined') {
     if (loadingEls.length > 0) {
       for (var i = 0; i < loadingEls.length; i++) {
         var el = loadingEls[i];
-        var style = window.getComputedStyle(el);
-        if (style.display !== 'none' && style.visibility !== 'hidden' && el.offsetWidth > 0) {
-          console.warn('[LoadingWatchdog] Loading overlay still visible: ', el.id || el.className);
-          return true;
-        }
+        if (!el || !(el instanceof Element)) continue;
+        try {
+          var style = window.getComputedStyle(el);
+          if (style && style.display !== 'none' && style.visibility !== 'hidden' && el.offsetWidth > 0) {
+            console.warn('[LoadingWatchdog] Loading overlay still visible: ', el.id || el.className);
+            return true;
+          }
+        } catch(e) {}
       }
     }
     
@@ -4352,7 +4411,9 @@ if (typeof p5 !== 'undefined') {
     // Remove all loading overlays including #p5_loading
     var loadingEls = document.querySelectorAll('.loading, #loading, #p5_loading, [class*="loader"], [class*="spinner"]');
     for (var i = 0; i < loadingEls.length; i++) {
-      loadingEls[i].style.display = 'none';
+      if (loadingEls[i] && loadingEls[i].style) {
+        loadingEls[i].style.display = 'none';
+      }
     }
     
     // Force p5.js to skip preload and proceed to setup
@@ -4683,6 +4744,21 @@ class WebBridge(QObject):
         # 防護：過濾 SVG 大量座標輸出與過長 Log，防止 Log 爆塞與終端機卡死
         if "<svg" in msg or "<polyline" in msg or "<path" in msg or len(msg) > 1000:
             return
+        
+        # 智能日誌防洪：對短時間內頻繁發送的數值陣列或重複訊息進行抑制 (防止 True Feeling 類模組每幀噴出數值阻塞 IPC)
+        import time as _t_mod
+        now = _t_mod.time()
+        if not hasattr(self, '_last_js_log_time'):
+            self._last_js_log_time = 0.0
+            self._last_js_log_msg = ""
+        
+        is_coord_array = (msg.startswith('[') and msg.endswith(']') and len(msg) < 60)
+        if is_coord_array or msg == self._last_js_log_msg:
+            if now - self._last_js_log_time < 0.25:  # 每秒上限 4 條高頻數值/重複日誌
+                return
+        
+        self._last_js_log_time = now
+        self._last_js_log_msg = msg
         logger.info(f"💡 [JS LOG]: {msg}")
         if hasattr(self.app, 'log_to_console'):
             self.app.log_to_console(f"💡 [JS LOG]: {msg}")
@@ -6330,6 +6406,26 @@ class StandaloneInjectorApp(QMainWindow):
         editor_lbl.setStyleSheet("font-size: 14px; font-weight: bold; color: #a855f7;")
         layout.addWidget(editor_lbl)
 
+        # 啟動 VisualStudio Pro 4K 視覺神經創作工作站
+        self.btn_launch_studio = QPushButton("🚀 啟動 VisualStudio Pro (4K 視覺神經創作工作站)", scroll_content)
+        self.btn_launch_studio.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #7e22ce, stop:1 #a855f7);
+                color: #ffffff;
+                font-weight: bold;
+                font-size: 12px;
+                padding: 8px 14px;
+                border-radius: 6px;
+                border: 1px solid #c084fc;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6b21a8, stop:1 #9333ea);
+                border-color: #e9d5ff;
+            }
+        """)
+        self.btn_launch_studio.clicked.connect(self.launch_visual_studio_pro)
+        layout.addWidget(self.btn_launch_studio)
+
         # OpenProcessing fetch area (2-row stacked for responsive fit)
         op_box = QVBoxLayout()
         op_box.setSpacing(4)
@@ -6354,9 +6450,19 @@ class StandaloneInjectorApp(QMainWindow):
         self.btn_op_batch = QPushButton("📥 【批次收編作者作品】", scroll_content)
         self.btn_op_batch.setStyleSheet("background-color: #3b0764; border-color: #581c87; color: #f3e8ff; font-weight: bold; font-size: 11px; padding: 4px 8px;")
         self.btn_op_batch.clicked.connect(self.open_batch_import_dialog)
+
+        self.btn_time_machine = QPushButton("⏳ 【收編時光機】", scroll_content)
+        self.btn_time_machine.setStyleSheet("background-color: #312e81; border-color: #4f46e5; color: #c7d2fe; font-weight: bold; font-size: 11px; padding: 4px 8px;")
+        self.btn_time_machine.clicked.connect(self.open_time_machine_dialog)
+
+        self.btn_test_logs = QPushButton("📜 【試運行日誌】", scroll_content)
+        self.btn_test_logs.setStyleSheet("background-color: #1e1b4b; border-color: #4338ca; color: #c7d2fe; font-weight: bold; font-size: 11px; padding: 4px 8px;")
+        self.btn_test_logs.clicked.connect(self.open_test_run_logs_folder)
         
         op_btn_row.addWidget(self.btn_op_fetch)
         op_btn_row.addWidget(self.btn_op_batch)
+        op_btn_row.addWidget(self.btn_time_machine)
+        op_btn_row.addWidget(self.btn_test_logs)
         op_box.addLayout(op_btn_row)
         layout.addLayout(op_box)
 
@@ -6488,6 +6594,25 @@ class StandaloneInjectorApp(QMainWindow):
 
         self.left_tabs.addTab(tab, "視覺模組收編與編輯")
 
+    def launch_visual_studio_pro(self):
+        """以獨立進程啟動 VisualStudio Pro (4K 視覺神經創作工作站)"""
+        workspace_dir = os.path.dirname(os.path.abspath(__file__))
+        studio_script = os.path.join(workspace_dir, "visual_studio.py")
+        python_bin = sys.executable
+
+        # 傳入當前選中或正在編輯的模組名稱
+        current_name = self.name_input.text().strip() if hasattr(self, 'name_input') else ""
+        cmd = [python_bin, studio_script]
+        if current_name and os.path.exists(os.path.join(workspace_dir, "custom_visuals", f"{current_name}.json")):
+            cmd.extend(["--edit", current_name])
+
+        try:
+            import subprocess
+            subprocess.Popen(cmd, cwd=workspace_dir)
+            logger.info(f"Launched VisualStudio Pro via {cmd}")
+        except Exception as e:
+            QMessageBox.critical(self, "啟動失敗", f"無法啟動 VisualStudio Pro: {e}")
+
     def init_renderer_tab(self):
         tab = QWidget(self)
         tab.setStyleSheet("background-color: #0b0b0e;")
@@ -6518,14 +6643,24 @@ class StandaloneInjectorApp(QMainWindow):
         batch_folder_box.addWidget(btn_browse_dir)
         layout.addLayout(batch_folder_box)
 
-        # Genre Selection
+        # Genre Selection (SOTA 18 大主流與細分音樂風格)
         genre_box = QHBoxLayout()
         genre_lbl = QLabel("音樂分析風格:", tab)
         self.genre_select = QComboBox(tab)
         self.genre_select.setView(QListView())
-        self.genre_select.addItems(["Auto (自動偵測)", "Techno", "Dub Techno", "Lo-fi", "Ambient", "DnB", "EDM", "Jazz", "IDM", "Hard Techno", "Rock", "POP"])
+        self.genre_select.addItems([
+            "Auto (自動偵測)", "Techno", "Dub Techno", "Hard Techno", "Lo-fi", "Ambient",
+            "DnB", "EDM", "IDM", "Jazz", "Rock", "POP", "Trance", "Synthwave", "Dubstep",
+            "House", "Metal", "Classical", "Downtempo"
+        ])
         genre_box.addWidget(genre_lbl)
         genre_box.addWidget(self.genre_select)
+
+        self.lbl_genre_badge = QLabel("⚡ 聲學遙測: 待分析 (智慧自動模式)", tab)
+        self.lbl_genre_badge.setStyleSheet("color: #38bdf8; font-size: 11px; font-weight: bold; margin-left: 8px; background: rgba(56, 189, 248, 0.08); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.25);")
+        genre_box.addWidget(self.lbl_genre_badge)
+        genre_box.addStretch()
+        self.genre_select.currentIndexChanged.connect(self._on_genre_selection_changed)
         layout.addLayout(genre_box)
 
         # Visual selection header & sort/view-mode comboboxes
@@ -6572,9 +6707,17 @@ class StandaloneInjectorApp(QMainWindow):
         ])
         self.sort_select.setFixedWidth(150)
         self.sort_select.currentIndexChanged.connect(self.refresh_presets_list)
-        
         header_box.addWidget(lbl_sort)
         header_box.addWidget(self.sort_select)
+
+        lbl_batch_filter = QLabel("批次/日期:", tab)
+        self.batch_date_select = QComboBox(tab)
+        self.batch_date_select.setView(QListView())
+        self.batch_date_select.setFixedWidth(160)
+        self.batch_date_select.currentIndexChanged.connect(self.refresh_presets_list)
+        header_box.addWidget(lbl_batch_filter)
+        header_box.addWidget(self.batch_date_select)
+
         layout.addLayout(header_box)
         
         self.visual_list = QListWidget(tab)
@@ -6954,6 +7097,74 @@ class StandaloneInjectorApp(QMainWindow):
         fx_type_box_5.addStretch()
         layout.addLayout(fx_type_box_5)
 
+        # Row 6: Ultra-Cutting-Edge Flagship Global Post-FX
+        fx_type_box_6 = QHBoxLayout()
+        fx_type_box_6.setSpacing(12)
+
+        self.fx_cb_chladni_cymatics = QCheckBox("克拉尼駐波", tab)
+        self.fx_cb_chladni_cymatics.setChecked(True)
+        self.fx_cb_chladni_cymatics.setToolTip("旗艦全域 1: 克拉尼克聲波駐波紋 (Chladni Cymatics) — 聲學幾何共振與幾何節線發光沙紋")
+
+        self.fx_cb_ferrofluid_spikes = QCheckBox("磁流體刺針", tab)
+        self.fx_cb_ferrofluid_spikes.setChecked(True)
+        self.fx_cb_ferrofluid_spikes.setToolTip("旗艦全域 2: 磁流體刺針湧動 (Ferrofluid Spikes) — 低音重拍爆發金屬磁針與漆黑液體流變")
+
+        self.fx_cb_volumetric_caustics = QCheckBox("體積焦散", tab)
+        self.fx_cb_volumetric_caustics.setChecked(True)
+        self.fx_cb_volumetric_caustics.setToolTip("旗艦全域 3: 體積焦散光網 (Volumetric Caustics) — 水下折射聚焦光網與空靈和弦調色")
+
+        self.fx_cb_clifford_torus = QCheckBox("四維環面", tab)
+        self.fx_cb_clifford_torus.setChecked(True)
+        self.fx_cb_clifford_torus.setToolTip("旗艦全域 4: 四維克利福德環面扭曲 (4D Clifford Torus Warp) — 非歐幾何拓撲超曲面旋轉映射")
+
+        self.fx_cb_holographic_moire = QCheckBox("全息莫爾", tab)
+        self.fx_cb_holographic_moire.setChecked(True)
+        self.fx_cb_holographic_moire.setToolTip("旗艦全域 5: 聲學全息莫爾干涉 (Acoustic Holographic Moiré) — 高頻打擊樂微米光柵干涉與彩色虹彩")
+
+        self.fx_cb_lens_defocus = QCheckBox("鏡頭失焦", tab)
+        self.fx_cb_lens_defocus.setChecked(True)
+        self.fx_cb_lens_defocus.setToolTip("生理光學 1: 鏡頭失焦與光學散景 (Lens Defocus) — 大光圈散景呼吸、移軸徑向景深與電影黑柔焦")
+
+        self.fx_cb_ocular_tremor = QCheckBox("眼球微顫", tab)
+        self.fx_cb_ocular_tremor.setChecked(True)
+        self.fx_cb_ocular_tremor.setToolTip("生理光學 2: 生理性眼球顫動與跳視 (Ocular Tremor) — 40~65Hz 生理微抖、重拍跳視衝擊回彈與前庭眼震")
+
+        for cb in [self.fx_cb_chladni_cymatics, self.fx_cb_ferrofluid_spikes, self.fx_cb_volumetric_caustics, self.fx_cb_clifford_torus, self.fx_cb_holographic_moire, self.fx_cb_lens_defocus, self.fx_cb_ocular_tremor]:
+            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
+            fx_type_box_6.addWidget(cb)
+        fx_type_box_6.addStretch()
+        layout.addLayout(fx_type_box_6)
+
+        # Row 7: Next-Gen Flagship Glitch Matrix (Quantum Decoherence, Latent Hallucination, Tape Head Drag, Huffman Collapse, Spectral Fractal Shear)
+        fx_type_box_7 = QHBoxLayout()
+        fx_type_box_7.setSpacing(12)
+
+        self.fx_cb_quantum_decoherence = QCheckBox("量子退相干", tab)
+        self.fx_cb_quantum_decoherence.setChecked(True)
+        self.fx_cb_quantum_decoherence.setToolTip("次世代故障 1: 量子退相干崩塌 (Quantum Decoherence) — 薛丁格波包干涉、自旋對稱破缺與量子穿隧跳躍")
+
+        self.fx_cb_latent_hallucination = QCheckBox("潛空間幻覺", tab)
+        self.fx_cb_latent_hallucination.setChecked(True)
+        self.fx_cb_latent_hallucination.setToolTip("次世代故障 2: 神經潛空間幻覺故障 (Latent Hallucination) — 自注意力Patch錯位、語義流淌與夢境特徵回授")
+
+        self.fx_cb_tape_head_drag = QCheckBox("磁帶咬帶", tab)
+        self.fx_cb_tape_head_drag.setChecked(True)
+        self.fx_cb_tape_head_drag.setToolTip("次世代故障 3: 類比磁帶刮擦與咬帶 (Tape Head Drag) — 壓帶輪高斯卡帶、磁頭刮痕與色彩消磁拖影")
+
+        self.fx_cb_huffman_entropy_collapse = QCheckBox("熵編碼崩毀", tab)
+        self.fx_cb_huffman_entropy_collapse.setChecked(True)
+        self.fx_cb_huffman_entropy_collapse.setToolTip("次世代故障 4: JPEG 宏塊熵編碼崩毀 (Huffman Collapse) — DC 係數雪崩漂移、AC 量子化炸裂與色空間逆轉")
+
+        self.fx_cb_spectral_fractal_shear = QCheckBox("頻譜碎形撕裂", tab)
+        self.fx_cb_spectral_fractal_shear.setChecked(True)
+        self.fx_cb_spectral_fractal_shear.setToolTip("次世代故障 5: 時空頻譜碎形撕裂 (Spectral Fractal Shear) — 音頻時域波形幾何撕裂、泛音碎形裂紋與左右對撕")
+
+        for cb in [self.fx_cb_quantum_decoherence, self.fx_cb_latent_hallucination, self.fx_cb_tape_head_drag, self.fx_cb_huffman_entropy_collapse, self.fx_cb_spectral_fractal_shear]:
+            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
+            fx_type_box_7.addWidget(cb)
+        fx_type_box_7.addStretch()
+        layout.addLayout(fx_type_box_7)
+
         # Progress bar
         self.progress_bar = QProgressBar(tab)
         self.progress_bar.setValue(0)
@@ -7027,6 +7238,27 @@ class StandaloneInjectorApp(QMainWindow):
         file_path, _ = safe_get_open_file_name(self, "選擇音訊檔案", "", "Audio Files (*.mp3 *.wav *.m4a *.flac)")
         if file_path:
             self.audio_input.setText(file_path)
+            if hasattr(self, 'lbl_genre_badge'):
+                self.lbl_genre_badge.setText("⚡ 已載入音訊，待觸發分析...")
+
+    def _on_genre_selection_changed(self):
+        if not hasattr(self, 'lbl_genre_badge'):
+            return
+        current_text = self.genre_select.currentText().strip()
+        if "Auto" in current_text:
+            self.lbl_genre_badge.setText("⚡ 聲學遙測: 待分析 (智慧自動模式)")
+            self.lbl_genre_badge.setStyleSheet("color: #38bdf8; font-size: 11px; font-weight: bold; margin-left: 8px; background: rgba(56, 189, 248, 0.08); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.25);")
+        else:
+            try:
+                from audio_fingerprint_engine import get_genre_profile
+                profile = get_genre_profile(current_text)
+                disp = profile.get('display_name', current_text)
+                atk = profile.get('ballistic', {}).get('attack_ms', 10.0)
+                rel = profile.get('ballistic', {}).get('release_ms', 180.0)
+                self.lbl_genre_badge.setText(f"🎨 導演手動指定: {disp} | 阻尼: {atk:.0f}ms/{rel:.0f}ms")
+                self.lbl_genre_badge.setStyleSheet("color: #c084fc; font-size: 11px; font-weight: bold; margin-left: 8px; background: rgba(192, 132, 252, 0.12); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(192, 132, 252, 0.35);")
+            except Exception:
+                self.lbl_genre_badge.setText(f"🎨 導演手動指定: {current_text}")
 
     def browse_audio_dir(self):
         dir_path = safe_get_existing_directory(self, "選擇音訊來源資料夾")
@@ -7175,6 +7407,35 @@ class StandaloneInjectorApp(QMainWindow):
                         "is_starred": is_starred
                     })
             self.cached_presets = list(presets_data)
+
+        # 📅 批次/日期篩選器初始化與過濾
+        if hasattr(self, "batch_date_select"):
+            from batch_history_manager import BatchHistoryManager
+            if not hasattr(self, "_batch_history_mgr") or self._batch_history_mgr is None:
+                self._batch_history_mgr = BatchHistoryManager(workspace_dir)
+
+            current_filter_id = self.batch_date_select.currentData() or "all"
+            date_options = self._batch_history_mgr.get_date_filter_options()
+            
+            existing_ids = [self.batch_date_select.itemData(i) for i in range(self.batch_date_select.count())]
+            new_ids = [opt["id"] for opt in date_options]
+            if existing_ids != new_ids:
+                self.batch_date_select.blockSignals(True)
+                self.batch_date_select.clear()
+                for opt in date_options:
+                    self.batch_date_select.addItem(opt["label"], opt["id"])
+                idx = self.batch_date_select.findData(current_filter_id)
+                if idx >= 0:
+                    self.batch_date_select.setCurrentIndex(idx)
+                else:
+                    self.batch_date_select.setCurrentIndex(0)
+                    current_filter_id = "all"
+                self.batch_date_select.blockSignals(False)
+            else:
+                current_filter_id = self.batch_date_select.currentData() or "all"
+
+            if current_filter_id and current_filter_id != "all":
+                presets_data = self._batch_history_mgr.filter_modules_by_selection(presets_data, current_filter_id)
         
         # 🔍 搜尋過濾邏輯：如果 search_input 內有輸入內容，進行模糊過濾
         if hasattr(self, "search_input") and self.search_input.text().strip():
@@ -7490,6 +7751,57 @@ class StandaloneInjectorApp(QMainWindow):
             # 8. 自動修復常見的 blendMode 熔接函數 (如 blendModebackground / blendModefill 等)
             code = re.sub(r'\bblendMode(background|ellipse|rect|fill|stroke|noStroke|noFill|strokeWeight|push|pop|const|let|var|beginClip)\b', r'blendMode(BLEND); \1', code)
 
+            # 9. 自動修復 OpenProcessing 腳本查詢 (如 document.querySelector('script[src^="blob"]').getAttribute('src'))
+            code = re.sub(
+                r'document\.querySelector\(\s*[\'"]script\[src\^=["\']?blob["\']?\][\'"]\s*\)\s*\.\s*getAttribute\(\s*[\'"]src[\'"]\s*\)',
+                r'(document.querySelector(\'script[src^="blob"]\')?.getAttribute("src") || "")',
+                code
+            )
+            code = re.sub(
+                r'document\.querySelector\(([^)]+)\)\.getAttribute\(',
+                r'(document.querySelector(\1)?.getAttribute(',
+                code
+            )
+
+            # 10. 自動頂層類別宣告前置提升 (Class Hoisting - 防止 TDZ ReferenceError: Cannot access 'X' before initialization)
+            if "class " in code:
+                try:
+                    lines = code.splitlines(keepends=True)
+                    in_class = False
+                    brace_depth = 0
+                    class_blocks = []
+                    other_lines = []
+                    current_class = []
+                    for line in lines:
+                        stripped = line.strip()
+                        code_part = line.split('//')[0]
+                        if not in_class:
+                            if brace_depth == 0 and re.match(r'^(?:export\s+)?class\s+([A-Za-z0-9_$]+)', stripped):
+                                in_class = True
+                                current_class = [line]
+                                brace_depth += code_part.count('{') - code_part.count('}')
+                                if brace_depth <= 0:
+                                    in_class = False
+                                    brace_depth = 0
+                                    class_blocks.append(''.join(current_class))
+                                    current_class = []
+                                continue
+                            else:
+                                brace_depth = max(0, brace_depth + code_part.count('{') - code_part.count('}'))
+                                other_lines.append(line)
+                        else:
+                            current_class.append(line)
+                            brace_depth += code_part.count('{') - code_part.count('}')
+                            if brace_depth <= 0:
+                                in_class = False
+                                brace_depth = 0
+                                class_blocks.append(''.join(current_class))
+                                current_class = []
+                    if class_blocks:
+                        code = ''.join(class_blocks) + '\n' + ''.join(other_lines)
+                except Exception:
+                    pass
+
         has_import_export = bool(re.search(r'\b(import\s+[\{\*a-zA-Z0-9_]|export\s+(default|const|let|var|function|class))\b', code))
         is_module = has_import_export
 
@@ -7515,7 +7827,32 @@ class StandaloneInjectorApp(QMainWindow):
             "if (typeof window.Sprite !== 'undefined' && typeof Sprite === 'undefined') { try { Sprite = window.Sprite; } catch(e){} }\n"
             "if (typeof window.Group !== 'undefined' && typeof Group === 'undefined') { try { Group = window.Group; } catch(e){} }\n"
             "if (typeof window.world !== 'undefined' && typeof world === 'undefined') { try { world = window.world; } catch(e){} }\n"
-            "if (typeof window.OPC === 'undefined') { window.OPC = { slider: function(){}, button: function(){}, toggle: function(){}, collapse: function(){}, expand: function(){} }; }\n"
+            "if (typeof window.OPC === 'undefined' || typeof window.OPC.title !== 'function') {\n"
+            "  (function() {\n"
+            "    var stub = function(){ return stub; };\n"
+            "    if (typeof Proxy !== 'undefined') {\n"
+            "      try {\n"
+            "        window.OPC = new Proxy(stub, {\n"
+            "          get: function(target, prop) {\n"
+            "            if (prop in target) return target[prop];\n"
+            "            if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') return undefined;\n"
+            "            return function(name, value) {\n"
+            "              if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') { window[name] = value; }\n"
+            "              else if (typeof name === 'object' && name && name.name && typeof name.value !== 'undefined' && typeof window[name.name] === 'undefined') { window[name.name] = name.value; }\n"
+            "              return stub;\n"
+            "            };\n"
+            "          }\n"
+            "        });\n"
+            "      } catch(e) {}\n"
+            "    }\n"
+            "    if (!window.OPC || typeof window.OPC.title !== 'function') {\n"
+            "      var methods = ['slider', 'toggle', 'palette', 'color', 'text', 'button', 'select', 'label', 'title', 'header', 'separator', 'collapsed', 'bezier', 'initVariable', '_set', 'set', 'buttonPressed', 'buttonReleased', 'collapse', 'expand', 'delete', 'callParentFunction', 'getEaseFunction', 'setOSC', 'loadOSC', 'oscSendMessage', 'setGlobal'];\n"
+            "      window.OPC = window.OPC || stub;\n"
+            "      methods.forEach(function(m){ window.OPC[m] = function(name, value){ if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') window[name] = value; else if (typeof name === 'object' && name && name.name && typeof name.value !== 'undefined' && typeof window[name.name] === 'undefined') window[name.name] = name.value; return window.OPC; }; });\n"
+            "    }\n"
+            "  })();\n"
+            "}\n"
+            "if (typeof OPC === 'undefined') { try { var OPC = window.OPC; } catch(e){} }\n"
             "if (typeof window.createFont !== 'undefined' && typeof createFont === 'undefined') { try { createFont = window.createFont; } catch(e){} }\n"
             "if (typeof window.wordsOfWisdom !== 'undefined' && typeof wordsOfWisdom === 'undefined') { try { wordsOfWisdom = window.wordsOfWisdom; } catch(e){} }\n"
             "if (typeof wordsOfWisdom === 'undefined') { window.wordsOfWisdom = ['Flow', 'Pulse', 'Vibration', 'Resonance', 'Structure', 'Echo', 'Wave', 'Core', 'Drift', 'Static', 'Horizon', 'Depth']; }\n"
@@ -10389,24 +10726,45 @@ function draw() {
             self.status_lbl.setText(f"批次處理 ({index + 1}/{total_songs}): {filename}")
             QApplication.processEvents()
             
-            # Step 0: 優先進行檔案比對，判斷是否已渲染並跳過（防止未比對前先執行視覺庫準備與音軌分析）
+            # Resolution config (提前提取以支援解析度精確跳過比對)
+            res_str = self.res_select.currentText()
+            if "4K" in res_str:
+                w, h = 3840, 2160
+            elif "1080p" in res_str:
+                w, h = 1920, 1080
+            else:
+                w, h = 1280, 720
+                
+            fps = int(self.fps_select.currentText())
+            trans_sec = self.trans_slider.value() / 10.0
+            fx_prob = self.fx_prob_slider.value() / 100.0
+            genre = self.genre_select.currentText()
+
+            # Step 0: 優先進行檔案與解析度比對，判斷是否已渲染並跳過（防止未比對前先執行視覺庫準備與音軌分析）
             name, _ = os.path.splitext(filename)
             output_file = os.path.join(out_dir, f"{name}.mp4")
             
             if os.path.exists(output_file) and os.path.getsize(output_file) > 1024 * 1024:
                 import subprocess
-                def get_duration(file_path):
+                def get_video_info(file_path):
                     try:
                         cmd = [
-                            'ffprobe', '-v', 'error', '-show_entries', 'format=duration',
-                            '-of', 'default=noprint_wrappers=1:nokey=1', file_path
+                            'ffprobe', '-v', 'error',
+                            '-select_streams', 'v:0',
+                            '-show_entries', 'stream=width,height:format=duration',
+                            '-of', 'json', file_path
                         ]
                         res = subprocess.run(cmd, capture_output=True, text=True, check=True)
-                        dur = float(res.stdout.strip())
-                        if dur > 0:
-                            return dur
+                        data = json.loads(res.stdout)
+                        dur = float(data.get('format', {}).get('duration', 0.0))
+                        streams = data.get('streams', [])
+                        vw = int(streams[0].get('width', 0)) if streams else 0
+                        vh = int(streams[0].get('height', 0)) if streams else 0
+                        return dur, vw, vh
                     except Exception:
-                        pass
+                        return 0.0, 0, 0
+
+                def get_audio_dur(file_path):
                     try:
                         import soundfile as sf
                         info = sf.info(file_path)
@@ -10420,13 +10778,16 @@ function draw() {
                         pass
                     return 0.0
                 
-                video_dur = get_duration(output_file)
-                audio_dur = get_duration(audio_path)
+                video_dur, video_w, video_h = get_video_info(output_file)
+                audio_dur = get_audio_dur(audio_path)
                 
                 if video_dur > 0 and audio_dur > 0 and abs(video_dur - audio_dur) <= 1.0:
-                    self.log_to_console(f"【跳過】偵測到已完成的影片檔案（長度一致：{video_dur:.1f}秒 / {audio_dur:.1f}秒），自動跳過: {filename}")
-                    success_count += 1
-                    continue
+                    if video_w >= w and video_h >= h:
+                        self.log_to_console(f"【跳過】偵測到已完成的高畫質影片（長度一致：{video_dur:.1f}秒，解析度：{video_w}x{video_h}），自動跳過: {filename}")
+                        success_count += 1
+                        continue
+                    else:
+                        self.log_to_console(f"🔄 偵測到現有影片解析度 ({video_w}x{video_h}) 低於目標設定 ({w}x{h})，將重新以高畫質渲染: {filename}")
                 else:
                     self.log_to_console(f"⚠️ 偵測到影片檔案，但長度不一致（影片 {video_dur:.1f}秒 vs 音訊 {audio_dur:.1f}秒），將重新渲染: {filename}", is_err=True)
             
@@ -10463,20 +10824,6 @@ function draw() {
                         if 'name' not in preset_dict:
                             preset_dict['name'] = preset_dict.get('title', vp)
                         visuals_data.append(preset_dict)
-                        
-            # Resolution config
-            res_str = self.res_select.currentText()
-            if "4K" in res_str:
-                w, h = 3840, 2160
-            elif "1080p" in res_str:
-                w, h = 1920, 1080
-            else:
-                w, h = 1280, 720
-                
-            fps = int(self.fps_select.currentText())
-            trans_sec = self.trans_slider.value() / 10.0
-            fx_prob = self.fx_prob_slider.value() / 100.0
-            genre = self.genre_select.currentText()
             
             # Increment used count
             video_id = f"{name}.mp4"
@@ -10544,6 +10891,18 @@ function draw() {
                 'ascii_cyber_matrix': self.fx_cb_ascii_cyber_matrix.isChecked(),
                 'chromatic_radial_zoom': self.fx_cb_chromatic_radial_zoom.isChecked(),
                 'synthwave_grid_scan': self.fx_cb_synthwave_grid_scan.isChecked(),
+                'chladni_cymatics': self.fx_cb_chladni_cymatics.isChecked(),
+                'ferrofluid_spikes': self.fx_cb_ferrofluid_spikes.isChecked(),
+                'volumetric_caustics': self.fx_cb_volumetric_caustics.isChecked(),
+                'clifford_torus': self.fx_cb_clifford_torus.isChecked(),
+                'holographic_moire': self.fx_cb_holographic_moire.isChecked(),
+                'lens_defocus': self.fx_cb_lens_defocus.isChecked(),
+                'ocular_tremor': self.fx_cb_ocular_tremor.isChecked(),
+                'quantum_decoherence': self.fx_cb_quantum_decoherence.isChecked(),
+                'latent_hallucination': self.fx_cb_latent_hallucination.isChecked(),
+                'tape_head_drag': self.fx_cb_tape_head_drag.isChecked(),
+                'huffman_entropy_collapse': self.fx_cb_huffman_entropy_collapse.isChecked(),
+                'spectral_fractal_shear': self.fx_cb_spectral_fractal_shear.isChecked(),
                 'bypass_downscale': self.native_4k_cb.isChecked()
             }
             
@@ -10719,6 +11078,18 @@ function draw() {
                 'ascii_cyber_matrix': self.fx_cb_ascii_cyber_matrix.isChecked(),
                 'chromatic_radial_zoom': self.fx_cb_chromatic_radial_zoom.isChecked(),
                 'synthwave_grid_scan': self.fx_cb_synthwave_grid_scan.isChecked(),
+                'chladni_cymatics': self.fx_cb_chladni_cymatics.isChecked(),
+                'ferrofluid_spikes': self.fx_cb_ferrofluid_spikes.isChecked(),
+                'volumetric_caustics': self.fx_cb_volumetric_caustics.isChecked(),
+                'clifford_torus': self.fx_cb_clifford_torus.isChecked(),
+                'holographic_moire': self.fx_cb_holographic_moire.isChecked(),
+                'lens_defocus': self.fx_cb_lens_defocus.isChecked(),
+                'ocular_tremor': self.fx_cb_ocular_tremor.isChecked(),
+                'quantum_decoherence': self.fx_cb_quantum_decoherence.isChecked(),
+                'latent_hallucination': self.fx_cb_latent_hallucination.isChecked(),
+                'tape_head_drag': self.fx_cb_tape_head_drag.isChecked(),
+                'huffman_entropy_collapse': self.fx_cb_huffman_entropy_collapse.isChecked(),
+                'spectral_fractal_shear': self.fx_cb_spectral_fractal_shear.isChecked(),
                 'bypass_downscale': self.native_4k_cb.isChecked()
             }
         
@@ -10778,13 +11149,31 @@ function draw() {
                 'ascii_cyber_matrix': True,
                 'chromatic_radial_zoom': True,
                 'synthwave_grid_scan': True,
+                'chladni_cymatics': True,
+                'ferrofluid_spikes': True,
+                'volumetric_caustics': True,
+                'clifford_torus': True,
+                'holographic_moire': True,
+                'lens_defocus': True,
+                'ocular_tremor': True,
+                'quantum_decoherence': True,
+                'latent_hallucination': True,
+                'tape_head_drag': True,
+                'huffman_entropy_collapse': True,
+                'spectral_fractal_shear': True,
                 'bypass_downscale': getattr(self, 'native_4k_cb', None).isChecked() if getattr(self, 'native_4k_cb', None) is not None else False
             }
         # Step 1: Analyze audio
         try:
             detector = AudioBeatDetector()
             analysis = detector.analyze(audio_path, genre)
-            resolved_genre = analysis.get('genre', 'Generic').lower().strip()
+            resolved_genre = analysis.get('genre_key', analysis.get('genre', 'generic')).lower().strip()
+            if hasattr(self, 'lbl_genre_badge'):
+                disp_genre = analysis.get('genre', resolved_genre.capitalize())
+                bpm_val = analysis.get('bpm', 120.0)
+                arousal_pct = int(analysis.get('arousal', 0.5) * 100)
+                self.lbl_genre_badge.setText(f"🎵 已識別: {disp_genre} | {bpm_val:.1f} BPM | 能量喚醒: {arousal_pct}%")
+                self.lbl_genre_badge.setStyleSheet("color: #4ade80; font-size: 11px; font-weight: bold; margin-left: 8px; background: rgba(74, 222, 128, 0.1); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(74, 222, 128, 0.3);")
         except Exception as e:
             if show_popups:
                 QMessageBox.critical(self, "分析失敗", f"音軌分析失敗: {e}")
@@ -11025,6 +11414,15 @@ function draw() {
         self._last_post_processor = _post_processor  # 暴露給批次迴圈以追蹤已使用主題
         _post_fx_enabled = [True]  # Mutable for memory-based auto-disable
 
+        # 動態計算記憶體安全門檻（根據本機實際實體記憶體配置，例如 32GB 設備設定 22GB 門檻，避免 16GB 過早關閉特效）
+        _mem_watchdog_threshold = 20480
+        try:
+            import psutil as _psutil_probe
+            _total_sys_ram_mb = _psutil_probe.virtual_memory().total / (1024 * 1024)
+            _mem_watchdog_threshold = max(16384, int(_total_sys_ram_mb * 0.70))
+        except Exception:
+            _mem_watchdog_threshold = 20480
+
         # Fix 6: Crash logging — write to file alongside output video
         _render_log_path = output_file.rsplit('.', 1)[0] + '_render.log'
         _file_handler = logging.FileHandler(_render_log_path, encoding='utf-8')
@@ -11255,17 +11653,40 @@ function draw() {
                         else if (typeof window.draw === 'function') window.draw();
                     }} catch(e) {{}}
                     
-                    let canvases = document.querySelectorAll('canvas');
                     let cnv = null;
-                    for (let i = canvases.length - 1; i >= 0; i--) {{
-                        let c = canvases[i];
-                        if (c && c.width > 0 && c.height > 0) {{
-                            cnv = c;
-                            break;
+                    if (window._p5Instance && window._p5Instance.canvas && window._p5Instance.canvas.width > 0 && window._p5Instance.canvas.height > 0) {{
+                        cnv = window._p5Instance.canvas;
+                    }}
+                    if (!cnv) {{
+                        let defCnv = document.getElementById('defaultCanvas0') || document.querySelector('canvas.p5Canvas');
+                        if (defCnv && defCnv.width > 0 && defCnv.height > 0) {{
+                            cnv = defCnv;
+                        }}
+                    }}
+                    if (!cnv) {{
+                        let canvases = document.querySelectorAll('canvas');
+                        let maxArea = 0;
+                        for (let i = 0; i < canvases.length; i++) {{
+                            let c = canvases[i];
+                            if (c && c.width > 0 && c.height > 0) {{
+                                let area = c.width * c.height;
+                                if (area > maxArea) {{
+                                    maxArea = area;
+                                    cnv = c;
+                                }}
+                            }}
                         }}
                     }}
                     if (cnv) {{
-                        return cnv.toDataURL('image/jpeg', 0.95);
+                        try {{
+                            return cnv.toDataURL('image/jpeg', 0.95);
+                        }} catch(e) {{
+                            try {{
+                                return cnv.toDataURL('image/png');
+                            }} catch(e2) {{
+                                return 'canvas_error_' + e.message;
+                            }}
+                        }}
                     }}
                     return "no_canvas";
                 }})();
@@ -12431,12 +12852,18 @@ function draw() {
                 if i % 200 == 0:
                     logger.info(f"幀 {i}/{total_frames} ({int(i/total_frames*100)}%) 記憶體={mem_mb:.0f}MB 佇列={_frame_queue.qsize()}/{_frame_queue.maxsize}")
                 
-                # Fix 7: Memory watchdog — auto-disable post-fx above threshold (optimized for 32GB iMac)
-                if mem_mb > 16384 and _post_fx_enabled[0]:
-                    _post_fx_enabled[0] = False
-                    logger.warning(f"記憶體 {mem_mb:.0f}MB 超過 16GB 閾值，自動停用後製特效節省記憶體")
-                    self.log_to_console(f"⚠️ 記憶體使用 {mem_mb:.0f}MB 超過 16GB 閾值，已自動停用後製特效")
-                elif mem_mb > 12288 and i % 100 != 0:  # Force extra GC above 12GB
+                # Fix 7: Memory watchdog — 自適應監控與動態自動恢復機制
+                if mem_mb > _mem_watchdog_threshold:
+                    gc.collect()
+                    if _post_fx_enabled[0]:
+                        _post_fx_enabled[0] = False
+                        logger.warning(f"記憶體 {mem_mb:.0f}MB 超過閾值 {_mem_watchdog_threshold}MB，暫時降級後製特效以防崩潰")
+                        self.log_to_console(f"⚠️ 記憶體使用 {mem_mb:.0f}MB 超標，暫時降級後製特效以維護系統穩定")
+                elif mem_mb < (_mem_watchdog_threshold - 3072) and not _post_fx_enabled[0]:
+                    _post_fx_enabled[0] = True
+                    logger.info(f"✅ 記憶體已安全回落至 {mem_mb:.0f}MB，自動恢復完整後製特效")
+                    self.log_to_console(f"✅ 記憶體已回落至 {mem_mb:.0f}MB，恢復後製特效運行")
+                elif mem_mb > 14000 and i % 100 != 0:  # Force extra GC above 14GB
                     gc.collect()
 
             self.progress_bar.setValue(i + 1)
@@ -12618,8 +13045,16 @@ function draw() {
                 _file_handler.close()
             except:
                 pass
-            # Fix 2: Final GC
+            # Fix 2: Deep memory purge & process events between songs
+            try:
+                QApplication.processEvents()
+            except Exception:
+                pass
             gc.collect()
+            try:
+                QApplication.processEvents()
+            except Exception:
+                pass
             logger.info(f"=== 渲染結束，資源已釋放 ===")
 
     def create_credits_file(self, output_file, visuals_data):
@@ -13036,6 +13471,13 @@ function draw() {
         dialog = BatchImportDialog(self, refresh_callback=self.refresh_presets_list)
         dialog.exec()
 
+    def open_time_machine_dialog(self):
+        from batch_importer import BatchTimeMachineDialog
+        from batch_history_manager import BatchHistoryManager
+        mgr = BatchHistoryManager(workspace_dir)
+        dialog = BatchTimeMachineDialog(self, history_mgr=mgr, refresh_callback=self.refresh_presets_list)
+        dialog.exec()
+
 
 
 
@@ -13095,55 +13537,33 @@ function draw() {
             QMessageBox.warning(self, "目錄不存在", "custom_visuals 目錄不存在，無法進行清理！")
             return
             
-        json_files = [f for f in os.listdir(save_dir) if f.endswith(".json")]
-        json_files.sort()
-        
-        if not json_files:
-            QMessageBox.information(self, "無模組", "視覺預設模組庫中無任何模組需要清理！")
+        from batch_importer import BatchScopeSelectionDialog, TestRunDialog
+        from batch_history_manager import BatchHistoryManager
+        mgr = getattr(self, "_batch_history_mgr", None) or BatchHistoryManager(workspace_dir)
+
+        # 🎯 彈出範圍選擇器：支援最新批次、指定批次、歷史基準或全庫巡檢
+        scope_dlg = BatchScopeSelectionDialog(self, history_mgr=mgr)
+        if scope_dlg.exec() != QDialog.DialogCode.Accepted or not scope_dlg.result_items:
             return
-            
-        items_to_test = []
-        for filename in json_files:
-            filepath = os.path.join(save_dir, filename)
-            try:
-                with open(filepath, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                
-                # Extract sketch ID from URL if possible
-                url = data.get("url", "")
-                sketch_id = None
-                sketch_match = re.search(r'/sketch/(\d+)', url)
-                if not sketch_match:
-                    sketch_match = re.search(r'/@[\w\-]+/(\d+)', url)
-                if sketch_match:
-                    sketch_id = sketch_match.group(1)
-                else:
-                    sketch_id = filename[:-5]
-                
-                items_to_test.append({
-                    "id": sketch_id,
-                    "title": data.get("name", filename[:-5]),
-                    "url": url or "https://openprocessing.org",
-                    "filename": filename,
-                    "filepath": filepath,
-                    "code": data.get("code", ""),
-                    "custom_html": data.get("custom_html", ""),
-                    "custom_css": data.get("custom_css", ""),
-                    "save_dir": save_dir
-                })
-            except Exception as e:
-                print(f"Error loading {filename}: {e}")
-                
-        if not items_to_test:
-            QMessageBox.warning(self, "無有效模組", "未能載入任何有效的視覺預設模組。")
-            return
-            
-        from batch_importer import TestRunDialog
-        test_dlg = TestRunDialog(items_to_test, self)
+
+        test_dlg = TestRunDialog(
+            scope_dlg.result_items,
+            self,
+            batch_id=scope_dlg.result_batch_id,
+            history_mgr=mgr,
+            scope_name=scope_dlg.result_scope_desc
+        )
         test_dlg.exec()
         
         # 重新整理 Preset 列表
         self.refresh_presets_list()
+
+    def open_test_run_logs_folder(self):
+        log_dir = os.path.join(workspace_dir, "logs", "test_runs")
+        os.makedirs(log_dir, exist_ok=True)
+        from PyQt6.QtGui import QDesktopServices
+        from PyQt6.QtCore import QUrl
+        QDesktopServices.openUrl(QUrl.fromLocalFile(log_dir))
 
     def extract_js_object(self, html, var_name):
         import re

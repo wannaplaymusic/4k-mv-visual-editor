@@ -17,10 +17,48 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
         "Distant Industrial Rain.mp4",
-        "Oscillation Wave.mp4"
-    ]
+        "Oscillation Wave.mp4",
+        "True Feeling.mp4",
+        "Perimeter Glow.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "Wednesdaymorning",
+        "primary_psychological_state": "sublime_catharsis",
+        "secondary_psychological_states": [
+            "feverish_warm",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "破曉昇華",
+            "意識覺醒",
+            "光芒滌蕩"
+        ],
+        "narrative_function": "aftermath_resonance",
+        "jungian_archetype": "the_self",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                45.0,
+                75.0
+            ],
+            "mean_lightness": 0.245,
+            "mean_chroma": 0.099,
+            "contrast_level": "analogous_subtle",
+            "emotional_temperature": "feverish_warm"
+        },
+        "dynamics": {
+            "mean_velocity": 6.86,
+            "curl_vorticity": 0.218,
+            "divergence": -0.0,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:45:27"
+    },
+    "is_new_semantic_ingested": true
 }

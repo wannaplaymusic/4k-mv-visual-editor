@@ -17,9 +17,48 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 1,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
-        "Carbon Resonance.mp4"
-    ]
+        "Carbon Resonance.mp4",
+        "Harmonic Bleed.mp4",
+        "Controlled Pressure Energy.mp4",
+        "Modern 2026 Momentum.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "RainbowArcs",
+        "primary_psychological_state": "sublime_catharsis",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "破曉昇華",
+            "意識覺醒",
+            "光芒滌蕩"
+        ],
+        "narrative_function": "aftermath_resonance",
+        "jungian_archetype": "the_self",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                225.0,
+                195.0
+            ],
+            "mean_lightness": 0.927,
+            "mean_chroma": 0.065,
+            "contrast_level": "analogous_subtle",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 0.01,
+            "curl_vorticity": 0.003,
+            "divergence": -0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:42:17"
+    },
+    "is_new_semantic_ingested": true
 }

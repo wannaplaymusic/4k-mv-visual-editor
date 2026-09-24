@@ -21,5 +21,7 @@
     "is_starred": false,
     "used_in_videos": [
         "Inner Radius.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "STATIC_FREEZE_NO_TEMPORAL_DYNAMICS"
 }

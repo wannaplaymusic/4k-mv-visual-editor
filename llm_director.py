@@ -1,11 +1,26 @@
+# -*- coding: utf-8 -*-
+"""
+SENTINEL: Cognitive Adaptive Cinematography Director (CACD 2.0)
+雙層 AI 電影作者導演系統 (Auteur Director Engine)
+- L1 宏觀大腦: 
+  - 30ms 確定性專家作者樹 (Auteur Matrix Tree: 劇作原型、四幕辯證變奏、OKLCH色彩劇力曲線)
+  - 4.5秒硬超時雙軌競爭機制 (Competitive Dual-Track with Hard Timeout & 0-latency Fallback)
+- L2 微觀動態編舞器 (DirectorChoreographer):
+  - Walter Murch 六法則情感連續性評估 (Emotion 51%)
+  - 零顯存時間軸微移 J/L-Cut (Temporal Offset Nudge: 提前 150~350ms 弱拍切分)
+  - 彈道生理阻尼濾波調變 (u_tension, u_chaos, u_sublime)
+- 素材生態 (BanditInventorySelector & SemanticSoftProjector):
+  - 語義心靈約束 + UCB 冷門與修復資產優先首秀
+  - 全局香農熵動態帶寬控制 (2.6 <= H <= 3.6)
+"""
+
 import os
 import re
 import json
 import logging
-import shutil
-import subprocess
 import time
-from typing import List, Dict, Any, Optional
+import math
+from typing import List, Dict, Any, Optional, Tuple
 import urllib.request
 import urllib.error
 
@@ -14,25 +29,56 @@ try:
 except ImportError:
     requests = None
 
-try:
-    import numpy as np
-except ImportError:
-    np = None
-
-from surreal_director_bridge import SurrealCognitiveDirectorBridge
 from bandit_inventory_selector import BanditInventorySelector
-from saliency_eyetrace_bridge import SaliencyEyeTraceBridge
 from director_choreographer import DirectorChoreographer
+from semantic_soft_projector import SemanticSoftProjector
+from surreal_director_bridge import SurrealCognitiveDirectorBridge
 
 logger = logging.getLogger("StandaloneInjector.LLMDirector")
 
+# 四大心靈劇作母題
+AUTEUR_THEMES = [
+    {
+        "id": "promethean_catharsis",
+        "title": "普羅米修斯的救贖 (Promethean Catharsis)",
+        "motif": "火種、神經元網格與自性重構",
+        "progression": ["疏離囚籠 (Thesis)", "對抗掙扎 (Antithesis)", "毀滅臨界 (Crisis)", "意識覺醒與昇華 (Synthesis)"],
+        "color_arc": "深冷靛藍 (240°) ➔ 警示琥珀 (45°) ➔ 爆裂洋紅 (320°) ➔ 熾白日光 (90°)",
+        "ideal_valence_range": (-0.8, 0.6),
+        "ideal_arousal_min": 0.55
+    },
+    {
+        "id": "cosmic_awe_self_realization",
+        "title": "宇宙敬畏與自性顯現 (Cosmic Awe & Self-Realization)",
+        "motif": "星系漩渦、微觀粒子與曼陀羅",
+        "progression": ["無盡虛空 (Thesis)", "重力吸積 (Antithesis)", "量子奇異點 (Crisis)", "天體合一 (Synthesis)"],
+        "color_arc": "純黑虛無 (0°) ➔ 幽靈青綠 (180°) ➔ 冰封紫羅蘭 (270°) ➔ 純金耀斑 (80°)",
+        "ideal_valence_range": (-0.2, 0.9),
+        "ideal_arousal_min": 0.35
+    },
+    {
+        "id": "cybernetic_paranoia",
+        "title": "賽博異化與失控協議 (Cybernetic Paranoia)",
+        "motif": "晶體破裂、時間齒輪與雜訊噪點",
+        "progression": ["冰冷秩序 (Thesis)", "雜訊入侵 (Antithesis)", "系統過載 (Crisis)", "數位廢墟 (Synthesis)"],
+        "color_arc": "單色單調 (0°) ➔ 劇毒螢光綠 (130°) ➔ 暴烈電光青 (195°) ➔ 灰燼殘彩 (0°)",
+        "ideal_valence_range": (-1.0, 0.1),
+        "ideal_arousal_min": 0.65
+    },
+    {
+        "id": "hypnotic_zen_dissolution",
+        "title": "禪意催眠與熵增消解 (Hypnotic Zen Dissolution)",
+        "motif": "呼吸流體、波形干涉與自相似分形",
+        "progression": ["寧靜水面 (Thesis)", "脈動漣漪 (Antithesis)", "意識漫散 (Crisis)", "無我消融 (Synthesis)"],
+        "color_arc": "莫蘭迪灰藍 (220°) ➔ 溫潤玉綠 (150°) ➔ 暮色薄紫 (280°) ➔ 晨曦微光 (60°)",
+        "ideal_valence_range": (-0.4, 0.7),
+        "ideal_arousal_min": 0.10
+    }
+]
+
 class LLMDirectorAgent:
     """
-    4K MV 視覺整合雙層智慧導演系統 (CACD: Cognitive Adaptive Cinematography Director)
-    - L1 宏觀大腦 (Local LLM via Ollama): 策展全曲世界觀、12音 HSL 色彩光譜演進與哲學隱喻
-    - L2 微觀動態編舞器 (DirectorChoreographer): 落地 Walter Murch 六法則、J/L-Cut 錯位、視線引導 (Eye-Trace)
-    - 素材生態 (BanditInventorySelector): 情境多臂老虎機與審美香農熵衰減，打破少數模組壟斷
-    - 毫秒級確定性專家回退保障 (Fail-safe Heuristic Engine)
+    SOTA 雙層電影作者導演管線
     """
 
     def __init__(
@@ -52,112 +98,20 @@ class LLMDirectorAgent:
         self.model_name = self.default_model
         self.bandit = BanditInventorySelector()
         self.choreographer = DirectorChoreographer()
-        self._last_ollama_check = 0.0
-        self._ollama_available = False
-
-    def _http_get(self, url: str, timeout: float = 2.0) -> Optional[Dict[str, Any]]:
-        """ 具備 requests 與 urllib 雙重降級的 HTTP GET 請求 """
-        if requests:
-            try:
-                res = requests.get(url, timeout=timeout)
-                if res.status_code == 200:
-                    return res.json()
-            except Exception:
-                return None
-        else:
-            try:
-                req = urllib.request.Request(url)
-                with urllib.request.urlopen(req, timeout=timeout) as resp:
-                    if resp.status == 200:
-                        return json.loads(resp.read().decode('utf-8'))
-            except Exception:
-                return None
-        return None
-
-    def _http_post(self, url: str, json_data: Dict[str, Any], timeout: float = 18.0) -> Optional[Dict[str, Any]]:
-        """ 具備 requests 與 urllib 雙重降級的 HTTP POST 請求 """
-        if requests:
-            try:
-                res = requests.post(url, json=json_data, timeout=timeout)
-                if res.status_code == 200:
-                    return res.json()
-            except Exception:
-                return None
-        else:
-            try:
-                req = urllib.request.Request(
-                    url,
-                    data=json.dumps(json_data).encode('utf-8'),
-                    headers={"Content-Type": "application/json"}
-                )
-                with urllib.request.urlopen(req, timeout=timeout) as resp:
-                    if resp.status == 200:
-                        return json.loads(resp.read().decode('utf-8'))
-            except Exception:
-                return None
-        return None
-
-    def ensure_ollama_running(self) -> bool:
-        """ 檢查並自動於背景啟動 Ollama 本地服務 (具備冷卻快取避免阻塞) """
-        now = time.time()
-        if (now - self._last_ollama_check) < 45.0:
-            return self._ollama_available
-
-        self._last_ollama_check = now
-
-        # 極速探測在線狀態 (300ms 逾時)
-        if self._http_get(self.tags_url, timeout=0.3) is not None:
-            self._ollama_available = True
-            return True
-
-        ollama_bin = shutil.which("ollama") or ("/usr/local/bin/ollama" if os.path.exists("/usr/local/bin/ollama") else None)
-        if not ollama_bin:
-            self._ollama_available = False
-            return False
-
-        try:
-            subprocess.Popen([ollama_bin, "serve"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            for _ in range(2):
-                time.sleep(0.2)
-                if self._http_get(self.tags_url, timeout=0.2) is not None:
-                    logger.info("Ollama 本地服務背景喚醒成功！")
-                    self._ollama_available = True
-                    return True
-        except Exception:
-            pass
-
-        self._ollama_available = False
-        return False
 
     def get_ollama_status(self) -> Dict[str, Any]:
-        """ 探測 Ollama 服務狀態與可用模型 """
-        self.ensure_ollama_running()
+        """ 快速探測本地 LLM 狀態 (超時 1 秒) """
         try:
-            data = self._http_get(self.tags_url, timeout=2.0)
-            if data is not None:
-                models_data = data.get("models", [])
-                models = [m.get("name", "") for m in models_data]
-                
-                # 優先選取常用導演模型
-                active_model = self.default_model
-                found = False
-                for candidate in ["llama3:latest", "llama3", "deepseek-r1:8b", "deepseek-r1:latest", "deepseek-r1", "mistral"]:
-                    if any(candidate == m or candidate in m for m in models):
-                        active_model = candidate
-                        found = True
-                        break
-                if not found and models:
-                    active_model = models[0]
-
-                return {
-                    "status": "ready",
-                    "message": f"AI 導演引擎就緒 ({active_model})",
-                    "model": active_model,
-                    "available": models
-                }
-            return {"status": "offline", "message": "Ollama 服務無回應", "model": self.default_model, "available": []}
-        except Exception as e:
-            return {"status": "offline", "message": f"AI 引擎離線 ({str(e)})", "model": self.default_model, "available": []}
+            req = urllib.request.Request(self.tags_url)
+            with urllib.request.urlopen(req, timeout=1.2) as resp:
+                if resp.status == 200:
+                    data = json.loads(resp.read().decode('utf-8'))
+                    models = [m.get("name", "") for m in data.get("models", [])]
+                    active_model = self.default_model if self.default_model in models else (models[0] if models else "")
+                    return {"status": "ready", "model": active_model, "available": models}
+        except Exception:
+            pass
+        return {"status": "offline", "model": self.default_model, "available": []}
 
     def generate_director_script(
         self, 
@@ -166,14 +120,14 @@ class LLMDirectorAgent:
         recent_used_keys: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
-        雙層導演決策流水線：
-        1. 透過 BanditInventorySelector 預先評估與規劃模組多樣性與審美熵
-        2. 若本地 LLM 可用，由 L1 宏觀模型賦予全曲世界觀敘事與電影概念
-        3. 由 L2 DirectorChoreographer 進行微觀動態編舞 (Walter Murch 六法則、J/L-Cut、視線質心連續性)
+        SOTA 雙軌電影作者決策流程：
+        1. 30ms 確定性專家作者樹 (Auteur Matrix Tree) 即時產出高品質劇作草案 (零等待保證)
+        2. 透過 Contextual Bandit 完成初始模組分配 (語義約束 + UCB 冷門與修復優先)
+        3. 若本地 LLM 可用，發起 4.5 秒硬超時競爭查詢，融合同化高階哲學描述
+        4. 由 L2 DirectorChoreographer 完成微觀動態編舞 (Murch 51% 心靈對齊、J/L-Cut 錯位、彈道阻尼)
         """
         storyboard_sections = audio_telemetry.get("storyboard", [])
         if not storyboard_sections:
-            # 建立預設分鏡結構
             storyboard_sections = [
                 {"section": "Intro", "duration": 15.0},
                 {"section": "Verse", "duration": 30.0},
@@ -182,7 +136,10 @@ class LLMDirectorAgent:
                 {"section": "Outro", "duration": 15.0}
             ]
 
-        # 1. 建立歷史使用次數字典
+        # 1. 30ms 確定性專家作者大腦決策
+        auteur_theme = self._resolve_auteur_theme(audio_telemetry)
+        
+        # 2. 構建歷史次數字典
         recent_set = set(recent_used_keys or [])
         historical_counts = {}
         for m in available_modules:
@@ -192,7 +149,7 @@ class LLMDirectorAgent:
                 used += 2
             historical_counts[k] = used
 
-        # 2. 透過 Contextual Bandit 完成初始模組分配推薦
+        # 3. 語義約束 + UCB 冷門優先 Bandit 選模組
         bandit_assignments = self.bandit.select_modules_for_storyboard(
             storyboard_sections=storyboard_sections,
             available_modules=available_modules,
@@ -200,186 +157,105 @@ class LLMDirectorAgent:
             historical_used_counts=historical_counts
         )
 
-        status = self.get_ollama_status()
-        if status["status"] != "ready":
-            logger.info("⚡ 本地 LLM 處於離線狀態，啟用 L2 專家級確定性導演引擎 (<50ms)...")
-            return self._fallback_heuristic_script(audio_telemetry, available_modules, bandit_assignments)
+        # 4. 探測 LLM 競爭雙軌 (4.5 秒硬上限)
+        ollama_status = self.get_ollama_status()
+        llm_enhanced_meta = None
 
-        model_name = status["model"]
-        
-        # 3. 構造向 L1 宏觀導演查詢的高階 Prompt
-        modules_summary = []
-        for b_item in bandit_assignments[:35]:
-            modules_summary.append({
-                "id": b_item["assigned_module_id"],
-                "name": b_item["module_name"],
-                "target_section": b_item["section_name"],
-                "bandit_score": b_item["bandit_score"]
-            })
+        if ollama_status["status"] == "ready":
+            try:
+                llm_enhanced_meta = self._query_llm_with_timeout(
+                    audio_telemetry=audio_telemetry,
+                    bandit_assignments=bandit_assignments,
+                    auteur_theme=auteur_theme,
+                    model_name=ollama_status["model"],
+                    timeout_sec=4.5
+                )
+            except Exception as e:
+                logger.warning(f"⚠️ LLM 查詢超時或異常 ({str(e)})，0 延遲無縫採納確定性專家作者大腦。")
 
-        system_prompt = (
-            "You are an avant-garde 4K Music Video Director and Creative Technologist following Walter Murch's Rule of Six. "
-            "Direct visual narratives for electronic, techno, synthwave, and ambient music videos. "
-            "Output STRICT JSON without conversational text or markdown formatting."
-        )
-
-        genre_val = audio_telemetry.get('genre', 'Techno')
-        genre_tel = audio_telemetry.get('genre_telemetry', {})
-        sub_genre = genre_tel.get('sub_genre', '')
-        valence = audio_telemetry.get('valence', genre_tel.get('valence', 0.0))
-        arousal = audio_telemetry.get('arousal', genre_tel.get('arousal', 0.5))
-        danceability = genre_tel.get('danceability', 0.8)
-
-        genre_display = f"{genre_val}"
-        if sub_genre:
-            genre_display += f" ({sub_genre})"
-        genre_display += f" | Affect: [Valence={valence:+.2f}, Arousal={arousal:.2f}, Danceability={danceability:.2f}]"
-
-        sec_summary = []
-        for s in storyboard_sections:
-            s_name = s.get('section', 'Section')
-            s_hint = s.get('style_hint', '')
-            s_arousal = s.get('arousal', None)
-            if s_hint and s_arousal is not None:
-                sec_summary.append(f"{s_name} (Arousal: {s_arousal:.2f}, Mood: {s_hint})")
-            else:
-                sec_summary.append(s_name)
-
-        user_prompt = f"""Analyze this music telemetry and direct a cohesive 4K Music Video:
-[Track Telemetry]
-- Genre & Affect: {genre_display}
-- BPM: {audio_telemetry.get('bpm', 120):.1f}
-- Key: {audio_telemetry.get('key', 'Unknown')}
-- Storyboard Dynamics: {sec_summary}
-
-[Contextual Bandit Pre-Allocated Module Recommendations]
-{json.dumps(modules_summary, ensure_ascii=False)}
-
-[Director Directives]
-1. Define a high-concept aesthetic theme title & color mood palette.
-2. Formulate a 1-2 sentence director artistic statement.
-3. For each section, refine the assigned module ID, specify camera framing ('fill' for peak impact or 'contain' for counterpoint), and post-fx intensity (0.1 to 1.0).
-
-[Required JSON Format]
-{{
-  "theme_title": "string",
-  "color_palette_mood": "string",
-  "director_statement": "string",
-  "shot_list": [
-    {{
-      "section_index": 0,
-      "section_name": "Intro",
-      "assigned_module_id": "module_id",
-      "framing_mode": "contain",
-      "transition_style": "luma_wipe",
-      "target_fx_intensity": 0.3
-    }}
-  ],
-  "intensity_curve": [0.3, 0.5, 0.9, 0.4]
-}}
-"""
-
-        try:
-            full_prompt = f"<|system|>\n{system_prompt}\n<|user|>\n{user_prompt}\n<|assistant|>"
-            resp_data = self._http_post(
-                f"{self.host}/api/generate",
-                json_data={
-                    "model": model_name,
-                    "prompt": full_prompt,
-                    "stream": False,
-                    "options": {
-                        "temperature": 0.35,
-                        "num_predict": 1200
-                    }
-                },
-                timeout=18.0
-            )
-            if resp_data is not None:
-                raw_response = resp_data.get("response", "")
-                cleaned_text = raw_response.strip()
-                if "```json" in cleaned_text:
-                    cleaned_text = cleaned_text.split("```json")[1].split("```")[0].strip()
-                elif "```" in cleaned_text:
-                    cleaned_text = cleaned_text.split("```")[1].split("```")[0].strip()
-                else:
-                    brace_match = re.search(r'\{[\s\S]*\}', cleaned_text)
-                    if brace_match:
-                        cleaned_text = brace_match.group(0)
-                
-                result = json.loads(cleaned_text)
-                if "shot_list" in result and len(result["shot_list"]) > 0:
-                    # 透過 L2 編舞器補全視線引導、J/L-Cut 與 Walter Murch 剪輯指標
-                    enriched_shots, intensity_curve = self.choreographer.plan_cinematic_shots(
-                        storyboard_sections=storyboard_sections,
-                        audio_telemetry=audio_telemetry,
-                        assigned_modules=result["shot_list"]
-                    )
-                    result["shot_list"] = enriched_shots
-                    result["intensity_curve"] = intensity_curve
-                    logger.info(f"✨ 成功透過本地 LLM ({model_name}) + L2 編舞器生成高階導演劇本: 「{result.get('theme_title')}」")
-                    return result
-        except Exception as e:
-            logger.warning(f"LLM 宏觀生成超時或解析失敗 ({e})，平滑轉入 L2 確定性編舞引擎...")
-
-        return self._fallback_heuristic_script(audio_telemetry, available_modules, bandit_assignments)
-
-    def _fallback_heuristic_script(
-        self, 
-        audio_telemetry: Dict[str, Any], 
-        available_modules: List[Dict[str, Any]], 
-        pre_assigned: Optional[List[Dict[str, Any]]] = None
-    ) -> Dict[str, Any]:
-        """
-        L2 專家級確定性回退機制：
-        結合 Bandit 庫存探索、SAVAP 超現實概念策展、視線引導與 Walter Murch 六法則編舞
-        在 < 50ms 內瞬間完成專業級電影劇本生成
-        """
-        storyboard = audio_telemetry.get("storyboard", [])
-        if not storyboard:
-            storyboard = [
-                {"section": "Intro", "duration": 15.0},
-                {"section": "Verse", "duration": 30.0},
-                {"section": "Build-up", "duration": 15.0},
-                {"section": "Drop", "duration": 30.0},
-                {"section": "Outro", "duration": 15.0}
-            ]
-
-        genre = audio_telemetry.get("genre", "Electronic")
-        
-        # 若無預先指派，由 Bandit 即時求解
-        if not pre_assigned:
-            pre_assigned = self.bandit.select_modules_for_storyboard(
-                storyboard_sections=storyboard,
-                available_modules=available_modules,
-                audio_telemetry=audio_telemetry
-            )
-
-        # L2 微觀動態編舞規劃
+        # 5. 微觀動態編舞 (L2 Choreographer)
         shot_list, intensity_curve = self.choreographer.plan_cinematic_shots(
-            storyboard_sections=storyboard,
+            storyboard_sections=storyboard_sections,
             audio_telemetry=audio_telemetry,
-            assigned_modules=pre_assigned
+            assigned_modules=bandit_assignments
         )
 
-        # 融入 SAVAP 超現實導演美學元數據
-        for shot in shot_list:
-            sec_name = shot["section_name"]
-            surreal_meta = SurrealCognitiveDirectorBridge.evaluate_and_curate_surreal_scene(
-                sec_name, audio_telemetry, num_elements=5
-            )
-            shot["surreal_topology"] = surreal_meta.get("topology_mode", "orbital")
-            shot["curated_theme"] = surreal_meta.get("theme_title", "Procedural Universe")
-            shot["aesthetic_score"] = surreal_meta.get("aesthetic_score", 0.85)
+        # 6. 整合母題與四幕辯證標籤
+        num_shots = len(shot_list)
+        for i, shot in enumerate(shot_list):
+            # 依時間比例指派四幕辯證階段
+            progress = i / max(1, num_shots - 1)
+            stage_idx = min(3, int(progress * 4))
+            shot["dialectical_stage"] = auteur_theme["progression"][stage_idx]
+            shot["symbolic_motif"] = auteur_theme["motif"]
 
-        first_shot_theme = shot_list[0].get("curated_theme", "Procedural Metamorphosis")
+        theme_title = llm_enhanced_meta.get("theme_title") if llm_enhanced_meta else auteur_theme["title"]
+        director_statement = llm_enhanced_meta.get("director_statement") if llm_enhanced_meta else (
+            f"電影作者劇本：圍繞「{auteur_theme['motif']}」母題，落地四幕辯證演進與 Walter Murch 情感切分。"
+        )
 
         return {
-            "theme_title": f"{genre} · {first_shot_theme}",
-            "color_palette_mood": "Deep OKLCH / Dynamic Phase Harmony",
-            "director_statement": "L2 雙層確定性編舞劇本：依據 Walter Murch 六法則、J/L-Cut 錯位剪輯與視線連續性精準排片。",
+            "theme_title": theme_title,
+            "soul_theme": auteur_theme["id"],
+            "symbolic_motif": auteur_theme["motif"],
+            "chromatic_narrative": auteur_theme["color_arc"],
+            "color_palette_mood": auteur_theme["color_arc"],
+            "director_statement": director_statement,
             "shot_list": shot_list,
             "intensity_curve": intensity_curve or [0.3, 0.5, 0.9, 0.4]
         }
+
+    def _resolve_auteur_theme(self, audio_telemetry: Dict[str, Any]) -> Dict[str, Any]:
+        """ 30ms 確定性專家作者樹：根據音樂 Valence/Arousal/Tension 映射最佳心靈劇作母題 """
+        genre_tel = audio_telemetry.get('genre_telemetry', {})
+        valence = float(audio_telemetry.get('valence', genre_tel.get('valence', 0.0)))
+        arousal = float(audio_telemetry.get('arousal', genre_tel.get('arousal', 0.5)))
+        genre = str(audio_telemetry.get('genre', 'Electronic')).lower()
+
+        if "ambient" in genre or "chill" in genre or arousal < 0.35:
+            return AUTEUR_THEMES[3] # 禪意催眠與熵增消解
+        elif "cyber" in genre or "glitch" in genre or (valence < -0.3 and arousal > 0.6):
+            return AUTEUR_THEMES[2] # 賽博異化與失控協議
+        elif valence >= 0.2:
+            return AUTEUR_THEMES[1] # 宇宙敬畏與自性顯現
+        else:
+            return AUTEUR_THEMES[0] # 普羅米修斯的救贖
+
+    def _query_llm_with_timeout(
+        self,
+        audio_telemetry: Dict[str, Any],
+        bandit_assignments: List[Dict[str, Any]],
+        auteur_theme: Dict[str, Any],
+        model_name: str,
+        timeout_sec: float = 4.5
+    ) -> Optional[Dict[str, Any]]:
+        """ 4.5 秒硬超時約束查詢，防止卡死 UI """
+        prompt = f"""You are a master 4K Music Video Film Director following Walter Murch's Rule of Six.
+Music Affect: Genre={audio_telemetry.get('genre')}, BPM={audio_telemetry.get('bpm')}.
+Auteur Theme: {auteur_theme['title']} (Motif: {auteur_theme['motif']}).
+
+Output strictly valid JSON with no markdown:
+{{
+  "theme_title": "Short poetic title (max 6 words)",
+  "director_statement": "Concise auteur vision statement explaining the psychological journey"
+}}"""
+
+        payload = {
+            "model": model_name,
+            "prompt": prompt,
+            "stream": False,
+            "format": "json"
+        }
+        
+        req = urllib.request.Request(
+            self.api_url,
+            data=json.dumps(payload).encode('utf-8'),
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=timeout_sec) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            raw_response = data.get("response", "{}")
+            return json.loads(raw_response)
 
     def generate_shot_list(self, song_telemetry: Dict[str, Any]) -> Dict[str, Any]:
         """ 向後相容接口 """
@@ -392,59 +268,3 @@ class LLMDirectorAgent:
             "intensity_curve": script.get("intensity_curve", [0.3, 0.5, 0.9, 0.6, 0.3]),
             "fullscreen_fit_mode": "fill"
         }
-
-    def rank_presets_for_director(
-        self, 
-        presets_list: List[Dict[str, Any]], 
-        target_section: str = "verse",
-        track_dna: Optional[List[float]] = None
-    ) -> List[Dict[str, Any]]:
-        scored_presets = []
-        target_section_lower = target_section.lower()
-
-        for preset in presets_list:
-            score = 50.0
-            provenance = preset.get("provenance", {})
-            license_mode = str(preset.get("license_mode", ""))
-            author = str(preset.get("author", ""))
-            if (isinstance(provenance, dict) and provenance.get("origin") == "ai_incubator") or license_mode == "Original" or "AI Incubator" in author:
-                score += 25.0
-                
-            director_tags = preset.get("director_tags", {})
-            if isinstance(director_tags, dict):
-                section_fit = director_tags.get("section_fitness") or director_tags.get("section_scores") or {}
-                if isinstance(section_fit, dict) and target_section_lower in section_fit:
-                    try:
-                        score += float(section_fit.get(target_section_lower, 0.5)) * 20.0
-                    except (ValueError, TypeError):
-                        pass
-
-            used_count = preset.get("used_count", 0)
-            if isinstance(used_count, (int, float)) and used_count > 0:
-                score -= (used_count * 50.0)
-                
-            scored_presets.append((score, preset))
-            
-        scored_presets.sort(key=lambda x: x[0], reverse=True)
-        return [item[1] for item in scored_presets]
-
-class VIRController:
-    def __init__(self, vir_budget: float = 1.0, target_fps: float = 60.0):
-        self.vir_budget = vir_budget
-        self.target_fps = target_fps
-        self.ideal_frame_time_ms = 1000.0 / target_fps
-
-    def clamp_fx_intensities(
-        self, 
-        active_fx_dict: Dict[str, float], 
-        current_entropy: float = 0.5, 
-        last_frame_time_ms: float = 16.0
-    ) -> Dict[str, float]:
-        fps_penalty = max(1.0, last_frame_time_ms / self.ideal_frame_time_ms)
-        adjusted_budget = self.vir_budget / fps_penalty
-        current_cost = (current_entropy * 0.35) + (sum(active_fx_dict.values()) * 0.65)
-        
-        if current_cost > adjusted_budget and current_cost > 0.001:
-            scale_factor = float(max(0.15, min(1.0, adjusted_budget / current_cost)))
-            return {k: float(v * scale_factor) for k, v in active_fx_dict.items()}
-        return active_fx_dict

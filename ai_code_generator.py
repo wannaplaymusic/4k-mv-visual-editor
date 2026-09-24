@@ -275,7 +275,9 @@ Follow these strict rules:
 8. NO external library dependencies (no Three.js, no Tone.js, no ml5). Rely entirely on standard p5.js built-ins.
 9. Use HSB or HSL color mode for dynamic, smooth color transitions (e.g., `colorMode(HSB, 360, 100, 100)`).
 10. The visual must look impressive at 4K resolution (3840x2160). Make numerical constants and stroke weights relative to `width` and `height` rather than hardcoding absolute pixel values.
-11. Output ONLY pure JavaScript code. Do not wrap in markdown fences. Do not provide explanations or comments outside the code."""
+11. CINEDANCE 3D Optics & Studio Lighting: If using WEBGL mode, link camera FOV to audio energy via `perspective()`, and use studio 3-point lighting: `directionalLight()` (key light driven by bass), `pointLight()` (rim light driven by high frequencies), and `ambientLight()` (fill light).
+12. CINEDANCE Shot Risk Prevention: Clamp angular velocities (no spinning faster than 0.05 rad/frame) and scale factors (clamp between 0.2 and 3.5). Guard against division by zero and NaN coordinates.
+13. Output ONLY pure JavaScript code. Do not wrap in markdown fences. Do not provide explanations or comments outside the code."""
 
     def __init__(self, api_url=None, model_name=None):
         self.config = load_ai_config()

@@ -17,10 +17,48 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
         "Late Commute.mp4",
-        "Static Latitude.mp4"
-    ]
+        "Static Latitude.mp4",
+        "Controlled Pressure Energy.mp4",
+        "Modern 2026 Momentum.mp4"
+    ],
+    "expressive_profile": {
+        "module_id": "OPCMIDI",
+        "primary_psychological_state": "hypnotic_trance",
+        "secondary_psychological_states": [
+            "glacial_cold",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "時間之流",
+            "自相似分形",
+            "脈動波紋"
+        ],
+        "narrative_function": "tension_accelerator",
+        "jungian_archetype": "the_animus",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                195.0,
+                285.0
+            ],
+            "mean_lightness": 0.222,
+            "mean_chroma": 0.052,
+            "contrast_level": "polychromatic_chaos",
+            "emotional_temperature": "glacial_cold"
+        },
+        "dynamics": {
+            "mean_velocity": 1.66,
+            "curl_vorticity": 0.084,
+            "divergence": -0.003,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-24 12:42:41"
+    },
+    "is_new_semantic_ingested": true
 }

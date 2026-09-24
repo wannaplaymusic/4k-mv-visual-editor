@@ -265,18 +265,22 @@ def make_test_html(code: str, custom_css: str = "", custom_html: str = "") -> st
     {P5_V2_COMPAT_SHIM}
     {IMMUNITY_STUBS_JS}
     if (typeof p5 !== 'undefined' && p5.prototype) {{
-      const origSetup = p5.prototype.setup;
-      p5.prototype.setup = function() {{
-        window._p5Instance = this;
-        window.__setupFinished = true;
-        if (origSetup) return origSetup.apply(this, arguments);
-      }};
-      const origDraw = p5.prototype.draw;
-      p5.prototype.draw = function() {{
-        window.__drawCount = (window.__drawCount || 0) + 1;
-        window._p5Instance = this;
-        if (origDraw) return origDraw.apply(this, arguments);
-      }};
+      try {{
+        const origSetup = p5.prototype.setup;
+        p5.prototype.setup = function() {{
+          window._p5Instance = this;
+          window.__setupFinished = true;
+          if (origSetup) return origSetup.apply(this, arguments);
+        }};
+      }} catch(e) {{}}
+      try {{
+        const origDraw = p5.prototype.draw;
+        p5.prototype.draw = function() {{
+          window.__drawCount = (window.__drawCount || 0) + 1;
+          window._p5Instance = this;
+          if (origDraw) return origDraw.apply(this, arguments);
+        }};
+      }} catch(e) {{}}
     }}
   </script>
   <script src="custom_visuals/libs/p5.sound.min.js"></script>

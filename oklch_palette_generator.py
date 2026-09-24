@@ -45,19 +45,25 @@ class OKLCHPaletteGenerator:
         """ 生成完整的歌曲專屬多維色票包 (含 Major/Minor 雙模組與 Hex 格式) """
         base_h = self.rng.uniform(0.0, 360.0)
         
-        # 依據音樂曲風調整明度與彩度基底
-        if self.genre in ('ambient', 'dub_techno', 'lo-fi', 'classical', 'jazz'):
-            l_base = 0.22 + 0.18 * float(self.dna[0])
-            c_base = 0.05 + 0.07 * float(self.dna[1])
-            harmonies = [0.0, 35.0, 190.0, 220.0]  # 鄰近色與微互補
-        elif self.genre in ('hard_techno', 'dnb', 'dubstep', 'acid'):
-            l_base = 0.55 + 0.30 * float(self.dna[0])
-            c_base = 0.20 + 0.12 * float(self.dna[1])
-            harmonies = [0.0, 90.0, 180.0, 270.0]  # 高張力四分對沖
-        else:
-            l_base = 0.45 + 0.35 * float(self.dna[0])
-            c_base = 0.15 + 0.15 * float(self.dna[1])
-            harmonies = [0.0, 120.0, 240.0, 60.0]  # 三分色彩對沖
+        # 依據音樂曲風自適應對齊 SOTA 本體庫色彩規格
+        canonical_genre = self.genre.lower().replace('-', '_').replace(' ', '_')
+        try:
+            from audio_fingerprint_engine import get_genre_profile
+            profile = get_genre_profile(canonical_genre)
+            oklch_cfg = profile.get("oklch", {})
+            l_preset = oklch_cfg.get("l_base", 0.45)
+            c_preset = oklch_cfg.get("c_base", 0.15)
+            harmonies = oklch_cfg.get("harmonies", [0.0, 120.0, 240.0, 60.0])
+        except Exception:
+            if canonical_genre in ('ambient', 'dub_techno', 'lo_fi', 'classical', 'jazz', 'downtempo'):
+                l_preset, c_preset, harmonies = 0.28, 0.06, [0.0, 35.0, 190.0, 220.0]
+            elif canonical_genre in ('hard_techno', 'dnb', 'dubstep', 'metal', 'edm'):
+                l_preset, c_preset, harmonies = 0.60, 0.22, [0.0, 90.0, 180.0, 270.0]
+            else:
+                l_preset, c_preset, harmonies = 0.45, 0.15, [0.0, 120.0, 240.0, 60.0]
+
+        l_base = float(np.clip(l_preset + (float(self.dna[0]) - 0.5) * 0.18, 0.15, 0.92))
+        c_base = float(np.clip(c_preset + (float(self.dna[1]) - 0.5) * 0.08, 0.02, 0.32))
             
         rgb_colors = []
         for offset in harmonies:

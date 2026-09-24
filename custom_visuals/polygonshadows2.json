@@ -17,10 +17,13 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 3,
     "is_starred": false,
     "used_in_videos": [
         "Slow Motion Static.mp4",
-        "Lunar Fraction.mp4"
-    ]
+        "Lunar Fraction.mp4",
+        "Metro Ghost.mp4"
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "STATIC_FREEZE_NO_TEMPORAL_DYNAMICS"
 }
