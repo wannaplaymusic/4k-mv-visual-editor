@@ -23,5 +23,7 @@
         "Echo Control Sector.mp4",
         "Surgical Patterns Universe.mp4",
         "Filter Sweep.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

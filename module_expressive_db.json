@@ -1575,5 +1575,145 @@
     "confidence_score": 0.75,
     "analyzed_engine": "heuristic_fallback",
     "updated_at": "2026-09-24 12:47:14"
+  },
+  "Untitled_time8": {
+    "module_id": "Untitled_time8",
+    "primary_psychological_state": "alienation_void",
+    "secondary_psychological_states": [
+      "sterile_neutral",
+      "static_crystalline"
+    ],
+    "symbolic_metaphors": [
+      "宇宙深淵",
+      "存在的孤寂",
+      "冷色虛空"
+    ],
+    "narrative_function": "genesis_anchor",
+    "jungian_archetype": "the_void",
+    "color_profile": {
+      "dominant_oklch_hues": [
+        135.0,
+        255.0
+      ],
+      "mean_lightness": 0.008,
+      "mean_chroma": 0.01,
+      "contrast_level": "monochrome_stark",
+      "emotional_temperature": "sterile_neutral"
+    },
+    "dynamics": {
+      "mean_velocity": 0.34,
+      "curl_vorticity": 0.009,
+      "divergence": 0.001,
+      "motion_energy_type": "static_crystalline"
+    },
+    "hydration_level": 1,
+    "confidence_score": 0.75,
+    "analyzed_engine": "heuristic_fallback",
+    "updated_at": "2026-09-24 21:24:15"
+  },
+  "SuperellipseGrid": {
+    "module_id": "SuperellipseGrid",
+    "primary_psychological_state": "alienation_void",
+    "secondary_psychological_states": [
+      "sterile_neutral",
+      "static_crystalline"
+    ],
+    "symbolic_metaphors": [
+      "宇宙深淵",
+      "存在的孤寂",
+      "冷色虛空"
+    ],
+    "narrative_function": "genesis_anchor",
+    "jungian_archetype": "the_void",
+    "color_profile": {
+      "dominant_oklch_hues": [
+        15.0,
+        345.0
+      ],
+      "mean_lightness": 0.0,
+      "mean_chroma": 0.0,
+      "contrast_level": "monochrome_stark",
+      "emotional_temperature": "sterile_neutral"
+    },
+    "dynamics": {
+      "mean_velocity": 0.02,
+      "curl_vorticity": 0.001,
+      "divergence": -0.0,
+      "motion_energy_type": "static_crystalline"
+    },
+    "hydration_level": 1,
+    "confidence_score": 0.75,
+    "analyzed_engine": "heuristic_fallback",
+    "updated_at": "2026-09-24 21:24:44"
+  },
+  "KuShulanWCCChallenge250227": {
+    "module_id": "KuShulanWCCChallenge250227",
+    "primary_psychological_state": "alienation_void",
+    "secondary_psychological_states": [
+      "sterile_neutral",
+      "static_crystalline"
+    ],
+    "symbolic_metaphors": [
+      "宇宙深淵",
+      "存在的孤寂",
+      "冷色虛空"
+    ],
+    "narrative_function": "genesis_anchor",
+    "jungian_archetype": "the_void",
+    "color_profile": {
+      "dominant_oklch_hues": [
+        255.0,
+        345.0
+      ],
+      "mean_lightness": 0.003,
+      "mean_chroma": 0.029,
+      "contrast_level": "monochrome_stark",
+      "emotional_temperature": "sterile_neutral"
+    },
+    "dynamics": {
+      "mean_velocity": 0.22,
+      "curl_vorticity": 0.025,
+      "divergence": -0.001,
+      "motion_energy_type": "static_crystalline"
+    },
+    "hydration_level": 1,
+    "confidence_score": 0.75,
+    "analyzed_engine": "heuristic_fallback",
+    "updated_at": "2026-09-24 21:25:52"
+  },
+  "cuartadosis_1": {
+    "module_id": "cuartadosis_1",
+    "primary_psychological_state": "sublime_catharsis",
+    "secondary_psychological_states": [
+      "feverish_warm",
+      "sinusoidal_breath"
+    ],
+    "symbolic_metaphors": [
+      "破曉昇華",
+      "意識覺醒",
+      "光芒滌蕩"
+    ],
+    "narrative_function": "aftermath_resonance",
+    "jungian_archetype": "the_self",
+    "color_profile": {
+      "dominant_oklch_hues": [
+        15.0,
+        45.0
+      ],
+      "mean_lightness": 0.232,
+      "mean_chroma": 0.072,
+      "contrast_level": "analogous_subtle",
+      "emotional_temperature": "feverish_warm"
+    },
+    "dynamics": {
+      "mean_velocity": 3.51,
+      "curl_vorticity": 0.2,
+      "divergence": -0.055,
+      "motion_energy_type": "sinusoidal_breath"
+    },
+    "hydration_level": 1,
+    "confidence_score": 0.75,
+    "analyzed_engine": "heuristic_fallback",
+    "updated_at": "2026-09-24 21:26:21"
   }
 }

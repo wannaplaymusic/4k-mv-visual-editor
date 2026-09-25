@@ -1,30 +1,32 @@
 {
-  "name": "Gyroid",
-  "code": "// === Tab: mySketch ===\n// Gyroid\n// Approximates the Gyroid isosurface\n// f(x,y,z) = sin(x)cos(y) + sin(y)cos(z) + sin(z)cos(x)\n// by sampling a 3D grid and drawing line segments\n// at zero-crossings between neighboring grid points.\n\nconst GRID_RES = 60;\nconst TOTAL_SIZE = 600;\nconst STEP = TOTAL_SIZE / GRID_RES;\nconst LIMIT = 0.25;\n\nlet gyroidModel;\n\nfunction gyroid(x, y, z) {\n  return sin(x) * cos(y) + sin(y) * cos(z) + sin(z) * cos(x);\n}\n\nfunction zeroCross(v1, v2) {\n  return (v1 > 0 && v2 <= 0) || (v1 < 0 && v2 >= 0);\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  perspective(PI / 3, width / height, 0.1, 10000);\n\n  const delta = (TWO_PI / TOTAL_SIZE) * STEP;\n\n  gyroidModel = buildGeometry(() => {\n    for (let i = 0; i < GRID_RES; i++) {\n      for (let j = 0; j < GRID_RES; j++) {\n        for (let k = 0; k < GRID_RES; k++) {\n          // Physical coordinates for rendering\n          const px = -TOTAL_SIZE / 2 + i * STEP;\n          const py = -TOTAL_SIZE / 2 + j * STEP;\n          const pz = -TOTAL_SIZE / 2 + k * STEP;\n\n          // Normalized coordinates for the gyroid function (-PI to PI)\n          const x = map(px, -TOTAL_SIZE / 2, TOTAL_SIZE / 2, -PI, PI);\n          const y = map(py, -TOTAL_SIZE / 2, TOTAL_SIZE / 2, -PI, PI);\n          const z = map(pz, -TOTAL_SIZE / 2, TOTAL_SIZE / 2, -PI, PI);\n\n          const val = gyroid(x, y, z);\n\n          if (abs(val) > LIMIT) continue;\n\n          if (zeroCross(val, gyroid(x + delta, y, z))) {\n            line(px, py, pz, px + STEP, py, pz);\n          }\n          if (zeroCross(val, gyroid(x, y + delta, z))) {\n            line(px, py, pz, px, py + STEP, pz);\n          }\n          if (zeroCross(val, gyroid(x, y, z + delta))) {\n            line(px, py, pz, px, py, pz + STEP);\n          }\n        }\n      }\n    }\n  });\n}\n\nfunction draw() {\n  background(0);\n  orbitControl();\n  rotateY(frameCount * 0.002);\n\n  stroke(255);\n  strokeWeight(1);\n  noFill();\n\n  model(gyroidModel);\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Naoki Tsutae",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@ntsutae/2877557",
-  "date_added": "2026-07-06 20:56:55",
-  "scaling_mode": "auto",
-  "used_in_videos": [
-    "Warp Storm Conqueror.mp4",
-    "Cold Vacuum.mp4",
-    "Digital Haze.mp4",
-    "Echo Directive.mp4",
-    "Monolithic Interval.mp4",
-    "Night Drive Core Roll.mp4",
-    "Vacuum Memory.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 8
+    "name": "Gyroid",
+    "code": "// === Tab: mySketch ===\n// Gyroid\n// Approximates the Gyroid isosurface\n// f(x,y,z) = sin(x)cos(y) + sin(y)cos(z) + sin(z)cos(x)\n// by sampling a 3D grid and drawing line segments\n// at zero-crossings between neighboring grid points.\n\nconst GRID_RES = 60;\nconst TOTAL_SIZE = 600;\nconst STEP = TOTAL_SIZE / GRID_RES;\nconst LIMIT = 0.25;\n\nlet gyroidModel;\n\nfunction gyroid(x, y, z) {\n  return sin(x) * cos(y) + sin(y) * cos(z) + sin(z) * cos(x);\n}\n\nfunction zeroCross(v1, v2) {\n  return (v1 > 0 && v2 <= 0) || (v1 < 0 && v2 >= 0);\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  perspective(PI / 3, width / height, 0.1, 10000);\n\n  const delta = (TWO_PI / TOTAL_SIZE) * STEP;\n\n  gyroidModel = buildGeometry(() => {\n    for (let i = 0; i < GRID_RES; i++) {\n      for (let j = 0; j < GRID_RES; j++) {\n        for (let k = 0; k < GRID_RES; k++) {\n          // Physical coordinates for rendering\n          const px = -TOTAL_SIZE / 2 + i * STEP;\n          const py = -TOTAL_SIZE / 2 + j * STEP;\n          const pz = -TOTAL_SIZE / 2 + k * STEP;\n\n          // Normalized coordinates for the gyroid function (-PI to PI)\n          const x = map(px, -TOTAL_SIZE / 2, TOTAL_SIZE / 2, -PI, PI);\n          const y = map(py, -TOTAL_SIZE / 2, TOTAL_SIZE / 2, -PI, PI);\n          const z = map(pz, -TOTAL_SIZE / 2, TOTAL_SIZE / 2, -PI, PI);\n\n          const val = gyroid(x, y, z);\n\n          if (abs(val) > LIMIT) continue;\n\n          if (zeroCross(val, gyroid(x + delta, y, z))) {\n            line(px, py, pz, px + STEP, py, pz);\n          }\n          if (zeroCross(val, gyroid(x, y + delta, z))) {\n            line(px, py, pz, px, py + STEP, pz);\n          }\n          if (zeroCross(val, gyroid(x, y, z + delta))) {\n            line(px, py, pz, px, py, pz + STEP);\n          }\n        }\n      }\n    }\n  });\n}\n\nfunction draw() {\n  background(0);\n  orbitControl();\n  rotateY(frameCount * 0.002);\n\n  stroke(255);\n  strokeWeight(1);\n  noFill();\n\n  model(gyroidModel);\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Naoki Tsutae",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@ntsutae/2877557",
+    "date_added": "2026-07-06 20:56:55",
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Warp Storm Conqueror.mp4",
+        "Cold Vacuum.mp4",
+        "Digital Haze.mp4",
+        "Echo Directive.mp4",
+        "Monolithic Interval.mp4",
+        "Night Drive Core Roll.mp4",
+        "Vacuum Memory.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "used_count": 8,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

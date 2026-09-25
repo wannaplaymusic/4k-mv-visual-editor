@@ -1,30 +1,32 @@
 {
-  "name": "recursiveorbits",
-  "code": "// === Tab: mySketch ===\n//Keeping it simple and graceful.\n\nlet m, center, speed, offsetInc\nlet colors = [\"#2a274a\", \"#3d3829\", \"#729880\", \"#d0d074\", \"#719c67\", \"#70732b\", \"#a6690e\"]\nlet offsetter = 0\n\nfunction setup() {\n\tm = max(windowWidth, windowHeight)\n\tcreateCanvas(m, m);\n\tcenter = createVector(width * 0.5, height * 0.5)\n\toffsetInc = TAU / 7\n\tnoStroke()\n}\n\nfunction draw() {\n\tbackground(\"#a53c0b\")\n\toffsetter = 0\n\tspeed = frameCount * 0.01\n\tfor (let i = 0; i < colors.length; i++) {\n\t\tfill(colors[i])\n\t\tlet sizer = map(i, 0, colors.length, m * 0.2, m * 0.175)\n\t\tbody(center, 0, sizer, 0, 1)\n\t}\n}\n\nfunction body(fulcrum, orbitR, s, offset, depth) {\n\trspeed = speed * depth\n\tlet newPos = createVector(fulcrum.x + (cos(offset + rspeed) * orbitR), fulcrum.y + (sin(offset + rspeed) * orbitR))\n\tcircle(newPos.x, newPos.y, s)\n\tif (depth < 6) {\n\t\toffsetter += offsetInc\n\t\tlet newS = s * 0.5\n\t\tbody(newPos, newS * 2.75, newS, offsetter, depth + 1)\n\t}\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Aaron Reuland (a_ soluble_fish)",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@a_soluble_fish/2752756",
-  "date_added": "2026-07-06 21:46:05",
-  "is_starred": false,
-  "used_in_videos": [
-    "Serene Night Throb.mp4",
-    "Clear Sky.mp4",
-    "Cold Vacuum.mp4",
-    "Digital Haze.mp4",
-    "Monolithic Interval.mp4",
-    "Night Drive Core Roll.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 7,
-  "scaling_mode": "auto"
+    "name": "recursiveorbits",
+    "code": "// === Tab: mySketch ===\n//Keeping it simple and graceful.\n\nlet m, center, speed, offsetInc\nlet colors = [\"#2a274a\", \"#3d3829\", \"#729880\", \"#d0d074\", \"#719c67\", \"#70732b\", \"#a6690e\"]\nlet offsetter = 0\n\nfunction setup() {\n\tm = max(windowWidth, windowHeight)\n\tcreateCanvas(m, m);\n\tcenter = createVector(width * 0.5, height * 0.5)\n\toffsetInc = TAU / 7\n\tnoStroke()\n}\n\nfunction draw() {\n\tbackground(\"#a53c0b\")\n\toffsetter = 0\n\tspeed = frameCount * 0.01\n\tfor (let i = 0; i < colors.length; i++) {\n\t\tfill(colors[i])\n\t\tlet sizer = map(i, 0, colors.length, m * 0.2, m * 0.175)\n\t\tbody(center, 0, sizer, 0, 1)\n\t}\n}\n\nfunction body(fulcrum, orbitR, s, offset, depth) {\n\trspeed = speed * depth\n\tlet newPos = createVector(fulcrum.x + (cos(offset + rspeed) * orbitR), fulcrum.y + (sin(offset + rspeed) * orbitR))\n\tcircle(newPos.x, newPos.y, s)\n\tif (depth < 6) {\n\t\toffsetter += offsetInc\n\t\tlet newS = s * 0.5\n\t\tbody(newPos, newS * 2.75, newS, offsetter, depth + 1)\n\t}\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Aaron Reuland (a_ soluble_fish)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@a_soluble_fish/2752756",
+    "date_added": "2026-07-06 21:46:05",
+    "is_starred": false,
+    "used_in_videos": [
+        "Serene Night Throb.mp4",
+        "Clear Sky.mp4",
+        "Cold Vacuum.mp4",
+        "Digital Haze.mp4",
+        "Monolithic Interval.mp4",
+        "Night Drive Core Roll.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "used_count": 7,
+    "scaling_mode": "auto",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

@@ -34,5 +34,7 @@
         "Subfloor Transmission.mp4",
         "Ultimate Core Patterns.mp4"
     ],
-    "used_count": 8
+    "used_count": 8,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

@@ -23,5 +23,5 @@
         "Low Light Territory.mp4"
     ],
     "needs_qc_repair": true,
-    "qc_reject_reason": "ZERO_VARIANCE_WHITE_SCREEN (Frame 0 Var=0.00, Mean=255.00)"
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

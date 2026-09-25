@@ -23,5 +23,7 @@
         "Clouded Subbass.mp4",
         "Elastic Range.mp4",
         "Coastal Infrastructure.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

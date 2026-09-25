@@ -23,5 +23,7 @@
         "Steel Decay Pattern.mp4",
         "Deep Sleep.mp4",
         "Rubber Tracks.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

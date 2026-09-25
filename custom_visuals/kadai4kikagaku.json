@@ -1,28 +1,30 @@
 {
-  "name": "kadai4kikagaku",
-  "code": "// === Tab: mySketch ===\nlet x,y\nfunction setup() {\n  createCanvas(windowWidth,windowHeight);\n  x=windowWidth/2;\n  y=windowHeight/2;\n  colorMode(HSB,255);\n}\n\nfunction draw() {\n  background(0);\n  noFill();\n  translate(x,y);\n  rotate(radians(45));\n  rectMode(CENTER);\n  for(let i=0;i<200;i++){\n    translate((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))/50,0);\n    rotate(radians((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/50));\n    stroke(i*1.25,i*10,255);\n    ellipse(0,0,i*3,i*3);\n    rect(0,0,i*3,i*3);\n  }\n  \n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "2025H2535",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@u521691/2742550",
-  "date_added": "2026-07-06 21:19:15",
-  "used_in_videos": [
-    "4AM Tollbooth.mp4",
-    "Cold Vacuum.mp4",
-    "Digital Haze.mp4",
-    "Echo Directive.mp4",
-    "Monolithic Interval.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 6,
-  "scaling_mode": "auto"
+    "name": "kadai4kikagaku",
+    "code": "// === Tab: mySketch ===\nlet x,y\nfunction setup() {\n  createCanvas(windowWidth,windowHeight);\n  x=windowWidth/2;\n  y=windowHeight/2;\n  colorMode(HSB,255);\n}\n\nfunction draw() {\n  background(0);\n  noFill();\n  translate(x,y);\n  rotate(radians(45));\n  rectMode(CENTER);\n  for(let i=0;i<200;i++){\n    translate((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))/50,0);\n    rotate(radians((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/50));\n    stroke(i*1.25,i*10,255);\n    ellipse(0,0,i*3,i*3);\n    rect(0,0,i*3,i*3);\n  }\n  \n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "2025H2535",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@u521691/2742550",
+    "date_added": "2026-07-06 21:19:15",
+    "used_in_videos": [
+        "4AM Tollbooth.mp4",
+        "Cold Vacuum.mp4",
+        "Digital Haze.mp4",
+        "Echo Directive.mp4",
+        "Monolithic Interval.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "used_count": 6,
+    "scaling_mode": "auto",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

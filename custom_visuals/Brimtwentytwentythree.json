@@ -1,30 +1,32 @@
 {
-  "name": "Brimtwentytwentythree",
-  "code": "// === Tab: mySketch ===\n/*\nEnrique Jiménez\nBrim twenty-twentythree\nOctober 2023\n\nDescription: Coded version of the art piece \nBrim two (1972)\nby Julian Stanczak\n\nThe animated version starts with the parallel vertical lines that\nbend to reach the 3D rombhus effect of the original piece\n*/\n\n//Set the canvas for the output\nfunction setup() {\n\tcreateCanvas(600, 600); // Set the canvas size\n\tbackground(0); // Canvas background function stroke(\"white\") // Default stroke color\n}\n\n// Set the variables \nvar steps = 50 // The variable steps defines the number of verticals to the middle of the sketch\nvar x=[1]  // x is a list including the values of the initial separation between bars\nvar min = 1.0001 // min sets the minimun factor for separation from the previous bar\nvar max = 1.2 // max is maximum factor for separation from the previous bar\nvar count = min //count sets the initial value of the counter. Should be between values min and max\nvar increasing = true // set initial state of the counter. True if values should start increasing, False if they should start decreasing\n\n// The createCounter function takes as arguments two values that are the bounds of a counter and return increasing or decreasing values in that range\nfunction createCounter(min, max) {\n//The following if...else block increase count if this value is smaller than max and decrease count if this is bigger than min\n    if (increasing) {\n      count+=0.0004; // increasing value for count\n      if (count >= max) {\n        increasing = false; //Increasing switches to false when it reaches max value\n      }\n    } else {\n      count-=0.0005; //decreasing value for count\n      if (count <= min) {\n        increasing = true; //Increasing switches to true when it reaches min value\n      }\n    }\n    return count;\n}\n\nfunction draw() {\n\tbackground(\"black\"); //Paints the background black every frame\n\tlet factor = createCounter(min,max); //The value returned by the counter is used as a multiplier factor \n\t\n\t//The for loop below fills the x list as a succession where each value equal the previous value on the list multiplied by the factor\n\tfor(i=1; i<steps/2; i++){\n\t\tx[i] = x[i-1]*factor\n\t}\n\t\n\tlet x_coordinates = []; //Declare an empty list for the x-coordinates\n\tx.forEach((element) => x_coordinates.push(map(element,x[0],x[steps/2-1],width/2,0.1))) // Fills the x_coordinates list mapping the values in x\n\t\n\t//Using the values fo x_coordinates the next for loop draws the bars\n\tfor (i=0 ; i < x_coordinates.length; i++){\n\t\n\t\tline(x_coordinates[i],0,width/2-[...x_coordinates].reverse()[i],height/2) //Draws the bars of the upper left quarter of the canvas\n\t\tline(x_coordinates[i],height,width/2-[...x_coordinates].reverse()[i],height/2) //Draws the bars of the lower left quarter of the canvas\n\t\tline(width-[...x_coordinates].reverse()[i],0,x_coordinates[i]+width/2,height/2) //Draws the bars of the upper right quarter of the canvas\n\t\tline(width-[...x_coordinates].reverse()[i],height,x_coordinates[i]+width/2,height/2) //Draws the bars of the lower right quarter of the canvas\n\t\t}\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Enrique",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@u386070/2050182",
-  "date_added": "2026-07-06 22:16:13",
-  "is_starred": false,
-  "scaling_mode": "cover",
-  "used_in_videos": [
-    "Radiation Vortex Warlord.mp4",
-    "Cold Vacuum.mp4",
-    "Blue Hour Resonance.mp4",
-    "Icebound Groove.mp4",
-    "Monolithic Interval.mp4",
-    "Subfloor Transmission.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 7
+    "name": "Brimtwentytwentythree",
+    "code": "// === Tab: mySketch ===\n/*\nEnrique Jiménez\nBrim twenty-twentythree\nOctober 2023\n\nDescription: Coded version of the art piece \nBrim two (1972)\nby Julian Stanczak\n\nThe animated version starts with the parallel vertical lines that\nbend to reach the 3D rombhus effect of the original piece\n*/\n\n//Set the canvas for the output\nfunction setup() {\n\tcreateCanvas(600, 600); // Set the canvas size\n\tbackground(0); // Canvas background function stroke(\"white\") // Default stroke color\n}\n\n// Set the variables \nvar steps = 50 // The variable steps defines the number of verticals to the middle of the sketch\nvar x=[1]  // x is a list including the values of the initial separation between bars\nvar min = 1.0001 // min sets the minimun factor for separation from the previous bar\nvar max = 1.2 // max is maximum factor for separation from the previous bar\nvar count = min //count sets the initial value of the counter. Should be between values min and max\nvar increasing = true // set initial state of the counter. True if values should start increasing, False if they should start decreasing\n\n// The createCounter function takes as arguments two values that are the bounds of a counter and return increasing or decreasing values in that range\nfunction createCounter(min, max) {\n//The following if...else block increase count if this value is smaller than max and decrease count if this is bigger than min\n    if (increasing) {\n      count+=0.0004; // increasing value for count\n      if (count >= max) {\n        increasing = false; //Increasing switches to false when it reaches max value\n      }\n    } else {\n      count-=0.0005; //decreasing value for count\n      if (count <= min) {\n        increasing = true; //Increasing switches to true when it reaches min value\n      }\n    }\n    return count;\n}\n\nfunction draw() {\n\tbackground(\"black\"); //Paints the background black every frame\n\tlet factor = createCounter(min,max); //The value returned by the counter is used as a multiplier factor \n\t\n\t//The for loop below fills the x list as a succession where each value equal the previous value on the list multiplied by the factor\n\tfor(i=1; i<steps/2; i++){\n\t\tx[i] = x[i-1]*factor\n\t}\n\t\n\tlet x_coordinates = []; //Declare an empty list for the x-coordinates\n\tx.forEach((element) => x_coordinates.push(map(element,x[0],x[steps/2-1],width/2,0.1))) // Fills the x_coordinates list mapping the values in x\n\t\n\t//Using the values fo x_coordinates the next for loop draws the bars\n\tfor (i=0 ; i < x_coordinates.length; i++){\n\t\n\t\tline(x_coordinates[i],0,width/2-[...x_coordinates].reverse()[i],height/2) //Draws the bars of the upper left quarter of the canvas\n\t\tline(x_coordinates[i],height,width/2-[...x_coordinates].reverse()[i],height/2) //Draws the bars of the lower left quarter of the canvas\n\t\tline(width-[...x_coordinates].reverse()[i],0,x_coordinates[i]+width/2,height/2) //Draws the bars of the upper right quarter of the canvas\n\t\tline(width-[...x_coordinates].reverse()[i],height,x_coordinates[i]+width/2,height/2) //Draws the bars of the lower right quarter of the canvas\n\t\t}\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Enrique",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@u386070/2050182",
+    "date_added": "2026-07-06 22:16:13",
+    "is_starred": false,
+    "scaling_mode": "cover",
+    "used_in_videos": [
+        "Radiation Vortex Warlord.mp4",
+        "Cold Vacuum.mp4",
+        "Blue Hour Resonance.mp4",
+        "Icebound Groove.mp4",
+        "Monolithic Interval.mp4",
+        "Subfloor Transmission.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "used_count": 7,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

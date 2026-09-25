@@ -17,13 +17,14 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 4,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
         "Crisp Rimshot Fade.mp4",
         "Bare Reality.mp4",
         "Concrete Resonance Unit.mp4",
-        "Pale Frequency.mp4"
+        "Pale Frequency.mp4",
+        "Spatial Hypnosis Layer.mp4"
     ],
     "expressive_profile": {
         "module_id": "MathoberTangentAnimated",

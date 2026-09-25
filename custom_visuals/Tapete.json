@@ -23,5 +23,7 @@
         "Lost Signal.mp4",
         "Hidden Truth.mp4",
         "Pure Being.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

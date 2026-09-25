@@ -27,5 +27,7 @@
         "Ultimate Core Patterns.mp4"
     ],
     "used_count": 9,
-    "scaling_mode": "cover"
+    "scaling_mode": "cover",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

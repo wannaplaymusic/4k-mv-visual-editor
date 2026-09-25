@@ -1,29 +1,31 @@
 {
-  "name": "LiminalSpaces",
-  "code": "// === Tab: mySketch ===\nlet t = 0;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  rectMode(CENTER);\n  noFill();\n  strokeWeight(2);\n}\n\nfunction draw() {\n  background(15, 15, 30); // dark ambience\n\n  const steps = 25; // number of rectangles to draw\n  for (let i = 0; i < steps; i++) {\n    let p = i / steps;\n    let w = lerp(width * 1.4, 40, p);\n    let h = lerp(height * 1.4, 40, p);\n    let offset = sin(t + p * 5) * 60; // offset to create drifting spaces\n\n    push();\n    translate(width / 2 + offset, height / 2 + offset);\n    rotate(sin(t + p * 3) * 0.1);\n    stroke(lerpColor(color(50, 60, 80), color(230, 230, 255), p));\n    rect(0, 0, w, h);\n    pop();\n  }\n\n  t += 0.01;\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Gonçalo Perdigão",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@goncaloperdigao/2669473",
-  "date_added": "2026-07-06 22:14:45",
-  "scaling_mode": "auto",
-  "used_in_videos": [
-    "Radiation Armor Rage.mp4",
-    "Digital Haze.mp4",
-    "Kinetic Beat.mp4",
-    "Echo Directive.mp4",
-    "Monolithic Interval.mp4",
-    "Vacuum Memory.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 7
+    "name": "LiminalSpaces",
+    "code": "// === Tab: mySketch ===\nlet t = 0;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  rectMode(CENTER);\n  noFill();\n  strokeWeight(2);\n}\n\nfunction draw() {\n  background(15, 15, 30); // dark ambience\n\n  const steps = 25; // number of rectangles to draw\n  for (let i = 0; i < steps; i++) {\n    let p = i / steps;\n    let w = lerp(width * 1.4, 40, p);\n    let h = lerp(height * 1.4, 40, p);\n    let offset = sin(t + p * 5) * 60; // offset to create drifting spaces\n\n    push();\n    translate(width / 2 + offset, height / 2 + offset);\n    rotate(sin(t + p * 3) * 0.1);\n    stroke(lerpColor(color(50, 60, 80), color(230, 230, 255), p));\n    rect(0, 0, w, h);\n    pop();\n  }\n\n  t += 0.01;\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Gonçalo Perdigão",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@goncaloperdigao/2669473",
+    "date_added": "2026-07-06 22:14:45",
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Radiation Armor Rage.mp4",
+        "Digital Haze.mp4",
+        "Kinetic Beat.mp4",
+        "Echo Directive.mp4",
+        "Monolithic Interval.mp4",
+        "Vacuum Memory.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "used_count": 7,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

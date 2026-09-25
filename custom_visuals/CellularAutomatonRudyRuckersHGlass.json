@@ -1,29 +1,31 @@
 {
-  "name": "CellularAutomatonRudyRuckersHGlass",
-  "code": "// === Tab: mySketch ===\n////////////////////////////////////////////////////////////////////////////////\n// Based on https://www.rudyrucker.com/oldhomepage/celdoc/rules.html#HGlass\n////////////////////////////////////////////////////////////////////////////////\nvar n = 160\nvar step\nvar board = []\n\nsetup = () => {\n  createCanvas(800, 800)\n  step = width / n\n  noStroke()\n  fill('black')\n  board.length = 0\n  for (let x = n; x--;) {\n    board[x] = []\n    for (let y = n; y--;) {\n      board[x][y] = (random(1) < .5 && y > n / 8)? 1 : 0\n    }\n  }\n}\ndraw = () => {\n  background('white')\n  let next = []\n  for (let x = n; x--;) next[x] = []\n  \n\tfor (let y = n; y--;) {\n    for (let x = n; x--;) {\n      const neighbors = \n\t\t\t\t+ 1 * board[x][y] \t\t\t\t\t\t\t// self\n        + 2 * board[x][(y - 1 + n) % n] // north\n        + 4 * board[x][(y + 1) % n] \t\t// south\n        + 8 * board[(x - 1 + n) % n][y] // west\n\t\t\t\t+ 16 * board[(x + 1) % n][y] \t\t// east\n      switch (neighbors) {\n\t\t\tcase 1: case 2: case 3:\n\t\t\tcase 11: case 21: case 25:\n\t\t\tcase 29: case 30:case 31:\n        next[x][y] = 1\n        rect(x * step, y * step, step + 1, step + 1)\n        break;\n      default:\n        next[x][y] = 0\n      }\n    }\n  }\n  board = next\n}\nmousePressed = () => setup()",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Rudy Rucker&#039;s HGlass",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@ntsutae/1598681",
-  "date_added": "2026-07-06 22:10:05",
-  "used_in_videos": [
-    "Bare Relaxed Relaxed.mp4",
-    "Cold Vacuum.mp4",
-    "Digital Haze.mp4",
-    "Echo Directive.mp4",
-    "Icebound Groove.mp4",
-    "Monolithic Interval.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 7,
-  "scaling_mode": "cover"
+    "name": "CellularAutomatonRudyRuckersHGlass",
+    "code": "// === Tab: mySketch ===\n////////////////////////////////////////////////////////////////////////////////\n// Based on https://www.rudyrucker.com/oldhomepage/celdoc/rules.html#HGlass\n////////////////////////////////////////////////////////////////////////////////\nvar n = 160\nvar step\nvar board = []\n\nsetup = () => {\n  createCanvas(800, 800)\n  step = width / n\n  noStroke()\n  fill('black')\n  board.length = 0\n  for (let x = n; x--;) {\n    board[x] = []\n    for (let y = n; y--;) {\n      board[x][y] = (random(1) < .5 && y > n / 8)? 1 : 0\n    }\n  }\n}\ndraw = () => {\n  background('white')\n  let next = []\n  for (let x = n; x--;) next[x] = []\n  \n\tfor (let y = n; y--;) {\n    for (let x = n; x--;) {\n      const neighbors = \n\t\t\t\t+ 1 * board[x][y] \t\t\t\t\t\t\t// self\n        + 2 * board[x][(y - 1 + n) % n] // north\n        + 4 * board[x][(y + 1) % n] \t\t// south\n        + 8 * board[(x - 1 + n) % n][y] // west\n\t\t\t\t+ 16 * board[(x + 1) % n][y] \t\t// east\n      switch (neighbors) {\n\t\t\tcase 1: case 2: case 3:\n\t\t\tcase 11: case 21: case 25:\n\t\t\tcase 29: case 30:case 31:\n        next[x][y] = 1\n        rect(x * step, y * step, step + 1, step + 1)\n        break;\n      default:\n        next[x][y] = 0\n      }\n    }\n  }\n  board = next\n}\nmousePressed = () => setup()",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Rudy Rucker&#039;s HGlass",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@ntsutae/1598681",
+    "date_added": "2026-07-06 22:10:05",
+    "used_in_videos": [
+        "Bare Relaxed Relaxed.mp4",
+        "Cold Vacuum.mp4",
+        "Digital Haze.mp4",
+        "Echo Directive.mp4",
+        "Icebound Groove.mp4",
+        "Monolithic Interval.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "used_count": 7,
+    "scaling_mode": "cover",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

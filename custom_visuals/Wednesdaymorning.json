@@ -17,13 +17,14 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 4,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
         "Distant Industrial Rain.mp4",
         "Oscillation Wave.mp4",
         "True Feeling.mp4",
-        "Perimeter Glow.mp4"
+        "Perimeter Glow.mp4",
+        "Spatial Hypnosis Layer.mp4"
     ],
     "expressive_profile": {
         "module_id": "Wednesdaymorning",

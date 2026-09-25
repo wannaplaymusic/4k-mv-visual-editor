@@ -4,6 +4,23 @@
 
 ---
 
+## 🚀 [v1.5.1] - 2026-09-25
+### 🛠️ 無頭品質檢驗修復增強、類別提升防 TDZ 崩潰、靜默頁面防對話方塊阻塞與視覺模組修補
+
+- **🛠️ 無頭 QC 修復管線健全化 (`headless_qc_repair.py`)**：
+  - **頂層類別宣告前置提升 (Class Hoisting)**：自動解析並前置提升 ES6 頂層 Class 宣告，從根本杜絕 JavaScript 暫時性死區（TDZ: Cannot access class before initialization）執行時期崩潰。
+  - **OPC (OpenProcessing Controls) 防崩潰樁全面擴充**：補全 `OPC.slider`, `OPC.toggle`, `OPC.palette`, `OPC.color`, `OPC.button`, `OPC.select` 等全套 26 種方法與鏈式呼叫相容，徹底解決 OPC 缺失中斷問題。
+  - **QWebEngine 沙盒日誌防噪**：過濾並忽略無害的 WebGL context 初始化重試、Mojo 音訊輸出與空字型警告。
+  - **測試 HTML 注入順序優化**：將防崩潰免疫樁移至所有三方庫加載完成後執行，確保全域物件覆蓋率達 100%。
+
+- **🛡️ 語義抽樣背景工作守護 (`semantic_ingestion/semantic_worker_daemon.py`)**：
+  - **靜默瀏覽器頁面 (`SilentWebEnginePage`)**：注入自訂 QWebEnginePage 全面攔截並靜音 `window.alert`, `window.confirm`, `window.prompt` 等阻塞式原生彈窗，防止背景常駐抽樣線程被意外卡死。
+
+- **📦 視覺模組與心靈特徵庫同步 (`module_expressive_db.json`, `custom_visuals/`)**：
+  - 同步 130+ 個自動修復之自訂視覺特效模組與心靈表達特徵標籤資料庫。
+
+---
+
 ## 🚀 [v1.5.0] - 2026-09-24
 ### 🎬 CINEDANCE 影視級鏡頭光學編譯系統、12 大旗艦 VJ 音畫特效矩陣、PSE 光敏健康防護、VisualStudio Pro 4K 神經創作工作站與批次收編時光機回溯
 

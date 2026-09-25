@@ -11,12 +11,13 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 3,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
         "Highway Pulse.mp4",
         "Final Rest.mp4",
-        "Pale Frequency.mp4"
+        "Pale Frequency.mp4",
+        "Spatial Hypnosis Layer.mp4"
     ],
     "expressive_profile": {
         "module_id": "uM_variant_PulseGrid_1",

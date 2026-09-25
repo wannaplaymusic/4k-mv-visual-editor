@@ -1,29 +1,31 @@
 {
-  "name": "StrangeVibrations",
-  "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n// inspired by https://twitter.com/beesandbombs/status/1343221449218285570?s=09\n\nlet points = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n  \n  for (let r = 12; r < 200; r += 12) {\n    for (let i = 0; i < r/2; i++) {\n      let theta = map(i, 0, r/2, 0, TWO_PI);\n      points.push({\n        r: r,\n        theta: theta\n      });\n    }\n  }\n}\n\nfunction draw() {\n  let f = frameCount/25;\n  blendMode(BLEND);\n  background(0);\n  blendMode(ADD);\n  translate(width/2, height/2);\n  rotate(PI/2);\n  for (let p of points) {\n    let disp = map(p.r, 100, 192, 70, 0);\n    if (p.r < 100) {\n      disp = map(p.r, 12, 100, 0, 70);\n    }\n    let cost = cos(p.theta);\n    let sint = sin(p.theta);\n    let t = f + p.r/70;\n    \n    fill(255, 0, 0);\n    let val = cos(t)/2+0.5;\n    let r = p.r + val*disp;\n    circle(r*cost, r*sint, 5);\n    fill(0, 255, 0);\n    val = cos(t + 0.05)/2+0.5;\n    r = p.r + val*disp;\n    circle(r*cost, r*sint, 5);\n    fill(0, 0, 255);\n    val = cos(t + 0.1)/2+0.5;\n    r = p.r + val*disp;\n    circle(r*cost, r*sint, 5);\n  }\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Roni Kaufman",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@ronikaufman/1051702",
-  "date_added": "2026-07-06 22:19:29",
-  "scaling_mode": "auto",
-  "used_in_videos": [
-    "Servo Skull Execution.mp4",
-    "Cold Vacuum.mp4",
-    "Digital Haze.mp4",
-    "Blue Hour Resonance.mp4",
-    "Monolithic Interval.mp4",
-    "Vacuum Memory.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 7
+    "name": "StrangeVibrations",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n// inspired by https://twitter.com/beesandbombs/status/1343221449218285570?s=09\n\nlet points = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n  \n  for (let r = 12; r < 200; r += 12) {\n    for (let i = 0; i < r/2; i++) {\n      let theta = map(i, 0, r/2, 0, TWO_PI);\n      points.push({\n        r: r,\n        theta: theta\n      });\n    }\n  }\n}\n\nfunction draw() {\n  let f = frameCount/25;\n  blendMode(BLEND);\n  background(0);\n  blendMode(ADD);\n  translate(width/2, height/2);\n  rotate(PI/2);\n  for (let p of points) {\n    let disp = map(p.r, 100, 192, 70, 0);\n    if (p.r < 100) {\n      disp = map(p.r, 12, 100, 0, 70);\n    }\n    let cost = cos(p.theta);\n    let sint = sin(p.theta);\n    let t = f + p.r/70;\n    \n    fill(255, 0, 0);\n    let val = cos(t)/2+0.5;\n    let r = p.r + val*disp;\n    circle(r*cost, r*sint, 5);\n    fill(0, 255, 0);\n    val = cos(t + 0.05)/2+0.5;\n    r = p.r + val*disp;\n    circle(r*cost, r*sint, 5);\n    fill(0, 0, 255);\n    val = cos(t + 0.1)/2+0.5;\n    r = p.r + val*disp;\n    circle(r*cost, r*sint, 5);\n  }\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Roni Kaufman",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@ronikaufman/1051702",
+    "date_added": "2026-07-06 22:19:29",
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Servo Skull Execution.mp4",
+        "Cold Vacuum.mp4",
+        "Digital Haze.mp4",
+        "Blue Hour Resonance.mp4",
+        "Monolithic Interval.mp4",
+        "Vacuum Memory.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "used_count": 7,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

@@ -131,5 +131,7 @@
         "Forward Motion Vibe.mp4",
         "Warm Chord Swells.mp4"
     ],
-    "used_count": 2
+    "used_count": 2,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

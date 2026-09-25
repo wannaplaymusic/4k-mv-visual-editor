@@ -22,5 +22,7 @@
     "used_in_videos": [
         "Muted Aurora Pulse.mp4",
         "Absolute Margin.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

@@ -23,5 +23,7 @@
         "Low Frequency Vault.mp4",
         "Silent Horizon.mp4",
         "True Feeling.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

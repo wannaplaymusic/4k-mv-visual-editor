@@ -23,5 +23,7 @@
         "Submerged Echoes.mp4",
         "Pale Perimeter.mp4",
         "Urban Drift.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

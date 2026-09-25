@@ -1,29 +1,31 @@
 {
-  "name": "three",
-  "code": "// === Tab: mySketch ===\n// #WCCChallenge Phenomena\n// A humble contribution and I can't say what is shown here. Just imagine it is a dancing _________.\n// Scaled for a display in landscape mode. \n\n// Basic params\nvar lineCt;\nvar lineLen; \n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tlineCt = 40;\n\tlineLen = windowWidth * 0.1;\n}\n\nfunction makeLine(x, n) {\n\t// Generates an array of x-values to determine the lines' ends.\n\ta = [];\n\tfor (let i = 0; i < lineCt; i++) {\n\t\ta.push(x + lineLen * cos(n + (frameCount - i) / 123) * sin(n + TWO_PI * i / lineCt - TWO_PI * frameCount / 100));\n\t}\n\treturn a;\n}\n\nfunction draw() {\n\tbackground(0);\n\tnoFill();\n\t// Generating three arrays storing the x-positions\n\tarr = makeLine(windowWidth / 2, 0);\n\tbrr = makeLine(windowWidth / 2 - lineLen, 1);\n\tcrr = makeLine(windowWidth / 2 + lineLen, 2);\n\tstroke(250);\n\tfor (let i = 0; i < lineCt; i++) {\n\t\tlet y = map(i + 0.5, 0, lineCt - 0.5, 0, height);\n\t\t// alternating the left and the right lines\n\t\tif (i % 2 == 0) {\n\t\t\tline(arr[i], y, brr[i],y);\t\t\n\t\t} else {\n\t\t\tline(arr[i], y, crr[i],y);\t\t\n\t\t}\n\t}\t\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Knodel",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@u456185/2921590",
-  "date_added": "2026-07-06 21:14:26",
-  "used_count": 8,
-  "scaling_mode": "auto",
-  "used_in_videos": [
-    "Corrupt Cop Payoff.mp4",
-    "Clear Sky.mp4",
-    "Concrete Tides.mp4",
-    "Icebound Groove.mp4",
-    "Monolithic Interval.mp4",
-    "Vacuum Memory.mp4",
-    "Ultimate Core Patterns.mp4"
-  ]
+    "name": "three",
+    "code": "// === Tab: mySketch ===\n// #WCCChallenge Phenomena\n// A humble contribution and I can't say what is shown here. Just imagine it is a dancing _________.\n// Scaled for a display in landscape mode. \n\n// Basic params\nvar lineCt;\nvar lineLen; \n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tlineCt = 40;\n\tlineLen = windowWidth * 0.1;\n}\n\nfunction makeLine(x, n) {\n\t// Generates an array of x-values to determine the lines' ends.\n\ta = [];\n\tfor (let i = 0; i < lineCt; i++) {\n\t\ta.push(x + lineLen * cos(n + (frameCount - i) / 123) * sin(n + TWO_PI * i / lineCt - TWO_PI * frameCount / 100));\n\t}\n\treturn a;\n}\n\nfunction draw() {\n\tbackground(0);\n\tnoFill();\n\t// Generating three arrays storing the x-positions\n\tarr = makeLine(windowWidth / 2, 0);\n\tbrr = makeLine(windowWidth / 2 - lineLen, 1);\n\tcrr = makeLine(windowWidth / 2 + lineLen, 2);\n\tstroke(250);\n\tfor (let i = 0; i < lineCt; i++) {\n\t\tlet y = map(i + 0.5, 0, lineCt - 0.5, 0, height);\n\t\t// alternating the left and the right lines\n\t\tif (i % 2 == 0) {\n\t\t\tline(arr[i], y, brr[i],y);\t\t\n\t\t} else {\n\t\t\tline(arr[i], y, crr[i],y);\t\t\n\t\t}\n\t}\t\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Knodel",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@u456185/2921590",
+    "date_added": "2026-07-06 21:14:26",
+    "used_count": 8,
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Corrupt Cop Payoff.mp4",
+        "Clear Sky.mp4",
+        "Concrete Tides.mp4",
+        "Icebound Groove.mp4",
+        "Monolithic Interval.mp4",
+        "Vacuum Memory.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

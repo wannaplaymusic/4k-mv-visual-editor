@@ -17,12 +17,13 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 3,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
         "Glass Partition.mp4",
         "Concrete Resonance Unit.mp4",
-        "Perimeter Glow.mp4"
+        "Perimeter Glow.mp4",
+        "Underground Relay.mp4"
     ],
     "expressive_profile": {
         "module_id": "TinyTipsnTricks",

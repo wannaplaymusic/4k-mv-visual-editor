@@ -51,6 +51,9 @@ def build_sentinel_html(code: str, custom_html: str = "") -> str:
     if (typeof window.innerHeight === 'undefined' || window.innerHeight === 0) window.innerHeight = 720;
     window.windowWidth = 1280;
     window.windowHeight = 720;
+    window.alert = function(msg) {{ console.warn('[BLOCKED ALERT]:', msg); }};
+    window.confirm = function(msg) {{ console.warn('[BLOCKED CONFIRM]:', msg); return true; }};
+    window.prompt = function(msg) {{ console.warn('[BLOCKED PROMPT]:', msg); return null; }};
   </script>
   <script src="custom_visuals/libs/p5.min.js"></script>
   <script>
@@ -73,6 +76,15 @@ def build_sentinel_html(code: str, custom_html: str = "") -> str:
 </html>
 """
 
+class SilentWebEnginePage(QWebEnginePage):
+    """ 靜默頁面：攔截一切阻塞式 JS 對話方塊 (alert/confirm/prompt) """
+    def javaScriptAlert(self, securityOrigin, msg):
+        pass
+    def javaScriptConfirm(self, securityOrigin, msg):
+        return True
+    def javaScriptPrompt(self, securityOrigin, msg, defaultValue):
+        return True, defaultValue
+
 class HeadlessSampler:
     """ 無頭視訊抽樣器 """
     def __init__(self, app: QApplication):
@@ -82,6 +94,8 @@ class HeadlessSampler:
         self.profile.settings().setAttribute(QWebEngineSettings.WebAttribute.Accelerated2dCanvasEnabled, True)
         
         self.view = QWebEngineView()
+        self.page = SilentWebEnginePage(self.profile, self.view)
+        self.view.setPage(self.page)
         self.view.resize(QSize(1280, 720))
         self.view.show() # 激活內部渲染管道
 

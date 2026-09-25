@@ -23,5 +23,7 @@
         "Low Frequency Vault.mp4",
         "Low Light Territory.mp4",
         "Soft Collapse of Time.mp4"
-    ]
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

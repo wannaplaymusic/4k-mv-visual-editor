@@ -1,6 +1,6 @@
 import os
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
-os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-web-security --disable-gpu --disable-gpu-rasterization"
+os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--no-sandbox --disable-web-security --use-gl=angle"
 
 import sys
 import re
@@ -100,6 +100,34 @@ IMMUNITY_STUBS_JS = """
   if (typeof select === 'undefined') window.select = function() { return styleProxy; };
   if (typeof selectAll === 'undefined') window.selectAll = function() { return []; };
 
+  // OPC Mock / Universal Polyfill APIs
+  if (typeof window.OPC === 'undefined' || typeof window.OPC.title !== 'function') {
+    (function() {
+      var stub = function(){ return stub; };
+      if (typeof Proxy !== 'undefined') {
+        try {
+          window.OPC = new Proxy(stub, {
+            get: function(target, prop) {
+              if (prop in target) return target[prop];
+              if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') return undefined;
+              return function(name, value) {
+                if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') { window[name] = value; }
+                else if (typeof name === 'object' && name && name.name && typeof name.value !== 'undefined' && typeof window[name.name] === 'undefined') { window[name.name] = name.value; }
+                return stub;
+              };
+            }
+          });
+        } catch(e) {}
+      }
+      if (!window.OPC || typeof window.OPC.title !== 'function') {
+        var methods = ['slider', 'toggle', 'palette', 'color', 'text', 'button', 'select', 'label', 'title', 'header', 'separator', 'collapsed', 'bezier', 'initVariable', '_set', 'set', 'buttonPressed', 'buttonReleased', 'collapse', 'expand', 'delete', 'callParentFunction', 'getEaseFunction', 'setOSC', 'loadOSC', 'oscSendMessage', 'setGlobal'];
+        window.OPC = window.OPC || stub;
+        methods.forEach(function(m){ window.OPC[m] = function(name, value){ if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') window[name] = value; else if (typeof name === 'object' && name && name.name && typeof name.value !== 'undefined' && typeof window[name.name] === 'undefined') window[name.name] = name.value; return window.OPC; }; });
+      }
+    })();
+  }
+  if (typeof OPC === 'undefined') { try { window.OPC = window.OPC; var OPC = window.OPC; } catch(e){} }
+
   // 2. ML5, Tone, PVector stubs
   if (typeof window.ml5 === 'undefined') {
     const mockML = { on: () => {}, ready: Promise.resolve(), features: { get: () => [] } };
@@ -165,6 +193,46 @@ def fix_syntax_errors(code: str) -> str:
     code = re.sub(r'([A-Za-z0-9_$\.]+)\s*\[\s*\]\s*=\s*([^;\n]+);', r'\1.push(\2);', code)
     code = re.sub(r'([A-Za-z0-9_$\.]+)\s*\[\s*\1\.length\s*\]\s*=\s*([^;\n]+);', r'\1.push(\2);', code)
     code = re.sub(r'\bsize\s*\(\s*([^,)]+)\s*,\s*([^,)]+)\s*\)', r'createCanvas(\1, \2)', code)
+
+    # 頂層類別宣告前置提升 (Class Hoisting - 防止 TDZ Cannot access 'X' before initialization)
+    if "class " in code:
+        try:
+            lines = code.splitlines(keepends=True)
+            in_class = False
+            brace_depth = 0
+            class_blocks = []
+            other_lines = []
+            current_class = []
+            for line in lines:
+                stripped = line.strip()
+                code_part = line.split('//')[0]
+                if not in_class:
+                    if brace_depth == 0 and re.match(r'^(?:export\s+)?class\s+([A-Za-z0-9_$]+)', stripped):
+                        in_class = True
+                        current_class = [line]
+                        brace_depth += code_part.count('{') - code_part.count('}')
+                        if brace_depth <= 0:
+                            in_class = False
+                            brace_depth = 0
+                            class_blocks.append(''.join(current_class))
+                            current_class = []
+                        continue
+                    else:
+                        brace_depth = max(0, brace_depth + code_part.count('{') - code_part.count('}'))
+                        other_lines.append(line)
+                else:
+                    current_class.append(line)
+                    brace_depth += code_part.count('{') - code_part.count('}')
+                    if brace_depth <= 0:
+                        in_class = False
+                        brace_depth = 0
+                        class_blocks.append(''.join(current_class))
+                        current_class = []
+            if class_blocks:
+                code = ''.join(class_blocks) + '\n' + ''.join(other_lines)
+        except Exception:
+            pass
+
     return code
 
 def transpile_processing_java_to_js(code: str) -> str:
@@ -263,25 +331,6 @@ def make_test_html(code: str, custom_css: str = "", custom_html: str = "") -> st
   <script src="custom_visuals/libs/p5.min.js"></script>
   <script>
     {P5_V2_COMPAT_SHIM}
-    {IMMUNITY_STUBS_JS}
-    if (typeof p5 !== 'undefined' && p5.prototype) {{
-      try {{
-        const origSetup = p5.prototype.setup;
-        p5.prototype.setup = function() {{
-          window._p5Instance = this;
-          window.__setupFinished = true;
-          if (origSetup) return origSetup.apply(this, arguments);
-        }};
-      }} catch(e) {{}}
-      try {{
-        const origDraw = p5.prototype.draw;
-        p5.prototype.draw = function() {{
-          window.__drawCount = (window.__drawCount || 0) + 1;
-          window._p5Instance = this;
-          if (origDraw) return origDraw.apply(this, arguments);
-        }};
-      }} catch(e) {{}}
-    }}
   </script>
   <script src="custom_visuals/libs/p5.sound.min.js"></script>
   <script src="custom_visuals/libs/p5.func.min.js"></script>
@@ -289,6 +338,9 @@ def make_test_html(code: str, custom_css: str = "", custom_html: str = "") -> st
   <script src="custom_visuals/libs/p5.flex.min.js"></script>
   <script src="custom_visuals/libs/rampensau.js"></script>
   <script src="custom_visuals/libs/chroma.min.js"></script>
+  <script>
+    {IMMUNITY_STUBS_JS}
+  </script>
   {custom_html}
 </head>
 <body>
@@ -308,7 +360,8 @@ class QWebEngineTester(QWebEnginePage):
         ignored_patterns = [
             "failed to fetch", "audiocontext", "cors", "[mock]", "[loadingwatchdog]",
             "opentype", ".ttf", ".otf", "width or height of 0", "[preloadguard]",
-            "net::err", "mime type"
+            "net::err", "mime type", "error creating webgl context", "mojoaudiooutputipc",
+            "null font in textfont", "p5_compat"
         ]
         if any(p in msg_lower for p in ignored_patterns):
             return
@@ -366,7 +419,8 @@ def main():
         print(f"❌ 找不到 custom_visuals 目錄: {CUSTOM_VISUALS_DIR}")
         return
         
-    json_files = [f for f in os.listdir(CUSTOM_VISUALS_DIR) if f.endswith(".json") and f != "modules_index.json"]
+    ignored_json = {"modules_index.json", "module_usage_history.json", "favorites.json", "repair_report.json"}
+    json_files = [f for f in os.listdir(CUSTOM_VISUALS_DIR) if f.endswith(".json") and f not in ignored_json]
     json_files.sort()
     
     total = len(json_files)

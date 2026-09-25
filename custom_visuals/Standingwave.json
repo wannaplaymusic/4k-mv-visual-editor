@@ -1,29 +1,31 @@
 {
-  "name": "Standingwave",
-  "code": "// === Tab: mySketch ===\nlet velocity = 0;\nlet gridSize = 300;\nlet cellSize = 10;\nlet amplitude = 20;\nlet wavelength = 30;\n\nfunction setup() {\n\tcreateCanvas(900, 700, WEBGL);\n\tnoFill();\n\tstrokeWeight(1);\n}\n\nfunction draw() {\n\tbackground(255);\n\trotateX(PI / 3);\n   orbitControl();\n\tfor (let y = -gridSize; y <= gridSize; y += cellSize) {\n\t\tbeginShape();\n\t\tfor (let x = -gridSize; x <= gridSize; x += cellSize) {\n\t\t\tlet d = dist(x, y, 0, 0);\n\t\t\tlet z = amplitude * sin(d / wavelength - velocity);\n\t\t\tvertex(x, y, z);\n\t\t}\n\t\tendShape();\n\t}\n\n\tfor (let x = -gridSize; x <= gridSize; x += cellSize) {\n\t\tbeginShape();\n\t\tfor (let y = -gridSize; y <= gridSize; y += cellSize) {\n\t\t\tvar d = dist(x, y, 0, 0);\n\t\t\tvar z = amplitude * sin(d / wavelength - velocity);\n\t\t\tvertex(x, y, z);\n\t\t}\n\t\tendShape();\n\t}\n\tvelocity += 0.1;\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "noel",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@noel/2803575",
-  "date_added": "2026-07-06 21:21:05",
-  "used_in_videos": [
-    "Calm Twilight Chain.mp4",
-    "Cold Vacuum.mp4",
-    "Digital Haze.mp4",
-    "Echo Directive.mp4",
-    "Monolithic Interval.mp4",
-    "Vacuum Memory.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 7,
-  "scaling_mode": "auto"
+    "name": "Standingwave",
+    "code": "// === Tab: mySketch ===\nlet velocity = 0;\nlet gridSize = 300;\nlet cellSize = 10;\nlet amplitude = 20;\nlet wavelength = 30;\n\nfunction setup() {\n\tcreateCanvas(900, 700, WEBGL);\n\tnoFill();\n\tstrokeWeight(1);\n}\n\nfunction draw() {\n\tbackground(255);\n\trotateX(PI / 3);\n   orbitControl();\n\tfor (let y = -gridSize; y <= gridSize; y += cellSize) {\n\t\tbeginShape();\n\t\tfor (let x = -gridSize; x <= gridSize; x += cellSize) {\n\t\t\tlet d = dist(x, y, 0, 0);\n\t\t\tlet z = amplitude * sin(d / wavelength - velocity);\n\t\t\tvertex(x, y, z);\n\t\t}\n\t\tendShape();\n\t}\n\n\tfor (let x = -gridSize; x <= gridSize; x += cellSize) {\n\t\tbeginShape();\n\t\tfor (let y = -gridSize; y <= gridSize; y += cellSize) {\n\t\t\tvar d = dist(x, y, 0, 0);\n\t\t\tvar z = amplitude * sin(d / wavelength - velocity);\n\t\t\tvertex(x, y, z);\n\t\t}\n\t\tendShape();\n\t}\n\tvelocity += 0.1;\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "noel",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@noel/2803575",
+    "date_added": "2026-07-06 21:21:05",
+    "used_in_videos": [
+        "Calm Twilight Chain.mp4",
+        "Cold Vacuum.mp4",
+        "Digital Haze.mp4",
+        "Echo Directive.mp4",
+        "Monolithic Interval.mp4",
+        "Vacuum Memory.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "used_count": 7,
+    "scaling_mode": "auto",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

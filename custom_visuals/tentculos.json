@@ -1,30 +1,32 @@
 {
-  "name": "tentculos",
-  "code": "// === Tab: mySketch ===\n// color palette\n\nvar colors = ['#f0101c', '#f05697', '#0b469b', '#32b6c3', '#f78000', '#fddf0e', '#9fe063', '#315423', '#16141b'];\n\n// scale of the vector field \n// smaller values => bigger structures  \n// bigger values  ==> smaller structures \n\nvar myScale = 2;\n\n// number of drawing agents \n\nvar nAgents = 500;\n\nvar agent = [];\n\n// set spinning direction (plus or minus)\n\nvar direction = 1;\n\nvar par = 0;\n\nvar border = 150;\n\nvar widthRescale;\n\nfunction setup() {\n\t\n\tlet d = displayDensity();\n\t\n\tlet isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);\n\n  if (isMobile) {\n\t\tpixelDensity(1);\n\t\tcreateCanvas(windowWidth*0.9,windowWidth*0.9);\n  } else {\n\t\tpixelDensity(d);\n\t\tcreateCanvas(800,800);\n  }\n\t\n\twidthRescale = 800/width;\n\t\n\tborder = border*widthRescale;\n\t\n\tframeRate(20);\n\t\n\tcolorMode(HSB, 360, 100, 100,100);\n\trectMode(CENTER);\n\tstrokeCap(SQUARE);\n\n\tbackground(100);\n\n\tfor (let i = 0; i < nAgents; i++) {\n\t\tagent.push(new Agent());\n\t}\n\n}\n\nfunction draw() {\n\t\n\tstroke(0);\n\tnoFill();\n\tstrokeWeight(10*widthRescale);\n\trect(width/2,height/2,width,height);\n\t\n\tfor (let i = 0; i < agent.length; i++) \n\t{\n\t\t//if (frameCount > 50)\n\t\t{\n\t\t  agent[i].update();\n\t\t}\n\t}\n\n}\n\n\n// paintining agent \n\n\nclass Agent {\n\tconstructor() {\n\t\tthis.p = createVector(random(border, width - border), random(border, height - border));\n\n\t\tthis.pOld = createVector(this.p.x, this.p.y);\n\n\t\tthis.step = 0.25*widthRescale;\n\t\t\n\t\tthis.rad =  30/widthRescale;\n\n\t\tthis.color = random(colors);\n\n\t\tif (random(0, 1) > 0.5) {\n\t\t\tthis.direction = 1;\n\t\t} else {\n\t\t\tthis.direction = -1;\n\t\t}\n\t\t\n\t\tthis.myrand = random(0,1);\n\n\t\tthis.strokeWidth = 0.5*widthRescale;\n\n\t}\n\t\n\tgetRad() \n\t{\n     return this.rad;\n\t}\n\n\tupdate() {\n\n\t\tif (random(0, 1) < 1.0e-4) {\n\t\t\tthis.direction *= -1;\n\t\t}\n\t\t\t\n\t\tif (frameCount > 50)\n\t\t{\n\t\t  this.p.x += direction * vector_field(this.p.x, this.p.y).x * this.step ;\n\t\t  this.p.y += direction * vector_field(this.p.x, this.p.y).y * this.step ;\n\t\t}\n\t\t\n\t\tstrokeWeight(this.strokeWidth);\n    stroke(this.color);\n\t\tfill(100);\n\t\t\n\t\tif (this.rad > 1)\n\t\t{\n\t\t\tif(this.myrand < 0.5) \n\t\t\t{\n\t\t    ellipse(this.p.x, this.p.y, this.rad,this.rad);\n\t\t\t  this.rad -= 0.1;\n\t\t\t}\n\t\t\t\n\t\t}\n\t\t\n\t\tthis.pOld.set(this.p);\n\n\t}\n\n}\n\n// vector field function \n// the painting agents follow the flow defined \n// by this function \n\n\nfunction vector_field(x, y) {\n\t\n\tx = map(x, 0, width,  0, myScale);\n\ty = map(y, 0, height, 0, myScale);\n\n\n\tlet k1 = map(x,-myScale,myScale,-15,15);\n  let k2 = map(y,-myScale,myScale,-15,15);\n\t\n\tlet u = sin(k1 * y) + cos(k2 * y);\n\tlet v = sin(k2 * x) - cos(k1 * x);\n \n\treturn createVector(u, v);\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://unpkg.com/p5.js-svg@1.1.1\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "garabatospr",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@garabatospr/2715522",
-  "date_added": "2026-07-06 20:55:38",
-  "is_starred": false,
-  "used_count": 8,
-  "scaling_mode": "cover",
-  "used_in_videos": [
-    "Between Two Pulses.mp4",
-    "Clear Sky.mp4",
-    "Concrete Tides.mp4",
-    "Monolithic Interval.mp4",
-    "Night Drive Core Roll.mp4",
-    "Subfloor Transmission.mp4",
-    "Ultimate Core Patterns.mp4"
-  ]
+    "name": "tentculos",
+    "code": "// === Tab: mySketch ===\n// color palette\n\nvar colors = ['#f0101c', '#f05697', '#0b469b', '#32b6c3', '#f78000', '#fddf0e', '#9fe063', '#315423', '#16141b'];\n\n// scale of the vector field \n// smaller values => bigger structures  \n// bigger values  ==> smaller structures \n\nvar myScale = 2;\n\n// number of drawing agents \n\nvar nAgents = 500;\n\nvar agent = [];\n\n// set spinning direction (plus or minus)\n\nvar direction = 1;\n\nvar par = 0;\n\nvar border = 150;\n\nvar widthRescale;\n\nfunction setup() {\n\t\n\tlet d = displayDensity();\n\t\n\tlet isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);\n\n  if (isMobile) {\n\t\tpixelDensity(1);\n\t\tcreateCanvas(windowWidth*0.9,windowWidth*0.9);\n  } else {\n\t\tpixelDensity(d);\n\t\tcreateCanvas(800,800);\n  }\n\t\n\twidthRescale = 800/width;\n\t\n\tborder = border*widthRescale;\n\t\n\tframeRate(20);\n\t\n\tcolorMode(HSB, 360, 100, 100,100);\n\trectMode(CENTER);\n\tstrokeCap(SQUARE);\n\n\tbackground(100);\n\n\tfor (let i = 0; i < nAgents; i++) {\n\t\tagent.push(new Agent());\n\t}\n\n}\n\nfunction draw() {\n\t\n\tstroke(0);\n\tnoFill();\n\tstrokeWeight(10*widthRescale);\n\trect(width/2,height/2,width,height);\n\t\n\tfor (let i = 0; i < agent.length; i++) \n\t{\n\t\t//if (frameCount > 50)\n\t\t{\n\t\t  agent[i].update();\n\t\t}\n\t}\n\n}\n\n\n// paintining agent \n\n\nclass Agent {\n\tconstructor() {\n\t\tthis.p = createVector(random(border, width - border), random(border, height - border));\n\n\t\tthis.pOld = createVector(this.p.x, this.p.y);\n\n\t\tthis.step = 0.25*widthRescale;\n\t\t\n\t\tthis.rad =  30/widthRescale;\n\n\t\tthis.color = random(colors);\n\n\t\tif (random(0, 1) > 0.5) {\n\t\t\tthis.direction = 1;\n\t\t} else {\n\t\t\tthis.direction = -1;\n\t\t}\n\t\t\n\t\tthis.myrand = random(0,1);\n\n\t\tthis.strokeWidth = 0.5*widthRescale;\n\n\t}\n\t\n\tgetRad() \n\t{\n     return this.rad;\n\t}\n\n\tupdate() {\n\n\t\tif (random(0, 1) < 1.0e-4) {\n\t\t\tthis.direction *= -1;\n\t\t}\n\t\t\t\n\t\tif (frameCount > 50)\n\t\t{\n\t\t  this.p.x += direction * vector_field(this.p.x, this.p.y).x * this.step ;\n\t\t  this.p.y += direction * vector_field(this.p.x, this.p.y).y * this.step ;\n\t\t}\n\t\t\n\t\tstrokeWeight(this.strokeWidth);\n    stroke(this.color);\n\t\tfill(100);\n\t\t\n\t\tif (this.rad > 1)\n\t\t{\n\t\t\tif(this.myrand < 0.5) \n\t\t\t{\n\t\t    ellipse(this.p.x, this.p.y, this.rad,this.rad);\n\t\t\t  this.rad -= 0.1;\n\t\t\t}\n\t\t\t\n\t\t}\n\t\t\n\t\tthis.pOld.set(this.p);\n\n\t}\n\n}\n\n// vector field function \n// the painting agents follow the flow defined \n// by this function \n\n\nfunction vector_field(x, y) {\n\t\n\tx = map(x, 0, width,  0, myScale);\n\ty = map(y, 0, height, 0, myScale);\n\n\n\tlet k1 = map(x,-myScale,myScale,-15,15);\n  let k2 = map(y,-myScale,myScale,-15,15);\n\t\n\tlet u = sin(k1 * y) + cos(k2 * y);\n\tlet v = sin(k2 * x) - cos(k1 * x);\n \n\treturn createVector(u, v);\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://unpkg.com/p5.js-svg@1.1.1\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "garabatospr",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@garabatospr/2715522",
+    "date_added": "2026-07-06 20:55:38",
+    "is_starred": false,
+    "used_count": 8,
+    "scaling_mode": "cover",
+    "used_in_videos": [
+        "Between Two Pulses.mp4",
+        "Clear Sky.mp4",
+        "Concrete Tides.mp4",
+        "Monolithic Interval.mp4",
+        "Night Drive Core Roll.mp4",
+        "Subfloor Transmission.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
 }

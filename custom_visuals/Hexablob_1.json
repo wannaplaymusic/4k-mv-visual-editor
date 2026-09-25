@@ -17,13 +17,14 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 4,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
         "Infinite Loop.mp4",
         "Deep Peace.mp4",
         "Route Marker.mp4",
-        "Spatial Hypnosis Haze.mp4"
+        "Spatial Hypnosis Haze.mp4",
+        "Underground Relay.mp4"
     ],
     "expressive_profile": {
         "module_id": "Hexablob_1",
