@@ -1,0 +1,28 @@
+{
+    "name": "aloneonthebeach",
+    "code": "// === Tab: mySketch ===\n//for #wccChallenge theme: pointillism. Personal goals- nothing but points, 50 lines or less Ended up w Mark Rothko vs Seurat but JS animation\nlet mover=0\nlet waterColors=['#5d809a','#70a0b8','#8aa0b8','#436d79']\nlet sandColors=['#af967a','#bd9f80','#bfa28c','#826d51','#bba385']\nlet skyColors=['#6ea7dc','#84b3dd','#5d98d1','#96b0cd','#99b8d3']\nlet simplex\n\nfunction setup() {\t\n\tcreateCanvas(windowHeight *0.75, windowHeight);\n\trs=random(1000)\n\tsimplex = new OpenSimplexNoise(Date.now());\n}\n\nfunction draw() {\n\trandomSeed(rs)\n\tbackground(255)\n\t\n\t//clouds\n\tfor(let y=0; y<=height/2; y+=5){\n\t\tfor(let x=0; x<=width+5; x+=5){\n\t\t\tstroke(random(skyColors))\n\t strokeWeight(map(noise(y/50, (x+mover)/100), 0, 1, 0, 8))\n\t\tpoint(x, y)\n\t\t}\n\t}\n\tmover+=0.9\n\t\n\t//sand\n\tfor(let y=height*0.7; y<height; y+=5){\n\t\tfor(let x=0; x<=width; x+=5){\n\t\t\tstroke(random(sandColors))\n\t\tstrokeWeight(noise(x, y)*5);\n\t\t\tpoint(x- noise(y/10)*2, y- noise(x/20, y/20)*10)\n\t\t}\n\t}\n\t\n\t//water\n\tlet power=3\n\tfor(let y=height/2; y<height *0.75; y+=5){\n\t\tfor(let x=0; x<=width+5; x+=5){\n\t\t\tstroke(random(waterColors))\n\t\tstrokeWeight(4.5)\n\t\t\tyer=map(simplex.noise3D(x/200, (y+ sin(mover/30)*power)/80, mover/50), -1, 1, -power+sin(mover/10), power+sin(mover/10))\n\t\t\tpoint(x, y + yer)\t\n\t\t}\n\t\tpower+=2\n\t}\t\n}\n\nfunction windowResized() {\n  resizeCanvas(windowHeight *0.75, windowHeight);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Johan Cuda",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "batch_2026-10-05"
+    ],
+    "url": "https://openprocessing.org/sketch/1943804",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:37:11",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

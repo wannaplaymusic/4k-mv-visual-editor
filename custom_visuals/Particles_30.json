@@ -1,0 +1,33 @@
+{
+    "name": "Particles",
+    "code": "// === Tab: mySketch.js ===\nvar Particles = [];\nfunction setup() {\n    createCanvas(windowWidth, windowHeight);\n    var maxP = 150;\n    for (var i = 0; i < maxP; i++) {\n        Particles.push({\n            px : random(width),\n            py : random(height),\n            vx : 0,\n            vy : 0,\n            ax : 0,\n            ay : 0,\n            pc : randomColor()\n        });\n    }\n}\nfunction draw() {\n    background(15);\n    for (var i = 0; i < Particles.length; i++) {\n        show(i);\n        update(Particles[i]);\n        checkEdges(Particles[i]);\n    }\n}\nfunction show(index) {\n    var p = Particles[index];\n    var powerMinDist = pow(120, 2);\n    ellipse(p.px, p.py, 5, 5);\n    for (var j = index + 1; j < Particles.length; j++) {\n        var o = Particles[j];\n        var dx = o.px - p.px;\n        var dy = o.py - p.py;\n        var powerDist =  dx * dx + dy * dy;\n        if (powerDist < powerMinDist) {\n            var alpha = map(powerDist, 0, powerMinDist, 255, 0);\n            stroke(p.pc.r, p.pc.g, p.pc.b, alpha);\n\t\t\t\t\t\tstrokeWeight(map(powerDist, 0, powerMinDist, 2, 0));\n            line(p.px, p.py, o.px, o.py);\n        }\n    }\n}\nfunction update(p) {\n    p.ax = random(-0.1, 0.1);\n    p.ay = random(-0.1, 0.1);\n    p.vx += p.ax;\n    p.vy += p.ay;\n    limit(p, 2)\n    p.px += p.vx;\n    p.py += p.vy;\n}\nfunction checkEdges(p){\n    if (p.px > width) {\n        p.px = width;\n        p.vx *= -1;\n    } else if (p.px < 0) {\n        p.px = 0;\n        p.vx *= -1;\n    }\n    if (p.py > height) {\n        p.py = height;\n        p.vy *= -1;\n    } else if (p.py < 0) {\n        p.py = 0;\n        p.vy *= -1;\n    }\n}\nfunction limit(p, limit){\n    var powerLimit = pow(limit, 2);\n    var powerVel = p.vx * p.vx + p.vy * p.vy;\n    if (powerVel > powerLimit){\n        var vel = sqrt(powerVel);\n        p.vx = (p.vx / vel) * limit;\n        p.vy = (p.vy / vel) * limit;\n    }\n}\nfunction randomColor() {\n    return c = {\n        r : random(120, 255),\n        g : random(120, 255),\n        b : random(120, 255)\n    }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "anthony",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1381126",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:03:40",
+    "used_in_videos": [
+        "Pure Immersion Meditation.mp4",
+        "Hypnotic Core Pressure.mp4"
+    ],
+    "used_count": 2,
+    "is_starred": false
+}

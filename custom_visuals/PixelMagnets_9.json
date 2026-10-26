@@ -1,0 +1,33 @@
+{
+    "name": "PixelMagnets",
+    "code": "// === Tab: pixel_magnets ===\nvar imageScale;\nvar dotDensity = .1; // higher ratios = more dots\nvar damping = 0.4;\nvar kRadiusFactor = 0.5;\nvar kSpeed = 3.0;\nvar minDistFactor = 2.5; // area of influence - smaller numbers make rendering go faster\nvar radiusRatio = 5;\nvar radiusOffset = 0.1;\nvar nbrParticles = 12500;\nvar particlesPerFrame = 8;  \nvar reference;\nvar cachedBrightness;\n\n\nclass Particle\n{\n\tconstructor(_x, _y)\n\t{\n\t\tthis.vx = 0;\n\t\tthis.vy = 0;\n\t\tthis.x = _x;\n\t\tthis.y = _y;\n\t\tthis.rad = 1;\n\t\tthis.vrad = 1;\n\t}\n}\n\nvar particles = [];\n\nvar minRadius, maxRadius, medRadius;\n\nfunction preload(){\n  reference = loadImage(\"https://openprocessing.org/sketch/1765810/files/me.jpg\");\n}\n  \nfunction setup()\n{\n\tcreateCanvas(640, 640);\n\n\tvar dwidth = reference.width;\n\tvar dheight = reference.height;\n\timageScale = width/dwidth;\n\t\n\tcachedBrightness = new Array(reference.width * reference.height);\n\tfor (var y = 0, i = 0; y < reference.height; y++) {\n\t\tfor (var x = 0; x < reference.width; x++) {\n\t\t\tvar index = y * reference.width + x;\n\t\t\tcachedBrightness[index] = red(reference.get(x, y)) / 255;\n\t\t}\n\t}\n\n\n\tfill(0);\n\tellipseMode(CENTER);\n\n\tvar medArea = (width*height)/nbrParticles;\n\tmedRadius = sqrt(medArea/PI);\n\tminRadius = medRadius;\n\tmaxRadius = medRadius*medRadius*1;\n\tbackground(255);\n}\n\nfunction doPhysics()\n{\n\tfor (var i = 0; i < particles.length; ++i) {\n\t\tvar p = particles[i];\n\t\tvar px = ~~(p.x / imageScale);//~~ = fast round\n\t\tvar py = ~~(p.y / imageScale);\n\t\tif (px >= 0 && px < reference.width && py >= 0 && py < reference.height) {\n\t\t\tvar v =  cachedBrightness[py * reference.width + px];\n\t\t\tp.rad = map(v, 0, 1, minRadius, maxRadius);\n\t\t\tp.vrad = radiusOffset + radiusRatio * (1 - v) ;\n\t\t}\n\t\t\n\t\tp.fx = 0;\n\t\tp.fy = 0;\n\t\tp.wt = 0;\n\t\tp.vx *= damping;\n\t\tp.vy *= damping;\n\t}\n\n\t// Particle -> particle interactions\n\tfor (var i = 0; i < particles.length-1; ++i) {\n\t\tvar p = particles[i];\n\t\tfor (var j = i+1; j < particles.length; ++j) {\n\t\t\tvar pj = particles[j];\n\t\t\tif (i== j || abs(pj.x - p.x) > p.rad*minDistFactor ||\n\t\t\t\tabs(pj.y - p.y) > p.rad*minDistFactor)\n\t\t\t\tcontinue;\n\n\t\t\tvar dx = p.x - pj.x;\n\t\t\tvar dy = p.y - pj.y;\n\t\t\tvar distance = sqrt(dx*dx+dy*dy);\n\t\t\tvar maxDist = (p.rad + pj.rad);\n\t\t\t\n\t\t\tvar diff = maxDist - distance;\n\t\t\tif (diff > 0) {\n\t\t\t\tvar scle = diff/maxDist;\n\t\t\t\tscle = scle*scle;\n\t\t\t\tp.wt += scle;\n\t\t\t\tpj.wt += scle;\n\t\t\t\tscle = scle*kSpeed/distance;\n\t\t\t\tp.fx += dx*scle;\n\t\t\t\tp.fy += dy*scle;\n\t\t\t\tpj.fx -= dx*scle;\n\t\t\t\tpj.fy -= dy*scle;\n\t\t\t}\n\t\t}\n\t}\n\n\tfor (var i = 0; i < particles.length; ++i) {\n\t\tvar p = particles[i];\n\n\t\t// keep within edges\n\t\tvar dx, dy, distance, scle, diff;\n\t\tvar maxDist = p.rad;\n\t\t// left edge  \n\t\tdistance = dx = p.x - 0;    \n\t\tdy = 0;\n\t\tdiff = maxDist - distance;\n\t\tif (diff > 0) {\n\t\t\tscle = diff/maxDist;\n\t\t\tscle = scle*scle;\n\t\t\tp.wt += scle;\n\t\t\tscle = scle*kSpeed/distance;\n\t\t\tp.fx += dx*scle;\n\t\t\tp.fy += dy*scle;\n\t\t}\n\t\t// right edge  \n\t\tdx = p.x - width;    \n\t\tdy = 0;\n\t\tdistance = -dx;\n\t\tdiff = maxDist - distance;\n\t\tif (diff > 0) {\n\t\t\tscle = diff/maxDist;\n\t\t\tscle = scle*scle;\n\t\t\tp.wt += scle;\n\t\t\tscle = scle*kSpeed/distance;\n\t\t\tp.fx += dx*scle;\n\t\t\tp.fy += dy*scle;\n\t\t}\n\t\t// top edge\n\t\tdistance = dy = p.y - 0;    \n\t\tdx = 0;\n\t\tdiff = maxDist - distance;\n\t\tif (diff > 0) {\n\t\t\tscle = diff/maxDist;\n\t\t\tscle = scle*scle;\n\t\t\tp.wt += scle;\n\t\t\tscle = scle*kSpeed/distance;\n\t\t\tp.fx += dx*scle;\n\t\t\tp.fy += dy*scle;\n\t\t}\n\t\t// bot edge  \n\t\tdy = p.y - height;    \n\t\tdx = 0;\n\t\tdistance = -dy;\n\t\tdiff = maxDist - distance;\n\t\tif (diff > 0) {\n\t\t\tscle = diff/maxDist;\n\t\t\tscle = scle*scle;\n\t\t\tp.wt += scle;\n\t\t\tscle = scle*kSpeed/distance;\n\t\t\tp.fx += dx*scle;\n\t\t\tp.fy += dy*scle;\n\t\t}\n\t\tif (p.wt > 0) {\n\t\t\tp.vx += p.fx/p.wt;\n\t\t\tp.vy += p.fy/p.wt;\n\t\t}\n\t\tp.x += p.vx;\n\t\tp.y += p.vy;\n\t}\n}\n\n\nfunction draw()\n{\n\tbackground(255);\n\t//if (particles.length % 100 == 0) println(particles.length);\n\n\tif (particles.length < nbrParticles) {\n\t\tfor (var i = 0; i < particlesPerFrame; i++) {\n\t\t\tparticles.push(new Particle(random(width), random(height)));\n\t\t}\n\t}\n\n\n\tdoPhysics();\n\n\tstroke(0);\n\t//noStroke();\n\tfor (var i = 0; i < particles.length; ++i) {\n\t\t//circle(particles[i].x, particles[i].y, particles[i].vrad);\n\t\tstrokeWeight(particles[i].vrad);\n\t\tpoint(particles[i].x, particles[i].y);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Prakhar Aditya",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1765810",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:44:47",
+    "used_in_videos": [
+        "Pure Modern Percussion.mp4",
+        "Sub Pressure Loop.mp4"
+    ],
+    "used_count": 2,
+    "is_starred": false
+}

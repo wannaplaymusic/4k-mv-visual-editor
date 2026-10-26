@@ -1,0 +1,26 @@
+{
+    "name": "BeautifulBurnout",
+    "code": "// === Tab: mySketch.js ===\n/*\nIt is a 2D shader made for the weekly Creative Coding Challenge\n(https://openprocessing.org/curation/78544) on the theme \"Beautiful Burnout\".\n\nOn this subject, I was reminded of the unceasing radiance of a\nhigh-achiever, which shines with such vigour, colour and versatility,\nuntil suddenly the colours fade noticeably and the vigour wanes.\n\nInteraction:\n- Space Bar: Pause/Play\n- Mouse Wheel: Forward / Backward in time\n\n*/\n\nconst scale = Math.max(1, devicePixelRatio)\nlet theShader, wheelDelta = 0, wheelOffset = 0, pause = false, paused = 0, time = 0\n\nfunction preload(){\n\ttheShader = loadShader('https://openprocessing.org/sketch/2965966/files/vert.glsl', 'frag.glsl')\n}\n\nfunction setup() {\n\tpixelDensity(scale)\n\tcreateCanvas(windowWidth, windowHeight, WEBGL)\n}\n\nfunction windowResized() {\n\tpixelDensity(scale)\n\tresizeCanvas(windowWidth, windowHeight)\n}\n\nfunction mouseWheel(e) {\n\tif (wheelDelta * e.deltaY < 0) {\n\t\twheelDelta = e.deltaY\n\t} else {\n\t\twheelDelta = lerp(wheelDelta, e.deltaY, .05)\n\t}\n\twheelOffset += wheelDelta\n}\n\nfunction keyPressed(e) {\n\tif (e.key === \" \") {\n\t\tif (!pause) {\n\t\t\tpause = true\n\t\t} else {\n\t\t\tpause = false\n\t\t\tpaused = millis() - time\n\t\t}\n\t}\n}\n\nfunction draw() {\n  shader(theShader)\n  if (!pause) time = millis() - paused\n  theShader.setUniform(\"resolution\", [width * scale, height * scale])\n  theShader.setUniform(\"wheel\", [wheelDelta, wheelOffset])\n  theShader.setUniform(\"time\", time / 1000.0)\n  rect(0, 0, width, height)\n}\n\n// === Tab: vert.glsl ===\n#version 300 es \nin vec3 aPosition; void main() { gl_Position=vec4(aPosition*2.-1., 1.0); }\n\n// === Tab: frag.glsl ===\n#version 300 es\n/*********\n* made by Matthias Hurrle (@atzedent)\n*/\nprecision highp float;\nout vec4 O;\nuniform float time;\nuniform vec2 resolution;\nuniform vec2 wheel;\n#define FC gl_FragCoord.xy\n#define R resolution\n#define T (time+wheel.y/1e3)\n#define S smoothstep\n#define SE(v,s) S(s+1./MN,s-1./MN,v)\n#define MN min(R.x,R.y)\n#define hue(a) (.25+.6*cos(6.3*(a)+vec3(0,85,21)))\n#define lum(a) dot(a,vec3(.21,.71,.07))\nvec3 render(vec2 uv) {\n\tvec2 p=uv;\n\tvec3 col=vec3(0);\n\tuv*=1.2;\n\tfloat t=T;\n\tif (mod(T,20.)>10.) t=.0;\n\tfor (float i=.0; i<2.; i++) {\n\t\tfloat\n\t\ta=atan(uv.x,uv.y)/6.28318,\n\t\tb=length(.1+round(uv*3.));\n\t\tuv=vec2(a*9.-b,a+log(b)-t);\n\t\tuv=fract(uv);\n\t\tuv=abs(uv)/dot(uv,uv)*1.5-1.-S(.2,-.2,sin(t/3.1415));\n\t\tuv*=mat2(cos(T-vec4(0,11,33,0)));\n\t\tcol+=SE(length(uv),.25)*hue(t*.2+i*.25+T);\n\t\tuv*=i+1.;\n\t}\n\tif (t==.0) col=vec3(lum(col)); // the burnout\n\treturn col;\n}\n#define AA\nvoid main() {\n\tvec2 uv=(FC-.5*R)/MN;\n\tvec3 col=render(uv);\n\t#ifdef AA\n\tfor (float x=.0; x<=1.; x++) {\n\t\tfor (float y=.0; y<=1.; y++)\n\t\t\tcol+=render(uv+(vec2(x,y)-.5)/R);\n\t}\n\tcol/=5.;\n\t#endif\n\t// vignette\n\tvec2 c=FC/R;\n\tc*=1.-c.yx;\n\tfloat vig=c.x*c.y*25.;\n\tvig=pow(vig,.125);\n\tcol*=vig;\n\tcol=max(col,.08);\n\tO=vec4(col,1);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\t<meta charset=\"utf-8\" />\n\t<!-- keep the line below for OpenProcessing compatibility -->\n\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t<script src=\"https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/p5.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\nhtml,\nbody {\n\tmargin: 0;\n\tpadding: 0;\n\toverflow: hidden;\n\tbackground: #fff;\n}\n",
+    "inline_assets": {},
+    "author": "atzedent",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/2965966",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 21:06:58",
+    "used_in_videos": [
+        "Dark Nebula Assault.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,67 @@
+{
+    "name": "CosmicWind",
+    "code": "// === Tab: mySketch ===\nlet unit = 10\nconst nums = 15//Math.round((screen.width + screen.height) / unit * 2);\nconst noiseScale = 60//Math.sqrt(nums) * unit * Math.PI/2;\nlet a, b, c, d, e, f;\nlet group1;\nlet ac, bc, cc, aColor, bColor, cColor;\nlet sizes=[unit*0.25, unit*1.25]\nlet wells=[];\n/////////////////////////////////////////////////////////////////\n\nfunction setup() {\n  createCanvas(500, 500 );\n  background(0, 11, 33);\n  noStroke();\n\n  ac = rCol(12);\n  bc = rCol(12);\n  cc = rCol(12);\n  \n  aColor = color(ac[0], bc[1], cc[2], 12);\n  bColor = color(bc[0], cc[1], ac[2], 12);\n  cColor = color(cc[0], ac[1], bc[2], 12);\n\n  a = new ParticleGroup(aColor, nums, sizes);\n  b = new ParticleGroup(bColor, nums, sizes);\n  c = new ParticleGroup(cColor, nums, sizes);\n  \n  d = new ParticleGroup(ac, nums, sizes);\n  e = new ParticleGroup(bc, nums, sizes);\n  f = new ParticleGroup(cc, nums, sizes);\n  \n  group1 = [a, b, c, d, e, f];\n  \n  for (let group of group1){\n    ParticleGroup.populate(group);\n  }\nfor(let i=-PI;i<PI; i+=TAU/nums){\n  wells.push(new Well((i+PI)*width/(TAU),(i+PI)*height/(TAU), abs(i)*tan(abs(i*2)), i /*random(-PI/(360/359*1/12),PI/(360/359*1/12))*/));\n  }\n\t\n}\n\n\n\n\nfunction draw() {\n//background(0, 11, 33)\n\t//translate(width/2,height/2)\n\t//rotate((frameCount%360)*PI/1440)\n  for(let i=0; i<1; i++){\nfor(let w of wells){\n      w.move();\n  w.checkEdge()\n  for (let group of group1){\nw.pull(group);\n}\nfill(255, 0);\n\tellipse(w.x, w.y, w.d);\n}\n}\n/*fill(255);\nrect(0, 0, width, 10);\nrect(0, height-10, width, 10);\nrect(0, 0, 10, height);\nrect(width-10, 0, 10, height);*/\n}\n\n/////////////////////////////////////////////////////////////////////////\n\nclass ParticleGroup {\n  \n  static populate(aGroup){\n    for (let i = 0; i < aGroup.amount; i++){\n      aGroup.container.push(new Particle(Math.round(Math.random()*width / (unit / TWO_PI)) * unit/TWO_PI, Math.round(Math.random()*height / (unit/TWO_PI)) *unit/TWO_PI, aGroup.sizeRange[0]/2+random(aGroup.sizeRange[0])));\n    }\n  }\n  \n  constructor(color, amount, sizeRange = [0.1, 0.3]){\n    this.color = color;\n    this.sizeRange = sizeRange;\n    this.amount = amount;\n    this.container = [];\n    this.populated=false;\n  }\n    \n  update(){\n    if (this.populated==false){\n      ParticleGroup.populate(this);\n      this.populated=true;\n    }\n    w.pull(this);\n    w2.pull(this);\n    \n    for (let particles of this.container){\n      fill(this.color);\n      particles.move();\n      particles.checkEdge();\n      particles.display();\n    }\n  }\n  }\n\n/////////////////////////////////////////////////////////////////////////\n\nclass Particle {\n  constructor(x, y, size) {\n    this.dir = createVector(0, 0);\n    this.vel = createVector(size/2, size/2);\n    this.pos = createVector(x, y);\n    this.speed = random([size/2, -size/2]);\n    this.size = size;\n    this.angle = TWO_PI;\n    this.noiseScale = noiseScale;\n    this.well=false;\n  }\n\n  move() {\n    //this.noiseScale+=cos(tickly/nums)\n    this.angle = noise((-0.5*width+this.pos.x) / this.noiseScale, (-0.5*height+this.pos.y )/ this.noiseScale);\n    this.angle *= (TWO_PI);\n\n    this.pos.y += this.speed*(Math.cos(this.angle));\n    this.pos.x += this.speed*(Math.sin(this.angle));\n  }\n\n  checkEdge() {\n    \n    if (this.pos.x < 0 || this.pos.x > width ||this.pos.y < 0 || this.pos.y > height) {\n      this.pos.x = round(random(width) / (unit/TWO_PI)) * unit/TWO_PI;\n      this.pos.y = round(random(height) / (unit/TWO_PI)) * unit/TWO_PI;\n      this.speed*= -1;\n    }\n\n  }\n\n  display() {\n    ellipse(this.pos.x, this.pos.y, this.size );\n  }\n}\n\n//////////////////////////////////////////////////////////////////////\n\nclass Well{\n  \nconstructor(x, y, strength, diameter){\nthis.x=x;\nthis.y=y;\nthis.mag = strength;\nthis.d=diameter;\nthis.maxDist = (((strength)+diameter))*PI;\nthis.angle=1;\nthis.speed=1;\n}\n\nmove(){\n\nthis.angle = noise(0.5*this.x / noiseScale, 0.5*this.y / noiseScale);\n    this.angle *= (TWO_PI);\n\n    this.y += (this.d/PI)*(Math.cos(this.angle));\n    this.x += (this.d/PI)*(Math.sin(this.angle));\n  }\n\n  checkEdge() {\n    \n    if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {\n      this.x = round(random(width) / (unit/TWO_PI)) * unit/TWO_PI;\n      this.y = round(random(height) / (unit/TWO_PI)) * unit/TWO_PI;\n\t\t\tthis.speed*=-1\n    }\n    }\n\n  \n  pull(pGroup){\n    for (let p of pGroup.container){\n  let d = dist(this.x, this.y, p.pos.x, p.pos.y);\n      if(abs(d) <= abs(this.maxDist)){\n        p.noiseScale=((d*this.angle)*atan((p.noiseScale/this.mag)));\n         p.speed-=((d/p.size*p.angle/p.noiseScale)*sin((d*this.mag)));\n      } else {\n\t\t\t\tp.speed=Math.sign(p.speed)*p.size/2;\n\t\t\t}\n        fill(pGroup.color);\n      p.move();\n      p.checkEdge();\n      p.display();\n      \n  }\n  }\n}\n\n/////////////////////////////////////////////////////////////////////\n\nfunction rCol(alpha = 4 /*4+Math.random()*12*/) {\n  return [Math.random() * 255, Math.random() * 255, Math.random() * 255, alpha];\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Justin Turner",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/817935",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:52:25",
+    "expressive_profile": {
+        "module_id": "CosmicWind.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                135.0,
+                255.0
+            ],
+            "mean_lightness": 0.016,
+            "mean_chroma": 0.03,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 1.15,
+            "curl_vorticity": 0.063,
+            "divergence": -0.012,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 13:46:32"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Underground Relay.mp4"
+    ],
+    "used_count": 1
+}

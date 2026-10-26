@@ -1,0 +1,27 @@
+{
+    "name": "WobblySWIM",
+    "code": "// === Tab: mySketch ===\nlet mass = [];\nlet positionX = [];\nlet positionY = [];\nlet velocityX = [];\nlet velocityY = [];\nlet colors = [];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tnoStroke();\n\tbackground(0);\n}\n\nfunction draw() {\n\tfill(0, 10); // Semi-transparent fill to create trails\n\trect(0, 0, width, height);\n\n\tfor (let a = 0; a < mass.length; a++) {\n\t\tlet ax = 0, ay = 0;\n\n\t\tfor (let b = 0; b < mass.length; b++) {\n\t\t\tif (a !== b) {\n\t\t\t\tlet dx = positionX[b] - positionX[a];\n\t\t\t\tlet dy = positionY[b] - positionY[a];\n\t\t\t\tlet d = sqrt(dx * dx + dy * dy);\n\t\t\t\tif (d < 1) d = 1;\n\n\t\t\t\tlet force = (d - 200) * mass[b] / d;\n\t\t\t\tax += force * dx;\n\t\t\t\tay += force * dy;\n\t\t\t}\n\t\t}\n\n\t\tvelocityX[a] = velocityX[a] * 0.98 + ax * mass[a];\n\t\tvelocityY[a] = velocityY[a] * 0.98 + ay * mass[a];\n\t}\n\n\tfor (let i = 0; i < mass.length; i++) {\n\t\tpositionX[i] += velocityX[i];\n\t\tpositionY[i] += velocityY[i];\n\n\t\tfill(colors[i][0], colors[i][1], colors[i][2], 100);\n\t\tellipse(positionX[i], positionY[i], mass[i] * 1200, mass[i] * 1200);\n\t}\n}\n\nfunction addNewParticle() {\n\tmass.push(random(0.009, 0.001));\n\tpositionX.push((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))));\n\tpositionY.push((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\tvelocityX.push(random(-1, 1));\n\tvelocityY.push(random(-1, 1));\n\tcolors.push([\n\t\trandom(120, 120),\n\t\trandom(90, 250),\n\t\trandom(100, 255)\n\t]);\n}\n\nfunction mouseClicked() {\n\taddNewParticle();\n}\n\nfunction mouseDragged() {\n\taddNewParticle();\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u113016",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09"
+    ],
+    "url": "https://openprocessing.org/sketch/2689186",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 15:49:20",
+    "used_in_videos": [
+        "Gladiator Star Arena.mp4",
+        "Quantum Leap Warriors.mp4"
+    ],
+    "used_count": 2
+}

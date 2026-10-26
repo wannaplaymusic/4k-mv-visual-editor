@@ -1,0 +1,31 @@
+{
+    "name": "WobblySwarm",
+    "code": "// === Tab: mySketch ===\nvar mass = [];\nvar positionX = [];\nvar positionY = [];\nvar velocityX = [];\nvar velocityY = [];\nvar colors = [];\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n  background(32);\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction draw() {\n  background(32);\n  generateParticles(120);\n  updateParticles();\n  drawParticles();\n}\n\nfunction drawParticles() {\n  for (var particle = 0; particle < mass.length; particle++) {\n    positionX[particle] += velocityX[particle];\n    positionY[particle] += velocityY[particle];\n    fill(colors[particle]);\n    ellipse(positionX[particle], positionY[particle], mass[particle] * 1000, mass[particle] * 1000);\n  }\n}\n\nfunction updateParticles() {\n  for (var particleA = 0; particleA < mass.length; particleA++) {\n    var accelerationX = 0, accelerationY = 0;\n\n    for (var particleB = 0; particleB < mass.length; particleB++) {\n      if (particleA != particleB) {\n        var distanceX = positionX[particleB] - positionX[particleA];\n        var distanceY = positionY[particleB] - positionY[particleA];\n\n        var distance = sqrt(distanceX * distanceX + distanceY * distanceY);\n        if (distance < 1) distance = 1;\n\n        var force = (distance - 320) * mass[particleB] / distance;\n        \n        accelerationX += force * distanceX;\n        accelerationY += force * distanceY;\n      }\n    }\n\n    velocityX[particleA] = velocityX[particleA] * 0.02 + accelerationX * mass[particleA];\n    velocityY[particleA] = velocityY[particleA] * 0.02 + accelerationY * mass[particleA];\n  }\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction addNewParticle(x, y) {\n  mass.push(random(0.004, 0.04));\n  positionX.push(x);\n  positionY.push(y);\n  velocityX.push(0);\n  velocityY.push(0);\n  colors.push(randomColor());\n  \n  if (mass.length > 400) {\n    var index = random(0, mass.length);\n    mass.splice(index, 1);\n    positionX.splice(index, 1);\n    positionY.splice(index, 1);\n    velocityX.splice(index, 1);\n    velocityY.splice(index, 1);\n    colors.splice(index, 1);\n  }\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction randomColor() {\n  return color(random(100, 255), noise(frameCount) * 255, noise(frameCount) * 255)\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction generateParticles(pNum) {\n  translate(width/2, height/2);\n  \n  let index = frameCount % pNum;\n  let dr = TWO_PI / pNum;\n  let radians = dr * index + random(0, 6);\n  \n  let radius = (width / 100) * sin(frameCount % 100);\n\n  \n  addNewParticle(cos(radians) * radius, sin(radians) * radius); \n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Joey de l&#039;Arago",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1065441",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:27:03",
+    "used_in_videos": [
+        "Highway Cruise Atmosphere.mp4"
+    ],
+    "used_count": 1
+}

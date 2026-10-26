@@ -1,0 +1,24 @@
+{
+    "name": "Reflections",
+    "code": "// === Tab: mySketch ===\nlet sh;\n\nfunction setup() {\n\tpixelDensity(2);\n\tcreateCanvas(1112, 834,WEBGL);\n  sh = createShader(vert,frag);\n\tthis.shader(sh);\n\trectMode(CENTER);\n}\n\nfunction draw() {\n\tbackground(0);\n\tsh.setUniform(\"u_resolution\", [width*2,height*2]);\n\tsh.setUniform(\"u_time\", millis()*0.001);\n\tnoStroke();\n\t\n\trect(0,0,width,height);\n}\n\n// === Tab: Shader ===\nvar frag = `\n\t\t\n#ifdef GL_ES\nprecision highp float;\n#endif\n\n#define PI 3.14159265358979323846\n\nuniform vec2 u_resolution;\nuniform float u_time;\n\n\nfloat random (in vec2 st) {\n\t\t//return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);// < - not work on mobile\n   \thighp float a = 12.9898;\n    highp float b = 58.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(st.xy ,vec2(a,b));\n    highp float sn= mod(dt,2.14);\n    return fract(sin(sn) * c);\n}\n\nfloat noise(vec2 st) {\n    vec2 i = vec2(0.);\n\t\ti = floor(st);\n    vec2 f = vec2(0.);\n\t\tf = fract(st);\n    vec2 u =  vec2(0.);\n\t\tu = f*f*(3.0-2.0*f);\n    return mix( mix( random( i + vec2(0.0,0.0) ),\n                     random( i + vec2(1.0,0.0) ), u.x),\n                mix( random( i + vec2(0.0,1.0) ),\n                     random( i + vec2(1.0,1.0) ), u.x), u.y);\n}\n\n\nmat2 rotate2d(float angle){\n    return mat2(cos(angle),-sin(angle),\n                sin(angle),cos(angle));\n}\n\n\nfloat grid(in vec2 uv){\n    float scale = 4.;\n    uv *= scale;\n    uv = fract(uv);\n    float o = uv.x >0.99 && uv.x <= 1. || uv.y >0.99 && uv.y <= 1. ? 1.:0.;\n    return o;\n}\n\nvoid main() {\n\t\tvec2 st = vec2(0.);\n    st = gl_FragCoord.xy/u_resolution.x;\n    \n\t\tvec2 symPos = vec2(0.);\n    symPos = st;\n    symPos.x = abs(st.x-0.5)*2.;\n    symPos.y = abs(st.y-0.5*u_resolution.y/u_resolution.x)*2.3;\n    symPos= symPos.x >symPos.y ? symPos.xy :symPos.yx;\n    symPos =  rotate2d(u_time/10.) * (symPos);\n   \n\t\tfloat nv = 0.;\n    nv = noise((symPos + u_time/10.)*15.);\n    nv = step(nv,.5+.15*sin(u_time/2.)) + random(st)*.3;\n\n\t\tvec3 color = vec3(0.);\n    color = vec3(symPos.x*.1 + .1,0.2,symPos.y*.4 + .3) * vec3(1.-nv)  + vec3(nv)*.95 * vec3(1.800,0.527,0.998); \n    gl_FragColor = vec4(color,1.0);\n}\n\n`;\n\n\nvar vert=`\n//standard vertex shader\n#ifdef GL_ES\n      precision highp float;\n    #endif\n\t\t#extension GL_OES_standard_derivatives : enable\n    // attributes, in\n    attribute vec3 aPosition;\n    attribute vec3 aNormal;\n    attribute vec2 aTexCoord;\n    attribute vec4 aVertexColor;\n\n    // attributes, out\n    varying vec3 var_vertPos;\n    varying vec4 var_vertCol;\n    varying vec3 var_vertNormal;\n    varying vec2 var_vertTexCoord;\n    \n    // matrices\n    uniform mat4 uModelViewMatrix;\n    uniform mat4 uProjectionMatrix;\n    uniform mat3 uNormalMatrix;\n\n    void main() {\n      gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);\n\n      // just passing things through\n      var_vertPos      = aPosition;\n      var_vertCol      = aVertexColor;\n      var_vertNormal   = aNormal;\n      var_vertTexCoord = aTexCoord;\n    }\n`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/850256",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:44:30",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

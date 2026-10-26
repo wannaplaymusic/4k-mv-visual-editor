@@ -1,0 +1,28 @@
+{
+    "name": "TheHeartofP5",
+    "code": "// === Tab: mySketch ===\nfunction setup()\n{\n\tcreateCanvas(windowWidth, windowHeight,WEBGL);\n\tbackground(100);\n\tcolorMode(HSB,360,100,100)\n\n\tfor(i=0;i<200;i++)\n\t{\n\t\t\teval(\"thing\"+i+\"=creatething();\")\n\t}\n}\n\nlet a=0\n\nfunction draw()\n{\n\tpush()\n\trotateX(1.58)\n\tfor(i=0;i<200;i++)\n\t{\n\t\t\t eval(\"updatething(thing\"+i+\");\")\n\t}\n\ta=a+.01\n\tpop()\n}\n\nfunction creatething()\n{\n     let thing={}\n     thing.x = random(0,width/2)\n     thing.y = random(-500,height/2)\n\t\t thing.c = random(360)\n\t\t return thing\n}\n\nfunction updatething(thing)\n{\n\trotateY(a)\n\tpush()\n\tstroke(thing.c,100,95)\n\tfill(thing.c,100,95,10)\n\tthing.x=thing.x+random(-2,2)\n\tstrokeWeight(random(9))\n\t\n\tcircle(thing.x,thing.y,20)\n\tpop()\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Joe DeNavas (DD89)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2353804",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:20:20",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Fog Signal 4AM.mp4"
+    ],
+    "used_count": 1
+}

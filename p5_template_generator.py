@@ -1,9 +1,12 @@
+from ast_sandbox_patcher import ASTSandboxPatcher
+
 class P5SurrealTemplateGenerator:
     """
     SAVAP v3.0 旗艦級 p5.js 多元素音畫互動腳本生成器：
     - 支援 2 ~ 10 個多元素空間拓撲 (Totem / Orbital / Constellation)
     - 包含創作主題與思維宣言 (Concept Manifesto)
     - 頻段分流解耦、多米諾衝擊波、動態形態蛻變
+    - 集成 ASTSandboxPatcher 循環超時守門與原型凍結
     """
     @staticmethod
     def generate_multi_element_masterpiece_script(
@@ -90,7 +93,7 @@ function drawElement_{i}(bass, mid, high, chordColorHex) {{
 
         all_elem_draw_calls = "\n  ".join([f"drawElement_{i}(bass, mid, high, chordColorHex);" for i in range(1, num_elements)])
 
-        return f"""// ============================================================================
+        raw_script = f"""// ============================================================================
 // 🌌 超現實音畫拼貼神作 (SAVAP v3.0 Masterpiece): {asset_id}
 // 🎨 創作主題: {theme_meta.get('theme_title', 'Surreal Multi-Element Collage')}
 // 🧠 哲學思維: {theme_meta.get('concept_thought', 'Surrealist juxtaposition of subconscious symbols.')}
@@ -281,3 +284,5 @@ function windowResized() {{
   resizeCanvas(windowWidth, windowHeight);
 }}
 """
+        return ASTSandboxPatcher.patch_sketch_code(raw_script)
+

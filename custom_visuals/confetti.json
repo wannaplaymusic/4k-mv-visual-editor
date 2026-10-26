@@ -1,0 +1,33 @@
+{
+    "name": "confetti",
+    "code": "// === Tab: MMs ===\n// mariana magalhães — DSG1413 — 2020.1\n// Audio-visual enhanced confetti particle system\n\nlet p = [];\nlet cores = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  \n  cores = [\n    color(6, 150, 104), color(107, 221, 140), color(41, 140, 192), \n    color(163, 201, 254), color(174, 115, 251), color(179, 86, 145), color(251, 9, 152), \n    color(250, 175, 227), color(67, 114, 222), color(129, 244, 254), color(118, 138, 96), \n    color(191, 205, 142), color(192, 244, 66), color(202, 81, 0), color(251, 209, 39), color(168, 121, 98), \n    color(101, 241, 18), color(253, 44, 59), color(254, 183, 134), color(201, 34, 214)\n  ];\n\n  for (let j = 0; j < 800; j++) {\n    let baseCol = cores[j % cores.length];\n    let c = color(red(baseCol), green(baseCol), blue(baseCol), 160);\n    p.push(new Particle(random(width), random(height), c));\n  }\n}\n\nfunction draw() {\n  background(10, 10, 16, 40);\n  noStroke();\n\n  let bass = (typeof window !== 'undefined' && window.audioLow !== undefined) ? window.audioLow : 0.5;\n  let isBeat = (typeof window !== 'undefined' && window.isBeat) ? 1 : 0;\n  let speedMultiplier = 1.0 + bass * 2.5 + isBeat * 1.5;\n\n  for (let k = 0; k < p.length; k++) {\n    p[k].move(speedMultiplier);\n    p[k].draw(bass, isBeat);\n  }\n}\n\nclass Particle {\n  constructor(ix, iy, ic) {\n    this.x = ix;\n    this.y = iy;\n    this.c = ic;\n    this.vx = random(-1.5, 1.5);\n    this.vy = random(-1.5, 1.5);\n    this.size = random(8, 20);\n    this.rot = random(TWO_PI);\n    this.rotSpeed = random(-0.05, 0.05);\n  }\n\n  move(speedMult) {\n    this.x += (this.vx + random(-0.5, 0.5)) * speedMult;\n    this.y += (this.vy + random(-0.5, 0.5)) * speedMult;\n    this.rot += this.rotSpeed * speedMult;\n\n    if (this.x < -20) this.x = width + 20;\n    if (this.x > width + 20) this.x = -20;\n    if (this.y < -20) this.y = height + 20;\n    if (this.y > height + 20) this.y = -20;\n\n    if (mouseIsPressed) {\n      this.x += random(-5, 5);\n      this.y += random(-5, 5);\n    }\n  }\n\n  draw(bass, isBeat) {\n    push();\n    translate(this.x, this.y);\n    rotate(this.rot);\n    fill(this.c);\n    let currentSize = this.size * (1.0 + bass * 0.4 + (isBeat ? 0.3 : 0));\n    rectMode(CENTER);\n    rect(0, 0, currentSize, currentSize * 0.7, 4);\n    pop();\n  }\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "mariana",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/911585",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:42:07",
+    "needs_qc_repair": false,
+    "qc_reject_reason": "",
+    "used_in_videos": [
+        "Reverb District.mp4"
+    ],
+    "used_count": 1
+}

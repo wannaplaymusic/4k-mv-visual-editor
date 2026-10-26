@@ -1,0 +1,28 @@
+{
+    "name": "CristalBall",
+    "code": "// === Tab: mySketch ===\nlet h;\nlet angle = 0;\n\n\nlet speed = 0.01;\n\nfunction setup() {\n  createCanvas(600, 600);\n  noStroke();\n  background(\"#005\");\n  h = height / 2;\n}\n\nfunction draw() {\n  for (let y = 0; y < h; y += 6) {\n    let c = lerpColor(color(\"#005\"), color(\"#4BB\"), y / h);\n    fill(c);\n    square(y, y, width - 2 * y);\n  }\n  fill(\"#fff\");\n  for (let i = 6000; i > 0; i--) {\n    let x = h + sin(i + angle) * sin(i * i) * 250;\n    let y = h + 250 * cos(i * i);\n    circle(x, y, 2);\n  }\n  angle += speed; \n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "noel",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2019068",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:26:34",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Filtered Pad Immersion.mp4"
+    ],
+    "used_count": 1
+}

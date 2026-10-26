@@ -1,0 +1,22 @@
+{
+    "name": "Palindrome",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n// color palette from https://iquilezles.org/www/articles/palettes/palettes.htm\n\nlet theShader;\nlet timeOffset;\nlet grph;\n\n\nfunction preload() {\n  theShader = createShader(vert, frag);\n}\n\nfunction setup() {\n\tbackground(0);\n\tcreateCanvas(500, 500);\n\tnoStroke();\n\ttimeOffset = random(100000);\n\t\n\tgrph = createGraphics(width*sqrt(10), height*sqrt(10), WEBGL);\n\timageMode(CENTER);\n}\n\nfunction draw() {\n\tgrph.shader(theShader);\n\ttheShader.setUniform('u_resolution', [1, 1]);\n\ttheShader.setUniform('u_time', millis()/1000 + timeOffset);\n\t\n\tgrph.rect(0, 0, width, height);\n\ttranslate(width/2, height/2);\n\trotate(millis()/3000);\n\timage(grph, 0, 0);\n}\n\n// === Tab: frag ===\nconst frag = `\n\t#ifdef GL_ES\n\tprecision mediump float;\n\t#endif\n\n\tvarying vec2 vTexCoord;\n\n\tuniform vec2 u_resolution;\n\t//uniform vec2 u_mouse;\n\tuniform float u_time;\n\n\tvoid main() {\n\t\tvec2 st = vTexCoord.xy/u_resolution.xy;\n\t\tst.x *= u_resolution.x/u_resolution.y;\n\n\t\tfloat t = u_time/4.;\n\t\tif (st.x < 0.5) {\n\t\t\t\tt += st.y;\n\t\t} else {\n\t\t\t\tt -= st.y;\n\t\t}\n\n\t\tvec3 a = vec3(0.5, 0.5, 0.5);\n\t\tvec3 b = vec3(0.5, 0.5, 0.5);\n\t\tvec3 c = vec3(1., 1., 1.);\n\t\tvec3 d = vec3(0.00, 0.10, 0.20);\n\t\tvec3 color = a+b*cos(6.28318530718*(c*t+d));\n\n\t\tgl_FragColor = vec4(color,1.0);\n\t}\n`;\n\n// === Tab: vert ===\nconst vert = `\n\tattribute vec3 aPosition;\n\tattribute vec2 aTexCoord;\n\n\tvarying vec2 vTexCoord;\n\n\tvoid main() {\n\t\tvTexCoord = aTexCoord;\n\n\t\tvec4 positionVec4 = vec4(aPosition, 1.0);\n\t\tpositionVec4.xy = positionVec4.xy * 2.0 - 1.0;\n\n\t\tgl_Position = positionVec4;\n\t}\n`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u264433",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1206115",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:15:18"
+}

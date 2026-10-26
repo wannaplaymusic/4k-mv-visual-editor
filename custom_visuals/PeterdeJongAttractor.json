@@ -1,0 +1,31 @@
+{
+    "name": "PeterdeJongAttractor",
+    "code": "// === Tab: mySketch ===\n/**\n * Attrattore di Peter de Jong con sovrimpressione della formula e parametri.\n * Premi 's' (o 'S') per salvare il canvas come immagine.\n */\n\n// Parametri dell'attrattore\nlet a = -2.36888;\nlet b = -2.1;\nlet c = -2.5;\nlet d = -2.0;\n\n// Coordinate iniziali\nlet x = 0.0;\nlet y = 0.0;\n\n// Parametri di disegno\nlet scaleFactor = 120;   \nlet pointsPerFrame = 8000;\nlet max_cycle=100;\nlet t=0;\n\nfunction setup() {\n  createCanvas(800, 800);\n  background(120);\n\n  frameRate(30);\n\tpixelDensity(8)\n\t\n  fill(0)\n\trect(0,0,800,800)\n}\n\nfunction draw() {\n  // ---- Disegno dei punti dell'attrattore ----\n  // Trasliamo il sistema di coordinate al centro del canvas\n  push();\n  translate(width / 2, height / 2);\n\n  // Iteriamo un certo numero di punti per \"riempire\" gradualmente la forma\n  for (let i = 0; i < pointsPerFrame; i++) {\n    // Calcoliamo le coordinate successive\n    let xNext = sin(a * y) - cos(b * x);\n    let yNext = sin(c * x) - cos(d * y);\n\n    // Aggiorniamo x e y\n    x = xNext;\n    y = yNext;\n\n    // Impostiamo un colore in base a x (o a un mix di x,y)\n    //let col = map(x, -2, 2, 0, 255);\n    //let col2 = map(y, -2, 2, 100, 255);\n    //stroke(col, col2, col2, 20);\n    stroke(220,220,220,40)\n    point(x * scaleFactor, y * scaleFactor);\n  }\n  pop();\n\n  push();\n  noStroke();\n\n  // Rettangolo semi-trasparente dietro il testo (per leggibilità)\n  fill(0, 150);\n  //rect(10, 10, 250, 10);\n\n  fill(255);\n  textSize(14);\n  text(\n    \"Peter de Jong Attractor\\n\" +\n    \"x_{n+1} = sin(a*y_n) - cos(b*x_n)\\n\" +\n    \"y_{n+1} = sin(c*x_n) - cos(d*y_n)\\n\" +\n    \"a=\" + a + \", b=\" + b + \", c=\" + c + \", d=\" + d,\n    20,\n    30\n  );\n  pop();\n  \n  t++;\n  if(t>=max_cycle)\n    noLoop();\n  \n}\n\n// Funzione per salvare l'immagine premendo il tasto 's' o 'S'\nfunction keyPressed() {\n  if (key === 's' || key === 'S') {\n    saveCanvas('peter_de_jong', 'png');\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "_deadcode_",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2516070",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:58:16",
+    "used_in_videos": [
+        "Ultimate Driving Immersion.mp4"
+    ],
+    "used_count": 1
+}

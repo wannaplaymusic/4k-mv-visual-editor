@@ -1,0 +1,24 @@
+{
+    "name": "MandelbrotShader",
+    "code": "// === Tab: mySketch ===\n// the 'varying's are shared between both vertex & fragment shaders\nlet varying = 'precision highp float; varying vec2 vPos;';\n\n// the vertex shader is called for each vertex\nlet vs =\n  varying +\n  'attribute vec3 aPosition;' +\n  'void main() { vPos = (gl_Position = vec4(aPosition,1.0)).xy; }';\n\n// the fragment shader is called for each pixel\nlet fs =\n  varying +\n  'uniform vec2 p;' +\n  'uniform float r;' +\n  'const int I = 200;' +\n  'void main() {' +\n  '  vec2 c = p + vPos * r, z = c;' +\n  '  float n = 0.0;' +\n  '  for (int i = I; i > 0; i --) {' +\n  '    if(z.x*z.x+z.y*z.y > 4.0) {' +\n  '      n = float(i)/float(I);' +\n  '      break;' +\n  '    }' +\n  '    z = vec2(z.x*z.x-z.y*z.y, 2.0*z.x*z.y) + c;' +\n  '  }' +\n  '  gl_FragColor = vec4(0.5-cos(n*17.0)/2.0,0.5-cos(n*13.0)/2.0,0.5-cos(n*23.0)/2.0,1.0);' +\n  '}';\n\nlet mandel;\nfunction setup() {\n  createCanvas(1112, 834, WEBGL);\n\n  // create and initialize the shader\n  mandel = createShader(vs, fs);\n  shader(mandel);\n  noStroke();\n\n  // 'p' is the center point of the Mandelbrot image\n  mandel.setUniform('p', [-0.74364388703, 0.13182590421]);\n}\n\nfunction draw() {\n  // 'r' is the size of the image in Mandelbrot-space\n  mandel.setUniform('r', 1.5 * exp(-6.5 * (1 + sin(millis() / 2000))));\n  quad(-1, -1, 1, -1, 1, 1, -1, 1);\n}\n\nfunction mousePressed(){\n  save('pix.jpg');\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "Giefhell",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/834361",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:44:43",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

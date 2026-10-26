@@ -1,0 +1,24 @@
+{
+    "name": "DeJongAttractor",
+    "code": "// === Tab: mySketch ===\nlet x;\nlet y;\nlet a, b, c, d;\nlet num_points = 1000\n\nfunction setup() {\n\t//equations\n\t//xt+1 = sin(a * yt) - cos(b * xt)\n\t//yt+1 = sin(c * xt) - cos(d * yt)\n\tcreateCanvas(windowWidth, screen.availHeight);\n\t// createCanvas(windowWidth*2, windowHeight*2);\n\tcolorMode(HSB, 100);\n\t// background(100);\n\tstroke(50);\n\tx = 0;\n\ty = 0;\n\t\n\t// a = 2.01;\n\t// b = -0.49;\n\t// c = 1.24;\n\t// d = 1.88;\n\ta = random(-3,3);\n\tb = random(-3,3);\n\tc = random(-3,3);\n\td = random(-3,3);\n\t// a = 2;\n\t// b=-7;\n\t// c=-1.2;\n\t// d=2;\n\t// console.log(a);\n\t// console.log(b);\n\t// console.log(c);\n\t// console.log(d);\n}\n\nfunction draw() {\n\t// // noLoop()\n\tblendMode(MULTIPLY);\n\t\n\tbackground(100);\n\t\n\tnoFill()\n\t// beginShape(POINTS)\n\tfor(let i=0; i<num_points; i++){\n\t\t\n\t\tx_plot = map(x, -2,2, 0, width, true);\n\t\ty_plot = map(y, -2,2, 0, height, true);\n\t\t\n\t\tpoint(x_plot,y_plot);\n\t\t// vertex(x_plot, y_plot);\n\n\t\tx2 = sin(a * y) - cos(b * x)\n\t\ty2 = sin(c * x) - cos(d * y)\t\n\t\tstroke(map(x2, -2, 2, 40, 100), map(y2, -2, 2, 10, 60), 100);\n\t\t// stroke(50);\n\n\t\tx = x2;\n\t\ty = y2;\n\t}\n\t// endShape()\n\t// da = 0.005\n\t// db = 0.001\n\t// dc = 0.005\n\t// // a -= da\n\t// b -= db\n\t// c -= dc\n\t// if (a < -3 || a > 3){da*=-1}\n\t// if (b < -3 || b > 3){db*=-1}\n\t// if (c < -3 || c > 3){dc*=-1}\n}\n\nfunction mousePressed() {\n\tblendMode(BLEND);\n\tbackground(100);\n\tnum_points = 25000;\n\ta = random(-3,3);\n\tb = random(-3,3);\n\tc = random(-3,3);\n\td = random(-3,3);\n  draw()\n}\n\nfunction keyPressed() {\n\tif (key == 's') {\n\t\tsaveCanvas('de_jong_attractor', 'png');\n\t} else{\n\t\tnum_points = 250000;\n\t\tdraw()\n\t}\n}\n\nfunction deviceShaken() {\n\tnum_points = 250000;\n\tdraw()\n}\n\nfunction keyPressed(){\n\tsave('pix.jpg');\n}\n\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/778646",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:56:38",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,22 @@
+{
+    "name": "SinfulLinDot",
+    "code": "// === Tab: sketch_140719a ===\n/* let HAS let BEEN let BEFORE. (Sarcasm) every user needs there own one to show off though. */\n\nlet bubbles = new ArrayList();\nlet lines = false;\nlet clickOnce;\n\nfunction setup() {\n  createCanvas(1200, 640);\n  frameRate(60);\n  noStroke();\n  \n  for (i = 0; i <= 150; i++) {\n    bubbles.add(new Bubble(new PVector(random(width), random(height)), random(5, 10)));\n  }\n}\n\nfunction draw() {\n  background(255);\n\n  for (i = 0; i < bubbles.size(); i++) {\n    let b = (Bubble) bubbles.get(i);\n    if (lines) {\n      for (q = 0; q < bubbles.size(); q++) {\n        let b2 = (Bubble) bubbles.get(q);\n        let d = PVector.dist(b.loc, b2.loc);\n        if (d < 100) {\n          stroke(100, 25, 235, 80);\n          line(b.loc.x, b.loc.y, b2.loc.x, b2.loc.y);\n        }\n      }\n    }\n    b.draw();\n    b.moveBubble();\n    //b.applyForce(gravity);\n    b.boundaries();\n  }\n  fill(0);\n  text(int(frameRate), 5, 10);\n}\n\nfunction mousePressed() {\n  if (lines && clickOnce == false) {\n    lines = false;\n    clickOnce = true;\n  }\n  else if (!lines && clickOnce == false) {\n    lines = true;\n    clickOnce = true;\n  }\n}\n\nfunction mouseReleased() {\n  clickOnce = false;\n}\n\nclass Bubble {\n  loc;\n  acc;\n  vel;\n\n  mass = 1;\n  size;\n\n  constructor(loc_, size_) {\n    loc = loc_;\n    vel = new PVector(random(-3, 3), random(-3, 3));\n\n    size = size_;\n  }\n\n  function draw() {\n    noStroke();\n    fill(255, 255);\n    ellipse(loc.x, loc.y, size+1, size+1);\n    fill(255);\n    ellipse(loc.x, loc.y, size, size);\n  }\n\n  function moveBubble() {\n    loc.add(vel);\n  }\n  function boundaries() {\n    if (loc.y < 0)\n      vel.y *= -1;\n    if (loc.y > height)\n      vel.y *= -1;\n    if (loc.x > width)\n      vel.x *= -1;\n    if (loc.x < 0)\n      vel.x *= -1;\n  }\n}\n\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Amalgama",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1373870",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:03:22"
+}

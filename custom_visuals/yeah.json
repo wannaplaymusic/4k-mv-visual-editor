@@ -1,0 +1,24 @@
+{
+    "name": "yeah",
+    "code": "// === Tab: mySketch ===\n\"use strict\";\nconst P = new p5.Shader(this._renderer,\n    // vert\n    `attribute vec3 aPosition;\nvarying vec2 vuv;\n\nvoid main()\n{\n\t\tconst float scale = .5;\n    gl_Position = vec4(aPosition.x * .5, aPosition.y, 0, scale);\n    \n\t\tvuv = aPosition.xy;\n\n}`, // frag\n\t\t`precision highp float;\nvarying vec2 vuv;\nuniform float time;\n\nvoid main()\n{\n    // frame\n    if (abs(vuv.x) > .485 || abs(vuv.y) > .485) \n\t\t{\n        gl_FragColor = vec4(0.5, 0.5, 0.5, 1.);\n        return;\n    }\n\t\t// position\n\t\tvec2 p = vuv;\n\t\n    // lights\n    float l = 0.; \n\t\t\n\t\t// for more or less understandable reasons a loop must be phrased this way  \n    ${\"for(float _ii = 0.1; _ii<0.25; _ii+=.01 )\"}\n\t\tl += .005 / length( p + \n\t\t\t\t\t\t\t\t vec2(cos(10. * _ii * time) * _ii, -sin(10. * _ii * time) * _ii) // rotation\n\t\t\t\t\t\t\t\t); \n\n    // shade \n    gl_FragColor.rgb = vec3(l, l, l + .1);\n    gl_FragColor.a = 1.;\n\n}`);\n\nvar osc, osc2;\nfunction setup() \n{\n    createCanvas(windowWidth, windowHeight, WEBGL);\n\n    noStroke();\n   \n    setAttributes({\n        alpha: !1,\n        depth: !1,\n        stencil: !1,\n        antialias: !1,\n        premultipliedAlpha: !1,\n        presereDrawingBuffer: !1,\n        failIfMajorPerformanceCaveat: !1\n    });\n\n    background(255);\n    shader(P);\n\t\n\t  osc = new p5.Oscillator(0, 'sine');\n    osc.start();\n\n    osc2 = new p5.Oscillator(0, 'sine');\n    osc2.start();\n\n}\n\nfunction draw() \n{\n\t\n\t\tlet tFreq = PI++ * .0051 * 200;\n\t\tlet tPan = PI++ * .1;\n\t\n    osc.pan(sin(tPan), .1)\n    osc.freq(160.0 + ceil(-3.0 * (sin(tFreq))));\n\t\n    osc2.pan(sin(tPan), .1)\n    osc2.freq(100.0 + ceil(-3.0 * (sin(tFreq))));\n\n\t\t\n    P.setUniform(\"time\", millis() * .001);\n\n    plane(0, 0);\n}\n\nfunction windowResized() \n{\n    resizeCanvas(windowWidth, windowHeight);\n}\n\n// ^;.;^\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u80663",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/671298",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:54:00",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

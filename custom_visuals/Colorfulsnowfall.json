@@ -1,0 +1,28 @@
+{
+    "name": "Colorfulsnowfall",
+    "code": "// === Tab: mySketch ===\nclass Star {\n  constructor() {\n    this.scale = random(0.5, 2.0);\n    this.position = createVector(random(0, width), -20);\n    this.velocity = createVector(0, map(this.scale, 0.5, 1.5, 0.2, 1.0));\n    this.accelaration = createVector(0, 0);\n    this.rotationalPosition = 0;\n    this.rotationalVelocity = random(0, 0.05);\n    this.col = color(random(1.0), 0.5, 1.0, 0.8);\n\t\tthis.side = 40;\n    this.img = createGraphics(this.side, this.side);\n    this.imgSetup();\n  }\n  update() {\n    this.velocity.add(this.accelaration);\n    this.position.add(this.velocity);\n    this.accelaration.set(0, 0);\n    this.rotationalPosition += this.rotationalVelocity;\n  }\n  imgSetup() {\n    for (let i = 0; i < 6; i++) {\n      this.img.push();\n      this.img.translate(this.side / 2, this.side / 2);\n      this.img.rotate(i * TWO_PI / 6);\n      this.img.scale(this.scale);\n      this.img.noFill();\n      this.img.stroke(this.col);\n      this.img.strokeWeight(1);\n      this.img.beginShape(QUADS);\n      this.img.vertex(0, 0);\n      this.img.vertex(2, 3);\n      this.img.vertex(0, 10);\n      this.img.vertex(-2, 3);\n      this.img.endShape();\n      this.img.pop();\n    }\n  }\n  display() {\n    push();\n    imageMode(CENTER);\n    translate(this.position.x, this.position.y);\n    rotate(this.rotationalPosition);\n    image(this.img, 0, 0);\n    pop();\n  }\n}\n\nclass Snowflake_01 extends Star {\n\tconstructor() {\n\t\tsuper();\n\t}\n  imgSetup() {\n    for (let i = 0; i < 6; i++) {\n      this.img.push();\n      this.img.translate(this.side / 2, this.side / 2);\n      this.img.rotate(i * TWO_PI / 6);\n      this.img.scale(this.scale);\n      this.img.noFill();\n      this.img.stroke(this.col);\n      this.img.strokeWeight(1);\n      this.img.beginShape(LINES);\n      this.img.vertex(0, 0);\n      this.img.vertex(0, 10);\n      this.img.vertex(0, 4);\n      this.img.vertex(2, 6);\n      this.img.vertex(0, 4);\n      this.img.vertex(-2, 6);\n      this.img.vertex(0, 7);\n      this.img.vertex(2, 9);\n      this.img.vertex(0, 7);\n      this.img.vertex(-2, 9);\n      this.img.endShape();\n      this.img.pop();\n    }\n  }\n}\n\nclass Snowflake_02 extends Star {\n\tconstructor() {\n\t\tsuper();\n\t}\n  imgSetup() {\n    for (let i = 0; i < 12; i++) {\n      this.img.push();\n      this.img.translate(this.side / 2, this.side / 2);\n      this.img.rotate(i * TWO_PI / 12);\n      this.img.scale(this.scale);\n      this.img.noFill();\n      this.img.stroke(this.col);\n      this.img.strokeWeight(1);\n      this.img.beginShape(LINES);\n\t\t\tif (i % 2 == 0) {\n      \tthis.img.vertex(0, 0);\n      \tthis.img.vertex(0, 10);\n      \tthis.img.vertex(0, 5);\n      \tthis.img.vertex(2, 7);\n      \tthis.img.vertex(0, 5);\n      \tthis.img.vertex(-2, 7);\n      \tthis.img.vertex(0, 7);\n      \tthis.img.vertex(2, 9);\n      \tthis.img.vertex(0, 7);\n      \tthis.img.vertex(-2, 9);\n\t\t\t} else {\n\t\t\t\tthis.img.vertex(0, 0);\n\t\t\t\tthis.img.vertex(0.75, 4);\n\t\t\t\tthis.img.vertex(0, 0);\n\t\t\t\tthis.img.vertex(-0.75, 4);\t\t\t\t\n\t\t\t}\n      this.img.endShape();\n      this.img.pop();\n    }\n  }\n}\n\nlet objs = [];\nlet interval = 10;\n\nfunction setup() {\n  createCanvas(800, 800);\n  frameRate(60);\n  colorMode(HSB, 1.0);\n  blendMode(BLEND);\n  background(0);\n}\n\nfunction draw() {\n  clear();\n  background(0);\n  if (frameCount % interval == 0) {\n\t\tlet p = random(1)\n    if (p < 0.33) {\n      objs.push(new Star());\n    } else if (p >= 0.33 && p < 0.66 ) {\n      objs.push(new Snowflake_01());\n    } else {\n\t\t\tobjs.push(new Snowflake_02());\n\t\t}\n  }\n  for (let i = 0; i < objs.length; i++) {\n    objs[i].update();\n    objs[i].display();\n  }\n  for (let i = 0; i < objs.length; i++) {\n    if (objs[i].position.y > height + 10) {\n      objs.splice(i, 1);\n    }\n  }\n}\n\nfunction keyTyped() {\n  if (key === 'r') {\n    objs = [];\n  } else if (key === '1') {\n\t\tinterval = 60;\n\t} else if (key === '2') {\n\t\tinterval = 30;\n\t} else if (key === '3') {\n\t\tinterval = 15;\n\t} else if (key === '4') {\n\t\tinterval = 10;\n\t} else if (key === '5') {\n\t\tinterval = 4;\n\t} \n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Dama",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/660900",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:14:19",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Inner Harbour Dub.mp4"
+    ],
+    "used_count": 1
+}

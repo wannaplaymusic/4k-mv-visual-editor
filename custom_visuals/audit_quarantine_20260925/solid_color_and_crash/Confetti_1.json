@@ -1,0 +1,24 @@
+{
+    "name": "Confetti",
+    "code": "// === Tab: mySketch ===\nlet particles;\nlet msPressed;\nlet round;\nlet amount;\nlet timer;\nlet time;\nlet rounds;\n\nfunction setup() {\n\tcreateCanvas(1300, 650);\n\t\n\tamount = 150;\n\ttime = 30;\n\trounds = 15;\n\tparticles = new Array(amount * rounds);\n\t\n\tfor (j = 0; j < particles.length; j++) {\n\t\t\tparticles[j] = new Particle(color(0));\n\t\t\tparticles[j].live = false;\n\t}\n}\n\nfunction draw() {\n\tbackground(255);\n\tif (msPressed) {\n\t\tfor (j = 0; j < particles.length; j++) {\n\t\t\tparticles[j].update();\n\t\t\tparticles[j].draw();\n\t\t}\n\t}\n\ttimer++;\n}\n\nclass Particle {\n\tx;\n\ty;\n\txVel;\n\tyVel;\n\td;\n\trotation;\n\tangle;\n\tc;\n\tlive;\n\t\n\tconstructor(c_) {\n\t\tx = random(0, width);\n\t\ty = -50;\n\t\txVel = random(-1, 1);\n\t\tyVel = random(2, 5);\n\t\td = map(yVel, 2, 5, 12, 20);\n\t\trotation = random(0, 1);\n\t\tc = c_;\n\t}\n\t\n\tfunction update() {\n\t\tx += xVel;\n\t\ty += yVel;\n\t\tangle += rotation;\n\t\t\n\t\tif (y > height + (d / 2)) {\n\t\t\tlive = false;\n\t\t}\n\t}\n\t\n\tfunction draw() {\n\t\tif (live) {\n\t\t\tpushMatrix();\n\t\t\ttranslate(x, y);\n\t\t\tfill(c);\n\t\t\tnoStroke();\n\t\t\trotate(radians(angle));\n\t\t\trect(0, 0, d, d);\n\t\t\tpopMatrix();\n\t\t}\n\t}\n}\n\nfunction mousePressed() {\n\tif (timer > time) {\n\t\tmsPressed = true;\n\t\tif (round < rounds) {\n\t\t\tround++;\n\t\t} else {\n\t\t\tround = 1;\n\t\t}\n\t\t\n\t\tfor(i = amount * round - amount; i < amount * round; i++) {\n\t\t\tlet ran = floor(random(0, 3.999));\n\t\t\tif (ran == 0) {\n\t\t\t\tcc = color(255, 51, 51);\n\t\t\t} else if (ran == 1) {\n\t\t\t\tcc = color(0, 153, 51);\n\t\t\t} else if (ran == 2) {\n\t\t\t\tcc = color(102, 153, 255);\n\t\t\t} else if (ran == 3) {\n\t\t\t\tcc = color(255, 209, 26);\n\t\t\t}\n\t\t\tparticles[i] = new Particle(cc);\n\t\t\tparticles[i].live = true;\n\t\t}\n\t\ttimer = 0;\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Austin Obringer",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/772518",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:58:43",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

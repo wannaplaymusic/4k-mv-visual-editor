@@ -1,0 +1,27 @@
+{
+    "name": "untitled_20220202",
+    "code": "// === Tab: mySketch.js ===\n// by SamuelYAN\n// more works //\n   // https://twitter.com/SamuelAnn0924\n   // https://www.instagram.com/samuel_yan_1990/\n\nvar seed = Math.random() * 1341;\nvar t;\nvar num;\nvar radius;\nvar sizes = [];\n\nlet colors0 = \"4596c7-6d8370-e45240-21d3a4-3303f9\".split(\"-\").map((a) => \"#\" + a);\nlet colors1 = \"5d565c-b41a1d-c0dee4-edb136-e07958\".split(\"-\").map((a) => \"#\" + a);\nlet colors2 = \"7382ce-9fb7f4-12177d-9bb5e9-7486af\".split(\"-\").map((a) => \"#\" + a);\nlet colors3 = \"1b1b1b-292929-f3f3f3-222222-ff0000\".split(\"-\").map((a) => \"#\" + a);\nlet colors4 = \"eda492-d59c95-af3918-d9b6b5-853532\".split(\"-\").map((a) => \"#\" + a);\nlet colors5 = \"f86fcd-97d183-240ce8-b0e298-7f37e8\".split(\"-\").map((a) => \"#\" + a);\nlet colors6 = \"2E294E-541388-F1E9DA-FFD400-D90368\".split(\"-\").map((a) => \"#\" + a);\nvar color_setup;\n\nfunction setup() {\n\trandomSeed(seed);\n\t// pixelDensity(5);\n\tcreateCanvas(windowWidth, windowHeight);\n\tnum = random(1000,500);\n\tradius = max(windowWidth, windowHeight) * 0.3;\n\tcolor_setup = random([colors0, colors1, colors2, colors3, colors4, colors5, colors6]);\n\tfor (let a = 0; a < TAU; a += TAU / num) {\n\t\tsizes.push(random(0.1, 10))\n\t}\n\tbackground(10);\n\tt = 0;\n}\n\nfunction draw() {\n\trandomSeed(seed);\n\t// background(10);\n\tbackground(10, random(55, 30));\n  // blendMode(LIGHTEST);\n\tpush();\n\ttranslate(width / 2, height / 2);\n\trotate(random(TAU) + t);\n\tfor (let i = 0; i < num; i++) {\n\t\tlet a = (TAU / num) * i + t\n\t\tlet x = radius * cos(a + t);\n\t\tlet y = radius * sin(a - t);\n\t\tstroke(random(color_setup));\n\t\tstrokeWeight(sizes[i]);\n\t\tlet d = random(10, 80);\n\n\t\tdrawingContext.shadowColor = str(random(color_setup))+\"80\";\n\t\tdrawingContext.shadowOffsetX = 0;\n\t\tdrawingContext.shadowOffsetY = 0;\n\t\tdrawingContext.shadowBlur = 10;\n\t\tpoint(x + random(-d, d), y + random(-d, d));\n\t}\n\tpop();\n\tt += 0.003;\n}\n\nfunction keyTyped() {\n\tif (key === \"s\" || key === \"S\") {\n\t\tsaveCanvas(\"untitled_20220202\", \"png\");\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Samuel YAN",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1466249",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:59:46",
+    "used_in_videos": [
+        "Pure Modern Percussion.mp4",
+        "Ion Blast Barbarian.mp4"
+    ],
+    "used_count": 2
+}

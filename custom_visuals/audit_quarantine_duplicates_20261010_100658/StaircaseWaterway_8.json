@@ -1,0 +1,26 @@
+{
+    "name": "StaircaseWaterway",
+    "code": "// === Tab: mySketch.js ===\n// 核心参数设置\nlet tideY;           // 当前水面实际Y坐标\nlet targetTideY;     // 目标水面Y坐标（跟随鼠标）\nlet noiseOffset = 0; // 控制海浪横向滚动的变量\nlet gridSize = 16;   // 字符海的密度（数字越大越稀疏，呼吸感越强）\n\n// 夏日漱石 (Summer Salt) 歌词排版\nconst lyricsLines = [\n  \"Summer days will pass you by\",\n  \"But we're just soaking in the sun\",\n  \"Waiting for the tide to turn\",\n  \"In this orange sea of ours\",\n  \"Revvin' up the engine, driving to the coast\",\n  \"Leave the heavy world behind\"\n];\n\n// 构成海水的字符库（排除了太宽的字母，保持视觉整洁）\nconst seaChars = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:;\";\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  // 初始化水面在屏幕下方\n  tideY = height * 0.8;\n  targetTideY = height * 0.8;\n  \n  noCursor(); // 隐藏默认鼠标箭头\n  textFont('Georgia'); // 使用带有一点复古诗意的衬线字体\n}\n\nfunction draw() {\n  // 1. 绘制沙滩背景 (非常淡的暖灰色)\n  background('#F7F5F0'); \n\n  // 2. 绘制沙滩上的歌词 (一次性排布好)\n  drawLyrics();\n\n  // 3. 计算潮汐的平滑移动\n  // 限制鼠标控制范围，不让水完全消失或完全淹没屏幕\n  let constrainedMouseY = constrain((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), height * 0.1, height * 0.95);\n  // 使用 lerp 让水面“缓慢、有阻力地”追随鼠标，而不是瞬间跳转\n  targetTideY = constrainedMouseY;\n  tideY = lerp(tideY, targetTideY, 0.05); \n  \n  // 海浪随时间向左流动的速度\n  noiseOffset += 0.005; \n\n  // 4. 绘制字符橘子海\n  drawCharacterSea();\n}\n\n// === 绘制歌词层 ===\nfunction drawLyrics() {\n  textAlign(CENTER, CENTER);\n  let startY = height * 0.3; // 歌词起始高度\n  let lineSpacing = 45;      // 行距\n  \n  for (let i = 0; i < lyricsLines.length; i++) {\n    let yPos = startY + i * lineSpacing;\n    \n    // 给歌词一点淡淡的阴影，模仿刻在沙子上的质感\n    fill('#E2DDD5');\n    text(lyricsLines[i], width / 2 + 1, yPos + 1);\n    \n    // 歌词主体颜色 (复古棕灰)\n    fill('#8E8578'); \n    textSize(22);\n    text(lyricsLines[i], width / 2, yPos);\n  }\n}\n\n// === 绘制核心：字符橘子海 ===\nfunction drawCharacterSea() {\n  textAlign(CENTER, CENTER);\n  textSize(gridSize * 0.85); // 字体略小于网格，留出呼吸感空隙\n  noStroke();\n\n  // 遍历整个屏幕的网格\n  for (let x = 0; x <= width; x += gridSize) {\n    \n    // 利用柏林噪声(Perlin Noise)计算这一列的海浪高度\n    // 叠加两层噪声让波浪更自然（主波浪+细碎波浪）\n    let wave1 = noise(x * 0.002, noiseOffset) * 150;\n    let wave2 = noise(x * 0.008, noiseOffset * 1.5) * 40;\n    // waveEdge 是这条虚拟的海浪分界线\n    let waveEdge = tideY + (wave1 + wave2 - 95); \n\n    for (let y = 0; y <= height; y += gridSize) {\n      \n      // 只有当网格点位于海浪线之下时，才绘制海水字符\n      if (y > waveEdge) {\n        \n        // 计算当前字符距离水面的“深度”\n        let depth = y - waveEdge;\n        \n        // 【关键】基于坐标生成伪随机索引，保证字符位置固定不闪烁\n        let charIndex = floor(noise(x * 0.1, y * 0.1) * seaChars.length);\n        let charToDraw = seaChars.charAt(charIndex);\n\n        // --- 颜色计算 (橘子海渐变) ---\n        let c;\n        if (depth < 30) {\n          // 浅水区 / 浪尖区：明亮的白金色过渡到橘黄色\n          let inter = map(depth, 0, 30, 0, 1);\n          c = lerpColor(color('#FFF2D4'), color('#FFB74D'), inter);\n          \n          // 在浪尖加入随机的“波光粼粼”高光效果\n          let sparkle = noise(x * 0.05, y * 0.05, frameCount * 0.05);\n          if (sparkle > 0.75) c = color('#FFFFFF'); \n          \n        } else if (depth < 150) {\n          // 中层水区：橘黄色过渡到深橘红色\n          const inter = map(depth, 30, 150, 0, 1);\n          c = lerpColor(color('#FFB74D'), color('#F57C00'), inter);\n        } else {\n          // 深水区：深橘红色往下延伸\n          const inter = map(depth, 150, height, 0, 1);\n          inter = constrain(inter, 0, 1);\n          c = lerpColor(color('#F57C00'), color('#bf360c'), inter);\n        }\n\n        fill(c);\n        \n        // 绘制字符\n        // 加入一点极其微小的y轴正弦偏移，让水下的字符有微微的水波扭曲感\n        let subtleWobble = sin(frameCount * 0.02 + y * 0.1) * 2;\n        text(charToDraw, x, y + subtleWobble);\n      }\n    }\n  }\n}\n\n// 确保在窗口调整大小时画面不会崩坏\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "jiaman",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2902209",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:40:53",
+    "used_in_videos": [
+        "Berlin Depth Module.mp4"
+    ],
+    "used_count": 1
+}

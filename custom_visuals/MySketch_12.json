@@ -1,0 +1,62 @@
+{
+    "name": "MySketch",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(100);\n}\n\nfunction draw() {\n\tcircle((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 20);\n}let canvasSize = 1000;\nlet COLORS = [\"#bffdd4\",\"#fee2ff\",\"#ff00d2\",\"#dfd402\",\"#5564ff\",\"#ff0000\",\"#fffb28\",\"#1100ff\",\"#84ff5f\",\"#780083\"];\n//let COLORS = [\"#bffdd4\",\"#2b2eff\",\"#46daff\",\"rgb(223, 212, 2)\",\"#1b226b\"];\n//let COLORS = [\"#ff0000\",\"rgb(255, 251, 40)\",\"#1100ff\",\"#84ff5f\",\"#780083\"];\n//let COLORS = [\"#ffffff\",\"#8b8b8b\",\"#484848\"];\nlet grid = 200;\nlet rA;\nlet cxt;\nlet seed;\nfunction setup() {\n  createCanvas(canvasSize, canvasSize);\n  rectMode(CENTER);\n  frameRate(30)\n\n  var time = new Date();\n  seed = time.getTime();\n  console.log(\"Seed:\", seed);\n  strokeWeight(1);\n\n}\n\n\nfunction draw() {\n\n  blendMode(BLEND);\n  background(0,200)\n  blendMode(ADD);\n  translate(grid/2,grid/2);\n  for(var x = 0; x < width; x+=grid){\n    for(var y = 0; y < height; y+=grid){\n      object(x,y,grid/6);\n    }\n  }\n  \n}\n\nfunction object(x,y,r){\n  push();\n  noStroke();\n  translate(x+50*sin(y*seed),y+50*cos(x*seed));\n  noFill();\n\n  \n  var clridx = (x/grid + y/grid*(width/grid) +seed) % COLORS.length;\n\n  let pulse = pow(max(0, sin(frameCount * 0.15+ x+y)), 2);\n  let alpha = 80 + pulse * 120;\n\n  var clr = color(COLORS[clridx]);\n  clr.setAlpha(alpha);\n  stroke(clr);\n\n  for(var i = 0; i < 5; i++){\n    rotate(PI/5+frameCount*0.01+ (x+y)*0.01 ); \n    ellipse(0,0,r,r*4);\n  }\n\n  var clr = color(COLORS[(clridx + 1) % COLORS.length]);\n  clr.setAlpha(alpha);\n  stroke(clr);\n  for(var i = 0; i < 6; i++){\n    rotate(TAU/6);\n    for(var j = 0; j < (x/grid+y/grid+2); j++){ \n      circle(2*r*sin(frameCount*0.05),0,r*(1+0.2*j)*sin(frameCount*0.05+(x+y)*0.02));\n    }\n  }\n\n    \n  var clr = color(COLORS[(clridx + 2) % COLORS.length]);\n  clr.setAlpha(alpha);\n  fill(clr);\n  for(var i = 0; i < 5; i++){\n    rotate(-TAU/5- frameCount*0.02);\n    rect(2*r*sin(frameCount*0.05),0,r/2);\n  }\n  pop()\n}\n\n\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "MA",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2931493",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 16:57:00",
+    "expressive_profile": {
+        "module_id": "MySketch_12.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                135.0,
+                15.0
+            ],
+            "mean_lightness": 0.009,
+            "mean_chroma": 0.025,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.42,
+            "curl_vorticity": 0.01,
+            "divergence": -0.007,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 17:36:38"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Classic Spirit Foundation.mp4"
+    ],
+    "used_count": 1
+}

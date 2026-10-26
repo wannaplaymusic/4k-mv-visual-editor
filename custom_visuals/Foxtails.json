@@ -1,0 +1,33 @@
+{
+    "name": "Foxtails",
+    "code": "// === Tab: mySketch ===\nlet particles=[]\nlet colors = \"228822-44aa55-66cc77-57a165-88cc99\".split(\"-\").map(a=>\"#\"+a)\n\nfunction setup() {\n\tcreateCanvas(1112,834);\n\tpixelDensity(2);\n\tbackground(180, 220, 255)\n\tfor(let o=0;o<10;o++){\n\tlet _x = random(width),_y=random(height)\n\n\t//bigger\n\tfor(let i=0;i<15;i++){\n\t\tlet newP = new Particle({\n\t\t\tp: createVector(_x-250,height+400),\n\t\t\tv: createVector(4,-2.84).rotate(random(0.05,0.05)),\n\t\t\ta: createVector(0,0),\n\t\t\tcolor: color(random(colors)),\n\t\t\t\n\t\t})\n\t\tparticles.push(newP)\n\t\t\n\t}\n\t\n\t}\n\t\n}\n\nfunction draw() {\n\trotate(2*PI)\n\tparticles.forEach(p=>{\n\t\tp.update()\n\t\tp.draw()\n\t})\n\tparticles= particles.filter(p=>p.life>0)\n\t\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\"); \n    lapse = millis();\n  } \n}\n\n// === Tab: particles ===\nclass Particle{\n\tconstructor(args){\n\t\tlet def = {\n\t\t\tp: createVector(0,0),\n\t\t\tv: createVector(0,0),\n\t\t\ta: createVector(0,0),\n\t\t\tr: 12, \n\t\t\tlife: 200,\n\t\t}\n\t\tObject.assign(def,args)\n\t\tObject.assign(this,def)\n\t}\n\tdraw(){\n\t\tpush()\n\t\t// blendMode(SCREEN)\n\t\t\ttranslate(this.p)\n\t\t\tnoStroke()\n\t\t\tfill(this.color)\n\t\t\tif (this.life <= 2){\n        fill(160, 100, 20);\n\t\t\t  circle(0,-this.r/2,this.r/2)\n\t\t\t}\n\t\t\tif (this.life <= 2) fill(140, 80, 20);\n\t\t\tcircle(0,0,this.r)\n\n\t\t\t\n\t\tpop()\n\t}\n\tupdate(){\n\t\tthis.life-=0.1\n\t\t\n\t\tif (this.r<4){\n\t\t\tthis.life=2\n\t\t\tthis.r=random(15,20) ///the flower at the end of the stem\n\t\t}\n\t\t\n\t\tthis.p.add(this.v)\n\t\tthis.v.add(this.a)\n\t\t\n\t\tthis.r*=0.9954\n\t\t\n\t\tthis.v.rotate(random(0.065,-0.0769))\n\t\t\n\t\t\t\n\t\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1812936",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:42:18",
+    "used_in_videos": [
+        "Coastal Delay.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_FLAT_COLOR_SCREEN (All Frames MaxVar=0.00)"
+}

@@ -1,0 +1,62 @@
+{
+    "name": "GENUARY2022_0120_aseaofCircles",
+    "code": "// === Tab: mySketch ===\n// by SamuelYAN\n// more works //\n// https://twitter.com/SamuelAnn0924\n// https://www.instagram.com/samuel_yan_1990/\n\n// reference: https://gorillasun.de/blog/Smooth-Curves-with-Perlin-Noise-and-Recreating-the-Unknown-Pleasures-Album-Cover-in-P5\n\nvar seed = Math.random() * 9999;\nvar xOff, yOff, dir, plus, wave_h,t,p;\nvar color1, color2;\n//new color pallete\nlet colors0 = \"4596c7-6d8370-e45240-21d3a4-3303f9\".split(\"-\").map((a) => \"#\" + a);\nlet colors02 = \"4596c7-6d8370-e45240-21d3a4-3303f9\".split(\"-\").map((a) => \"#\" + a +\"1a\");\nlet colors1 = \"5d565c-b41a1d-c0dee4-edb136-e07958\".split(\"-\").map((a) => \"#\" + a);\nlet colors12 = \"5d565c-b41a1d-c0dee4-edb136-e07958\".split(\"-\").map((a) => \"#\" + a +\"1a\");\nlet colors2 = \"7382ce-9fb7f4-12177d-9bb5e9-7486af\".split(\"-\").map((a) => \"#\" + a);\nlet colors22 = \"7382ce-9fb7f4-12177d-9bb5e9-7486af\".split(\"-\").map((a) => \"#\" + a +\"1a\");\nlet colors3 = \"1b1b1b-292929-f3f3f3-222222-ff0000\".split(\"-\").map((a) => \"#\" + a);\nlet colors32 = \"1b1b1b-292929-f3f3f3-222222-ff0000\".split(\"-\").map((a) => \"#\" + a +\"1a\");\nlet colors4 = \"eda492-d59c95-af3918-d9b6b5-853532\".split(\"-\").map((a) => \"#\" + a);\nlet colors42 = \"eda492-d59c95-af3918-d9b6b5-853532\".split(\"-\").map((a) => \"#\" + a +\"1a\");\nlet colors5 = \"f86fcd-97d183-240ce8-b0e298-7f37e8\".split(\"-\").map((a) => \"#\" + a);\nlet colors52 = \"f86fcd-97d183-240ce8-b0e298-7f37e8\".split(\"-\").map((a) => \"#\" + a +\"1a\");\nlet colorbg = \"ffffff\".split(\"-\").map((a) => \"#\" + a);\nlet colorbg2 = \"ffffff1a\".split(\"-\").map((a) => \"#\" + a);\nvar grad;\n\nfunction setup() {\n\trandomSeed(seed);\n\tcreateCanvas(windowWidth,windowHeight);\n\tbackground(colorbg2);\n\t// pixelDensity(5);\n\tcolor1 = random([colors0, colors1, colors2, colors3, colors4, colors5]);\n\tcolor2 = colorbg2;\n\txOff = 0;\n\tyOff = 0;\n\tdir = 1;\n\tplus = 0.5;\n\twave_h =100;\n\tt =0;\n\tmakeFilter();\n}\n\nfunction draw() {\n\trandomSeed(seed);\n\t// background(colorbg2);\n\tnoStroke();\n\tlet mountain_h = height / int(random(30, 50));\n\tfor (let n = 0; n < height; n += random(mountain_h/2,mountain_h)) {\n\t\tpush();\n\t\ttranslate(0, height-n);\n\t\tgrad = drawingContext.createLinearGradient(0, -mountain_h, 0, mountain_h);\n\t\tgrad.addColorStop(0, random(color1));\n\t\tgrad.addColorStop(1, random(color2));\n\t\tdrawingContext.fillStyle = grad;\n\t\tfor (let i = xOff; i < width - xOff; i += 10) {\n\t\t\tp = random(-1, 1);\n\t\t\tcircle(i, cos(i+t) * random(yOff)*p,random(15))\n\t\t}\n\t\tpop();\n\t}\n\n\tif (dir == 1) {\n\t\tif(yOff < wave_h){ dir = 1;}\n\t\telse if(yOff >= wave_h){dir = -1;plus = random(0.1);}\n\t} \n\telse if (dir == -1) {\n\t\tif(yOff > 0){ dir = -1;}\n\t\telse if(yOff <= 0){dir = 1;plus = random(0.1);}\n\t} \n\t\n\tyOff += plus * dir;\n\tt += 0.1;\n\tp += 1;\n\timage(overAllTexture, 0, 0);\n}\n\nfunction makeFilter() {\n\t// noiseのフィルターをつくる\n\tcolorMode(HSB, 360, 100, 100, 100);\n\tdrawingContext.shadowColor = color(0, 0, 5, 95);\n\toverAllTexture = createGraphics(windowWidth, windowHeight);\n\toverAllTexture.loadPixels();\n\tfor (var i = 0; i < width; i++) {\n\t\tfor (var j = 0; j < height; j++) {\n\t\t\toverAllTexture.set(\n\t\t\t\ti,\n\t\t\t\tj,\n\t\t\t\tcolor(\n\t\t\t\t\t0,\n\t\t\t\t\t0,\n\t\t\t\t\t99,\n\t\t\t\t\tnoise(i / 3, j / 3, (i * j) / 50) * random(1, 5)\n\t\t\t\t)\n\t\t\t);\n\t\t}\n\t}\n\toverAllTexture.updatePixels();\n}\n\nfunction keyTyped() {\n\tif (key === \"s\" || key === \"S\") {\n\t\tsaveCanvas(\"GENUARY 2022_0120_a sea of Circles\", \"png\");\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "未知作者",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-05"
+    ],
+    "url": "https://openprocessing.org/sketch/1448437",
+    "batch_id": "batch_20261005_141539",
+    "batch_date": "2026-10-05",
+    "date_added": "2026-10-05 17:10:49",
+    "expressive_profile": {
+        "module_id": "GENUARY2022_0120_aseaofCircles.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "feverish_warm",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                15.0
+            ],
+            "mean_lightness": 0.108,
+            "mean_chroma": 0.072,
+            "contrast_level": "analogous_subtle",
+            "emotional_temperature": "feverish_warm"
+        },
+        "dynamics": {
+            "mean_velocity": 0.56,
+            "curl_vorticity": 0.019,
+            "divergence": -0.001,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-10-05 17:26:29"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Authentic Essence Energy.mp4",
+        "Quantum Leap Warriors.mp4"
+    ],
+    "used_count": 2
+}

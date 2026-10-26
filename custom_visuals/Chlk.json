@@ -1,0 +1,33 @@
+{
+    "name": "Chlk",
+    "code": "// === Tab: mySketch ===\nlet particle, system, cnv, attr;\nlet systems = [];\n\nlet w = window.innerWidth;\nlet h = window.innerHeight;\n\nfunction setup() {\n  cnv = createCanvas(w, h);\n  system = new System(width/2, 450);\n  \n  attr = new Attractor(550, 50, 100);\n  \n  //200, 400\n}\n\nwindow.onresize = function() {\n  // assigns new values for width and height variables\n  w = window.innerWidth;\n  h = window.innerHeight;  \n  cnv.size(w,h);\n}\n\nfunction draw() {\n  background(0, 3);\n  \n  attr.pos.x = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n  attr.pos.y = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n  \n  stroke(0);\n  fill(255);\n  circle(width/2-19, 453, 15);\n  circle(width/2, 452, 15);\n  circle(width/2+5, 458, 15);\n  circle(width/2+14, 464, 15);\n  circle(width/2, 465, 15);\n  circle(width/2-10, 470, 15);\n  circle(width/2-12, 457, 15);\n  circle(width/2, 475, 15);\n  \n  \n  \n  system.emit(15);\n  system.show();\n  system.update();\n  \n}\n\n// === Tab: Attractor.js ===\nclass Attractor {\n  constructor (x, y, mass) {\n    this.pos = (createVector(x, y));\n    this.mass = mass;\n    this.r = sqrt(this.mass) * 2;\n  }\n  \n  show() {\n    noStroke();\n    fill(255);\n    circle(this.pos.x, this.pos.y, this.r*2);\n  }\n  \n  attract(particle) {\n    let force = p5.Vector.sub(this.pos, particle.pos);\n    let distanceSq = constrain(force.magSq(), 10, 2);\n    //500, 50, (10, 2), (170, 280), (270, 280), (70, 280), (7, 280)\n    let G = 10;\n    //10, 30, 50\n    \n    let strength = G * (this.mass * particle.mass) / distanceSq;\n    \n    force.setMag(strength);\n    \n    particle.applyForce(force);\n  }\n}\n\n// === Tab: Particle.js ===\nclass Particle {\n  constructor(x, y, m) {\n    this.pos = createVector(x, y);\n    this.vel = p5.Vector.random2D();\n    this.vel.mult(random(1, 5));\n    this.acc = createVector(0, 0);\n    this.mass = m;\n    this.r = sqrt(this.mass)*10;\n    this.lifetime = 250;\n  }\n  \n  show() {\n    noStroke();\n    fill(255, this.lifetime);\n    circle(this.pos.x, this.pos.y, this.r);\n    // stroke(255, this.lifetime);\n    // line(this.pos.x, this.pos.y, this.pos.x, this.pos.y + 7)\n  }\n  \n  finished() {\n    return this.lifetime < 0;\n  }\n  \n  applyForce(force) {\n    let f = p5.Vector.div(force, this.mass);\n    this.acc.add(f);\n  }\n  \n  edges() {\n    if (this.pos.y >=height || this.pos.y <= 0) {\n      //this.pos.y = (height - this.size/2);\n      this.vel.y *= -1;\n    } else if (this.pos.x >= width || this.pos.x <= 0) {\n      this.vel.x *= -1;\n    }\n  }\n  \n  go() {\n    this.vel.add(this.acc);\n    this.pos.add(this.vel);\n    this.acc.set(0, 0);\n    this.lifetime -= 5;\n  }\n}\n\n// === Tab: System.js ===\nclass System {\n  constructor(x, y) {\n    this.position = createVector(x, y);\n    this.particles = [];\n  }\n  \n  emit(num) {\n    for (let i = 0; i < num; i++) {\n      this.particles.push(new Particle(this.position.x, this.position.y, 0.03));\n    }\n  }\n  \n  update() {\n    for (let particle of this.particles) {\n      let gravity = createVector(0, -1);\n      particle.applyForce(gravity);\n      particle.edges();\n      particle.go();\n      attr.attract(particle);\n      \n    }\n\n    for (let i = this.particles.length - 1; i >= 0; i--) {\n      if (this.particles[i].finished()) {\n        this.particles.splice(i, 1);\n      }\n    }\n  }\n\n  show() {\n    for (let particle of this.particles) {\n      particle.show();\n      //particle.edges();\n      \n    }\n  }\n  }\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "metalkey",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1633396",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:47:47",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Reverb District.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,24 @@
+{
+    "name": "Endofourdays",
+    "code": "// === Tab: mySketch ===\n//colorGum\n//_|rafa diniz\n//https://vimeo.com/rafadiniz\n//https://www.instagram.com/rafaddiniz/\n//rafa.diniz.paulino@gmail.com\n\n\nArrayList<Particle> ps;\n\nlet countN;\nlet countC;\n\nlet movX = width/2-100;\nlet smovX = 1.2;\n\nfunction setup() {\n\t//fullScreen(dispaly);\n  createCanvas(1080, 720);\n  ps = new ArrayList<Particle>();\n}\n\nfunction draw() {\n  \n  background(0);\n\t\n\n  countC += 0.01;\n  countN += 0.01;\n  \n  noStroke();\n\n  let wind =  new PVector(0, 0);\n\n  wind.x = 0.01 * noise(countN) - 0.01 * noise(countN);\n  wind.y = 0.01 * noise(countN) - 0.01 * noise(countN);\n\n  let nx = noise(countC * 0.002 + countN)* 1.5;\n  let ny = noise(countC * 0.002 + countN);\n\n  let sX = sin(countC * 0.002 + countN);\n\n  for (i = 60; i < 1280; i += 80) {\n    ps.add(new Particle(new PVector(i*nx, i/4)));\n  }\n\n  for (i = ps.size() - 1; i >=0; i--) {\n\n    let dps = (Particle) ps.get(i);\n\n    let mapC = map(dps.lifespan, 0, 2000, 0, 255);\n\n    fill(\n      127 + 127 * sin(i* 0.0155 + countC), \n      127 + 127 * sin(i* 0.0140 + countC), \n      127 + 127 * sin(i* 0.0137 + countC)\n      );\n\n    dps.acc = new PVector(0.01 * sX, 0.05 * ny);\n\n    dps.run();\n    //dps.checkEdges();\n    dps.applyForce(wind);\n\n    if (dps.isDead()) {\n      ps.remove(i);\n    }\n  }\n}\n\n\n\n///class particle system // based on nature of code book\nclass PSystem {\n  ArrayList<Particle> particles;\n  \n  origin;\n  \n  PSystem(loc) {\n    origin = loc.get();\n    particles = new ArrayList<Particle>();\n  }\n\n  function addParticles() {\n    particles.add(new Particle(origin));\n  }\n  \n  function applyForce(f) {\n    for (let p of particles) {\n      p.applyForce(f);\n    }\n  }\n  \n   function applyRepeller(r) {\n    for (let p of particles) {\n      let force = r.repel(p);\n      p.applyForce(force);\n    }\n  }\n\n  function run() {\n    Iterator<Particle> it =\n        particles.iterator();\n    while (it.hasNext()) {\n      let p = it.next();\n      p.run();\n      p.checkEdges();\n      if (p.isDead()) {\n        it.remove();\n      }\n    }\n  }\n}\n\n///class particle// based on nature of code book\nclass Particle {\n\n  loc;\n  vel;\n  acc;\n\n  lifespan;\n  mass;\n\n  Particle(lc) {    \n\n    acc = new PVector(0, 0);\n    vel = new PVector(0, 0);\n    loc = lc.get();\n    lifespan = 1000;\n\n    mass = 1;\n  }\n\n  function applyForce(force) {\n    let f = PVector.div(force, mass);\n    acc.add(f);\n  }\n\n\n  function run() {\n    update();\n    display();\n  }\n\n  function update() {\n    vel.add(acc);\n    loc.add(vel);\n    lifespan -= 2.0;\n  }\n\n  function display() {\n\n    ellipse(loc.x, loc.y, 40, 40);\n  }\n\n\n  function checkEdges() {\n\n    if (loc.x > width) {\n      loc.x = width;\n      vel.x *= -1;\n    } else if (loc.x < 0) {\n      loc.x = 0;\n      vel.x *= -1;\n    }\n\n    if (loc.y > height) {\n      loc.y = height;\n      vel.y *= -1;\n    } else if (loc.y < 0) {\n      vel.y *= -1;\n      loc.y = 0;\n    }\n  }\n  \n\n  isDead() {\n    if (lifespan < 0.0) {\n      return true;\n    } else {\n      return false;\n    }\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "TEDDY.F",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/871583",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:47:17",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

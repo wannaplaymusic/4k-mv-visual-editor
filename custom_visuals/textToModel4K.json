@@ -1,0 +1,26 @@
+{
+    "name": "textToModel4K",
+    "code": "// === Tab: mySketch ===\n// Disable the FES.\np5.disableFriendlyErrors = true;\n\nlet geom;\nlet activeFont;\nlet artShader;\nlet lineShader;\n\n// Define parameters as simple variables\nlet words = 'TEXT TO MODEL 4K';\nlet extrude = 10;\nlet palette = [\"#ffe03d\", \"#fe4830\", \"#d33033\", \"#dd35ff\", \"#7799ff\", \"#00cc3c\"];\n\nasync function setup() {\n  createCanvas(1920, 1080, WEBGL);\n  // Disables multiple console methods\n  const methods = ['log', 'debug', 'info', 'warn', 'error'];\n  methods.forEach(method => {\n    console[method] = () => {};\n  });\n  // Using Anton as the default font for this example:\n\n // Alternative fonts:\n // Anton: 'https://fonts.gstatic.com/s/anton/v25/1Ptgg87LROyAm0K08i4gS7lu.ttf'\n // Montserrat: 'https://fonts.gstatic.com/s/montserrat/v29/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Ew-Y3tcoqK5.ttf'\n // Source Serif: 'https://fonts.gstatic.com/s/sourceserif4/v8/vEFy2_tTDB4M7-auWDN0ahZJW3IX2ih5nk3AucvUHf6OAVIJmeUDygwjihdqrhxXD-wGvjU.ttf'\n  activeFont = await loadFont('https://openprocessing.org/sketch/2920546/files/Nedo-Regular.ttf');\n\t\n  // createSlider(min, max, [value], [step])\n  slider = createSlider(0, 3, 2, 0.1);\n  slider.position(50, 50, 10);\n  slider.size(130);\n\t\n  geom = activeFont.textToModel(words, 0, 80, { sampleFactor: 4, extrude: extrude }); \n  geom.clearColors();\n  geom.normalize();\n\n  artShader = baseMaterialShader().modify({\n    uniforms: {\n      'float time': () => millis(),\n      'float warp': () => warp,\n      'float numColors': () => palette.length,\n      'vec3[6] colors': () => palette.flatMap((c) => [red(c)/255, green(c)/255, blue(c)/255]),\n    },\n    vertexDeclarations: 'out vec3 vPos;',\n    fragmentDeclarations: 'in vec3 vPos;',\n    'Vertex getObjectInputs': `(Vertex inputs) {\n      vPos = inputs.position;\n      inputs.position.x += 5. * warp * sin(inputs.position.y * 0.1 + time * 0.001) / (1. + warp);\n      inputs.position.y += 5. * warp * sin(inputs.position.x * 0.1 + time * 0.0009) / (1. + warp);\n      return inputs;\n    }`,\n    'vec4 getFinalColor': `(vec4 _c) {\n      float x = vPos.x * 0.005;\n      float a = floor(fract(x) * numColors);\n      float b = a == numColors - 1. ? 0. : a + 1.;\n      float t = fract(x * numColors);\n      vec3 c = mix(colors[int(a)], colors[int(b)], t);\n      return vec4(c, 1.);\n    }`\n  });\n\n  lineShader = baseStrokeShader().modify({\n    uniforms: {\n      'float time': () => millis(),\n      'float warp': () => warp,\n    },\n    'StrokeVertex getObjectInputs': `(StrokeVertex inputs) {\n      inputs.position.x += 5. * warp * sin(inputs.position.y * 0.1 + time * 0.001) / (1. + warp);\n      inputs.position.y += 5. * warp * sin(inputs.position.x * 0.1 + time * 0.0009) / (1. + warp);\n      return inputs;\n    }`,\n  });\n}\n\nfunction draw() {\n\t//if (frameCount%200==0)  save(\"image_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n  background(255);\n\twarp = slider.value();\n  //orbitControl();\n\tortho();\n  shader(artShader);\n  strokeShader(lineShader);\n\t//noStroke()\n  strokeWeight(1);\n\tstroke(0);\n  scale(max(width, height) / 120, 16); // 2nd parameter sets text size\n  model(geom);\n  describe('3D wavy with different color sets \"Hello\" in Anton on white canvas, rotatable via mouse.');\n}\n\nfunction keyPressed(){\n  save(\"image_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/2920546",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 21:17:34",
+    "used_in_videos": [
+        "Cryo Weapon Marauder.mp4"
+    ],
+    "used_count": 1
+}

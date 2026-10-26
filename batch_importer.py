@@ -5,6 +5,7 @@ import random
 import datetime
 import traceback
 import requests
+import hashlib
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit,
     QLabel, QListWidget, QListWidgetItem, QProgressBar, QTextEdit,
@@ -48,38 +49,85 @@ def validate_visual_module_eligibility(title, code, custom_html="", tags=None, d
     text_check = f"{title.lower()} {' '.join(tags)} {desc.lower()} {code.lower()[:3000]} {custom_html.lower()}"
     full_content = code + "\n" + custom_html
 
-    # 1. 攝影機與 AR / XR / VR (Camera / Webcam / AR / VR)
+    # 1. 攝影機與 AR / VR / XR / MR (Camera / Webcam / AR / VR / XR - 絕對封殺)
     if filter_options.get("skip_camera_ar", True):
+        # 檢測攝影機與視訊輸入
         if re.search(r'\bcreateCapture\s*\(', full_content, re.IGNORECASE) and not ("p5capture" in full_content.lower() and not any(kw in full_content.lower() for kw in ["video", "camera", "webcam"])):
             return False, "含有攝影機輸入 (createCapture)"
-        if re.search(r'\b(getUserMedia|clmtrackr|webcam|live_camera|videoCapture)\b', full_content, re.IGNORECASE):
+        if re.search(r'\b(getUserMedia|clmtrackr|webcam|live_camera|videoCapture|navigator\.mediaDevices)\b', full_content, re.IGNORECASE):
             return False, "含有攝影機/Webcam 調用"
-        if any(t in ['webcam', 'camera', 'camera capture', 'video capture'] for t in tags):
+        if any(t in ['webcam', 'camera', 'camera capture', 'video capture', 'live cam'] for t in tags):
             return False, "標籤含有攝影機/Webcam"
-        ar_xr_kws = ['webxr', 'webvr', 'xrsession', 'vrbutton', 'arbutton', 'webgl_vr', 'p5.vr', 'mindar', 'artoolkit', 'a-scene', 'a-entity', 'zappar', 'augmented reality', 'virtual reality']
+
+        # 全面封殺 AR / VR / XR / MR 空間沉浸式框架與呼叫
+        ar_xr_kws = [
+            'webxr', 'webvr', 'xrsession', 'vrbutton', 'arbutton', 'webgl_vr', 'p5.vr', 
+            'mindar', 'artoolkit', 'a-scene', 'a-entity', 'zappar', 'augmented reality', 
+            'virtual reality', 'mixed reality', 'immersive-vr', 'immersive-ar', 'renderer.xr',
+            'three.xr', 'requestsession', 'xrreferencespace', 'oculus', 'quest', 'cardboard',
+            '8thwall', 'webar', 'web_ar', 'web_vr', 'hiro', 'kanji', 'markerroot', 'armarker'
+        ]
         for kw in ar_xr_kws:
             if kw in text_check:
-                return False, f"含有 AR/XR/VR 呼叫 ({kw})"
-        if any(t in ['ar', 'xr', 'vr', 'webxr', 'webvr', 'augmented-reality', 'virtual-reality'] for t in tags):
-            return False, "標籤含有 AR/XR/VR"
+                return False, f"含有 AR/VR/XR 沉浸式呼叫或框架 ({kw})"
 
-    # 2. 遊戲類型模組 (GAME)
+        # 標籤嚴格排除
+        if any(t in ['ar', 'xr', 'vr', 'mr', 'webxr', 'webvr', 'augmented-reality', 'virtual-reality', 'mixed-reality', 'augmented reality', 'virtual reality'] for t in tags):
+            return False, "標籤明確含有 AR/VR/XR"
+
+        # 標題單詞判定 (精準匹配獨立 ar/vr/xr 單詞，防止類似 'star' 或 'park' 被誤殺)
+        clean_title_words = re.findall(r'[a-zA-Z0-9]+', title.lower())
+        if any(w in ['ar', 'vr', 'xr', 'mr', 'webxr', 'webvr', 'webar'] for w in clean_title_words):
+            return False, f"標題含有 AR/VR/XR 關鍵字 ({title})"
+
+    # 2. 遊戲類型模組 (GAME - 嚴格高靈敏度全面攔截)
     if filter_options.get("skip_games", True):
-        game_types = ['tetris', 'flappy', 'pacman', 'pac-man', 'mario', 'breakout', 'asteroids', 'minesweeper', 'tictactoe', 'tic-tac-toe', 'sudoku', 'chess', 'shooter', 'invader', 'pinball', 'racing game', 'platformer', 'pong', 'samegame', 'gameport', 'hotorcoldgame', 'constraingame', '3dgame', 'duelashootergame']
+        # 廣泛遊戲類型特徵詞庫
+        game_types = [
+            'tetris', 'flappy', 'pacman', 'pac-man', 'mario', 'breakout', 'asteroids', 
+            'minesweeper', 'tictactoe', 'tic-tac-toe', 'sudoku', 'chess', 'shooter', 
+            'invader', 'pinball', 'racing', 'platformer', 'pong', 'samegame', 'gameport', 
+            'hotorcoldgame', 'constraingame', '3dgame', 'duelashootergame', 'snake', 'frogger',
+            'roguelike', 'rpg', 'arcade', 'minigame', 'dungeon', 'towerdefense', 'tower defense', 
+            'brick', 'paddle', 'boardgame', 'cardgame', 'solitaire', 'puzzle', 'maze', 
+            'dodge', 'runner', 'endless runner', 'galaxy attack', 'space shooter'
+        ]
+        title_tag_str = f"{title.lower()} {' '.join(tags)}"
         for kw in game_types:
             if kw in title.lower().replace(' ', '') or any(kw in t.replace(' ', '') for t in tags):
                 if kw == 'asteroids' and 'planet' in title.lower():
                     continue
                 return False, f"含有遊戲類型特徵 ({kw})"
-        if any(t in ['game', 'games', 'gaming', 'arcade', 'minigame', 'gameplay'] for t in tags):
-            return False, "標籤含有遊戲類別 (Game/Arcade)"
+
+        # 標籤與標題含有遊戲分類 (排除音樂 player 或 video player 誤殺)
         clean_title = title.lower()
+        if any(t in ['game', 'games', 'gaming', 'arcade', 'minigame', 'gameplay', 'game development'] for t in tags):
+            return False, "標籤含有遊戲類別 (Game/Arcade)"
+
         if not clean_title.startswith('pixel_') and ('game' in clean_title or 'arcade' in clean_title):
             return False, f"標題含有遊戲關鍵字 ({title})"
-        # 檢測遊戲機制 (Score + GameOver + Lives/Health)
+
+        # 檢測遊戲機制代碼特徵 (高靈敏度逐項命中判定)
         code_lower = code.lower()
-        if re.search(r'\b(game_?over|you win|you lose)\b', code_lower) and re.search(r'\b(score\s*\+=|lives\s*-=|highscore|restartgame)\b', code_lower):
-            return False, "代碼含有互動遊戲計分與勝負機制"
+        
+        # A. 勝負/死亡/過關結算狀態
+        if re.search(r'\b(game_?over|you\s*win|you\s*lose|victory|defeat|game_?state|gamestate)\b', code_lower):
+            if any(term in code_lower for term in ['score', 'lives', 'hp', 'health', 'level', 'play', 'restart', 'startgame', 'reset']):
+                return False, "含有遊戲勝負、死亡或重開局狀態機"
+
+        # B. 計分與高分累積機制
+        if re.search(r'\b(score\s*(\+=|\+\+|\=|\:)|highscore|high_score|points\s*\+=|coins\s*\+=)\b', code_lower):
+            if any(term in code_lower for term in ['player', 'bullet', 'enemy', 'target', 'hit', 'miss', 'lives', 'level']):
+                return False, "代碼含有遊戲計分、金幣或積分累積系統"
+
+        # C. 角色生命值與扣血機制
+        if re.search(r'\b(lives\s*(-=|\-\-)|health\s*(-=|\-\-)|hp\s*(-=|\-\-)|player\.lives|player\.health|player\.hp)\b', code_lower):
+            return False, "含有玩家生命值 (Lives/Health) 扣減機制"
+
+        # D. 典型玩家操控與實體碰撞
+        if re.search(r'\b(keyisdown|keycode)\b', code_lower) and re.search(r'\b(left_arrow|right_arrow|up_arrow|down_arrow)\b', code_lower):
+            if any(term in code_lower for term in ['player', 'ship', 'car', 'bullet', 'obstacle', 'speed', 'jump']):
+                return False, "含有鍵盤操控主角移動與障礙物互動之遊戲玩法"
 
     # 3. 高耗時加載模組 (Heavy Loading)
     if filter_options.get("skip_heavy_loading", True):
@@ -107,6 +155,9 @@ def validate_visual_module_eligibility(title, code, custom_html="", tags=None, d
         # 檢測 text() 密集調用且缺乏其他幾何繪圖
         text_calls = len(re.findall(r'\btext\s*\(', code))
         font_calls = len(re.findall(r'\b(textFont|loadFont|textSize|textAlign)\s*\(', code))
+        # 檢測 text() 密集調用且缺乏其他幾何繪圖
+        text_calls = len(re.findall(r'\btext\s*\(', code))
+        font_calls = len(re.findall(r'\b(textFont|loadFont|textSize|textAlign)\s*\(', code))
         if font_calls >= 2 and text_calls >= 6:
             geom_calls = len(re.findall(r'\b(rect|circle|ellipse|vertex|triangle|sphere|box|point|curve|bezier)\s*\(', code))
             if geom_calls < 3:
@@ -123,6 +174,56 @@ def validate_visual_module_eligibility(title, code, custom_html="", tags=None, d
         # 只有 setup() 沒有 draw() 函數
         if "setup" in code and "draw" not in code:
             return False, "模組僅包含靜態 setup()，缺乏 draw() 連續幀動畫"
+
+    # 6. 惡意代碼與安全沙盒違規 (Harmful & Security Quarantine)
+    clean_code_no_comments = re.sub(r'/\*[\s\S]*?\*/', '', code)
+    clean_code_no_comments = re.sub(r'//.*', '', clean_code_no_comments)
+    full_clean = clean_code_no_comments + "\n" + custom_html
+
+    harmful_checks = [
+        (r'(?<![\w\.])(?:window|document|top|parent)\.location\s*(?:=|\.href|\.replace|\.assign)', '頁面劫持/主動跳轉 (location hijack)'),
+        (r'(?<![\w\.])(?:window\.)?open\s*\(\s*[\'"`]https?://', '廣告彈窗/外開新分頁 (window.open)'),
+        (r'(?<![\w\.])document\.cookie\b', '嘗試存取使用者 Cookie'),
+        (r'\b(?:coinhive|cryptonight|coinminer|deepminer)\b', '加密貨幣挖礦惡意代碼'),
+        (r'\bwhile\s*\(\s*(?:true|1|!0)\s*\)\s*\{(?![^}]*\bbreak\b)', '無跳出條件之無窮 while 死循環 (Deadlock)'),
+        (r'\bfor\s*\(\s*;\s*;\s*\)\s*\{(?![^}]*\bbreak\b)', '無跳出條件之無窮 for 死循環 (Deadlock)'),
+    ]
+    for pat, h_reason in harmful_checks:
+        if re.search(pat, full_clean, re.IGNORECASE):
+            return False, f"安全違規: {h_reason}"
+
+    # 7. 純草稿、模板與空專案 (Drafts, Templates & Empty Sketches)
+    draft_titles = ['my sketch', 'untitled', 'empty sketch', 'new sketch', 'default sketch', 'test', 'demo sketch', 'template']
+    clean_t = title.lower().strip()
+    if clean_t in draft_titles:
+        # 若標題為草稿且代碼量極少或無幾何繪圖指令
+        if len(code.strip()) < 300:
+            return False, f"未命名之初學草稿或空模板 ({title})"
+        # 檢查是否只是預設的 setup/draw 骨架
+        if "createCanvas(400, 400)" in code and "background(220)" in code and len(code.strip()) < 500:
+            return False, "預設空白畫布模板 (Default 400x400 canvas)"
+
+    # 檢查是否缺乏任何基本繪圖指令
+    draw_cmds = re.findall(r'\b(rect|circle|ellipse|vertex|line|point|box|sphere|torus|cylinder|cone|triangle|quad|image|shader|bezier|curve|arc)\s*\(', code)
+    if len(draw_cmds) == 0 and "loadShader" not in code and "createShader" not in code and "webgl" not in code.lower():
+        return False, "缺乏任何幾何或著色器繪圖指令 (Zero-Draw Output)"
+
+    # 8. 純手動塗鴉筆刷/畫板工具 (Drawing Pad & Manual Tools Without Autonomous Motion)
+    # 若模組僅在滑鼠按住時繪圖，且沒有任何自主動態更新，在 MV 自動播放時會呈現純黑/留白
+    if "mouseIsPressed" in code and "background" not in code:
+        # 如果 draw 裡只有 if (mouseIsPressed) 且沒有自主粒子/幾何運動
+        draw_body_match = re.search(r'function\s+draw\s*\([^)]*\)\s*\{([\s\S]*?)\}', code)
+        if draw_body_match:
+            dbody = draw_body_match.group(1).strip()
+            if dbody.startswith("if (mouseIsPressed") or dbody.startswith("if(mouseIsPressed"):
+                if not any(kw in dbody for kw in ["sin(", "cos(", "noise(", "frameCount", "random("]):
+                    return False, "純手動滑鼠塗鴉板工具（無自主動態動畫）"
+
+    # 9. 純演算法模擬與非視覺圖表展示 (Non-visual Algorithm / Data Visuals)
+    algo_kws = ['sorting algorithm', 'bubble sort', 'quick sort', 'merge sort', 'pathfinding', 'a* search', 'dijkstra', 'covid simulation', 'data chart', 'stock chart']
+    for akw in algo_kws:
+        if akw in text_check:
+            return False, f"屬於資料圖表或演算法教學模擬 ({akw})"
 
     return True, ""
 
@@ -285,20 +386,59 @@ def adapt_and_repair_code_text(code, sketch_id=None):
         "(typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : "
         "(typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))"
     )
+    audio_reactive_pmouseX = (
+        "(window.simulatedPMouseX !== undefined ? window.simulatedPMouseX : "
+        "(typeof sub_bass_prev !== 'undefined' ? map(sub_bass_prev, 0, 1, width*0.1, width*0.9) : "
+        "(typeof window.simulatedMouseX !== 'undefined' ? window.simulatedMouseX - 12 : pmouseX)))"
+    )
+    audio_reactive_pmouseY = (
+        "(window.simulatedPMouseY !== undefined ? window.simulatedPMouseY : "
+        "(typeof percussive_prev !== 'undefined' ? map(percussive_prev, 0, 1, height, 0) : "
+        "(typeof window.simulatedMouseY !== 'undefined' ? window.simulatedMouseY - 12 : pmouseY)))"
+    )
     audio_reactive_pressed = "((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))"
 
     adapted = adapted.replace(audio_reactive_mouseX, "___MOUSE_X_PLACEHOLDER___")
     adapted = adapted.replace(audio_reactive_mouseY, "___MOUSE_Y_PLACEHOLDER___")
+    adapted = adapted.replace(audio_reactive_pmouseX, "___PMOUSE_X_PLACEHOLDER___")
+    adapted = adapted.replace(audio_reactive_pmouseY, "___PMOUSE_Y_PLACEHOLDER___")
     adapted = adapted.replace(audio_reactive_pressed, "___MOUSE_PRESSED_PLACEHOLDER___")
 
-    adapted = re.sub(r'(?<!\.)\bmouseX\b', audio_reactive_mouseX, adapted)
-    adapted = re.sub(r'(?<!\.)\bmouseY\b', audio_reactive_mouseY, adapted)
-    adapted = re.sub(r'(?<!\.)\bpmouseX\b', audio_reactive_mouseX, adapted)
-    adapted = re.sub(r'(?<!\.)\bpmouseY\b', audio_reactive_mouseY, adapted)
-    adapted = re.sub(r'(?<!\.)\bmouseIsPressed\b', audio_reactive_pressed, adapted)
+    # 先行清理任何已被污染損壞的 simulatedMouse 賦值左值語法 (如 (window.simulatedMouseX ... ) = val)
+    adapted = re.sub(r'\([^\n]*?simulatedMouseX[^\n]*?\)\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedMouseX \1', adapted)
+    adapted = re.sub(r'\([^\n]*?simulatedMouseY[^\n]*?\)\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedMouseY \1', adapted)
+    adapted = re.sub(r'\([^\n]*?simulatedPMouseX[^\n]*?\)\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedPMouseX \1', adapted)
+    adapted = re.sub(r'\([^\n]*?simulatedPMouseY[^\n]*?\)\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedPMouseY \1', adapted)
+    adapted = re.sub(r'\([^\n]*?simulatedMouseX[^\n]*?\)\s*(\+\+|--)', r'window.simulatedMouseX\1', adapted)
+    adapted = re.sub(r'\([^\n]*?simulatedMouseY[^\n]*?\)\s*(\+\+|--)', r'window.simulatedMouseY\1', adapted)
+
+    # 優先處理賦值與自增自減操作，將目標轉為 window.simulatedMouseX / Y，防止三元運算子置於賦值左側引發 Invalid left-hand side in assignment
+    adapted = re.sub(r'(?<![\.\w])mouseX\s*\+\+', 'window.simulatedMouseX++', adapted)
+    adapted = re.sub(r'(?<![\.\w])mouseX\s*--', 'window.simulatedMouseX--', adapted)
+    adapted = re.sub(r'\+\+\s*mouseX\b(?!\.)', '++window.simulatedMouseX', adapted)
+    adapted = re.sub(r'--\s*mouseX\b(?!\.)', '--window.simulatedMouseX', adapted)
+
+    adapted = re.sub(r'(?<![\.\w])mouseY\s*\+\+', 'window.simulatedMouseY++', adapted)
+    adapted = re.sub(r'(?<![\.\w])mouseY\s*--', 'window.simulatedMouseY--', adapted)
+    adapted = re.sub(r'\+\+\s*mouseY\b(?!\.)', '++window.simulatedMouseY', adapted)
+    adapted = re.sub(r'--\s*mouseY\b(?!\.)', '--window.simulatedMouseY', adapted)
+
+    adapted = re.sub(r'(?<![\.\w])mouseX\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedMouseX \1', adapted)
+    adapted = re.sub(r'(?<![\.\w])mouseY\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedMouseY \1', adapted)
+    adapted = re.sub(r'(?<![\.\w])pmouseX\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedPMouseX \1', adapted)
+    adapted = re.sub(r'(?<![\.\w])pmouseY\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedPMouseY \1', adapted)
+
+    # Replace pmouse BEFORE mouse for remaining read-only expressions
+    adapted = re.sub(r'(?<![\.\w])pmouseX\b', audio_reactive_pmouseX, adapted)
+    adapted = re.sub(r'(?<![\.\w])pmouseY\b', audio_reactive_pmouseY, adapted)
+    adapted = re.sub(r'(?<![\.\w])mouseX\b', audio_reactive_mouseX, adapted)
+    adapted = re.sub(r'(?<![\.\w])mouseY\b', audio_reactive_mouseY, adapted)
+    adapted = re.sub(r'(?<![\.\w])mouseIsPressed\b(?!\s*=[^=])', audio_reactive_pressed, adapted)
 
     adapted = adapted.replace("___MOUSE_X_PLACEHOLDER___", audio_reactive_mouseX)
     adapted = adapted.replace("___MOUSE_Y_PLACEHOLDER___", audio_reactive_mouseY)
+    adapted = adapted.replace("___PMOUSE_X_PLACEHOLDER___", audio_reactive_pmouseX)
+    adapted = adapted.replace("___PMOUSE_Y_PLACEHOLDER___", audio_reactive_pmouseY)
     adapted = adapted.replace("___MOUSE_PRESSED_PLACEHOLDER___", audio_reactive_pressed)
 
     # 5. WebGL 判定
@@ -313,11 +453,12 @@ def adapt_and_repair_code_text(code, sketch_id=None):
     lines = adapted.split("\n")
     declared_top_vars = set()
     new_lines = []
+    GLSL_TYPES = {'float', 'int', 'uint', 'bool', 'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3', 'ivec4', 'bvec2', 'bvec3', 'bvec4', 'mat2', 'mat3', 'mat4', 'sampler2D', 'samplerCube'}
     for line in lines:
         m = re.match(r'^(\s*)(let|const)\s+([A-Za-z0-9_$]+)(.*)', line)
         if m:
             indent, kw, varname, rest = m.groups()
-            if varname in declared_top_vars:
+            if varname in declared_top_vars and varname not in GLSL_TYPES:
                 new_lines.append(f"{indent}var {varname}{rest}")
             else:
                 declared_top_vars.add(varname)
@@ -325,6 +466,40 @@ def adapt_and_repair_code_text(code, sketch_id=None):
         else:
             new_lines.append(line)
     adapted = "\n".join(new_lines)
+
+    # 7. 🚀 現代 ES 模組多分頁 (Multi-Tab ES Modules) 自動內聯平鋪轉譯
+    # 解決: Cannot use import statement outside a module 與跨分頁 import { ... } from "./shader.js" 沙盒解析失敗問題
+    if "// === Tab:" in adapted and re.search(r'\b(import|export)\b', adapted):
+        tabs = re.split(r'(?:// === Tab: ([^\n=]+) ===)', adapted)
+        if len(tabs) >= 3:
+            tab_names = set()
+            for i in range(1, len(tabs), 2):
+                t_name = tabs[i].strip()
+                tab_names.add(t_name)
+                if t_name.endswith('.js'):
+                    tab_names.add(t_name[:-3])
+            
+            def _inline_rel_import(match):
+                rel_path = match.group(2).strip().lstrip('./').lstrip('/')
+                rel_base = rel_path[:-3] if rel_path.endswith('.js') else rel_path
+                if rel_base in tab_names or rel_path in tab_names:
+                    return f"/* [Inlined Multi-Tab] {rel_path} */"
+                return match.group(0)
+
+            processed_parts = []
+            if tabs[0].strip():
+                processed_parts.append(tabs[0])
+            for i in range(1, len(tabs), 2):
+                tname = tabs[i].strip()
+                tbody = tabs[i+1]
+                # 將分頁內的相對引用轉為直接呼叫
+                tbody = re.sub(r'import\s+\{([^}]+)\}\s+from\s+[\'"](\.[^\'\"]+)[\'"];?', _inline_rel_import, tbody)
+                tbody = re.sub(r'import\s+\*\s+as\s+([A-Za-z0-9_$]+)\s+from\s+[\'"](\.[^\'\"]+)[\'"];?', _inline_rel_import, tbody)
+                # 將 export 聲明降級為一般全域宣告
+                tbody = re.sub(r'\bexport\s+(const|let|var|function|class)\b', r'\1', tbody)
+                tbody = re.sub(r'\bexport\s+default\s+', r'/* export default */ ', tbody)
+                processed_parts.append(f"// === Tab: {tname} ===\n" + tbody)
+            adapted = "\n".join(processed_parts)
 
     return adapted
 
@@ -335,7 +510,7 @@ class BatchImportWorker(QThread):
     item_finished = pyqtSignal(str, str, str)
     finished = pyqtSignal(list)
 
-    def __init__(self, items_to_import, save_dir, batch_id=None, batch_date=None, filter_options=None, history_mgr=None):
+    def __init__(self, items_to_import, save_dir, batch_id=None, batch_date=None, filter_options=None, history_mgr=None, speed_mode="smart", api_token=None):
         super().__init__()
         self.items = items_to_import
         self.save_dir = save_dir
@@ -343,65 +518,220 @@ class BatchImportWorker(QThread):
         self.batch_date = batch_date or datetime.datetime.now().strftime("%Y-%m-%d")
         self.filter_options = filter_options or DEFAULT_FILTER_OPTIONS
         self.history_mgr = history_mgr
+        self.speed_mode = speed_mode or "smart"
+        self.api_token = (api_token or "").strip()
+        self.is_aborted = False
         self.failed_list = []
         self.success_list = []
 
+    def stop(self):
+        self.is_aborted = True
+
     def run(self):
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
+        has_token = bool(self.api_token)
+        # 依是否有 Token 及速度模式設定間隔 (無 Token 限制在 10 req/min，即 ~7.0s/件；有 Token 可達 100 req/min，即 1.2s/件)
+        if has_token:
+            if self.speed_mode == "fast":
+                base_delay_range = (1.0, 1.8)
+                skip_delay_range = (0.5, 1.0)
+                max_retries = 6
+            elif self.speed_mode == "safe":
+                base_delay_range = (2.5, 4.0)
+                skip_delay_range = (1.2, 2.0)
+                max_retries = 8
+            else:  # smart
+                base_delay_range = (1.5, 2.5)
+                skip_delay_range = (0.8, 1.5)
+                max_retries = 8
+        else:
+            # 匿名未帶 Token 模式：嚴格遵循 10 req/min 上限，各作品間隔預設 7.0 ~ 9.0 秒
+            if self.speed_mode == "safe":
+                base_delay_range = (8.0, 11.0)
+                skip_delay_range = (4.0, 6.0)
+                max_retries = 8
+            elif self.speed_mode == "fast":
+                base_delay_range = (5.5, 7.0)
+                skip_delay_range = (3.0, 4.0)
+                max_retries = 6
+            else:  # smart
+                base_delay_range = (6.8, 8.8)
+                skip_delay_range = (3.5, 5.0)
+                max_retries = 8
+
+        adaptive_penalty = 0.0
+
+        session = requests.Session()
+        session_headers = {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Origin": "https://openprocessing.org",
+            "Referer": "https://openprocessing.org/"
         }
+        if self.api_token:
+            session_headers["Authorization"] = f"Bearer {self.api_token}"
+            self.log.emit("🔑 已啟用 OpenProcessing API Token 授權認證 (享 100 req/min 高速配額)", False)
+        session.headers.update(session_headers)
+
+        # 🛡️ 建立現有模組防重複索引庫 (URL / Sketch ID / 程式碼規格化指紋)
+        existing_urls = set()
+        existing_sketch_ids = set()
+        existing_code_fingerprints = {}  # hash -> module_name
+
+        def _get_norm_fp(c_str, h_str=""):
+            c_clean = re.sub(r'//.*|/\*.*?\*/', '', c_str or "", flags=re.DOTALL)
+            c_clean = "".join(c_clean.split())
+            h_clean = "".join((h_str or "").split())
+            return hashlib.sha256((c_clean + "|||" + h_clean).encode("utf-8")).hexdigest()
+
+        if os.path.exists(self.save_dir):
+            for ef in os.listdir(self.save_dir):
+                if ef.endswith(".json") and not ef.startswith("manifest") and ef not in ("modules_index.json", "module_usage_history.json"):
+                    ef_path = os.path.join(self.save_dir, ef)
+                    try:
+                        with open(ef_path, "r", encoding="utf-8") as jf:
+                            jd = json.load(jf)
+                            ju = jd.get("url", "").strip()
+                            if ju:
+                                existing_urls.add(ju)
+                                sm = re.search(r'/(\d+)', ju)
+                                if sm:
+                                    existing_sketch_ids.add(int(sm.group(1)))
+                            jc = jd.get("code", "")
+                            jch = jd.get("custom_html", "")
+                            if jc or jch:
+                                jh = _get_norm_fp(jc, jch)
+                                existing_code_fingerprints[jh] = ef[:-5]
+                    except Exception:
+                        pass
+        self.log.emit(f"🛡️ 防重複比對庫就緒：已載入 {len(existing_code_fingerprints)} 個現有視覺指紋與 {len(existing_sketch_ids)} 個作品 ID", False)
         
         for i, item in enumerate(self.items):
+            if self.is_aborted:
+                self.log.emit("🛑 批次收編作業已被使用者手動中止。", True)
+                break
+
             sketch_id = item["id"]
             title = item["title"] or f"op_{sketch_id}"
             url = item["url"]
+            title_og = title
+            code = ""
+            asset_names = []
+
+            # 🛡️ 1. URL / Sketch ID 預檢攔截 (完全免發請求，節省配額並杜絕重複)
+            if sketch_id in existing_sketch_ids or str(sketch_id) in existing_sketch_ids or url in existing_urls:
+                self.log.emit(f"⏩ 略過已收錄作品: 「{title}」(ID: {sketch_id} 已在庫存中)", False)
+                item_delay = random.uniform(*skip_delay_range)
+                continue
             
             self.progress.emit(i, f"正在下載「{title}」(ID: {sketch_id})...")
             self.log.emit(f"[{i+1}/{len(self.items)}] 正在下載「{title}」...", False)
+
+            item_delay = random.uniform(*base_delay_range)
             
             try:
-                embed_url = f"https://openprocessing.org/sketch/{sketch_id}/embed/"
-                resp = None
-                max_retries = 3
-                retry_delay = 3
+                sketch_data = None
+                code_objects = None
+                author = "未知作者"
+                
+                # 🚀 全面採用官方純淨 REST API (徹底杜絕 Cloudflare 403 阻擋)
+                api_meta_url = f"https://openprocessing.org/api/sketch/{sketch_id}"
+                api_code_url = f"https://openprocessing.org/api/sketch/{sketch_id}/code"
                 
                 for retry in range(max_retries + 1):
+                    if self.is_aborted:
+                        raise InterruptedError("使用者手動中止作業。")
                     try:
-                        resp = requests.get(embed_url, headers=headers, timeout=12)
-                        if resp.status_code == 429:
+                        resp_meta = session.get(api_meta_url, timeout=12)
+                        
+                        # 429 限流精確深度退避：等待完整的 60 秒滑動窗口重置，絕不放棄該作品
+                        if resp_meta.status_code == 429:
                             if retry < max_retries:
-                                wait_sec = retry_delay * (2 ** retry) + random.uniform(1.0, 2.5)
-                                self.log.emit(f"⚠️ [HTTP 429] 限流防護：將於 {wait_sec:.1f} 秒後進行第 {retry+1} 次重試...", True)
-                                self.msleep(int(wait_sec * 1000))
+                                wait_sec = 65.0 + random.uniform(5.0, 15.0) + (retry * 15.0)
+                                self.log.emit(
+                                    f"⚠️ [API 速率防護] 觸發 OpenProcessing 頻率上限 (429)！\n"
+                                    f"   ⏳ 正在安全冷卻 {wait_sec:.0f} 秒以等待 60s 配額窗口重置 (第 {retry+1}/{max_retries} 次)，完成後將自動無縫續傳「{title_og}」...",
+                                    True
+                                )
+                                total_ms = int(wait_sec * 1000)
+                                elapsed = 0
+                                while elapsed < total_ms:
+                                    if self.is_aborted:
+                                        raise InterruptedError("使用者手動中止作業。")
+                                    chunk = min(1000, total_ms - elapsed)
+                                    self.msleep(chunk)
+                                    elapsed += chunk
                                 continue
                             else:
-                                raise Exception("無法存取 OpenProcessing (HTTP 429 限流已達上限)")
-                        elif resp.status_code != 200:
-                            raise Exception(f"無法存取 OpenProcessing (HTTP {resp.status_code})")
-                        break
+                                raise Exception("無法存取 OpenProcessing (API 429 限流重試上限)")
+                        
+                        if resp_meta.status_code == 200:
+                            meta_json = resp_meta.json()
+                            resp_code = session.get(api_code_url, timeout=15)
+                            if resp_code.status_code == 429:
+                                if retry < max_retries:
+                                    wait_sec = 65.0 + random.uniform(5.0, 10.0)
+                                    self.log.emit(f"⏳ [代碼端點冷卻] 正在安全冷卻 {wait_sec:.0f} 秒後重新獲取代碼...", True)
+                                    self.msleep(int(wait_sec * 1000))
+                                    continue
+                            if resp_code.status_code == 401:
+                                if "Authorization" in session.headers:
+                                    session.headers.pop("Authorization", None)
+                                    self.api_token = ""
+                                    base_delay_range = (6.8, 8.8)
+                                    skip_delay_range = (3.5, 5.0)
+                                    self.log.emit(
+                                        f"⚠️ [API Token 已失效 (HTTP 401)] 代碼端點驗證失敗！\n"
+                                        f"   🔄 已自動卸載無效 Token，無縫切換為「公開匿名安全模式」重試「{title_og}」...",
+                                        True
+                                    )
+                                    self.msleep(1000)
+                                    continue
+                                else:
+                                    raise Exception("無法存取作品代碼庫 (HTTP 401 未授權)")
+                            if resp_code.status_code == 200:
+                                code_objects = resp_code.json()
+                                sketch_data = meta_json
+                                title_og = sketch_data.get("title", title)
+                                author = sketch_data.get("username", "未知作者")
+                                break
+                            else:
+                                raise Exception(f"無法讀取作品代碼庫 (HTTP {resp_code.status_code})")
+                        elif resp_meta.status_code == 401:
+                            if "Authorization" in session.headers:
+                                session.headers.pop("Authorization", None)
+                                self.api_token = ""
+                                base_delay_range = (6.8, 8.8)
+                                skip_delay_range = (3.5, 5.0)
+                                self.log.emit(
+                                    f"⚠️ [API Token 已失效 (HTTP 401)] 偵測到配置的 OP API Token 無效或已過期！\n"
+                                    f"   🔄 已自動卸載無效 Token，無縫降級為「公開匿名安全模式」重試下載「{title_og}」...",
+                                    True
+                                )
+                                self.msleep(1000)
+                                continue
+                            else:
+                                raise Exception("無法存取 OpenProcessing API (HTTP 401 未授權)")
+                        elif resp_meta.status_code == 404:
+                            raise Exception("作品不存在或作者已將其設為私密 (HTTP 404)")
+                        else:
+                            raise Exception(f"無法存取 OpenProcessing API (HTTP {resp_meta.status_code})")
                     except requests.exceptions.RequestException as req_err:
                         if retry < max_retries:
-                            self.msleep(3000)
+                            self.log.emit(f"⚠️ 網路請求微抖動 ({req_err})，5 秒後重試...", True)
+                            self.msleep(5000)
                         else:
                             raise req_err
                 
-                sketch_json = self.extract_js_object(resp.text, "sketch")
-                if not sketch_json:
-                    raise ValueError("無法在頁面中解析 sketch 核心資料。")
-                
-                sketch_data = json.loads(sketch_json)
-                title_og = sketch_data.get("title", title)
-                versions = sketch_data.get("versions", [])
-                if not versions or not versions[0].get("codeObjects", []):
-                    raise ValueError("作品代碼庫為空。")
+                if not code_objects or not sketch_data:
+                    raise ValueError("作品代碼庫為空或無法讀取。")
                 
                 def get_order_id(x):
                     val = x.get("orderID")
                     try: return float(val) if val is not None else 0
                     except (ValueError, TypeError): return 0
                     
-                sorted_objects = sorted(versions[0]["codeObjects"], key=get_order_id)
+                sorted_objects = sorted(code_objects, key=get_order_id)
                 
                 code = ""
                 custom_css = ""
@@ -428,26 +758,24 @@ class BatchImportWorker(QThread):
                     assets_dir = os.path.join(workspace_dir, "custom_visuals", "assets", str(sketch_id))
                     os.makedirs(assets_dir, exist_ok=True)
                     for asset in asset_names:
+                        if self.is_aborted: break
                         clean_asset = asset.lstrip("./")
                         asset_url = file_base + clean_asset
                         local_file_path = os.path.join(assets_dir, clean_asset)
                         os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
                         try:
-                            asset_resp = requests.get(asset_url, headers=headers, timeout=10)
+                            asset_resp = session.get(asset_url, timeout=10)
                             if asset_resp.status_code == 200:
                                 with open(local_file_path, "wb") as af:
                                     af.write(asset_resp.content)
+                            elif asset_resp.status_code == 429:
+                                self.log.emit(f"⚠️ 資產下載遇到 429 限流，暫緩重試: {clean_asset}", True)
+                                self.msleep(5000)
                         except Exception:
                             pass
+                        self.msleep(int(random.uniform(200, 400)))
                 
-                meta_matches = re.findall(r'<meta[^>]+property=["\']og:title["\'][^>]+content=["\'](.*?)["\']', resp.text, re.IGNORECASE)
-                author = "未知作者"
-                if meta_matches:
-                    content = meta_matches[0].replace("&amp;", "&").replace("&quot;", '"').replace("&#39;", "'")
-                    parts = content.split(" - ")
-                    if len(parts) >= 2: author = parts[1].strip()
-                if author == "未知作者" or not author:
-                    author = sketch_data.get("username", "未知作者")
+                author = sketch_data.get("username", "未知作者")
                 
                 # 依使用者選項執行視覺模組收錄資格檢測
                 tags_list = sketch_data.get("tags", [])
@@ -468,27 +796,50 @@ class BatchImportWorker(QThread):
                             ef.write(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - SKIPPED ({reject_reason}): {url} - {title_og}\n")
                     except Exception:
                         pass
+                    # 關鍵修復：即使略過模組，也賦予適度冷卻間隔，避免連續略過時對伺服器狂轟觸發 429 限流
+                    item_delay = random.uniform(*skip_delay_range)
                     continue
 
-                # 🎛️ 控制項自動無痕隱藏樣式注入 (Pure Canvas)
+                # 🎛️ 控制項自動無痕隱藏樣式注入 (Pure Canvas - 4K MV 極限隱藏)
                 if self.filter_options.get("hide_controls", True):
                     pure_canvas_css = (
-                        "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n"
+                        "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n"
                         ".dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n"
+                        ".tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n"
                         "[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n"
                         "[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n"
                         "[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n"
-                        "input, button, select, textarea, label, form {\n"
+                        "[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n"
+                        ".p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\n"
+                        "input, button, select, textarea, label, form, nav, header {\n"
                         "  display: none !important;\n"
                         "  visibility: hidden !important;\n"
                         "  opacity: 0 !important;\n"
                         "  pointer-events: none !important;\n"
+                        "  width: 0 !important;\n"
+                        "  height: 0 !important;\n"
+                        "  position: absolute !important;\n"
+                        "  left: -9999px !important;\n"
+                        "  top: -9999px !important;\n"
                         "}\n"
                     )
                     if "Pure Canvas" not in custom_css:
                         custom_css = pure_canvas_css + custom_css
 
                 adapted_code = adapt_and_repair_code_text(code, sketch_id=sketch_id)
+
+                # 🛡️ 實質程式碼重複性檢測 (防止 OpenProcessing 上的 Fork / 重複臨摹作業)
+                code_fp = _get_norm_fp(adapted_code, custom_html)
+                if code_fp in existing_code_fingerprints:
+                    existing_mod = existing_code_fingerprints[code_fp]
+                    self.log.emit(f"⚠️ 略過實質重複模組: 「{title_og}」(ID: {sketch_id}) 與現有模組「{existing_mod}」程式碼完全相同 (Fork/重複收錄)", False)
+                    try:
+                        with open(os.path.join(workspace_dir, "op_import_errors.txt"), "a", encoding="utf-8") as ef:
+                            ef.write(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - SKIPPED (DUPLICATE_CODE with {existing_mod}): {url} - {title_og}\n")
+                    except Exception:
+                        pass
+                    item_delay = random.uniform(*skip_delay_range)
+                    continue
                 
                 cleaned_title = re.sub(r'[^a-zA-Z0-9_]', '', title_og) or f"op_{sketch_id}"
                 candidate = f"{cleaned_title}.json"
@@ -500,6 +851,22 @@ class BatchImportWorker(QThread):
                 save_path = os.path.join(self.save_dir, candidate)
                 unique_name = candidate[:-5]
                 
+                # 🏷️ 標籤智慧增強 (Smart Tag Enrichment)
+                computed_tags = ["batch_import", "openprocessing", "audio_reactive", f"batch_{self.batch_date}"]
+                if isinstance(tags_list, list):
+                    for t in tags_list:
+                        t_clean = str(t).strip().lower()
+                        if t_clean and t_clean not in computed_tags:
+                            computed_tags.append(t_clean)
+
+                particle_keywords = ["particle", "particles", "stardust", "dust", "galaxy", "cosmic", "flowfield", "flow field", "attractor", "flock", "swarm", "physics", "dots"]
+                content_check = f"{title_og.lower()} {desc_text.lower()} {' '.join(computed_tags)} {url.lower()} {adapted_code[:2000].lower()}"
+                if any(pk in content_check for pk in particle_keywords):
+                    for pt in ["particle", "particles", "ambient_particle", "ambient", "ambient_compatible"]:
+                        if pt not in computed_tags:
+                            computed_tags.append(pt)
+                    self.log.emit(f"✨ [粒子標記] 模組「{cleaned_title}」已識別為粒子視覺，自動注入 Ambient 專屬標籤！", False)
+
                 data = {
                     "name": cleaned_title,
                     "code": adapted_code,
@@ -511,7 +878,7 @@ class BatchImportWorker(QThread):
                     "inline_assets": {},
                     "author": author,
                     "license": "CC BY-NC-SA",
-                    "tags": ["batch_import", "openprocessing", "audio_reactive", f"batch_{self.batch_date}"],
+                    "tags": computed_tags,
                     "url": url,
                     "batch_id": self.batch_id,
                     "batch_date": self.batch_date,
@@ -520,23 +887,35 @@ class BatchImportWorker(QThread):
                 
                 with open(save_path, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=4, ensure_ascii=False)
+
+                # 🛡️ 即時同步至防止重複索引集合中
+                existing_urls.add(url)
+                existing_sketch_ids.add(sketch_id)
+                existing_code_fingerprints[code_fp] = unique_name
                 
                 # 縮圖下載
                 thumb_dir = os.path.join(self.save_dir, "thumbnails")
                 os.makedirs(thumb_dir, exist_ok=True)
                 dest_thumb_path = os.path.join(thumb_dir, f"{unique_name}.jpg")
                 thumb_downloaded = False
-                for ext in [".jpg", ".png"]:
-                    try:
-                        thumb_url = f"https://openprocessing.org/usercontent/sketches/images/{sketch_id}{ext}"
-                        img_resp = requests.get(thumb_url, headers=headers, timeout=5)
-                        if img_resp.status_code == 200:
+                try:
+                    thumb_url = f"https://openprocessing.org/sketch/{sketch_id}/thumbnail"
+                    img_resp = session.get(thumb_url, timeout=6)
+                    if img_resp.status_code == 200 and len(img_resp.content) > 500:
+                        try:
+                            import io
+                            from PIL import Image as PILImage
+                            with PILImage.open(io.BytesIO(img_resp.content)) as im:
+                                im.convert("RGB").save(dest_thumb_path, "JPEG", quality=90)
+                                thumb_downloaded = True
+                        except Exception:
                             with open(dest_thumb_path, "wb") as img_f:
                                 img_f.write(img_resp.content)
                             thumb_downloaded = True
-                            break
-                    except Exception:
-                        continue
+                    elif img_resp.status_code == 429:
+                        self.msleep(1500)
+                except Exception:
+                    pass
                 
                 # 向批次歷史管理器實時登記
                 if self.history_mgr:
@@ -556,7 +935,13 @@ class BatchImportWorker(QThread):
                     "custom_css": custom_css, "save_dir": self.save_dir, "batch_id": self.batch_id
                 })
                 self.item_finished.emit(sketch_id, "SUCCESS", "")
+
+                # 若順利收錄，逐漸緩解自適應懲罰延遲
+                adaptive_penalty = max(0.0, adaptive_penalty - 0.25)
                 
+            except InterruptedError:
+                self.log.emit("🛑 批次收編已被使用者中止。", True)
+                break
             except Exception as e:
                 err_detail = traceback.format_exc()
                 self.log.emit(f"  [-] 【收編失敗】「{title}」: {e}", True)
@@ -565,8 +950,16 @@ class BatchImportWorker(QThread):
                     "id": sketch_id, "title": title, "url": url, "error": str(e),
                     "traceback": err_detail, "original_code": code if 'code' in locals() else "N/A"
                 })
-            
-            self.msleep(int(random.uniform(1200, 2500)))
+            finally:
+                # 保證每個項目之間必定進行冷卻間隔，徹底解決跳過不合規模組時 0ms 狂轟觸發 429 的問題
+                if not self.is_aborted:
+                    total_wait = item_delay + adaptive_penalty
+                    self.msleep(int(total_wait * 1000))
+        
+        try:
+            session.close()
+        except Exception:
+            pass
         
         # 觸發 SENTINEL 語義解析獨立子程序 (非同步處理)
         if self.success_list:
@@ -924,11 +1317,16 @@ class TestRunDialog(QDialog):
         self.history_mgr = history_mgr
         self.scope_name = scope_name or "全部模組"
         self.current_idx = 0
+        self.parent_app = parent
+        # 尋找真正具備 get_html_content 的主程式視窗 (向上遍歷父層)
+        p = parent
+        while p:
+            if hasattr(p, 'get_html_content'):
+                self.parent_app = p
+                break
+            p = p.parent() if hasattr(p, 'parent') and callable(p.parent) else None
         self.errors = []
         self.countdown = 15
-        self.parent_app = parent
-        
-        # 建立試運行審計與遙測日誌器
         self.logger = TestRunLogger(
             batch_id=self.batch_id,
             scope_name=self.scope_name,
@@ -1145,10 +1543,38 @@ class TestRunDialog(QDialog):
         self.status_label.setText(f"正在試運行中... 剩餘 {self.countdown} 秒")
         
         # 載入畫布 HTML
+        code_str = self.current_item.get("code", "")
+        custom_css = self.current_item.get("custom_css", "")
+        custom_html = self.current_item.get("custom_html", "")
+        inline_assets = self.current_item.get("inline_assets", {})
+
+        html = None
         if self.parent_app and hasattr(self.parent_app, 'get_html_content'):
-            html = self.parent_app.get_html_content(self.current_item["code"])
-        else:
-            html = f"<html><body><script src='custom_visuals/libs/p5.min.js'></script><script>{self.current_item['code']}</script></body></html>"
+            html = self.parent_app.get_html_content(
+                code_str,
+                custom_css=custom_css,
+                custom_html=custom_html,
+                inline_assets=inline_assets,
+                sketch_id=sketch_id
+            )
+        if not html:
+            try:
+                for w in QApplication.topLevelWidgets():
+                    if hasattr(w, 'get_html_content'):
+                        self.parent_app = w
+                        html = w.get_html_content(
+                            code_str,
+                            custom_css=custom_css,
+                            custom_html=custom_html,
+                            inline_assets=inline_assets,
+                            sketch_id=sketch_id
+                        )
+                        break
+            except Exception:
+                pass
+
+        if not html:
+            html = f"<html><body><script src='custom_visuals/libs/p5.min.js'></script><script>{code_str}</script></body></html>"
             
         from main import get_local_base_url
         self.web_view.setHtml(html, get_local_base_url())
@@ -1163,6 +1589,10 @@ class TestRunDialog(QDialog):
         self.countdown -= 1
         if self.countdown > 0:
             self.status_label.setText(f"正在試運行中... 剩餘 {self.countdown} 秒")
+            try:
+                self.web_view.page().runJavaScript("if (typeof window.triggerBeat === 'function') window.triggerBeat();")
+            except Exception:
+                pass
         else:
             self.timer.stop()
             self.status_label.setText("✨ 試運行完成，請選擇是否保留。")
@@ -1960,6 +2390,55 @@ class BatchImportDialog(QDialog):
         cb_btn_row.addWidget(btn_reset_defaults)
         f_layout.addLayout(cb_btn_row)
 
+        # ⏱️ 下載速率防護與限流保護控制列
+        rate_row = QHBoxLayout()
+        lbl_rate = QLabel("⏱️ 下載防限流模式：")
+        lbl_rate.setStyleSheet("color: #a855f7; font-weight: bold; font-size: 12px;")
+        rate_row.addWidget(lbl_rate)
+        
+        self.combo_speed_mode = QComboBox()
+        self.combo_speed_mode.addItem("🛡️ 智慧自適應模式 (無 Token 7~9s / 帶 Token 1.5s + 429 階梯退避)", "smart")
+        self.combo_speed_mode.addItem("🐢 穩健安全模式 (無 Token 8~11s 間隔，超大批次必備)", "safe")
+        self.combo_speed_mode.addItem("⚡ 快速衝刺模式 (需要 API Token，1.0~1.8s 高速收錄)", "fast")
+        self.combo_speed_mode.setStyleSheet("""
+            QComboBox { background-color: #18181b; color: #f4f4f5; border: 1px solid #27272a; border-radius: 4px; padding: 4px 8px; font-size: 12px; }
+            QComboBox::drop-down { border: none; }
+            QComboBox QAbstractItemView { background-color: #18181b; color: #f4f4f5; selection-background-color: #7c3aed; }
+        """)
+        rate_row.addWidget(self.combo_speed_mode)
+        f_layout.addLayout(rate_row)
+
+        # 🔑 OpenProcessing 官方 API Token（選填，可提速 10 倍解鎖 100 req/min）
+        token_row = QHBoxLayout()
+        lbl_token = QLabel("🔑 OP API Token：")
+        lbl_token.setStyleSheet("color: #38bdf8; font-weight: bold; font-size: 12px;")
+        token_row.addWidget(lbl_token)
+        self.input_api_token = QLineEdit()
+        self.input_api_token.setPlaceholderText("選填（貼上後提速 10 倍且不卡 429，可於 openprocessing.org/user/#edit 免費取得）")
+        self.input_api_token.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #27272a; border-radius: 4px; padding: 4px 8px; font-size: 11px;")
+        # 自動讀取本地已保存的 Token
+        token_file = os.path.join(workspace_dir, "op_api_token.txt")
+        if os.path.exists(token_file):
+            try:
+                with open(token_file, "r", encoding="utf-8") as tf:
+                    saved_token = tf.read().strip()
+                    if saved_token:
+                        self.input_api_token.setText(saved_token)
+            except Exception:
+                pass
+        token_row.addWidget(self.input_api_token)
+
+        btn_verify_token = QPushButton("🔍 測試 Token")
+        btn_verify_token.setStyleSheet("background-color: #27272a; color: #e4e4e7; border: 1px solid #3f3f46; border-radius: 4px; padding: 4px 10px; font-size: 11px;")
+        btn_verify_token.setToolTip("測試此 Token 是否有效以及能否正常存取 OpenProcessing 官方 API")
+        btn_verify_token.clicked.connect(self.verify_api_token)
+        token_row.addWidget(btn_verify_token)
+
+        self.lbl_token_status = QLabel("")
+        self.lbl_token_status.setStyleSheet("font-size: 11px;")
+        token_row.addWidget(self.lbl_token_status)
+        f_layout.addLayout(token_row)
+
         right_layout.addWidget(self.filter_group)
         
         right_layout.addWidget(QLabel("📋 待收編作品列表"))
@@ -1980,11 +2459,18 @@ class BatchImportDialog(QDialog):
         self.btn_import.setObjectName("btn_import")
         self.btn_import.setEnabled(False)
         self.btn_import.clicked.connect(self.start_batch_import)
+
+        self.btn_stop = QPushButton("⏹️ 停止收編")
+        self.btn_stop.setObjectName("btn_stop")
+        self.btn_stop.setEnabled(False)
+        self.btn_stop.setStyleSheet("background-color: #dc2626; border-color: #ef4444; color: white;")
+        self.btn_stop.clicked.connect(self.stop_batch_import)
         
         self.btn_close = QPushButton("關閉")
         self.btn_close.clicked.connect(self.close)
         
         action_bar.addWidget(self.btn_import)
+        action_bar.addWidget(self.btn_stop)
         action_bar.addWidget(self.btn_close)
         right_layout.addLayout(action_bar)
         
@@ -2250,14 +2736,59 @@ class BatchImportDialog(QDialog):
                 
         if not selected: return
         self.btn_import.setEnabled(False)
+        self.btn_stop.setEnabled(True)
+        self.combo_speed_mode.setEnabled(False)
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, len(selected))
         
         # 發起獨立日期收編批次
         source_url = self.url_input.text().strip()
         filter_opts = self.get_filter_options()
+        speed_mode = self.combo_speed_mode.currentData() or "smart"
+        api_token = self.input_api_token.text().strip() if hasattr(self, 'input_api_token') else ""
+        if not api_token:
+            token_file = os.path.join(workspace_dir, "op_api_token.txt")
+            if os.path.exists(token_file):
+                try:
+                    with open(token_file, "r", encoding="utf-8") as tf:
+                        api_token = tf.read().strip()
+                except Exception:
+                    pass
+        elif api_token:
+            try:
+                with open(os.path.join(workspace_dir, "op_api_token.txt"), "w", encoding="utf-8") as tf:
+                    tf.write(api_token)
+            except Exception:
+                pass
+        
         batch_id, batch_date = self.history_mgr.start_new_batch(source_url, filter_opts)
         self.log_to_console(f"🛡️ 【批次隔離已就緒】批次 ID: {batch_id} (日期: {batch_date})，歷史庫存受強制保護中！")
+        self.log_to_console(f"⏱️ 【防限流設定】當前模式: {self.combo_speed_mode.currentText()}")
+        if api_token:
+            # 啟動前進行 2 秒輕量快速預檢
+            token_valid = True
+            try:
+                r_check = requests.get(
+                    "https://openprocessing.org/api/sketch/2625",
+                    headers={
+                        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+                        "Authorization": f"Bearer {api_token}"
+                    },
+                    timeout=3
+                )
+                if r_check.status_code == 401:
+                    token_valid = False
+            except Exception:
+                pass
+
+            if not token_valid:
+                self.log_to_console("⚠️ 【Token 失效警告】填寫的 OP API Token 已過期或無效 (HTTP 401)！已自動略過該 Token，改以公開匿名安全模式進行收編...", True)
+                api_token = ""
+            else:
+                self.log_to_console("🔑 【已載入 API Token】已通過官方認證，解鎖 100 req/min 高速官方認證配額！")
+        
+        if not api_token:
+            self.log_to_console("ℹ️ 【未配置 API Token】以安全呼吸間隔 (10 req/min) 穩定運行，若遇 429 將自動等待 65 秒窗口重置。")
 
         self.worker = BatchImportWorker(
             selected,
@@ -2265,16 +2796,78 @@ class BatchImportDialog(QDialog):
             batch_id=batch_id,
             batch_date=batch_date,
             filter_options=filter_opts,
-            history_mgr=self.history_mgr
+            history_mgr=self.history_mgr,
+            speed_mode=speed_mode,
+            api_token=api_token
         )
         self.worker.progress.connect(lambda idx, txt: self.progress_bar.setValue(idx))
         self.worker.log.connect(self.log_to_console)
         self.worker.finished.connect(self.on_import_finished)
         self.worker.start()
 
+    def verify_api_token(self):
+        token = self.input_api_token.text().strip() if hasattr(self, 'input_api_token') else ""
+        if not token:
+            self.lbl_token_status.setStyleSheet("color: #94a3b8;")
+            self.lbl_token_status.setText("（留空以匿名模式收編）")
+            return
+        self.lbl_token_status.setStyleSheet("color: #eab308;")
+        self.lbl_token_status.setText("⏳ 檢測中...")
+        QApplication.processEvents()
+        try:
+            r = requests.get(
+                "https://openprocessing.org/api/sketch/2625",
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+                    "Authorization": f"Bearer {token}"
+                },
+                timeout=4
+            )
+            if r.status_code == 200:
+                self.lbl_token_status.setStyleSheet("color: #22c55e; font-weight: bold;")
+                self.lbl_token_status.setText("✅ 有效 (100 req/min)")
+                try:
+                    with open(os.path.join(workspace_dir, "op_api_token.txt"), "w", encoding="utf-8") as tf:
+                        tf.write(token)
+                except Exception:
+                    pass
+            elif r.status_code == 401:
+                self.lbl_token_status.setStyleSheet("color: #ef4444; font-weight: bold;")
+                self.lbl_token_status.setText("❌ 無效或已過期 (HTTP 401)")
+            else:
+                self.lbl_token_status.setStyleSheet("color: #f97316;")
+                self.lbl_token_status.setText(f"⚠️ 狀態: {r.status_code}")
+        except Exception as e:
+            self.lbl_token_status.setStyleSheet("color: #f97316;")
+            self.lbl_token_status.setText("⚠️ 連線超時")
+
+    def stop_batch_import(self):
+        if hasattr(self, 'worker') and self.worker.isRunning():
+            self.btn_stop.setEnabled(False)
+            self.log_to_console("🛑 正在傳送中止訊號，當前作品完成後將安全停止...", True)
+            self.worker.stop()
+
+    def closeEvent(self, event):
+        if hasattr(self, 'worker') and self.worker.isRunning():
+            reply = QMessageBox.question(
+                self, "確認停止", "批次收編仍在進行中，關閉視窗將中止收編作業，是否確定關閉？",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                self.worker.stop()
+                self.worker.wait(2000)
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
+
     def on_import_finished(self, failed):
         self.progress_bar.setValue(self.progress_bar.maximum())
         self.btn_import.setEnabled(True)
+        self.btn_stop.setEnabled(False)
+        self.combo_speed_mode.setEnabled(True)
         self.existing_urls = self.get_existing_urls()
         if self.refresh_callback:
             self.refresh_callback()

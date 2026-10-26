@@ -1,0 +1,62 @@
+{
+    "name": "MetalWave_252",
+    "code": "// === Tab: mySketch ===\n // by SamuelYAN\n // more works //\n // https://twitter.com/SamuelAnn0924\n // https://www.instagram.com/samuel_yan_1990/\n\n var ranges;\n let seed = Math.random() * 1241;\n var mySize;\nlet str_wei = 0;\nlet x_space;\n\n // colors\n let colors0 = \"281914-1a1a1a-202020-242e30\".split(\"-\").map((a) => \"#\" + a);\n let colors1 = \"fef9fb-fafdff-ffffff-fcfbf4-f9f8f6\".split(\"-\").map((a) => \"#\" + a);\n let colors2 = \"8c75ff-c553d2-2dfd60-2788f5-23054f-f21252-8834f1-c4dd92-184fd3-f9fee2-2E294E-541388-F1E9DA-FFD400-D90368-e9baaa-ffa07a-164555-ffe1d0-acd9e7-4596c7-6d8370-e45240-21d3a4-3303f9-cd2220-173df6-244ca8-a00360-b31016\".split(\"-\").map((a) => \"#\" + a);\n let color1, color2;\n let colorselet = [];\n let plus, margin;\n let tile_count = 10;\n let h_size;\n\n function setup() {\n \t// pixelDensity(5);\n \trandomSeed(seed);\n \tmySize = max(windowWidth, windowHeight);\n \tcreateCanvas(1112, 834);\n \tbackground(\"#202020\");\n \tmargin = mySize / 50;\n \tranges = random([100,150,200,250]);\n \tcolor1 = random(colors1);\n \tcolor2 = random(colors2);\n \tplus = 0;\n \tcolorselet[0] = random(colors2);\n \tcolorselet[1] = random(colors2);\n \tcolorselet[2] = random(colors2);\n \t//colorselet[3] = random(colors2);\n \th_size = int(random(200, 100));\n\t x_space = int(random(20,50));\n }\n\n function draw() {\n \t// background(\"#202020\");\n \trandomSeed(seed);\n \tnoiseSeed(seed);\n\n \tnoFill();\n \tlet H = random(1.25, 0.75) / 5;\n \tlet aa = random(1, 0.8) * 1.25;\n \tlet res = random(0.005, 0.001);\n \tfor (let i = 0; i < ranges; i++) {\n \t\tstrokeWeight(str_wei);\n \t\tstroke(random(colorselet));\n \t\tif (ranges % 3 == 0) {\n \t\t\tdrawingContext.shadowColor = random(colors0);\n \t\t\tdrawingContext.shadowOffsetX = str_wei;\n \t\t\tdrawingContext.shadowOffsetY = str_wei;\n \t\t\tdrawingContext.shadowBlur = 0;\n \t\t} else {\n \t\t\tdrawingContext.shadowColor = random(colors1);\n \t\t\tdrawingContext.shadowOffsetX = str_wei;\n \t\t\tdrawingContext.shadowOffsetY = str_wei;\n \t\t\tdrawingContext.shadowBlur = 0;\n \t\t}\n\n \t\tfor (let x = -width * 3; x < width * 3; x += x_space) {\n \t\t\tlet n = noise(x * 0.01, i * 0.01, frameCount * res);\n \t\t\tlet y = map(n, -0.25, 1, height * aa, height * H);\n \t\t\tpoint(x + 10 * (plus - 5), y - plus);\n \t\t}\n \t}\n  if(str_wei <4){\n\t\tstr_wei += 0.01;\n\t}\n\n \tif (plus < 2 * height / h_size) {\n \t\tplus += random(0.1, 0.05);\n\t\t\n \t} else {\n \t\tdrawingContext.shadowColor = random(colors1);\n \t\tdrawingContext.shadowOffsetX = 0;\n \t\tdrawingContext.shadowOffsetY = 0;\n \t\tdrawingContext.shadowBlur = 0;\n\n \t\t//frame\n\n \t\tnoFill();\n \t\tstroke(\"#202020\");\n \t\tstrokeWeight(margin);\n \t\t//rect(0, 0, width, height);\n \t\tnoLoop();\n \t}\n }\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\n \n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "RITSUKO",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2764231",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:03:38",
+    "expressive_profile": {
+        "module_id": "MetalWave_252_1.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                135.0,
+                15.0
+            ],
+            "mean_lightness": 0.0,
+            "mean_chroma": 0.0,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.05,
+            "curl_vorticity": 0.005,
+            "divergence": 0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 17:40:04"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Classic Spirit Foundation.mp4"
+    ],
+    "used_count": 1
+}

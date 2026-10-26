@@ -1,0 +1,22 @@
+{
+    "name": "CliffordAttractor",
+    "code": "// === Tab: mySketch ===\nlet parameters = {\n\t\"para0\": 1.24,\n\t\"para1\": -1.25,\n\t\"para2\": -1.81,\n\t\"para3\": -1.91,\n\t\"color\": { h: 0, s: 1, v: 1 },\n\t\"dark mode\": true\n}\nlet canvasSize = 750\nlet hitsDict = {}\nlet hits;\nlet x = 0;\nlet y = 0;\n\nfunction setup() {\n\tcreateCanvas(canvasSize, canvasSize);\n\tcolorMode(HSB, 100)\n\tconst gui = new dat.GUI;\n\tfor (let i = 0; i < 4; i++) {\n\t\tgui.add(parameters, \"para\" + i.toString()).min(-3).max(3).step(0.01).name(\"parameter\" + (i + 1).toString()).onChange(redraw);\n\t}\n  gui.addColor(parameters, 'color').onFinishChange(redraw);\n\tgui.add(parameters, \"dark mode\").onFinishChange(redraw);\n\tgui.add({onclick: () => {\n\t\tparameters[\"para\"] = []\n\t\tfor (let i = 0; i < 4; i++) {\n\t\t\tparameters[\"para\" + i.toString()] = random(0, 1) + random([1, -2])\n\t\t}\n\t\tparameters[\"color\"][\"h\"] = random(0, 360)\n\t\t// parameters[\"dark mode\"] = random([true, false])\n\t\tredraw()\n\t\tfor (let controller of gui.__controllers) {\n\t\t\tcontroller.updateDisplay();\n\t\t}\n\t}}, 'onclick').name('ROLL!');\n\tgui.add({onclick: () => {\n\t\tsaver()\n  }}, 'onclick').name('SAVE');\n}\n\nfunction draw() {\n\tlet paraString = \"\"\n\tfor (let i = 0; i < 4; i++) {\n\t\tparaString += parameters[\"para\" + i.toString()].toString() + \",\"\n\t}\n\tif (!(paraString in hitsDict)) hitsDict[paraString] = Array(canvasSize).fill(0).map(x => Array(canvasSize).fill(0));\n\thits = hitsDict[paraString]\n\tif (parameters[\"dark mode\"]) background(0);\n\telse background(255);\n\timage(getImage(), 0, 0);\n}\n\n// Get next position\nfunction next(x, y) {\n\tlet nx = (sin(parameters[\"para0\"]*y) + parameters[\"para2\"] * cos(parameters[\"para0\"]*x))\n\tlet ny = (sin(parameters[\"para1\"]*x) + parameters[\"para3\"] * cos(parameters[\"para1\"]*y))\n\treturn [nx, ny]\n}\n\nfunction getImage() {\n\t// Calculate hits\n\tlet scale = 1\n\tfor (let round = 0; round < 5*10**3; round++) {\n\t\t[x, y] = next(x, y)\n\t\timgX = int(map(x, -4, 4, 0, canvasSize));\n\t\timgY = int(map(y, -4, 4, 0, canvasSize));\n\t\thits[imgX][imgY] += scale;\n\t}\n\tlet maxHits = max(hits.map(x => max(x)))\n\n\t// Create image by hits\n\tlet img = createImage(canvasSize, canvasSize);\n\timg.loadPixels();\n\tfor (let m = 0; m < canvasSize; m++) {\n\t\tfor (let n = 0; n < canvasSize; n++) {\n\t\t\tlet num = hits[m][n];\n\t\t\tif (num == 0) continue;\n\t\t\tnum = map(log(num), 0, log(maxHits), 0, 1);\n\t\t\tif (parameters[\"dark mode\"]) img.set(m, n, color(map(parameters[\"color\"][\"h\"], 0, 360, 0, 100), 100-num*90, 40+num*60));\n\t\t\telse img.set(m, n, color(map(parameters[\"color\"][\"h\"], 0, 360, 0, 100), 10+num*90, 100-num*60));\n\t\t\t\n\t\t}\n\t}\n\timg.updatePixels();\n\treturn img\n}\n\nfunction saver(){\n  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2239364",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:15:33"
+}

@@ -1,0 +1,24 @@
+{
+    "name": "Bolides",
+    "code": "// === Tab: mySketch ===\nlet bol;  // declare le tableau bol composé d'objets de classe Bolide\n\nvoid setup() {\n  size(400, 400);\n  bol=new Bolide [8]; // initialise la longueur du tableau bol\n  for (int i=0; i<bol.length; i++) { // crée le tableau bol\n    bol[i]=new Bolide();\n  }\n}\n\nvoid draw () {  \n  background(255);\n  for (int i=0; i<bol.length; i++) { // appelle les fonctions de tous les objets du tableau bol à la fois\n    //bol[i].deplace(); // ne pas utiliser si suisSouris est utilisé\n    bol[i].suisSouris(); // ne pas utiliser si deplace est utilisé\n    bol[i].affiche();\n    //bol[i].limite();  // ne pas utiliser si rebondit est utilisé\n    bol[i].rebondit(); // ne pas utiliser si limite est utilisé\n  }\n}\n\nclass Bolide {  // déclare la classe d'objets let PVector position; // ces objets sont composés d'objets PVector\n  PVector velocite;\n  PVector acceleration;\n\n  Bolide() { // initialise les PVector pour chaque objet de classe Bolide\n    position=new PVector(random(width), random(height));\n    velocite=new PVector(0, 0);\n    acceleration=new PVector(0, 0);  // si l'accélération est constante, on a besoin d'une très petite valeur par ex: velocite(0,2) acceleration(0.01,0)\n    // on peut utiliser PVector.random() pour une accélération aléatoire, voir ci-dessous\n    // l'accélération peut aussi suivre la souris\n  }\n\n  // declare les fonctions applicables aux objets de la classe let function deplace() { \n    acceleration=PVector.random2D(); // préciser 2D pour ne pas avoir trois valeurs\n    velocite.add(acceleration); // on modifie la vélocité grâce à acceleration\n    velocite.limit(5); // limite les déplacements à cinq pixels max\n    position.add(velocite); // on modifie la position grâce à velocite\n  }\n\n  function suisSouris() { // l'accélération dépend des mouvements de la souris\n    PVector souris=new PVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n    souris.sub(position); // le vecteur pointe vers la souris, mais il a une trop grande magnitude\n    souris.setMag(0.2);  // on normalise le vecteur souris puis on le divise par cinq\n    acceleration=souris;  // l'accélération dépend de la position de la souris\n    velocite.add(acceleration); // on modifie la vélocité grâce à acceleration\n    velocite.limit(5); // limite les déplacements à cinq pixels max\n    position.add(velocite); // on modifie la position grâce à velocite\n  }\n\n  function limite() { // si le bolide sort de la fenêtre, il entre à nouveau par le côté opposé\n    if (position.x>width) position.x=0;\n    if (position.x<0) position.x=width;\n    if (position.y>height) position.y=0;\n    if (position.y<0) position.y=height;\n  }\n  \n  function rebondit() { // on teste si les coordonnées de chaque objet sortent de la fenêtre\n    if (position.x>width || position.x<0) {\n      velocite.x=velocite.x*-1;  // on inverse le sens de déplacement\n    }\n    if (position.y>height || position.y<0) {\n      velocite.y=velocite.y*-1;\n    }\n  }\n\n  function affiche() {  // les objets de la classe let sont des cercles gris de 8 px\n    noStroke();    \n    fill(25);\n    ellipse(position.x, position.y, 8, 8);\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "apolline",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/657087",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:17:33",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

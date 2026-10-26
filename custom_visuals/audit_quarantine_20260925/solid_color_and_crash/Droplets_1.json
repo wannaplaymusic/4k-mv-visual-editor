@@ -1,0 +1,24 @@
+{
+    "name": "Droplets",
+    "code": "// === Tab: mySketch ===\ng = 0.01\nairR = 0.01\n\nvolume = 3;\n\nrocks = [];\ndroplets = [];\n\npress = false\n\nfunction setup() {\n\tcreateCanvas(windowWidth -800, windowHeight);\n\tbackground(255);\n\tnoStroke();\n\n\n\trocks.push(new rock(700, 500, 100))\n\trocks.push(new rock(800, 400, 50))\n\trocks.push(new rock(790, 700, 120))\n\trocks.push(new rock(820, 600, 70))\n}\n\n\nfunction splitDrop(drop, i){\n\tdroplets.splice(i, 1);\n\t\n\tif (drop.size > 3){\n\t\tnewSize = drop.size - 2\n\n\t\tfor (var i=0; i < random(1,3); i++){\n\t\t\tdroplets.push(new droplet(drop.pos.x, drop.pos.y, newSize, createVector(random(drop.v.x * 0.9, drop.v.x * 1.1) + random(-2, 2), drop.v.y * -random(0.2, 0.4))))\n\t\t}\n\t}\n\t\n\n}\n\nfunction collide(drop, i){\n\n\t\n\tfor (var j=0; j<rocks.length; j++){\n\t\tif (collideCircleCircle(drop.pos.x, drop.pos.y, drop.size, rocks[j].pos.x, rocks[j].pos.y, rocks[j].size)){\n\t\t\tsplitDrop(drop,i)\n\t\t}\n\t}\n\t\n}\n\n\nfunction draw() {\n\tbackground(0);\n\t\n\n\t\n\t\n\t//createDroplets\n\tfor (var i=0; i<volume; i++){\n\t\tdroplets.push(new droplet(530, 110 + random(-3, 3), 8, createVector(random(3,5))))\n\t}\n\t\n\tfor (var i=0; i<droplets.length; i++){\n\t\t\n\t\t\n\t\tdroplets[i].update()\n\t\t\n\t\t\n\t\tif (droplets[i].life <= 0){\n\t\t\tdroplets.splice(i,1);\n\t\t} else {\n\t\t\tcollide(droplets[i], i)\n\t\t}\n\t}\n\t\n\t\n\tfor (var j=0; j<rocks.length; j++){\n\t\trocks[j].draw()\n\t}\n\t\n\t\t//drawPipe\n\tfill(255,0,0);\n\trect(400,100, 120, 20);\n\trect(520,95, 20, 30);\n}\n\n\n\nfunction mousePressed() {\n\tpress = true;\n}\nfunction mouseReleased(){\n    press = false;\n}\n\n// === Tab: droplet ===\nfunction droplet (x, y, s, vel){\n\tthis.pos = createVector(x,y);\n\tthis.size = s;\n\tthis.v = createVector(vel.x,vel.y);\n\tthis.a = createVector(0,0);\n\tthis.life = 300\n\t\n\tthis.update = function(){\n\n\t\t\n\t\tthis.a = createVector(this.v.x * -airR, g*this.size);\n\t\tthis.v.add(this.a);\n\t\tthis.pos.add(this.v);\n\t\t\n\t\tthis.draw()\n\t\tthis.life -= 1\n\t}\n\t\n\tthis.draw = function(){\n\n\t\tfill(0,(10-this.size) * 40, 235);\n\t\tellipse(this.pos.x, this.pos.y, this.size);\n\t}\n\t\n\n}\n\n// === Tab: rock ===\nfunction rock(x, y, s){\n\tthis.pos = createVector(x,y)\n\tthis.size = s\n\t\n\tthis.draw = function(){\n\t\tfill(200,200,200);\n\t\tellipse(this.pos.x, this.pos.y, this.size);\n\t\t\n\t\tif (press == true){\n\t\t\tif (collidePointCircle((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),this.pos.x,this.pos.y,this.size)){\n\t\t\t\tthis.pos.x = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))\n\t\t\t\tthis.pos.y = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))\n\t\t\t}\n\t\t}\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "418ImATeapot",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/766175",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:58:07",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

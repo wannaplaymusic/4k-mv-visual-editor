@@ -1,0 +1,27 @@
+{
+    "name": "TheArchitect",
+    "code": "// === Tab: mySketch ===\n// let can change with these values:\n\nlet sides = 4;\nlet delay = 40; // this will automatically reduce over time\n\nlet bg = color(230);\nlet fg = color(0);\n\nlet targetFps = 30;\n\n// let don't mess with what's below unless you know what you're doing :)\n\nfunction setup() {\n  //createCanvas(windowWidth, windowHeight, WEBGL);\n\tcreateCanvas(1112, 834);\n  strokeWeight(4);\n  frameRate(targetFps);\n}\n\nlet primes = [2, 3, 5, 7, 11, 13];\n\nlet nowSide = 0;\nlet remain = 0;\nlet xs = new Array(200);\nlet ys = new Array(200);\n\nlet x = 0, y = 0;\nlet ptx = x, pty = y, tx = x, ty = y;\nlet number = 0;\nlet rot = 0;\nlet zoom = 0;\n\nfunction draw() {\n\tif(mousePressed)  {\n\t\tzoom+=(0.6-zoom)/16;\n\t} else  {\n\t\tzoom+=(1-zoom)/16;\n\t}\n  ptx+=(x-ptx)/64;\n  pty+=(y-pty)/64;  \n  tx+=(ptx-tx)/64;\n  ty+=(pty-ty)/64;\n  background(bg);\n  rot+=0.0005;\n\n  translate(width/2, height/2);\n  rotate(rot);\n\tscale(zoom);\n\n  translate(-tx, -ty);\n  number += (float(xs.length) - number)/16;\n  stroke(lerpColor(bg, fg, 0.8));\n  for (i = 0; i<xs.length-1; i++) {\n    line(xs[i], ys[i], xs[i+1], ys[i+1]);\n  }\n\n  stroke(fg);\n  let last = xs.length-1;\n  if (last>=0) {\n    let v = 1-remain/delay;//(cos(remain/delay*PI)+1)/2; // smooth motion\n    line(xs[last], ys[last], \n      lerp(xs[last], x, v), \n      lerp(ys[last], y, v));\n  }\n  \n  remain--;\n  if (remain<=0) {\n    delay += (5-delay)/32; // faster every time!\n    \n    for(i = 0; i<xs.length-1; i++)  {\n      xs[i] = xs[i+1];\n      ys[i] = ys[i+1];\n    }\n\n    xs[xs.length-1] = x;\n    ys[ys.length-1] = y;\n    let magnitude = primes[int(random)(primes.length)] * 30;\n    nowSide = (nowSide+1)%sides;\n\t\tif(nowSide<0.1)  {\n\t\t\tmagnitude+=60;\n\t\t}\n    x+=cos(TWO_PI*float(nowSide)/sides)*magnitude;\n    y+=sin(TWO_PI*float(nowSide)/sides)*magnitude;\n    remain = delay;\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1941061",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:33:53",
+    "used_in_videos": [
+        "Azure Static.mp4",
+        "Fusion Rift Dominion.mp4"
+    ],
+    "used_count": 2
+}

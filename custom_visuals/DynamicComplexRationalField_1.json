@@ -1,0 +1,34 @@
+{
+    "name": "DynamicComplexRationalField",
+    "code": "// === Tab: mySketch ===\n// Inspired (and helped) by @mathelirium on http://x.com/mathelirium/status/1976867742742397176\n\nlet theShader;\n\nfunction preload() {\n  vertShader = `\n  precision highp float;\n  attribute vec3 aPosition;\n  attribute vec2 aTexCoord;\n  varying vec2 vTexCoord;\n  void main() {\n    vTexCoord = aTexCoord;\n    gl_Position = vec4(aPosition, 1.0);\n  }`;\n\n  fragShader = `\n  precision highp float;\n\n  uniform vec2 u_resolution;\n  uniform float u_time;\n  varying vec2 vTexCoord;\n\n  // Complex functions\n  vec2 c_add(vec2 a, vec2 b){ return a + b; }\n  vec2 c_sub(vec2 a, vec2 b){ return a - b; }\n  vec2 c_mul(vec2 a, vec2 b){ return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x); }\n  vec2 c_div(vec2 a, vec2 b){\n\t  float d = b.x*b.x + b.y*b.y + 1e-6;\n    return vec2((a.x*b.x + a.y*b.y)/d, (a.y*b.x - a.x*b.y)/d);\n  }\n  float c_mag(vec2 z){ return length(z); }\n  float c_arg(vec2 z){ return atan(z.y, z.x); }\n\n  void main(){\n    // normalize and center coordinates in complex plane\n    vec2 uv = vTexCoord * 2.0 - 1.0;\n    uv.x *= u_resolution.x / u_resolution.y;\n    vec2 z = uv;\n\t\t\n    // zeros and poles a_j and b_k\n    vec2 zeros[2];\n    vec2 poles[2];\n\n    zeros[0] = 0.6 * vec2(sin(u_time * 0.8), cos(u_time * 0.6));\n    zeros[1] = 0.6 * vec2(sin(u_time * 0.9 + 2.1), cos(u_time * 0.7 + 1.5));\n\n    poles[0] = 0.6 * vec2(sin(u_time * 0.7 + 1.0), cos(u_time * 0.8 + 0.5));\n    poles[1] = 0.6 * vec2(sin(u_time * 1.1 + 3.0), cos(u_time * 1.3 + 2.0));\n\n    // implementing sum-based rational function\n    // S(z) = Σ [w_j / (z - a_j)] - Σ [v_k / (z - b_k)]\n    // each zero acts like a “positive charge”\n    // each pole acts like a “negative charge”\n    vec2 S = vec2(0.0);\n    for (int i = 0; i < 2; i++) {\n      vec2 wj = vec2(1.0, 0.0); // equal weights\n      S += c_div(wj, c_sub(z, zeros[i]));\n    }\n    for (int i = 0; i < 2; i++) {\n      vec2 vk = vec2(1.0, 0.0);\n      S -= c_div(vk, c_sub(z, poles[i]));\n    }\n\n    // extract magnitude |S(z)| and phase arg(S(z))\n    float mag = c_mag(S);\n    float arg = c_arg(S);\n\n    // logarithmic scaling to control field extreems\n    float m = log(mag + 1.0);\n    float inv = log(1.0/mag + 1.0);\n    float balance = 0.4 * (m + inv);\n    float bright = pow(balance, 2.0);\n\n    // color based on phase\n    vec3 base = 0.6 + 0.4 * cos(arg + vec3(0.0, 2.0, 4.0) + u_time * 0.2);\n\n    // iso phase white field contour lines\n    // sin(arg * PI) ≈ 0 gives phase boundaries\n    \n    float shimmer = 0.5 + 0.5 * sin(u_time * 2.0 + mag * 3.0);\n    float lines = smoothstep(0.12, 0.0, abs(sin(arg * 3.14159 * 1.0 + shimmer)));\n    base = mix(base, vec3(1.0), lines * 0.9);\n\n    // localized brightness enhance near poles and zeros\n    // as like electric field intensity\n    float near = 0.0;\n    for (int i=0; i<2; i++) {\n      near += exp(-5.0 * length(z - zeros[i]));\n      near += exp(-5.0 * length(z - poles[i]));\n    }\n    bright += 0.2 * near;\n\n    // adding a vignette\n    vec3 color = base * bright;\n    float vignette = smoothstep(1.1, 0.3, length(uv));\n    color *= vignette;\n\n    gl_FragColor = vec4(color, 1.0);\n  }`;\n}\n\nfunction setup() {\n  createCanvas(700, 700, WEBGL);\n  background(0, 0, 40);\n  theShader = createShader(vertShader, fragShader);\n}\n\nfunction draw() {\n  shader(theShader);\n  theShader.setUniform(\"u_time\", millis() / 3000.0);\n  theShader.setUniform(\"u_resolution\", [width, height]);\n  beginShape(TRIANGLE_STRIP);\n  vertex(-1, -1, 0, 0, 0);\n  vertex(1, -1, 0, 1, 0);\n  vertex(-1, 1, 0, 0, 1);\n  vertex(1, 1, 0, 1, 1);\n  endShape();\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "noel",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2755154",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:47:51",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Authentic Essence Pulse.mp4"
+    ],
+    "used_count": 1,
+    "is_starred": false
+}

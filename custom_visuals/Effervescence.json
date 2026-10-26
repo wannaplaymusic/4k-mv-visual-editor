@@ -1,0 +1,67 @@
+{
+    "name": "Effervescence",
+    "code": "// === Tab: mySketch ===\n/*\nAuthor: Adam Santone, PhD\nDate: 2024\nNotes:\n - Created with help from StarChat2 AI:\n - https://huggingface.co/spaces/HuggingFaceH4/starchat2-playground\n*/\n\n\nlet particles = [];\nconst MAX_PARTICLES = 500;\nconst MIN_SIZE = 10;\nconst MAX_SIZE = 300;\nconst MAX_SPEED = 8;\n\nfunction setup() {\n\t\n  //canvas description for screen readers\n  describe('A solid background with randomly placed particles that appear and then fade over time.');\n\n\t\n  createCanvas(windowWidth, windowHeight);\n  \n  // Initialize particles array\n  for (let i = 0; i < MAX_PARTICLES; i++) {\n    const x = random(width);\n    const y = random(height);\n    let size_custom = random(MIN_SIZE, MAX_SIZE);\n    \n    // Define particle color\n    const hue = random(360);\n    const saturation = random(70) + 30;\n    const brightness = random(90) + 10;\n  \n    particles[i] = new Particle(x, y, size_custom, [hue, saturation, brightness]);\n  }\n}\n\nfunction draw() {\n  background('#ffffff');\n\n  // Update and display each particle\n  for (let i = 0; i < particles.length; i++) {\n    const particle = particles[i];\n\n    if (!particle.isDead()) {\n      //const mouseAngle = atan2((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - particle.y, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - particle.x);\n      \n      // Apply forces to the particle based on mouse position\n      //const forceMagnitude = map(dist((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), particle.x, particle.y), 0, width/2, 0.01, 0.1);\n      //const forceX = cos(mouseAngle) * forceMagnitude;\n      //const forceY = sin(mouseAngle) * forceMagnitude;\n\n      //particle.applyForce(forceX, forceY);\n    \n      particle.update();\n      particle.display();\n    } else {\n      // Remove dead particles from the array\n      particles.splice(i, 1);\n      i--;\n    }\n  }\n\n  // Add new particles when fewer than max count\n  if (particles.length < MAX_PARTICLES) {\n    var x = random(width);\n    var y = random(height);\n    var size_custom = random(MIN_SIZE, MAX_SIZE);\n    \n    // Define particle color\n    var hue = random(360);\n    var saturation = random(70) + 30;\n    var brightness = random(90) + 10;\n  \n    particles.push(new Particle(x, y, size_custom, [hue, saturation, brightness]));\n  }\n}\n\nclass Particle {\n  constructor(x, y, size_custom, color) {\n    this.position = createVector(x, y);\n    this.velocity = createVector();\n    this.acceleration = createVector();\n    this.size_custom = size_custom;\n    this.color = color;\n    this.lifespan = random(255);\n  }\n\n  applyForce(forceX, forceY) {\n    const force = createVector(forceX, forceY);\n    this.acceleration.add(force);\n  }\n\n  update() {\n    this.velocity.limit(MAX_SPEED);\n    this.velocity.add(this.acceleration);\n    this.position.add(this.velocity);\n    this.acceleration.mult(1);\n    this.lifespan -= 0.8; // relates to how fast new particles appear\n    \n\n    // Reduce life span and size gradually\n    this.lifespan -= 0.01;     // how fast the particles disappear\n    this.size_custom *= 0.98; // how fast the particles shrink\n    \n    \n  }\n\n  display() {\n    noStroke();\n\t\t//let channel_red   = this.color[0];\n\t\t//let channel_green = this.color[1];\n\t\tlet channel_red   = 255;\n\t\tlet channel_green = 20;\n\t\tlet channel_blue  = this.color[2];\n\t\tlet channel_alpha = this.lifespan;\n    fill(channel_red,channel_green,channel_blue,channel_alpha);\n    circle(this.position.x, this.position.y, this.size_custom);\n  }\n\n  isDead() {\n    return this.lifespan <= 0 || this.size_custom <= 0;\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Adam Santone, PhD",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2222525",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:14:49",
+    "expressive_profile": {
+        "module_id": "Effervescence.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                15.0,
+                135.0
+            ],
+            "mean_lightness": 0.009,
+            "mean_chroma": 0.017,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.18,
+            "curl_vorticity": 0.011,
+            "divergence": 0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-26 11:19:20"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Depth Regulation.mp4"
+    ],
+    "used_count": 1
+}

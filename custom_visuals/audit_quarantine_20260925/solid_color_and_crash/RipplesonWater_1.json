@@ -1,0 +1,22 @@
+{
+    "name": "RipplesonWater",
+    "code": "// === Tab: mySketch ===\nlet cols;\nlet rows;\nfloat[][] current;\nfloat[][] previous;\n\nlet dampening = 0.95;\n\nfunction setup() {\n  createCanvas(600, 600);\n  cols = width;\n  rows = height;\n  current = new Array(cols)[rows];\n  previous = new Array(cols)[rows];\n}\n\nfunction mouseDragged() {\n  previous[(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))][(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))] = 255;\n}\n\nfunction draw() {\n  background(0);\n  \n  loadPixels();\n  for (i = 1; i < cols-1; i++) {\n    for (j = 1; j < rows-1; j++) {\n      current[i][j] = (\n        previous[i-1][j] + \n        previous[i+1][j] +\n        previous[i][j-1] + \n        previous[i][j+1]) / 2 -\n        current[i][j];\n      current[i][j] = current[i][j] * dampening;\n      let index = i + j * cols;\n      pixels[index] = color(current[i][j]);\n    }\n  }\n  updatePixels();\n\n  float[][] temp = previous;\n  previous = current;\n  current = temp;\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "cloud.cb",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2020093",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:32:51"
+}

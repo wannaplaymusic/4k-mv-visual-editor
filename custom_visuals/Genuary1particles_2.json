@@ -1,0 +1,33 @@
+{
+    "name": "Genuary1particles",
+    "code": "// === Tab: mySketch ===\n//music - Music by <a href=\"https://pixabay.com/users/rockot-1947599/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=173062\">Rockot</a> from <a href=\"https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=173062\">Pixabay</a>\nlet counter=0\nlet R=0\nlet G=0\nlet B=0\nfunction preload() //preloads background music\n{\n\tsoundFormats('mp3', \"wav\");\n\tsong = loadSound('https://openprocessing.org/sketch/2135177/files/newmusic.mp3')\n}\n\n// this class describes the properties of a single particle.\nclass Particle {\n// setting the co-ordinates, radius and the\n// speed of a particle in both the co-ordinates axes.\n  constructor(){\n    this.x = random(-500,width+500);\n    this.y = random(-500,height+500);\n    this.r = random(1);\n    this.xSpeed = random(-5,5);\n    this.ySpeed = random(-1,1.5);\n  }\n\n// creation of a particle.\n  createParticle() {\n    noStroke();\n    fill(0);\n    circle(this.x,this.y,this.r);\n  }\n\n// setting the particle in motion.\n  moveParticle() {\n    if(this.x < 100 || this.x > width+100)\n      this.xSpeed*=-1;\n    if(this.y < 100 || this.y > height+100)\n      this.ySpeed*=-1;\n    this.x+=this.xSpeed;\n    this.y+=this.ySpeed;\n  }\n\n// this function creates the connections(lines)\n// between particles which are less than a certain distance apart\n  joinParticles(particles) {\n    particles.forEach(element =>{\n      let dis = dist(this.x,this.y,element.x,element.y);\n      if(dis<95) {\n\t\t\t\tif(volumeLevel>=50) \n\t\t\t\t{\n\t\t\t\t\tnoStroke()\n\t\t\t\t\tthis.x = random(-200,width+200);\n    \t\t\tthis.y = random(-200,height+200);\n\t\t\t\t\tstroke(random(255),0,0,random(255))\n\t\t\t\t\tstrokeWeight(.5)\n\t\t\t\t}\n\t\t\t\telse \n\t\t\t\t{\n\t\t\t\tstroke(0)\n\t\t\t\tstrokeWeight(volumeLevel/8)\n\t\t\t\t}\n\t\t\t\t\n        line(this.x,this.y,element.x,element.y);\n      }\n    });\n  }\n}\n\n// an array to add multiple particles\nlet particles = [];\n\nfunction setup() {\n\tsong.play()\n\tsong.loop()\n\tamp = new p5.Amplitude();\n  createCanvas(windowWidth, windowHeight);\n  for(let i = 0;i<600;i++){\n    particles.push(new Particle());\n  }\n}\n\nfunction draw() {\n  var vol = amp.getLevel();\n  volumeLevel = round(map(vol, 0, 0.3,1, 50));\n  for(let i = 0;i<particles.length;i++) {\n    particles[i].createParticle();\n    particles[i].moveParticle();\n    particles[i].joinParticles(particles.slice(i));\n  }\n\tlet thefill=random(255)\n\tfill(thefill,thefill,thefill,volumeLevel/8)\n\tnoStroke()\n\trect(0,0,width,height)\n\tcounter++\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "particles",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2135177",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:19:46",
+    "used_in_videos": [
+        "Concrete Signal Unit.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

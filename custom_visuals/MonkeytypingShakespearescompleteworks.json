@@ -1,0 +1,36 @@
+{
+    "name": "MonkeytypingShakespearescompleteworks",
+    "code": "// === Tab: mySketch ===\n/*\n A fun experiment! \n \n Monkey typewritting animation\n \n The infinite monkey theorem states that if you let \n a monkey hit the keys of a typewriter at random an \n infinite amount of times, eventually the monkey will \n type out the entire works of Shakespeare. \n \n Author: Juan Carlos Ponce Campuzano\n https://dynamicmath.xyz\n 26/March/2024\n \n I still need to improve it! I will be back to that soon :)\n \n*/\n\nlet system; // For storing the particles\n\nlet repeller;\nlet strength = -300;\n\nlet img1, img2;\nlet currentImage;\n\nfunction preload() {\n\t// Monkey images made with GeoGebra\n\t// https://www.geogebra.org/m/ke9sdhex\n  img1 = loadImage('https://openprocessing.org/sketch/2734456/files/monkey-curves-left.png');\n  img2 = loadImage('https://openprocessing.org/sketch/2734456/files/monkey-curves-right.png');\n}\n\nlet letters = \"abcdefghijklmnopqrstuvwxyz\"; // Array of characters\n\nlet initialPositionX, initialPositionY;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  \n  currentImage = img1; // Start with img1 displayed\n  \n  initialValues();\n  \n  system = new ParticleSystem(\n    createVector(initialPositionX, initialPositionY)\n  );\n\t\n\t// Add a general description of the canvas.\n  describe('The infinite monkey theorem states that a monkey hitting keys at random on a typewriter keyboard for an infinite amount of time will almost surely type any given text, including the complete works of William Shakespeare. ∞ 🤯 ');\n}\n\nfunction draw() {\n  background(0);\n  cursor(HAND);\n\t\n\t/* Add monkey animation */\n\t\n\t// Calculate the scale factor based on the canvas size\n  let scaleFactor = min(width / img1.width, height / img1.height) * 0.5;\n  \n  // Calculate the scaled image size\n  let scaledWidth = img1.width * scaleFactor;\n  let scaledHeight = img1.height * scaleFactor;\n  \n  // Calculate the position for the scaled image\n  let posX = width * 8 / 10 - scaledWidth / 2;\n  let posY = height * 8 / 10 - scaledHeight / 2;\n  \n  // Display the current image at the specified position with scaled size\n  image(currentImage, posX, posY, scaledWidth, scaledHeight);\n  \n  // Alternate between img1 and img2 every second\n  if (frameCount % 15 == 0) { // 60 frames per second\n    if (currentImage === img1) {\n      currentImage = img2;\n    } else {\n      currentImage = img1;\n    }\n  }\n\t\n\t/* Add particles */\n\t\n  system.addParticle();\n\n  // We're applying a universal gravity.\n  let gravity = createVector(0, 0.1);\n  system.applyForce(gravity);\n\n  \n  // Applying the repeller\n  repeller = new Repeller(0, 0);\n\n  system.applyRepeller(repeller);\n\n  system.run();\n  //repeller1.display();\n  \n}\n\nfunction initialValues() {\n  initialPositionX = width - (width * 3.5) / 12;\n  initialPositionY = height - (height * 1.9) / 10;\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n  initialValues();\n\tsystem = new ParticleSystem(\n    createVector(initialPositionX, initialPositionY)\n  );\n}\n\nclass Particle {\n  constructor(position) {\n    this.acceleration = createVector(0, 0);\n    this.velocity = createVector(random(-1, 1), random(-1, 0));\n    this.position = position.copy();\n    this.lifespan = 600;\n    this.mass = 2;\n    this.letter = letters.charAt(floor(random(letters.length))); // Choose a random letter from the array\n  }\n\n  run() {\n    this.update();\n    this.display();\n  }\n\n  applyForce(force) {\n    this.force = force.copy();\n    force.div(this.mass);\n    this.acceleration.add(force);\n    this.display();\n  }\n\n  // Method to update position\n  update() {\n    this.velocity.add(this.acceleration);\n    this.position.add(this.velocity);\n    this.acceleration.mult(0);\n    this.lifespan -= 2;\n    this.radius -= 0.01;\n  }\n\n  // Method to display\n  display() {\n    push();\n    fill(255, this.lifespan);\n    stroke(0, this.lifespan);\n    strokeWeight(1.7);\n    textSize(32);\n    textAlign(CENTER, CENTER);\n    text(this.letter, this.position.x, this.position.y);\n    pop();\n  }\n\n  // Is the particle still useful?\n  isDead() {\n    return this.lifespan < 0;\n  }\n}\n\nclass ParticleSystem {\n  constructor(position) {\n    this.origin = position.copy();\n    this.particles = [];\n  }\n\n  addParticle() {\n    this.particles.push(new Particle(this.origin));\n  }\n\n  applyForce(force) {\n    for (let p of this.particles) {\n      p.applyForce(force);\n    }\n  }\n\n  applyRepeller(r) {\n    for (let p of this.particles) {\n      this.force = r.repel(p);\n      p.applyForce(this.force);\n    }\n  }\n\n  run() {\n    for (var i = this.particles.length - 1; i >= 0; i--) {\n      var p = this.particles[i];\n      p.run();\n      if (p.isDead()) {\n        this.particles.splice(i, 1);\n      }\n    }\n  }\n}\n\n// Repeller class\nclass Repeller {\n  constructor(x, y) {\n    this.position = new p5.Vector(x, y);\n    this.r = 35;\n  }\n\n  display() {\n    stroke(140);\n    fill(0);\n    ellipse(this.position.x, this.position.y, this.r * 2, this.r * 2);\n  }\n\n  repel(p) {\n    // [full] This is the same repel algorithm used in Chapter 2:\n    // forces based on gravitational attraction:\n\t\t// https://natureofcode.com/forces/\n    this.dir = new p5.Vector.sub(this.position, p.position);\n    this.d = this.dir.mag();\n    this.dir.normalize();\n    this.d = constrain(this.d, 5, 100);\n    this.force = (-1.5 * strength) / (this.d * this.d);\n    this.dir.mult(this.force);\n    return this.dir;\n    //[end]\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "jamie",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2734456",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:48:23",
+    "used_in_videos": [
+        "Infinite Blue Chamber.mp4",
+        "Remote Signal Bloom.mp4",
+        "Gravity in Reverb.mp4"
+    ],
+    "used_count": 3,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "is_starred": false
+}

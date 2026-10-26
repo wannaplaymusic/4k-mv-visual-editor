@@ -57,8 +57,8 @@ def transpile_processing_to_js(src):
 當任意第三方視覺代碼（如 OpenProcessing 抓取的 Canvas 腳本）在 Web 容器中執行時，為了防範其因為缺乏 DOM 元件、特定函式庫（如 `ml5.js`, `Tone.js`, `THREE.Group`）而拋錯中斷，應在運行前預先注入以下防護機制：
 
 ```javascript
-// 1. 免疫 DOM 元素建立與樣式操作拋錯
-(function() {
+// 1. 免疫 DOM 元素建立與樣式操作拋錯 (注意：開頭必須具備防禦性分號 ; 防止 ASI 危害)
+;(function() {
   const handler = {
     get: function(target, prop) {
       if (prop === 'style') {

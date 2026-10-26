@@ -1,0 +1,28 @@
+{
+    "name": "glitch002",
+    "code": "// === Tab: mySketch ===\nconst TEXTURE_SIZE = 128;\nconst SIZE = TEXTURE_SIZE*2\nconst PARTICLE_COUNT = TEXTURE_SIZE * TEXTURE_SIZE;\n\nlet indices = new Float32Array(PARTICLE_COUNT);\nlet particleGeom;\n\nlet fontLoaded = false;\n\nlet simulationShader;\nlet renderShader;\nlet next;\nlet prev;\nlet topLeft;\nlet bottomRight;\nlet up;\nlet down;\nlet left;\nlet right;\nlet size;\n\nconst simVert = `\nprecision highp float;\n\nattribute vec3 aPosition;\nattribute vec2 aTexCoord;\nattribute vec4 aVertexColor;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nvarying vec2 vTexCoord;\n\n\nvoid main() {\n  vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * viewModelPosition;\n  \n  // gl_Position = vec4(aPosition.xy, 0.0, 1.0);\n  \n  // vTexCoord =  (vTexCoord.xy) * 2.0;\n  vTexCoord = aTexCoord.xy  ;\n \n}`\n\nconst simFrag = `\nprecision highp float;\n\nuniform sampler2D u_particles;\nuniform float u_dt;\n\nvarying vec2 vTexCoord;\n\nvoid main() {\n  \n    vec4 particule = texture2D(u_particles, vTexCoord);\n\n    vec2 position = particule.xy;\n    vec2 velocity = particule.zw;\n\n\n    vec2 acceleration = vec2(cos(vTexCoord.x), sin(vTexCoord.y));\n    velocity += acceleration * u_dt;\n    position += velocity * u_dt;\n    position = fract(position);\n\n    gl_FragColor = vec4(position, velocity);\n //  gl_FragColor = vec4(particule.x,particule.y, 0.0, 1);\n}`\n\nconst renderVert = `\nattribute float aIndex;\nuniform sampler2D u_particles;\nuniform float u_texSize;\n\nvoid main() {\n    float x = mod(aIndex, u_texSize) / u_texSize;\n    float y = floor(aIndex / u_texSize) / u_texSize;\n\n    vec2 uv = vec2(x, y);\n    vec4 p = texture2D(u_particles, uv);\n\n    vec2 position = p.xy;\n\n    gl_Position = vec4(position, 0.0, 1.0);\n    gl_PointSize = 2.0;\n}`\n\nconst renderFrag = `\nprecision highp float;\n\nvoid main() {\n  // gl_PointCoord ∈ [0,1] inside the point\n  vec2 uv = gl_PointCoord * 2.0 - 1.0;\n  float d = dot(uv, uv);\n\n  if (d > 1.0) discard;\n\n  float alpha = 1.0 - d;\n  gl_FragColor = vec4(1.0, 0.7, 0.2, alpha);\n}`\n\nfunction preload() {\n  simulationShader = createShader(simVert, simFrag);\n  renderShader = createShader(renderVert, renderFrag);\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  frameRate(30)\n\n  zoom = max(windowWidth, windowHeight) / TEXTURE_SIZE\n  // Init coordinat\n  up = -TEXTURE_SIZE*zoom / 2;\n  left = -TEXTURE_SIZE*zoom / 2;\n  down = TEXTURE_SIZE*zoom / 2;\n  right = TEXTURE_SIZE*zoom / 2;\n\n  //Init indices\n  for (let i = 0; i < PARTICLE_COUNT; i++) {\n    indices[i] = i;\n  }\n\n  // Init particles geometrie\n  particleGeom = new p5.Geometry();\n  for (let i = 0; i < PARTICLE_COUNT; i++) {\n    particleGeom.vertices.push([0, 0, 0]);\n  }\n  particleGeom.computeNormals();\n  particleGeom.vertexBuffers = {\n    aIndex: {\n      data: indices, // expose vertex indexes\n      size: 1,\n    },\n  };\n  particleGeom.drawMode = POINTS;\n\n  // Init Simulation texture\n  next = createFramebuffer({\n    width: TEXTURE_SIZE,\n    height: TEXTURE_SIZE,\n    format: FLOAT,\n  });\n\n  prev = createFramebuffer({\n    width: TEXTURE_SIZE,\n    height: TEXTURE_SIZE,\n    format: FLOAT,\n  });\n\n  next.begin();\n  for (let y = 0; y < TEXTURE_SIZE; y++) {\n    for (let x = 0; x < TEXTURE_SIZE; x++) {\n      stroke(\n        random(255), // pos.x\n        random(255), // pos.y\n        0.0, // vel.x\n        255.0 // vel.y\n      );\n      point(x, y);\n    }\n  }\n  next.end();\n  image(next, 0, 0);\n}\n\n\nfunction draw() {\n  [prev, next] = [next, prev];\n\n  next.begin();\n\n  clear();\n  shader(simulationShader);\n  simulationShader.setUniform(\"u_dt\", 0.005);\n  simulationShader.setUniform(\"u_particles\", prev);\n  noStroke();\n  plane(TEXTURE_SIZE, TEXTURE_SIZE);\n  resetShader();\n\n  next.end();\n  \n  image(next, left, up ,TEXTURE_SIZE*zoom, TEXTURE_SIZE*zoom);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "TheBigRoomXXL",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2838579",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:01:16",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Concrete Signal Unit.mp4"
+    ],
+    "used_count": 1
+}

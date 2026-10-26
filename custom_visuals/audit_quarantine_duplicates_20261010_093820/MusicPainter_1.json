@@ -1,0 +1,29 @@
+{
+    "name": "MusicPainter",
+    "code": "// === Tab: mySketch ===\nlet musicAnalyzer;\nvar particles_a = [];\nvar particles_b = [];\nvar particles_c = [];\nvar particles_bg = [];\nvar nums =\t300;\nvar noiseScale = 800;\nlet font, fontsize = 15;\nlet colorCanvas = 0; \t\t\t\t//change the canvas color: 0 is black, 255 is white\n\n//Change the color for line A\nlet R1 = \t66;\nlet G1 = \t229;\nlet B1 = \t244;\n\n//Change the color for line B\nlet R2 = \t84;\nlet G2 = \t62;\nlet B2 =\t199;\n\n//Change the color for line C\nlet R3 = \t198;\nlet G3 = \t27;\nlet B3 =\t136;\n\n//Change the color for the background effect\nlet Rbg = 15;\nlet Gbg = 100;\nlet Bbg =\t80;\n\nfunction keyPressed() {\n\tif (key == 's') saveImage();\t\t\t\t\t\t//Press S to save your image\n}\n\nfunction preload() {\n  soundFormats('mp3', 'ogg');\n  music = loadSound('https://openprocessing.org/sketch/1207378/files/idont.mp3');         //Load your own track to paint with\n\tfont = loadFont(\"https://openprocessing.org/sketch/1207378/files/Roboto-Regular.ttf\");\n}\n\nfunction setup() {\n  music.setVolume(1);\n  music.play();\n\tmusicAnalyzer = new p5.FFT();\n  musicAnalyzer.setInput(music);\n\tcreateCanvas(1280, 720);\n\tfor(var i = 0; i < nums; i++){\n\t\tparticles_a[i] = new Particle(random(0, width),random(0,height));\n\t\tparticles_b[i] = new Particle(random(0, width),random(0,height));\n\t\tparticles_c[i] = new Particle(random(0, width),random(0,height));\n\t\tparticles_bg[i] = new Particle(random(0, width),random(0,height));\n\t}\n\ttextFont(font);\n  textSize(fontsize);\n  textAlign(LEFT, CENTER);\n\tbackground(colorCanvas);\n}\n\nfunction draw() {\n\t\n\tlet musicAnalyzed = musicAnalyzer.analyze();\n\t\n  var bass    = musicAnalyzer.getEnergy(\"bass\");\n  var mid     = musicAnalyzer.getEnergy(\"mid\");     \n  var treble  = musicAnalyzer.getEnergy(\"treble\");\n\n  var mapBass     = map( bass, 0, 255, -100, 100 );\n  var mapMid      = map( mid, 0, 255, -150, 150 );\n  var mapTreble   = map( treble, 0, 255, -200, 200 );\n\t\n\tvar soundArray = [mapBass,mapMid,mapTreble];\n\t\n\tlet spectrum = musicAnalyzer.analyze();\n\t\n\tnoStroke();\n\tsmooth();\n\tfor(var i = 0; i < nums; i++){\n\t\tvar radius = map(i,0,nums,1,2);\n\t\tvar alpha = map(i,0,nums,0,250);\n\t\t\n\t\tfill(color(Rbg+((mapMid+soundArray[Math.floor(Math.random() * soundArray.length)])/10),Gbg+((mapBass+soundArray[Math.floor(Math.random() * soundArray.length)])/10),Bbg+((mapTreble+soundArray[Math.floor(Math.random() * soundArray.length)])/10),soundArray[Math.floor(Math.random() * soundArray.length)]/50));\n\t\tparticles_bg[i].move(soundArray[Math.floor(Math.random() * soundArray.length)]*2);\n\t\tparticles_bg[i].display(soundArray[Math.floor(Math.random() * soundArray.length)]/2);\n\t\tparticles_bg[i].checkEdge();\n\t\t\n\t\tfill(color(R1+(mapTreble/10), G1+(mapBass/10), B1+(mapMid/10),alpha));\n\t\tparticles_a[i].move(soundArray[Math.floor(Math.random() * soundArray.length)]);\n\t\tparticles_a[i].display(mapMid/30);\n\t\tparticles_a[i].checkEdge(soundArray[Math.floor(Math.random() * soundArray.length)]);\n\t\n\t\tfill(color(R2+(mapBass/20), G2+(mapMid/10), B2+(mapTreble/10),alpha));\n\t\tparticles_b[i].move(soundArray[Math.floor(Math.random() * soundArray.length)]);\n\t\tparticles_b[i].display(mapTreble/30);\n\t\tparticles_b[i].checkEdge(soundArray[Math.floor(Math.random() * soundArray.length)]);\n\n\t\tfill(color(R3+(mapTreble/10), G3+(mapMid/10), B3+(mapBass/10),alpha));\n\t\tparticles_c[i].move(soundArray[Math.floor(Math.random() * soundArray.length)]);\n\t\tparticles_c[i].display(mapBass/30);\n\t\tparticles_c[i].checkEdge(soundArray[Math.floor(Math.random() * soundArray.length)]);\n\t}  \n\t\n}\n\nfunction Particle(x, y){\n\tthis.dir = createVector(0, 0);\n\tthis.vel = createVector(0, 0);\n\tthis.pos = createVector(x, y);\n\tthis.speed = 0.6;\n\n\tthis.move = function(direction){\n\t\tvar angle = noise(this.pos.x/(noiseScale-direction), this.pos.y/(noiseScale-direction))*TWO_PI*noiseScale;\n\t\tthis.dir.x = cos(angle);\n\t\tthis.dir.y = sin(angle);\n\t\tthis.vel = this.dir.copy();\n\t\tthis.vel.mult(this.speed-(direction/50));\n\t\tthis.pos.add(this.vel);\n\t}\n\n\tthis.checkEdge = function(more){\n\t\tif(this.pos.x > width || this.pos.x < 0 || this.pos.y > height || this.pos.y < 0){\n\t\t\tthis.pos.x = random(more/2, width);\n\t\t\tthis.pos.y = random(more/2, height);\n\t\t}\n\t}\n\n\tthis.display = function(r){\n\t\tellipse(this.pos.x, this.pos.y, r, r);\n\t}\n\t\n}\nfunction saveImage(){\n\tnoLoop();\n\tfill(255);\n  text(\"Painted using: \"+music.file, 10, 700);\n\tsave('Music Painting - '+music.file+'.png');\n\tmusic.pause();\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "aaren",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1207378",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:17:56",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

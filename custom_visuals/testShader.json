@@ -1,0 +1,26 @@
+{
+    "name": "testShader",
+    "code": "// === Tab: mySketch ===\n/* jacques maire;\n* fork timtim \"https://openprocessing.org/sketch/1116844\"\n* test shader 3D\n*/\n\np5.disableFriendlyErrors = true\n\nlet myShader;\n\nfunction preload() {\n  \n  myShader = createShader(vert, frag);\n}\n\nfunction setup() {\n  createCanvas(1112, 834, WEBGL);\n  noStroke();\n}\n\nfunction draw() {\n  background(0);\n  shader(myShader);\n  myShader.setUniform(\"uFrameCount\", frameCount*2);\n\n  rotateX(frameCount * 0.001);\n  rotateY(frameCount * 0.001);\n  translate(2.0*cos(frameCount * 0.01),2.0*sin(frameCount * 0.01),200.0);\n  // Draw some geometry to the screen\n \n  sphere(width / 2.0, 700.0, 100.0);\n}\n\nfunction windowResized() {\n  resizeCanvas(1112, 834);\n}\n\n// === Tab: tab2 ===\nvert=`\n// Obtenez l’attribut de position de la géométrie\nattribute vec3 aPosition;\n\n// Obtenez l’attribut de coordination de texture de la géométrie\nattribute vec2 aTexCoord;\n\n// Obtenez l’attribut vertéx normal de la géométrie\nattribute vec3 aNormal;\n\n//Lorsque nous utilisons la géométrie 3D, nous devons également utiliser certaines variables intégrées que p5 fournit\n// La plupart des moteurs 3D vous fourniront ces variables. Ce sont des matrices 4x4 qui définissent\n// the camera position / rotation, and the geometry position / rotation / scale\n// Il ya en fait 3 matrices, mais deux d’entre eux ont déjà été combinés en un seul\n// Cette pré-combinaison est un truc d’optimisation de sorte que l’ombrage vertex n’a pas à faire autant de travail\n\n// uProjectionMatrix est utilisé pour convertir les coordonnées globale 3D en coordonnées d’écran 2D\nuniform mat4 uProjectionMatrix;\n\n// uModelViewMatrix est une combinaison de la matrice du modèle et de la matrice de vue\n// The model matrix defines the object position / rotation / scale\n// Multiplier uModelMatrix * vec4 (aPosition, 1.0) déplacerait l’objet dans sa position mondiale\n\n// The view matrix defines attributes about the camera, such as focal length and camera position\n// Multiplying uModelViewMatrix * vec4(aPosition, 1.0) would move the object into its world position in front of the camera\nuniform mat4 uModelViewMatrix;\n\n//  Obtenez l’uniforme framecount\nuniform float uFrameCount;\n\nvarying vec2 vTexCoord;\nvarying vec3 vNormal;\nvec4 quaternion(vec3 axis, float phi){\n vec3 axs=normalize(axis);\n  return vec4(axs*sin(phi/2.0),cos(phi/2.0));}\n \nvec3 qtourne(vec4 q, vec3 v){return v+2.0*cross(cross(v,q.xyz)-(q.w)*v,q.xyz);}\n\n\n\nvoid main() {\n\n  // copier les données de position dans un vec4, en utilisant 1.0 comme composant w\n  vec4 positionVec4 = vec4(aPosition, 4.0);\n   vec3  axv         =normalize(vec3(0.0,uFrameCount,0.0)*3.0);\n   vec4 qua= quaternion(axv,cos(positionVec4.x) );\n   vec3 tou=qtourne(qua,aNormal*3.0);\n  tou+=aPosition;\n  // La fréquence et l’amplitude détermineront l’apparence du déplacement\n  float frequency = 5.5;\n  float amplitude = 5.0;\n  float distortion = sin(positionVec4.x * frequency + uFrameCount * 0.02);\n  positionVec4.x *= distortion * aNormal.x * amplitude*0.6;\n\n \n  vNormal = aNormal;\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n  vTexCoord = aTexCoord;\n}`;\n\n// === Tab: tab3 ===\nfrag=`\n\nprecision mediump float;\n\nvarying vec2 vTexCoord;\nvarying vec3 vNormal;\n\nvoid main() {\n  vec3 color = vNormal*3.2  ;\n  gl_FragColor = vec4(color ,1.0);\n}`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1232166",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:10:53",
+    "used_in_videos": [
+        "Cyber Tribe Annihilation.mp4"
+    ],
+    "used_count": 1
+}

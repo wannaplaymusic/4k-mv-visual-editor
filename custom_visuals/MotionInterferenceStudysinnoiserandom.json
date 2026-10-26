@@ -1,0 +1,24 @@
+{
+    "name": "MotionInterferenceStudysinnoiserandom",
+    "code": "// === Tab: mySketch ===\n// Theme: Combining motion\n// Compare sin / noise / random behavior\n\n// テーマ : 動きを組み合わせる\n// 回転＋揺れ、noise＋回転、sin＋randomなど動きが複雑になるとどう見えるか観察する。\n\nlet angle = 0;\n\nfunction setup() {\n\tcreateCanvas(400, 400);\n\ttextAlign(CENTER, CENTER);\n}\n\nfunction draw() {\n\tbackground(220);\n\ttranslate(200, 200);\n\trotate(angle);\n\tstroke(0);\n\n\t//回転＋揺れ　sin (regular motion)\n\tlet a = sin(frameCount * 0.1) * 100;\n\tfill(255);\n\tcircle(50, a, 100);\n\ttext(\"sin\", 50, a);\n\n\t//noise＋回転　noise (smooth randomness)\n\tlet b = noise(frameCount * 0.1) * 100;\n\tfill(0, 50);\n\tcircle(50, b, 100);\n\ttext(\"noise\", 50, b);\n\n\t//sin + random (add jitter)\n\tlet base = sin(frameCount * 0.1) * 100;\n\t// randomでブレを追加\n\tlet r = random(-20, 20);\n\t// 合成\n\tlet c = base + r;\n\tfill(255, 0, 0, 30);\n\tcircle(50, c, 100);\n\n\t//noise振れ幅０～１　map (range conversion)\n\tlet d = sin(frameCount * 0.1) * 100;\n\tfill(0, 255, 0, 50, 30);\n\tlet e = map(d, -1, 1, 0, 1);\n\tcircle(50, e, 100);\n\n\tangle += 0.01;\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "nanachi",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2899015",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 16:58:47",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,32 @@
+{
+    "name": "FlowFields001",
+    "code": "// === Tab: mySketch ===\n// by SamuelYAN\n// more works //\n   // https://twitter.com/SamuelAnn0924\n   // https://www.instagram.com/samuel_yan_1990/\n\n\nlet left_x, right_x, top_y, bottom_y, resolution;\nlet num_colums, num_rows;\nlet grid = [];\nlet default_angle, angle;\nlet space;\nlet xoff = 0.1;\nlet yoff = 0.1;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  colorMode(HSB, 360, 100, 100, 100);\n  left_x = int(width * -2.5);\n  right_x = int(width * 2.5);\n  top_y = int(height * -2.5);\n  bottom_y = int(height * 2.5);\n  resolution = int(width * 0.005);\n  num_columns = (right_x - left_x) / resolution;\n  num_rows = (bottom_y - top_y) / resolution;\n  space = 2;\n  for (let x = 0; x < num_columns; x++) {\n    grid[x] = [];\n    for (let y = 0; y < num_rows; y++) {\n      let angle = (y / num_rows) * (x / num_columns) * PI * 32;\n      grid[x][y] = angle + random(-0.5, 0.5);\n    }\n  }\n  // pixelDensity(5);\n\tbackground(\"#D2B48C\");\n  // background(0, 0, 95, 100);\n}\n\nfunction draw() {\n  let x = random(-width / 2, width * 1.5);\n  let y = random(-height / 2, height * 1.5);\n  let step_length = random(10,16);\n  beginShape();\n  for (var i = 0; i < step_length; i++) {\n    noFill();\n    strokeCap(SQUARE);\n    if (x < 300 && y < 300 && x + y <= 300) {\n      strokeWeight(random(1.2, 3.8));\n      stroke(random(240, 280), random(45, 90), 95, random(45, 65));\n    } else if (x > 200 && y > 200 && x + y >= 200 + height) {\n      strokeWeight(random(1.8, 2.8));\n      stroke(random(240, 280), random(45, 90), 95, random(35, 55));\n    } else {\n      strokeWeight(random(2.2, 4.8));\n      stroke(random(220, 310), random(45, 90), 95, random(45, 85));\n    }\n    curveVertex(x, y);\n    let x_offset = x - left_x;\n    let y_offset = y - top_y;\n    let column_index = int(x_offset / resolution);\n    let row_index = int(y_offset / resolution);\n    grid_angle = grid[column_index][row_index];\n    let x_step = map(noise(xoff,yoff),0,1,-2,2) * step_length * 0.1 * sin(grid_angle) - 25;\n    let y_step = map(noise(xoff,yoff),0,1,-2,2)* step_length * 0.2 * atan(grid_angle) - 10;\n    let t = random(0.75, 1.2);\n    x = lerp(x, x + x_step, t);\n    y = lerp(y, y + y_step, t);\n    \n    xoff += random(-0.25, 0.25);\n    yoff += random(-0.25, 0.25);\n    \n    circle(x+xoff,y+yoff,random(5));\n  }\n  endShape();\n\n}\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u357101",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-05",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1828230",
+    "batch_id": "batch_20261005_141539",
+    "batch_date": "2026-10-05",
+    "date_added": "2026-10-05 16:20:46",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_FLAT_COLOR_SCREEN (All Frames MaxVar=0.00)",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

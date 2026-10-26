@@ -1,0 +1,24 @@
+{
+    "name": "Particlestrianglescjko",
+    "code": "// === Tab: sketch147268 ===\n\nlet NB_PARTICLES = 200;\nArrayList<Triangle> triangles;\nlet parts = new Array(NB_PARTICLES);\nlet image;\nlet myColor = new MyColor();\n\nfunction setup()\n{\n  createCanvas(1280, 720);\n  for (i = 0; i < NB_PARTICLES; i++)\n  {\n    parts[i] = new Particle();\n  }\n}\n\nfunction draw()\n{\n  myColor.update();\n  noStroke();\n  fill(120, 1);\n  background(0);\n  triangles = new ArrayList<Triangle>();\n  let p1, p2;\n\n  for (i = 0; i < NB_PARTICLES; i++)\n  {\n    parts[i].move();\n  }\n\n  for (i = 0; i < NB_PARTICLES; i++)\n  {\n    p1 = parts[i];\n    p1.neighboors = new ArrayList<Particle>();\n    p1.neighboors.add(p1);\n    for (j = i+1; j < NB_PARTICLES; j++)\n    {\n      p2 = parts[j];\n      let d = PVector.dist(p1.pos, p2.pos); \n      if (d > 0 && d < Particle.DIST_MAX)\n      {\n        p1.neighboors.add(p2);\n      }\n    }\n    if(p1.neighboors.size() > 1)\n    {\n      addTriangles(p1.neighboors);\n    }\n  }\n  drawTriangles();\n}\n\nfunction drawTriangles()\n{\n  noStroke();\n  fill(myColor.R, myColor.G, myColor.B, 5);\n  stroke(max(myColor.R-15, 0), max(myColor.G-15, 0), max(myColor.B-15, 0), 13);\n  //noFill();\n  beginShape(TRIANGLES);\n  for (i = 0; i < triangles.size(); i ++)\n  {\n    let t = triangles.get(i);\n    t.display();\n  }\n  endShape();  \n}\n\nfunction addTriangles(ArrayList<Particle> p_neighboors)\n{\n  let s = p_neighboors.size();\n  if (s > 3)\n  {\n    for (i = 1; i < s-1; i ++)\n    { \n      for (j = i+1; j < s; j ++)\n      { \n         triangles.add(new Triangle(p_neighboors.get(0).pos, p_neighboors.get(i).pos, p_neighboors.get(j).pos));\n      }\n    }\n  }\n}\n\nfunction mousePressed()\n{\n   myColor.init(); \n}\n\nclass MyColor\n{\n  R, G, B, Rspeed, Gspeed, Bspeed;\n  minSpeed = .7;\n  maxSpeed = 1.5;\n  constructor()\n  {\n    init();\n  }\n  \n  function init()\n  {\n    R = random(255);\n    G = random(255);\n    B = random(255);\n    Rspeed = (random(1) > .5 ? 1 : -1) * random(minSpeed, maxSpeed);\n    Gspeed = (random(1) > .5 ? 1 : -1) * random(minSpeed, maxSpeed);\n    Bspeed = (random(1) > .5 ? 1 : -1) * random(minSpeed, maxSpeed);\n  }\n  \n  function update()\n  {\n    Rspeed = ((R += Rspeed) > 255 || (R < 0)) ? -Rspeed : Rspeed;\n    Gspeed = ((G += Gspeed) > 255 || (G < 0)) ? -Gspeed : Gspeed;\n    Bspeed = ((B += Bspeed) > 255 || (B < 0)) ? -Bspeed : Bspeed;\n  }\n}\n\nclass Particle\n{\n  RAD = 4;\n  BOUNCE = -1;\n  SPEED_MAX = 4.2;\n  DIST_MAX = 100;\n  let speed = new PVector(random(-SPEED_MAX, SPEED_MAX), random(-SPEED_MAX, SPEED_MAX));\n  let acc = new PVector(0, 0);\n  pos;\n  //neighboors contains the particles within let distance, as well as itself\n  ArrayList<Particle> neighboors;\n  \n  constructor()\n  {\n    pos = new PVector (random(width), random(height));\n  }\n\n  function move()\n  {    \n    pos.add(speed);\n    \n    acc.mult(0);\n    \n    if (pos.x < 0)\n    {\n      pos.x = 0;\n      speed.x *= BOUNCE;\n    }\n    else if (pos.x > width)\n    {\n      pos.x = width;\n      speed.x *= BOUNCE;\n    }\n    if (pos.y < 0)\n    {\n      pos.y = 0;\n      speed.y *= BOUNCE;\n    }\n    else if (pos.y > height)\n    {\n      pos.y = height;\n      speed.y *= BOUNCE;\n    }\n  }\n  \n  function display()\n  {\n    fill(255, 14);\n    ellipse(pos.x, pos.y, RAD, RAD);\n  }\n}\n\nclass Triangle\n{\n  A, B, C; \n\n  constructor(p1, p2, p3)\n  {\n    A = p1;\n    B = p2;\n    C = p3;\n  }\n  \n  function display()\n  {\n    vertex(A.x, A.y);\n    vertex(B.x, B.y);\n    vertex(C.x, C.y);\n  }\n}\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "cjko.ok",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/824727",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:52:30",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

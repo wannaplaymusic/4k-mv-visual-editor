@@ -1,0 +1,31 @@
+{
+    "name": "ParticleAffection",
+    "code": "// === Tab: mySketch ===\n/*\nParticle Affection\n\nAuthor: Meral Senturk inspired from Interactive logos\n\njasonlabbe3d.com\ntwitter.com/russetPotato\n*/\n\nconst SPIN_MULTIPLIER = 45;\nconst MIN_PARTICLE_COUNT = 200;\nconst MAX_PARTICLE_COUNT = 700;\nconst MIN_PARTICLE_SIZE = 12;\nconst MAX_PARTICLE_SIZE = 50;\nconst MIN_FORCE = 0.4;\nconst MAX_FORCE = 0.6;\nconst REPULSION_RADIUS = 100;\nconst REPULSION_STRENGTH = 0.25;\n\nconst DrawTypes = {\n    Ellipse: 0,\n    Rect: 1,\n    Triangle: 2,\n};\n\nlet particles = [];\nlet particleCount = 550;\nlet drawType = DrawTypes.Ellipse;\n\nfunction setup() {\n    createCanvas(windowWidth, windowHeight);\n    spawnParticles();\n}\n\nfunction draw() {\n    background(30);\n\n    textSize(16);\n    fill(255);\n    textAlign(LEFT);\n    text(\n        `\n        How to interact \n        Move your mouse over the heart to interact.\n        \n        Controls \n        Left-click or spacebar: Change particle type\n        + : Increase particles\n        - : Decrease particles\n        `,\n        50, 50\n    );\n\n    particles.forEach((particle) => {\n        particle.move();\n        particle.display();\n    });\n}\n\nfunction spawnParticles() {\n    particles = [];\n    for (let i = 0; i < particleCount; i++) {\n        const angle = random(TWO_PI);\n        const radius = random(0.4, 1) * 200;\n        const x = width / 2 + radius * cos(angle);\n        const y = height / 2 - radius * sin(angle);\n        particles.push(new Particle(createVector(x, y)));\n    }\n}\n\nfunction mouseMoved() {\n    particles.forEach((particle) => particle.reactToMouse((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))));\n}\n\nfunction keyPressed() {\n    if (key === '+') {\n        particleCount = min(particleCount + 50, MAX_PARTICLE_COUNT);\n        spawnParticles();\n    } else if (key === '-') {\n        particleCount = max(particleCount - 50, MIN_PARTICLE_COUNT);\n        spawnParticles();\n    } else if (key === ' ') {\n        drawType = (drawType + 1) % Object.keys(DrawTypes).length;\n    }\n}\n\nfunction mousePressed() {\n    if (mouseButton === LEFT) {\n        drawType = (drawType + 1) % Object.keys(DrawTypes).length;\n    }\n}\n\nclass Particle {\n    constructor(pos) {\n        this.pos = pos;\n        this.vel = p5.Vector.random2D().mult(random(MIN_FORCE, MAX_FORCE));\n        this.size = random(MIN_PARTICLE_SIZE, MAX_PARTICLE_SIZE);\n        this.color = color(random(200, 255), random(50, 100), random(150, 255), 150);\n    }\n\n    move() {\n        this.pos.add(this.vel);\n\n        // Heart-shaped bounds\n        const d = dist(this.pos.x, this.pos.y, width / 2, height / 2);\n        if (d > 200) {\n            this.vel.mult(-1); // Bounce back\n        }\n    }\n\n    reactToMouse(mx, my) {\n        var d = dist(this.pos.x, this.pos.y, mx, my);\n        if (d < REPULSION_RADIUS) {\n            let force = p5.Vector.sub(this.pos, createVector(mx, my)).setMag(REPULSION_STRENGTH);\n            this.vel.add(force);\n        }\n    }\n\n    display() {\n        push();\n        translate(this.pos.x, this.pos.y);\n        rotate(this.vel.heading() * SPIN_MULTIPLIER);\n        fill(this.color);\n        noStroke();\n\n        switch (drawType) {\n            case DrawTypes.Ellipse:\n                ellipse(0, 0, this.size, this.size);\n                break;\n            case DrawTypes.Rect:\n                rect(0, 0, this.size, this.size);\n                break;\n            case DrawTypes.Triangle:\n                triangle(\n                    -this.size * 0.5, -this.size * 0.5,\n                    0, this.size,\n                    this.size * 0.5, -this.size * 0.5\n                );\n                break;\n        }\n        pop();\n    }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Z ZR",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2588857",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:55:55",
+    "used_in_videos": [
+        "Driving Essence Swells.mp4"
+    ],
+    "used_count": 1
+}

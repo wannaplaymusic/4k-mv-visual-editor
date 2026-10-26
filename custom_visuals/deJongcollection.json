@@ -1,0 +1,26 @@
+{
+    "name": "deJongcollection",
+    "code": "// === Tab: mySketch ===\n// 整えるの面倒だったから雑に詰め合わせた\n// reference:http://paulbourke.net/fractals/peterdejong/\n\nx=y=100;\ntypeId = 0;\nconst ID_MAX = 8;\nsetup=_=>{\n  createCanvas(600,600);\n  colorMode(HSB,100);\n  noStroke();\n  background(100);\n}\ndraw=_=>{\n  translate(300,300);\n  r=400;while(r--){\n\t\tdejong();\n  }\n}\n\nfunction dejong(){\n\twindow[\"dejong\" + typeId]();\n}\n\nfunction dejong0(){\n  u=x;v=y;\n  a = -0.709; b = 1.638; c = 0.452; d = 1.740;\n  x=f7(a*v) - f8(b*u);y=f7(c*u)-f8(d*v);\n  fill(25+x*5+y*5,60+x*6-y*6,100,30);\n  circle(x * 100 + 10, y * 110 + 30, 2);\n}\n\nfunction dejong1(){\n  u=x;v=y;\n  a = 2.01; b = -2.53; c = 1.61; d = -0.33;\n  x=f7(a*v) - f8(b*u);y=f7(c*u)-f8(d*v);\n  fill(25+x*5+y*5,60+x*6-y*6,100,30);\n  circle(x*100, y*140 + 140, 2);\n}\n\nfunction dejong2(){\n  u=x;v=y;\n  a = -2; b = -2; c = -1.2; d = 2; // なかなか良い\n  x=f7(a*v) - f8(b*u);y=f7(c*u)-f8(d*v);\n  fill(25+x*5+y*5,60+x*6-y*6,100,30);\n  circle(20 + x*100, 30 + y*110, 2);\n}\n\nfunction dejong3(){\n  u=x;v=y;\n  a = -2.3; b = -1.7; c = -1.2; d = 2;\n  x=f3(a*v) - f4(b*u);y=f3(c*u)-f4(d*v);\n  fill(25+x*5+y*5,60+x*6-y*6,100,30);\n  circle(x*125, 60+y*180, 2);\n}\n\nfunction dejong4(){\n  u=x;v=y;\n  a = 1.5; b = 2.7; c = 0.8; d= 1.7;\n  x=f3(a*v) - f4(b*u);y=f3(c*u)-f4(d*v);\n  fill(25+x*5+y*5,60+x*6-y*6,100,30);\n  circle(x*125, 60+y*180, 2);\n}\n\nfunction dejong5(){\n  u=x;v=y; // ドーナツ\n  a = 1.40; b = 1.56; c = 1.40; d = -6.56;\n  x=d*f1(a*u)-f1(b*v);y=c*f2(a*u)+f2(b*v);\n  fill(25+x*5+y*5,60+x*6-y*6,100,30);\n  circle(x * 32, y * 64, 2);\n}\n\nfunction dejong6(){\n  u=x;v=y;\n  a = 1.30; b = 1.56; c = 1.60; d = -4.56;\n  x=d*f7(a*u)-f7(b*v);y=c*f8(a*u)+f8(b*v);\n  fill(25+x*5+y*5,60+x*6-y*6,100,30);\n  circle(x * 40, y * 80 - 80, 2);\n}\n\nfunction dejong7(){\n  u=x;v=y;\n  a = 3; b = -1.9; c = 1.4;d = -1.5;\n  x=d*f7(a*u)-f7(b*v);y=c*f8(a*u)+f8(b*v);\n  fill(25+x*5+y*5,60+x*6-y*6,100,30);\n  circle(x * 80, y * 80 - 80, 2);\n}\n\nfunction dejong8(){\n  u=x;v=y;\n  a=-2.4;b=-0.2;c=-1.86;d=-3.5;\n  x=d*f7(a*u)-f7(b*v);y=c*f8(a*u)+f8(b*v);\n  fill(25+x*5+y*5,60+x*6-y*6,100,30);\n  circle(x*50,y*80-60,2);\n}\n\nfunction mouseClicked(){\n\tbackground(100);\n\ttypeId++;\n\tif(typeId > ID_MAX){ typeId = 0; }\n\tx=y=100;\n}\n\n// utility.\nfunction f1(x){ return sin(x); }\nfunction f2(x){ return cos(x); }\nfunction f3(x){\n  let m = floor(abs(x) * 0.5 / PI) + 2;\n  x += 2 * PI * m;\n  x = x % TAU;\n  return max(min((2 / PI) * x, 2 - (2 / PI) * x), (2 / PI) * (x - 2 * PI));\n}\nfunction f4(x){ return f3(x + PI / 2); }\nfunction f5(x){ return f1(x) + f3(x); }\nfunction f6(x){ return f2(x) + f4(x); }\nfunction f7(x){ return f1(x) + 0.5 * f1(2 * x) + 0.25 * f1(4 * x); }\nfunction f8(x){ return f2(x) + 0.5 * f2(2 * x) + 0.25 * f2(4 * x); }\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Abdulkadir Arpacı",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1680826",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:47:13",
+    "used_in_videos": [
+        "Arctic Delay Lines.mp4"
+    ],
+    "used_count": 1
+}

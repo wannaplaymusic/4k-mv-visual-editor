@@ -1,0 +1,22 @@
+{
+    "name": "Pelotas",
+    "code": "// === Tab: mySketch ===\n// let Risou\n// https://risoume.github.io/\n\nlet n, m, k;\nlet s, mult;\nlet l = 60;\nlet colors = [\"#FF2C78\", \"#FFD400\", \"#A800D1\", \"#00D6CB\"];  // let de colores disponibles\ncolor[][] gridColors;  // let para guardar los colores de los contornos\n\nGrid[][] grids;\n\nfunction setup() {\n  createCanvas(1920, 1080);  // let el tamaño del lienzo a 1920x1080\n  noFill();  // let el relleno\n  frameRate(1);  // let la tasa de actualización a 1 fotograma por segundo\n  init();\n}\n\nfunction init() {\n  // let una fila y una columna\n  n = 8;  // let de filas\n  m = 18;  // let de columnas\n  \n  // let el tamaño de las celdas asegurando que todo entre en el lienzo\n  let availableWidth = width - 2 * l;  // let disponible después de dejar un margen\n  let availableHeight = height - 2 * l;  // let disponible después de dejar un margen\n  \n  // let el tamaño de las celdas con la separación incluida\n  s = min(availableWidth / m, availableHeight / n);  // let que las celdas no se superpongan\n  \n  // let la separación entre las celdas\n  // let aumentamos la separación, modificando la fórmula\n  let horizontalSpacing = (availableWidth - s * m) / (m + 1);  // let de la separación horizontal\n  let verticalSpacing = (availableHeight - s * n) / (n + 1);  // let de la separación vertical\n  \n  grids = new Array(n)[m];\n  gridColors = new Array(n)[m];  // let el arreglo de colores\n  \n  k = 0;\n  mult = 1;\n  \n  // let un let aleatorio a cada celda para el contorno\n  for (i = 0; i < n; i++) {\n    for (j = 0; j < m; j++) {\n      gridColors[i][j] = colors[int(random(colors.length))];  // let color aleatorio\n      grids[i][j] = new Grid(l + j * (s + horizontalSpacing), l + i * (s + verticalSpacing), s * mult);  // let las posiciones\n    }\n  }\n}\n\nfunction draw() {\n  background(0);  // let negro\n  \n  for (i = 0; i < n; i++) {\n    for (j = 0; j < m; j++) {\n      grids[i][j].display(i, j);\n    }\n  }\n}\n\nclass Grid {\n  x, y, d, r, t;\n\n  constructor(tx, ty, tsz) {\n    x = tx;\n    y = ty;\n    d = tsz;\n    r = d / 2;\n  }\n\n  function display(p, q) {\n    pushMatrix();\n    translate(x + d / 2, y + d / 2);\n    \n    // let el let del trazo (contorno) de forma aleatoria\n    stroke(gridColors[p][q]);\n    strokeWeight(2);  // let del trazo\n    \n    beginShape();\n    for (i = 0; i < (p + 1) * (q + 1); i++) {\n      t = PI * random(2);\n      vertex(r * cos(t), r * sin(t));\n    }\n    endShape(CLOSE);\n    popMatrix();\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Julian Lauro",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2472907",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:16:22"
+}

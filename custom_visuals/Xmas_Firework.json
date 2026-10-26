@@ -1,0 +1,31 @@
+{
+    "name": "Xmas_Firework",
+    "code": "// === Tab: mySketch ===\n// by SamuelYAN\n// more works //\n// https://twitter.com/SamuelAnn0924\n// https://www.instagram.com/samuel_yan_1990/\n\nvar seed = Math.random() * 1000;\nvar particles = [];\nvar mySize;\nvar parNum;\nlet colors1 = \"e5463e-ef6a5b-bc3c34-1f6f36-498655-1e5c2e-416fd2-6b85da-3a5cac\".split(\"-\").map((a) => \"#\" + a);\nlet colors2 = \"e183ce-e4d4ad-55e597-728581-f94f2e-6e467f-5a73d8-77d831-a2745d\".split(\"-\").map((a) => \"#\" + a);\nlet colors3 = \"ff499e-d264b6-a480cf-779be7-49b6ff-49ffd4-f080d2-a3c48b-ccc792\".split(\"-\").map((a) => \"#\" + a);\nlet colors4 = \"547cff-49a181-7691f9-d6e6e9-3e1b9f-de958c-3e8953-af5046-3d43ae\".split(\"-\").map((a) => \"#\" + a);\nlet colorbg = \"1e2426\".split(\"-\").map((a) => \"#\" + a);\nlet timer = 0;\nlet fireworks_color;\n\nfunction setup() {\n\t//randomSeed(seed);\n\tmySize = max(windowWidth, windowHeight);\n\tcreateCanvas(windowWidth, windowHeight);\n\t// createCanvas(600,600);\n\t// pixelDensity(5);\n\tbackground(colorbg);\n\tfireworks_color = random([colors1,colors2,colors3,colors4]);\n\tmake_par(width / 2, height / 2);\n\tlet filter = new makeFilter();\n}\n\nfunction make_par(x, y) {\n\tthis.x = x;\n\tthis.y = y;\n\tparNum = random([5,10]);\n\tfor (let i = 0; i < parNum; i++) {\n\t\tparticles.push(new Particle(this.x, this.y))\n\t}\n}\n\nfunction draw() {\n\trandomSeed(seed);\n\t// blendMode(ADD)\n\tfor (let i = particles.length - 1; i > 0; i--) {\n\t\tif (i < particles.length) {\n\t\t\tparticles[i].show();\n\t\t\tparticles[i].update();\n\t\t\tif (particles[i].r < 5) {\n\t\t\t\tparticles[i].explode();\n\t\t\t}\n\t\t\tif (particles[i].finished()) {\n\t\t\t\tif (timer < 50) {\n\t\t\t\t\tmake_par(particles[i].x, particles[i].y);\n\t\t\t\t\ttimer++;\n\t\t\t\t}\n\t\t\t\tparticles.splice(i, 1);\t\t\n\t\t\t}\n\t\t}\n\t\t\n\t}\n\timage(overAllTexture, 0, 0);\n}\n\nfunction makeFilter() {\n\t// noiseのフィルターをつくる\n\tcolorMode(HSB, 360, 100, 100, 100);\n\tdrawingContext.shadowColor = color(0, 0, 95, 25);\n\toverAllTexture = createGraphics(windowWidth, windowHeight);\n\toverAllTexture.loadPixels();\n\tfor (var i = 0; i < width; i++) {\n\t\tfor (var j = 0; j < height; j++) {\n\t\t\toverAllTexture.set(\n\t\t\t\ti,\n\t\t\t\tj,\n\t\t\t\tcolor(\n\t\t\t\t\t10,\n\t\t\t\t\t10,\n\t\t\t\t\t10,\n\t\t\t\t\tnoise(i / 3, j / 3, (i * j) / 50) * random(1, 15)\n\t\t\t\t)\n\t\t\t);\n\t\t}\n\t}\n\toverAllTexture.updatePixels();\n}\n\nfunction mouseClicked(){\n\t//loop();\n\tparticles = [];\n\tbackground(colorbg);\n\tfireworks_color = random([colors1,colors2,colors3,colors4]);\n\tmake_par((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\ttimer =0;\n}\n\nfunction keyTyped() {\n\tif (key === \"s\" || key === \"S\") {\n\t\tnoLoop();\n\t\tsaveCanvas(\"Xmas_Fireworks\", \"png\");\n\t}\n}\n\n// === Tab: tab2 ===\nfunction Particle(x, y) {\n\tthis.x = x;\n\tthis.y = y;\n\tthis.pos = createVector(this.x, this.y);\n\tthis.vel = createVector(0,-sin(random(0,1)));\n\tthis.acc = createVector(random(0.01,-0.01), random(0.01,-0.01));\n\t//this.alpha = 100;\n\tthis.r = random(30, 10);\n\tthis.particles2 = [];\n\tthis.color = random(fireworks_color);\n\n\tthis.update = function() {\n\t\tthis.vel.add(this.acc);\n\t\tthis.pos.add(this.vel);\n\t\t//this.alpha -= 0.25;\n\t\tif (this.r > 0) {\n\t\t\tthis.r -= 0.1;\n\t\t}\n\t};\n\n\tthis.show = function() {\n\t\tfill(this.color);\n\t\tnoStroke();\n\t\tcircle(this.pos.x, this.pos.y, this.r);\n\t};\n\n\tthis.explode = function() {\n\t\tthis.particles2.push(new Particle2(this.pos.x, this.pos.y, this.r,this.color));\n\t\tfor (let i = this.particles2.length - 1; i > 0; i--) {\n\t\t\t//this.particles2[i].r = this.r;\n\t\t\tthis.particles2[i].show();\n\t\t\tthis.particles2[i].update();\n\n\t\t\tif (this.particles2[i].finished()) {\n\t\t\t\tthis.particles2.splice(i, 1);\n\t\t\t}\n\t\t}\n\t};\n\n\tthis.finished = function() {\n\t\treturn this.r < 3;\n\t};\n}\n\n// === Tab: tab3 ===\nfunction Particle2(x, y,r,color) {\n\tthis.x = x;\n\tthis.y = y;\n\tthis.explode = new Particle(this.x, this.y);\n\tthis.pos = createVector(this.x, this.y);\n\tthis.vel = createVector(random(-1.25,1.25), random(-1.25,1.25));\n\tthis.acc = createVector(random(-0.005, 0.005), random(-0.005, 0.005));\n\t//this.alpha = 50;\n\tthis.r = r;\n\tthis.color = color;\n\t\n\n\tthis.update = function() {\n\t\tthis.vel.add(this.acc);\n\t\tthis.pos.add(this.vel);\n\t\tif (this.r > 0) {\n\t\t\tthis.r -= 0.01;\n\t\t}\n\t}\n\n\tthis.show = function() {\n\t\tnoFill();\n\t\tstroke(this.color);\n\t\tstrokeWeight(random(1));\n\t\tcircle(this.pos.x, this.pos.y, this.r);\n\t}\n\n\tthis.finished = function() {\n\t\treturn this.r < 0;\n\t};\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Samuel YAN",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1400988",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:02:36",
+    "used_in_videos": [
+        "Vaporized Structures.mp4"
+    ],
+    "used_count": 1
+}

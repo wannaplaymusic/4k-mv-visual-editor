@@ -1,0 +1,70 @@
+{
+    "name": "GravityFieldLinesInteractiveParticleNetwork",
+    "code": "// === Tab: ParticleNetwork ===\n//network\nvar distThreshold = 100;\n\n//particles\nvar numOfParticles = 200;\nvar particles = [];\n\n//containment\nvar circleRadius = 400;\n\n//interactivity\nvar gravity = 0;\nvar mouseWheelSensitivity = 0.001;\n\nvar dampeningForce = 0;\nvar maxDampening = 0.1;\n\nfunction setup() {\n    createCanvas(900, 900);\n\n    //create all the particles\n    for (var i = 0; i < numOfParticles; i++) {\n        particles.push(new Particle());\n    }\n}\n\nfunction draw() {\n    background(255);\n\n    //draw background circle\n    fill(0);\n    noStroke()\n    ellipse(width / 2, height / 2, circleRadius * 2);\n\n    //update and show all teh particles\n    for (var i = 0; i < particles.length; i++) {\n        particles[i].update();\n        particles[i].connectNearestParticles(particles, i);\n        particles[i].show();\n    }\n}\n\nfunction Reset() {\n    //reste gravity\n    gravity = 0;\n\n    //create new particles\n    particles = [];\n    for (var i = 0; i < numOfParticles; i++) {\n        particles.push(new Particle());\n    }\n}\n\nfunction mouseWheel(event) {\n    //change gravity\n    gravity -= event.delta * mouseWheelSensitivity;\n}\n\nfunction mouseClicked() {\n    //reset gravity\n    gravity = 0;\n}\n\nfunction mousePressed() {\n    //enamble dampening\n    if (mouseButton == CENTER) {\n        dampeningForce = maxDampening;\n    }\n}\n\nfunction mouseReleased() {\n    //Disable dampening\n    dampeningForce = 0;\n}\n\nfunction keyReleased() {\n    //reset\n    if (key == ' ') {\n        Reset();\n    }\n}\n\n// === Tab: Particle ===\nfunction Particle() {\n    //calculate random spawn vector inide circle\n    const vectorInCircle = createVector(random(-1, 1), random(-1, 1));\n    vectorInCircle.limit(1);\n    vectorInCircle.mult(circleRadius);\n    this.pos = createVector(width / 2, height / 2).add(vectorInCircle);\n\n    //calculate random color\n    this.color = color(random(255), random(255), random(255));\n\n    //set size\n    this.size = 3;\n\n    //create random motion vector\n    this.vel = createVector(random(-1, 1), random(-1, 1));\n\n    //array of particles connected with this particle\n    this.connectedWith = [];\n\n    //alpha value of the triangles between the particles\n    this.triangleAlpha = 100;\n}\n\nParticle.prototype.show = function () {\n    //darw particle\n    fill(this.color);\n    noStroke();\n    ellipse(this.pos.x, this.pos.y, this.size);\n\n    //darw triangles between particles (only of there are at least two particles connected to this one)\n    if (this.connectedWith.length > 1) {\n        for (var i = 0; i < this.connectedWith.length - 1; i += 2) { //go through all connected particles in steps of two\n\n            //calculate teh color of the triangle from the particle colors\n            var r = (red(this.color) + red(this.connectedWith[i].color) + red(this.connectedWith[i + 1].color)) / 3;\n            var g = (green(this.color) + green(this.connectedWith[i].color) + green(this.connectedWith[i + 1].color)) / 3;\n            var b = (blue(this.color) + blue(this.connectedWith[i].color) + blue(this.connectedWith[i + 1].color)) / 3;\n            var col = color(r, g, b, this.triangleAlpha);\n\n            //darw the shape\n            fill(col);\n            noStroke();\n            beginShape(TRIANGLES);\n            vertex(this.pos.x, this.pos.y);\n            vertex(this.connectedWith[i].pos.x, this.connectedWith[i].pos.y);\n            vertex(this.connectedWith[i + 1].pos.x, this.connectedWith[i + 1].pos.y);\n            endShape(CLOSE);\n        }\n    }\n}\n\nParticle.prototype.update = function () {\n    //add gravity\n    this.vel.add(createVector(0, gravity));\n\n    //add dampening\n    var dampening = this.vel.copy().mult(-1);\n    dampening.limit(1);\n    dampening.mult(dampeningForce);\n    this.vel.add(dampening);\n\n    //update position\n    this.pos.add(this.vel);\n\n    //calc dist to center for collision\n    var center = createVector(width / 2, height / 2);\n    var distToCenter = this.pos.dist(center);\n\n    //if particle is leaving circle, pop it back in and reverse its velocity\n    if (distToCenter > circleRadius) {\n        const vecToCenter = center.copy().sub(this.pos).normalize();\n\n        this.vel = this.vel.sub(vecToCenter.copy().mult(p5.Vector.dot(this.vel, vecToCenter)*2));\n        this.pos = center.copy().add(vecToCenter.mult(-circleRadius));\n    }\n}\n\nParticle.prototype.connectNearestParticles = function (particles, ownIndex) {\n    for (var i = 0; i < particles.length; i++) { //go through all particles\n        if (i != ownIndex) { //make sure we don't check ourselfs\n            //calc dist to the particle\n            var dist = this.pos.dist(particles[i].pos);\n\n            //check if we are allready connected to this particle\n            var allreadyConnected = false;\n            for (var j = 0; j < this.connectedWith.length; j++) {\n                if (this.connectedWith[j] == particles[i]) {\n                    //after we know we are connected with this particle, check wether we should disconnect\n                    if (dist > distThreshold) {\n                        this.connectedWith.splice(j, 1);\n                    }\n                    allreadyConnected = true;\n                }\n            }\n\n            //only if we arent allready connected to the particle or not just disconnected, check wether we should connect\n            if (!allreadyConnected) {\n                if (dist < distThreshold) {\n                    this.connectedWith.push(particles[i]);\n                }\n            }\n        }\n    }\n};\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Albert",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1990209",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:27:07",
+    "used_in_videos": [
+        "Nocturnal Infrastructure.mp4",
+        "Soft Collapse.mp4",
+        "Fading Coordinates.mp4"
+    ],
+    "used_count": 3,
+    "expressive_profile": {
+        "module_id": "GravityFieldLinesInteractiveParticleNetwork.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                15.0,
+                345.0
+            ],
+            "mean_lightness": 0.006,
+            "mean_chroma": 0.025,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.12,
+            "curl_vorticity": 0.009,
+            "divergence": -0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-10-05 14:04:05"
+    },
+    "is_new_semantic_ingested": true,
+    "is_starred": false
+}

@@ -1,0 +1,26 @@
+{
+    "name": "drip",
+    "code": "// === Tab: mySketch ===\nlet currentScale\nraindrops =[];\nicicles = [];\nlet gravity = 0.0002\n\nfunction setup() {\n  createCanvas(350, 500);\n  noStroke()\n  for(let i=0; i<8; i++){\n    icicles.push(new icicle)\n  }\n}\n\nfunction draw() {\n  background(200);\n  \n  \n  for( let icicle of icicles) {\n    icicle.update();\n    icicle.show();\n  }\n\n  \n  for (let Raindrop of raindrops) {\n    Raindrop.update();\n    Raindrop.show();\n  }\n  \n  \n}\n\nclass icicle{\n  constructor(){\n    this.x=random(0, width)\n    this.y=random(30, 200)\n    this.scaler= 1 - (this.y/2000)\n    this.timer=round(random(50, 300))\n  }\n  update(){\n    if(this.timer>=0){\n      this.timer-=1\n    }else{\n      raindrops.push(new Raindrop(this.x, this.y, this.scaler));\n      this.timer=random(100, 300)\n    }   \n  }\n  \n  show(){\n    push()\n  translate(this.x, this.y)\n  scale(this.scaler)\n  currentScale=this.scaler\n  for(let i=0; i>-220; i-=5){\n    fill(0, 200+i)\n    ellipse(0-(i/10), i, i * .5, 2-(i/5))\n  }\n  pop()  \n  }\n}\n\nclass Raindrop{\n  constructor(x, y, scaler){\n    this.x=x\n    this.y=y\n    this.acc=0\n    this.speed=0\n    this.scaler= scaler\n    this.timer=random(1, 800)\n    this.r= 5 * this.scaler\n  }\n  \n  update(){\n      this.acc+=gravity\n      this.speed+=this.acc\n      this.y+=this.speed\n    if (this.y > height) {\n      let index = raindrops.indexOf(this);\n      raindrops.splice(index, 1);\n    }\n  }\n  show(){\n    fill(255)\n    ellipse(this.x, this.y, this.r)\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Aaron Reuland (a_ soluble_fish)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1224849",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:14:23",
+    "used_in_videos": [
+        "Substructure 9.mp4"
+    ],
+    "used_count": 1
+}

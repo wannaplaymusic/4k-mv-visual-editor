@@ -1,0 +1,26 @@
+{
+    "name": "Web01",
+    "code": "// === Tab: mySketch ===\nlet simpleShader;\nlet newX = 0;\nlet newY = 0;\nlet oldX = 0;\nlet oldY = 0;\nlet img;\nlet flip = 0;\nlet pg;\n\nfunction preload(){\n  // Load the shader\n  simpleShader = loadShader('https://openprocessing.org/sketch/2162165/files/basic.vert', 'basic.frag');\n\n  // Load the image\n  // img = loadImage('');\t\n  img = loadImage(\"https://openprocessing.org/sketch/2162165/files/w01.png\");\n  \n}\n\nfunction setup() {\n  // shaders require WEBGL mode to work\n  createCanvas(1920, 1080, WEBGL);\n\tpg = createGraphics(width, height); \n\tif (flip == 1){\n\t  pg.scale(1, -1);\n\t  pg.image(img, 0, -height, width, height);\n  }else{\n    pg.image(img, 0, 0, width, height);\n\t}\n  window.simulatedMouseX = width / 4;\n\twindow.simulatedMouseY = height / 4;\n}\n\nfunction draw() {  \n  if (frameCount%100 == 0){\n    newX = random(width);\n\t\tnewY = random(height);\n\t}\n\tif window.simulatedMouseX -=1;\n\tif window.simulatedMouseX +=1;\n\tif (newY > oldY) oldY-=1;\n\tif window.simulatedMouseY +=1;\n\t\n  // shader() sets the active shader with our shader\n  shader(simpleShader);\n  \n  const mx = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 0, 100);\n  const my = map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, 0, 100);\n  \n  // Send the image to the shader\n  simpleShader.setUniform(\"uTexture\", pg);\n  simpleShader.setUniform(\"uScale\", [mx, my]);\n\n  // rect gives us some geometry on the screen\n  rect(0,0,width, height);\n  \n}\n\nfunction keyPressed(){\n    save('pix.jpg');\n}\n \n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u232581",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/2162165",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 22:39:57",
+    "used_in_videos": [
+        "Void Vortex Gladiator.mp4"
+    ],
+    "used_count": 1
+}

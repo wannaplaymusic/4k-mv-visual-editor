@@ -17,12 +17,14 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 5,
     "is_starred": true,
     "used_in_videos": [
+        "The Last Echo Delay.mp4",
         "Airlock Reverie.mp4",
         "Metal Frame.mp4",
-        "The Last Echo Delay.mp4"
+        "Submerged Echoes.mp4",
+        "True Feeling.mp4"
     ],
     "needs_qc_repair": true,
     "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"

@@ -1,0 +1,24 @@
+{
+    "name": "Itjustdoesntlastdoesit",
+    "code": "// === Tab: mySketch ===\n//recommended soundtrack- \"bad girl\" by Devendra Banhart ---> code by Aaron Reuland\n\nrain=[]\ncolors=[\"#75b9be\",\"#696d7d\",\"#d72638\",\"#f49d37\",\"#140f2d\"]\n\nfunction setup() {\n  createCanvas(800, 600);\n\tbackground('#f0ead6');\n\t//blendMode(HARD_LIGHT)\n}\n\nfunction draw() {\n\tbackgroundColor=color('#f0ead6')\n\tbackgroundColor.setAlpha(10)\n\tbackground(backgroundColor)\n  \n  if(frameCount%2==0){\n    rain.push(new drip(random(width), random(-100, height), random(5, 30)))\n  }\n\n  for(let i=rain.length-1; i>=0; i--){\n    rain[i].move();\n    rain[i].show();\n  }\n}\n\nclass pointer{\n  constructor(rad, acc, finalSize){\n    this.dist=1\n    this.rad=rad\n    this.speed=0\n    this.acc=acc\n    this.pos=createVector(0, 0)\n    this.finalSize=finalSize\n    this.downSpeed=createVector(0, 0.01)\n    this.downAcc=createVector(0, 0.05+this.acc/500)\n  }\n  move(){\n    if(this.dist<=this.finalSize){\n    this.speed+=this.acc\n    this.dist+=this.speed\n    this.pos=createVector(cos(this.rad)*this.dist, sin(this.rad)*this.dist)\n    } else{\n      this.downSpeed.add(this.downAcc);\n      this.pos.add(this.downSpeed);  \n    }\n  }\n}\n\n\nclass drip{\n  constructor(x, y, extent){\n    this.splat=[]\n\t\tthis.color= color(random(colors))\n    this.x=x\n    this.y=y\n\t\tthis.death=500\n    this.extent=extent\n    this.noiseStart=random(1000)\n  for(let i=this.noiseStart;i<this.noiseStart+TWO_PI; i+=0.1){\n    let acc= (noise(i))\n    this.splat.push(new pointer(i, acc, extent))\n  }  \n  }\n  \n move(){\n   for(let n of this.splat){\n     n.move()\n   }\n\t this.death-=1\n   if(this.death<1){\n     let index = rain.indexOf(this);\n      rain.splice(index, 1);\n   }\n } \n show(){\n noStroke()\n\t this.color.setAlpha(80)\n fill(this.color)\n   push()\n  translate(this.x, this.y)\n  beginShape()\n  for(let i=0; i<this.splat.length; i++){\n    curveVertex(this.splat[i].pos.x, this.splat[i].pos.y)\n  }\n  endShape(CLOSE)\npop() \n }\n  \n}\n\nfunction mousePressed() {\n    let fs = fullscreen();\n    fullscreen(!fs);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Aaron Reuland (a_ soluble_fish)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1645787",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:47:21",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

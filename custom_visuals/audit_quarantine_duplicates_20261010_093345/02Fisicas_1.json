@@ -1,0 +1,24 @@
+{
+    "name": "02Fisicas",
+    "code": "// === Tab: mySketch ===\n// ref: https://openprocessing.org/sketch/433914\n\nlet col = ['#ffffff', '#3838f6'];\n\nlet num = 15;\nlet margin = 0;\nlet sz;\n\nlet sclVal, angle;\n\nfunction setup(){\n\tcreateCanvas(800, 800);\n\tsz = (width - margin*2) / num;\n\tangle = 0;\n}\n\nfunction draw(){\n\tbackground(col[1]);\n\n\tlet gap = 10;\n\ttranslate(-sz *gap, 0);\n\t\n\tfor(let i=0; i<num+gap; i++){\n\t\tlet x = margin + i * sz;\n\t\tfor(let j=0; j<=num; j++){\n\t\t\tlet y = margin + j * sz;\n\n\t\t\tsclVal = ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) /5) / 1.5 ; //+ noise(j)*20\n\t\t\t\n\t\t\tx += (sin(angle) * sclVal) ;\t\t\n\n\t\t\tif(j % 2 === 0){\n\t\t\t\tif(i % 2 === 0){\n\t\t\t\t\tfill(col[0]);\n\t\t\t\t} else if(i % 2 === 1){\n\t\t\t\t\tfill(col[1]);\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tif(i % 2 === 0){\n\t\t\t\t\tfill(col[1]);\n\t\t\t\t} else if(i % 2 === 1){\n\t\t\t\t\tfill(col[0]);\n\t\t\t\t}\n\t\t\t}\n\n\t\t\t// noStroke();\n\t\t\tstroke(col[1]);\n\t\t\trect(x, y, sz);\n\t\t\t//circle(x,y,sz);\n\n\t\t\tangle += PI/8; //5\n\t\t\t\n\t\t}\t\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u330128",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09"
+    ],
+    "url": "https://openprocessing.org/sketch/1704100",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 17:10:32",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

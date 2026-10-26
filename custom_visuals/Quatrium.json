@@ -1,0 +1,24 @@
+{
+    "name": "Quatrium",
+    "code": "// === Tab: mySketch ===\nvar jmShad;\n\nfunction setup() {\n  \n  createCanvas(1112,834,WEBGL);\n  rectMode(CENTER);\n  noStroke();\n  fill(204,100,100);\n  jmShad = createShader(vert, frag);\n  }\n\nfunction draw() {  \n  this.shader(jmShad);\n  background(0);\n  jmShad.setUniform('resolution',[width,height]);\n  jmShad.setUniform('time',millis()/2000);\n  rect(0,0,width,height);\n}\n\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n// prevents mouse press from registering twice\n  if (millis() - lapse > 400){\n    save('pix.jpg');\n    lapse = millis();\n  }\n}\n\n// === Tab: tab2 ===\nvar vert=`\n     #ifdef GL_ES\n      precision highp float;\n      #endif\n\n    // \n    attribute vec3 aPosition;\n    attribute vec3 aNormal;\n    attribute vec2 aTexCoord;\n    attribute vec4 aVertexColor;\n\n    //\n    varying vec3 var_vertPos;\n    varying vec4 var_vertCol;\n    varying vec3 var_vertNormal;\n    varying vec2 var_vertTexCoord;\n    \n    // matrices\n    uniform mat4 uModelViewMatrix;\n    uniform mat4 uProjectionMatrix;\n    uniform mat3 uNormalMatrix;\n\n    void main() {\n      gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);\n\n      // just passing things through\n      var_vertPos      = aPosition;\n      var_vertCol      = aVertexColor;\n      var_vertNormal   = aNormal;\n      var_vertTexCoord = aTexCoord;\n    }\n    \n`;\n\n// === Tab: tab3 ===\nvar frag=`\n\n#ifdef GL_ES\nprecision highp float;\n#endif\n\nuniform vec2 resolution;\nuniform float time;\nconst float PI=3.14159265359;\nconst float TAU = PI*2.0;\nconst float nb=0.01;\n\n vec4 quaternion(vec3 axis, float theta){\n  return vec4(axis*sin(theta/2.0),cos(theta/2.0));}\n\nvec3 qtourne(vec4 q, vec3 v){return v+2.0*cross(cross(v,q.xyz)-q.w*v,q.xyz);}\n\nvec3 coupe(vec2 st){\n vec4 quat=quaternion(normalize(vec3(0.1*sin(time),0.4*cos(time),0.2*sin(time))),time);\n  vec3  st3=vec3(-0.5+st.x,st.y,0.2*cos(time));\n  st3=qtourne(quat,st3);\n  vec3 col=vec3(st3.x,st3.y,1.0);//abs(sin(time*3.0))*\n  st=st3.xy*nb;\n  \n  float somme=floor(pow(abs(st.y),-0.35)/(1.0+st.y*st.y))+floor(pow(abs(st.x),-0.35)/(1.0+st.x*st.x));\n  if(mod(somme,2.0) > 0.0){col=vec3(abs(cos(time)),2.0*abs(sin(time)),0.0);}\n\n  return col;\n}\nvoid main(void)\n{\n    vec2 ps = gl_FragCoord.xy / resolution.xy;\n    \n  ps=2.0*ps - 2.0*vec2(1.0);\n\n    vec3 colo=coupe(ps+vec2(0.5,-0.5)); \n    gl_FragColor=vec4(colo,1.0);\n}   \n`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1049728",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:24:34",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

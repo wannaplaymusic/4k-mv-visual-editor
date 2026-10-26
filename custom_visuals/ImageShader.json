@@ -1,0 +1,26 @@
+{
+    "name": "ImageShader",
+    "code": "// === Tab: mySketch ===\nvar theShader;\nvar img0;\n\nfunction preload() {\n\ttheShader = createShader(vert, frag);\n\timg0 = loadImage(\"https://openprocessing.org/sketch/2366020/files/IMG_2616.heic\");\n}\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowWidth*.75, WEBGL);\n\tbackground(100);\n\twindow.simulatedMouseX = width/2;\n}\n\nfunction draw() {\n\tnoStroke();\n\tshader(theShader);\n\ttheShader.setUniform(\"tex0\", img0);\n\ttheShader.setUniform(\"canvasSize\", [width, height]);\n\ttheShader.setUniform(\"mouse\", [(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) / width, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) / height]);\n\ttheShader.setUniform(\"time\", frameCount);\n\tquad(-1, 1, 1, 1, 1, -1, -1, -1)\n}\n\n// === Tab: vert ===\nconst vert = `#version 300 es\n  precision mediump float;\n\t\n\tin vec4 aPosition;\n  in vec2 aTexCoord;\n\n  out vec2 vTexCoord;\n\n  void main() {\n    vTexCoord = aTexCoord;\n    gl_Position = aPosition;\n  }\n`;\n\n// === Tab: frag ===\nconst frag = `#version 300 es\n  precision mediump float;\n\n  uniform sampler2D tex0;\n  uniform vec2 canvasSize;\n  uniform vec2 mouse;\n  uniform float time;\n\t\n\tconst float TAU = 6.283185;\n\t\n\tfloat dist2(vec2 v1, vec2 v2) {\n\t\tvec2 diff = v1 - v2;\n\t\tfloat ratio = canvasSize.y / canvasSize.x;\n\t\tdiff *= vec2(1, ratio);\n\t\treturn length(diff);\n\t}\n\t\n\tvec2 rotate(vec2 v, float a) {\n\t\tfloat ratio = canvasSize.y / canvasSize.x;\n\t\tv *= vec2(1, ratio);\n\t\tfloat s = sin(a);\n\t\tfloat c = cos(a);\n\t\tmat2 m = mat2(c, s, -s, c);\n\t\treturn m * v / vec2(1, ratio);\n\t}\n\t\n\tvec3 chromaticAbberationX(sampler2D tex, vec2 uv, float x, float d, float strength) {\n\t\tvec2 newUVR = uv;\n\t\tvec2 newUVG = uv;\n\t\tvec2 newUVB = uv;\n\t\tif(abs(uv.x - x) < d) {\n\t\t\tnewUVR.x += strength * 20. * (d - abs(uv.x - x));\n\t\t\tnewUVB.x -= strength * 20. * (d - abs(uv.x - x));\n\t\t}\n\t\tfloat R = texture(tex, newUVR).r;\n\t\tfloat G = texture(tex, newUVG).g;\n\t\tfloat B = texture(tex, newUVB).b;\n\t\tvec3 col = vec3(R, G, B);\n\t\treturn col;\n\t}\n\n  in vec2 vTexCoord;\n  out vec4 fragColor;\n  void main() {\n    vec2 uv = vTexCoord;\n\t\tfloat ratio = canvasSize.y / canvasSize.x;\n\t\tvec3 col = vec3(0);\n\t\tcol = chromaticAbberationX(tex0, uv, mouse.x, 0.2, 0.01);\n\t\tif(false) { //TURN OFF\n\t\tif(dist2(uv, mouse) < 0.1) {\n\t\t\t// col = texture(tex0, uv + vec2(sin(time / 10.) * 0.5 * (0.1 - dist2(uv, mouse)), cos(time / 10.) * 0.5 / ratio * (0.1 - dist2(uv, mouse)))).rgb;\n\t\t\t// col = texture(tex0, uv + (uv - mouse) * 50. * (0.1 - dist2(uv, mouse))).rgb;\n\t\t\tcol = texture(tex0, mouse + (rotate(uv - mouse, TAU * 0.25 * 10. * (0.1 - dist2(uv, mouse))))).rgb;\n\t\t} else {\n\t\t\tcol = texture(tex0, uv).rgb;\n\t\t}\n\t\t}\n    fragColor = vec4(col, 1.);\n  }\n`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/2366020",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 22:18:03",
+    "used_in_videos": [
+        "Infinite Feedback Spacious.mp4"
+    ],
+    "used_count": 1
+}

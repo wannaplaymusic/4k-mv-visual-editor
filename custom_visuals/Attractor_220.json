@@ -1,0 +1,33 @@
+{
+    "name": "Attractor_220",
+    "code": "// === Tab: mySketch ===\n// Attractor_22.0\n\nlet DX = -100 ; let DY = -100 ; let P = 2 ; let PP = sqrt(P) ; let max = 400 ;\n\nlet SX ; let SY ; let H ; let X ; let Y ; let C ; \nlet I ; let II ; let III ; let A ; let R ; let B ;\n\nfunction setup(){\n\tcreateCanvas(600, 600) ; noSmooth() ; background(0) ; fill(255) ; textSize(20) ;\n\tSX = -300 ; SY = -300 ; H = 600 ; B = 1 ;\n}//setup()\n\nfunction draw(){\n\t  for ( I = 0 ; I < 600 ; I++ ){\n\t\t\tX = I*H/600 + SX ; Y = II*H/600 + SY ;\n\t\t\tC = 0 ;\n\t\t\tfor ( III = 0 ; III < max ; III++ ){\n\t\t\t\tR = sqrt(pow(X,2)+pow(Y,2)) ; \n        A = atan(Y/X) ;\n        if ( X < 0 ){ A = A+PI ; }  \n\t\t\t  if ( X >= 0 && Y < 0 ){ A = A+(2*PI) ; }\n        A = A/P ; R = R*PP ;\n        X = R*cos(A) ; Y = R*sin(A) ;\n\t\t\t  Y = Y+DY ; X = X+DX ;\n\t\t\t\tC = C+1 ;\n\t\t\t\tif ( R > 3000 ){ III = max ; }\n\t\t\t}//III\n\t\t\tif ( C < max ){ C = 100*C/max ; stroke(125*sin(C)+125,0,0) ; }else{ stroke(0) ; } \n\t\t\tpoint(I,II) ;\n\t\t}//let II = II+1 ; if ( II >= 600 ){ II = 0 ; } \n\ttext(\"*\"+B,20,20) ;\n}//draw()\n\nfunction mousePressed(){\n\tX = H*float((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))))/600 + SX ; \n\tY = H*float((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))))/600 + SY ;\n\tSX = X-(H/4) ; SY = Y-(H/4) ; H = H/2 ; B = B*2 ;\n\tbackground(0) ;\n}//mousePressed()\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "KaijinQ",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1246999",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:11:12",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Blackout Interval.mp4"
+    ],
+    "used_count": 1
+}

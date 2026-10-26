@@ -1,0 +1,29 @@
+{
+    "name": "ColorfulSmoke_dynamicreference",
+    "code": "// === Tab: main.js ===\n/*\nColorful smoke\n\nA simple smoke effect.\n\njasonlabbe3d.com\ntwitter.com/russetPotato\n*/\n\nvar particles = [];\nvar maxAge = 60;\nvar globalHue = 0;\nvar pos;\nvar pos2;\n\nfunction setup() {\n\tcreateCanvas(1112, 834);\n\tcolorMode(HSB, 255);\n\ttextAlign(CENTER);\n\ttextSize(20);\n\tpos = new p5.Vector(width / 8, height / 2);\n}\n\nfunction draw() {\n\tblendMode(BLEND);\n  background(0);\n  blendMode(SCREEN);\n\t\n\tlet vector = new p5.Vector(pos.x, pos.y);\n\tpos = p5.Vector.lerp(pos, new p5.Vector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))), 0.05);\n\tpos2 = p5.Vector.lerp(pos, new p5.Vector(1112-(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))), 0.05);\n\tvector.sub(pos.x, pos.y);\n\tif (vector.mag() > 1) {\n\t\tparticles.push(new Particle(pos.x, pos.y));\n\t\tparticles.push(new Particle(pos2.x, pos2.y));\n\t}\n\t\n\tif (frameCount % 30 == 0) {\n\t\tglobalHue = random(255);\n\t}\n\t\n\tfor (let i = particles.length -1; i > -1; i--) {\n\t\tif (i == particles.length - 1) {\n\t\t\tcontinue;\n\t\t}\n\t\t\n\t\tlet opacity = map(particles[i].age, 0, maxAge, 0, 255);  // From opaque to transparent.\n\t\tlet offset = (1 - (particles[i].age / float(maxAge))) * 50  * particles[i].offsetVariance;  // Have it rise the longer it's alive.\n\t\t\n\t\tstroke(0, opacity);\n\t\tstrokeWeight(map(particles[i].age, 0, maxAge, 160, 10) * particles[i].sizeVariance);  // From small to bigger size.\n\t\tdrawingContext.shadowColor = color(particles[i].hue, 100, 200, opacity);\n\t\tdrawingContext.shadowBlur = map(particles[i].age, 0, maxAge, 60 * particles[i].sizeVariance, 1);  // From small to large blur.\n\t\t\n\t\tline(\n\t\t\tparticles[i].pos.x, particles[i].pos.y - offset, \n\t\t\tparticles[i + 1].pos.x, particles[i + 1].pos.y - offset);\n\t\t\n\t\tparticles[i].age -= 0.5;\n\t\tif (particles[i].age <= 0) {\n\t\t\tparticles.splice(i, 1);\n\t\t}\n\t}\n\t\n\tdrawingContext.shadowBlur = 0;\n\tfill(255);\n\t//text(\"Move the mouse around\", width / 2, 40);\n}\n\n// === Tab: particle.js ===\nfunction Particle(x, y) {\n\tthis.pos = new p5.Vector(x, y);\n\tthis.age = maxAge;\n\tthis.offsetVariance = random(0.5, 3);\n\tthis.sizeVariance = random(0.5, 1.5);\n\tthis.hue = globalHue;\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u246008",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1003230",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 18:02:25",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

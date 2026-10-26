@@ -1,0 +1,31 @@
+{
+    "name": "StarFieldbutcolorful",
+    "code": "// === Tab: mySketch ===\n//Starfield\n//Alessandro Valentino 2021;\n\n\n\n\n\nconst MAX_NUMBER = 200;\n\nlet vertShader = `\n\tprecision highp float;\n\n\tattribute vec3 aPosition;\n\n\tvoid main() {\n\t\tvec4 positionVec4 = vec4(aPosition, 1.0);\n\t\tpositionVec4.xy = positionVec4.xy * 2.0 - 1.0;\n\t\tgl_Position = positionVec4;\n\t}\n`;\n\nlet fragShader = `\n\tprecision highp float;\n\t\n\tuniform float time;\n\tuniform float a;\n\tuniform float slide;\n\tuniform vec2 resolution;\n\tuniform vec3 particles[${MAX_NUMBER}];\n    uniform vec3 colors[${MAX_NUMBER}];\n\n\t\n\tvoid main() {\n\t\t\tvec2 st = gl_FragCoord.xy / resolution.xy; \n\t\t\t\n            // Center coordinates;\n            vec2 st_c = 1.0 - 2.0 * st;\n\t\t\t\n            // Restore aspect ratio;\n\t\t\tst_c.y *= resolution.y/resolution.x;\n\n\n\t\t\tfloat angle = a * 2.0 * 3.1415;\n\t\t\tmat2 R = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));\n\t\t\tst_c *= R;\n\n\t\t\tfloat mult = 0.01;\n\t\t\t\n      vec3 col = vec3(0.0);\n        \n\t\t\tfor(int i = 0; i < ${MAX_NUMBER}; i++){\n\t\t\t\n\t\t\t\t\tvec3 particle = particles[i];\n\t\t\t\t\tvec2 pos = particle.xy;\n\t\t\t\t\tfloat m = particle.z * 1.1;\n\t\t\t\t\tvec3 color = colors[i]/ 255.0;\n\t\t\t\t\tcol += color / distance(st_c, pos)  * m * mult ;\n\t\t\t}\n           \n\t\t\tvec3 output_color = col;\n\t\t\tvec3 contr = output_color * output_color;\n\t\t\toutput_color = mix(output_color, contr, slide);\n\t\t\tgl_FragColor = vec4(output_color, 1.0);\n\t\t\t\n\t}\n`;\n\nlet shader;\nlet buffer, bufferB;\nlet palette = [\"#231942\", \"#5E548E\", \"#9F86C0\", \"#BE95C4\", \"#8A430A\", \"#36A832\"];\n//let palette = [\"#16f99d\", \"#5f1357\", \"97084e\", \"#e4e690\", \"#a74507\", \"#036032\", \"#8d42d6\", \"#9c6978\", \"#16c766\", \"#7e909e\", \"#ad92b3\", \"#235251\", \"#17daf2\", \"#15c2cc\", \"#978a32\", \"#3e826a\", \"#9065dc\", \"#a6c55f\", \"#038e17\", \"#8be08b\", \"#7f3973\", \"#facccf\", \"#0ae3ca\", \"#79826b\"];\nlet particles = [];\nlet colors = [];\nlet angle = 0.0;\nlet target_angle = 0.0;\n\n\nlet time = 0.0;\nlet speed = 1.009;\nlet w;\n\nfunction preload() {\n\tshader = createShader(vertShader, fragShader);\n}\n\nfunction setup() {\n\t\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n\tw = max(windowWidth, windowHeight);\n  pixelDensity(1);\n\t\n\tbuffer = createGraphics(w, w, WEBGL);\n\tbufferB = createGraphics(w, w);\n\tbuffer.noStroke();\n\n\tfor (let i = 0; i < MAX_NUMBER; i++){\n\t\tlet p = [random(-0.2, 0.2), random(-0.2, 0.2), random(0.03, 0.4)];\n\t\tparticles.push(p);\n\n\t\tlet col = palette[int(random(0, palette.length))];\n\t\tcolors.push([red(col), green(col), blue(col)]);\n\t}\n\n\t\n}\n\nfunction draw() {\n\t\n\tif ((random(0.0, 1.0) < 0.01) & (abs(angle - target_angle) < 0.01)){\n\t\ttarget_angle = random(0.0, 1.0);\n\t  }\n\t  \n\tangle += (target_angle - angle) * 0.001;\n\t\n\tlet data = prepareData(particles, colors);\n\n\tshader.setUniform(\"a\", angle);\n\tshader.setUniform(\"slide\", 0.9);\n\tshader.setUniform(\"resolution\", [w, w]);\n\tshader.setUniform(\"particles\", data.particles);\n\tshader.setUniform(\"colors\", data.colors);\n\n\tbuffer.shader(shader);\n\tbuffer.rect(0, 0, w, w);\n\t\n\tbufferB.image(buffer, 0, 0, w, w);\n\t\n\t\n\t\n\timage(bufferB, (width - w) * 0.5, (height - w) * 0.5, w, w);\n\n\t// Motion effect;\n\n\tfor (let i  = 0; i < particles.length; i++){\n\t\tlet sp = speed * (1.0 + 0.05 * particles[i][2]);\n\t\tvar p = [particles[i][0] * sp, particles[i][1] * sp, particles[i][2] * sp];\n\t\tparticles[i] = p;\n\t}\n\n\t// Check boundaries;\n\n\tparticles.forEach((p, i) => {\n\n\t\tlet x = p[0];\n\t\tlet y = p[1];\n\n\t\tif (x > 1.0 | x < - 1.0 | y > 1.0 | y < -1.0){\n\t\t\tp[2] *= 0.8;\n\t\t}\n\t\tif (x > 2.0 | x < - 2.0 | y > 2.0 | y < -2.0){\n\t\t\tp[0] = random(-0.3, 0.3);\n\t\t\tp[1] = random(-0.3, 0.3);\n\t\t\tp[2] = random(0.01, 0.4);\n\t\t\t//let col = palette[int(random(0, palette.length))];\n\t\t\t//colors[i] = [red(col), green(col), blue(col)];\n\t\t\tcolors[i] = [int(random(0,255)), int(random(0,255)), int(random(0,255))];\n\t\t}\n\t});\n\n\ttime += 0.05;\n}\n\n// Prepare data to send to the shader;\n\nfunction prepareData(arr, arr2){\n\t\n\tvar data = {\"particles\": [], \"colors\" : []}\n\tarr.forEach((p, i) => {\n\t\tdata[\"particles\"].push(...p);\n\t\tdata[\"colors\"].push(...arr2[i]);\n\t});\n\treturn data;\n}\n\n\n\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Dylan Shaffer",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1210693",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:15:39",
+    "used_in_videos": [
+        "Pure Immersion Meditation.mp4"
+    ],
+    "used_count": 1
+}

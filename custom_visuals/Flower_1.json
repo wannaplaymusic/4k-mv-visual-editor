@@ -1,0 +1,22 @@
+{
+    "name": "Flower",
+    "code": "// === Tab: mySketch ===\n//made by twitter.com/mattywillo_\n//for twitter.com/sableRaph's weekly creative coding challenge\n//i was working on something else and couldn't finish it before the stream, or at all\n//so heres some gradients, squint and it looks like a flower\n//this is NOT really the meromorphic function / domain colouring thing\n//but something i bumbled into while working on that\n//go look at https://twitter.com/mattywillo_/status/1451843306183266306\n//instead which is better, but doesn't run on the web\n\nlet t = 0, st = .0001, res, sh;\n\nfunction draw() {\n  t+=st*deltaTime;\n\n  sh.setUniform(\"t\", t%1);\n  sh.setUniform(\"l\", t|0);\n  shader(sh);\n  rect(0,0,0);\n}\n\n//noprotect\nlet src = [`\nattribute vec3 aPosition;\nvarying vec2 uv;\nvoid main() {\n  gl_Position = vec4(aPosition*2.-1., 1.0);\n  uv = vec2(aPosition.x, 1.-aPosition.y)*2.-1.;\n}\n`,`\nprecision highp float;\n#define PI `+Math.PI+`\nvarying vec2 uv;\nuniform float t,l;\n\n//iq's oklab implentation\nvec3 oklab_mix( vec3 colA, vec3 colB, float h )\n{\n    const mat3 kCONEtoLMS = mat3(0.4121656120,  0.2118591070,  0.0883097947,0.5362752080,  0.6807189584,  0.2818474174,0.0514575653,  0.1074065790,  0.6302613616);\n    const mat3 kLMStoCONE = mat3(4.0767245293, -1.2681437731, -0.0041119885,-3.3072168827,  2.6093323231, -0.7034763098,0.2307590544, -0.3411344290,  1.7068625689);\n    vec3 lmsA = pow( kCONEtoLMS*colA, vec3(1.0/3.0) );\n    vec3 lmsB = pow( kCONEtoLMS*colB, vec3(1.0/3.0) );\n    vec3 lms = mix( lmsA, lmsB, h );\n    lms *= 1.0+0.2*h*(1.0-h);\n    return kLMStoCONE*(lms*lms*lms);\n}\n\nvec2 d(vec2 a, vec2 b) {return vec2(((a.x*b.x+a.y*b.y)/(b.x*b.x+b.y*b.y)),(a.y*b.x-a.x*b.y)/(b.x*b.x+b.y*b.y));}\n\nvoid main() {\n  vec2 p = uv;\n  vec2 l = vec2(1), j = vec2(1), k = vec2(1);\n  for(float i = 0.; i <= 1.; i+=.1) {\n    float ct = (mod(floor(t*2.),2.)==0.)?i*t:1.-(i-i*t);\n    float cs = (mod(floor(mod(t+.5,1.)*2.),2.)==0.)?i*mod(t+.5,1.):1.-(i-i*mod(t+.5,1.));\n    vec2 a = vec2(sin(ct*PI*4.), cos(ct*PI*4.))*.2;\n    vec2 b = -a;\n    l = d(l,d(p-a,p-b));\n    j = d(j,d(p-vec2(sin(i*PI*2.), cos(i*PI*4.))*.5,p-b));\n    k = d(k,d(p-vec2(sin(cs*PI*4.), cos(ct*PI*2.))*.6,p-b));\n  }\n  float d = .5*atan(l.y,l.x)/PI+.5;\n  float e = .5*atan(j.y,j.x)/PI+.5;\n  float f = .5*atan(k.y,k.x)/PI+.5;\n  gl_FragColor = vec4(oklab_mix(oklab_mix(oklab_mix(vec3(162,180,255)/255.,vec3(109,104,112)/255.,e-d),vec3(130,205,255)/255.,e-d), oklab_mix(1.-vec3(104,109,120)/255.,1.-vec3(121,220,240)/255.,e), f-e),1.);\n}`];\n\nfunction setup() {\n  res = Math.max(windowWidth, windowHeight);\n  createCanvas(1112, 834, WEBGL);\n  sh = new p5.Shader(undefined, ...src);\n}\n\nfunction windowResized() {\n  res = max(windowWidth, windowHeight);\n  resizeCanvas(width, height);\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1724634",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 23:22:33"
+}

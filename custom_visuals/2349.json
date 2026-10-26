@@ -1,0 +1,28 @@
+{
+    "name": "2349",
+    "code": "// === Tab: mySketch.js ===\nfunction setup() \n{\n\tcreateCanvas(1400, 500,WEBGL);\n\tbackground(255);\n}\n\nlet counter=0\nlet zaxisCounter=0\n\nfunction draw() \n{\n\tif(zaxisCounter<=900)\n\t{\n\t\tcamera(0, zaxisCounter, 400+zaxisCounter, 0, 0, 0, 0, 1, 0)\n\t\tcounter=counter+.01\n\t\tzaxisCounter=zaxisCounter+random(5)\n\t\torbitControl()\n\t\trotateY((3.14/2)+3.14)\n\n\t\tfor(i=0;i<500;i++)\n\t\t{\n\t\t\tpush()\n\t\t\trotateX(random(3.14))\n\t\t\ttranslate(50,300-i,0)\n\t\t\tnoFill()\n\t\t\tstroke(0)\n\t\t\tcircle(0,0,100-i)\n\t\t\tstroke(255)\n\t\t\tcircle(0,0,100-i*2)\n\t\t\tpop()\n\t\t}\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\t<meta charset=\"utf-8\" />\n\t<!-- keep the line below for OpenProcessing compatibility -->\n\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/addons/p5.sound.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n\nhtml, body \n{  \n    text-align: center;  \n    background-color: #FFFFFF; \n    margin: 0;\n    padding: 10px;\n}  \ncanvas {\n  margin: 10px auto;\n  width:100%;\n  display: block;\n  border: solid 23px black;\n  padding: 26px 26px;\n  box-shadow: -26px 26px 26px gray;\n}\n\n",
+    "inline_assets": {},
+    "author": "Joe DeNavas (DD89)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2240368",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:25:41",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Monotone Current.mp4"
+    ],
+    "used_count": 1
+}

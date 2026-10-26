@@ -1,0 +1,67 @@
+{
+    "name": "Attractor2",
+    "code": "// === Tab: mySketch ===\nlet canvasSize = { w: 0, h: 0 }\nlet lastTime = 0\nlet particles = []\nlet baseVel = 0.2\nlet constVel = 0\nlet maxDist = 50\nlet duration = 3000\nlet maxSpeed = 8\n\nclass Particle {\n  constructor () {\n    this.pos = createVector(0, 0)\n    this.vel = createVector(0, 0)\n    this.reset()\n    // this.vel = createVector(random(-baseVel, baseVel), random(-baseVel, baseVel))\n    this.gravity = createVector(0, 0.002)\n    this.acc = createVector(random(-0.2, 0.2), random(-0.2, 0.2))\n    // this.startTime = -duration - 1\n    this.attractor = createVector(0, 0)\n  }\n\n  update (x, y) {\n    this.prev = this.pos.copy()\n    const pos = this.pos\n    if (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)) && dist(pos.x, pos.y, x, y) < maxDist) {\n      this.startTime = millis()\n    }\n\n    let currTime = millis()\n    let timeElapsed = currTime - this.startTime\n    if (100 < timeElapsed && timeElapsed < duration) {\n\n      if (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) {\n        this.attractor.set(x, y)\n        this.attractor.sub(this.pos)\n        this.attractor.div(5)\n\n        this.acc.add(this.attractor)\n        this.acc.div(500)\n      }\n\n      this.acc.add(this.gravity)\n      this.vel.add(this.acc)\n      this.vel.limit(maxSpeed)\n    } else {\n      this.vel.limit(constVel)\n    }\n\n    this.pos.add(this.vel)\n  }\n\n  draw () {\n    const prev = this.prev\n    const curr = this.pos\n    line(prev.x, prev.y, curr.x, curr.y)\n  }\n\n  isOutOfView () {\n    const { w, h } = canvasSize\n    var pos = this.pos\n    return pos.x < 0 || pos.x >= w || pos.y < 0 || pos.y >= h\n  }\n\n  reset () {\n    const { w, h } = canvasSize\n    this.pos.set(random(0, w - 1), random(0, h - 1))\n    this.startTime = -duration - 1\n    this.vel.set(random(-baseVel, baseVel), random(-baseVel, baseVel))\n  }\n}\n\nfunction setup () {\n  canvasSize.w = windowWidth - 0\n  canvasSize.h = windowHeight - 0\n  const { w, h } = canvasSize\n\n  lastTime = millis()\n  constVel = sqrt(baseVel * baseVel * 2)\n\n  createCanvas(w, h)\n  background(0)\n\n  for (let i = 0; i < 2000; i++) {\n    particles.push(new Particle())\n  }\n}\n\nfunction draw () {\n  colorMode(RGB)\n  background(0, 16)\n\n  strokeWeight(2)\n  stroke(15, 238, 241, 255)\n\n  particles.forEach(p => {\n    p.update((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))))\n    p.draw()\n    if (p.isOutOfView()) {\n      p.reset()\n    }\n  })\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Rex",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/658571",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:17:23",
+    "expressive_profile": {
+        "module_id": "Attractor2.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                15.0,
+                255.0
+            ],
+            "mean_lightness": 0.003,
+            "mean_chroma": 0.011,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.09,
+            "curl_vorticity": 0.005,
+            "divergence": -0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 14:09:44"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Weight of Reverb.mp4"
+    ],
+    "used_count": 1
+}

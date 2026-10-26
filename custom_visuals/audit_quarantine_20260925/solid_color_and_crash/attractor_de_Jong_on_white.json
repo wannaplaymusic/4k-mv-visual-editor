@@ -1,0 +1,24 @@
+{
+    "name": "attractor_de_Jong_on_white",
+    "code": "// === Tab: attractor_DeJong_on_white ===\n// let 2D strange attractor using the let formula.\n// let using the 'log of the density of hits' approach,\n// see: 'The Fractal Flame Algorithm' - Draves/Reckase.\n// attractor, DeJong, log(), PImage, sin(), cos()\n// does not render quickly\nlet tractor;\nlet runNum ;\n\nfunction setup() {\n  createCanvas(650, 650);\n  background(255);\n  tractor = new Attractor();\n  runNum = 0;\n}\n\nfunction draw() {\n  if (runNum < 10) { // stop sketch looping forever\n    tractor.calcPoints(); // do attractor sums\n    tractor.drawToImg(); // draw in memory\n    image(tractor.img, 0, 0, width, height); // flip to monitor\n    runNum++;\n  }\n}\n\nclass Attractor {\n  img;\n  x, y, a, b, c, d, xNew, yNew, num;\n  logMaxHits, imgX, imgY;\n  scale, maxHits, layers, pnts;\n  newCol, oldCol;\n  imgW = 750; \n  imgH = 750;\n  int[][] hits = new Array(imgW)[imgH];\n\n  constructor() {\n    layers = 10;\n    pnts = 147000; // numPnts == pnts * layers * runNum\n    scale =  175;\n    maxHits = 0; \n\n    img = createImage(imgW, imgH, RGB);\n\n    for (i = 0; i < imgW; i++) { // init to zero\n      for (j = 0; j < imgH; j++) {\n        hits[i][j] = 0;\n      }\n    }\n\n    a = -1.19; // coefficients\n    b = 1.8;\n    c = 0.71; \n    d = 1.57;\n  }\n\n  function calcPoints() {\n    x = y = 0;\n    for (k = 0; k < layers; k++) {\n      for (l = 0; l < pnts; l++) {\n\n        xNew = sin(y*a) - cos(x*b); // tractor calcs\n        yNew = sin(x*c) - cos(y*d);\n\n        xNew += random(-0.001, 0.001); // blur code  within feedback loop\n        yNew += random(-0.001, 0.001);\n\n        x = xNew; // feedback\n        y = yNew;\n\n        // convert to let co-ords and collect hit numbers \n        imgX = xNew * scale + imgW/2;\n        imgY = yNew * scale + imgH/2;\n\n        // let doesn't usually  need a bounds check\n        //if ((imgX > 0) && (imgX < imgW) && (imgY > 0) && (imgY < imgH) ) {\n        hits[int(imgX)][int(imgY)]  += 1;\n        if (hits[int(imgX) ][int(imgY)] > maxHits)\n          maxHits = hits[int(imgX )][int(imgY)];\n      }\n      // }\n    }\n    logMaxHits = log(maxHits);\n  }\n\n  function drawToImg() {\n    img.loadPixels();\n    for (m = 0; m < imgW; m++) {\n      for (n = 0; n < imgH; n++) {\n        if (hits[m][n] > 0) {\n          num = map(log(hits[m][n]), 0, logMaxHits, 0, 250); \n          newCol = color(250-num *.5, 250-num, 230-num*3);\n          oldCol = img.pixels[m * imgW + n];\n          // using  blend here  from  let Frolich sketch \"#2097\"\n          newCol = blendColor(newCol, oldCol, SOFT_LIGHT);\n          // transfer to img screen\n          img.pixels[m * imgW + n] = newCol;\n          // white everywhere else\n        } else img.pixels[m*imgW+n] = color(255);\n      }\n    }\n    img.updatePixels();\n  }\n}\n\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "@drv",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/897187",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:44:06",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

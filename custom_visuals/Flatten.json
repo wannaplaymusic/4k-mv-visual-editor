@@ -12,7 +12,8 @@
         "batch_import",
         "openprocessing",
         "audio_reactive",
-        "restored"
+        "restored",
+        "batch_2026-09-25"
     ],
     "frequency": 50,
     "storyboard_weight": 50,
@@ -20,8 +21,8 @@
     "used_count": 3,
     "is_starred": false,
     "used_in_videos": [
-        "Crisp Rimshot Fade.mp4",
         "Gain Staging.mp4",
+        "Crisp Rimshot Fade.mp4",
         "Inner Peace.mp4"
     ]
 }

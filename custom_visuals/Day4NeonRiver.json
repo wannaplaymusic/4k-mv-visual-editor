@@ -1,0 +1,24 @@
+{
+    "name": "Day4NeonRiver",
+    "code": "// === Tab: mySketch ===\nlet objs = [];\nlet objsNum = 50;\n\nconst palette = [\"#FF00D8\", \"#FFB201\", \"#98FF00\", \"#00FFC4\", \"#0082FE\", \"#B733FF\"];\n\nfunction setup() {\n    // Calculate a canvas size that fits the screen while maintaining a 1080:1920 ratio\n  let canvasHeight = window.innerHeight * 0.8;\n  let canvasWidth = (1080 / 1920) * canvasHeight;\n\n  createCanvas(canvasWidth, canvasHeight);\n  \n  angleMode(DEGREES);\n  noFill();\n\n  background(20);\n\n  for (let i = 0; i < objsNum; i++) {\n    objs.push(new Obj(i));\n  }\n}\n\nfunction draw() {\n  blendMode(BLEND);\n  background(20, 50);\n\n  blendMode(ADD);\n\n  for (let i = 0; i < objs.length; i++) {\n    objs[i].move();\n    objs[i].display();\n  }\n}\n\nclass Obj {\n  constructor(tmpIndex) {\n    this.index = tmpIndex;\n    // We now have both a startX and startY.\n    this.startX = random(width);\n    this.startY = random(height);\n    this.init();\n    // The range is now applied to both axes.\n    this.goalX = this.startX + this.rangeX;\n    this.goalY = this.startY + this.rangeY;\n  }\n\n  init() {\n    // The range and step values will apply to both x and y.\n    this.range = random(10, 200);\n    this.step = random(5, 8);\n    this.strWeight = random(15, 25);\n    this.c = color(random(palette));\n    this.c.setAlpha(50);\n  }\n\n  move() {\n    // We move both the X and Y positions by the same step value.\n    this.startX += this.step;\n    this.startY += this.step;\n    this.goalX = this.startX + this.range;\n    this.goalY = this.startY + this.range;\n\n    // We check if the line has moved off the bottom or right side of the canvas.\n    if (this.startX > width || this.startY > height) {\n      this.init();\n      // We reset both X and Y to just off the top-left corner.\n      this.startX = -this.range;\n      this.startY = -this.range;\n      this.goalX = this.startX + this.range;\n      this.goalY = this.startY + this.range;\n    }\n  }\n\n  display() {\n    strokeWeight(this.strWeight);\n    stroke(this.c);\n    beginShape();\n    // The loop now iterates diagonally, but we'll stick to one axis for simplicity.\n    // Let's loop through the X values. The Y values will be calculated relative to X.\n    for (let x = this.startX; x <= this.goalX; x++) {\n      // We calculate a y value that creates a diagonal \"path\".\n      // We use the startY and the difference from the startX to create the diagonal.\n      // Perlin noise is still applied to create the wavy effect.\n      // We use the mapped Y value to adjust the vertex's Y position.\n      let noiseY = map(noise(x * 0.001, this.index * 0.1, frameCount * 0.002), 0, 1, -height * 0.25, height * 1.25);\n      let y = (x - this.startX) + this.startY + noiseY;\n      \n      vertex(x, y);\n    }\n    endShape();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "tiantianxu",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2810876",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:02:31",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

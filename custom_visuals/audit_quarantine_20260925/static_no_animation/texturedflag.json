@@ -1,0 +1,22 @@
+{
+    "name": "texturedflag",
+    "code": "// === Tab: mySketch.js ===\n/*\nPlease note that the rendering time for P5js may be quite lengthy, \ndepending on your processor. If you require a quick rendering, \nP5js may not be the best option. However, to simplify the process, \nI have provided P5Capture code which can convert your animation \ninto an MP4 video. \nSimply begin the sketch and the recording will start automatically. \nKeep an eye on the time and when you reach the desired duration, \nclick the Stop button to save the animation onto your hard drive.\n*/\n\nlet f = 0;\nlet c = 1;\nlet p = 0;\nlet bg = 0;\nlet W = 400;\nlet img;\n\npreload = (_) => {\n\t/*\n\tTo use your image, you'll need to have a 400x400px color PNG file \n\tready to upload here. Make sure to also read the OpenProcessing \n\tinstructions on how to upload your image. For optimal results, \n\ttry to avoid using white areas in your image and opt for light grey instead.\n\t*/\n\timg = loadImage('https://openprocessing.org/sketch/1957382/files/KTlogo1.png');\n}\n\nsetup = (_) => {\n\tcreateCanvas(W, W);\n\tnoiseSeed(83474);  // Change the value for a different animation\n}\n\ndraw = (_) => {\n\tbackground(bg)\n\tif (frameCount === 1) {\n\tconst capture = P5Capture.getInstance();\n\tcapture.start({\n\tformat: \"mp4\",\n\tframerate: 60\n\t});\n\t}\n\tfor (y = 0; y < W; y ++) {\n\t\tfor (x = 0; x < 800; x ++) {\n\t\t\tn = noise((x + f * 1.5) / 666, (y + f) / W);\n\t\t\tif (x < 400) {\n\t\t\t\tshade = map(n, 0, 0.6, 30, 255);\n\t\t\t\t// hilite = map(n, 0.45, 0.7, 0, W)\n\t\t\t\t// hilite = abs(map(tan(n/PI), 0, 0.6, 0, 200))\n\t\t\t\thilite = abs(atan(map(n, 0.0, 0.53, -1, 0))) * 2 + 1.5;\n\t\t\t\tr = (img.get(x, y)[0] - shade + hilite * 44) * hilite + 20 * hilite;\n\t\t\t\tg = (img.get(x, y)[1] - shade + hilite * 44) * hilite + 20 * hilite;\n\t\t\t\tb = (img.get(x, y)[2] - shade + hilite * 44) * hilite + 20 * hilite;\n\t\t\t\ty < 399 ? stroke(r, g, b): stroke(bg);\n\t\t\t}\n\t\t\tline(x, W, x, y + n * (sin(PI / 1000 * x) * W) - W / 6);\n\t\t\tp = n;\n\t\t}\n\t\tc = -c;\n\t}\n\tf -= 4\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\t<meta charset=\"utf-8\" />\n\t<!-- keep the line below for OpenProcessing compatibility -->\n\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/addons/p5.sound.min.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5.capture@1.4.1/dist/p5.capture.umd.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nhtml,\nbody {\n\tmargin: 0;\n\tpadding: 0;\n\tbackground: #000;\n}\n\nmain {\n\tdisplay: flex;\n\tjustify-content: center;\n\theight: 100vh;\n\talign-items: center;\n}\n\ncanvas {\n\tborder-radius: 20px;\n}\n",
+    "inline_assets": {},
+    "author": "KomaTebe",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1957382",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:37:00"
+}

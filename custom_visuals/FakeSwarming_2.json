@@ -1,0 +1,29 @@
+{
+    "name": "FakeSwarming",
+    "code": "// === Tab: mySketch ===\nvar _imgSize = 400;\nvar _img, _img2, _img3;\nvar _ffCount = 90;\nvar _ff = [];\n\nfunction setup() {\n    createCanvas(1112, 834);\n    background(0);\n    noStroke();\n    imgSet();\n    for (var i=0; i<_ffCount; i++) {\n        if (i<_ffCount/3) {_ff[i] = new FfObj3();}\n        else if ( i>=_ffCount/3 && i<_ffCount/3*2 ) { _ff[i] = new FfObj2();}\n        else { _ff[i] = new FfObj(); }\n    }\n}\n\nfunction draw() {\n    background(0);\n    for (var i=0; i<_ffCount; i++) {\n        _ff[i].drawImg();\n    }\n    for (var i=0; i<_ffCount; i++) {\n        _ff[i].drawMe();\n        _ff[i].updateMe();\n    }\n}\n\nfunction imgSet() {\n    _img = createImage(_imgSize, _imgSize);\n    _img.loadPixels();\n    for (var i = 0; i < _img.width; i++) {\n        for (var j = 0; j < _img.height; j++) {\n            var pixAlpha = 255/(dist(_img.width/2, _img.height/2, i, j)-1)*1.47;\n            if (pixAlpha < 1.89) { pixAlpha=0; }\n            _img.set(i, j, color(210, 210, 255, pixAlpha));\n        }\n    }\n    _img.updatePixels();\n\n    _img2 = createImage(_imgSize, _imgSize);\n    _img2.loadPixels();\n    for (var i = 0; i < _img2.width; i++) {\n        for (var j = 0; j < _img2.height; j++) {\n            var pixAlpha = 255/(dist(_img2.width/2, _img2.height/2, i, j)-1)*1.47;\n            if (pixAlpha < 1.89) { pixAlpha=0; }\n            _img2.set(i, j, color(255, 210, 210, pixAlpha));\n        }\n    }\n    _img2.updatePixels();\n\n    _img3 = createImage(_imgSize, _imgSize);\n    _img3.loadPixels();\n    for (var i = 0; i < _img3.width; i++) {\n        for (var j = 0; j < _img3.height; j++) {\n            var pixAlpha = 255/(dist(_img3.width/2, _img3.height/2, i, j)-1)*1.47;\n            if (pixAlpha < 1.89) { pixAlpha=0; }\n            _img3.set(i, j, color(210, 255, 210, pixAlpha));\n        }\n    }\n    _img3.updatePixels();\n}\n\nfunction FfObj() {\n    this.pX = width/2 + random(-10, 10);\n    this.pY = height/2 + random(-10, 10);\n    this.noiseX = 1000+random(-1.5, 1.5);\n    this.noiseY = -1000+random(-1.5, 1.5);\n    this.noiseScale = random(0.015, 0.017);\n}\nFfObj.prototype.updateMe = function() {\n    this.pX += noise(this.noiseX)*6-2.8;\n    this.pY += noise(this.noiseY)*6-2.8;\n    if (this.pX < 0) { this.pX = 0;}\n    if (this.pX > width) { this.pX = width;}\n    if (this.pY < 0) { this.pY = 0;}\n    if (this.pY > height) { this.pY = height;}\n    this.noiseX += this.noiseScale;\n    this.noiseY += this.noiseScale;\n}\nFfObj.prototype.drawImg = function() {\n    image(_img, this.pX -_img.width/2 , this.pY -_img.height/2);\n}\nFfObj.prototype.drawMe = function() {\n    fill(220, 220, 255, 255);\n    ellipse(this.pX, this.pY, 6);   \n}\n\nfunction FfObj2() {\n    this.uber = FfObj.prototype;\n    FfObj.call(this);\n    this.noiseX = 5000+random(-1.5, 1.5);\n    this.noiseY = -5000+random(-1.5, 1.5);\n}\nFfObj2.prototype = Object.create(FfObj.prototype);\nFfObj2.prototype.constructor = FfObj2;\nFfObj2.prototype.drawImg = function() {\n    image(_img2, this.pX -_img2.width/2 , this.pY -_img2.height/2);\n}\nFfObj2.prototype.drawMe = function() {\n    fill(255, 220, 220, 255);\n    ellipse(this.pX, this.pY, 6);   \n}\n\nfunction FfObj3() {\n    this.uber = FfObj.prototype;\n    FfObj.call(this);\n    this.noiseX = -10000+random(-1.5, 1.5);\n    this.noiseY = 10000+random(-1.5, 1.5);\n}\nFfObj3.prototype = Object.create(FfObj.prototype);\nFfObj3.prototype.constructor = FfObj3;\nFfObj3.prototype.drawImg = function() {\n    image(_img3, this.pX -_img3.width/2 , this.pY -_img3.height/2);\n}\nFfObj3.prototype.drawMe = function() {\n    fill(220, 255, 220, 255);\n    ellipse(this.pX, this.pY, 6);   \n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1445463",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:00:52",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

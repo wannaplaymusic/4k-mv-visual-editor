@@ -17,11 +17,13 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 3,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
-        "Delay Trail Hypnosis.mp4",
         "Calm Spirit.mp4",
-        "Faint Memory.mp4"
+        "Delay Trail Hypnosis.mp4",
+        "Faint Memory.mp4",
+        "Slowwave Continuum.mp4",
+        "Signal Loss.mp4"
     ]
 }

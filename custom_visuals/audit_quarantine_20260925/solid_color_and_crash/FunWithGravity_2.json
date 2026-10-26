@@ -1,0 +1,22 @@
+{
+  "name": "FunWithGravity",
+  "code": "// === Tab: sketch291393 ===\nArrayList<Particle> m; //let Particles themselves\n\nlet count = 1000; //let many particles to spawn\n\nlet spdLimit = 200; //let limit of each particle's speed in pixels per second\n\nlet SUNSET = 1;\nlet ICE = 2;\nlet FIRE = 3;\n\nlet THEME = SUNSET;\n\nfunction setup() {  \n  createCanvas(1080, 720);\n  colorMode(HSB, 360, 100, 100);\n  m = new ArrayList<Particle>();\n  for (i = 0; i<count; i++) {\n    m.add(new Particle());\n  }\n  window.simulatedMouseX = width/2;\n  window.simulatedMouseY = height/2;\n}\n\nfunction draw() {\n  noStroke();\n  fill(0, 40);\n  rect(-1, -1, width + 1, height + 1);\n  fill(50, 50, 255);\n  for (let a of m) {\n    a.update();\n    a.draw();\n  }\n}\n\nclass Particle {\n\n  let prev, pos, mouse = new PVector(), spd, acc;\n  col;\n  let turnFactor = random(3, 10);\n\n  constructor() {\n    pos = new PVector(random(width), random(height));\n    prev = new PVector(pos.x, pos.y);\n    spd = new PVector(random(2), random(2));\n    acc = new PVector();\n\n    switch(THEME) {\n        case SUNSET:\n            col = color(random(320, 420) % 360, 90, 100);\n            break;\n        case ICE:\n            col = color(random(155, 210), random(40, 100), 100);\n            break;\n        case FIRE:\n            col = color(random(45), 90, 100);\n            break;\n        default:\n            col = color(random(360), 90, 100);\n            break;\n    }\n\n  }\n\n  function update() {\n    prev = new PVector(pos.x, pos.y);\n    if (pos.x > width || pos.x < 0) {\n      spd.x *= -0.9;\n    }\n    if (pos.y < 0 || pos.y > height ) {\n      spd.y *= -0.9;\n    }\n    mouse.set((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n    let attraction = new PVector(mouse.x, mouse.y);\n    attraction.sub(pos);\n    acc.set(attraction);\n    acc.normalize();\n    acc.div(turnFactor);\n    spd.add(acc);\n    spd.limit(spdLimit * (1/60));\n    pos.add(spd);\n  }\n\n  function draw() {\n\n    //noStroke();\n    //fill(col);\n    //ellipse(pos.x, pos.y, size, size);\n    //ellipse(pos.x, pos.y, size, size);\n    stroke(col);\n    strokeWeight(1);\n    line(prev.x, prev.y, pos.x, pos.y);\n  }\n}\n\n",
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "custom_html": "",
+  "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+  "inline_assets": {},
+  "author": "Dan",
+  "license": "CC BY-NC-SA",
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "batch_2026-09-25"
+  ],
+  "url": "https://openprocessing.org/sketch/1462558",
+  "batch_id": "batch_20260925_103420",
+  "batch_date": "2026-09-25",
+  "date_added": "2026-09-25 11:58:59"
+}

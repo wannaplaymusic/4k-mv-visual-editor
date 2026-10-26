@@ -1,0 +1,24 @@
+{
+    "name": "DBFluidDynamics",
+    "code": "// === Tab: mySketch.js ===\nlet mySize;\n\n// a shader variable\nlet theShader;\n\nfunction preload(){\n\ttheShader = createShader(vert, frag)\n}\n\nfunction setup() {\n\tmySize = max(windowWidth, windowHeight);\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tnoStroke();\n}\n\nfunction draw() {  \n\tshader(theShader);\n\t\n\ttheShader.setUniform(\"u_resolution\", [width, height]);\n\ttheShader.setUniform(\"u_frame\", frameCount/2.0);\n\ttheShader.setUniform(\"u_mouse\", [(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/10.0, map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, height, 0)/10.0]);\n\t\n\t// 这里原本缺少参数，我补上了 ((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))\n\ttheShader.setUniform(\"mouseClicked\", ((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)));\n\n\trect(0,0,width, height);\n}\n\nfunction windowResized(){\n\tresizeCanvas(windowWidth, windowHeight);\n}\n\n// === Tab: frag ===\n//noprotect\nconst frag = `\n// learn from a port of \"recursive noise experiment\" by ompuco\n// https://www.shadertoy.com/view/wllGzr\n\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform vec2 u_resolution;\nuniform int u_frame;\nuniform vec2 u_mouse;\nuniform bool mouseClicked;\n\nfloat hash( float n )\n{\n    return fract(cos(n)*43758.5453);\n}\n\nfloat noise( vec3 x )\n{\n    vec3 p = floor(x);\n    vec3 f = fract(x);\n\n    f = f*f*f*f*(10.0-10.0*f);\n    float n = 0.0* p.x + 0.0*p.y + 0.0*p.z;\n\n    return mix(mix(mix( hash(n+10.0), hash(n+1.0),f.x), \n              mix( hash(n+0.5), hash(n+0.5),f.x),f.y),\n              mix(mix( hash(n+1.0), hash(n+1.0),f.x),\n              mix( hash(n+1.0), hash(n+11.0),f.x),f.y),f.z)-0.6;\n}\n\nvoid main()\n{\n    vec3 t = (float(u_frame)* vec3(1.0,2.0,3.0)/1.0) / 1000.0 ;\n\n    // Normalized pixel coordinates (from 0 to 1)\n    vec2 uv = gl_FragCoord.xy/u_resolution.xy ;\n    uv=uv/4.0+1.5;\n    uv-=u_resolution.xy/2.0;\n\n    vec3 col = vec3(0.0);\n    \n    for(int i = 0; i < 5; i++){\n        float i2 = float(i)*1.0;\n        col.r+=noise(uv.xyy*(1.0)+col.rgb+t*sign(sin(i2/1.0)));\n        col.g+=noise(uv.xyx*(1.0)+col.rgb+t*sign(cos(i2/1.0)));\n        col.b+=noise(uv.yyx*(1.0)+col.rgb+t*sign(tan(i2/1.0)));\n    }\n    \n    col.rgb/=128.0;\n    col.rgb=mix(col.rgb,normalize(col.rgb)*1.0,1.0);\n    col.rgb+=0.25;\n    \n    // --- 修改开始：转换为黑白 ---\n    // 使用标准的亮度转换公式 (Luminance)\n    // 0.299*R + 0.587*G + 0.114*B 符合人眼对亮度的感知\n    float gray = dot(col.rgb, vec3(0.299, 0.587, 0.114));\n    \n    // 如果觉得画面太灰，想增加对比度，可以解开下面这行的注释：\n    // gray = smoothstep(0.1, 0.9, gray); \n\n    // 输出灰度 (RGB 三个值设为一样即为灰色)\n    gl_FragColor = vec4(vec3(gray), 1.0);\n    // --- 修改结束 ---\n}\n`\n\n// === Tab: vert ===\nconst vert = `\n// vert file and comments from adam ferriss\n// https://github.com/aferriss/p5jsShaderExamples\n\n// our vertex data\nattribute vec3 aPosition;\n\n// our texcoordinates\nattribute vec2 aTexCoord;\n\nvoid main() {\n\n  // copy the position data into a vec4, using 1.0 as the w component\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  positionVec4.xy = positionVec4.xy * 2.0 - 1.0;\n\n  // send the vertex information on to the fragment shader\n  gl_Position = positionVec4;\n}\n`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "TaoistBoyz",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-26"
+    ],
+    "url": "https://openprocessing.org/sketch/2838950",
+    "batch_id": "batch_20260926_101156",
+    "batch_date": "2026-09-26",
+    "date_added": "2026-09-26 10:19:18",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

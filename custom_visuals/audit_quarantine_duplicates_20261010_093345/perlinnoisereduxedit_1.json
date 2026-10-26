@@ -1,0 +1,31 @@
+{
+    "name": "perlinnoisereduxedit",
+    "code": "// === Tab: mySketch ===\n// This sketch borrows heavily from yasai's perlin noise sketch\n// Tony R. 2018\n\nvar seed = \"openprocessing\";\nvar nums;\nvar maxLife = 10;\nvar noiseScale = 200;\nvar\tsimulationSpeed = 0.2;\nvar fadeFrame = 0;\n\nvar padding_top = 100;\nvar padding_side = 100;\nvar inner_square = 512;\n\nvar particles = [];\nvar backgroundColor;\nvar color_from;\nvar color_to;\n\nfunction setup(){\n\trandomSeed(seed);\n\tnoiseSeed(seed);\n\tnums = 100;\n\t\n\tbackgroundColor = color(20, 20, 20);\n\tcolor_from = color('black');\n\tcolor_to = color('white');\n\t// color_from = color('purple');\n\t// color_to = color('cyan');\n\t\n\t//createCanvas(windowWidth, windowHeight);\n\tcreateCanvas(windowHeight, windowHeight);\n\tbackground(backgroundColor);\n\t\n\tnoStroke();\n\tsmooth();\n\t\n\tpadding_top = (height - inner_square)/2;\n\tpadding_side = (width - inner_square)/2;\n\t\n\tfor(var i = 0; i < nums; i++){\n\t\tvar p = new Particle();\n\t\tp.pos.x = random(padding_side, width-padding_side);\n\t\tp.pos.y = padding_top;\n\t\tparticles[i] = p;\n\t}\n\t\n\tbackground(color(0));\n\tfill(color(255));\n}\n\nfunction draw(){\n\t\n\t++fadeFrame;\n\tif(fadeFrame % 5 == 0){\n\t\t\n\t\tblendMode(DIFFERENCE);\n\t\tfill(1, 1, 1);\n\t\trect(0,0,width,height);\n\n\t\tblendMode(LIGHTEST);\n\t\t//blendMode(DARKEST); //looks terrible. stutters\n\t\tfill(backgroundColor);\n\t\trect(0,0,width,height);\n\t}\n\t\n\tblendMode(BLEND);\n\t\n\tfor(var i = 0; i < nums; i++){\n\t\tvar iterations = map(i,0,nums,5,1);\n\t\tvar radius = map(i,0,nums,2,6);\n\t\t\n\t\tparticles[i].move(iterations);\n\t\tparticles[i].checkEdge();\n\t\t\n\t\tvar alpha = 255;\n\t\t\n\t\tvar particle_heading = particles[i].vel.heading()/PI;\n\t\tif(particle_heading < 0){\n\t\t\t\tparticle_heading *= -1;\n\t\t}\n\t\tvar particle_color = lerpColor(particles[i].color1, particles[i].color2, particle_heading);\n\t\t\n\t\tvar fade_ratio; //TODO\n\t\tfade_ratio = min(particles[i].life * 5 / maxLife, 1);\n\t\tfade_ratio = min((maxLife - particles[i].life) * 5 / maxLife, fade_ratio);\n\n\t\tfill(red(particle_color), green(particle_color), blue(particle_color), alpha * fade_ratio);\n\t\tparticles[i].display(radius);\n\t} \n}\n\n\n\n\n\n\nfunction Particle(){\n// member properties and initialization\n\tthis.vel = createVector(0, 0);\n\tthis.pos = createVector(random(0, width), random(0, height));\n\tthis.life = random(0, maxLife);\n\tthis.flip = int(random(0,2)) * 2 - 1;\n\tthis.color1 = this.color2 = color('white');\n\t\n\tif(int(random(3)) == 1){\n\t\t//this.color1 = color('palegreen');\n\t\t//this.color2 = color('cyan');\n\t\tthis.color1 = color_from;\n\t\tthis.color2 = color_to;\n\t}\n\t\n// member functions\n\tthis.move = function(iterations){\n\t\tif((this.life -= 0.01666) < 0)\n\t\t\tthis.respawnTop();\n\t\twhile(iterations > 0){\n\t\t\t\n\t\t\tvar transition = map(this.pos.x, padding_side, width-padding_side, 0, 1);\n\t\t\tvar angle = noise(this.pos.x/noiseScale, this.pos.y/noiseScale)*transition*TWO_PI*noiseScale;\n\t\t\t//var transition = map(this.pos.y, height/5, height-padding_top, 0, 1, true);\n\t\t\t//var angle = HALF_PI;\n\t\t\t//angle += (noise(this.pos.x/noiseScale, this.pos.y/noiseScale)-0.5)*transition*TWO_PI*noiseScale/66;\n\n\t\t\tthis.vel.x = cos(angle);\n\t\t\tthis.vel.y = sin(angle);\n\t\t\tthis.vel.mult(simulationSpeed);\n\t\t\tthis.pos.add(this.vel);\n\t\t\t--iterations;\n\t\t}\n\t}\n\n\tthis.checkEdge = function(){\n\t\tif(this.pos.x > width - padding_side\n\t\t|| this.pos.x < padding_side\n\t\t|| this.pos.y > height - padding_top\n\t\t|| this.pos.y < padding_top){\n\t\t\tthis.respawnTop();\n\t\t}\n\t}\n\t\n\tthis.respawn = function(){\n\t\tthis.pos.x = random(0, width);\n\t\tthis.pos.y = random(0, height);\n\t\tthis.life = maxLife;\n\t}\n\t\n\tthis.respawnTop = function() {\n\t\tthis.pos.x = random(padding_side, width-padding_side);\n\t\tthis.pos.y = padding_top;\n\t\tthis.life = maxLife;\n\t\t//this.color1 = lerpColor(color('white'), color_from, (this.pos.x-padding_side)/inner_square);\n\t\t//this.color2 = lerpColor(color('white'), color_to, (this.pos.x-padding_side)/inner_square);\n\t}\n\n\tthis.display = function(r){\n\t\tellipse(this.pos.x, this.pos.y, r, r);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "seicaratteri",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1505902",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:58:16",
+    "used_in_videos": [
+        "Hypnotic Core Repetition.mp4"
+    ],
+    "used_count": 1
+}

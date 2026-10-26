@@ -1,0 +1,62 @@
+{
+    "name": "Colorsguare",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io\n// https://twitter.com/KaufmanRoni\n\nlet n = 64, s;\nlet world;\nlet palette;\nlet col = 0, backCol;\n\nfunction setup() {\n  createCanvas(500, 500);\n  noStroke();\n\t\n\ts = width/n;\n\tinitParams();\n}\n\nfunction draw() {\n  oneStep();\n  drawWorld();\n\t\n\tif ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > -1 || (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) > -1 || (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) < width || (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) < height) {\n    let i = floor(n * (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))/height);\n    let j = floor(n * (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/width);\n    if (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) world[i][j] = palette[col%palette.length];\n\t\tfill(palette[col%palette.length]);\n\t\tsquare(j*s, i*s, s);\n  }\n}\n\nfunction oneStep() {\n  for (let i = n-2; i > -1; i--) {\n    for (let j = 0; j < n; j++) {\n      let v = world[i][j];\n      if (v != backCol) {\n        if (world[i+1][j] == backCol) {\n          world[i][j] = backCol;\n          world[i+1][j] = v;\n        } else if (j > 0 && world[i+1][j-1] == backCol) {\n          world[i][j] = backCol;\n          world[i+1][j-1] = v;\n        } else if (j < n-1 && world[i+1][j+1] == backCol) {\n          world[i][j] = backCol;\n          world[i+1][j+1] = v;\n        }\n      }\n    }\n  }\n}\n\nfunction drawWorld() {\n  for (let i = 0; i < n; i++) {\n    let y = i*s;\n    for (let j = 0; j < n; j++) {\n      let x = j*s;\n      fill(world[i][j]);\n      square(x, y, s);\n    }\n  }\n}\n\nfunction addGrain(x, y) {\n  if (x > -1 || y > -1 || x < width || y < height) {\n    var i = floor(n * y/height);\n    var j = floor(n * x/width);\n    world[i][j] = palette[col%palette.length];\n  }\n}\n\nfunction initParams() {\n\tpalette = [\"fbf8cc\", \"#fde4cf\", \"#ffcfd2\", \"#f1c0e8\", \"#cfbaf0\", \"#a3c4f3\", \"#90dbf4\", \"#8eecf5\", \"#98f5e1\", \"#b9fbc0\", \"#ffafcc\", \"#a2d2ff\", \"#d8e2dc\", \"#ffe8d6\"];\n  shuffle(palette, true);\n  backCol = palette.pop();\n\t\n\tworld = [];\n\tfor (let i = 0; i < n; i++) {\n    let line = [];\n    for (let j = 0; j < n; j++) {\n      line.push(backCol);\n    }\n    world.push(line);\n  }\n}\n\nfunction keyPressed() {\n\tif (key == \" \") {\n\t\tcol++;\n\t}\n\tif (keyCode == DELETE) {\n\t\tinitParams();\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Claire Chen陳潔愔",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1517569",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:58:09",
+    "expressive_profile": {
+        "module_id": "Colorsguare.json",
+        "primary_psychological_state": "hypnotic_trance",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "時間之流",
+            "自相似分形",
+            "脈動波紋"
+        ],
+        "narrative_function": "tension_accelerator",
+        "jungian_archetype": "the_animus",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                15.0
+            ],
+            "mean_lightness": 0.326,
+            "mean_chroma": 0.02,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.08,
+            "curl_vorticity": 0.003,
+            "divergence": 0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 14:15:28"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Weight of Reverb.mp4",
+        "Fusion Rift Dominion.mp4"
+    ],
+    "used_count": 2
+}

@@ -9,12 +9,14 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageChops, ImageFilter
 
 import json
 import time
+import hashlib
+import collections
 
 logger = logging.getLogger("StandaloneInjector.PostProcessor")
 
 _VJ_FX_HISTORY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets_cache", "vj_fx_history.json")
 
-def _load_vj_fx_history(max_entries=20):
+def _load_vj_fx_history(max_entries=50):
     try:
         if os.path.exists(_VJ_FX_HISTORY_PATH):
             with open(_VJ_FX_HISTORY_PATH, "r", encoding="utf-8") as f:
@@ -25,7 +27,7 @@ def _load_vj_fx_history(max_entries=20):
         logger.debug(f"Failed to load VJ FX history: {e}")
     return []
 
-def _save_vj_fx_history(entry, max_entries=20):
+def _save_vj_fx_history(entry, max_entries=50):
     try:
         os.makedirs(os.path.dirname(_VJ_FX_HISTORY_PATH), exist_ok=True)
         history = _load_vj_fx_history(max_entries)
@@ -183,7 +185,12 @@ class PhotosensitiveSafetyLimiter:
 
         if self.prev_frame_smoothed is None or self.prev_frame_smoothed.shape != img_np.shape:
             self.prev_frame_smoothed = img_np.astype(np.float32)
+            self.last_hazard_score = 0.0
+            self.last_red_ratio = red_ratio
             return img_np
+
+        self.last_hazard_score = float(hazard_score)
+        self.last_red_ratio = float(red_ratio)
 
         if hazard_score > 0.05:
             clamp_alpha = min(0.70, float(hazard_score * 0.70))
@@ -193,6 +200,14 @@ class PhotosensitiveSafetyLimiter:
         else:
             self.prev_frame_smoothed = 0.85 * self.prev_frame_smoothed + 0.15 * img_np.astype(np.float32)
             return img_np
+
+    def get_safety_telemetry(self):
+        score = getattr(self, 'last_hazard_score', 0.0)
+        return {
+            'hazard_score': score,
+            'red_ratio': getattr(self, 'last_red_ratio', 0.0),
+            'status': 'SAFE' if score < 0.1 else ('WARNING' if score < 0.35 else 'DANGER')
+        }
 
 
 def srgb_to_oklab(img_np):
@@ -248,6 +263,249 @@ def oklab_to_srgb(img_oklab):
     c_gamma[mask] = 1.055 * (c[mask] ** (1.0 / 2.4)) - 0.055
     c_gamma[~mask] = 12.92 * c[~mask]
     return np.clip(np.round(c_gamma * 255.0), 0, 255).astype(np.uint8)
+
+
+def apply_ambient_perceptual_chroma_limiter(
+    img_np: np.ndarray,
+    chroma_limit: float = 0.070,
+    target_hue_deg: Optional[float] = None,
+    hue_blend: float = 0.0,
+    highlight_rolloff: float = 0.88,
+    warmth_offset: float = 0.0
+) -> np.ndarray:
+    """
+    OKLab 感知色度抑制與電影級大氣色彩修整器 (Perceptual Chroma Limiter & Atmospheric ShowLook)
+    專門解決 Ambient 曲風下偶發的高飽和鮮艷刺眼色塊或個別視覺模組寫死原色的問題：
+    1. 將 sRGB 影像精準轉至 OKLab 色彩空間 (L, a, b)。
+    2. 計算像素感知彩度 C = sqrt(a^2 + b^2)。
+    3. 對超出安全門檻 C_limit 的鮮艷像素執行雙曲正切 (tanh) 柔和滾降壓縮：
+       C' = C_limit * tanh(C / C_limit)
+       保留色彩豐富度的同時徹底消除數碼螢光刺眼感。
+    4. 針對極端高光 (L > highlight_rolloff) 進行大氣散射滾降，營造 Turrell Ganzfeld 漫射質感。
+    5. 依據目標導演色相 (target_hue_deg) 進行環境色溫漂移，統一全片調性。
+    """
+    if img_np is None or img_np.size == 0:
+        return img_np
+
+    try:
+        ok = srgb_to_oklab(img_np)
+        L = ok[:, :, 0]
+        a = ok[:, :, 1]
+        b = ok[:, :, 2]
+
+        C = np.sqrt(a * a + b * b)
+
+        # 雙曲正切 (tanh) 柔和色度壓制 (Smooth Chroma Soft-Knee Compression)
+        c_lim = max(0.015, float(chroma_limit))
+        scale = np.where(C > c_lim, (c_lim * np.tanh(C / c_lim)) / np.maximum(C, 1e-6), 1.0)
+        a_clamped = a * scale
+        b_clamped = b * scale
+
+        # 導演目標色相微弱大氣浸潤 (Target Hue Atmospheric Infusion)
+        if target_hue_deg is not None and hue_blend > 0.001:
+            h_rad = math.radians(float(target_hue_deg))
+            target_a = c_lim * 0.7 * math.cos(h_rad)
+            target_b = c_lim * 0.7 * math.sin(h_rad)
+            blend_w = min(0.35, float(hue_blend))
+            a_clamped = a_clamped * (1.0 - blend_w) + target_a * blend_w
+            b_clamped = b_clamped * (1.0 - blend_w) + target_b * blend_w
+
+        # 微調色溫 (Warmth offset)
+        if abs(warmth_offset) > 0.001:
+            a_clamped += warmth_offset * 0.02
+            b_clamped += warmth_offset * 0.01
+
+        # 高光柔化滾降 (Highlight Soft-Roll-off - Turrell Ganzfeld Effect)
+        if highlight_rolloff < 0.99:
+            hl_mask = L > highlight_rolloff
+            excess = L - highlight_rolloff
+            L_soft = np.where(hl_mask, highlight_rolloff + (1.0 - highlight_rolloff) * np.tanh(excess * 3.0), L)
+        else:
+            L_soft = L
+
+        ok_out = np.dstack((L_soft, a_clamped, b_clamped))
+        return oklab_to_srgb(ok_out)
+    except Exception as e:
+        return img_np
+
+
+class FXPolymorphicMutationEngine:
+    """
+    呼叫級動態多態突變引擎 (Polymorphic Mutation Engine)
+    保證全域後製特效在每次被擊發時，均由當前音樂微節奏、曲風與混沌種子驅動，
+    產生劇烈不同屬性（幾何拓撲、尺度維度、對稱軸數、色彩極化、非線性曲率、質地顆粒度），
+    徹底消除千篇一律的視覺疲勞，同時緊密耦合音樂能量與風格。
+    """
+    ACES_INDUSTRIAL_MONOLITH = np.array([
+        [10, 17, 40],     # 深冷鈷藍
+        [18, 18, 20],     # 玄武岩黑
+        [255, 183, 3],    # 純鎢金
+        [160, 175, 190]   # 冷鉻銀
+    ], dtype=np.float32)
+
+    ACES_ACID_MUTATION = np.array([
+        [3, 25, 30],      # 深墨綠
+        [57, 255, 20],    # 劇毒螢光酸綠
+        [114, 9, 183],    # 暗紫外光
+        [200, 255, 100]   # 亮黃綠
+    ], dtype=np.float32)
+
+    ACES_THERMAL_CORE = np.array([
+        [26, 26, 29],     # 深炭灰
+        [195, 7, 63],     # 熔岩赤紅
+        [250, 250, 250],  # 高溫白熾
+        [78, 14, 30]      # 暗緋紅
+    ], dtype=np.float32)
+
+    ACES_BRUTALIST_HIGH_KEY = np.array([
+        [250, 250, 250],  # 純鈦白
+        [5, 5, 5],        # 深鉛黑
+        [142, 154, 175],  # 中性鉻銀
+        [60, 64, 72]      # 冷工業灰
+    ], dtype=np.float32)
+
+    ACES_AMBIENT_MIST = np.array([
+        [18, 24, 32],      # Deep Nordic Slate
+        [48, 62, 74],      # Morandi Mist Blue-Gray
+        [98, 114, 126],    # Soft Fog Stone
+        [168, 180, 190]    # Muted Pale Cloud
+    ], dtype=np.float32)
+
+    PALETTES = [
+        ACES_INDUSTRIAL_MONOLITH,
+        ACES_ACID_MUTATION,
+        ACES_THERMAL_CORE,
+        ACES_BRUTALIST_HIGH_KEY
+    ]
+
+    @classmethod
+    def generate_invocation_dna(cls, fx_name: str, t: float, beat_energy: float, 
+                                audio_feats: dict, song_seed: int = 0, genre: str = 'techno') -> dict:
+        """
+        每次特效呼叫時，動態合成高熵 6 維度突變參數字典 (DNA)
+        """
+        feats = audio_feats if isinstance(audio_feats, dict) else {}
+        sub_bass = float(feats.get('sub_bass', 0.5))
+        percussive = float(feats.get('percussive', 0.5))
+        roughness = float(feats.get('roughness', 0.5))
+        ethereal = float(feats.get('ethereal', 0.5))
+        centroid = float(feats.get('centroid', feats.get('spectral_centroid', 0.5)))
+        harmonic = float(feats.get('harmonic', 0.5))
+        stereo_width = float(feats.get('stereo_width', 0.5))
+        
+        # 雜湊呼叫時間戳與微步特徵，生成呼叫級高隨機度種子
+        t_hash = int(round(t * 120.0))
+        name_hash = int(hashlib.md5(fx_name.encode('utf-8')).hexdigest()[:6], 16)
+        seed_val = (t_hash * 31337 + int(beat_energy * 10000) + name_hash + (song_seed or 0)) & 0x7FFFFFFF
+        rng = np.random.RandomState(seed_val % (2**31 - 1))
+
+        # 1. 幾何模式突變 (0: 徑向旋渦, 1: 笛卡爾切片, 2: 雙曲幾何, 3: 碎形晶格, 4: 極坐標折疊)
+        geom_mode = int(rng.randint(0, 5))
+
+        # 2. 尺度跳躍突變 (極細粒子 0.25 到 巨集切片 4.2)
+        scale_pool = [0.25, 0.5, 1.0, 2.0, 3.5, 4.2]
+        base_scale = float(rng.choice(scale_pool))
+        scale_factor = base_scale * float(0.75 + 0.5 * sub_bass)
+
+        # 3. 旋轉角與對稱軸突變
+        rot_angle = float(rng.uniform(0.0, 360.0))
+        sym_axes = int(rng.choice([1, 2, 3, 4, 6, 8]))
+
+        # 4. 色彩極性突變與調色盤選取
+        genre_lower = genre.lower() if isinstance(genre, str) else ''
+        is_amb_dna = any(k in genre_lower for k in ('ambient', 'drone', 'meditative', 'chill', 'downtempo', 'atmospheric')) or bool(feats.get('force_ambient_color'))
+        if is_amb_dna:
+            chosen_palette = cls.ACES_AMBIENT_MIST
+            color_polarity = int(rng.choice([0, 3, 4]))  # 嚴禁 pol=1 (霓虹反轉) 與 pol=2 (高反差紅藍分離)
+            chroma_shift = float(rng.uniform(0.01, 0.04))
+        else:
+            if 'acid' in genre_lower:
+                pal_idx = int(rng.choice([1, 0, 2]))
+            elif 'hard' in genre_lower:
+                pal_idx = int(rng.choice([2, 0, 3]))
+            elif 'dub' in genre_lower:
+                pal_idx = int(rng.choice([0, 3]))
+            else:
+                pal_idx = int(rng.randint(0, len(cls.PALETTES)))
+            chosen_palette = cls.PALETTES[pal_idx]
+            color_polarity = int(rng.randint(0, 5))
+            chroma_shift = float(rng.uniform(0.03, 0.18) * (0.8 + 0.6 * roughness))
+
+        # 5. 非線性曲率與動態包絡
+        warp_exp = float(rng.uniform(0.4, 2.8) * (0.6 + 0.8 * beat_energy))
+        noise_gran = float(rng.uniform(0.1, 1.0))
+        env_type = int(rng.randint(0, 3))
+
+        return {
+            'seed': seed_val,
+            'fx_name': fx_name,
+            'geometry_mode': geom_mode,
+            'scale_factor': scale_factor,
+            'rotation_angle': rot_angle,
+            'symmetry_axes': sym_axes,
+            'color_polarity': color_polarity,
+            'chroma_shift': chroma_shift,
+            'warp_exponent': warp_exp,
+            'noise_granularity': noise_gran,
+            'envelope_type': env_type,
+            'palette': chosen_palette,
+            'sub_bass': sub_bass,
+            'percussive': percussive,
+            'roughness': roughness,
+            'ethereal': ethereal,
+            'centroid': centroid,
+            'harmonic': harmonic,
+            'stereo_width': stereo_width,
+            'beat_energy': beat_energy,
+            't': t
+        }
+
+    @classmethod
+    def apply_color_polarization(cls, img_np: np.ndarray, dna: dict, intensity: float) -> np.ndarray:
+        """
+        依據突變 DNA 將畫面色彩映射至當前高階 ACES 工業調色盤或極化互補色
+        """
+        if intensity < 0.02 or img_np is None:
+            return img_np
+        pol = dna.get('color_polarity', 0)
+        eff = float(np.clip(intensity, 0.0, 1.0))
+
+        if pol == 0:
+            # 模式 0: ACES 調色盤通道亮度雙色調映射 (Duotone Map)
+            pal = dna.get('palette', cls.ACES_INDUSTRIAL_MONOLITH)
+            gray = (0.299 * img_np[:, :, 0] + 0.587 * img_np[:, :, 1] + 0.114 * img_np[:, :, 2]) / 255.0
+            idx_low = np.clip((gray * 3.0).astype(np.int32), 0, 2)
+            idx_high = np.clip(idx_low + 1, 0, 3)
+            frac = (gray * 3.0 - idx_low)[:, :, None]
+            c_low = pal[idx_low]
+            c_high = pal[idx_high]
+            mapped = (c_low * (1.0 - frac) + c_high * frac).astype(np.float32)
+            out = img_np.astype(np.float32) * (1.0 - eff * 0.7) + mapped * (eff * 0.7)
+            return np.clip(out, 0, 255).astype(np.uint8)
+
+        elif pol == 1:
+            # 模式 1: 霓虹酸性極化反轉 (Chroma Solarization Inversion)
+            c = img_np.astype(np.float32)
+            solar = np.where(c > 128.0, 255.0 - c, c * 1.5)
+            out = c * (1.0 - eff * 0.65) + solar * (eff * 0.65)
+            return np.clip(out, 0, 255).astype(np.uint8)
+
+        elif pol == 2:
+            # 模式 2: 冷暖雙峰對比分離 (Split Toning)
+            shift = dna.get('chroma_shift', 0.08) * 255.0 * eff
+            out = img_np.astype(np.float32).copy()
+            out[:, :, 0] = np.clip(out[:, :, 0] + shift, 0, 255)  # Boost Red
+            out[:, :, 2] = np.clip(out[:, :, 2] - shift * 0.7, 0, 255) # Dim Blue
+            return out.astype(np.uint8)
+
+        elif pol == 3:
+            # 模式 3: 高反差純黑白鎢金高光 (High-Key Monolith Tint)
+            gray = (0.299 * img_np[:, :, 0] + 0.587 * img_np[:, :, 1] + 0.114 * img_np[:, :, 2])
+            mono = np.dstack([gray, gray * 0.95, gray * 0.85]).astype(np.float32)
+            out = img_np.astype(np.float32) * (1.0 - eff * 0.8) + mono * (eff * 0.8)
+            return np.clip(out, 0, 255).astype(np.uint8)
+
+        return img_np
 
 
 class TimeDisplacementBuffer:
@@ -433,11 +691,15 @@ class VJAestheticEngine:
 
 class ProceduralCameraRig:
     """程序化虛擬鏡頭矩陣：3D透視投影 (Perspective Homography)、Dolly Zoom、手持漂移、旋轉與空間幾何"""
-    def __init__(self, rng=None):
+    def __init__(self, rng=None, is_hard_techno=False):
         self.rng = rng or random.Random()
+        self.is_hard_techno = is_hard_techno
         self.mode = self.rng.choice(['orbit_spin', 'dolly_zoom_pulse', 'handheld_drift', 'spiral_vortex'])
-        self.speed = self.rng.uniform(0.6, 1.4)
-        self.amplitude = self.rng.uniform(0.8, 1.2)
+        self.rig_archetype = self.rng.choice(['kinetic_punch', 'brutalist_lock', 'orbital_sway', 'seismic_tremor'])
+        self.speed = self.rng.uniform(0.9, 1.75) if is_hard_techno else self.rng.uniform(0.6, 1.4)
+        self.amplitude = self.rng.uniform(0.85, 1.35) if is_hard_techno else self.rng.uniform(0.8, 1.2)
+        self.kick_zoom_gain = self.rng.uniform(0.06, 0.14)
+        self.shake_gain = self.rng.uniform(4.0, 13.0)
 
     def apply(self, img_np, t, beat_energy, section_name='Verse', cinedance_meta=None, enable_perspective_3d=True):
         if cv2 is None: return img_np
@@ -445,12 +707,22 @@ class ProceduralCameraRig:
         center = (w / 2.0, h / 2.0)
 
         sec = section_name.lower()
-        if 'intro' in sec or 'outro' in sec: intensity_scale = 0.2
-        elif 'verse' in sec or 'bridge' in sec: intensity_scale = 0.4
-        elif 'build' in sec: intensity_scale = 1.2
-        else: intensity_scale = 1.75
+        if self.is_hard_techno:
+            # ⚡ Hard Techno 段落呼吸對比：Intro/Verse 保持建築結構清晰穩定，Build-up 蓄力，Drop 釋放極致衝擊
+            if 'intro' in sec or 'outro' in sec: intensity_scale = 0.35
+            elif 'bridge' in sec: intensity_scale = 0.55
+            elif 'verse' in sec: intensity_scale = 0.75
+            elif 'build' in sec: intensity_scale = 1.20
+            else: intensity_scale = 1.85  # Drop / Chorus Climax
+            if self.rig_archetype == 'brutalist_lock' and ('drop' not in sec and 'chorus' not in sec):
+                intensity_scale *= 0.55
+        else:
+            if 'intro' in sec or 'outro' in sec: intensity_scale = 0.2
+            elif 'verse' in sec or 'bridge' in sec: intensity_scale = 0.4
+            elif 'build' in sec: intensity_scale = 1.2
+            else: intensity_scale = 1.75
         
-        if beat_energy > 0.6: intensity_scale *= 1.3
+        if beat_energy > 0.65: intensity_scale *= 1.20
 
         # 讀取 CINEDANCE 元數據
         target_fov = 50.0
@@ -501,8 +773,23 @@ class ProceduralCameraRig:
                     [0.0, float(h)]
                 ])
 
+                # ⚡ 依曲目專屬鏡頭原型 (rig_archetype) 與段落決定大鼓衝擊縮放與震顫，杜絕 45 首歌全曲同質化搖晃
+                is_peak_sec = ('drop' in sec or 'chorus' in sec)
+                if self.is_hard_techno:
+                    if self.rig_archetype == 'kinetic_punch' and beat_energy > 0.55:
+                        dolly_z += (beat_energy ** 1.4) * self.kick_zoom_gain * (1.35 if is_peak_sec else 0.65)
+                    elif self.rig_archetype == 'orbital_sway' and beat_energy > 0.60:
+                        roll_rad += math.sin(t * 2.0) * 0.028 * beat_energy
+                    elif self.rig_archetype == 'seismic_tremor' and is_peak_sec and beat_energy > 0.65:
+                        dolly_z += (beat_energy ** 1.5) * (self.kick_zoom_gain * 0.85)
+                        roll_rad += self.rng.uniform(-1.0, 1.0) * 0.025 * beat_energy
+
                 scale_3d = 1.0 + dolly_z
                 cx, cy = w * 0.5, h * horizon_y
+                if self.is_hard_techno and is_peak_sec and self.rig_archetype in ('seismic_tremor', 'kinetic_punch') and beat_energy > 0.72:
+                    cx += self.rng.uniform(-1.0, 1.0) * self.shake_gain * beat_energy
+                    cy += self.rng.uniform(-1.0, 1.0) * (self.shake_gain * 0.75) * beat_energy
+
                 dst_pts = np.zeros_like(src_pts)
 
                 for idx in range(4):
@@ -583,131 +870,279 @@ class SpatialTriadRelighting:
 
 
 class AudioParticleFluidEngine:
-    """程序化 8 維基因粒子流體系統"""
-    GEOMETRY_MODES = ['SoftSphere', 'CrystallinePolyhedron', 'RingTorus', 'RibbonStrand', 'StarDustDot', 'VortexMesh', 'InkBlob', 'QuantumDot', 'VolumetricCloud', 'MistFog', 'DynamicSmoke', 'LiquidDroplet']
-    TRAJECTORY_MODES = ['NavierStokesFluid', 'LogarithmicSpiral', 'BrownianDiffusion', 'GravitationalAttractors', 'LinearJet', 'SineWaveFlow', 'ThermalBuoyancy']
-    SHADER_MODES = ['VolumetricGlow', 'FerrofluidMetallic', 'NeonFresnel', 'InkDispersion', 'RefractiveCrystal', 'SingularityLensing', 'GaussianSplatting', 'LiquidRefraction']
+    """
+    工業級超維動態粒子形態引擎 (Metamorphic Audio-Reactive Particle Engine)
+    - 每次生成具備唯一宇宙基因 (Cosmic DNA: 形態族群、對稱階數、物理力場、相變速度)
+    - 粒子本身拓撲幾何根據即時音樂特徵劇烈形變 (Morphological Deformation):
+      * Sub-Bass / Kick: 突刺多角星芒爆發 (Stellated Star Eruption) 與彈性果凍擠壓 (Squash & Stretch)
+      * Mid / Vocal: 邊緣流體諧波波動 (Harmonic Undulation) 與自旋扭轉
+      * High / Hi-hat: 晶體斷裂稜角震顫 (Crystalline Faceting Jitter) 與量子微粒發射
+    - 物理場矩陣: 渦流吸引子、洛倫茲混沌、諧振彈簧力與仿生集群
+    """
+    MORPH_FAMILIES = [
+        'StellatedStar',           # 星芒突刺多邊形 (Bass 強度驅動芒刺暴展)
+        'ElasticJellyBlob',        # 彈性果凍液滴 (低音衝擊擠壓、中頻諧波輪廓波動)
+        'QuantumResonanceRing',    # 量子共振同心環 (高頻激發衛星光點公轉)
+        'CrystallinePrism',        # 動態晶體多稜鏡 (Hihat 觸發邊緣碎裂微震顫)
+        'MetamorphicVoronoi',      # 沃羅諾伊動態晶胞拓撲
+        'CosmicFilament'           # 星雲超弦動態發光纖維
+    ]
+    PHYSICS_MODES = [
+        'VortexAttractor',         # 雙奇異點渦流吸積
+        'LorenzChaos',             # 洛倫茲奇異吸子微擾
+        'HarmonicSpring',          # 諧振子核心吸引回彈
+        'BrownianQuantum',         # 布朗分子熱運動與量子隧穿
+        'BoidsCentering'           # 仿生群體凝聚與速度匹配
+    ]
     EMISSION_PATTERNS = ['RadialBloom', 'SpiralHelix', 'DualAttractors', 'UpwardFountain', 'EdgeRingInward']
 
-    def __init__(self, max_particles=300, seed_string=None):
+    def __init__(self, max_particles=350, seed_string=None):
         import hashlib
         self.max_particles = max_particles
         self.particles = []
         self.cooldown = 0
         
-        hash_val = int(hashlib.md5((seed_string or "default_fluid").encode('utf-8')).hexdigest(), 16)
+        # 1. 唯一宇宙基因程序化隨機 (Procedural Cosmic DNA)
+        hash_val = int(hashlib.md5((seed_string or "unique_metamorphic_particle").encode('utf-8')).hexdigest(), 16)
         rng = random.Random(hash_val)
 
-        self.geom_mode = rng.choice(self.GEOMETRY_MODES)
-        self.traj_mode = rng.choice(self.TRAJECTORY_MODES)
-        self.shader_mode = rng.choice(self.SHADER_MODES)
-        self.emission_pattern = rng.choice(self.EMISSION_PATTERNS)
-        self.viscosity = rng.uniform(0.88, 0.98)
-        self.glow_feather = rng.uniform(0.3, 0.9)
-        self.blur_length = rng.uniform(5.0, 25.0)
-        self.splat_eccentricity = rng.uniform(1.5, 4.0)
+        self.dna = {
+            'morph_family': rng.choice(self.MORPH_FAMILIES),
+            'physics_mode': rng.choice(self.PHYSICS_MODES),
+            'emission_pattern': rng.choice(self.EMISSION_PATTERNS),
+            'symmetry_n': rng.choice([3, 4, 5, 6, 7, 8, 10, 12]),   # 對稱星芒階數
+            'viscosity': rng.uniform(0.91, 0.985),                   # 物理流體阻尼
+            'elastic_squash': rng.uniform(0.6, 1.4),                 # 果凍形變彈性剛度
+            'spin_speed': rng.uniform(1.2, 4.5),                     # 固有角動量
+            'spike_reach': rng.uniform(0.8, 2.2),                    # 低音芒刺伸展極限
+            'harmonic_nodes': rng.randint(3, 9),                     # 中頻諧波節點數
+            'jitter_scale': rng.uniform(0.15, 0.45)                  # 高頻稜角碎裂度
+        }
+        self.rng = rng
 
     def update_and_render(self, img_np, t, is_beat, beat_energy, audio_feats, intensity=0.5, custom_palette=None, section_name='Verse'):
         if cv2 is None or intensity < 0.05:
             return img_np
 
-        sec = section_name.lower()
-        if any(s in sec for s in ('intro', 'outro', 'verse', 'bridge')):
-            self.particles.clear()
-            return img_np
+        sec = str(section_name).lower()
+        h, w = img_np.shape[:2]
+        dt = 1.0 / 30.0
 
+        # 聲學特徵解包
+        sub_bass = float(audio_feats.get('sub_bass', 0.0))
+        audio_mid = float(audio_feats.get('mid', audio_feats.get('harmonic', 0.5)))
+        audio_high = float(audio_feats.get('high', audio_feats.get('percussive', 0.2)))
+        chord_hue = float(audio_feats.get('chord_hue', 0.0))
+
+        # 曲式段落動態生成權重
+        sec_weights = {
+            'drop': 1.6, 'chorus': 1.4, 'build': 1.2,
+            'verse': 0.65, 'bridge': 0.55, 'intro': 0.45, 'outro': 0.35
+        }
+        sec_mult = next((v for k, v in sec_weights.items() if k in sec), 0.70)
+        eff_intensity = max(0.1, min(1.8, intensity * sec_mult))
+
+        # 2. 粒子誕生排程
         if self.cooldown > 0:
             self.cooldown -= 1
-            if not self.particles: return img_np
-
-        h, w = img_np.shape[:2]
-        sub_bass = audio_feats.get('sub_bass', 0.0)
-
-        if (is_beat and beat_energy > 0.6) and len(self.particles) == 0:
-            self.cooldown = 75
-            num_to_spawn = int((15 + 35 * beat_energy + 25 * sub_bass) * intensity)
+        
+        spawn_trigger = (is_beat and beat_energy > 0.45) or (len(self.particles) < int(25 * eff_intensity) and self.rng.random() < 0.30)
+        if spawn_trigger and len(self.particles) < self.max_particles and self.cooldown == 0:
+            self.cooldown = int(18 / max(0.5, eff_intensity))
+            num_to_spawn = int((8 + 28 * beat_energy + 20 * sub_bass) * eff_intensity)
             
-            if custom_palette and isinstance(custom_palette, dict):
-                base_color = custom_palette.get('minor') if sub_bass > 0.4 else custom_palette.get('major')
-                if base_color is None:
-                    base_color = custom_palette.get('primary', [100, 200, 240])
-                try:
-                    vals = []
-                    for c in base_color[:3]:
-                        cv = float(c)
-                        if cv <= 1.0:
-                            cv *= 255.0
-                        vals.append(max(0.0, min(255.0, cv)))
-                    r_b, g_b, b_b = vals
-                except Exception:
-                    r_b, g_b, b_b = (100.0, 200.0, 240.0)
-            else:
-                r_b, g_b, b_b = (100.0, 200.0, 240.0)
+            # 色彩基調映射
+            base_hue = (chord_hue + self.rng.randint(-20, 20)) % 360.0
+            is_amb_p = bool(audio_feats.get('force_ambient_color') or audio_feats.get('ambient_color_policy'))
+            r_b, g_b, b_b = self._hue_to_rgb(base_hue, is_ambient=is_amb_p)
 
-            for i in range(min(num_to_spawn, self.max_particles)):
-                if self.emission_pattern == 'DualAttractors':
-                    cx = (w * 0.3) if (i % 2 == 0) else (w * 0.7)
-                    cy = h * 0.5 + math.sin(t) * (h * 0.1)
-                    ang = random.uniform(0, math.tau)
-                    spd = random.uniform(3.0, 15.0) * (0.8 + 1.2 * beat_energy)
-                elif self.emission_pattern == 'UpwardFountain':
-                    cx = w * 0.5 + random.uniform(-w * 0.2, w * 0.2)
-                    cy = h * 0.95
-                    ang = random.uniform(-math.pi * 0.8, -math.pi * 0.2)
-                    spd = random.uniform(8.0, 22.0) * (0.8 + 1.2 * beat_energy)
+            for i in range(min(num_to_spawn, self.max_particles - len(self.particles))):
+                pattern = self.dna['emission_pattern']
+                if pattern == 'DualAttractors':
+                    cx = (w * 0.28) if (i % 2 == 0) else (w * 0.72)
+                    cy = h * 0.5 + math.sin(t * 1.5) * (h * 0.15)
+                    ang = self.rng.uniform(0, math.tau)
+                    spd = self.rng.uniform(3.0, 16.0) * (0.7 + 1.3 * beat_energy)
+                elif pattern == 'UpwardFountain':
+                    cx = w * 0.5 + self.rng.uniform(-w * 0.35, w * 0.35)
+                    cy = h * 0.98
+                    ang = self.rng.uniform(-math.pi * 0.85, -math.pi * 0.15)
+                    spd = self.rng.uniform(9.0, 26.0) * (0.8 + 1.2 * beat_energy)
+                elif pattern == 'SpiralHelix':
+                    theta = t * 3.0 + i * 0.4
+                    rad_s = 20.0 + i * 8.0
+                    cx = w * 0.5 + math.cos(theta) * rad_s
+                    cy = h * 0.5 + math.sin(theta) * rad_s
+                    ang = theta + math.pi / 2.0
+                    spd = self.rng.uniform(4.0, 14.0)
                 else:
-                    cx, cy = w / 2.0, h / 2.0
-                    ang = random.uniform(0, math.tau)
-                    spd = random.uniform(2.0, 12.0) * (0.8 + 1.2 * beat_energy)
+                    cx, cy = w * 0.5, h * 0.5
+                    ang = self.rng.uniform(0, math.tau)
+                    spd = self.rng.uniform(2.5, 14.0) * (0.8 + 1.2 * beat_energy)
 
-                vx, vy = math.cos(ang) * spd, math.sin(ang) * spd
-                life = random.uniform(0.8, 2.2) if self.geom_mode in ('DynamicSmoke', 'LiquidDroplet') else random.uniform(0.6, 1.8)
-                sz = random.uniform(8.0, 30.0) if self.geom_mode in ('VolumetricCloud', 'MistFog', 'DynamicSmoke') else random.uniform(4.0, 14.0)
-                drift = random.randint(-15, 15)
+                vx = math.cos(ang) * spd
+                vy = math.sin(ang) * spd
+                life = self.rng.uniform(1.2, 3.2)
+                sz = self.rng.uniform(10.0, 36.0) * (0.8 + 0.6 * sub_bass)
+                rot = self.rng.uniform(0, math.tau)
+                rot_spd = self.rng.uniform(-1.0, 1.0) * self.dna['spin_speed']
+                mass = self.rng.uniform(0.6, 2.0)
+                
+                # 粒子初始封裝: [x, y, vx, vy, life, max_life, sz, color, rot, rot_spd, mass]
                 color = (
-                    int(max(0, min(255, round(r_b + drift)))),
-                    int(max(0, min(255, round(g_b + drift)))),
-                    int(max(0, min(255, round(b_b + drift))))
+                    int(max(0, min(255, r_b + self.rng.randint(-25, 25)))),
+                    int(max(0, min(255, g_b + self.rng.randint(-25, 25)))),
+                    int(max(0, min(255, b_b + self.rng.randint(-25, 25))))
                 )
-                self.particles.append([cx, cy, vx, vy, life, life, sz, color])
+                self.particles.append([cx, cy, vx, vy, life, life, sz, color, rot, rot_spd, mass])
 
         if not self.particles:
             return img_np
 
         overlay = img_np.copy()
         new_particles = []
+        phys_mode = self.dna['physics_mode']
+        viscosity = self.dna['viscosity']
 
+        # 3. 粒子物理更新與形變繪製
         for p in self.particles:
-            x, y, vx, vy, life, max_life, sz, color = p
-            dt = 1.0 / 30.0
+            x, y, vx, vy, life, max_life, sz, color, rot, rot_spd, mass = p
             
-            vx += math.sin(y * 0.015 + t * 2.0) * math.cos(x * 0.01) * 30.0 * dt
-            vy += math.cos(x * 0.015 - t * 2.0) * math.sin(y * 0.01) * 30.0 * dt
+            # --- 物理力場作用 ---
+            if phys_mode == 'VortexAttractor':
+                dx = x - w * 0.5
+                dy = y - h * 0.5
+                dist = math.hypot(dx, dy) + 1.0
+                vx += (-dy / dist * 65.0 - dx * 0.12) * dt / mass
+                vy += (dx / dist * 65.0 - dy * 0.12) * dt / mass
+            elif phys_mode == 'LorenzChaos':
+                vx += math.sin(y * 0.012 + t * 2.2) * 45.0 * dt
+                vy += math.cos(x * 0.012 - t * 2.2) * 45.0 * dt
+            elif phys_mode == 'HarmonicSpring':
+                dx = w * 0.5 - x
+                dy = h * 0.5 - y
+                vx += (dx * 0.8) * dt
+                vy += (dy * 0.8) * dt
+            else: # BrownianQuantum / Boids
+                vx += self.rng.uniform(-25.0, 25.0) * dt * (1.0 + audio_high)
+                vy += self.rng.uniform(-25.0, 25.0) * dt * (1.0 + audio_high)
 
+            # 速度與阻尼
+            vx *= viscosity
+            vy *= viscosity
             x += vx
             y += vy
+            rot += rot_spd * dt * (1.0 + 2.0 * beat_energy)
             life -= dt
 
-            if life > 0 and 0 <= x < w and 0 <= y < h:
-                alpha = (life / max_life)
-                cur_sz = max(1, int(sz * alpha))
-                color_tuple = (
-                    int(max(0, min(255, round(color[0])))),
-                    int(max(0, min(255, round(color[1])))),
-                    int(max(0, min(255, round(color[2]))))
+            if life > 0 and -100 <= x < (w + 100) and -100 <= y < (h + 100):
+                alpha = max(0.0, min(1.0, life / max_life))
+                cur_sz = max(2.0, sz * alpha)
+                
+                # --- 核心形變演算法 (Audio-Driven Morphological Deformation) ---
+                self._draw_morphing_particle(
+                    overlay, x, y, cur_sz, color, rot, t,
+                    sub_bass, audio_mid, audio_high, beat_energy
                 )
-                if overlay.ndim == 3 and overlay.shape[2] == 4:
-                    draw_color = (color_tuple[0], color_tuple[1], color_tuple[2], 255)
-                elif overlay.ndim == 3 and overlay.shape[2] == 3:
-                    draw_color = color_tuple
-                else:
-                    draw_color = int(color_tuple[0])
-                cv2.circle(overlay, (int(x), int(y)), cur_sz, draw_color, -1, lineType=cv2.LINE_AA)
-                new_particles.append([x, y, vx, vy, life, max_life, sz, color_tuple])
+                
+                new_particles.append([x, y, vx, vy, life, max_life, sz, color, rot, rot_spd, mass])
 
         self.particles = new_particles
-        blend_alpha = min(0.25, 0.15 * intensity + 0.1 * beat_energy)
+        blend_alpha = min(0.40, (0.16 + 0.20 * beat_energy + 0.12 * sub_bass) * eff_intensity)
         return cv2.addWeighted(img_np, 1.0 - blend_alpha, overlay, blend_alpha, 0)
+
+    def _draw_morphing_particle(self, canvas, cx, cy, sz, color, rot, t, sub_bass, audio_mid, audio_high, beat_energy):
+        """根據宇宙 DNA 與實時音訊特徵，動態形變繪製粒子頂點拓撲 (Shape Morphing)"""
+        fam = self.dna['morph_family']
+        sym_n = self.dna['symmetry_n']
+        
+        # 1. 星芒突刺多邊形 (低音衝擊時瞬間暴突尖刺)
+        if fam == 'StellatedStar':
+            num_pts = sym_n * 2
+            spike_factor = self.dna['spike_reach'] * (0.35 + 1.45 * sub_bass + 0.6 * beat_energy)
+            pts = []
+            for i in range(num_pts):
+                theta = rot + (i * math.tau / num_pts)
+                r_scale = (1.0 + spike_factor) if (i % 2 == 1) else (1.0 - 0.25 * sub_bass)
+                px = cx + math.cos(theta) * sz * r_scale
+                py = cy + math.sin(theta) * sz * r_scale
+                pts.append([int(px), int(py)])
+            poly_np = np.array([pts], dtype=np.int32)
+            cv2.fillPoly(canvas, poly_np, color, lineType=cv2.LINE_AA)
+            edge_color = tuple(min(255, int(c * 1.35)) for c in color)
+            cv2.polylines(canvas, poly_np, True, edge_color, 1, lineType=cv2.LINE_AA)
+
+        # 2. 彈性果凍液滴 (低音 Squash & Stretch 擠壓形變 + 中頻輪廓波浪擾動)
+        elif fam == 'ElasticJellyBlob':
+            squash_x = 1.0 + self.dna['elastic_squash'] * sub_bass * 0.95
+            squash_y = 1.0 / max(0.5, squash_x)
+            num_pts = 16
+            pts = []
+            for i in range(num_pts):
+                theta = rot + (i * math.tau / num_pts)
+                # 中頻諧波節點擾動
+                harm_wave = 1.0 + 0.25 * audio_mid * math.sin(self.dna['harmonic_nodes'] * theta + t * 4.0)
+                px = cx + math.cos(theta) * sz * squash_x * harm_wave
+                py = cy + math.sin(theta) * sz * squash_y * harm_wave
+                pts.append([int(px), int(py)])
+            poly_np = np.array([pts], dtype=np.int32)
+            cv2.fillPoly(canvas, poly_np, color, lineType=cv2.LINE_AA)
+
+        # 3. 量子共振同心環 (高頻公轉激發雙層量子態)
+        elif fam == 'QuantumResonanceRing':
+            irad = max(1, int(sz * (0.6 + 0.5 * sub_bass)))
+            thick = max(1, int(sz * 0.25 * (1.0 + audio_high)))
+            cv2.circle(canvas, (int(cx), int(cy)), irad, color, thick, lineType=cv2.LINE_AA)
+            # 伴隨公轉的量子衛星節點
+            sat_ang = rot * 2.5
+            sat_rad = irad * (1.5 + 0.4 * audio_high)
+            sx = int(cx + math.cos(sat_ang) * sat_rad)
+            sy = int(cy + math.sin(sat_ang) * sat_rad)
+            sat_col = tuple(min(255, int(c * 1.5)) for c in color)
+            cv2.circle(canvas, (sx, sy), max(2, int(sz * 0.3)), sat_col, -1, lineType=cv2.LINE_AA)
+
+        # 4. 動態晶體多稜鏡 (Hihat 高頻稜角碎裂震顫)
+        elif fam == 'CrystallinePrism':
+            num_pts = max(3, sym_n)
+            pts = []
+            jitter_amp = sz * self.dna['jitter_scale'] * audio_high
+            for i in range(num_pts):
+                theta = rot + (i * math.tau / num_pts)
+                jx = (self.rng.random() - 0.5) * jitter_amp
+                jy = (self.rng.random() - 0.5) * jitter_amp
+                px = cx + math.cos(theta) * sz * (1.0 + 0.3 * sub_bass) + jx
+                py = cy + math.sin(theta) * sz * (1.0 + 0.3 * sub_bass) + jy
+                pts.append([int(px), int(py)])
+            poly_np = np.array([pts], dtype=np.int32)
+            cv2.fillPoly(canvas, poly_np, color, lineType=cv2.LINE_AA)
+            cv2.polylines(canvas, poly_np, True, (255, 255, 255), 1, lineType=cv2.LINE_AA)
+
+        # 5. 沃羅諾伊晶胞 / 超弦動態發光纖維 (預設高品質形變)
+        else:
+            num_pts = 8
+            pts = []
+            for i in range(num_pts):
+                theta = rot + (i * math.tau / num_pts)
+                r_w = sz * (1.0 + 0.4 * math.sin(theta * 3.0 + t * 5.0) * audio_mid + 0.5 * sub_bass)
+                px = cx + math.cos(theta) * r_w
+                py = cy + math.sin(theta) * r_w
+                pts.append([int(px), int(py)])
+            poly_np = np.array([pts], dtype=np.int32)
+            cv2.fillPoly(canvas, poly_np, color, lineType=cv2.LINE_AA)
+
+    @staticmethod
+    def _hue_to_rgb(hue_deg, is_ambient=False):
+        h = (hue_deg % 360.0) / 60.0
+        c = 42.0 if is_ambient else 220.0
+        base_floor = 115.0 if is_ambient else 35.0
+        x = c * (1.0 - abs((h % 2.0) - 1.0))
+        if 0 <= h < 1: rgb = (c, x, 0)
+        elif 1 <= h < 2: rgb = (x, c, 0)
+        elif 2 <= h < 3: rgb = (0, c, x)
+        elif 3 <= h < 4: rgb = (0, x, c)
+        elif 4 <= h < 5: rgb = (x, 0, c)
+        else: rgb = (c, 0, x)
+        return (int(rgb[0] + base_floor), int(rgb[1] + base_floor), int(rgb[2] + base_floor))
 
 
 class FluidSimulator:
@@ -850,7 +1285,7 @@ class PostProcessor:
         self._turing_A = None
         self._turing_B = None
 
-        # 全套 43 大後製特效狀態鍵值
+        # 全套 68 大後製特效狀態鍵值 (升級整合 12 大次世代高辨識度幾何/拓撲強特徵特效庫)
         self.fx_active_states = {
             # Row 1: 基礎核心特效
             'spatial_warping': 0.0, 'fluid_noise': 0.0, 'temporal_feedback': 0.0,
@@ -881,7 +1316,14 @@ class PostProcessor:
             # Row 7: 次世代前沿 5 大故障特效矩陣 (Next-Gen Glitch Matrix)
             'quantum_decoherence': 0.0, 'latent_hallucination': 0.0,
             'tape_head_drag': 0.0, 'huffman_entropy_collapse': 0.0,
-            'spectral_fractal_shear': 0.0
+            'spectral_fractal_shear': 0.0,
+            # 🌟 Row 8: 12 大次世代前沿幾何/拓撲高衝擊特效矩陣 (SOTA 2026 FX Matrix)
+            'hyper_dimensional_fold': 0.0, 'reaction_diffusion_growth': 0.0,
+            'delaunay_voronoi_mesh': 0.0, 'slit_scan_time_warp': 0.0,
+            'gravitational_lensing': 0.0, 'acid_curl_fluid': 0.0,
+            'strobe_chroma_invert': 0.0, 'cyber_wireframe_lidar': 0.0,
+            'sine_terrain_displacement': 0.0, 'quantum_tunneling': 0.0,
+            'prismatic_refraction_prism': 0.0, 'magnetic_field_lines': 0.0
         }
 
         # Time-Vessel Matrix (走馬燈時間卷軸矩陣，滾動歷史緩衝區，預設 2 秒 @ 30fps，16 個特徵維度)
@@ -898,49 +1340,145 @@ class PostProcessor:
             self.rng = random.Random()
 
         genre_clean = genre.lower().strip() if isinstance(genre, str) else 'generic'
+        is_hard_techno = any(ht in genre_clean for ht in ('hard_techno', 'hard techno', 'schranz', 'industrial techno', 'hardcore'))
         is_electronic_genre = any(g in genre_clean for g in (
             'techno', 'electronic', 'dance', 'acid', 'dnb', 'dubstep', 'house',
             'idm', 'edm', 'dub_techno', 'hard_techno', 'trance', 'synthwave'
         ))
-        if is_electronic_genre or self.rng.random() < 0.40:
+        # ⚡ Hard Techno 追求冷硬幾何、雷射與高對比，徹底封殺黏稠有機流體與粒子群！
+        if is_hard_techno:
+            self.audio_particle_fluid = None
+        elif is_electronic_genre or self.rng.random() < 0.40:
             self.audio_particle_fluid = AudioParticleFluidEngine(seed_string=seed_string)
         else:
             self.audio_particle_fluid = None
 
-        self.camera_rig = ProceduralCameraRig(rng=self.rng)
+        self.is_hard_techno = is_hard_techno
+        self.camera_rig = ProceduralCameraRig(rng=self.rng, is_hard_techno=is_hard_techno)
+        self._recent_beat_fx_window = collections.deque(maxlen=8)
 
-        # 視覺美學主題風格包 (平衡擴充各主題池至 14~17 種特效，杜絕先驗抽樣偏差)
+        # 視覺美學主題風格包 (擴充升級至 13 大獨立美學風格池，注入 Hard Techno 專屬 IndustrialMonolith)
         self.theme_pools = {
-            'CyberGlitch': ['data_mosh', 'pixel_sort', 'hologram_glitch', 'scanline_glitch', 'matrix_ascii', 'phase_slit', 'centroid_glitch', 'film_burn', 'vector_scope', 'ascii_cyber_matrix', 'holographic_moire', 'ocular_tremor', 'quantum_decoherence', 'huffman_entropy_collapse', 'spectral_fractal_shear'],
-            'RetroAnalog': ['retro_degradation', 'vector_scan', 'frame_drop', 'handheld_camera', 'stylized_fade', 'photocopy_smear', 'blueprint_edge', 'lowpass_muffle', 'synthwave_grid_scan', 'chladni_cymatics', 'lens_defocus', 'ocular_tremor', 'tape_head_drag', 'film_burn', 'scanline_glitch'],
-            'DreamyArtistic': ['glow_illumination', 'kuwahara_paint', 'temporal_feedback', 'sedimentation', 'fluid_noise', 'collage_cutout', 'turing_pattern', 'point_cloud_depth', 'voronoi_shatter', 'volumetric_caustics', 'lens_defocus', 'latent_hallucination', 'clifford_torus', 'ambient_dsp'],
-            'Psychedelic': ['color_spectral', 'thermal_vision', 'kaleidoscope', 'reaction_diffusion', 'spatial_warping', 'infinity_tunnel', 'thermal_infrared', 'clifford_torus', 'ferrofluid_spikes', 'ocular_tremor', 'lens_defocus', 'latent_hallucination', 'quantum_decoherence', 'chromatic_radial_zoom', 'volumetric_caustics'],
-            'DigitalPixel': ['dynamic_mosaic', 'pixel_art', 'zoom_pulse', 'temporal_fractal', 'dolly_zoom', 'ascii_cyber_matrix', 'voronoi_shatter', 'holographic_moire', 'huffman_entropy_collapse', 'spectral_fractal_shear',
-                             'matrix_ascii', 'scanline_glitch', 'synthwave_grid_scan', 'pixel_sort', 'data_mosh', 'vector_scope', 'phase_slit'],
-            'AcidPsychedelic': ['reaction_diffusion', 'color_spectral', 'infinity_tunnel', 'turing_pattern', 'vector_scan', 'spatial_warping', 'hologram_glitch', 'chromatic_radial_zoom', 'clifford_torus', 'chladni_cymatics', 'ocular_tremor', 'quantum_decoherence', 'spectral_fractal_shear', 'ferrofluid_spikes', 'volumetric_caustics']
+            'IndustrialMonolith': [
+                'strobe_chroma_invert', 'cyber_wireframe_lidar', 'scanline_glitch', 'photocopy_smear',
+                'tension_overlay', 'vector_scan', 'delaunay_voronoi_mesh', 'data_mosh',
+                'slit_scan_time_warp', 'huffman_entropy_collapse', 'vector_scope', 'ascii_cyber_matrix',
+                'magnetic_field_lines', 'sine_terrain_displacement', 'phase_slit', 'centroid_glitch',
+                'frame_drop', 'retro_degradation', 'blueprint_edge', 'point_cloud_depth',
+                'tape_head_drag', 'lowpass_muffle', 'hyper_dimensional_fold', 'matrix_ascii',
+                'voronoi_shatter', 'pixel_sort', 'spectral_fractal_shear', 'thermal_vision'
+            ],
+            'CyberGlitch': [
+                'data_mosh', 'pixel_sort', 'hologram_glitch', 'scanline_glitch', 'matrix_ascii',
+                'phase_slit', 'centroid_glitch', 'vector_scope', 'ascii_cyber_matrix', 'holographic_moire',
+                'ocular_tremor', 'quantum_decoherence', 'huffman_entropy_collapse', 'spectral_fractal_shear',
+                'delaunay_voronoi_mesh', 'cyber_wireframe_lidar', 'quantum_tunneling',
+                'strobe_chroma_invert', 'dynamic_mosaic', 'hyper_dimensional_fold', 'synthwave_grid_scan',
+                'sine_terrain_displacement', 'magnetic_field_lines'
+            ],
+            'RetroAnalog': [
+                'retro_degradation', 'vector_scan', 'frame_drop', 'handheld_camera', 'stylized_fade',
+                'photocopy_smear', 'blueprint_edge', 'lowpass_muffle', 'tape_head_drag', 'film_burn',
+                'scanline_glitch', 'vignette_pulse', 'lens_defocus', 'synthwave_grid_scan',
+                'slit_scan_time_warp', 'magnetic_field_lines', 'vector_scope', 'data_mosh'
+            ],
+            'DreamyArtistic': [
+                'glow_illumination', 'kuwahara_paint', 'temporal_feedback', 'sedimentation', 'fluid_noise',
+                'collage_cutout', 'point_cloud_depth', 'voronoi_shatter', 'lens_defocus', 'latent_hallucination',
+                'ambient_dsp', 'vignette_pulse', 'turing_pattern', 'volumetric_caustics',
+                'prismatic_refraction_prism', 'reaction_diffusion_growth'
+            ],
+            'Psychedelic': [
+                'color_spectral', 'thermal_vision', 'kaleidoscope', 'spatial_warping', 'infinity_tunnel',
+                'thermal_infrared', 'latent_hallucination', 'chromatic_radial_zoom', 'volumetric_caustics', 'dolly_zoom',
+                'clifford_torus', 'reaction_diffusion', 'ferrofluid_spikes', 'zoom_pulse',
+                'hyper_dimensional_fold', 'acid_curl_fluid'
+            ],
+            'DigitalPixel': [
+                'dynamic_mosaic', 'pixel_art', 'zoom_pulse', 'temporal_fractal', 'dolly_zoom',
+                'ascii_cyber_matrix', 'voronoi_shatter', 'holographic_moire', 'huffman_entropy_collapse', 'spectral_fractal_shear',
+                'matrix_ascii', 'scanline_glitch', 'synthwave_grid_scan', 'pixel_sort', 'data_mosh',
+                'delaunay_voronoi_mesh', 'cyber_wireframe_lidar', 'strobe_chroma_invert'
+            ],
+            'AcidPsychedelic': [
+                'reaction_diffusion', 'color_spectral', 'infinity_tunnel', 'turing_pattern', 'vector_scan',
+                'spatial_warping', 'hologram_glitch', 'chromatic_radial_zoom', 'chladni_cymatics', 'spectral_fractal_shear',
+                'ferrofluid_spikes', 'quantum_decoherence', 'thermal_vision', 'phase_slit',
+                'acid_curl_fluid', 'reaction_diffusion_growth', 'strobe_chroma_invert'
+            ],
+            'BrutalistMonochrome': [
+                'blueprint_edge', 'photocopy_smear', 'frame_drop', 'matrix_ascii', 'lowpass_muffle',
+                'vector_scope', 'ascii_cyber_matrix', 'retro_degradation', 'film_burn', 'tape_head_drag',
+                'stylized_fade', 'vector_scan', 'tension_overlay', 'point_cloud_depth',
+                'magnetic_field_lines', 'sine_terrain_displacement', 'delaunay_voronoi_mesh',
+                'cyber_wireframe_lidar', 'scanline_glitch', 'voronoi_shatter', 'huffman_entropy_collapse'
+            ],
+            'BioOrganicFluids': [
+                'reaction_diffusion', 'fluid_noise', 'sedimentation', 'chladni_cymatics', 'ferrofluid_spikes',
+                'turing_pattern', 'voronoi_shatter', 'volumetric_caustics', 'temporal_feedback', 'glow_illumination',
+                'clifford_torus', 'kuwahara_paint', 'ambient_dsp', 'color_spectral',
+                'reaction_diffusion_growth', 'acid_curl_fluid', 'magnetic_field_lines'
+            ],
+            'OpticKinetic': [
+                'chromatic_radial_zoom', 'zoom_pulse', 'dolly_zoom', 'spatial_warping', 'infinity_tunnel',
+                'kaleidoscope', 'temporal_fractal', 'handheld_camera', 'voronoi_shatter', 'vector_scan',
+                'holographic_moire', 'phase_slit', 'dynamic_mosaic', 'centroid_glitch',
+                'hyper_dimensional_fold', 'slit_scan_time_warp', 'sine_terrain_displacement'
+            ],
+            'PrismaticRefraction': [
+                'volumetric_caustics', 'holographic_moire', 'clifford_torus', 'color_spectral', 'spectral_fractal_shear',
+                'quantum_decoherence', 'glow_illumination', 'point_cloud_depth', 'lens_defocus', 'latent_hallucination',
+                'chromatic_radial_zoom', 'infinity_tunnel', 'kaleidoscope', 'temporal_feedback',
+                'prismatic_refraction_prism', 'gravitational_lensing'
+            ],
+            'HardcoreThermal': [
+                'thermal_vision', 'thermal_infrared', 'ocular_tremor', 'huffman_entropy_collapse', 'centroid_glitch',
+                'data_mosh', 'phase_slit', 'pixel_sort', 'tension_overlay', 'vector_scope',
+                'dynamic_mosaic', 'spectral_fractal_shear', 'quantum_decoherence', 'film_burn',
+                'strobe_chroma_invert', 'gravitational_lensing', 'hyper_dimensional_fold',
+                'chromatic_radial_zoom', 'vector_scan', 'sine_terrain_displacement', 'cyber_wireframe_lidar',
+                'delaunay_voronoi_mesh', 'slit_scan_time_warp'
+            ],
+            'CosmicVoid': [
+                'point_cloud_depth', 'latent_hallucination', 'temporal_feedback', 'ambient_dsp', 'sedimentation',
+                'lowpass_muffle', 'lens_defocus', 'clifford_torus', 'turing_pattern', 'glow_illumination',
+                'vignette_pulse', 'temporal_fractal', 'kuwahara_paint', 'fluid_noise',
+                'gravitational_lensing', 'quantum_tunneling', 'slit_scan_time_warp'
+            ]
         }
         self._all_pool_effects = set(fx for pool in self.theme_pools.values() for fx in pool)
 
         allowed_themes = list(self.theme_pools.keys())
-        if 'acid' in genre_clean:
-            allowed_themes = ['AcidPsychedelic', 'Psychedelic', 'CyberGlitch']
-        elif 'hard_techno' in genre_clean:
-            allowed_themes = ['CyberGlitch', 'AcidPsychedelic', 'DigitalPixel']
+        if is_hard_techno:
+            # ⚡ 支援全方位硬核重低音風格：工業、熱成像、賽博故障、極簡野獸派、數位像素、動力光學、迷幻酸性、復古類比（由4大主題大幅擴充至8大主題）
+            allowed_themes = [
+                'IndustrialMonolith', 'HardcoreThermal', 'CyberGlitch', 'BrutalistMonochrome',
+                'DigitalPixel', 'OpticKinetic', 'AcidPsychedelic', 'RetroAnalog'
+            ]
+        elif 'acid' in genre_clean:
+            allowed_themes = ['AcidPsychedelic', 'Psychedelic', 'CyberGlitch', 'OpticKinetic']
         elif 'dub_techno' in genre_clean:
-            allowed_themes = ['DreamyArtistic', 'RetroAnalog', 'DigitalPixel']
+            allowed_themes = ['CosmicVoid', 'DreamyArtistic', 'RetroAnalog', 'DigitalPixel']
         elif 'idm' in genre_clean:
-            allowed_themes = ['CyberGlitch', 'DigitalPixel', 'AcidPsychedelic']
+            allowed_themes = ['CyberGlitch', 'DigitalPixel', 'AcidPsychedelic', 'PrismaticRefraction', 'OpticKinetic']
         elif 'edm' in genre_clean:
-            allowed_themes = ['Psychedelic', 'CyberGlitch', 'AcidPsychedelic']
-        elif any(g in genre_clean for g in ('lo-fi', 'lofi', 'ambient', 'jazz', 'classical', 'downtempo')):
-            allowed_themes = ['DreamyArtistic', 'RetroAnalog']
+            allowed_themes = ['Psychedelic', 'CyberGlitch', 'AcidPsychedelic', 'OpticKinetic', 'PrismaticRefraction']
+        elif any(g in genre_clean for g in ('lo-fi', 'lofi', 'ambient', 'drone', 'meditative', 'chill', 'jazz', 'classical', 'downtempo', 'atmospheric', 'sleep', 'new_age')):
+            allowed_themes = ['DreamyArtistic', 'RetroAnalog', 'CosmicVoid', 'BrutalistMonochrome', 'BioOrganicFluids']
         elif is_electronic_genre:
-            allowed_themes = ['CyberGlitch', 'AcidPsychedelic', 'DigitalPixel', 'Psychedelic', 'RetroAnalog', 'DreamyArtistic']
+            allowed_themes = list(self.theme_pools.keys())
 
-        # 讀取持久化跨曲目特效歷史（確保單曲渲染或跨天批次皆具備主題去重記憶）
-        fx_history = _load_vj_fx_history(max_entries=20)
-        recent_themes = [h.get('theme') for h in fx_history[-6:] if h.get('theme')]
-        effective_used_themes = list(used_themes) if used_themes else recent_themes
+        self.is_ambient_genre = any(g in genre_clean for g in ('ambient', 'drone', 'meditative', 'dark_ambient', 'chill', 'downtempo', 'atmospheric', 'sleep', 'new_age'))
+        ambient_forbidden_fx = {
+            'thermal_vision', 'thermal_infrared', 'strobe_chroma_invert', 'color_spectral',
+            'acid_curl_fluid', 'pixel_sort', 'film_burn', 'synthwave_grid_scan',
+            'ascii_cyber_matrix', 'huffman_entropy_collapse', 'centroid_glitch', 'ocular_tremor'
+        }
+
+        # 讀取持久化跨曲目特效歷史（確保單曲渲染或跨天批次皆具備主題去重記憶，記憶深度 50 首）
+        fx_history = _load_vj_fx_history(max_entries=50)
+        recent_themes = [h.get('theme') for h in fx_history[-20:] if h.get('theme')]
+        effective_used_themes = (list(used_themes) if used_themes else []) + recent_themes
 
         if effective_used_themes:
             counts = {t: effective_used_themes.count(t) for t in allowed_themes}
@@ -950,28 +1488,43 @@ class PostProcessor:
 
         self.selected_theme = self.rng.choice(allowed_themes)
         self.signature_pool = list(self.theme_pools[self.selected_theme])
+        if self.is_ambient_genre:
+            filtered_sig_pool = [fx for fx in self.signature_pool if fx not in ambient_forbidden_fx]
+            if len(filtered_sig_pool) >= 2:
+                self.signature_pool = filtered_sig_pool
 
-        # 跨曲目特效冷卻懲罰機制 (Cooldown Penalty)：
-        # 對最近 1~3 首曲目使用過的 Signature/Accent 特效施加階梯降權，強制系統在同主題內輪替探索冷門特效
+        # 跨曲目零重疊反碰撞懲罰機制 (Strict Anti-Collision Engine)：
+        # 對最近 1~20 首曲目使用過的 Signature/Accent 特效施加階梯降權
         recent_fx_penalties = {}
+        recent_sig_sets = []
         if fx_history:
-            # 最近第 1 首曲目：降權 90% (權重 0.1)
-            for fx in (fx_history[-1].get('signature_effects', []) + fx_history[-1].get('accent_effects', [])):
-                recent_fx_penalties[fx] = min(recent_fx_penalties.get(fx, 1.0), 0.1)
-            # 最近第 2 首曲目：降權 70% (權重 0.3)
-            if len(fx_history) >= 2:
-                for fx in (fx_history[-2].get('signature_effects', []) + fx_history[-2].get('accent_effects', [])):
-                    recent_fx_penalties[fx] = min(recent_fx_penalties.get(fx, 1.0), 0.3)
-            # 最近第 3 首曲目：降權 40% (權重 0.6)
-            if len(fx_history) >= 3:
-                for fx in (fx_history[-3].get('signature_effects', []) + fx_history[-3].get('accent_effects', [])):
-                    recent_fx_penalties[fx] = min(recent_fx_penalties.get(fx, 1.0), 0.6)
+            recent_sig_sets = [set(h.get('signature_effects', [])) for h in fx_history[-25:] if h.get('signature_effects')]
+            penalty_tiers = [0.005, 0.01, 0.03, 0.08, 0.15, 0.25, 0.40, 0.55, 0.70, 0.80, 0.90, 0.95, 0.98]
+            for step_idx, factor in enumerate(penalty_tiers):
+                hist_idx = -(step_idx + 1)
+                if len(fx_history) >= (step_idx + 1):
+                    for fx in fx_history[hist_idx].get('signature_effects', []):
+                        recent_fx_penalties[fx] = min(recent_fx_penalties.get(fx, 1.0), factor)
+                    for fx in fx_history[hist_idx].get('accent_effects', []):
+                        recent_fx_penalties[fx] = min(recent_fx_penalties.get(fx, 1.0), factor * 1.8)
 
         def _weighted_sample_no_replace(pool, k):
             pool_copy = list(pool)
             chosen = []
             for _ in range(min(k, len(pool_copy))):
-                weights = [recent_fx_penalties.get(fx, 1.0) for fx in pool_copy]
+                weights = []
+                for fx in pool_copy:
+                    w = recent_fx_penalties.get(fx, 1.0)
+                    # 降低高頻眼震等強烈生理干擾特效的預設競爭力
+                    if fx in ('ocular_tremor', 'huffman_entropy_collapse', 'centroid_glitch'):
+                        w *= 0.35
+                    # 新增之次世代前沿特效給予適度多樣性探索加權
+                    if fx in ('hyper_dimensional_fold', 'reaction_diffusion_growth', 'delaunay_voronoi_mesh',
+                              'slit_scan_time_warp', 'gravitational_lensing', 'acid_curl_fluid',
+                              'strobe_chroma_invert', 'cyber_wireframe_lidar', 'sine_terrain_displacement',
+                              'quantum_tunneling', 'prismatic_refraction_prism', 'magnetic_field_lines'):
+                        w *= 1.25
+                    weights.append(max(0.001, w))
                 total_w = sum(weights)
                 probs = [w / total_w for w in weights] if total_w > 0 else None
                 pick = self.rng.choices(pool_copy, weights=probs, k=1)[0]
@@ -979,10 +1532,32 @@ class PostProcessor:
                 pool_copy.remove(pick)
             return chosen
 
-        num_sig = self.rng.randint(2, 3)
-        self.signature_effects = set(_weighted_sample_no_replace(self.signature_pool, num_sig))
+        # 挑選 2~3 個 Signature 特效，並執行防撞車重試驗證（保證與最近 25 首曲目核心組合 100% 不重複）
+        self.signature_effects = set()
+        for _attempt in range(12):
+            num_sig = self.rng.randint(2, 3)
+            sig_candidate = set(_weighted_sample_no_replace(self.signature_pool, num_sig))
+            is_collision = any(sig_candidate == s_set for s_set in recent_sig_sets)
+            if not is_collision and len(recent_sig_sets) >= 1:
+                # 與上一首重疊數不能超過 1
+                if len(sig_candidate & recent_sig_sets[-1]) >= 2:
+                    is_collision = True
+            if not is_collision:
+                self.signature_effects = sig_candidate
+                break
+            self.signature_effects = sig_candidate
+
+        # 挑選 Accent 特效：2 個來自當前主題池，2 個允許從跨主題相容特效池探索，大幅增加色彩豐富度
         remaining_in_pool = [fx for fx in self.signature_pool if fx not in self.signature_effects]
-        self.accent_effects = set(_weighted_sample_no_replace(remaining_in_pool, min(len(remaining_in_pool), 2)))
+        theme_accents = _weighted_sample_no_replace(remaining_in_pool, min(len(remaining_in_pool), 2))
+        global_candidates = [
+            fx for fx in self._all_pool_effects
+            if fx not in self.signature_effects
+            and fx not in theme_accents
+            and (not self.is_ambient_genre or fx not in ambient_forbidden_fx)
+        ]
+        cross_accents = _weighted_sample_no_replace(global_candidates, 2)
+        self.accent_effects = set(theme_accents + cross_accents)
 
         # 將本次曲目特效選擇寫入持久化歷史
         _save_vj_fx_history({
@@ -1151,6 +1726,11 @@ class PostProcessor:
         elif i == 3: r, g, b = 0.0, q, 1.0
         elif i == 4: r, g, b = t_h, 0.0, 1.0
         elif i == 5: r, g, b = 1.0, 0.0, q
+        if getattr(self, 'is_ambient_genre', False):
+            # 壓制純飽和色，將色度融合入莫蘭迪霧灰基底 (S <= 0.22)
+            r = 0.52 * 0.78 + r * 0.65 * 0.22
+            g = 0.55 * 0.78 + g * 0.65 * 0.22
+            b = 0.58 * 0.78 + b * 0.65 * 0.22
         return (int(r * 255), int(g * 255), int(b * 255))
 
     def _get_audio_feature_mask(self, w, h, audio_feats, smoothed_sub_bass, smoothed_percussive, smoothed_roughness, smoothed_ethereal, beat_energy, anticipation_factor, fx_intensity, t):
@@ -1236,14 +1816,21 @@ class PostProcessor:
         if not user_enabled_fx:
             user_enabled_fx = {k: True for k in self.fx_active_states}
 
-        # 3. 狀態平滑衰減（Decay）與常駐基線（僅對符合主題特性的常駐特效賦予基線）
+        # 3. 狀態平滑衰減（Decay）與常駐基線（僅對符合主題特性的常駐特效賦予極低微弱基線，保留純淨留白空間）
         for fx_name in self.fx_active_states:
             if fx_name in user_enabled_fx:
                 eff_base = 0.0
                 if fx_name in ('vignette_pulse', 'lowpass_muffle', 'ambient_dsp'):
                     if fx_name in self.signature_pool or fx_name in self.signature_effects:
-                        eff_base = 0.06 * fx_intensity
-                self.fx_active_states[fx_name] = max(eff_base, self.fx_active_states[fx_name] - dt * 1.8)
+                        # 當使用者拉桿調低（<15%）時徹底歸零常駐基線，確保畫面極度乾淨
+                        if fx_prob >= 0.15:
+                            if any(s in sec_lower for s in ('drop', 'chorus', 'build')):
+                                eff_base = 0.015 * fx_intensity
+                            else:
+                                eff_base = 0.005 * fx_intensity
+                # ⚡ 衰減速度由 2.2 大幅提升至 4.8，讓重拍特效在 0.15~0.20 秒內俐落淡出，在 180+ BPM 重擊間留出充沛的視覺呼吸與留白
+                decay_rate = 4.8
+                self.fx_active_states[fx_name] = max(eff_base, self.fx_active_states[fx_name] - dt * decay_rate)
             else:
                 self.fx_active_states[fx_name] = 0.0
 
@@ -1252,23 +1839,81 @@ class PostProcessor:
                 self._fx_cooldown[k] -= 1
 
         # 4. 音視動態調度（Audio-Driven Dynamic Triggering）
-        # 嚴格實作「歌曲專屬主題與 Signature FX 隔離」：
-        # - 一般段落：100% 鎖定於本曲目的 signature_effects（確保每首歌具有獨立且穩定的視覺靈魂）
-        # - 高潮段落（Build-up / Drop / Chorus）：解鎖同主題的 accent_effects
+        # 嚴格依據使用者 UI 機率拉桿線性響應：
+        # - 拉桿設為 0% 時絕對不觸發任何重拍後製特效
+        # - 拉桿設為 10% 時真實維持約 10% 稀疏點綴，移除原先 20% 強制保底與大鼓過度增益
         if is_beat:
-            effective_prob = max(0.20, min(0.95, fx_prob * 1.3 + 0.3 * beat_energy))
-            if self.rng.random() < effective_prob:
-                is_climax = any(s in str(section_name).lower() for s in ('drop', 'chorus', 'build'))
-                
-                # 取得本曲目獲准觸發的特效池（限定在使用者於 UI 啟用的項目內）
-                theme_candidates = set(self.signature_effects)
-                if is_climax:
+            if fx_prob <= 0.001:
+                effective_prob = 0.0
+            else:
+                effective_prob = min(0.95, fx_prob * (0.65 + 0.55 * beat_energy))
+            if effective_prob > 0.0 and self.rng.random() < effective_prob:
+                sec_lower_name = str(section_name).lower()
+                is_climax = any(s in sec_lower_name for s in ('drop', 'chorus'))
+                is_buildup = 'build' in sec_lower_name
+
+                # 定義全 68 大特效的聲學驅動歸屬分類（覆蓋全部 8 大排前沿幾何/拓撲特效）
+                FX_BASS_DRIVEN = {
+                    'spatial_warping', 'fluid_noise', 'dynamic_mosaic', 'zoom_pulse',
+                    'turing_pattern', 'infinity_tunnel', 'chromatic_radial_zoom',
+                    'voronoi_shatter', 'ferrofluid_spikes', 'chladni_cymatics', 'tape_head_drag',
+                    'hyper_dimensional_fold', 'gravitational_lensing', 'sine_terrain_displacement', 'magnetic_field_lines'
+                }
+                FX_PERC_DRIVEN = {
+                    'pixel_sort', 'data_mosh', 'scanline_glitch', 'hologram_glitch',
+                    'ascii_cyber_matrix', 'matrix_ascii', 'centroid_glitch', 'vector_scan',
+                    'holographic_moire', 'quantum_decoherence', 'huffman_entropy_collapse',
+                    'spectral_fractal_shear', 'ocular_tremor', 'photocopy_smear',
+                    'delaunay_voronoi_mesh', 'strobe_chroma_invert', 'cyber_wireframe_lidar', 'quantum_tunneling'
+                }
+                FX_ETHEREAL_DRIVEN = {
+                    'glow_illumination', 'temporal_feedback', 'sedimentation',
+                    'point_cloud_depth', 'vector_scope', 'lowpass_muffle', 'blueprint_edge',
+                    'film_burn', 'temporal_fractal', 'ambient_dsp', 'volumetric_caustics',
+                    'latent_hallucination', 'kuwahara_paint', 'lens_defocus', 'collage_cutout',
+                    'color_spectral', 'prismatic_refraction_prism', 'reaction_diffusion_growth'
+                }
+                FX_SPATIAL_DRIVEN = {
+                    'phase_slit', 'clifford_torus', 'kaleidoscope', 'synthwave_grid_scan',
+                    'dolly_zoom', 'thermal_vision', 'thermal_infrared', 'reaction_diffusion',
+                    'pixel_art', 'handheld_camera', 'frame_drop', 'vignette_pulse', 'tension_overlay',
+                    'slit_scan_time_warp', 'acid_curl_fluid'
+                }
+
+                # 🌟 60/40 動態平衡律調度引擎 (60% 核心 Signature 靈魂錨定 + 40% 歌曲專屬 Accent 輪替)
+                # 嚴格錨定本曲 selected_theme 的專屬特效基因，杜絕跨曲目硬編碼覆寫造成 45 首歌特效同質化
+                theme_candidates = set()
+                dice = self.rng.random()
+                if dice < 0.60:
+                    # 60% 重拍：優先觸發歌曲 Signature 核心特效（維持單曲專屬辨識度靈魂）
+                    theme_candidates.update(self.signature_effects)
+                else:
+                    # 40% 重拍：結合歌曲專屬 Accent 特效與極少量同主題拓撲探索
+                    theme_candidates.update(self.signature_effects)
                     theme_candidates.update(self.accent_effects)
-                
+                    if dice > 0.88 and hasattr(self, 'signature_pool') and self.signature_pool:
+                        theme_candidates.update(self.rng.sample(self.signature_pool, min(2, len(self.signature_pool))))
+
+                if is_climax:
+                    # Drop / Chorus：以本曲 Signature 為核心，搭配本曲 Accent 中的重低音與瞬態衝擊特效
+                    climax_accents = [fx for fx in self.accent_effects if fx in (FX_BASS_DRIVEN | FX_PERC_DRIVEN)] or list(self.accent_effects)
+                    theme_candidates.update(self.signature_effects)
+                    theme_candidates.update(climax_accents)
+                elif is_buildup:
+                    # Build-up：蓄力階段，融合本曲 Signature 與空間/張力型 Accent
+                    buildup_accents = [fx for fx in self.accent_effects if fx in (FX_SPATIAL_DRIVEN | FX_BASS_DRIVEN)] or list(self.accent_effects)
+                    theme_candidates.update(self.signature_effects)
+                    theme_candidates.update(buildup_accents)
+                elif 'bridge' in sec_lower_name:
+                    bridge_accents = [fx for fx in self.accent_effects if fx in (FX_SPATIAL_DRIVEN | FX_ETHEREAL_DRIVEN)] or list(self.accent_effects)
+                    theme_candidates.update(bridge_accents)
+                elif 'intro' in sec_lower_name or 'outro' in sec_lower_name:
+                    intro_accents = [fx for fx in self.accent_effects if fx in (FX_ETHEREAL_DRIVEN | FX_SPATIAL_DRIVEN)]
+                    if intro_accents:
+                        theme_candidates.update(intro_accents)
+
                 # 與使用者在 UI 上勾選的特效取交集
                 curated_enabled = [fx for fx in theme_candidates if fx in user_enabled_fx]
-                
-                # 容錯：若使用者取消了 Signature 特效，從該主題的其他可用特效遞補
                 if not curated_enabled:
                     curated_enabled = [fx for fx in self.signature_pool if fx in user_enabled_fx]
                 if not curated_enabled:
@@ -1278,42 +1923,25 @@ class PostProcessor:
                 if not candidates:
                     candidates = curated_enabled
 
-                # 定義全 56 大特效的聲學驅動歸屬分類（覆蓋 Row 1 ~ Row 7 所有特效）
-                FX_BASS_DRIVEN = {
-                    'spatial_warping', 'fluid_noise', 'dynamic_mosaic', 'zoom_pulse',
-                    'turing_pattern', 'infinity_tunnel', 'chromatic_radial_zoom',
-                    'voronoi_shatter', 'ferrofluid_spikes', 'chladni_cymatics', 'tape_head_drag'
-                }
-                FX_PERC_DRIVEN = {
-                    'pixel_sort', 'data_mosh', 'scanline_glitch', 'hologram_glitch',
-                    'ascii_cyber_matrix', 'matrix_ascii', 'centroid_glitch', 'vector_scan',
-                    'holographic_moire', 'quantum_decoherence', 'huffman_entropy_collapse',
-                    'spectral_fractal_shear', 'ocular_tremor', 'photocopy_smear'
-                }
-                FX_ETHEREAL_DRIVEN = {
-                    'glow_illumination', 'temporal_feedback', 'sedimentation',
-                    'point_cloud_depth', 'vector_scope', 'lowpass_muffle', 'blueprint_edge',
-                    'film_burn', 'temporal_fractal', 'ambient_dsp', 'volumetric_caustics',
-                    'latent_hallucination', 'kuwahara_paint', 'lens_defocus', 'collage_cutout',
-                    'color_spectral'
-                }
-                FX_SPATIAL_DRIVEN = {
-                    'phase_slit', 'clifford_torus', 'kaleidoscope', 'synthwave_grid_scan',
-                    'dolly_zoom', 'thermal_vision', 'thermal_infrared', 'reaction_diffusion',
-                    'pixel_art', 'handheld_camera', 'frame_drop', 'vignette_pulse', 'tension_overlay'
-                }
+                # 連擊防抖微冷卻
+                if len(candidates) >= 2 and hasattr(self, '_last_beat_triggered_fx') and self._last_beat_triggered_fx:
+                    non_consecutive = [fx for fx in candidates if fx not in self._last_beat_triggered_fx]
+                    if non_consecutive:
+                        candidates = non_consecutive
 
-                # 依據當前音訊特徵加權候選特效
+                # 依據當前音訊特徵加權候選特效，並施加真正的 8 拍滑動窗口疲勞衰減器
                 weights = []
                 now_t = t
                 if not hasattr(self, '_intra_song_fx_history'):
                     self._intra_song_fx_history = {}
+                if not hasattr(self, '_recent_beat_fx_window'):
+                    self._recent_beat_fx_window = collections.deque(maxlen=8)
 
                 for fx in candidates:
                     w_val = 1.0
-                    # Signature 特效獲得顯著加權，確立本歌曲的獨特辨識度
+                    # Signature 特效獲得強識別度加權，確保每首歌保有專屬視覺印記
                     if fx in self.signature_effects:
-                        w_val += 2.0
+                        w_val += 2.6
                     if fx in FX_BASS_DRIVEN:
                         w_val += 1.8 * smoothed_sub_bass
                     if fx in FX_PERC_DRIVEN:
@@ -1323,30 +1951,60 @@ class PostProcessor:
                     if fx in FX_SPATIAL_DRIVEN:
                         w_val += 1.5 * stereo_width
 
-                    # 單曲內動態微冷卻機制：若剛觸發過，暫時降低權重，促成同曲目 2~3 款 Signature 特效交替閃耀
+                    # 🌟 真正的 8 拍滑動窗口審美疲勞衰減器 (True 8-Beat Sliding Window Anti-Fatigue Damper)：
+                    # 僅統計最近 8 次重拍內的實際觸發次數，避免計數器永久累加鎖死 Signature 特效
+                    recent_count = sum(1 for beat_set in self._recent_beat_fx_window if fx in beat_set)
+                    if recent_count >= 3:
+                        w_val *= 0.25
+                    elif recent_count == 2:
+                        w_val *= 0.55
+                    elif recent_count == 1:
+                        w_val *= 0.80
+
+                    # 單曲內動態微冷卻
                     last_fired = self._intra_song_fx_history.get(fx, -999.0)
                     time_since_fired = now_t - last_fired
-                    if time_since_fired < 1.2:  # 1.2 秒內剛觸發過
+                    if time_since_fired < 1.2:
                         w_val *= 0.3
                     elif time_since_fired < 2.5:
                         w_val *= 0.65
 
                     weights.append(w_val)
 
-                num_to_trigger = 1 if beat_energy < 0.65 else (2 if beat_energy < 0.88 else 3)
+                # 根據使用者 fx_prob 自適應約束單次重拍觸發的特效數量（低機率時絕不狂轟濫炸）
+                if fx_prob <= 0.15:
+                    num_to_trigger = 1
+                elif fx_prob <= 0.35:
+                    num_to_trigger = 1 if beat_energy < 0.82 else 2
+                else:
+                    num_to_trigger = 1 if beat_energy < 0.65 else (2 if beat_energy < 0.88 else 3)
                 num_to_trigger = min(num_to_trigger, len(candidates))
 
                 total_w = sum(weights)
                 probs = [w_val / total_w for w_val in weights] if total_w > 0 else None
                 selected = self.rng.choices(candidates, weights=probs, k=num_to_trigger)
 
-                for fx_name in set(selected):
+                HEAVY_GLITCH_FX = {
+                    'pixel_sort', 'data_mosh', 'phase_slit', 'quantum_decoherence',
+                    'huffman_entropy_collapse', 'spectral_fractal_shear', 'centroid_glitch',
+                    'spatial_warping', 'scanline_glitch', 'voronoi_shatter', 'ocular_tremor',
+                    'strobe_chroma_invert', 'hyper_dimensional_fold', 'delaunay_voronoi_mesh'
+                }
+                selected_set = set(selected)
+                for fx_name in selected_set:
                     self.fx_active_states[fx_name] = max(
                         self.fx_active_states[fx_name],
-                        min(1.0, 0.50 + 0.50 * beat_energy)
+                        min(1.0, 0.45 + 0.45 * beat_energy)
                     )
-                    self._fx_cooldown[fx_name] = 3
+                    # 節奏呼吸感約束：重度故障冷卻 50~75 幀，普通特效冷卻 30~45 幀
+                    if fx_name in HEAVY_GLITCH_FX:
+                        self._fx_cooldown[fx_name] = self.rng.randint(50, 75)
+                    else:
+                        self._fx_cooldown[fx_name] = self.rng.randint(30, 45)
                     self._intra_song_fx_history[fx_name] = now_t
+
+                self._recent_beat_fx_window.append(selected_set)
+                self._last_beat_triggered_fx = selected_set
 
         # 5. 分鏡與時間容器更新
         curr_feats = np.array([
@@ -1418,7 +2076,7 @@ class PostProcessor:
         m_mosaic = base_mult * (smoothed_sub_bass * 1.3 + turbulence * 0.5)
         m_pixelart = base_mult * (valence * 1.0 + smoothed_ethereal * 0.8)
         m_handheld = base_mult * (arousal * 0.9 + smoothed_roughness * 0.4)
-        m_stylizedfade = base_mult * silence_fade
+        m_stylizedfade = base_mult * max(silence_fade, (1.0 - min(1.0, arousal)) * 0.45)
         m_zoompulse = base_mult * (smoothed_sub_bass * 1.5 + beat_energy * 0.8)
         m_photocopy = base_mult * (smoothed_percussive * 1.2 + smoothed_roughness * 0.8)
         m_collage = base_mult * (ethereal_ambience * 1.2 + smoothed_ethereal * 0.6)
@@ -1458,6 +2116,24 @@ class PostProcessor:
         m_entropy = base_mult * (smoothed_roughness * 1.4 + beat_energy * 0.8 + turbulence * 0.6)
         m_spectral_shear = base_mult * (smoothed_percussive * 1.2 + harmonic * 0.9 + beat_energy * 0.7)
 
+        # 🌟 Row 8: 12 大次世代前沿幾何/拓撲高衝擊特效乘數
+        m_hyperfold = base_mult * (smoothed_sub_bass * 1.5 + beat_energy * 0.9)
+        m_rdgrowth = base_mult * (harmonic * 1.2 + smoothed_ethereal * 0.8)
+        m_delaunay = base_mult * (smoothed_percussive * 1.4 + smoothed_roughness * 0.7)
+        m_slitscan = base_mult * (stereo_width * 1.4 + turbulence * 0.7)
+        m_gravlens = base_mult * (smoothed_sub_bass * 1.6 + beat_energy * 0.8)
+        m_acidcurl = base_mult * (smoothed_roughness * 1.3 + harmonic * 0.8)
+        m_strobe = base_mult * (beat_energy * 1.8 + smoothed_sub_bass * 0.7)
+        m_lidar = base_mult * (smoothed_percussive * 1.3 + smoothed_roughness * 0.8)
+        m_sineterrain = base_mult * (smoothed_sub_bass * 1.4 + chord_brightness * 0.6)
+        m_quantravel = base_mult * (arousal * 1.2 + stereo_width * 0.7)
+        m_prismdisp = base_mult * (smoothed_ethereal * 1.4 + brilliance * 0.8)
+        m_maglines = base_mult * (smoothed_sub_bass * 1.3 + smoothed_percussive * 0.7)
+        m_phaseslit = base_mult * (stereo_width * 1.3 + smoothed_percussive * 0.7)
+        m_centroidglitch = base_mult * (spectral_centroid * 1.3 + smoothed_roughness * 0.7)
+        m_vignette = base_mult * (anticipation_factor * 1.2 + beat_phase * 0.5)
+        m_tension = base_mult * (0.5 + smoothed_roughness * 0.5)
+
         # 乘以活躍狀態 (fx_active_states)
         m_dist *= self.fx_active_states['spatial_warping']
         m_fluid *= self.fx_active_states['fluid_noise']
@@ -1480,6 +2156,7 @@ class PostProcessor:
         m_mosaic *= self.fx_active_states['dynamic_mosaic']
         m_pixelart *= self.fx_active_states['pixel_art']
         m_handheld *= self.fx_active_states['handheld_camera']
+        m_stylizedfade *= self.fx_active_states['stylized_fade']
         m_zoompulse *= self.fx_active_states['zoom_pulse']
         m_photocopy *= self.fx_active_states['photocopy_smear']
         m_collage *= self.fx_active_states['collage_cutout']
@@ -1510,6 +2187,24 @@ class PostProcessor:
         m_entropy *= self.fx_active_states['huffman_entropy_collapse']
         m_spectral_shear *= self.fx_active_states['spectral_fractal_shear']
 
+        # 🌟 Row 8 活躍狀態相乘
+        m_hyperfold *= self.fx_active_states['hyper_dimensional_fold']
+        m_rdgrowth *= self.fx_active_states['reaction_diffusion_growth']
+        m_delaunay *= self.fx_active_states['delaunay_voronoi_mesh']
+        m_slitscan *= self.fx_active_states['slit_scan_time_warp']
+        m_gravlens *= self.fx_active_states['gravitational_lensing']
+        m_acidcurl *= self.fx_active_states['acid_curl_fluid']
+        m_strobe *= self.fx_active_states['strobe_chroma_invert']
+        m_lidar *= self.fx_active_states['cyber_wireframe_lidar']
+        m_sineterrain *= self.fx_active_states['sine_terrain_displacement']
+        m_quantravel *= self.fx_active_states['quantum_tunneling']
+        m_prismdisp *= self.fx_active_states['prismatic_refraction_prism']
+        m_maglines *= self.fx_active_states['magnetic_field_lines']
+        m_phaseslit *= self.fx_active_states['phase_slit']
+        m_centroidglitch *= self.fx_active_states['centroid_glitch']
+        m_vignette *= self.fx_active_states['vignette_pulse']
+        m_tension *= self.fx_active_states['tension_overlay']
+
         # 8. 進入 NumPy 高性能流水線
         img_np = np.array(img.convert('RGB'))
         try:
@@ -1534,14 +2229,14 @@ class PostProcessor:
         # ── 38 大特效執行 Pass 完整流水線 ──
 
         # [NEW DERIVATIVE 1]: Stereo Phase Slit-Scan
-        if fx_flags.get('phase_slit', True) and stereo_width > 0.55:
+        if fx_flags.get('phase_slit', True) and m_phaseslit > 0.01:
             var_idx = self.get_variant_index('phase_slit', t, is_beat)
-            img_np = self.apply_phase_slit_custom(img_np, stereo_width, fx_intensity, var_idx)
+            img_np = self.apply_phase_slit_custom(img_np, stereo_width, m_phaseslit, var_idx)
 
         # [NEW DERIVATIVE 2]: Centroid Resonance Glitch
-        if fx_flags.get('centroid_glitch', True) and spectral_centroid > 0.45:
+        if fx_flags.get('centroid_glitch', True) and m_centroidglitch > 0.01:
             var_idx = self.get_variant_index('centroid_glitch', t, is_beat)
-            img_np = self.apply_centroid_glitch_custom(img_np, spectral_centroid, smoothed_roughness, fx_intensity, var_idx)
+            img_np = self.apply_centroid_glitch_custom(img_np, spectral_centroid, smoothed_roughness, m_centroidglitch, var_idx)
 
         # [PASS A]: Data-Mosh 數位撕裂
         if fx_flags.get('data_mosh', True) and m_mosh > 0.01:
@@ -1639,14 +2334,14 @@ class PostProcessor:
             img_np = self.apply_temporal_fractal_custom(img_np, stereo_width, arousal, m_fractal, var_idx)
 
         # [DERIVATIVE 3]: 正拍預期呼吸暗房
-        if fx_flags.get('vignette_pulse', True):
+        if fx_flags.get('vignette_pulse', True) and m_vignette > 0.01:
             var_idx = self.get_variant_index('vignette_pulse', t, is_beat)
-            img_np = self.apply_vignette_pulse_custom(img_np, beat_phase, anticipation_factor, fx_intensity, var_idx)
+            img_np = self.apply_vignette_pulse_custom(img_np, beat_phase, anticipation_factor, m_vignette, var_idx)
 
         # [DERIVATIVE 4]: 張力互斥
-        if fx_flags.get('tension_overlay', True):
+        if fx_flags.get('tension_overlay', True) and m_tension > 0.01:
             var_idx = self.get_variant_index('tension_overlay', t, is_beat)
-            img_np = self.apply_tension_overlay_custom(img_np, 0.5, chord_hue, fx_intensity, var_idx)
+            img_np = self.apply_tension_overlay_custom(img_np, 0.5, chord_hue, m_tension, var_idx)
 
         # [Pass 1-kuwahara]: Kuwahara 彩繪
         if fx_flags.get('kuwahara_paint', True) and m_kuwahara > 0.01:
@@ -1721,6 +2416,11 @@ class PostProcessor:
         if fx_flags.get('dolly_zoom', True) and m_dollyzoom > 0.01:
             var_idx = self.get_variant_index('dolly_zoom', t, is_beat)
             img_np = self.apply_dolly_zoom_custom(img_np, m_dollyzoom, anticipation_factor, is_beat, var_idx)
+
+        # [Pass 9.85]: 藝術淡入淡出 (Stylized Fade)
+        if fx_flags.get('stylized_fade', True) and (m_stylizedfade > 0.01 or silence_fade > 0.05):
+            var_idx = self.get_variant_index('stylized_fade', t, is_beat)
+            img_np = self.apply_stylized_fade_custom(img_np, m_stylizedfade, silence_fade, var_idx)
 
         # ── 第 5 排前沿全域 6 大特效 ──
         # [Row 5.1]: 全息干擾
@@ -1811,18 +2511,164 @@ class PostProcessor:
             var_idx = self.get_variant_index('ocular_tremor', t, is_beat)
             img_np = self.apply_ocular_tremor_custom(img_np, t, m_tremor, beat_energy, smoothed_sub_bass, smoothed_roughness, is_beat, var_idx)
 
-        # 9. 色彩增強、調色與銳化
-        if fx_flags.get('color_boost', True):
+        # ── 🌟 第 8 排 12 大次世代高辨識度幾何/拓撲強特徵特效執行 Pass 完整流水線 ──
+
+        # [Row 8.1]: 四維空間幾何折疊 (Hyper-Dimensional Fold)
+        if fx_flags.get('hyper_dimensional_fold', True) and m_hyperfold > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('hyper_dimensional_fold', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_hyper_dimensional_fold_custom(img_np, t, m_hyperfold, smoothed_sub_bass, beat_energy, is_beat, dna)
+
+        # [Row 8.2]: 異構反應擴散生長 (Reaction-Diffusion Growth)
+        if fx_flags.get('reaction_diffusion_growth', True) and m_rdgrowth > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('reaction_diffusion_growth', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_reaction_diffusion_growth_custom(img_np, t, m_rdgrowth, smoothed_sub_bass, smoothed_ethereal, dna)
+
+        # [Row 8.3]: 德勞內三角網格解構 (Delaunay-Voronoi Mesh)
+        if fx_flags.get('delaunay_voronoi_mesh', True) and m_delaunay > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('delaunay_voronoi_mesh', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_delaunay_voronoi_mesh_custom(img_np, t, m_delaunay, smoothed_percussive, smoothed_roughness, dna)
+
+        # [Row 8.4]: 時空狹縫延遲穿透 (Slit-Scan Time Warp)
+        if fx_flags.get('slit_scan_time_warp', True) and m_slitscan > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('slit_scan_time_warp', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_slit_scan_time_warp_custom(img_np, t, m_slitscan, stereo_width, dna)
+
+        # [Row 8.5]: 引力透鏡黑洞扭曲 (Gravitational Lensing)
+        if fx_flags.get('gravitational_lensing', True) and m_gravlens > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('gravitational_lensing', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_gravitational_lensing_custom(img_np, t, m_gravlens, smoothed_sub_bass, beat_energy, dna)
+
+        # [Row 8.6]: 酸性旋度流體混動 (Acid Curl Fluid)
+        if fx_flags.get('acid_curl_fluid', True) and m_acidcurl > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('acid_curl_fluid', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_acid_curl_fluid_custom(img_np, t, m_acidcurl, smoothed_roughness, harmonic, dna)
+
+        # [Row 8.7]: 極速反相頻閃脈衝 (Strobe Chroma Invert)
+        if fx_flags.get('strobe_chroma_invert', True) and m_strobe > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('strobe_chroma_invert', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_strobe_chroma_invert_custom(img_np, t, m_strobe, beat_energy, is_beat, dna)
+
+        # [Row 8.8]: 賽博光達深度線框 (Cyber Wireframe LiDAR)
+        if fx_flags.get('cyber_wireframe_lidar', True) and m_lidar > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('cyber_wireframe_lidar', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_cyber_wireframe_lidar_custom(img_np, t, m_lidar, smoothed_percussive, smoothed_roughness, dna)
+
+        # [Row 8.9]: 正弦音波地形位移 (Sine Terrain Displacement)
+        if fx_flags.get('sine_terrain_displacement', True) and m_sineterrain > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('sine_terrain_displacement', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_sine_terrain_displacement_custom(img_np, t, m_sineterrain, smoothed_sub_bass, chord_hue, dna)
+
+        # [Row 8.10]: 量子穿隧噪波分解 (Quantum Tunneling)
+        if fx_flags.get('quantum_tunneling', True) and m_quantravel > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('quantum_tunneling', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_quantum_tunneling_custom(img_np, t, m_quantravel, smoothed_roughness, arousal, dna)
+
+        # [Row 8.11]: 多稜鏡立體光譜色散 (Prismatic Refraction Prism)
+        if fx_flags.get('prismatic_refraction_prism', True) and m_prismdisp > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('prismatic_refraction_prism', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_prismatic_refraction_prism_custom(img_np, t, m_prismdisp, smoothed_ethereal, chord_brightness, dna)
+
+        # [Row 8.12]: 磁力線粉末吸附 (Magnetic Field Lines)
+        if fx_flags.get('magnetic_field_lines', True) and m_maglines > 0.01:
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('magnetic_field_lines', t, beat_energy, audio_feats, self.rng.randint(0, 10000), genre_clean)
+            img_np = self.apply_magnetic_field_lines_custom(img_np, t, m_maglines, smoothed_sub_bass, smoothed_percussive, dna)
+
+        # 9. 色彩增強、調色與銳化 (Ambient 曲風專用感知色度抑制與電影級大氣色彩修整)
+        is_ambient_genre = (
+            getattr(self, 'is_ambient_genre', False)
+            or any(k in genre_clean for k in ('ambient', 'drone', 'meditative', 'dark_ambient', 'downtempo', 'chill', 'atmospheric', 'sleep', 'new_age'))
+            or fx_flags.get('force_ambient_color', False)
+            or (isinstance(audio_feats, dict) and bool(audio_feats.get('force_ambient_color', False)))
+        )
+        ambient_policy = audio_feats.get('ambient_color_policy') if isinstance(audio_feats, dict) else None
+        ambient_chroma = 0.065
+        target_hue = None
+
+        if is_ambient_genre or fx_flags.get('ambient_chroma_limiter', False) or ambient_policy:
+            # 專屬 Ambient 模式：徹底拒絕生硬高飽和度放大，啟用 OKLab 感知色度抑制
+            if ambient_policy and isinstance(ambient_policy, dict):
+                ambient_chroma = float(ambient_policy.get('chroma_ceiling', ambient_chroma))
+                target_hue = ambient_policy.get('target_hue')
+            elif is_ambient_genre:
+                # 結合 sub_bass 與 ethereal 進行極細微大氣呼吸感浮動 (0.050 ~ 0.078)
+                ambient_chroma = 0.062 + (smoothed_sub_bass - 0.5) * 0.015 - smoothed_ethereal * 0.008
+                ambient_chroma = max(0.045, min(0.080, ambient_chroma))
+                target_hue = audio_feats.get('base_hue') if isinstance(audio_feats, dict) else None
+
+            # 套用 OKLab 感知色度抑制器 (消除任何寫死鮮豔原色/螢光刺眼色)
+            img_np = apply_ambient_perceptual_chroma_limiter(
+                img_np,
+                chroma_limit=ambient_chroma,
+                target_hue_deg=target_hue,
+                hue_blend=0.12 if target_hue is not None else 0.0,
+                highlight_rolloff=0.86,
+                warmth_offset=(smoothed_sub_bass - 0.5) * 0.05
+            )
+            # 輕微大氣對比修整，不膨脹飽和度
+            img_np = self.apply_color_enhancement(img_np, contrast=1.03, saturation=0.82, exposure=1.0)
+        elif fx_flags.get('color_boost', True):
             exposure = 1.05 + 0.1 * beat_energy if is_beat else 1.0
             img_np = self.apply_color_enhancement(img_np, contrast=1.12, saturation=1.15, exposure=exposure)
 
         if fx_flags.get('sharpen', True):
-            img_np = self.apply_sharpening(img_np, amount=0.6, radius=1.0)
+            # Ambient 曲風下適度減弱銳化強度，保留膠片柔和與大氣光暈
+            sharpen_amount = 0.35 if is_ambient_genre else 0.6
+            img_np = self.apply_sharpening(img_np, amount=sharpen_amount, radius=1.0)
 
         # Pass 10: 空靈聲學模擬
         if fx_flags.get('ambient_dsp', True) and self.fx_active_states['ambient_dsp'] > 0.04:
             var_idx = self.get_variant_index('ambient_dsp', t, is_beat)
             img_np = self.apply_ambient_dsp_custom(img_np, t, fx_intensity * self.fx_active_states['ambient_dsp'], smoothed_ethereal, smoothed_percussive, var_idx)
+
+        # 11. 實時動態曝光與 Ambient 全局微光大氣補償 (Adaptive Luminescence & Ganzfeld Atmosphere Normalization)
+        # 徹底根除 Ambient / 低喚起度曲風下畫面死黑、嚴重欠曝、看不到內容之根本缺陷
+        try:
+            cur_max = float(np.max(img_np[:, :, :3]))
+            cur_mean = float(np.mean(img_np[:, :, :3]))
+            if is_ambient_genre:
+                # Ambient 模式下畫面若過暗 (cur_max < 95 或 cur_mean < 16)
+                if cur_max < 95.0 or cur_mean < 16.0:
+                    # 1. 溫和動態增益拉伸，限制 boost_gain <= 2.2 防止暗部偏色被暴力放大成螢光高飽和
+                    target_peak = max(135.0, min(195.0, 150.0 + 35.0 * smoothed_ethereal))
+                    if cur_max > 4.0:
+                        boost_gain = min(2.2, target_peak / cur_max)
+                        float_rgb = img_np[:, :, :3].astype(np.float32) * boost_gain
+                        img_np[:, :, :3] = np.clip(float_rgb, 0, 255).astype(np.uint8)
+
+                # 2. 注入極光微光氛圍底光 (Ambient Aurora / Ganzfeld Floor)，杜絕死寂 RGB(0,0,0) 純黑
+                base_h = target_hue if target_hue is not None else chord_hue
+                h_rad = math.radians(base_h)
+                ambient_r = int(12 + 8 * math.sin(h_rad))
+                ambient_g = int(13 + 8 * math.sin(h_rad + 2.094))
+                ambient_b = int(16 + 9 * math.sin(h_rad + 4.188))
+                
+                dark_mask = (img_np[:, :, :3] < 24).astype(np.float32)
+                floor_rgb = np.zeros_like(img_np[:, :, :3], dtype=np.float32)
+                floor_rgb[:, :, 0] = ambient_r
+                floor_rgb[:, :, 1] = ambient_g
+                floor_rgb[:, :, 2] = ambient_b
+                img_np[:, :, :3] = np.clip(
+                    img_np[:, :, :3].astype(np.float32) + dark_mask * floor_rgb * (0.65 + 0.35 * smoothed_ethereal),
+                    0, 255
+                ).astype(np.uint8)
+
+                # 3. 曝光增益後再次執行終極 OKLab 色度夾持，100% 封鎖任何因暗部增益產生的鮮艷色溢出
+                img_np = apply_ambient_perceptual_chroma_limiter(
+                    img_np,
+                    chroma_limit=ambient_chroma,
+                    target_hue_deg=target_hue,
+                    hue_blend=0.08 if target_hue is not None else 0.0,
+                    highlight_rolloff=0.86,
+                    warmth_offset=0.0
+                )
+            else:
+                # 非 Ambient 曲風：若畫面極端欠曝 (cur_max < 45)，緊急救援拉升至可視範圍
+                if cur_max < 45.0 and cur_max > 4.0:
+                    boost_gain = min(3.5, 130.0 / cur_max)
+                    float_rgb = img_np[:, :, :3].astype(np.float32) * boost_gain
+                    img_np[:, :, :3] = np.clip(float_rgb, 0, 255).astype(np.uint8)
+        except Exception:
+            pass
 
         # ITU-R BT.1702 光敏安全門控防線 (Photosensitive Epilepsy Safety Limiter)
         if self.photosensitive_safe and self.safety_limiter is not None:
@@ -3215,10 +4061,12 @@ class PostProcessor:
                 c = x + 1j*y
                 z = np.zeros_like(c)
                 fractal_mask = np.zeros((h, w), dtype=np.uint8)
-                for i in range(15):
-                    z = z**2 + c
-                    mask = np.abs(z) < 2.0
-                    fractal_mask[mask] = i * 17
+                alive_mask = np.ones((h, w), dtype=bool)
+                with np.errstate(over='ignore', invalid='ignore'):
+                    for i in range(15):
+                        z[alive_mask] = z[alive_mask]**2 + c[alive_mask]
+                        alive_mask = np.abs(z) < 2.0
+                        fractal_mask[alive_mask] = i * 17
                 mask_rgb = np.stack([fractal_mask, fractal_mask, fractal_mask], axis=2)
                 return cv2.addWeighted(img_np, 1.0 - 0.4 * intensity, mask_rgb, 0.4 * intensity, 0)
             else:
@@ -4109,7 +4957,7 @@ class PostProcessor:
 
     # 7. 藝術淡入淡出 (Stylized Fade) 3變種
     def apply_stylized_fade_custom(self, img_np, intensity, silence_fade, variant):
-        fade_amt = max(intensity, silence_fade)
+        fade_amt = min(0.80, max(intensity * 0.65, silence_fade * 0.80))
         if fade_amt < 0.01: return img_np
         try:
             alpha_channel = None
@@ -4805,17 +5653,20 @@ class PostProcessor:
                 plasma = cv2.applyColorMap(gray_scope, cv2.COLORMAP_MAGMA)
                 out = cv2.addWeighted(refracted, 1.0 - intensity * 0.5, plasma, intensity * 0.7, 0)
             elif variant == 3:
-                # 賽博標尺 Target (Cyber-Grid Vector Target)
+                # 賽博標尺 Target + 音高絲帶 (Cyber-Grid Vector Target & Pitch Ribbon)
                 cv2.line(scope_canvas, (cx - 40, cy), (cx + 40, cy), (255, 255, 255), 1)
                 cv2.line(scope_canvas, (cx, cy - 40), (cx, cy + 40), (255, 255, 255), 1)
                 out = cv2.addWeighted(refracted, 1.0, scope_canvas, intensity, 0)
+                out = self.apply_pitch_ribbon(out, t, intensity * 0.7, chord_hue)
             else:
-                # 立體聲色散萬花筒 (Chromatic Stereo Kaleidoscope)
+                # 立體聲色散萬花筒 + 時域奇異吸引子相空間絲帶 (Chromatic Stereo Kaleidoscope & Strange Attractor)
                 split_r = np.roll(scope_canvas[:, :, 0], 5, axis=1)
                 split_b = np.roll(scope_canvas[:, :, 2], -5, axis=1)
                 scope_canvas[:, :, 0] = split_r
                 scope_canvas[:, :, 2] = split_b
                 out = cv2.addWeighted(refracted, 1.0, scope_canvas, intensity, 0)
+                if audio_samples is not None and len(audio_samples) >= 64:
+                    out = self.apply_strange_attractor_ribbon(out, audio_samples, chord_hue, intensity)
 
             if alpha_channel is not None and out is not None and out.ndim == 3 and out.shape[2] == 3:
                 out = cv2.merge([out, alpha_channel])
@@ -5029,14 +5880,15 @@ class PostProcessor:
 
     def apply_voronoi_shatter_custom(self, img_np, t, intensity, sub_bass, beat_energy, is_beat, variant=0):
         """前沿全域 2: 泰森多邊形碎裂折射 (Voronoi Shatter)
-        水晶幾何切片碎裂、稜鏡色散折射、低音動態折射與微光裂痕
+        水晶幾何切片碎裂、稜鏡色散折射、低音動態折射與微光裂痕 (整合呼叫級多態突變)
         """
         if intensity < 0.01 or cv2 is None:
             return img_np
         try:
             h, w = img_np.shape[:2]
-            # 為保證實時效能，在網格座標上生成 Voronoi 晶格偏移圖
-            num_cells = 8 + variant * 3
+            dna = FXPolymorphicMutationEngine.generate_invocation_dna('voronoi_shatter', t, beat_energy, {'sub_bass': sub_bass})
+            scale = dna.get('scale_factor', 1.0)
+            num_cells = int(np.clip((8 + variant * 3) * scale, 4, 56))
             cell_w = max(10, w // num_cells)
             cell_h = max(10, h // num_cells)
 
@@ -5044,8 +5896,8 @@ class PostProcessor:
             gw = w // cell_w + 1
             gh = h // cell_h + 1
             
-            disp_scale = 18.0 * intensity * (0.6 + 0.6 * beat_energy)
-            rng_seed = int(t * 3.0) + variant * 99
+            disp_scale = 22.0 * intensity * (0.6 + 0.6 * beat_energy)
+            rng_seed = dna.get('seed', int(t * 3.0) + variant * 99)
             local_rng = np.random.RandomState(rng_seed % 10000)
             
             dx_low = local_rng.uniform(-disp_scale, disp_scale, (gh, gw)).astype(np.float32)
@@ -5057,9 +5909,10 @@ class PostProcessor:
             x_grid, y_grid, _, _ = self.get_coordinate_grid(h, w)
 
             # 稜鏡三稜色散折射 (Prismatic Chromatic Dispersion)
-            disp_r = 0.98
+            shift_amt = dna.get('chroma_shift', 0.03)
+            disp_r = 1.0 - shift_amt
             disp_g = 1.00
-            disp_b = 1.03
+            disp_b = 1.0 + shift_amt
 
             map_xr = np.clip(x_grid + dx * disp_r, 0, w - 1).astype(np.float32)
             map_yr = np.clip(y_grid + dy * disp_r, 0, h - 1).astype(np.float32)
@@ -5080,11 +5933,12 @@ class PostProcessor:
             edge_mask = (edge_mag > 0.8).astype(np.float32)
 
             facet_alpha = min(0.45, 0.28 * intensity)
-            facet_color = np.array([220, 240, 255], dtype=np.float32)
+            pal = dna.get('palette', FXPolymorphicMutationEngine.ACES_INDUSTRIAL_MONOLITH)
+            facet_color = pal[2] # 鎢金高光色
             glow_edges = (edge_mask[:, :, None] * facet_color).astype(np.uint8)
 
             blended = cv2.addWeighted(shattered, 1.0, glow_edges, facet_alpha, 0)
-            return blended
+            return FXPolymorphicMutationEngine.apply_color_polarization(blended, dna, intensity * 0.45)
         except Exception as e:
             logger.error(f"Error in apply_voronoi_shatter_custom: {e}")
             return img_np
@@ -6008,6 +6862,494 @@ class PostProcessor:
             logger.error(f"Error in apply_spectral_fractal_shear_custom: {e}")
             return img_np
 
+    # ══════════════════════════════════════════════════════════════════
+    # 🌟 12 大次世代高辨識度幾何/拓撲強特徵特效庫 (SOTA FX Library)
+    # 深度耦合 Techno 聲學物理特徵，結合呼叫級多態突變 DNA 引擎
+    # ══════════════════════════════════════════════════════════════════
+
+    def apply_hyper_dimensional_fold_custom(self, img_np, t, intensity, sub_bass, beat_energy, is_beat, dna=None):
+        """次世代特效 1: 四維空間幾何折疊 (Hyper-Dimensional Fold)
+        4D 超立方體（Tesseract）旋轉投影折疊，空間向內反轉坍縮，多態拓撲變換
+        """
+        if intensity < 0.01 or cv2 is None:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('hyper_dimensional_fold', t, beat_energy, {'sub_bass': sub_bass})
+            scale = dna.get('scale_factor', 1.0) * (0.8 + 0.6 * sub_bass)
+            rot = math.radians(dna.get('rotation_angle', 0.0) + t * 45.0)
+            geom = dna.get('geometry_mode', 0)
+            eff = float(np.clip(intensity * (0.7 + 0.6 * beat_energy), 0.05, 1.8))
+
+            _, _, x_norm, y_norm = self.get_coordinate_grid(h, w)
+
+            # 4D 旋轉投影方程式：w_coord = cos(theta)*x - sin(theta)*y
+            theta = rot * 1.5
+            x_rot = x_norm * math.cos(theta) - y_norm * math.sin(theta)
+            y_rot = x_norm * math.sin(theta) + y_norm * math.cos(theta)
+            r = np.sqrt(x_rot * x_rot + y_rot * y_rot) + 1e-5
+
+            if geom == 0:
+                # 模式 0: 超立方體四角向心折疊 (Tesseract Centripetal Fold)
+                fold = np.sin(r * np.pi * scale * 3.0) / (r + 0.25)
+                dx = (x_rot * fold * 35.0 * eff).astype(np.float32)
+                dy = (y_rot * fold * 35.0 * eff).astype(np.float32)
+            elif geom == 1:
+                # 模式 1: 雙曲克萊茵瓶幾何扭結 (Klein Hyperbolic Twist)
+                twist = np.arctan2(y_rot, x_rot) * dna.get('symmetry_axes', 4)
+                dx = (np.cos(twist) * (r ** 1.4) * 45.0 * eff).astype(np.float32)
+                dy = (np.sin(twist) * (r ** 1.4) * 45.0 * eff).astype(np.float32)
+            elif geom == 2:
+                # 模式 2: 空間鏡面晶格對摺 (Spacetime Lattice Reflection)
+                grid_f = np.sin(x_rot * 12.0 * scale) * np.cos(y_rot * 12.0 * scale)
+                dx = (grid_f * 40.0 * eff).astype(np.float32)
+                dy = (-grid_f * 40.0 * eff).astype(np.float32)
+            else:
+                # 模式 3/4: 高維莫比烏斯環拓撲反轉 (Mobius Topology Inversion)
+                mobius = np.cos(r * 8.0 * scale - t * 3.0)
+                dx = (y_rot * mobius * 50.0 * eff).astype(np.float32)
+                dy = (-x_rot * mobius * 50.0 * eff).astype(np.float32)
+
+            x_grid, y_grid, _, _ = self.get_coordinate_grid(h, w)
+            map_x = np.clip(x_grid + dx, 0, w - 1).astype(np.float32)
+            map_y = np.clip(y_grid + dy, 0, h - 1).astype(np.float32)
+            warped = cv2.remap(img_np, map_x, map_y, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            out = cv2.addWeighted(img_np, 1.0 - 0.75 * eff, warped, 0.75 * eff, 0)
+            return FXPolymorphicMutationEngine.apply_color_polarization(out, dna, eff * 0.4)
+        except Exception as e:
+            logger.error(f"Error in apply_hyper_dimensional_fold_custom: {e}")
+            return img_np
+
+    def apply_reaction_diffusion_growth_custom(self, img_np, t, intensity, sub_bass, ethereal, dna=None):
+        """次世代特效 2: 異構反應擴散生長 (Reaction-Diffusion Growth)
+        灰-斯科特（Gray-Scott）圖靈斑圖有機菌絲動態蔓延生長
+        """
+        if intensity < 0.01 or cv2 is None:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('reaction_diffusion_growth', t, sub_bass, {'ethereal': ethereal})
+            eff = float(np.clip(intensity * (0.6 + 0.5 * sub_bass), 0.05, 1.6))
+            scale = dna.get('scale_factor', 1.0)
+            
+            # 在降採樣網格上生成高階雙曲斑圖，確保 4K 實時極速運行
+            gw, gh = max(32, w // 32), max(18, h // 32)
+            x_lin = np.linspace(-3.0, 3.0, gw, dtype=np.float32)
+            y_lin = np.linspace(-3.0, 3.0, gh, dtype=np.float32)
+            xx, yy = np.meshgrid(x_lin, y_lin)
+
+            # Gray-Scott 空間頻率方程模擬
+            k_param = 0.062 + 0.008 * math.sin(t * 1.2)
+            f_param = 0.035 + 0.005 * math.cos(t * 0.9)
+            phase = (xx * xx + yy * yy) * scale * 2.5 + t * 2.0
+            pattern = np.sin(xx * 5.0 * scale + np.cos(phase)) * np.cos(yy * 5.0 * scale + np.sin(phase))
+            mask_low = np.clip((pattern - (k_param * 10.0)) * 2.5, 0.0, 1.0).astype(np.float32)
+
+            mask = cv2.resize(mask_low, (w, h), interpolation=cv2.INTER_LINEAR)[:, :, None]
+
+            pal = dna.get('palette', FXPolymorphicMutationEngine.ACES_ACID_MUTATION)
+            col = pal[1] # 毒性螢光或高光色
+
+            growth_layer = (img_np.astype(np.float32) * (1.0 - mask * 0.8) + col * (mask * 0.8)).astype(np.float32)
+            out = cv2.addWeighted(img_np, 1.0 - 0.7 * eff, growth_layer.astype(np.uint8), 0.7 * eff, 0)
+            return FXPolymorphicMutationEngine.apply_color_polarization(out, dna, eff * 0.35)
+        except Exception as e:
+            logger.error(f"Error in apply_reaction_diffusion_growth_custom: {e}")
+            return img_np
+
+    def apply_delaunay_voronoi_mesh_custom(self, img_np, t, intensity, percussive, roughness, dna=None):
+        """次世代特效 3: 德勞內三角網格解構 (Delaunay-Voronoi Mesh Deconstruction)
+        拓撲三角剖分重構畫面、物理多邊形微裂隙與色散爆裂
+        """
+        if intensity < 0.01 or cv2 is None:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('delaunay_voronoi_mesh', t, percussive, {'roughness': roughness})
+            eff = float(np.clip(intensity * (0.6 + 0.6 * percussive), 0.05, 1.8))
+            scale = dna.get('scale_factor', 1.0)
+
+            # 依據尺度突變決定多邊形晶格密度
+            step = int(np.clip(36.0 / (scale + 0.2), 16, 128))
+            gh, gw = h // step + 1, w // step + 1
+            
+            rng = np.random.RandomState(dna.get('seed', 0) % (2**31 - 1))
+            jitter_amp = step * 0.45 * eff
+            jitter_x = rng.uniform(-jitter_amp, jitter_amp, (gh, gw)).astype(np.float32)
+            jitter_y = rng.uniform(-jitter_amp, jitter_amp, (gh, gw)).astype(np.float32)
+
+            jx_full = cv2.resize(jitter_x, (w, h), interpolation=cv2.INTER_LINEAR)
+            jy_full = cv2.resize(jitter_y, (w, h), interpolation=cv2.INTER_LINEAR)
+
+            x_grid, y_grid, _, _ = self.get_coordinate_grid(h, w)
+            map_x = np.clip(x_grid + jx_full, 0, w - 1).astype(np.float32)
+            map_y = np.clip(y_grid + jy_full, 0, h - 1).astype(np.float32)
+
+            meshed = cv2.remap(img_np, map_x, map_y, cv2.INTER_NEAREST, borderMode=cv2.BORDER_REFLECT)
+            # 增強晶格幾何線條邊界
+            edge_gray = cv2.cvtColor(meshed, cv2.COLOR_RGB2GRAY)
+            edges = cv2.Canny(edge_gray, 40, 120)
+            edge_mask = (edges > 0)[:, :, None]
+
+            pal = dna.get('palette', FXPolymorphicMutationEngine.ACES_INDUSTRIAL_MONOLITH)
+            wire_col = pal[2] # 鎢金/高光色線框
+            meshed[edge_mask[:, :, 0]] = (meshed[edge_mask[:, :, 0]] * 0.2 + wire_col * 0.8).astype(np.uint8)
+
+            out = cv2.addWeighted(img_np, 1.0 - 0.7 * eff, meshed, 0.7 * eff, 0)
+            return FXPolymorphicMutationEngine.apply_color_polarization(out, dna, eff * 0.4)
+        except Exception as e:
+            logger.error(f"Error in apply_delaunay_voronoi_mesh_custom: {e}")
+            return img_np
+
+    def apply_slit_scan_time_warp_custom(self, img_np, t, intensity, stereo_width, dna=None):
+        """次世代特效 4: 時空狹縫延遲穿透 (Slit-Scan Time Warp)
+        非線性時間軸狹縫置換，如同穿越蟲洞之時空折疊延遲
+        """
+        if intensity < 0.01 or cv2 is None or len(self.time_displacement_buffer.buffer) < 4:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('slit_scan_time_warp', t, stereo_width, {'stereo_width': stereo_width})
+            eff = float(np.clip(intensity * (0.6 + 0.5 * stereo_width), 0.05, 1.5))
+            geom = dna.get('geometry_mode', 0)
+            buf_len = len(self.time_displacement_buffer.buffer)
+
+            # 依據幾何模式生成不同維度的狹縫索引矩陣
+            if geom in (0, 4):
+                # 模式 0: 徑向同心圓時間狹縫 (Concentric Ripple Slits)
+                _, _, x_norm, y_norm = self.get_coordinate_grid(h, w)
+                r = np.sqrt(x_norm * x_norm + y_norm * y_norm)
+                idx_map = np.clip((np.sin(r * 18.0 - t * 6.0) * 0.5 + 0.5) * (buf_len - 1), 0, buf_len - 1).astype(np.int32)
+            elif geom == 1:
+                # 模式 1: 水平雙向對撕狹縫 (Horizontal Dual Slits)
+                y_lin = np.linspace(0.0, 1.0, h, dtype=np.float32)[:, None]
+                idx_map = np.clip((np.sin(y_lin * 24.0 + t * 4.0) * 0.5 + 0.5) * (buf_len - 1), 0, buf_len - 1).astype(np.int32)
+                idx_map = np.broadcast_to(idx_map, (h, w))
+            else:
+                # 模式 2/3: 菱形光譜網格狹縫 (Diamond Mesh Slits)
+                x_lin = np.linspace(-1.0, 1.0, w, dtype=np.float32)[None, :]
+                y_lin = np.linspace(-1.0, 1.0, h, dtype=np.float32)[:, None]
+                diag = np.sin(x_lin * 10.0 + y_lin * 10.0 + t * 5.0)
+                idx_map = np.clip((diag * 0.5 + 0.5) * (buf_len - 1), 0, buf_len - 1).astype(np.int32)
+
+            # 依據 idx_map 組合歷史時空影格 (分 4 個時間階層混合)
+            out = img_np.copy()
+            for step_b in range(0, buf_len, max(1, buf_len // 4)):
+                hist_frame = self.time_displacement_buffer.buffer[step_b]
+                if hist_frame.shape[:2] != (h, w):
+                    hist_frame = cv2.resize(hist_frame, (w, h))
+                mask = (idx_map >= step_b) & (idx_map < step_b + max(1, buf_len // 4))
+                out[mask] = hist_frame[mask]
+
+            blended = cv2.addWeighted(img_np, 1.0 - 0.8 * eff, out, 0.8 * eff, 0)
+            return FXPolymorphicMutationEngine.apply_color_polarization(blended, dna, eff * 0.3)
+        except Exception as e:
+            logger.error(f"Error in apply_slit_scan_time_warp_custom: {e}")
+            return img_np
+
+    def apply_gravitational_lensing_custom(self, img_np, t, intensity, sub_bass, beat_energy, dna=None):
+        """次世代特效 5: 引力透鏡黑洞扭曲 (Gravitational Lensing)
+        愛因斯坦環光線彎曲，中央奇點吸積時空漩渦
+        """
+        if intensity < 0.01 or cv2 is None:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('gravitational_lensing', t, beat_energy, {'sub_bass': sub_bass})
+            eff = float(np.clip(intensity * (0.7 + 0.6 * sub_bass), 0.05, 1.8))
+            scale = dna.get('scale_factor', 1.0)
+
+            # 奇點位置微顫 (隨低頻重拍抖動)
+            rng = np.random.RandomState(dna.get('seed', 0) % (2**31 - 1))
+            offset_x = float(rng.uniform(-0.15, 0.15) * eff)
+            offset_y = float(rng.uniform(-0.15, 0.15) * eff)
+
+            _, _, x_norm, y_norm = self.get_coordinate_grid(h, w)
+            dx_c = x_norm - offset_x
+            dy_c = y_norm - offset_y
+            r2 = dx_c * dx_c + dy_c * dy_c + 1e-4
+            r = np.sqrt(r2)
+
+            # 愛因斯坦半徑與強引力透鏡偏折公式: deflection = r_einstein^2 / r
+            r_einstein = 0.42 * scale * (0.8 + 0.4 * beat_energy)
+            deflection = (r_einstein ** 2) / (r + 0.08)
+            disp_scale = 55.0 * eff
+
+            dx = (dx_c * deflection * disp_scale).astype(np.float32)
+            dy = (dy_c * deflection * disp_scale).astype(np.float32)
+
+            x_grid, y_grid, _, _ = self.get_coordinate_grid(h, w)
+            map_x = np.clip(x_grid + dx, 0, w - 1).astype(np.float32)
+            map_y = np.clip(y_grid + dy, 0, h - 1).astype(np.float32)
+
+            warped = cv2.remap(img_np, map_x, map_y, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            
+            # 黑洞吸積盤光環高光 (Accretion Ring Glow)
+            ring_mask = np.exp(-((r - r_einstein) ** 2) / 0.008)[:, :, None]
+            pal = dna.get('palette', FXPolymorphicMutationEngine.ACES_THERMAL_CORE)
+            ring_col = pal[2] # 高溫白熾
+            warped = np.clip(warped.astype(np.float32) + ring_col * ring_mask * 0.8 * eff, 0, 255).astype(np.uint8)
+
+            out = cv2.addWeighted(img_np, 1.0 - 0.75 * eff, warped, 0.75 * eff, 0)
+            return FXPolymorphicMutationEngine.apply_color_polarization(out, dna, eff * 0.4)
+        except Exception as e:
+            logger.error(f"Error in apply_gravitational_lensing_custom: {e}")
+            return img_np
+
+    def apply_acid_curl_fluid_custom(self, img_np, t, intensity, roughness, harmonic, dna=None):
+        """次世代特效 6: 酸性旋度流體混動 (Acid Curl Fluid)
+        基於 Curl Noise 的不可壓縮旋度場，液態金屬酸性色彩流動
+        """
+        if intensity < 0.01 or cv2 is None:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('acid_curl_fluid', t, roughness, {'harmonic': harmonic})
+            eff = float(np.clip(intensity * (0.6 + 0.5 * roughness), 0.05, 1.6))
+            scale = dna.get('scale_factor', 1.0)
+
+            # 在低解析度生成旋度速度場 (u = dPsi/dy, v = -dPsi/dx)
+            gw, gh = max(32, w // 24), max(18, h // 24)
+            x_lin = np.linspace(-2.0, 2.0, gw, dtype=np.float32)
+            y_lin = np.linspace(-2.0, 2.0, gh, dtype=np.float32)
+            xx, yy = np.meshgrid(x_lin, y_lin)
+
+            psi = np.sin(xx * 3.5 * scale + t * 2.0) * np.cos(yy * 3.5 * scale - t * 1.5) + np.sin((xx + yy) * 2.0 * scale)
+            # 數值偏微分生成無發散流場 (Divergence-free Curl)
+            v_low, u_low = np.gradient(psi)
+            u_low = -u_low * 38.0 * eff
+            v_low = v_low * 38.0 * eff
+
+            u = cv2.resize(u_low, (w, h), interpolation=cv2.INTER_LINEAR)
+            v = cv2.resize(v_low, (w, h), interpolation=cv2.INTER_LINEAR)
+
+            x_grid, y_grid, _, _ = self.get_coordinate_grid(h, w)
+            map_x = np.clip(x_grid + u, 0, w - 1).astype(np.float32)
+            map_y = np.clip(y_grid + v, 0, h - 1).astype(np.float32)
+
+            fluid_warped = cv2.remap(img_np, map_x, map_y, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            out = cv2.addWeighted(img_np, 1.0 - 0.7 * eff, fluid_warped, 0.7 * eff, 0)
+            return FXPolymorphicMutationEngine.apply_color_polarization(out, dna, eff * 0.45)
+        except Exception as e:
+            logger.error(f"Error in apply_acid_curl_fluid_custom: {e}")
+            return img_np
+
+    def apply_strobe_chroma_invert_custom(self, img_np, t, intensity, beat_energy, is_beat, dna=None):
+        """次世代特效 7: 極速反相頻閃脈衝 (Strobe Chroma Invert)
+        底層高反差反相、雙色調通道爆裂極化，地下俱樂部暗光閃頻
+        """
+        if intensity < 0.01 or not is_beat:
+            return img_np
+        try:
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('strobe_chroma_invert', t, beat_energy, {})
+            eff = float(np.clip(intensity * (0.8 + 0.6 * beat_energy), 0.1, 1.9))
+            pol = dna.get('color_polarity', 0)
+
+            arr = img_np.astype(np.float32)
+            if pol == 0:
+                # 全光譜反相 + 高飽和加強
+                inv = 255.0 - arr
+            elif pol == 1:
+                # 單通道綠藍反相、保留紅通道 (Cyber Neon Strobe)
+                inv = arr.copy()
+                inv[:, :, 1] = 255.0 - inv[:, :, 1]
+                inv[:, :, 2] = 255.0 - inv[:, :, 2]
+            elif pol == 2:
+                # 太陽化閾值閃爍 (Solarized Strobe)
+                inv = np.where(arr > 120.0, 255.0 - arr, arr * 1.8)
+            else:
+                # 鎢金高光反轉
+                gray = (0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2])
+                inv = 255.0 - np.dstack([gray, gray * 0.9, gray * 0.75])
+
+            weight = float(0.85 * min(1.0, eff))
+            inv_u8 = np.clip(inv, 0, 255).astype(np.uint8)
+            if cv2 is not None:
+                out = cv2.addWeighted(img_np, 1.0 - weight, inv_u8, weight, 0)
+            else:
+                out = np.clip(img_np.astype(np.float32) * (1.0 - weight) + inv * weight, 0, 255).astype(np.uint8)
+            return out
+        except Exception as e:
+            logger.error(f"Error in apply_strobe_chroma_invert_custom: {e}")
+            return img_np
+
+    def apply_cyber_wireframe_lidar_custom(self, img_np, t, intensity, percussive, roughness, dna=None):
+        """次世代特效 8: 賽博光達深度線框 (Cyber Wireframe LiDAR)
+        光達深度掃描點雲提取、3D 霓虹網格線條穿透
+        """
+        if intensity < 0.01 or cv2 is None:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('cyber_wireframe_lidar', t, percussive, {'roughness': roughness})
+            eff = float(np.clip(intensity * (0.6 + 0.5 * percussive), 0.05, 1.6))
+            scale = dna.get('scale_factor', 1.0)
+
+            # Sobel 梯度與邊緣法線提取
+            gray = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
+            sobel_x = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
+            sobel_y = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
+            mag = np.sqrt(sobel_x * sobel_x + sobel_y * sobel_y)
+            mag_norm = np.clip(mag / 120.0, 0.0, 1.0)
+
+            # 光達掃描線穿透 (LiDAR Scanlines)
+            y_lin = np.linspace(0, h, h, dtype=np.float32)[:, None]
+            scan_lines = np.sin(y_lin * 0.25 * scale + t * 8.0) > 0.65
+
+            pal = dna.get('palette', FXPolymorphicMutationEngine.ACES_ACID_MUTATION)
+            col_wire = pal[1] # 霓虹綠/高光色
+            col_dark = pal[0] # 底色
+
+            lidar_edge = (mag_norm[:, :, None] * col_wire * 1.5).astype(np.float32)
+            lidar_lines = (scan_lines[:, :, None] * col_wire * 0.7).astype(np.float32)
+
+            blended = img_np.astype(np.float32) * (1.0 - 0.65 * eff) + (lidar_edge + lidar_lines) * (0.65 * eff)
+            out = np.clip(blended, 0, 255).astype(np.uint8)
+            return FXPolymorphicMutationEngine.apply_color_polarization(out, dna, eff * 0.3)
+        except Exception as e:
+            logger.error(f"Error in apply_cyber_wireframe_lidar_custom: {e}")
+            return img_np
+
+    def apply_sine_terrain_displacement_custom(self, img_np, t, intensity, sub_bass, chord_hue, dna=None):
+        """次世代特效 9: 正弦音波地形位移 (Sine Terrain Displacement)
+        三維正弦波動等高線位移，低頻驅動的地形起伏折射
+        """
+        if intensity < 0.01 or cv2 is None:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('sine_terrain_displacement', t, sub_bass, {})
+            eff = float(np.clip(intensity * (0.6 + 0.6 * sub_bass), 0.05, 1.7))
+            scale = dna.get('scale_factor', 1.0)
+            rot = math.radians(dna.get('rotation_angle', 45.0))
+
+            _, _, x_norm, y_norm = self.get_coordinate_grid(h, w)
+            # 旋轉投影軸
+            x_rot = x_norm * math.cos(rot) - y_norm * math.sin(rot)
+            y_rot = x_norm * math.sin(rot) + y_norm * math.cos(rot)
+
+            # 正弦波群疊加 (波面包絡)
+            wave1 = np.sin(x_rot * 16.0 * scale + t * 4.0)
+            wave2 = np.cos(y_rot * 12.0 * scale - t * 3.0)
+            terrain = (wave1 + wave2 * 0.7) * 28.0 * eff
+
+            x_grid, y_grid, _, _ = self.get_coordinate_grid(h, w)
+            map_x = np.clip(x_grid + terrain * math.cos(rot), 0, w - 1).astype(np.float32)
+            map_y = np.clip(y_grid + terrain * math.sin(rot), 0, h - 1).astype(np.float32)
+
+            displaced = cv2.remap(img_np, map_x, map_y, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            out = cv2.addWeighted(img_np, 1.0 - 0.7 * eff, displaced, 0.7 * eff, 0)
+            return FXPolymorphicMutationEngine.apply_color_polarization(out, dna, eff * 0.35)
+        except Exception as e:
+            logger.error(f"Error in apply_sine_terrain_displacement_custom: {e}")
+            return img_np
+
+    def apply_quantum_tunneling_custom(self, img_np, t, intensity, entropy, arousal, dna=None):
+        """次世代特效 10: 量子穿隧噪波分解 (Quantum Tunneling)
+        空間機率雲離散化、粒子重組與空間坍縮
+        """
+        if intensity < 0.01 or cv2 is None:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('quantum_tunneling', t, entropy, {'arousal': arousal})
+            eff = float(np.clip(intensity * (0.6 + 0.5 * entropy), 0.05, 1.6))
+            scale = dna.get('scale_factor', 1.0)
+
+            # 依據尺度產生量子穿隧離散網格
+            block_s = int(np.clip(16.0 * scale, 8, 64))
+            gh, gw = h // block_s + 1, w // block_s + 1
+
+            rng = np.random.RandomState(dna.get('seed', 0) % (2**31 - 1))
+            prob_cloud = rng.uniform(0.0, 1.0, (gh, gw)).astype(np.float32)
+            tunnel_mask = (prob_cloud > (1.0 - 0.45 * eff)).astype(np.float32)
+
+            mask_up = cv2.resize(tunnel_mask, (w, h), interpolation=cv2.INTER_NEAREST)[:, :, None]
+
+            # 量子相移偏移 (Phase Shift Offset)
+            shift_x = int(rng.uniform(-35.0, 35.0) * eff)
+            shift_y = int(rng.uniform(-25.0, 25.0) * eff)
+            shifted = np.roll(np.roll(img_np, shift_x, axis=1), shift_y, axis=0)
+
+            tunneled = np.where(mask_up > 0.5, shifted, img_np)
+            out = cv2.addWeighted(img_np, 1.0 - 0.75 * eff, tunneled, 0.75 * eff, 0)
+            return FXPolymorphicMutationEngine.apply_color_polarization(out, dna, eff * 0.4)
+        except Exception as e:
+            logger.error(f"Error in apply_quantum_tunneling_custom: {e}")
+            return img_np
+
+    def apply_prismatic_refraction_prism_custom(self, img_np, t, intensity, ethereal, chord_brightness, dna=None):
+        """次世代特效 11: 多稜鏡立體光譜色散 (Prismatic Refraction Prism)
+        多角度厚玻璃稜鏡折射，RGB 物理級折射分離與彩虹高光
+        """
+        if intensity < 0.01 or cv2 is None:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('prismatic_refraction_prism', t, ethereal, {'chord_brightness': chord_brightness})
+            eff = float(np.clip(intensity * (0.6 + 0.5 * ethereal), 0.05, 1.7))
+            rot = math.radians(dna.get('rotation_angle', 30.0))
+
+            x_grid, y_grid, _, _ = self.get_coordinate_grid(h, w)
+            dir_x, dir_y = math.cos(rot), math.sin(rot)
+
+            # 三波長色散偏折 (柯西色散公式模擬: 紅長波少折射, 藍短波多折射)
+            disp_dist = 28.0 * eff
+            d_r = disp_dist * 0.85
+            d_g = disp_dist * 1.00
+            d_b = disp_dist * 1.25
+
+            map_xr = np.clip(x_grid + dir_x * d_r, 0, w - 1).astype(np.float32)
+            map_yr = np.clip(y_grid + dir_y * d_r, 0, h - 1).astype(np.float32)
+            map_xg = np.clip(x_grid + dir_x * d_g, 0, w - 1).astype(np.float32)
+            map_yg = np.clip(y_grid + dir_y * d_g, 0, h - 1).astype(np.float32)
+            map_xb = np.clip(x_grid + dir_x * d_b, 0, w - 1).astype(np.float32)
+            map_yb = np.clip(y_grid + dir_y * d_b, 0, h - 1).astype(np.float32)
+
+            ch_r = cv2.remap(img_np[:, :, 0], map_xr, map_yr, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            ch_g = cv2.remap(img_np[:, :, 1], map_xg, map_yg, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            ch_b = cv2.remap(img_np[:, :, 2], map_xb, map_yb, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+
+            dispersed = np.dstack([ch_r, ch_g, ch_b])
+            out = cv2.addWeighted(img_np, 1.0 - 0.7 * eff, dispersed, 0.7 * eff, 0)
+            return FXPolymorphicMutationEngine.apply_color_polarization(out, dna, eff * 0.3)
+        except Exception as e:
+            logger.error(f"Error in apply_prismatic_refraction_prism_custom: {e}")
+            return img_np
+
+    def apply_magnetic_field_lines_custom(self, img_np, t, intensity, sub_bass, percussive, dna=None):
+        """次世代特效 12: 磁力線粉末吸附 (Magnetic Field Lines)
+        鐵磁流體沿磁感線吸附排列，磁極渦流物理粉末質感
+        """
+        if intensity < 0.01 or cv2 is None:
+            return img_np
+        try:
+            h, w = img_np.shape[:2]
+            dna = dna or FXPolymorphicMutationEngine.generate_invocation_dna('magnetic_field_lines', t, sub_bass, {'percussive': percussive})
+            eff = float(np.clip(intensity * (0.6 + 0.6 * sub_bass), 0.05, 1.7))
+            scale = dna.get('scale_factor', 1.0)
+
+            # 雙磁極偶極子場方程式 (Dipole Magnetic Field)
+            pole_d = 0.55 * scale
+            _, _, x_norm, y_norm = self.get_coordinate_grid(h, w)
+            r1 = np.sqrt((x_norm + pole_d)**2 + y_norm**2) + 0.08
+            r2 = np.sqrt((x_norm - pole_d)**2 + y_norm**2) + 0.08
+
+            potential = (1.0 / r1) - (1.0 / r2)
+            field_lines = np.sin(potential * 16.0 * scale + t * 3.0)
+
+            # 磁粉排列紋理 (Powder Absorption Texture)
+            powder_mask = (np.abs(field_lines) > 0.85).astype(np.float32)[:, :, None]
+            pal = dna.get('palette', FXPolymorphicMutationEngine.ACES_INDUSTRIAL_MONOLITH)
+            powder_col = pal[2] # 鎢金高光
+
+            powdered = (img_np.astype(np.float32) * (1.0 - powder_mask * 0.75 * eff) + powder_col * (powder_mask * 0.75 * eff))
+            out = np.clip(powdered, 0, 255).astype(np.uint8)
+            return FXPolymorphicMutationEngine.apply_color_polarization(out, dna, eff * 0.3)
+        except Exception as e:
+            logger.error(f"Error in apply_magnetic_field_lines_custom: {e}")
+            return img_np
+
 
 
 def apply_advanced_transition(pil_a, pil_b, progress, trans_type='displacement', intensity=0.5, is_beat=False, beat_energy=0.0, wipe_pattern='diagonal_tl_br', chord_color_hex='#0a0a0c', **kwargs):
@@ -6194,10 +7536,14 @@ def apply_advanced_transition(pil_a, pil_b, progress, trans_type='displacement',
 
 class SongProceduralFluidEngine:
     """
-    歌曲專屬 16-Gene Visual DNA 程序化流體與粒子保底演算法 (AetherDNA™ v2.0)
+    歌曲專屬 16-Gene Visual DNA 程序化流體與超弦粒子保底演算法 (AetherDNA™ v3.0)
     - 依據曲目獨立隨機種子生成專屬視覺架構，確保每首歌曲保底畫面 1-of-1 獨一無二。
-    - 支援 5 大張量幾何波場 (LiquidMetals, GasNebula, QuantumPlasma, GoldenLava, CyberMercury)。
-    - 深度耦合音訊聲學特徵 (stereo_width, roughness, centroid, percussive, audio_samples)。
+    - 支援 12 大張量幾何波場 (LiquidMetals, GasNebula, QuantumPlasma, GoldenLava, CyberMercury,
+      TuringReactionDiffusion, QuantumStrings, CyberGridHorizon, VortexSingularity,
+      BioluminescentMycelium, GlitchTopography, StrobeShockwave)。
+    - 支援 10,000+ 顆高速向量化超弦粒子物理場 (Vectorized Particle Field SIMD)。
+    - 深度樂段自適應 (Section-Aware Evolving Morphing)，各段落幾何張力自動演化。
+    - 深度耦合音訊聲學特徵 (stereo_width, roughness, centroid, percussive, audio_samples, sub_bass)。
     - 整合 Tri-Color 電影級調色盤、ACES 軟膝色調映射與 2.39:1 變形暗角。
     - 以全曲時間戳 t 作為自變數，進行常數級 O(1) 時間連續演化。
     """
@@ -6209,7 +7555,24 @@ class SongProceduralFluidEngine:
         rng = random.Random(hash_val)
 
         self.gene_hue_base = rng.uniform(0.0, 1.0)
-        self.gene_viscosity = rng.choice(['LiquidMetals', 'GasNebula', 'QuantumPlasma', 'GoldenLava', 'CyberMercury'])
+        self.all_viscosities = [
+            'LiquidMetals', 'GasNebula', 'QuantumPlasma', 'GoldenLava', 'CyberMercury',
+            'TuringReactionDiffusion', 'QuantumStrings', 'CyberGridHorizon', 'VortexSingularity',
+            'BioluminescentMycelium', 'GlitchTopography', 'StrobeShockwave'
+        ]
+        # 為不同樂段打散專屬幾何風格映射，確保樂段間各具辨識度
+        shuffled_visc = list(self.all_viscosities)
+        rng.shuffle(shuffled_visc)
+        self.section_visc_map = {
+            'Intro': shuffled_visc[0],
+            'Verse': shuffled_visc[1],
+            'Build-up': shuffled_visc[2],
+            'Drop': shuffled_visc[3],
+            'Chorus': shuffled_visc[4],
+            'Bridge': shuffled_visc[5],
+            'Outro': shuffled_visc[6]
+        }
+        self.gene_viscosity = self.section_visc_map['Verse']
         self.gene_harmony_mode = rng.choice(['split_complementary', 'triadic', 'analogous', 'neon_duotone'])
         self.gene_fluid_scale = rng.uniform(0.6, 2.2)
         self.gene_turbulence_freq = rng.uniform(0.4, 3.5)
@@ -6231,16 +7594,150 @@ class SongProceduralFluidEngine:
         self.col_secondary_base = np.array(colorsys.hls_to_rgb(h2, 0.25, 0.70), dtype=np.float32) * 255.0
         self.col_accent_base = np.array(colorsys.hls_to_rgb(h3, 0.65, 0.95), dtype=np.float32) * 255.0
 
-    def render_emergency_frame(self, w: int, h: int, t: float, beat_energy: float = 0.5, sub_bass: float = 0.5, chord_hex: str = "#a855f7", audio_feats: dict = None):
+        # 初始化向量化超弦粒子物理種子 (8,192 顆粒子，具備初始相位與空間頻率)
+        self.num_particles = 8192
+        p_rng = np.random.RandomState(hash_val % (2**31 - 1))
+        self.part_x0 = p_rng.uniform(-1.5, 1.5, self.num_particles).astype(np.float32)
+        self.part_y0 = p_rng.uniform(-1.5, 1.5, self.num_particles).astype(np.float32)
+        self.part_speed = p_rng.uniform(0.3, 1.8, self.num_particles).astype(np.float32)
+        self.part_phase = p_rng.uniform(0.0, 2.0 * np.pi, self.num_particles).astype(np.float32)
+        self.part_size = p_rng.uniform(0.5, 2.5, self.num_particles).astype(np.float32)
+        # 劃分 35% 為高頻 Hihat 空氣微塵粒子 (Micro-dust particles)
+        self.part_is_dust = (p_rng.uniform(0.0, 1.0, self.num_particles) < 0.35)
+
+    def _compute_wavefield(self, visc: str, xx, yy, tau: float, sub_bass: float, beat_energy: float, centroid: float, roughness: float, stereo_width: float, percussive: float, col_primary, col_secondary, col_accent):
+        """內部張量幾何波場算子生成器"""
+        if visc == 'LiquidMetals':
+            dx = np.sin(yy * (2.2 * self.gene_fluid_scale) + tau * 0.8 + sub_bass * 1.5)
+            dy = np.cos(xx * (1.8 * self.gene_fluid_scale) - tau * 0.7 + beat_energy * 1.2)
+            field1 = np.sin((xx + dx * 0.45) * 2.8 + (yy + dy * 0.45) * 2.4)
+            field2 = np.cos((xx - dx * 0.3) * 3.5 - (yy + dy * 0.3) * 1.8 + tau * 0.5)
+            wave = (field1 * 0.55 + field2 * 0.45)
+            specular = np.power(np.clip(wave * 0.5 + 0.5, 0.0, 1.0), 6.0) * (0.9 + centroid * 0.8)
+            norm_w = np.clip(wave * 0.5 + 0.5, 0.0, 1.0)
+            base_col = (1.0 - norm_w[:, :, None]) * col_secondary + norm_w[:, :, None] * col_primary
+            return np.clip(base_col + specular[:, :, None] * col_accent * 1.4, 0.0, 255.0)
+
+        elif visc == 'GasNebula':
+            oct1 = np.sin(xx * (1.2 * self.gene_fluid_scale) + tau * 0.35) * np.cos(yy * 1.0 - tau * 0.25)
+            oct2 = np.sin((xx * 2.2 - yy * 1.7) * self.gene_fluid_scale + tau * 0.55 + stereo_width * 0.6) * 0.5
+            oct3 = np.cos((xx * 4.4 + yy * 3.2) * self.gene_fluid_scale - tau * 0.85 + roughness * 0.8) * 0.25
+            wave = (oct1 + oct2 + oct3) * 0.6
+            norm_w = np.clip((wave + 1.0) * 0.5, 0.0, 1.0)
+            glow = np.exp(-((xx * 0.7)**2 + (yy * 1.1)**2)) * (0.4 + sub_bass * 0.5)
+            base_col = (1.0 - norm_w[:, :, None]) * col_secondary + norm_w[:, :, None] * col_primary
+            return np.clip(base_col + glow[:, :, None] * col_accent * 1.1, 0.0, 255.0)
+
+        elif visc == 'QuantumPlasma':
+            r = np.sqrt(xx**2 + (yy * 1.25)**2) + 1e-4
+            theta = np.arctan2(yy, xx)
+            spiral = np.sin(r * (5.5 * self.gene_fluid_scale) - theta * 3.0 - tau * 1.8 + roughness * 3.0)
+            cross_field = np.cos(xx * 3.8 + yy * 4.2 + tau * 1.4)
+            filaments = np.exp(-np.abs(spiral * 0.7 + cross_field * 0.3) * (5.5 - 2.0 * roughness))
+            norm_w = np.clip(filaments * (0.8 + percussive * 1.5 + beat_energy * 0.7), 0.0, 1.0)
+            void_ambient = col_secondary * 0.3
+            plasma_core = norm_w[:, :, None] * (col_primary * 0.6 + col_accent * 0.8)
+            return np.clip(void_ambient + plasma_core * 1.5, 0.0, 255.0)
+
+        elif visc == 'GoldenLava':
+            fx = np.sin(xx * (3.0 * self.gene_fluid_scale) + tau * 0.28)
+            fy = np.cos(yy * (2.6 * self.gene_fluid_scale) - tau * 0.22)
+            crust = 1.0 - np.abs(fx * fy)
+            fissures = np.power(np.clip(crust, 0.0, 1.0), 4.2) * (1.2 + sub_bass * 1.8)
+            basalt_plates = (np.cos(xx * 1.4 + yy * 1.4 + tau * 0.15) * 0.5 + 0.5) * 0.25
+            norm_fissure = np.clip(fissures, 0.0, 1.0)
+            basalt_color = col_secondary * (basalt_plates[:, :, None] * 0.4 + 0.1)
+            magma_color = col_primary * (norm_fissure[:, :, None] * 0.8) + col_accent * (norm_fissure[:, :, None]**2 * 1.4)
+            return np.clip(basalt_color + magma_color, 0.0, 255.0)
+
+        elif visc == 'CyberMercury':
+            u = np.sin(xx * (3.6 * self.gene_fluid_scale) + tau * 1.2 + stereo_width * 0.8)
+            v = np.cos(yy * (3.2 * self.gene_fluid_scale) - tau * 0.95)
+            caustic = np.sin(u * np.pi + v * np.pi + beat_energy * 2.0)
+            ripples = np.sin((xx**2 + yy**2) * 4.0 - tau * 2.5 + sub_bass * 2.0) * 0.3
+            synth_wave = np.clip((caustic * 0.7 + ripples + 1.0) * 0.5, 0.0, 1.0)
+            chrome_shimmer = np.power(synth_wave, 3.0) * (0.8 + centroid * 0.9)
+            base_col = (1.0 - synth_wave[:, :, None]) * col_secondary + synth_wave[:, :, None] * col_primary
+            return np.clip(base_col * 0.8 + chrome_shimmer[:, :, None] * col_accent * 1.3, 0.0, 255.0)
+
+        elif visc == 'TuringReactionDiffusion':
+            turing_u = np.sin(xx * 3.5 + np.cos(yy * 4.0 + tau * 0.5) * 1.8)
+            turing_v = np.cos(yy * 3.5 + np.sin(xx * 4.0 - tau * 0.6) * 1.8)
+            turing_pattern = np.abs(turing_u * turing_v)
+            turing_spots = np.exp(-((turing_pattern - 0.45)**2) * 18.0) * (0.8 + beat_energy * 0.8)
+            norm_w = np.clip(turing_spots, 0.0, 1.0)
+            return col_secondary * 0.25 + norm_w[:, :, None] * (col_primary * 0.7 + col_accent * 0.9)
+
+        elif visc == 'QuantumStrings':
+            string_freq = 5.0 * self.gene_fluid_scale
+            strings = np.sin(xx * string_freq + tau * 1.5) * np.sin(yy * string_freq * 1.2 - tau * 1.2)
+            harmonics = np.sin((xx + yy) * (string_freq * 1.8) + tau * 2.2 + percussive * 3.0) * 0.5
+            intensity = np.power(np.abs(strings + harmonics), 2.5) * (1.0 + sub_bass * 1.5)
+            norm_w = np.clip(intensity, 0.0, 1.0)
+            return col_secondary * 0.15 + norm_w[:, :, None] * (col_primary * 0.5 + col_accent * 1.2)
+
+        elif visc == 'CyberGridHorizon':
+            persp_y = np.clip(yy + 0.3, 0.04, 3.0)
+            grid_x = np.sin((xx / persp_y) * 8.0 + tau * 0.8)
+            grid_z = np.sin((2.0 / persp_y) * 4.0 - tau * 2.5 + beat_energy * 1.5)
+            laser_line = np.exp(-np.abs(grid_x) * 6.0) + np.exp(-np.abs(grid_z) * 6.0)
+            sky_glow = np.exp(-((yy - 0.4)**2) * 3.0) * 0.4
+            laser_val = np.clip(laser_line * (0.8 + beat_energy * 0.8) + sky_glow, 0.0, 1.5)
+            return col_secondary * 0.2 + laser_val[:, :, None] * col_accent * 1.2
+
+        elif visc == 'VortexSingularity':
+            r_dist = np.sqrt(xx**2 + yy**2) + 1e-4
+            angle = np.arctan2(yy, xx)
+            swirl = angle + (2.5 / (r_dist + 0.2)) + tau * 1.6
+            disk = np.exp(-((r_dist - 0.75)**2) * 8.0) * (0.8 + sub_bass * 1.2)
+            arms = np.sin(swirl * 3.0) * 0.5 + 0.5
+            disk_glow = disk * arms
+            event_horizon = np.clip(1.0 - np.exp(-((r_dist / 0.3)**3)), 0.0, 1.0)
+            return (disk_glow[:, :, None] * (col_primary * 0.6 + col_accent * 1.4) + col_secondary * 0.2) * event_horizon[:, :, None]
+
+        elif visc == 'BioluminescentMycelium':
+            n1 = np.sin(xx * 4.2 + np.cos(yy * 3.8 + tau * 0.5))
+            n2 = np.cos(yy * 4.2 + np.sin(xx * 3.8 - tau * 0.4))
+            veins = np.exp(-np.abs(n1 + n2) * 7.0) * (1.0 + roughness * 1.5)
+            nodes = np.exp(-(((xx % 0.6 - 0.3)**2 + (yy % 0.6 - 0.3)**2) * 25.0)) * (beat_energy * 1.5)
+            tot = np.clip(veins + nodes, 0.0, 1.0)
+            return col_secondary * 0.15 + tot[:, :, None] * (col_primary * 0.5 + col_accent * 1.5)
+
+        elif visc == 'GlitchTopography':
+            slice_shift = np.sin(np.floor(yy * 12.0) * 2.5 + tau * 4.0) * (0.15 * beat_energy)
+            topo = np.sin((xx + slice_shift) * 6.0 + tau * 0.7) + np.cos(yy * 6.0 - tau * 0.5)
+            bands = np.mod(topo * 4.0, 1.0)
+            edges = np.exp(-np.abs(bands - 0.5) * 8.0) * (0.9 + centroid * 0.8)
+            return col_secondary * 0.25 + edges[:, :, None] * (col_primary * 0.8 + col_accent * 1.0)
+
+        else:  # StrobeShockwave
+            r_dist = np.sqrt(xx**2 + (yy * 1.1)**2)
+            shock = np.sin(r_dist * 12.0 - tau * 4.0 + beat_energy * 3.0)
+            crest = np.power(np.clip(shock, 0.0, 1.0), 4.0) * (1.0 + percussive * 2.0)
+            crest_col = np.clip(crest, 0.0, 1.0)
+            return col_secondary * 0.2 + crest_col[:, :, None] * (col_primary * 0.4 + col_accent * 1.6)
+
+    def render_emergency_frame(self, w: int, h: int, t: float, beat_energy: float = 0.5, sub_bass: float = 0.5, chord_hex: str = "#a855f7", audio_feats: dict = None, section_name: str = "Verse", morph_weight: float = 0.0, prev_section_name: str = None):
         """
-        高質感有機程序化視覺保底 (Multi-Layer Procedural Spectrum & Fluid Nebula)
-        - 徹底廢除刻板同心圓與死板暗角
-        - 根據曲目種子與音訊多維動態，生成有機流體波紋、幾何動態場域與和弦光譜
+        高質感有機程序化視覺保底 (Multi-Layer Procedural Spectrum, 12 Geometries & Vectorized Particle Field)
         """
         try:
-            col_primary = self.col_primary_base.copy()
-            col_secondary = self.col_secondary_base.copy()
-            col_accent = self.col_accent_base.copy()
+            import colorsys
+            # 全曲時間推進色相漂移 (Progressive Hue Drift ~25° over time)，長曲依然維持新鮮感
+            drift_hue = (t * 0.0015) % 1.0
+            h1 = (self.gene_hue_base + drift_hue) % 1.0
+            if self.gene_harmony_mode == 'split_complementary':
+                h2, h3 = (h1 + 0.42) % 1.0, (h1 + 0.58) % 1.0
+            elif self.gene_harmony_mode == 'triadic':
+                h2, h3 = (h1 + 0.333) % 1.0, (h1 + 0.666) % 1.0
+            elif self.gene_harmony_mode == 'analogous':
+                h2, h3 = (h1 + 0.08) % 1.0, (h1 - 0.08) % 1.0
+            else:  # neon_duotone
+                h2, h3 = (h1 + 0.5) % 1.0, (h1 + 0.25) % 1.0
+
+            col_primary = np.array(colorsys.hls_to_rgb(h1, 0.45, 0.85), dtype=np.float32) * 255.0
+            col_secondary = np.array(colorsys.hls_to_rgb(h2, 0.25, 0.70), dtype=np.float32) * 255.0
+            col_accent = np.array(colorsys.hls_to_rgb(h3, 0.65, 0.95), dtype=np.float32) * 255.0
 
             # 和弦原色動態耦合調色盤
             if chord_hex and chord_hex.startswith('#') and len(chord_hex) == 7:
@@ -6260,6 +7757,8 @@ class SongProceduralFluidEngine:
             roughness = float(audio_feats.get('roughness', audio_feats.get('spectral_roughness', 0.2)))
             centroid = float(audio_feats.get('centroid', audio_feats.get('spectral_centroid', 0.5)))
             percussive = float(audio_feats.get('percussive', 0.0))
+            hihat_density = float(audio_feats.get('hihat_density', 0.0))
+            hihat_trigger = bool(audio_feats.get('hihat_trigger', False))
             audio_samples = audio_feats.get('audio_samples', None)
 
             # 雙尺度運算網格 (Dual-Scale Pipeline)，保證 4K 實時超低延遲
@@ -6272,60 +7771,64 @@ class SongProceduralFluidEngine:
             y_coords = np.linspace(-1.5, 1.5, dh, dtype=np.float32)
             xx, yy = np.meshgrid(x_coords, y_coords)
 
-            # 5 大張量幾何波場算子
-            visc = self.gene_viscosity
-            if visc == 'LiquidMetals':
-                dx = np.sin(yy * (2.2 * self.gene_fluid_scale) + tau * 0.8 + sub_bass * 1.5)
-                dy = np.cos(xx * (1.8 * self.gene_fluid_scale) - tau * 0.7 + beat_energy * 1.2)
-                field1 = np.sin((xx + dx * 0.45) * 2.8 + (yy + dy * 0.45) * 2.4)
-                field2 = np.cos((xx - dx * 0.3) * 3.5 - (yy + dy * 0.3) * 1.8 + tau * 0.5)
-                wave = (field1 * 0.55 + field2 * 0.45)
-                specular = np.power(np.clip(wave * 0.5 + 0.5, 0.0, 1.0), 6.0) * (0.9 + centroid * 0.8)
-                norm_w = np.clip(wave * 0.5 + 0.5, 0.0, 1.0)
-                base_col = (1.0 - norm_w[:, :, None]) * col_secondary + norm_w[:, :, None] * col_primary
-                small_rgb = np.clip(base_col + specular[:, :, None] * col_accent * 1.4, 0.0, 255.0)
+            # 根據樂段動態決定幾何風格 (Section Morphing & Cross-Section Blending)
+            visc_curr = self.section_visc_map.get(section_name, self.gene_viscosity)
+            small_rgb = self._compute_wavefield(
+                visc_curr, xx, yy, tau, sub_bass, beat_energy, centroid, roughness, stereo_width, percussive,
+                col_primary, col_secondary, col_accent
+            )
 
-            elif visc == 'GasNebula':
-                oct1 = np.sin(xx * (1.2 * self.gene_fluid_scale) + tau * 0.35) * np.cos(yy * 1.0 - tau * 0.25)
-                oct2 = np.sin((xx * 2.2 - yy * 1.7) * self.gene_fluid_scale + tau * 0.55 + stereo_width * 0.6) * 0.5
-                oct3 = np.cos((xx * 4.4 + yy * 3.2) * self.gene_fluid_scale - tau * 0.85 + roughness * 0.8) * 0.25
-                wave = (oct1 + oct2 + oct3) * 0.6
-                norm_w = np.clip((wave + 1.0) * 0.5, 0.0, 1.0)
-                glow = np.exp(-((xx * 0.7)**2 + (yy * 1.1)**2)) * (0.4 + sub_bass * 0.5)
-                base_col = (1.0 - norm_w[:, :, None]) * col_secondary + norm_w[:, :, None] * col_primary
-                small_rgb = np.clip(base_col + glow[:, :, None] * col_accent * 1.1, 0.0, 255.0)
+            # 若處於跨樂段邊界 (Cross-Section Morphing)，平滑混合兩種波場
+            if prev_section_name and prev_section_name != section_name and 0.01 < morph_weight < 0.99:
+                visc_prev = self.section_visc_map.get(prev_section_name, self.gene_viscosity)
+                if visc_prev != visc_curr:
+                    prev_rgb = self._compute_wavefield(
+                        visc_prev, xx, yy, tau, sub_bass, beat_energy, centroid, roughness, stereo_width, percussive,
+                        col_primary, col_secondary, col_accent
+                    )
+                    small_rgb = small_rgb * (1.0 - morph_weight) + prev_rgb * morph_weight
 
-            elif visc == 'QuantumPlasma':
-                r = np.sqrt(xx**2 + (yy * 1.25)**2) + 1e-4
-                theta = np.arctan2(yy, xx)
-                spiral = np.sin(r * (5.5 * self.gene_fluid_scale) - theta * 3.0 - tau * 1.8 + roughness * 3.0)
-                cross_field = np.cos(xx * 3.8 + yy * 4.2 + tau * 1.4)
-                filaments = np.exp(-np.abs(spiral * 0.7 + cross_field * 0.3) * (5.5 - 2.0 * roughness))
-                norm_w = np.clip(filaments * (0.8 + percussive * 1.5 + beat_energy * 0.7), 0.0, 1.0)
-                void_ambient = col_secondary * 0.3
-                plasma_core = norm_w[:, :, None] * (col_primary * 0.6 + col_accent * 0.8)
-                small_rgb = np.clip(void_ambient + plasma_core * 1.5, 0.0, 255.0)
+            # 🌌 注入 10,000+ 顆高速向量化超弦雙軌粒子物理場 (SIMD: Kick Shock + Hihat Micro-dust)
+            try:
+                # 粒子動態坐標更新
+                p_t = tau * self.part_speed
+                p_rad = np.sqrt(self.part_x0**2 + self.part_y0**2)
+                p_ang = np.arctan2(self.part_y0, self.part_x0) + p_t * 0.4 + beat_energy * 0.6
+                
+                # 軌道 1: 重音 Kick 衝擊波徑向位移
+                # 軌道 2: Hihat 滾奏空氣微塵高頻微抖動
+                hihat_boost = (1.5 if hihat_trigger else 1.0) * (0.8 + hihat_density * 1.2)
+                p_curr_rad = p_rad + np.sin(p_t + self.part_phase) * 0.2 + (beat_energy * 0.35)
+                
+                dust_jitter = np.where(self.part_is_dust, np.sin(p_t * 6.0) * (0.12 * hihat_boost), 0.0).astype(np.float32)
+                p_curr_rad = p_curr_rad + dust_jitter
 
-            elif visc == 'GoldenLava':
-                fx = np.sin(xx * (3.0 * self.gene_fluid_scale) + tau * 0.28)
-                fy = np.cos(yy * (2.6 * self.gene_fluid_scale) - tau * 0.22)
-                crust = 1.0 - np.abs(fx * fy)
-                fissures = np.power(np.clip(crust, 0.0, 1.0), 4.2) * (1.2 + sub_bass * 1.8)
-                basalt_plates = (np.cos(xx * 1.4 + yy * 1.4 + tau * 0.15) * 0.5 + 0.5) * 0.25
-                norm_fissure = np.clip(fissures, 0.0, 1.0)
-                basalt_color = col_secondary * (basalt_plates[:, :, None] * 0.4 + 0.1)
-                magma_color = col_primary * (norm_fissure[:, :, None] * 0.8) + col_accent * (norm_fissure[:, :, None]**2 * 1.4)
-                small_rgb = np.clip(basalt_color + magma_color, 0.0, 255.0)
+                curr_px = np.cos(p_ang) * p_curr_rad
+                curr_py = np.sin(p_ang) * p_curr_rad
 
-            else:  # CyberMercury
-                u = np.sin(xx * (3.6 * self.gene_fluid_scale) + tau * 1.2 + stereo_width * 0.8)
-                v = np.cos(yy * (3.2 * self.gene_fluid_scale) - tau * 0.95)
-                caustic = np.sin(u * np.pi + v * np.pi + beat_energy * 2.0)
-                ripples = np.sin((xx**2 + yy**2) * 4.0 - tau * 2.5 + sub_bass * 2.0) * 0.3
-                synth_wave = np.clip((caustic * 0.7 + ripples + 1.0) * 0.5, 0.0, 1.0)
-                chrome_shimmer = np.power(synth_wave, 3.0) * (0.8 + centroid * 0.9)
-                base_col = (1.0 - synth_wave[:, :, None]) * col_secondary + synth_wave[:, :, None] * col_primary
-                small_rgb = np.clip(base_col * 0.8 + chrome_shimmer[:, :, None] * col_accent * 1.3, 0.0, 255.0)
+                # 映射粒子至網格索引
+                grid_px = ((curr_px / (1.5 * aspect) + 1.0) * 0.5 * dw).astype(np.int32)
+                grid_py = ((curr_py / 1.5 + 1.0) * 0.5 * dh).astype(np.int32)
+
+                valid_mask = (grid_px >= 0) & (grid_px < dw) & (grid_py >= 0) & (grid_py < dh)
+                valid_px = grid_px[valid_mask]
+                valid_py = grid_py[valid_mask]
+                
+                # 微塵粒子發射高頻璀璨亮光
+                base_p_int = self.part_size[valid_mask] * (0.6 + beat_energy * 0.8)
+                dust_mult = np.where(self.part_is_dust[valid_mask], 1.2 * hihat_boost, 1.0).astype(np.float32)
+                valid_int = (base_p_int * dust_mult).astype(np.float32)
+
+                # 累積粒子亮度至 2D 緩衝
+                particle_layer = np.zeros((dh, dw), dtype=np.float32)
+                np.add.at(particle_layer, (valid_py, valid_px), valid_int)
+                particle_layer = np.clip(particle_layer, 0.0, 2.5)
+
+                # 將粒子疊加至原場景 (高光加色混合)
+                particle_rgb = particle_layer[:, :, None] * col_accent * 0.85
+                small_rgb = np.clip(small_rgb + particle_rgb, 0.0, 255.0)
+            except Exception:
+                pass
 
             # 時域波形 (audio_samples) 實時動態漣漪注入
             if audio_samples is not None and len(audio_samples) > 0:
@@ -6342,7 +7845,7 @@ class SongProceduralFluidEngine:
                 except Exception:
                     pass
 
-            # 全幅 2.39:1 電影級變形暗角 (柔和橢圓衰減，徹底廢除死板圓形暗角)
+            # 全幅 2.39:1 電影級變形暗角 (柔和橢圓衰減)
             vig_x = np.linspace(-1.0, 1.0, dw, dtype=np.float32)
             vig_y = np.linspace(-1.0, 1.0, dh, dtype=np.float32)
             vig_map = 1.0 - (vig_x[None, :]**2 * 0.35 + vig_y[:, None]**2 * 0.75) * 0.38

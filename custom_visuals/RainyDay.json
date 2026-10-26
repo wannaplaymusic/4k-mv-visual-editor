@@ -1,0 +1,27 @@
+{
+    "name": "RainyDay",
+    "code": "// === Tab: mySketch.js ===\n//Credit for original project I am modifying (rain that increases/decreases in intensity depending on mouse position): Lily\n// https://openprocessing.org/user/167511/#sketches\n\nvar d = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tbackground(204, 212, 224);\n\n  for (var i = 0; i < 500; i++) {\n    d.push(new Drop(random(0, windowWidth), random(0, windowHeight), random(2, 4)));\n\t\t// generate 500 raindrops at the start, these will be used throughout\n  }\n}\n\nfunction draw() {\n\t// fade effect: shade background with alpha bkgd\n\tnoStroke();\n  fill(82, 89, 99);\n  rect(0, 0, width, height);\n\n\t//Ground\n\tfill(48, 59, 55);\n\tellipse(750, 550, 1500, 200);\n\t\n\t// i'm guessing this updates each particle on screen?\n  for (var i = 0; i < d.length; i++) {\n    d[i].displ();\n  }\n\n\t//Drawing a window over the rain\n\tnoStroke();\n\t//Frame:\n\tfill(177, 183, 186);\n\trect(0, 580, windowWidth, 100);\n\trect(0, 0, windowWidth, 40);\n\trect(0, 0, 150, windowHeight);\n\trect(1400, 0, 160, windowHeight);\n\trect(710, 0, 110, windowHeight);\n\n\t//Apple on windowsill\n\tfill(71, 58, 49);\n\trect(1175, 450, 15, 50);\n\t\n\tfill(122, 74, 65);\n\tellipse(1200, 550, 120, 130);\n\tellipse(1165, 550, 120, 130);\n\n\tfill(212, 197, 199);\n\tellipse(1135, 510, 20, 20);\n\tellipse(1125, 520, 10, 12);\n}\n\nfunction Drop(x, y, sp) {\n  var x1 = x;\n  var y1 = y;\n  var x2;\n  var y2;\n  var s = sp;\n\n  this.displ = function() {\n    // converts mouse position. could also use map() to avoid mx <= 0\n\t\tvar mx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) / 120;\n    if (mx <= 0) {\n      mx = 0.5; // default, works as a failsafe. old one was too slow for me\n    }\n\t\t\n    y1 = y1 + s * mx; // scales speed according to mouse position\n    x2 = x1;\n    y2 = y1 + 30; // length of raindrops, change if they're too long/short\n\n    stroke(100, 117, 125);\n    line(x1, y1, x2, y2); // draws raindrop\n\n    if (y1 >= windowHeight - 80) { // did the drop hit the ground?\n\t\t\tnoFill();\n      noStroke();\n      fill(255, 150);\n      ellipse(x1, windowHeight - random(5, 50), random(2, 5), random(1, 4)); // then draw a splash\n      \n\t\t\t// renews the drop by sending it back to the top (no need to generate new ones)\n\t\t\tx1 = random(0, windowWidth);\n      y1 = -120;\n    }\n  }\n\t\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n\t<meta charset=\"utf-8\" />\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/addons/p5.sound.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nhtml,\nbody {\n\tmargin: 0;\n\tpadding: 0;\n}\n",
+    "inline_assets": {},
+    "author": "Ati.K",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2777179",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:47:43",
+    "used_in_videos": [
+        "Pressure Lines.mp4",
+        "Neutron Pulse Vanguard.mp4"
+    ],
+    "used_count": 2
+}

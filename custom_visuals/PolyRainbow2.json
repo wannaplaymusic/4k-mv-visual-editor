@@ -1,0 +1,29 @@
+{
+    "name": "PolyRainbow2",
+    "code": "// === Tab: mySketch ===\nvar POLYGON = 3;\nvar SCALE = 10;\nvar COLS = 16;\nvar ROWS = 16;\n//var pp;\nvar pps = []\n\nfunction setup() {\n  createCanvas(600, 600);\n  for (let i=0; i<COLS; i++) {\n    for (let j=0; j<ROWS; j++) {\n      pps.push(new PolyParticle(createVector(i*width/(COLS-1), j*height/(ROWS-1)), SCALE));\n    }\n  }\n  //pp = new PolyParticle(createVector(width/2, height/2), SCALE);\n  background(255);\n  colorMode(HSB, 256);\n}\n\nfunction draw() {\n  background(255);\n  for (let pp of pps) {\n  \tpp.update();\n  \tpp.draw();\n  }\n}\n\nfunction mouseClicked() {\n  for (let pp of pps) {\n    pp.randomForce();\n  }\n}\n\n\nfunction PolyParticle(pos, scale) {\n  this.eigenPos = pos;\n  this.scale = scale;\n  this.speed = createVector();\n  this.accel = createVector();\n  this.angle = 0;\n  this.angVel = 0.01;\n  this.colorPhase = floor(random(256));\n  this.particles = [];\n  for (let i=0; i<POLYGON; i++) {\n    let relPos = p5.Vector.fromAngle(TWO_PI*i/POLYGON);\n    this.particles.push(new Particle(this, relPos));\n  }\n}\nPolyParticle.prototype.update = function() {\n  this.speed.add(this.accel);\n  this.eigenPos.add(this.speed);\n  this.accel.set(0.0, 0.0);\n  let dPos = p5.Vector.sub(createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))), this.eigenPos);\n  this.angle = dPos.heading();\n  this.colorPhase = map(dPos.magSq(), 0, width*width+height*height, 0, 255);\n  //this.angle += this.angVel;\n  for (let part of this.particles) {\n    part.accel.add(this.attraction(part.position));\n    for (let otherPart of this.particles) {\n      let otherPos = p5.Vector.add(part.position, otherPart.position);\n      if (otherPos.magSq() > 0.1) part.accel.add(this.repulsion(otherPos));\n    }\n    part.update();\n  }\n}\nPolyParticle.prototype.draw = function() {\n  fill((frameCount+this.colorPhase)%256, 255, 255);\n  noStroke(); //stroke(random(255));\n  push();\n  translate(this.eigenPos.x, this.eigenPos.y);\n  rotate(this.angle);\n  scale(this.scale);\n  beginShape();\n  for (let part of this.particles) {\n    vertex(part.position.x, part.position.y);\n  }\n  endShape(CLOSE);\n  pop();\n}\nPolyParticle.prototype.repulsion = function(relPos) {\n  let mag = relPos.mag();\n  let f = 0.001 / relPos.magSq();               \n  return createVector(f*relPos.x/mag, f*relPos.y/mag);\n}\nPolyParticle.prototype.attraction = function(relPos) {\n  var mag = relPos.mag();\n  var f = -0.00001 * relPos.magSq();               \n  return createVector(f*relPos.x/mag, f*relPos.y/mag);\n}\nPolyParticle.prototype.randomForce = function() {\n  for (let part of this.particles) {\n    part.accel.add(p5.Vector.random2D().mult(this.scale/1000));\n  }\n}\n\n\nfunction Particle(parent, position) {\n  this.parent = parent;\n  this.position = position;\n  this.speed = createVector(0.0, 0.0);\n  this.accel = createVector(0.0, 0.0);\n}\nParticle.prototype.update = function() {\n    this.speed.add(this.accel);\n    this.position.add(this.speed);\n    this.accel.set(0.0, 0.0);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Gweltaz Duval-Guennoc",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/665493",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:14:40",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

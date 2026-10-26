@@ -1,0 +1,24 @@
+{
+    "name": "MicrocosmicSliver",
+    "code": "// === Tab: mySketch ===\nlet unit = (PG.PI ** PG.PHI);\nconst nums = 540;\nconst noiseScale = PG.PI * 400;\n\nlet a, b, c, d, e, f;\nlet group1;\nlet ac, bc, cc, aColor, bColor, cColor;\nlet sizes = [unit / 5, unit / 3];\n\n/////////////////////////////////////////////////////////////////\n\nfunction setup() {\n\tcreateCanvas(windowWidth * 11 / 12, windowHeight * 7 / 8);\n\tbackground(15, 12, 22);\n\n\tnoiseDetail(5, PG.PHI/2);\n\n\tnoStroke();\n\n\tac = rCol(15);\n\tbc = rCol(15);\n\tcc = rCol(15);\n\n\taColor = removeColor(\"red\");\n\tbColor = removeColor(\"red\");\n\tcColor = removeColor(\"red\");\n\n\ta = new ParticleGroup(aColor, nums, sizes);\n\tb = new ParticleGroup(bColor, nums, sizes);\n\tc = new ParticleGroup(cColor, nums, sizes);\n\td = new ParticleGroup(ac, nums, sizes);\n\te = new ParticleGroup(bc, nums, sizes);\n\tf = new ParticleGroup(cc, nums, sizes);\n\n\tgroup1 = [a, b, c, d, e, f];\n\n\tfor (let group of group1) {\n\t\tParticleGroup.populate(group);\n\t}\n\n}\n\n\n\n\nfunction draw() {\n\tfor (let group of group1) {\n\t\tgroup.update();\n\t}\n}\n\n/////////////////////////////////////////////////////////////////////////\n\nclass ParticleGroup {\n\n\tstatic populate(aGroup) {\n\t\tfor (let i = 0; i < aGroup.amount; i++) {\n\t\t\tlet x = rInc(width, unit / TAU);\n\t\t\tlet y = rInc(height, unit / TAU);\n\t\t\tlet size = random(aGroup.sizeRange[0], aGroup.sizeRange[1])\n\t\t\taGroup.container.push(new Particle(x, y, size));\n\t\t}\n\t}\n\n\tconstructor(color, amount, sizeRange = [0.1, 0.3]) {\n\t\tthis.color = color;\n\t\tthis.sizeRange = sizeRange;\n\t\tthis.amount = amount;\n\t\tthis.container = [];\n\t\tthis.populated = false;\n\t}\n\n\tupdate() {\n\t\tif (this.populated == false) {\n\t\t\tParticleGroup.populate(this);\n\t\t\tthis.populated = true;\n\t\t}\n\n\t\tfor (let particles of this.container) {\n\t\t\tfill(this.color);\n\t\t\tparticles.move();\n\t\t\tparticles.checkEdge();\n\t\t\tparticles.display();\n\t\t}\n\t}\n}\n\n/////////////////////////////////////////////////////////////////////////\n\nclass Particle {\n\tconstructor(x, y, size) {\n\t\tthis.dir = createVector(0, 0);\n\t\tthis.vel = createVector(size / 2, size / 2);\n\t\tthis.pos = createVector(x, y);\n\t\tthis.speed = random([size * unit / 2, -size * unit / 2]);\n\t\tthis.size = size;\n\t\tthis.angle = TAU;\n\t\tthis.noiseScale = noiseScale;\n\t\tthis.well = false;\n\t}\n\n\tmove() {\n\t\tthis.angle = noise(this.pos.x / (this.noiseScale), this.pos.y / (this.noiseScale));\n\t\tthis.angle *= TAU;\n\n\t\tthis.vel.rotate((tan((this.angle) * ctg2(this.angle))));\n\t\tthis.pos.add(this.vel);\n\t}\n\n\tcheckEdge() {\n\t\tpgWrap(this.pos, [random(width / 32), width * 31 / 32 + random(width / 32), random(height / 18), height * 17 / 18 + random(height / 18)]);\n\t}\n\n\tdisplay() {\n\t\tellipse(this.pos.x, this.pos.y, this.size);\n\t}\n}\n\n//////////////////////////////////////////////////////////////////////////\n\nfunction removeColor(pickRGB, cols = [ac, bc, cc]) {\n\tif (pickRGB === \"red\") {\n\t\treturn color(0, green(random(cols)), blue(random(cols)), 15);\n\t} else if (pickRGB === \"green\") {\n\t\treturn color(red(random(cols)), 0, blue(random(cols)), 15);\n\t} else if (pickRGB === \"blue\") {\n\t\treturn color(red(random(cols)), green(random(cols)), 0, 15);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Justin Turner",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/826636",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:52:05",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

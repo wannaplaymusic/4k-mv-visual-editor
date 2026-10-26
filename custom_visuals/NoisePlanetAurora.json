@@ -1,0 +1,63 @@
+{
+    "name": "NoisePlanetAurora",
+    "code": "// === Tab: mySketch ===\n // by SamuelYAN\n // more works //\n // https://twitter.com/SamuelAnn0924\n // https://www.instagram.com/samuel_yan_1990/\n\n // learn from https://p5js.org/examples/arrays-array-objects.html\n\n\n var ranges;\n let seed = Math.random() * 192;\n var mySize, margin, grad;\n let str_wei = 0;\n\n // colors\n let colorsbg = \"223240\".split(\"-\").map((a) => \"#\" + a);\n let colors1 = \"C16CD9-93D94E-04D9C4-ffffff\".split(\"-\").map((a) => \"#\" + a);\n // let colors2 = \"8c75ff-c553d2-2dfd60-2788f5-23054f-f21252-8834f1-c4dd92-184fd3-f9fee2-2E294E-541388-F1E9DA-FFD400-D90368-e9baaa-ffa07a-164555-ffe1d0-acd9e7-4596c7-6d8370-e45240-21d3a4-3303f9-cd2220-173df6-244ca8-a00360-b31016\".split(\"-\").map((a) => \"#\" + a);\n // let colors_cyber = \"ee0cf2-352ef2-1df252-f2e41d\".split(\"-\").map((a) => \"#\" + a);\n let color1, color2;\n let colorselet = [];\n\n let unit_x, unit_y;\n let count;\n let mods = [];\n let stop_count = 0;\n\n function setup() {\n \t// pixelDensity(5);\n \trandomSeed(seed);\n \tmySize = max(windowWidth, windowHeight);\n \tmargin = mySize / 100;\n \tcreateCanvas(920, 690);\n \tcolorselet[0] = \"#347355\";\n \tcolorselet[1] = random(colors1);\n \tunit_x = width;\n \tunit_y = unit_x / 16 * 11;\n\n \tnoStroke();\n\t let plusNum = random([2,4,3]);\n \tlet wideCount = width / unit_x;\n \tlet highCount = height / unit_y + plusNum;\n \tcount = wideCount * highCount;\n\n \tlet index = 0;\n \tfor (let y = 0; y < highCount; y++) {\n \t\tfor (let x = 0; x < wideCount; x++) {\n \t\t\tmods[index++] = new Module(\n \t\t\t\tx * unit_x - unit_x / 100,\n \t\t\t\ty * unit_y / (plusNum+1),\n \t\t\t\t0,\n \t\t\t\t0,\n \t\t\t\trandom(0.5, 1.0),\n \t\t\t\t1 * unit_x\n \t\t\t);\n \t\t}\n \t}\n \tlet filter1 = new makeFilter();\n \tbackground(colorsbg);\n }\n\n function draw() {\n \trandomSeed(seed);\n \tblendMode(ADD);\n \tblendMode(SCREEN);\n\n \tfor (let i = 0; i < count; i++) {\n \t\tmods[i].update();\n \t\tmods[i].draw();\n \t\tif (stop_count == 1) {\n \t\t\tblendMode(BLEND);\n \t\t\timage(overAllTexture, 0, 0);\n \t\t\tnoFill();\n \t\t\tstroke(\"#202020\");\n \t\t\tstrokeWeight(margin);\n \t\t\trectMode(CORNER);\n \t\t\t//rect(0, 0, width, height);\n \t\t\tnoLoop();\n \t\t}\n \t}\n }\n\n class Module {\n \tconstructor(xOff, yOff, x, y, speed, unit) {\n \t\tthis.xOff = xOff;\n \t\tthis.yOff = yOff;\n \t\tthis.x = x;\n \t\tthis.y = y;\n \t\tthis.speed = speed * 2;\n \t\tthis.unit = unit;\n \t\tthis.xDir = 1;\n \t\tthis.yDir = 1 / 16 * 11;\n \t}\n\n \t// Custom method for updating the variables\n \tupdate() {\n \t\tthis.x = this.x + this.speed * this.xDir;\n \t\tthis.y = this.y + this.speed * this.yDir / 10;\n \t\tif (this.x >= this.unit * 2 || this.x <= 0) {\n \t\t\tthis.xDir *= -1;\n \t\t\tstop_count++;\n \t\t\tthis.x = this.x + 1 * this.xDir;\n \t\t\tthis.y = this.y + 1 * this.yDir;\n \t\t}\n \t\tif (this.y >= this.unit || this.y <= 0) {\n \t\t\tthis.yDir *= -1 / 16 * 11;\n \t\t\tthis.y = this.y + 1 * this.yDir;\n \t\t}\n \t}\n\n \t// Custom method for drawing the object\n \tdraw() {\n \t\tstroke(str(colorselet[1]) + \"1a\");\n \t\tstrokeWeight(0.01);\n \t\tfill(str(random(colorselet)) + \"80\");\n\n \t\t//shadow & highlight\n \t\tdrawingContext.shadowColor = \"#ffffff33\";\n \t\tdrawingContext.shadowOffsetX = -1;\n \t\tdrawingContext.shadowOffsetY = -1;\n \t\tdrawingContext.shadowBlur = 0;\n \t\tdrawingContext.shadowColor = \"#2f2f2f1a\";\n \t\tdrawingContext.shadowOffsetX = 1;\n \t\tdrawingContext.shadowOffsetY = 1;\n \t\tdrawingContext.shadowBlur = 0;\n \t\t//shape\n \t\tlet y_size = this.unit * noise(random(2), random(5), frameCount * 0.01);\n \t\tlet rio = random(0.4, 0.2);\n \t\tlet y_plus = y_size * rio;\n \t\tpush();\n \t\ttranslate(this.xOff + this.x, this.yOff + this.y);\n \t\t//gradient\n \t\tgrad = drawingContext.createLinearGradient(0, y_plus-y_size / 16 * 11 / 2, 0, y_plus+y_size / 16 * 11 / 2);\n \t\tgrad.addColorStop(0, str(colorsbg) + \"00\");\n \t\tgrad.addColorStop(0.5 + random(-0.4, 0.4), colorselet[0]);\n \t\tgrad.addColorStop(1, str(colorselet[1]) + \"00\");\n \t\tdrawingContext.fillStyle = grad;\n \t\trectMode(CENTER);\n \t\trect(-y_size / 32 * 2, y_plus, (y_size / 16 * 3 - y_plus) * 0.05, y_size / 16 * 11);\n \t\t// rect(0, 0,y_size/16*1, y_size/16*11);\n \t\tpop();\n \t}\n }\n\n function makeFilter() {\n \trandomSeed(seed);\n \t// noiseのフィルターをつくる\n \tcolorMode(HSB, 360, 100, 100, 100);\n \tdrawingContext.shadowColor = color(0, 0, 5, 5);\n \toverAllTexture = createGraphics(windowWidth, windowHeight);\n \toverAllTexture.loadPixels();\n \tfor (var i = 0; i < width; i++) {\n \t\tfor (var j = 0; j < height; j++) {\n \t\t\toverAllTexture.set(\n \t\t\t\ti,\n \t\t\t\tj,\n \t\t\t\tcolor(0, 10, 70, noise(i / 3, j / 3, (i * j) / 50) * random(2, 10))\n \t\t\t);\n \t\t}\n \t}\n \toverAllTexture.updatePixels();\n }\n\n function keyTyped() {\n \tif (key === \"s\" || key === \"S\") {\n \t\t// image(overAllTexture, 0, 0);\n \t\t// noFill();\n \t\t// stroke(\"#202020\");\n \t\t// strokeWeight(margin);\n \t\t// // rectMode(CORNER);\n \t\t// rect(0, 0, width, height);\n \t\t// noLoop();\n \t\tsaveCanvas(\"0604_NoisePlanet_AURORA_2022\", \"png\");\n \t}\n }\n\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n// prevents mouse press from registering twice\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() +\n    \".jpg\");\n    lapse = millis();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2114267",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:29:52",
+    "expressive_profile": {
+        "module_id": "NoisePlanetAurora.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                135.0,
+                255.0
+            ],
+            "mean_lightness": 0.006,
+            "mean_chroma": 0.009,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.31,
+            "curl_vorticity": 0.013,
+            "divergence": 0.005,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-26 11:08:43"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Depth Regulation.mp4",
+        "Void Vortex Gladiator.mp4"
+    ],
+    "used_count": 2
+}

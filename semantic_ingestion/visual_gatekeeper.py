@@ -67,9 +67,12 @@ class VisualGatekeeper:
 
         # 3. 檢驗時序動態性 (前後幀差異)
         if len(frames_bgr) >= 2:
+            import cv2
             first_gray = np.mean(frames_bgr[0], axis=2).astype(np.float32)
             for idx in range(1, len(frames_bgr)):
                 curr_gray = np.mean(frames_bgr[idx], axis=2).astype(np.float32)
+                if curr_gray.shape != first_gray.shape:
+                    curr_gray = cv2.resize(curr_gray, (first_gray.shape[1], first_gray.shape[0]))
                 diff = float(np.mean(np.abs(curr_gray - first_gray)))
                 metrics["frame_diffs"].append(diff)
             

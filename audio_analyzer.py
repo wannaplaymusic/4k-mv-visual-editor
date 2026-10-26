@@ -14,6 +14,9 @@ from scipy.ndimage import median_filter
 import librosa
 import yt_dlp
 
+from audio_stem_separator import AudioStemSeparator
+from oklch_palette_generator import OKLCHPaletteGenerator
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - [%(levelname)s] - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -216,31 +219,87 @@ class HarmonicChordAnalyzer:
             tmpl[f"{root}aug"] = aug / np.linalg.norm(aug)
         return tmpl
 
+    def _build_transition_log_matrix(self, keys: List[str], self_prob: float = 0.86) -> np.ndarray:
+        """構建基於五度圈距離與同根音轉位的 HMM 狀態轉移對數機率矩陣"""
+        n_states = len(keys)
+        trans = np.full((n_states, n_states), (1.0 - self_prob) / max(1, n_states - 1), dtype=np.float64)
+        np.fill_diagonal(trans, self_prob)
+
+        # 解析各模板的根音 pitch class，給予五度圈相鄰根音更高轉移先驗
+        def _parse_root_pc(k: str) -> int:
+            for idx, r in enumerate(PITCH_CLASSES):
+                if k.startswith(r) and (len(k) == len(r) or k[len(r)] not in ('#',)):
+                    return idx
+            return 0
+
+        pcs = [_parse_root_pc(k) for k in keys]
+        for i in range(n_states):
+            for j in range(n_states):
+                if i == j:
+                    continue
+                # 五度圈距離 (0 ~ 6)
+                c5_dist = min((pcs[i] * 7 - pcs[j] * 7) % 12, (pcs[j] * 7 - pcs[i] * 7) % 12)
+                if c5_dist == 0:
+                    trans[i, j] *= 2.5  # 同根音調式互換
+                elif c5_dist == 1:
+                    trans[i, j] *= 1.8  # 屬/下屬相鄰五度
+        trans /= np.sum(trans, axis=1, keepdims=True)
+        return np.log(np.maximum(trans, 1e-12))
+
     def analyze(self, y_harmonic: np.ndarray, sr: int, hop_length: int) -> Tuple[List[str], List[str]]:
-        """利用 Harmonic 音訊計算 CQT Chroma 並進行滑動中值濾波"""
+        """利用低頻根音加權 CQT Chroma 與 Viterbi 動態規劃解碼和弦序列"""
         try:
-            # 優先使用 CQT Chroma (對數音高解析度)
-            chroma = librosa.feature.chroma_cqt(y=y_harmonic, sr=sr, hop_length=hop_length, n_chroma=12)
+            chroma_full = librosa.feature.chroma_cqt(y=y_harmonic, sr=sr, hop_length=hop_length, n_chroma=12)
+            # 提取低音區 (C1 ~ C4) Chroma 強化根音權重，避免轉位和弦頻繁跳動
+            chroma_bass = librosa.feature.chroma_cqt(
+                y=y_harmonic, sr=sr, hop_length=hop_length, n_chroma=12, fmin=32.703, n_octaves=3
+            )
+            if chroma_bass.shape == chroma_full.shape:
+                chroma = 0.65 * chroma_full + 0.35 * chroma_bass
+            else:
+                chroma = chroma_full
         except Exception as e:
             logger.debug(f"CQT Chroma 計算回退至 STFT Chroma: {e}")
             chroma = librosa.feature.chroma_stft(y=y_harmonic, sr=sr, hop_length=hop_length, n_chroma=12)
 
-        # 時間軸滑動中值濾波，消除瞬時雜音
         if chroma.shape[1] >= 5:
             chroma = median_filter(chroma, size=(1, 5))
-        
+
         keys = list(self.templates.keys())
-        matrix = np.array([self.templates[k] for k in keys])  # (N_templates, 12)
-        
-        # 餘弦相似度矩陣點積
+        matrix = np.array([self.templates[k] for k in keys], dtype=np.float64)  # (N_templates, 12)
+
         norms = np.linalg.norm(chroma, axis=0, keepdims=True) + 1e-8
         chroma_normed = chroma / norms
         sims = np.dot(matrix, chroma_normed)  # (N_templates, frames)
-        
-        best_indices = np.argmax(sims, axis=0)
+
+        # Viterbi HMM 時序正則化解碼 (抑制單幀抖動，確保和聲進行平滑性)
+        n_states, n_frames = sims.shape
+        if n_frames > 1:
+            log_trans = self._build_transition_log_matrix(keys, self_prob=0.86)
+            # 將餘弦相似度透過溫度係數映射為對數觀測似然
+            temp = 6.0
+            log_emit = sims * temp
+            log_emit -= np.max(log_emit, axis=0, keepdims=True)
+
+            dp = np.zeros((n_states, n_frames), dtype=np.float64)
+            backtrack = np.zeros((n_states, n_frames), dtype=np.int32)
+            dp[:, 0] = log_emit[:, 0]
+
+            for t_idx in range(1, n_frames):
+                scores = dp[:, t_idx - 1][:, None] + log_trans  # (prev_state, next_state)
+                best_prev = np.argmax(scores, axis=0)
+                backtrack[:, t_idx] = best_prev
+                dp[:, t_idx] = scores[best_prev, np.arange(n_states)] + log_emit[:, t_idx]
+
+            best_indices = np.zeros(n_frames, dtype=np.int32)
+            best_indices[-1] = int(np.argmax(dp[:, -1]))
+            for t_idx in range(n_frames - 2, -1, -1):
+                best_indices[t_idx] = backtrack[best_indices[t_idx + 1], t_idx + 1]
+        else:
+            best_indices = np.argmax(sims, axis=0)
+
         chord_names = [keys[idx] for idx in best_indices]
-        
-        # 解析根音與質量
+
         qualities = []
         for name in chord_names:
             if 'm' in name and 'dim' not in name:
@@ -254,8 +313,9 @@ class HarmonicChordAnalyzer:
             else:
                 q = 'major'
             qualities.append(q)
-            
+
         return chord_names, qualities
+
 
 
 # =====================================================================
@@ -381,8 +441,8 @@ class AudioBeatDetector:
         filename = os.path.basename(audio_path)
         mtime = os.path.getmtime(audio_path)
         clean_genre_tag = genre.strip().lower() if genre else 'auto'
-        cache_key = hashlib.sha256(f"{audio_path}_{mtime}_v6_priorfix_{clean_genre_tag}".encode('utf-8')).hexdigest()
-        cache_path = os.path.join(self.cache_dir, f"audio_v6_{cache_key}.npz")
+        cache_key = hashlib.sha256(f"{audio_path}_{mtime}_v10_sota_ssm_viterbi_stereo_{clean_genre_tag}".encode('utf-8')).hexdigest()
+        cache_path = os.path.join(self.cache_dir, f"audio_v10_{cache_key}.npz")
 
         # 1. 檢查快取
         if os.path.exists(cache_path):
@@ -395,22 +455,63 @@ class AudioBeatDetector:
 
         logger.info(f"🚀 開始高保真前沿音訊分析: {filename} (風格模式: {genre})")
 
-        # 2. 載入音訊 (22050Hz 為音樂資訊檢索標準，兼顧計算效率與瞬態精度)
+        # 2. 載入音訊 (保留雙聲道以計算真實 Mid/Side 聲場寬度，並提取單聲道進行頻譜分析)
         sr = 22050
         hop_length = 1024
         n_fft = 2048
 
-        y, _ = librosa.load(audio_path, sr=sr, mono=True)
-        y = np.nan_to_num(y, nan=0.0, posinf=1.0, neginf=-1.0)
+        y_raw, _ = librosa.load(audio_path, sr=sr, mono=False)
+        y_raw = np.nan_to_num(y_raw, nan=0.0, posinf=1.0, neginf=-1.0)
+        if y_raw.ndim == 2 and y_raw.shape[0] >= 2:
+            y_left = y_raw[0]
+            y_right = y_raw[1]
+            y = 0.5 * (y_left + y_right)
+            is_true_stereo = True
+        else:
+            y = y_raw if y_raw.ndim == 1 else y_raw[0]
+            y_left = y
+            y_right = y
+            is_true_stereo = False
         duration = float(librosa.get_duration(y=y, sr=sr))
 
         # 3. 確定性動態調色盤 (Oklab + 五度圈)
         palette = AdvancedProceduralPalette(filename)
 
         # 4. 節奏與拍點提取 (標準 Librosa 節奏圖追蹤)
-        tempo_raw, beats = librosa.beat.beat_track(y=y, sr=sr, hop_length=hop_length)
+        # hop=1024@22050Hz 的時間解析度約 46ms，BPM 會被量化成固定格點(如 129.199 / 143.555)，
+        # 因此節奏追蹤改用 hop=512，並依風格給予先驗速度範圍，修正半速/倍速誤判。
+        beat_hop = 512
+        _g = (genre or '').lower().replace('_', ' ')
+        if 'hard' in _g and 'techno' in _g:
+            start_bpm, bpm_lo, bpm_hi = 150.0, 125.0, 200.0
+        elif 'techno' in _g:
+            start_bpm, bpm_lo, bpm_hi = 132.0, 115.0, 160.0
+        else:
+            start_bpm, bpm_lo, bpm_hi = 120.0, 0.0, 1e9
+
+        onset_env = librosa.onset.onset_strength(y=y, sr=sr, hop_length=beat_hop)
+        tempo_raw, beats = librosa.beat.beat_track(
+            onset_envelope=onset_env, sr=sr, hop_length=beat_hop, start_bpm=start_bpm
+        )
         bpm = float(np.atleast_1d(tempo_raw)[0])
-        beat_times = [float(t) for t in librosa.frames_to_time(beats, sr=sr, hop_length=hop_length)]
+        # 倍速/半速折疊至風格合理範圍
+        if bpm > 0 and bpm_hi < 1e8:
+            while bpm < bpm_lo and bpm * 2.0 <= bpm_hi:
+                bpm *= 2.0
+            while bpm >= bpm_hi and bpm / 2.0 >= bpm_lo:
+                bpm /= 2.0
+        beat_times = [float(t) for t in librosa.frames_to_time(beats, sr=sr, hop_length=beat_hop)]
+        # librosa 的 tempo 估計本身落在離散頻格，改用整首拍點的線性回歸斜率取連續 BPM
+        if len(beat_times) >= 16 and bpm > 0:
+            try:
+                _idx = np.arange(len(beat_times), dtype=np.float64)
+                _slope = np.polyfit(_idx, np.asarray(beat_times, dtype=np.float64), 1)[0]
+                if _slope > 0:
+                    _refined = 60.0 / _slope
+                    if abs(_refined - bpm) / bpm < 0.03:
+                        bpm = float(_refined)
+            except Exception:
+                pass
 
         # 5. 頻譜與動態頻帶劃分 (精確 Hz 物理掩碼，解耦採樣率)
         S_complex = librosa.stft(y, n_fft=n_fft, hop_length=hop_length)
@@ -448,6 +549,35 @@ class AudioBeatDetector:
         
         percussive_smooth = np.convolve(p_rms / (np.max(p_rms) + 1e-8), box, mode='same')
         harmonic_smooth = np.convolve(h_rms / (np.max(h_rms) + 1e-8), box, mode='same')
+
+        # 6.5 神經與高保真物理 4-Stem 音軌分離 (Drums, Bass, Vocals, Other)
+        stem_separator = AudioStemSeparator()
+        try:
+            stems_dict = stem_separator.separate(y, sr=sr, hop_length=hop_length)
+            target_n_frames = S_mag.shape[1]
+            def _align_stem_env(env_arr):
+                if len(env_arr) == target_n_frames:
+                    return env_arr
+                elif len(env_arr) > 1:
+                    return np.interp(np.linspace(0, len(env_arr) - 1, target_n_frames), np.arange(len(env_arr)), env_arr)
+                else:
+                    return np.zeros(target_n_frames, dtype=np.float32)
+
+            env_drums = _align_stem_env(stems_dict['drums']['envelope'])
+            env_stem_bass = _align_stem_env(stems_dict['bass']['envelope'])
+            env_vocals = _align_stem_env(stems_dict['vocals']['envelope'])
+            env_other = _align_stem_env(stems_dict['other']['envelope'])
+            drums_track = [float(v) for v in np.convolve(env_drums, box, mode='same')]
+            stem_bass_track = [float(v) for v in np.convolve(env_stem_bass, box, mode='same')]
+            vocals_track = [float(v) for v in np.convolve(env_vocals, box, mode='same')]
+            other_track = [float(v) for v in np.convolve(env_other, box, mode='same')]
+            logger.info("✨ [4-Stem Separation] 成功完成神經/物理音軌解耦 (Drums, Bass, Vocals, Other)")
+        except Exception as stem_err:
+            logger.warning(f"4-Stem 分離異常回退: {stem_err}")
+            drums_track = [float(v) for v in percussive_smooth]
+            stem_bass_track = [float(v) for v in bass_norm]
+            vocals_track = [float(v) for v in mid_norm]
+            other_track = [float(v) for v in high_norm]
 
         # 7. CQT 和弦辨識
         raw_chords, chord_qualities = self.chord_engine.analyze(y_harm, sr, hop_length)
@@ -494,7 +624,12 @@ class AudioBeatDetector:
         except Exception:
             onset_rate = 3.0
 
-        # Tempogram 分析 (檢測 Double-time / Half-time，徹底杜絕 DnB/Lo-Fi Octave Error)
+        # 檢測檔案路徑與目錄之 Hard Techno / Techno 先驗
+        path_str = str(audio_path).lower()
+        is_hard_techno_prior = bool(re.search(r'(?:^|[\\/ \-_])hard techno(?:$|[\\/ \-_])', path_str))
+        is_techno_prior = bool(re.search(r'(?:^|[\\/ \-_])techno(?:$|[\\/ \-_])', path_str))
+
+        # Tempogram 分析 (檢測 Double-time / Half-time，徹底杜絕 DnB/Lo-Fi/Hard-Techno Octave Error)
         should_half_bpm, should_double_bpm = False, False
         try:
             tempogram = librosa.feature.tempogram(y=y, sr=sr, hop_length=hop_length)
@@ -504,17 +639,26 @@ class AudioBeatDetector:
             if len(valid_idx) > 0:
                 max_tg = np.max(mean_tg[valid_idx]) + 1e-8
                 half_target = bpm / 2.0
-                if half_target >= 55:
+                if half_target >= 55 and not (is_hard_techno_prior or is_techno_prior):
                     half_idx = np.argmin(np.abs(tempo_freqs - half_target))
                     if (mean_tg[half_idx] > 0.45 * max_tg or float(np.mean(percussive_smooth)) < 0.32) and bpm >= 135:
                         should_half_bpm = True
                 double_target = bpm * 2.0
                 if double_target <= 195:
                     double_idx = np.argmin(np.abs(tempo_freqs - double_target))
-                    if 45.0 <= bpm <= 95 and (mean_tg[double_idx] > 0.25 * max_tg or onset_rate >= 3.6 or float(np.mean(percussive_smooth)) > 0.38):
-                        should_double_bpm = True
+                    if 45.0 <= bpm <= 95:
+                        if is_hard_techno_prior or (is_techno_prior and double_target >= 125):
+                            should_double_bpm = True
+                        elif mean_tg[double_idx] > 0.25 * max_tg or onset_rate >= 3.6 or float(np.mean(percussive_smooth)) > 0.38:
+                            should_double_bpm = True
         except Exception as tg_err:
             logger.debug(f"Tempogram 評估略過: {tg_err}")
+
+        # 若路徑明確為 Hard Techno，強制禁止減半，且若速度低於 110 強制倍頻回 140~165
+        if is_hard_techno_prior:
+            should_half_bpm = False
+            if 60.0 <= bpm <= 95.0:
+                should_double_bpm = True
 
         # 自適應校準 BPM (消除八度誤差)
         if should_double_bpm:
@@ -540,16 +684,49 @@ class AudioBeatDetector:
         }
 
         # 11. 時間軸與完整 filter_dynamics 構建 (完全相容 main.py 渲染管線)
-        times = [float(t) for t in librosa.frames_to_time(np.arange(S_mag.shape[1]), sr=sr, hop_length=hop_length)]
+        n_frames = S_mag.shape[1]
+        times = [float(t) for t in librosa.frames_to_time(np.arange(n_frames), sr=sr, hop_length=hop_length)]
 
-        # 構建衍生指標
-        silence_fade = [1.0 if e > 0.05 else float(np.clip(e / 0.05, 0.0, 1.0)) for e in total_energy_norm]
+        # 構建衍生指標 (silence_fade: 0.0 代表正常播放無衰減，1.0 代表靜音淡出)
+        silence_fade = [0.0 if e > 0.05 else float(np.clip(1.0 - (e / 0.05), 0.0, 1.0)) for e in total_energy_norm]
         roughness = [float(np.clip(spectral_flatness_arr[min(i, len(spectral_flatness_arr)-1)] * 2.0, 0.0, 1.0)) for i in range(len(times))]
         ethereal_index = [float(np.clip((1.0 - p) * 0.6 + h * 0.4, 0.0, 1.0)) for p, h in zip(percussive_smooth, harmonic_smooth)]
         centroid_norm = [float(np.clip(c / 5000.0, 0.0, 1.0)) for c in spectral_centroid_arr[:len(times)]]
         if len(centroid_norm) < len(times):
             centroid_norm += [0.2] * (len(times) - len(centroid_norm))
-        stereo_width = [0.5] * len(times)
+
+        # 真實 Mid/Side 立體聲聲場寬度計算 (單聲道音訊則以高頻與頻譜平坦度進行心理聲學相位去相關估計)
+        if is_true_stereo:
+            y_mid = 0.5 * (y_left + y_right)
+            y_side = 0.5 * (y_left - y_right)
+            rms_mid = librosa.feature.rms(y=y_mid, frame_length=n_fft, hop_length=hop_length)[0]
+            rms_side = librosa.feature.rms(y=y_side, frame_length=n_fft, hop_length=hop_length)[0]
+            rms_mid = np.pad(rms_mid, (0, max(0, n_frames - len(rms_mid))), 'edge')[:n_frames]
+            rms_side = np.pad(rms_side, (0, max(0, n_frames - len(rms_side))), 'edge')[:n_frames]
+            raw_width = (rms_side / (rms_mid + rms_side + 1e-8)) * 1.65
+            smooth_width = np.convolve(np.clip(raw_width, 0.08, 1.0), box, mode='same')
+            stereo_width = [float(np.clip(w, 0.08, 1.0)) for w in smooth_width]
+        else:
+            stereo_width = [
+                float(np.clip(0.32 + 0.42 * high_norm[i] + 0.26 * roughness[i], 0.15, 0.95))
+                for i in range(len(times))
+            ]
+
+        # 高頻閉合/開放鈸 (Hi-Hat / Cymbal, 5000Hz ~ Nyquist) 瞬態密度與觸發器、合成器主旋律活躍度、低通/高通濾波包絡
+        hihat_mask = self._get_freq_mask(n_fft, sr, 5000.0, sr / 2.0)
+        hihat_raw = np.sum(S_mag[hihat_mask, :], axis=0) if np.any(hihat_mask) else high_energy
+        hihat_norm_arr = np.convolve(hihat_raw / (np.max(hihat_raw) + 1e-8), box, mode='same')
+        hihat_density = [float(np.clip(0.65 * hihat_norm_arr[i] + 0.35 * percussive_smooth[i], 0.0, 1.0)) for i in range(len(times))]
+        hihat_trigger = [
+            bool(hihat_density[i] > 0.40 and (i == 0 or hihat_density[i] > hihat_density[i - 1] + 0.04))
+            for i in range(len(times))
+        ]
+        synth_melody_active = [
+            bool(mid_norm[i] > 0.32 and harmonic_smooth[i] > 0.35)
+            for i in range(len(times))
+        ]
+        lowpass_env = [float(np.clip((1.0 - centroid_norm[i]) * 0.75 + (1.0 - high_norm[i]) * 0.25, 0.0, 1.0)) for i in range(len(times))]
+        highpass_env = [float(np.clip(high_norm[i] - bass_norm[i] * 0.65, 0.0, 1.0)) for i in range(len(times))]
 
         # 12. 風格與情緒遙測 (尊重導演手動指定與自動偵測)
         from audio_fingerprint_engine import normalize_genre_key, get_genre_profile
@@ -575,6 +752,28 @@ class AudioBeatDetector:
 
         ballistic_cfg = genre_telemetry.get('ballistic', {'attack_ms': 10.0, 'release_ms': 180.0})
 
+        # 12.5 OKLCH 知覺均勻調色盤生成 (五度圈諧波 + 曲風感知)
+        track_seed = int(hashlib.sha256(filename.encode('utf-8')).hexdigest()[:8], 16)
+        dna_coord = np.array([
+            float(np.mean(total_energy_norm)),
+            float(np.mean(percussive_smooth)),
+            float(np.mean(harmonic_smooth))
+        ], dtype=np.float32)
+        try:
+            oklch_gen = OKLCHPaletteGenerator(track_seed=track_seed, dna_coord=dna_coord, genre=resolved_genre_key)
+            oklch_palette = oklch_gen.generate_palette()
+        except Exception as oklch_err:
+            logger.warning(f"OKLCHPaletteGenerator 生成異常，使用預設值: {oklch_err}")
+            oklch_palette = {
+                'primary': (56, 189, 248),
+                'secondary': (168, 85, 247),
+                'accent': (244, 63, 94),
+                'highlight': (250, 204, 21),
+                'primary_hex': '#38bdf8',
+                'accent_hex': '#f43f5e',
+                'base_hue': 210.0
+            }
+
         filter_dynamics = {
             'times': times,
             'sub_bass_ratio': [float(v) for v in sub_norm],
@@ -585,6 +784,11 @@ class AudioBeatDetector:
             'bass': [float(v) for v in bass_norm],
             'mid': [float(v) for v in mid_norm],
             'high': [float(v) for v in high_norm],
+            # 4-Stem 獨立軌道包絡 (直通幾何與粒子系統)
+            'drums': drums_track,
+            'vocals': vocals_track,
+            'stem_bass': stem_bass_track,
+            'other': other_track,
             'bass_energy': [float(v) for v in bass_norm],
             'mid_energy': [float(v) for v in mid_norm],
             'high_energy': [float(v) for v in high_norm],
@@ -596,11 +800,20 @@ class AudioBeatDetector:
             'ethereal_index': ethereal_index,
             'centroid_norm': centroid_norm,
             'stereo_width': stereo_width,
+            'hihat_density': hihat_density,
+            'hihat_trigger': hihat_trigger,
+            'synth_melody_active': synth_melody_active,
+            'lowpass': lowpass_env,
+            'highpass': highpass_env,
             'chord_name': chord_names,
             'chord_hue': chord_hues,
             'chord_saturation': chord_saturations,
             'chord_brightness': chord_brightness,
             'chord_color_hex': chord_colors_hex,
+            # OKLCH 知覺均勻色彩與五度圈調色盤
+            'oklch_palette': oklch_palette,
+            'oklch_primary_hex': oklch_palette.get('primary_hex', '#38bdf8'),
+            'oklch_accent_hex': oklch_palette.get('accent_hex', '#f43f5e'),
             'palette_style': palette.style,
             'palette_base_hue': palette.base_hue,
             'acoustic_meta': acoustic_meta,
@@ -629,6 +842,7 @@ class AudioBeatDetector:
             'spectrum': S_downsampled.tolist(),
             'storyboard': storyboard,
             'palette_style': palette.style,
+            'oklch_palette': oklch_palette,
             'genre': genre_telemetry.get('primary_genre', resolved_genre_key.capitalize()),
             'genre_key': resolved_genre_key,
             'genre_telemetry': genre_telemetry,
@@ -636,10 +850,6 @@ class AudioBeatDetector:
             'arousal': genre_telemetry.get('arousal', 0.5),
             'ballistic': ballistic_cfg
         }
-
-        # 寫入快取
-        np.savez_compressed(cache_path, result=result)
-        return result
 
         # 寫入快取
         np.savez_compressed(cache_path, result=result)
@@ -656,10 +866,12 @@ class AudioBeatDetector:
         genre_telemetry: Optional[dict] = None
     ) -> List[dict]:
         """
-        利用自我相似矩陣 (Self-Similarity Matrix, SSM) 搭配 Foote 棋盤核尋找結構轉折點，
-        並進行拍點格線吸附 (Beat Grid Snapping) 與標準分鏡命名。
+        利用多特徵融合自我相似矩陣 (Multi-Feature Fused SSM: MFCC + Chroma + Energy Dynamics)
+        搭配標準 4 象限高斯錐化 Foote (2000) 棋盤核 (Gaussian-Tapered Checkerboard Kernel)
+        尋找結構轉折點，並進行拍點格線吸附 (Beat Grid Snapping) 與標準分鏡命名。
         """
-        if duration <= 6.0 or S_mag.shape[1] < 10:
+        n_frames_total = S_mag.shape[1] if (S_mag is not None and S_mag.ndim == 2) else len(times)
+        if duration <= 6.0 or n_frames_total < 10:
             return [{
                 'start': 0.0,
                 'end': round(duration, 3),
@@ -670,22 +882,65 @@ class AudioBeatDetector:
                 'style_hint': 'Standard Verse'
             }]
 
-        # 1. 降採樣計算 SSM (Cosine Distance)
-        hop = max(1, S_mag.shape[1] // 200)
-        power_spec = librosa.power_to_db(S_mag[:, ::hop] + 1e-8)
-        mfcc = librosa.feature.mfcc(S=power_spec, n_mfcc=13)
-        mfcc_norm = librosa.util.normalize(mfcc, axis=1)
-        ssm = np.dot(mfcc_norm.T, mfcc_norm)
+        # 1. 構建多模態融合特徵矩陣 (支援真實頻譜 S_mag 或純 dynamics 回退)
+        hop = max(1, n_frames_total // 200)
+        has_valid_spec = S_mag is not None and S_mag.ndim == 2 and float(np.max(S_mag)) > 1e-6
 
-        # 2. 計算 Foote Novelty 轉折曲線
-        kernel_size = 10
-        novelty = np.zeros(ssm.shape[0])
-        for i in range(kernel_size, ssm.shape[0] - kernel_size):
-            novelty[i] = np.sum(ssm[i-kernel_size:i, i:i+kernel_size]) - np.sum(ssm[i-kernel_size:i, i-kernel_size:i])
+        dyn_keys = ['sub_bass_ratio', 'bass_ratio', 'mid_ratio', 'high_ratio', 'percussive', 'harmonic', 'total_energy', 'roughness']
+        dyn_rows = []
+        for dk in dyn_keys:
+            arr = np.asarray(dynamics.get(dk, []), dtype=np.float64)
+            if len(arr) >= n_frames_total:
+                dyn_rows.append(arr[:n_frames_total:hop])
+            elif len(arr) > 0:
+                interp_arr = np.interp(np.linspace(0, len(arr) - 1, n_frames_total), np.arange(len(arr)), arr)
+                dyn_rows.append(interp_arr[::hop])
 
-        # 3. 尋找轉折峰值
-        peaks, _ = signal.find_peaks(-novelty, distance=12)
-        step_time = duration / max(ssm.shape[0], 1)
+        if has_valid_spec:
+            S_sub = S_mag[:, ::hop]
+            power_spec = librosa.power_to_db(S_sub + 1e-8)
+            mfcc = librosa.feature.mfcc(S=power_spec, n_mfcc=13)
+            mfcc_norm = librosa.util.normalize(mfcc, axis=0)
+            chroma_feat = librosa.feature.chroma_stft(S=S_sub, n_chroma=12)
+            chroma_norm = librosa.util.normalize(chroma_feat, axis=0)
+            if dyn_rows and len(dyn_rows[0]) == S_sub.shape[1]:
+                dyn_mat = librosa.util.normalize(np.vstack(dyn_rows), axis=0)
+                fused_feat = np.vstack([0.50 * mfcc_norm, 0.25 * chroma_norm, 0.25 * dyn_mat])
+            else:
+                fused_feat = np.vstack([0.65 * mfcc_norm, 0.35 * chroma_norm])
+        else:
+            if not dyn_rows:
+                dyn_mat = np.ones((4, max(12, n_frames_total // hop)), dtype=np.float64)
+            else:
+                dyn_mat = np.vstack(dyn_rows)
+            fused_feat = librosa.util.normalize(dyn_mat + 1e-6, axis=0)
+
+        fused_feat = librosa.util.normalize(fused_feat + 1e-8, axis=0)
+        ssm = np.dot(fused_feat.T, fused_feat)  # (N, N) 餘弦相似度矩陣
+
+        # 2. 構建標準 4 象限高斯錐化 Foote (2000) Checkerboard Kernel
+        n_ssm = ssm.shape[0]
+        kernel_half = max(3, min(12, n_ssm // 8))
+        u = np.linspace(-1.0, 1.0, 2 * kernel_half)
+        uu, vv = np.meshgrid(u, u)
+        # 對角塊 (uu * vv > 0) 為 +1，跨區塊 (uu * vv < 0) 為 -1；當處於段落交界時對角高相似、跨區低相似 -> Novelty 正向峰值
+        checker_sign = np.sign(uu) * np.sign(vv)
+        gauss_window = np.exp(-(uu ** 2 + vv ** 2) / (2.0 * (0.52 ** 2)))
+        foote_kernel = checker_sign * gauss_window
+        foote_kernel /= (np.sum(np.abs(foote_kernel)) + 1e-8)
+
+        novelty = np.zeros(n_ssm, dtype=np.float64)
+        for i in range(kernel_half, n_ssm - kernel_half):
+            patch = ssm[i - kernel_half:i + kernel_half, i - kernel_half:i + kernel_half]
+            novelty[i] = max(0.0, float(np.sum(patch * foote_kernel)))
+
+        if np.max(novelty) > 1e-8:
+            novelty /= np.max(novelty)
+
+        # 3. 尋找 Foote Novelty 正向轉折峰值
+        min_peak_dist = max(4, int(10 * (n_ssm / 150.0)))
+        peaks, _ = signal.find_peaks(novelty, distance=min_peak_dist, prominence=0.06)
+        step_time = duration / max(n_ssm, 1)
         boundary_times = [0.0] + [float(p * step_time) for p in peaks] + [duration]
         boundary_times = sorted(list(set(boundary_times)))
 
@@ -731,11 +986,30 @@ class AudioBeatDetector:
         display_genre = genre_telemetry.get('primary_genre', 'Electronic') if genre_telemetry else 'Electronic'
         base_valence = genre_telemetry.get('valence', 0.0) if genre_telemetry else 0.0
 
+        # 先計算各段落的 (mean_e, mean_p)，再以段落分佈百分位決定相對門檻
+        # 確保高壓縮 Hard Techno 既能準確識別峰值 Drop/Chorus (前 25~30% 高能段落)，又不會把普通 Verse 全誤判為 Drop
+        section_metrics = []
         for i in range(len(merged_boundaries) - 1):
             st, et = merged_boundaries[i], merged_boundaries[i+1]
             mask = (t_arr >= st) & (t_arr < et)
-            mean_e = float(np.mean(tot_energy[mask])) if np.any(mask) else 0.5
-            mean_p = float(np.mean(perc_energy[mask])) if np.any(mask) else 0.5
+            m_e = float(np.mean(tot_energy[mask])) if np.any(mask) else 0.5
+            m_p = float(np.mean(perc_energy[mask])) if np.any(mask) else 0.5
+            section_metrics.append((m_e, m_p))
+
+        sec_es = [m[0] for m in section_metrics] if section_metrics else [0.5]
+        sec_ps = [m[1] for m in section_metrics] if section_metrics else [0.3]
+        e_p72 = float(np.percentile(sec_es, 72))
+        e_p45 = float(np.percentile(sec_es, 45))
+        e_p22 = float(np.percentile(sec_es, 22))
+        p_p62 = float(np.percentile(sec_ps, 62))
+        drop_e_thr = min(0.56, max(0.40, e_p72))
+        drop_p_thr = min(0.35, max(0.18, p_p62))
+        build_e_thr = min(0.45, max(0.32, e_p45))
+        bridge_e_thr = max(0.22, min(0.34, e_p22))
+
+        for i in range(len(merged_boundaries) - 1):
+            st, et = merged_boundaries[i], merged_boundaries[i+1]
+            mean_e, mean_p = section_metrics[i]
 
             prog_ratio = st / max(duration, 1e-5)
 
@@ -772,28 +1046,33 @@ class AudioBeatDetector:
                     sec_arousal = 0.30
                     sec_intensity = 0.35
             else:
-                # 節奏音樂標準文法，結合流派專屬 Lexicon
-                if prog_ratio < 0.12 and mean_e < 0.40:
+                # 節奏音樂標準文法，結合流派專屬 Lexicon 與單曲相對動態門檻
+                if prog_ratio < 0.12 and mean_e < max(0.42, e_p45):
                     label = 'Intro'
                     hint = f"{lexicon.get('intro', 'Atmospheric Intro')} ({display_genre})"
                     sec_arousal = min(0.40, mean_e * 0.6)
                     sec_intensity = 0.25
-                elif prog_ratio > 0.88 and mean_e < 0.40:
+                elif prog_ratio > 0.88 and mean_e < max(0.42, e_p45):
                     label = 'Outro'
                     hint = f"{lexicon.get('outro', 'Decay / Fadeout Outro')} ({display_genre})"
                     sec_arousal = max(0.15, mean_e * 0.4)
                     sec_intensity = 0.20
-                elif mean_e > 0.58 and mean_p > 0.38:
+                elif (mean_e >= drop_e_thr and mean_p >= drop_p_thr) or (mean_e > 0.58 and mean_p > 0.38):
                     label = 'Drop'
                     hint = f"{lexicon.get('peak', 'Peak-Time Drop')} ({display_genre})"
                     sec_arousal = np.clip(mean_e * 0.85 + mean_p * 0.25, 0.75, 1.0)
                     sec_intensity = 1.0
-                elif mean_e > 0.42:
+                elif mean_e >= drop_e_thr and mean_p < drop_p_thr:
+                    label = 'Chorus'
+                    hint = f"{lexicon.get('peak', 'High-Energy Chorus')} ({display_genre})"
+                    sec_arousal = np.clip(mean_e * 0.82 + 0.15, 0.70, 0.95)
+                    sec_intensity = 0.90
+                elif mean_e >= build_e_thr:
                     label = 'Build-up'
                     hint = f"{lexicon.get('build', 'Rising Energy Build-up')} ({display_genre})"
                     sec_arousal = np.clip(mean_e * 0.8 + 0.2, 0.55, 0.85)
                     sec_intensity = 0.75
-                elif mean_e < 0.28:
+                elif mean_e < bridge_e_thr:
                     label = 'Bridge'
                     hint = f"{lexicon.get('break', 'Melodic Breakdown / Bridge')} ({display_genre})"
                     sec_arousal = np.clip(mean_e * 0.5, 0.25, 0.55)
@@ -813,6 +1092,27 @@ class AudioBeatDetector:
                 'valence': round(float(base_valence), 3),
                 'style_hint': hint
             })
+
+        # 保底機制：針對非 Ambient 的電子/節奏曲目，若全曲超過 3 個段落卻因持續高壓壓縮而未檢出任何 Drop，
+        # 自動將中段能量與瞬態衝擊最高的 1~2 個峰值段落晉升為 Drop，確保高潮視覺調度與頻閃正常解鎖
+        if genre_k != 'ambient' and len(sections) >= 4 and not any(s['section'] == 'Drop' for s in sections):
+            candidate_indices = [
+                idx for idx in range(1, len(sections) - 1)
+                if sections[idx]['section'] in ('Build-up', 'Chorus', 'Verse')
+            ] or list(range(len(sections)))
+            ranked = sorted(
+                candidate_indices,
+                key=lambda idx: section_metrics[idx][0] * 0.65 + section_metrics[idx][1] * 0.35,
+                reverse=True
+            )
+            num_drops = 2 if len(sections) >= 8 else 1
+            for d_idx in ranked[:num_drops]:
+                m_e, m_p = section_metrics[d_idx]
+                sections[d_idx]['section'] = 'Drop'
+                sections[d_idx]['intensity'] = 1.0
+                sections[d_idx]['arousal'] = round(float(np.clip(m_e * 0.85 + m_p * 0.25, 0.80, 1.0)), 3)
+                sections[d_idx]['style_hint'] = f"{lexicon.get('peak', 'Peak-Time Drop')} ({display_genre})"
+
 
         return sections if sections else [{'start': 0.0, 'end': duration, 'section': 'Verse', 'intensity': 0.5, 'arousal': 0.5, 'valence': 0.0, 'style_hint': 'Normal Verse'}]
 

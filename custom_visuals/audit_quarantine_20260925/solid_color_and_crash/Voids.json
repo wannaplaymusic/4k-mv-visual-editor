@@ -1,0 +1,22 @@
+{
+    "name": "Voids",
+    "code": "// === Tab: sketch189572 ===\nlet n = 200,\n  w = 1112, \n  h = 834, \n  w2 = w/2, \n  h2 = h/2;\nlet k1 = 500, \n  k2 = 0.1,\n  ks = 25,\n  a, b, d, r, f, diam, dx, dy;\nfloat[][] \n  initial_pos,\n  pos;\n\nfunction setup() \n{\n    createCanvas(w, h);\n\t  colorMode(HSB, 255);\n    background(-1);\n    cursor(CROSS);\n    stroke(0,50);\n    fill(-1);\n    a = b = r = f = diam = 0;\n    initial_pos = new Array(n)[2];\n    pos = new Array(n)[2];\n    for(i = 0; i < n; i++)\n    {\n        initial_pos[i][0] = pos[i][0] = random(width);\n        initial_pos[i][1] = pos[i][1] = random(height);\n     }  \n}\n\nfunction draw() \n{       \n    update();   \n    //copy(g, 0, 0, w, h, (w2-(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))))>>6, (h2-(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))))>>6, w, h);\n}\n\n\nfunction update()\n{\n    for (i = 0; i < n; i++)\n    {\n        a = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - pos[i][0];\n        b = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - pos[i][1];\n        d = a*a + b*b;\n        r = k1 / d;\n        dx = initial_pos[i][0] - pos[i][0];\n        dy = initial_pos[i][1] - pos[i][1];\n        pos[i][0] += dx*k2 - a*r;\n        pos[i][1] += dy*k2 - b*r;\n        f = atan2(b, a);\n        diam = ks * f;\n        pushMatrix();\n          translate(pos[i][0], pos[i][1]);\n          rotate(f);\n\t\t\t    fill(i/n*255, 200,255);\n          triangle(diam * .66, 0, -diam* .33, -diam * .5, -diam * .33, diam * .5);\n        popMatrix(); \n    } \n}\n\nfunction keyPressed(){\n    save('pix.jpg');\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/972555",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:34:11"
+}

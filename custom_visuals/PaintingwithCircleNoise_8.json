@@ -1,0 +1,31 @@
+{
+    "name": "PaintingwithCircleNoise",
+    "code": "// === Tab: mySketch ===\nvar particles;\nvar img = []\nvar n, s, maxR;\nvar indexImg = 0;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(\"#FFEDDA\");\n\tsmooth();\n\t\n\tn = 1000;\n\ts = 20;\n\tmaxR = height/2 - height/10;\n\t\n\tparticles = [];\n\t\n\timg.push(loadImage('https://openprocessing.org/sketch/1969150/files/1.jpg'));\n\timg.push(loadImage('https://openprocessing.org/sketch/1969150/files/2.jpg'));\n\timg.push(loadImage('https://openprocessing.org/sketch/1969150/files/3.jpg'));\n}\n\nfunction draw() {\n\ttranslate(width/2, height/2);\n\tnoStroke();\n\t\n\tif(s > 1) {\n\t\tif(particles.length != 0) {\n\t\t\tfor(let i = 0; i < particles.length; i++) {\n\t\t\t\tvar p = particles[i];\n\t\t\t\tp.show();\n\t\t\t\tp.move();\n\t\t\t\t\n\t\t\t\tif(p.isDead()) particles.splice(i, 1);\n\t\t\t}\n\t\t} else {\n\t\t\ts -= 2;\n\t\t\tinitParticles();\n\t\t}\n\t}\n}\n\nfunction initParticles() {\t\n\tfor(let i = 0; i < n; i++) {\n\t\tparticles.push(new Particle(maxR, s));\n\t\t\n\t\tvar p = particles[i];\n\t\tvar x = int(map(p.pos.x, -maxR, maxR, 0, img[indexImg].width));\n    var y = int(map(p.pos.y, -maxR, maxR, 0, img[indexImg].height));\n\t\tp.c = img[indexImg].get(x, y);\n\t}\n}\n\nfunction mousePressed() {\n\tindexImg = (indexImg + 1) % img.length;\n\tsetup();\n}\n\nclass Particle {\n  \n  constructor(maxR_, s_) {\n    this.s = s_;\n    this.c = \"\";\n    this.maxR = maxR_;\n    \n    this.life = 100;\n    \n    this.init();\n  }\n  \n  init() {\n    this.pos = p5.Vector.random2D();\n    this.pos.normalize();\n    this.pos.mult(random(2, maxR));\n\n    this.vel = createVector();\n  }\n\n  show() {\n    fill(this.c);\n    ellipse(this.pos.x, this.pos.y, this.s, this.s);\n    this.life -= 1;\n  }\n  \n  move() {\n    var angle = noise(this.pos.x / 400, this.pos.y / 400) * TAU;\n    \n    this.vel.set(cos(angle), sin(angle));\n    this.vel.mult(0.3);\n    this.pos.add(this.vel);\n  }\n  \n\n  isDead() {\n    var d = dist(this.pos.x, this.pos.y, 0, 0);\n \n    if(d > this.maxR || this.life < 1) return true;\n    else return false;\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "kiddoo",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1969150",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:31:31",
+    "used_in_videos": [
+        "Driving Essence Swells.mp4"
+    ],
+    "used_count": 1
+}

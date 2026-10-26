@@ -1,0 +1,29 @@
+{
+    "name": "Defocusedlights",
+    "code": "// === Tab: Lights ===\nlet colors = [\"#233D4D\", \"#FE7F2D\", \"#FCCA46\", \"#A1C181\", \"#619B8A\"];\nlet particles = [];\nlet amount = 40;\n\nfunction setup() {\n  createCanvas(300, 300);\n  noStroke();\n  frameRate(20);\n  let p = new Particle(random(width), random(height), random(colors));\n  particles.push(p);\n\t\n\tflex({ container: { padding: \"20px\" } })\n}\n\nfunction draw() {\n  background(\"#282846\");\n  for (let i = 0; i < particles.length; i++) {\n    if (particles[i].lv < 0) {particles.splice(i, 1);}\n    particles[i].update();\n    particles[i].show();\n  }\n  if (particles.length < amount) {\n    var p = new Particle(random(width), random(height), random(colors));\n    particles.push(p);\n  }\n}\n\n// === Tab: particles ===\nclass Particle {\n  constructor(x, y, clr) {\n    this.posx = x;\n    this.posy = y;\n    this.size = random(10, 60);\n    this.base = color(\"#000000\");\n    this.clr = color(clr);\n    this.lv = 0;\n    this.inc = 0.01;\n    this.maxlv = random(0.4, 1);\n  }\n  update() {\n    this.gradient = lerpColor(this.base, this.clr, this.lv);\n    this.lv += this.inc;\n    if (this.lv >= this.maxlv) {this.inc = -0.02;}\n  }\n  show() {\n    push();\n    blendMode(SCREEN);\n    fill(this.gradient);\n    drawingContext.shadowColor = color(this.gradient);\n    drawingContext.shadowBlur = 30;\n    circle(this.posx, this.posy, this.size);\n    pop();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Zaron Chen",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1569120",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:54:43",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,27 @@
+{
+    "name": "Slices",
+    "code": "// === Tab: sketch ===\n// By Roni Kaufman\n// https://ronikaufman.github.io/\n\nconst N_FRAMES = 150;\nlet theShader;\nlet back;\nlet front;\n\nfunction preload() {\n  theShader = createShader(vert, frag);\n}\n\nfunction setup() {\n  createCanvas(500, 500);\n  imageMode(CENTER)\n  \n  back = createGraphics(width, height, WEBGL);\n  back.shader(theShader);\n  theShader.setUniform('u_resolution', [1, 1]);\n  back.rect(0, 0, width, height);\n  \n  front = createGraphics(width, height);\n  front.rectMode(CENTER);\n}\n\nfunction draw() {\n  image(back, width/2, height/2);\n  \n  front.background(0);\n  front.erase();\n  front.strokeWeight(3);\n  front.noFill();\n  \n  translate(width/2, height/2);\n  if (frameCount%(2*N_FRAMES) > N_FRAMES) {\n    rotate(PI/2);\n  }\n  \n  let d = width/2;\n  let n = 8;\n  for (let i = 0; i < n; i++) {\n    let myFrame = (frameCount-3*i)%N_FRAMES;\n    let percent = myFrame/N_FRAMES;\n    let x, y = (i+1/2)*(d/n) - d/2;\n    if (myFrame < N_FRAMES/2) {\n      percent = easeInOutQuint(percent*2)/2;\n      x = percent*(width+d) - (d+width)/2;\n    } else {\n      percent = 1-easeInOutQuint(percent*2)/2;\n      x = width/2 - percent*(width+d) + d/2;\n    }\n    //front.rect(x+width/2-1, y+height/2, d, d/n);\n    for (let j = -n/2; j < n/2; j++) {\n      front.rect(x+width/2+(j+1/2)*d/n-2, y+height/2, d/n, d/n)\n    }\n  }\n  \n  image(front, 0, 0);\n}\n\n// from https://easings.net/\nfunction easeInOutQuint(x) {\n  return x < 0.5 ? 16 * x * x * x * x * x : 1 - pow(-2 * x + 2, 5) / 2;\n}\n\nconst frag = `\n\t#ifdef GL_ES\n\tprecision mediump float;\n\t#endif\n\n\tvarying vec2 vTexCoord;\n\n\tuniform vec2 u_resolution;\n\tuniform float u_time;\n\n\tvoid main() {\n\t  vec2 st = vTexCoord.xy/u_resolution.xy;\n\t  st.x *= u_resolution.x/u_resolution.y;\n      \n      vec3 col1 = vec3(1., 1., 0.);\n      vec3 col2 = vec3(1., 0., 0.);\n      float mixValue = distance(st.x+st.y, 1.);\n      vec3 color = mix(col1,col2,mixValue);\n\t  gl_FragColor = vec4(color,1.0);\n\t}\n`;\n\nconst vert = `\n\tattribute vec3 aPosition;\n\tattribute vec2 aTexCoord;\n\n\tvarying vec2 vTexCoord;\n\n\tvoid main() {\n\t\tvTexCoord = aTexCoord;\n\n\t\tvec4 positionVec4 = vec4(aPosition, 1.0);\n\t\tpositionVec4.xy = positionVec4.xy * 2.0 - 1.0;\n\n\t\tgl_Position = positionVec4;\n\t}\n`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "ronikaufman",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1183062",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:15:51",
+    "used_in_videos": [
+        "Depth Perception Unit.mp4",
+        "Void Shield Breaker.mp4"
+    ],
+    "used_count": 2
+}

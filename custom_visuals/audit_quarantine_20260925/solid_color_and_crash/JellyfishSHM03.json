@@ -1,0 +1,24 @@
+{
+    "name": "JellyfishSHM03",
+    "code": "// === Tab: mySketch ===\n//-- Simple(?) let Motion Experiments\n//-- Siddhartha, 29th Sept, 2019, let int N = 200;\nlet ntri = 8;\nlet rad = 300.0;\nlet dt = 0.0;\ncolor [] cols = {\"#a31621\", \"#faa916\", \"#e09f3e\", \"#fb4b4e\"};\n\ngeometry g1;\n\nfunction setup() {\n  // createCanvas(1000, 1000);\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  background(0);\n  g1 = new geometry();  \n \n}\n\nfunction draw() {\n  noStroke();\n  fill(0,80);\n  rect(0,0,width,height);\n  \n  g1.move();\n  g1.show();\n  //g1.connect();\n  \n  dt += 0.1;\n  \n  edges();\n\n}\n\nfunction edges() {\n  stroke(cols[1]);  \n  line(width/2 + rad -50, height/2 - rad - 35, width/2 + rad + 50 + 35, height/2 - rad - 35);\n  line(width/2 + rad -50, height/2 + rad + 35, width/2 + rad + 50 + 35, height/2 + rad + 35);  \n  line(width/2 - rad -50 -35, height/2 - rad - 35, width/2 - rad + 50, height/2 - rad - 35);\n  line(width/2 - rad -50 -35, height/2 + rad + 35, width/2 - rad + 50, height/2 + rad + 35);\n  \n  line(width/2 + rad + 50, height/2 - rad -50-20, width/2 + rad + 50, height/2 -rad + 50 + 20);\n  line(width/2 - rad - 50, height/2 - rad -50-20, width/2 - rad - 50, height/2 -rad + 50 + 20);\n  \n  line(width/2 + rad + 50, height/2 + rad -50-20, width/2 + rad + 50, height/2 +rad + 50 + 20);\n  line(width/2 - rad - 50, height/2 + rad -50-20, width/2 - rad - 50, height/2 +rad + 50 + 20);\n\n}\n\n// === Tab: tab2 ===\nclass geometry{\n  //-- let float [] xc;\n  float [] yc;\n  float [] phase;\n  float [] rad2;\n  color [] shade;\n  float [] size;\n  \n  constructor() {\n    //-- let xc = new Array(N);\n    yc = new Array(N);\n    phase = new Array(N);\n    rad2 = new Array(N);\n    shade = new Array(N);\n    size = new Array(N);\n    \n    for(i=0; i<N; ++i){\n      xc[i] = width/2 + rad*cos( TWO_PI*i/N );\n      yc[i] = height/2 + rad*sin( TWO_PI*i/N );\n      phase[i] = random(TWO_PI);\n      size[i] = random(1,40);\n      rad2[i] = random(8.0, 20.0);\n      shade[i] = cols[int(random(cols.length))];\n    }\n  }//-- let the Initializations\n  \n  //-- let function show() {\n  for(i=0; i<N; ++i){\n      stroke(shade[i]);\n      let d = pow((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - xc[i],2.0) + pow((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - yc[i],2.0);\n      if (d>2500){\n        ellipse(xc[i], yc[i], size[i]*sin(dt*rad2[i]/20.0 + phase[i]), size[i]*sin(dt*rad2[i]/20.0 + phase[i]));\n        ellipse(xc[i], yc[i], 3, 3);\n      } else {\n        ellipse(xc[i], yc[i], size[i]*sin(dt*rad2[i]/5.0 + phase[i]), size[i]*sin(dt + phase[i]));\n      }\n    }\n  }\n  \n  function connect() {\n    strokeWeight(1);  \n    for(i=0; i<N; ++i) {\n      for(j=i; j<N; ++j) {\n        stroke(shade[i]);\n        line(xc[i], yc[i], xc[j], yc[j]);\n      }\n    }\n  \n  for(i=0; i<ntri; ++i) {\n    noStroke();\n    fill(cols[int(random(cols.length))],100);\n    triangle(xc[i],yc[i],xc[(i+1)%N], yc[(i+1)%N], xc[(i+2)%N], yc[(i+2)%N]);\n    }\n  }\n\n  function move() {\n    for(i=0; i<N; ++i){\n      \n      xc[i] = width/2 + rad*cos( TWO_PI*i/N + phase[i] + dt*0.02 ) + rad2[i]*cos( phase[i] + dt );\n      yc[i] = height/2 + rad*sin( TWO_PI*i/N + dt*0.02 ) + 0.1*rad2[i]*sin( phase[i] + dt ); \n    }\n  }\n  \n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Siddhartha Mukherjee",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/761004",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:57:58",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

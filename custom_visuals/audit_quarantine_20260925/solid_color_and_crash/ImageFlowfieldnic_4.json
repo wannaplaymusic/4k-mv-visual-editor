@@ -1,0 +1,22 @@
+{
+    "name": "ImageFlowfieldnic",
+    "code": "// === Tab: mySketch ===\nArrayList<Particle> particles;\n\nlet xoff, yoff, zoff, inc, col;\n\nlet spread, cols, rows, num;\nlet offset = 2;\n//ىه\nlet img;\nlet vectors;\n\n\nfunction setup() {\n  createCanvas(520, 737);\n  background(0);\n  frameRate(100);\n  img = loadImage(\"https://openprocessing.org/sketch/1624729/files/dr2.jpg\");\n  init();\n}\n\n\nfunction init() {\n \n  spread  = 10;\n  inc  = random(0.1,0.8);\n  num  = 4000;\n  col  = random(255);\n  cols = floor(width / spread) + 1;\n  rows = floor(height / spread) + 1;\n  vectors   = new Array(cols * rows);\n  particles = new ArrayList<Particle>();\n\n  for (i=0; i<num; i++)\n    particles.add(new Particle());\n}\n\nfunction draw() {\n  fill(0,20);\n  rect(0,0,width,height);\n  filter(DILATE,2);\n  \n  yoff = 0;\n  for (y = 0; y < rows; y++) {\n    xoff = 0;\n    for (x = 0; x < cols; x++) {\n      let angle = noise(xoff, yoff, zoff) * TWO_PI * 2;\n      let v = PVector.fromAngle(angle);\n      v.setMag(1);\n      vectors[x + y * cols] = v;\n      xoff += inc;\n    }\n    yoff += inc;\n  }\n  zoff += 0.0005;\n  if (col < 255)col += 0.5;\n  else col = 0;\n  for (let p of particles)p.run();\n}\nfunction mousePressed()\n{\n  background(255);\n  init();\n}\n\n// === Tab: tab2 ===\nclass Particle {\n  pos, vel, acc, prev;\n  let max = random(1, 10);\n\n\n  constructor() {\n    pos  = new PVector(width/2, height/2);\n    prev = new PVector(pos.x, pos.y);\n    vel  = new PVector(0, 0);\n    acc  = new PVector(0, 0);\n  }\n\n\n  function copy() {\n    prev.x = pos.x;\n    prev.y = pos.y;\n  }\n\n\n  function run() {\n    follow();\n    update();\n    show();\n  }\n\n\n  function update() {\n    pos.add(vel);\n    vel.limit(max);\n    vel.add(acc);\n    acc.mult(0);\n    if (pos.x > width) {\n      pos.x = 0; \n      copy();\n    }  \n    if (pos.x < 0) {\n      pos.x = width; \n      copy();\n    } \n    if (pos.y > height) {\n      pos.y = 0; \n      copy();\n    }  \n    if (pos.y < 0) {\n      pos.y = height; \n      copy();\n    }\n  }\n  function follow() {\n    let x = floor(pos.x / spread);\n    let y = floor(pos.y / spread);\n    let force = vectors[x + y * cols];\n    acc.add(force);\n  }\n  function show() {\n   let c = img.get(int(pos.x),int(pos.y));\n   stroke(c);\n   line(pos.x, pos.y, prev.x, prev.y);\n\t\t\n       copy();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "natan",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1624729",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:49:33"
+}

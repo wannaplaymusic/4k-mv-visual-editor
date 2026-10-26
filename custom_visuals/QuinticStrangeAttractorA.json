@@ -1,0 +1,31 @@
+{
+    "name": "QuinticStrangeAttractorA",
+    "code": "// === Tab: mySketch ===\n// noprotect\n\nvar code = \"GEQGOYIKQQPEUJBKPXTVUSJHOVJDUAYYPRNTXFLGAM\";\nvar xmin = -0.8;\nvar xmax = 0.6;\nvar ymin = 0.1;\nvar ymax = 0.5;\nvar a, x0, y0;\nvar shufcol;\nvar hu;\nvar ab = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y']\n\nfunction c2c(c) {\n\tvar coeffs = [];\n\t//var ab = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y']\n\n\tfor (i = 0; i < c.length; i++) {\n\t\tfor (j = 0; j < ab.length; j++) {\n\t\t\tif (c[i] === ab[j]) {\n\t\t\t\tcoeffs.push(round(j - 12)/10);\n\t\t\t}\n\t\t}\n\t}\n\t\n\treturn coeffs;\n}\n\nfunction quintic(iters) {\n\tvar x = x0;\n\tvar y = y0;\n\t\n\tvar xn, yn;\n\t\n\tfor (i = 0; i < iters; i++) {\n\t\t// 1, x, x^2, x^3, x^4, x^5, x^4*y, x^3*y, x^3*y^2, x^2*y, x^2*y^2, x^2*y^3, x*y, x*y^2, x*y^3, x*y^4, y, y^2, y^3, y^4, y^5\n\t\t\n\t\txn = a[0] + a[1]*x + a[2]*x*x + a[3]*x*x*x + a[4]*x*x*x*x + a[5]*x*x*x*x*x + a[6]*x*x*x*x*y + a[7]*x*x*x*y + a[8]*x*x*x*y*y +\n\t\t\ta[9]*x*x*y + a[10]*x*x*y*y + a[11]*x*x*y*y*y + a[12]*x*y + a[13]*x*y*y + a[14]*x*y*y*y + a[15]*x*y*y*y*y + a[16]*y + a[17]*y*y +\n\t\t\ta[18]*y*y*y + a[19]*y*y*y*y + a[20]*y*y*y*y*y;\n\t\tyn = a[21] + a[22]*x + a[23]*x*x + a[24]*x*x*x + a[25]*x*x*x*x + a[26]*x*x*x*x*x + a[27]*x*x*x*x*y + a[28]*x*x*x*y + a[29]*x*x*x*y*y +\n\t\t\ta[30]*x*x*y + a[31]*x*x*y*y + a[32]*x*x*y*y*y + a[33]*x*y + a[34]*x*y*y + a[35]*x*y*y*y + a[36]*x*y*y*y*y + a[37]*y + a[38]*y*y +\n\t\t\ta[39]*y*y*y + a[40]*y*y*y*y + a[41]*y*y*y*y*y;\n\t\t\n\t\tx = xn;\n\t\ty = yn;\n\t}\n\t\n\tpoint(map(x, xmin, xmax, 0, width), map(y, ymin, ymax, height, 0));\n}\n\nfunction setup() {\n\tcreateCanvas(920, 690);\n\tbackground(255);\n\tcolorMode(HSB);\n\thu = random(360);\n\t//noLoop();\n}\n\nfunction draw() {\n\ta = c2c(code);\n\tfor (j = 0; j < 1000; j++) {\n\t\tstroke((hu+j/1000*360)%360, 100, 100, 1);\n\t\tx0 = random(xmin, xmax);\n\t\ty0 = random(ymin, ymax);\n\t\t\n\t\tquintic(10);\n\t}\n}\n\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n// prevents mouse press from registering twice\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() +      \".jpg\");\n    lapse = millis();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Tom",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2299932",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:11:15",
+    "used_in_videos": [
+        "Echoes in Suspension.mp4"
+    ],
+    "used_count": 1
+}

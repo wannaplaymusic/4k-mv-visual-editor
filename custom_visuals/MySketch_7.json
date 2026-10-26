@@ -1,0 +1,62 @@
+{
+    "name": "MySketch",
+    "code": "// === Tab: mySketch ===\nlet canvasSize = 1000;\nlet COLORS = [\"#fff12d1f\",\"#e41cfa27\",\"#00ccff3f\"];\nlet objs = [];\n\nlet objCount = 200;\nlet weight = 0;\nlet rLimMAxRatio = 0.6;\nlet rLimMinRatio = 0.3;\n\nlet alphaSpeed = 2;\nlet sound, fft;\nlet spots = [];\n\n\nfunction setup() {\n  createCanvas(canvasSize, canvasSize);\n  angleMode(DEGREES);\n\n  //円状に敷き詰め\n  var trycount = 0;\n  while(objs.length < objCount){\n    \n    //var angle = random(360);\n    //var r = canvasSize*random(0.45);\n    //var x = r*cos(angle);\n    //var y = r*sin(angle);  \n    var x = random(-canvasSize*0.5,canvasSize*0.5);\n    var y = random(-canvasSize*0.5,canvasSize*0.5);\n\n    var rLim = canvasSize*0.4;//(canvasSize*0.45-r);\n    // check hit\n    var hitresult = false;\n    for(let i = 0; i < objs.length; i++){\n      let o = objs[i];\n      let distance = dist(x, y, o.x, o.y);\n\n      if(distance + rLimMinRatio*canvasSize < o.rlim ){\n        hitresult = true;\n        break;\n      }\n      else{\n        rLim = min(rLim,distance - o.rlim)\n      }\n    }\n\n    if(!hitresult){\n      rLim = min(canvasSize*rLimMAxRatio,rLim);\n      corner = int(random(10,50));\n      var clr = random(COLORS);\n      objs.push(new mPoly(x,y,rLim,corner,0,clr));\n      spots.push({x:x,y:y,lim:rLim,corner, clr});\n\n    }\n\n    trycount++;\n    if(trycount > 10000){break;}\n  }\n}\n\nfunction draw() {\n  translate(canvasSize*0.5,canvasSize*0.5)\n  blendMode(BLEND);\n  background(10);\n\n\n\n  objs.forEach(o =>{\n    o.draw();\n  })\n\n\n  objs = objs.filter(o => o.a > 0);\n\n\n}\n\n\n\nfunction mPoly(x, y, Rlim,corner,rt= 0,clr = \"#ffffff27\") {\n  this.x = x;\n  this.y = y;\n  this.rlim = Rlim;\n  this.r = Rlim;\n  //this.color = color(random(COLORS));\n  this.a = 255;\n  this.weight = 0;\n  this.corner = corner;\n  this.rt = rt;\n  this.clr = clr;\n\n  this.draw = function() {\n    push();\n    fill(this.clr)\n    stroke(255,this.a);\n    translate(this.x, this.y);\n    rotate(this.rt);\n    circle(0,0,10);\n\n    beginShape();\n    \n    for(let i = 0; i < this.corner; i++){\n      let px = (this.r ) * cos(i*360/this.corner);//-10*noise(this.x+i,this.r);\n      let py = (this.r ) * sin(i*360/this.corner);//-10*noise(this.y+i,this.r);\n\n      vertex(0,0);\n      vertex(px,py);     \n    }\n\n    endShape(CLOSE);\n    //stroke(0);\n    //circle(0,0,this.rlim*2);\n    pop();\n\n    this.rt += alphaSpeed*0.1;\n  };\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "MA",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2975181",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 16:55:37",
+    "expressive_profile": {
+        "module_id": "MySketch_7.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                345.0,
+                285.0
+            ],
+            "mean_lightness": 0.155,
+            "mean_chroma": 0.0,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 2.54,
+            "curl_vorticity": 0.07,
+            "divergence": -0.004,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 17:35:46"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Authentic Essence Momentum.mp4"
+    ],
+    "used_count": 1
+}

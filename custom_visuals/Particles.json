@@ -11,7 +11,12 @@
     "license": "CC BY-NC-SA",
     "tags": [
         "batch_import",
-        "audio_reactive"
+        "audio_reactive",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
     ],
     "url": "https://openprocessing.org/@u258859/2479419",
     "date_added": "2026-07-06 22:15:30",

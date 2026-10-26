@@ -1,0 +1,24 @@
+{
+    "name": "AfterPollock",
+    "code": "// === Tab: mySketch ===\nlet agents = [];\nlet numAgents = 30;\nlet a = 1; \nlet margin = 100;\n\nfunction setup() {\n  createCanvas(1000, 1000);\n  colorMode(RGB, 1.0, 1.0, 1.0, 255);\n  background(1.0, 1.0, 1.0);\n\n  for (let i = 0; i < 10; i++) {\n    let c = color(1.0, 1.0, 0.0);\n    let pos = createVector(random(2 * margin, width - 2 * margin), random(2 * margin, height - 2 * margin));\n    let mom = createVector(0.0, 0.0);\n    agents[i] = new Agent(pos, mom, random(2.0, 7.0), c);\n  }\n\n  for (let i = 10; i < 20; i++) {\n    var c = color(1.0, 1.0, 1.0);\n    var pos = createVector(random(2 * margin, width - 2 * margin), random(2 * margin, height - 2 * margin));\n    var mom = createVector(0.0, 0.0);\n    agents[i] = new Agent(pos, mom, random(2.0, 7.0), c);\n  }\n\n  for (let i = 20; i < numAgents; i++) {\n    var c = color(0.0, 0.0, 0.0);\n    var pos = createVector(random(2 * margin, width - 2 * margin), random(2 * margin, height - 2 * margin));\n    var mom = createVector(0.0, 0.0);\n    agents[i] = new Agent(pos, mom, random(2.0, 7.0), c);\n  }\n}\n\nfunction draw() {\n  //background(1.0, 1.0, 1.0);\n  fill(1.0, 1.0, 1.0, 1);\n\n  for (let i = 0; i < numAgents; i++) {\n    agents[i].display();\n    let dp = Guassian();\n    dp.mult(0.5);\n    agents[i].evolve(dp);\n  }\n}\n\nclass Agent {\n  constructor(position, momentum, r, ellipseColor) {\n    this.q = position;\n    this.p = momentum;\n    this.radius = r;\n    this.diameter = 2 * r;\n    this.c = ellipseColor;\n    this.r = red(this.c);\n    this.g = green(this.c);\n    this.b = blue(this.c);\n  }\n\n  evolve(dp) {\n    if (this.q.x > width - margin && dp.x > 0) {\n      dp.x = -dp.x;\n    }\n    if (this.q.x < margin && dp.x < 0) {\n      dp.x = -dp.x;\n    }\n    if (this.q.y > height - margin && dp.y > 0) {\n      dp.y = -dp.y;\n    }\n    if (this.q.y < margin && dp.y < 0) {\n      dp.y = -dp.y;\n    }\n\n    this.p.add(dp);\n    this.p.normalize();\n    this.p.mult(3.0);\n    this.q.add(this.p);\n\n    let temp = this.diameter + random(-1, 1);\n    \n    if (temp > 0.0 && temp < 4 * this.radius) {\n      this.diameter = temp;\n    }\n  }\n\n  display() {\n    fill(this.c);\n    noStroke();\n    ellipse(this.q.x, this.q.y, this.diameter, this.diameter);\n  }\n}\n\nfunction Guassian() {\n  let R = sqrt(-2 * log(random(1)));\n  let theta = 2 * PI * random(1);\n\n  //Box–Muller method \n  return createVector(R * cos(theta), R * sin(theta));  \n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "David Crooks",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2291706",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:10:15",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

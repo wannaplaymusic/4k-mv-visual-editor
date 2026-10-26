@@ -1,0 +1,27 @@
+{
+    "name": "Zhukovski_cross",
+    "code": "// === Tab: mySketch ===\nlet myShader;\nlet gr;\nlet properFrameCount = 0;\n\nlet vs =\n\"precision mediump float;\" +\n\"attribute vec3 aPosition;\" +\n\"void main(){\" +\n\"  gl_Position = vec4(aPosition, 1.0);\" +\n\"}\";\n\nlet fs =\n\"precision mediump float;\" +\n\"uniform vec2 uResolution;\" +\n\"uniform float uCount;\" +\n\"const float TAU = 6.28318;\" +\n\"const vec2 e0 = vec2(1.0, 0.0);\" +\n\"const vec2 e1 = vec2(0.0, 1.0);\" +\n// hsb to rgb.\n\"vec3 getRGB(float h, float s, float b){\" +\n\"    vec3 c = vec3(h, s, b);\" +\n\"    vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);\" +\n\"    rgb = rgb * rgb * (3.0 - 2.0 * rgb);\" +\n\"    return c.z * mix(vec3(1.0), rgb, c.y);\" +\n\"}\" +\n\"vec2 zhu(vec2 p){\" +\n\"  float m = p.x * p.x + p.y * p.y;\" +\n\"  return vec2(p.x + 0.25 * p.x / m, p.y - 0.25 * p.y / m);\" +\n\"}\" +\n\"void main(){\" +\n\"  vec2 p = (gl_FragCoord.xy - uResolution.xy) / min(uResolution.x, uResolution.y);\" +\n\"  vec2 q = zhu(p);\" +\n//\"  q = p;\" +\n\"  float s = uCount / 480.0;\" +\n\"  q *= mat2(cos(s), sin(s), -sin(s), cos(s));\" +\n\"  q = 2.0 * (fract(q * 10.0) - 0.5);\" +\n\"  vec3 col = getRGB(.75, abs(q.x*q.x-q.y*q.y)*4.0, pow(length(p), 0.75));\" +\n\"  gl_FragColor = vec4(col, 1.0);\" +\n\"}\";\n\nfunction setup() {\n  createCanvas(1112, 834);\n  gr = createGraphics(width, height, WEBGL);\n  myShader = gr.createShader(vs, fs);\n  gr.shader(myShader);\n}\n\nfunction draw() {\n  clear();\n  myShader.setUniform(\"uResolution\", [width, height]);\n  myShader.setUniform(\"uCount\", properFrameCount);\n  gr.quad(-1, -1, -1, 1, 1, 1, 1, -1);\n  image(gr, 0, 0);\n  properFrameCount++;\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1190482",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:14:10",
+    "used_in_videos": [
+        "Depth Perception Unit.mp4",
+        "Pulsar War Machine.mp4"
+    ],
+    "used_count": 2
+}

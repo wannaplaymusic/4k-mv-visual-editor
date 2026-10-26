@@ -1,0 +1,28 @@
+{
+    "name": "FireandIce",
+    "code": "// === Tab: sketch.js ===\n\n// 魔 © 2024-01-13 by Zaron Chen is licensed under CC BY-NC-SA 3.0. To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/3.0/\n\nimport { mountFlex } from \"https://cdn.jsdelivr.net/npm/p5.flex@0.1.1/src/p5.flex.min.mjs\"\n/* [Inlined Multi-Tab] shader.js */\n\nmountFlex(p5) \n\nnew p5((p) => {\n\tconst [WIDTH, HEIGHT] = [p.windowWidth, p.windowWidth*.75]\n\tconst PIXEL_DENSITY = 1\n\tconst CANVAS_SIZE = [WIDTH, HEIGHT]\n\tconst TEXEL_SIZE = [1 / (WIDTH * PIXEL_DENSITY), 1 / (HEIGHT * PIXEL_DENSITY)]\n\tlet gfx, theShader\n\n\tp.setup = () => {\n\t\tp.createCanvas(WIDTH, HEIGHT)\n\t\tp.flex()\n\n\t\tp.pixelDensity(PIXEL_DENSITY)\n\n\t\tgfx = p.createGraphics(WIDTH, HEIGHT, p.WEBGL)\n\t\ttheShader = p.createShader(vert, frag)\n\n\t\tp.noStroke()\n\t\tgfx.noStroke()\n\t\t\n\t\tp.describe(`\"魔\" by Zaron Chen`)\n\t}\n\n\tp.draw = () => {\n\t\tp.background(255)\n\t\tgfx.background(0)\n\n\t\tgfx.shader(theShader)\n\t\ttheShader.setUniform(\"tex0\", p._renderer)\n\t\ttheShader.setUniform(\"canvasSize\", CANVAS_SIZE)\n\t\ttheShader.setUniform(\"texelSize\", TEXEL_SIZE)\n\t\ttheShader.setUniform(\"mouse\", [p.mouseX / WIDTH, p.mouseY / HEIGHT])\n\t\ttheShader.setUniform(\"time\", p.frameCount / 60)\n\t\tgfx.quad(-1, 1, 1, 1, 1, -1, -1, -1)\n\n\t\tp.image(gfx, 0, 0)\n\t\t\n\t\tif (p.mouseIsPressed){\n      p.save('f&i.jpg')\n    }\n\t}\n})\n\n\n\n\n\n// === Tab: shader.js ===\n\n// noprotect\n\n// https://github.com/ZRNOF/Shox\nimport * as Shox from \"https://cdn.jsdelivr.net/npm/shox@1.0.0/src/Shox.js\"\n\nconst frag = `#version 300 es\n  precision mediump float;\n\n  uniform sampler2D tex0;\n  uniform vec2 texelSize;\n  uniform vec2 canvasSize;\n  uniform vec2 mouse;\n  uniform float time;\n\n  ${Shox.iqPalette}\n\n  // ref: https://piterpasma.nl/articles/wobbly\n  float wobbly(vec2 uv, float t) {\n    float w0 = sin(.3*uv.x+2.*t+1.+2.3*sin(.4*uv.y-2.*t+.5));\n    float w1 = sin(.2*uv.y+3.*t+2.+2.2*sin(.5*uv.x-3.*t+.4));\n    return .5+.25*(w0+w1);\n  }\n\n  float fbm(vec2 uv, float t) {\n    float n = 0.;\n    n +=    1.*wobbly(  1.*uv+vec2(100., 200.), t*.25 );\n    n +=    .5*wobbly(  2.*uv+vec2(300., 400.), t*.25 );\n    n +=   .25*wobbly(  4.*uv+vec2(500., 600.), t*.25 );\n    n +=  .125*wobbly(  8.*uv+vec2(700., 800.), t*.25 );\n    n += .0625*wobbly( 16.*uv+vec2(900., 0.00), t*.25 );\n    return n/1.9375;\n  }\n\n  in vec2 vTexCoord;\n  out vec4 fragColor;\n  void main() {\n    vec2 uv = vTexCoord*2.-1.;\n    if (canvasSize.x>canvasSize.y) uv.x *= canvasSize.x/canvasSize.y;\n    else uv.y *= canvasSize.y/canvasSize.x;\n    uv *= 6.;\n\n    float n = fbm(uv, time);\n    vec2 a = vec2( fbm(uv+1.*n+vec2(1.2, 2.3), time), fbm(uv+1.*n+vec2(3.4, 4.5), time) );\n    vec2 b = vec2( fbm(uv+2.*a+vec2(5.6, 6.7), time), fbm(uv+2.*a+vec2(7.8, 8.9), time) );\n    float r = fbm(uv+50.*b, time);\n    r = n*fbm(uv+5.*r, time);\n\n    vec3 col = palette(r,\n      vec3(1.0, 1.0, 1.0),\n      vec3(1.5, 1.0, 1.5),\n      vec3(1.0, 1.0, 1.0),\n      vec3(0.2, 0.1, 0.0)\n    );\n\n    fragColor = vec4(col, 1.);\n  }\n`\n\nconst vert = `#version 300 es\n\n  in vec4 aPosition;\n  in vec2 aTexCoord;\n\n  out vec2 vTexCoord;\n\n  void main() {\n    vTexCoord = aTexCoord;\n    gl_Position = aPosition;\n  }\n`\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"UTF-8\" />\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n\t\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.js\"></script>\n\t\t<link rel=\"stylesheet\" href=\"./style.css\" />\n\t\t<title>魔</title>\n\t</head>\n\t<body>\n\t\t<script type=\"module\" src=\"./sketch.js\"></script>\n\t</body>\n</html>\n\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\nbody {\n\tbackground-color: black;\n\tuser-select: none;\n\ttouch-action: none;\n}\n\n",
+    "inline_assets": {},
+    "author": "u425308",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-05",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/2388091",
+    "batch_id": "batch_20261005_141539",
+    "batch_date": "2026-10-05",
+    "date_added": "2026-10-05 15:17:26",
+    "used_in_videos": [
+        "Dimensional Haze.mp4"
+    ],
+    "used_count": 1,
+    "is_starred": false
+}

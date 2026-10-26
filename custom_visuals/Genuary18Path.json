@@ -1,0 +1,26 @@
+{
+    "name": "Genuary18Path",
+    "code": "// === Tab: mySketch ===\nlet geom\nlet warpStroke\nlet warpFill\nlet font\n\nasync function setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL)\n\tfont = await loadFont('https://fonts.gstatic.com/s/prompt/v12/-W__XJnvUD7dzB26Z9AcZkIzeg.ttf')\n\ttextSize(150)\n\ttextAlign(CENTER, CENTER)\n\tgeom = font.textToModel('p5*js', 0, 0, {\n\t\tsampleFactor: 0.5\n\t})\n\n\twarpStroke = baseStrokeShader().modify(warp)\n\twarpFill = baseColorShader().modify(warp)\n\n\tbackground('#F52CA6')\n}\n\nfunction warp() {\n\tconst frame = uniformFloat(() => max(0, frameCount - 60))\n\tgetObjectInputs((inputs) => {\n\t\tconst s = 0.005\n\t\tinputs.position.xy += frame * 0.2 * [\n\t\t\tnoise(inputs.position.x * s, inputs.position.y * s, frame * 0.002),\n\t\t\tnoise(inputs.position.x * s, inputs.position.y * s, frame * 0.002 + 100)\n\t\t]\n\t\treturn inputs\n\t})\n}\n\nfunction draw() {\n\tconst x = -width/2 + 100 + max(0, frameCount - 60) * 2\n\tif (x < width/2 - 100) {\n\t\tpush()\n\t\ttranslate(x, 0)\n\t\tstrokeShader(warpStroke)\n\t\tshader(warpFill)\n\t\tfill(255)\n\t\tstroke(0, 150)\n\t\trotate(PI/2)\n\t\tmodel(geom)\n\t\tpop()\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "davepagurek",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/2850448",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 21:27:08",
+    "used_in_videos": [
+        "Carbon Phase.mp4"
+    ],
+    "used_count": 1
+}

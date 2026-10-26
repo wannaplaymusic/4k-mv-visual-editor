@@ -1,0 +1,22 @@
+{
+    "name": "HerecomesSunagain",
+    "code": "// === Tab: mySketch ===\nlet m = 360;\n\nint [][] x = new Array(m)[8];\nint [][] l = new Array(m)[8];\nint [][] sw = new int [m][8];\nint [][] c = new Array(m)[8];\nlet rgb = new Array(6);\n\nfunction setup(){\n  createCanvas(800, 800);\n  background(0);\n\tcolorMode(HSB,360,100,100);\n  strokeWeight(10);\n  \n  stroke(255,255,0);\n  \n   for(i = 0; i<m; i++){\n     for(k = 0; k < 8; k++){\n       x[i][k]=k*70+int(random(-10,10));\n       l[i][k]=int(random(5,40));\n       sw[i][k] = int(random(0.25,1.5));\n\t\t\t c[i][k] = int(random(6));\n     }\n   }\n\t\n\t rgb[0]=\"#E9FA0A\";\n   rgb[1]=\"#FFFFFF\";\n   rgb[2]=\"#F2D10F\";\n   rgb[3]=\"#F9FA14\";\n   rgb[4]=\"#FFC905\";\n   rgb[5]=\"#D1A60B\"; \n    \n}\n\n\n\nfunction draw(){\n    fill(0,6);\n\t  noStroke();\n    rect(0,0,width,height);\n    translate(width/2,height/2);\n    //ellipse(0,0,100,100);\n    stroke(255,255,0);\n    for(alpha=0; alpha <m; alpha++){\n      rotate(radians(360/m));\n      for(k =0; k < 8; k++){\n        x[alpha][k]+=5;\n        if ((x[alpha][k])+(l[alpha][k]) > 700){\n          x[alpha][k] = 0;\n        }\n        strokeWeight(sw[alpha][k]);\n\t\t\t\tstroke((frameCount/6+alpha)%360,100,100);\n        line(x[alpha][k],0,x[alpha][k]+l[alpha][k],0);\n      }\n    }\n    fill((frameCount/6)%360,100,100);\n    ellipse(0,0,188,188);\n  \n}\n  \n  \n  \n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "lilagondwana",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2044607",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:25:50"
+}

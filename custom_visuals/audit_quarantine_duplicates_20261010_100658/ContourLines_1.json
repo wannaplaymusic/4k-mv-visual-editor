@@ -1,0 +1,25 @@
+{
+    "name": "ContourLines",
+    "code": "// === Tab: main ===\nlet contourShader;\n\nconst N_mountains = 40,\n\t\t\tmountains = [];\n\nfunction preload() {\n\tcontourShader = getShader(this._renderer);\n}\n\n\tvar data = [];\n\nfunction setup() {\n\tcreateCanvas(1112, 834, WEBGL);\n\tshader(contourShader);\n\tfor (let i = 0; i < N_mountains; i ++) data.push(Math.random() * width, Math.random() * height, (Math.random() + 1) * 5);\n\n}\n\nfunction draw() {\n\n\tfor (let i = 0; i < N_mountains; i ++) {\n\t\tvar thisdata = data[i];\n\t\t// thisdata.x += 0.05;\n\t\t// thisdata.y += 0.05;\n\t\t// thisdata.z += 0.05;\n\t\tthisdata += 0.8;\n\t\tdata[i] = thisdata;\n\t}\n\n\tcontourShader.setUniform(\"mountains\", data);\n\trect(0, 0, width, height);\n}\n\n//save JPG\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  // prevents mouse press from registering twice\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  }\n}\n\n// === Tab: shader ===\nfunction getShader(_renderer) {\n\tconst vert = `\n\t\tattribute vec3 aPosition;\n\t\tattribute vec2 aTexCoord;\n\n\t\tvarying vec2 vTexCoord;\n\n\t\tvoid main() {\n\t\t\tvTexCoord = aTexCoord;\n\n\t\t\tvec4 positionVec4 = vec4(aPosition, 1.0);\n\t\t\tpositionVec4.xy = positionVec4.xy * 2.0 - 1.0;\n\n\t\t\tgl_Position = positionVec4;\n\t\t}\n\t`;\n\n\tconst frag = `\n\t\tprecision highp float;\n\n\t\tvarying vec2 vTexCoord;\n\n\t\tuniform vec3 mountains[${N_mountains}];\n\n\t\tconst float WIDTH = ${windowWidth}.0;\n\t\tvar float HEIGHT = ${windowHeight}.0;\n\n\t\t#define PI 3.1415926538\n\n\t\tvoid main() {\n\t\t\tfloat x = vTexCoord.x * WIDTH;\n\t\t\tfloat y = vTexCoord.y * HEIGHT;\n\t\t\tfloat v = 0.0;\n\n\t\t\tfor (int i = 0; i < ${N_mountains}; i++) {\n\t\t\t\tvec3 mtn = mountains[i];\n\t\t\t\tfloat dx = mtn.x - x;\n\t\t\t\tfloat dy = mtn.y - y;\n\t\t\t\tfloat r = mtn.z;\n\t\t\t\tv += exp(-0.0001 * (dx * dx + dy * dy));\n\t\t\t}\n\t\t\t\n\t\t\tfloat value = -1.0 / (cos(v * PI / 0.1) + 0.93);\n\n\t\t\tif(value > 0.0) gl_FragColor = vec4(0.0, 0, 0.0, 1.0);\n\t\t\telse gl_FragColor = vec4(1, 1, 1, 1);\n\t\t}\n\t`;\n\t\n\treturn createShader(vert, frag);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u282326",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/2114248",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 22:44:02",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

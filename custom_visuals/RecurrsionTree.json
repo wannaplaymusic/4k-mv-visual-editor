@@ -1,0 +1,24 @@
+{
+    "name": "RecurrsionTree",
+    "code": "// === Tab: mySketch ===\nvar opacity = 11;\nlet timer=0\nfunction setup() \n{\n  createCanvas(windowWidth, windowHeight)\n  background(0);\n}\n\nfunction draw() \n{\n\ttimer++\n\tif(timer<=100)\n\t{\n\t   stroke(random(255),random(255),random(255));\n\t\tstrokeWeight(2)\n\t   translate(400,height);\n\t   var angle = random(0,6.14);\n\t   branch(281,angle);\n\t\tbranch(81,angle);\n\t   translate(0,height-370)\n\t   branch(500,angle);\n\t}\n}\n\n\nfunction branch(len,theta) \n{\n  strokeWeight(random(5))\n  translate(random(width/43),0)\n  line(0,0,0,-len);\n  translate(0,-len);\n  var a = random(10.0);\n  if(len>2)\n  {\n    push();\n      rotate(theta);\n      branch(random(.5)*len,theta);\n    pop();\n    push();\n      rotate(-theta);\n      branch(0.618*len,theta);\n    pop();  \n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Joe DeNavas (DD89)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2987960",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 16:54:51",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

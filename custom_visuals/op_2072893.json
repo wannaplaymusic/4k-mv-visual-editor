@@ -1,0 +1,22 @@
+{
+    "name": "op_2072893",
+    "code": "// === Tab: mySketch ===\n// Refraction 💎 #WCCChallenge\n\nlet junction\nasync function setup() {\n\tcreateCanvas(1200, 600)\n\tcolorMode(HSB)\n\tangleMode(DEGREES)\n\tbackground(0, 0, 0)\n\n\tjunction = height / 3 //floor(height / 2 + random(-100, 100))\n\n\tfor (let tm = 0; tm < 10; tm++) {\n\t\tmaxLen = floor(sqrt(width * width + height * height))\n\t\thalfMaxLen = floor(maxLen / 2)\n\n\t\t// draw point\n\t\tjunction = floor(random(height*0.9)) // mouse\n\n\t\tlet tx = width / 2\n\t\tlet ty = height / 2\n\t\ttranslate(tx, ty)\n\t\trotate(random(360))\n\n\t\tstroke(0, 0, 100)\n\t\tline(\n\t\t\t-halfMaxLen,\n\t\t\t-halfMaxLen + junction,\n\t\t\thalfMaxLen,\n\t\t\t-halfMaxLen + junction\n\t\t)\n\n\t\tlet ls = random(0.5, 0.75) // speed of light in slow medium, 0.66 glass, 0.75 water\n\t\tlet ray = { fromX: 0, toX: 0 }\n\t\tlet ref = { fromX: 0, toX: 0 }\n\t\tray.fromX = -halfMaxLen + floor(random(width)) // mouse\n\t\tray.toX = -halfMaxLen + halfMaxLen\n\t\tlet opp = ray.toX - ray.fromX\n\t\tlet adj = junction\n\t\tlet angle = atan2(opp, adj)\n\n\t\tref.fromX = ray.toX\n\t\tref.toX = ref.fromX + (height - adj) * tan(angle * ls)\n\n\t\tlet amount = random([5, 10, 15, 20, 25])\n\t\tlet sd = random([1, 3, 5, 7, 9, 11])\n\n\t\tfor (let y = -halfMaxLen; y < -halfMaxLen + junction; y++) {\n\t\t\tconst x = map(y, -halfMaxLen, -halfMaxLen + junction, ray.fromX, ray.toX)\n\t\t\tstroke(0, 0, 100)\n\t\t\tlight(x, y, amount, sd)\n\t\t\t//await sleep(1)\n\t\t}\n\n\t\tlet minWei = 0.7 // the purple light\n\t\tlet weiStep = (1 - minWei) / amount\n\t\tlet lineAmount = amount\n\t\tfor (let y = -halfMaxLen + junction; y <= halfMaxLen; y++) {\n\t\t\tlet wei = 1\n\t\t\tfor (let n = 0; n < lineAmount; n++) {\n\t\t\t\tref.toX = ref.fromX + (height - adj) * tan(angle * ls * wei)\n\t\t\t\tvar x = map(y, -halfMaxLen + junction, halfMaxLen, ref.fromX, ref.toX)\n\t\t\t\tconst h = map(wei, 1, minWei, 0, 270)\n\t\t\t\tconst s =\n\t\t\t\t\tmap(y, -halfMaxLen + junction, halfMaxLen, 0, 100) * (abs(angle) / 45)\n\t\t\t\tstroke(h, s, 100)\n\t\t\t\tlight(x, y, 1, sd)\n\t\t\t\twei -= weiStep\n\t\t\t}\n\t\t}\n\t\tawait sleep(100)\n\t}\n}\n\nfunction draw() {}\n\nfunction light(x, y, amount, sd) {\n\tfor (let i = 0; i < amount; i++) {\n\t\tpoint(randomGaussian(x, sd), y)\n\t}\n}\n\nfunction sleep(ms) {\n\treturn new Promise((resolve) => setTimeout(resolve, ms))\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "JY8627",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2072893",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:23:20"
+}

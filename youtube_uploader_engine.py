@@ -324,7 +324,7 @@ class CredentialPoolManager:
         print(f"[CredentialPool] 🔄 Rotated to credential project: {self.get_active_secret_file().name}")
         return True
 
-    def get_authenticated_service(self, headless_port: int = 0):
+    def get_authenticated_service(self, headless_port: int = 0, allow_browser: bool = True):
         """
         Authenticates using the currently active client_secrets.
         Stores token_<index>.json in cred_dir.
@@ -355,17 +355,28 @@ class CredentialPoolManager:
                 try:
                     creds.refresh(Request())
                 except Exception as e:
-                    print(f"[CredentialPool] Failed to refresh token: {e}, re-authenticating...")
+                    print(f"[CredentialPool] Failed to refresh token: {e}, clearing expired token...")
                     creds = None
+                    try:
+                        if token_file.exists():
+                            token_file.unlink()
+                    except Exception:
+                        pass
 
             if not creds:
+                if not allow_browser:
+                    print("[CredentialPool] Interactive browser authorization required but allow_browser is False.")
+                    return None
                 flow = InstalledAppFlow.from_client_secrets_file(str(secret_file), YOUTUBE_SCOPES)
                 creds = flow.run_local_server(port=headless_port)
 
-            with open(token_file, "w", encoding="utf-8") as token_out:
-                token_out.write(creds.to_json())
+            if creds:
+                with open(token_file, "w", encoding="utf-8") as token_out:
+                    token_out.write(creds.to_json())
 
         # Build YouTube v3 service
+        if not creds:
+            return None
         service = build("youtube", "v3", credentials=creds)
         return service
 
@@ -388,10 +399,10 @@ class YouTubeUploaderEngine:
     def reset_cancel(self):
         self._cancel_requested = False
 
-    def connect(self) -> Any:
+    def connect(self, allow_browser: bool = True) -> Any:
         """Initializes YouTube API client, automatically skipping exhausted projects."""
         self.cred_manager.auto_select_available()
-        self.service = self.cred_manager.get_authenticated_service()
+        self.service = self.cred_manager.get_authenticated_service(allow_browser=allow_browser)
         return self.service
 
     def get_channel_info(self) -> Dict[str, str]:
@@ -544,6 +555,310 @@ class YouTubeUploaderEngine:
             except Exception as e:
                 logger.error(f"Failed to add video {video_id} to playlist {playlist_id}: {e}", exc_info=True)
                 return False
+
+    # --------------------------------------------------------------------------
+    # Scheduled Release & Batch Schedule Management
+    # --------------------------------------------------------------------------
+    def execute_with_quota_retry(self, api_func: Callable[[Any], Any], action_name: str = "api_call") -> Any:
+        """Executes an API call function, automatically rotating credentials if quota is exceeded."""
+        max_attempts = max(1, len(self.cred_manager.client_secrets_files))
+        for attempt in range(max_attempts):
+            if not self.service:
+                self.connect()
+            try:
+                return api_func(self.service)
+            except HttpError as http_err:
+                err_str = str(http_err)
+                if "quotaExceeded" in err_str or getattr(http_err, "resp", None) and http_err.resp.status in (403, 429):
+                    logger.warning(f"⚠️ Quota exceeded during {action_name}. Attempting credential rotation...")
+                    if self.cred_manager.rotate_to_next():
+                        self.service = None
+                        self.connect()
+                        continue
+                raise http_err
+            except Exception as e:
+                raise e
+
+    def get_uploads_playlist_id(self) -> str:
+        """Fetches the special uploads playlist ID for the authenticated channel."""
+        def call_fn(svc):
+            req = svc.channels().list(part="contentDetails", mine=True)
+            resp = req.execute()
+            items = resp.get("items", [])
+            if items:
+                proj = self.cred_manager.get_active_secret_file().stem if self.cred_manager.get_active_secret_file() else "default"
+                quota_tracker.record_action(proj, "channels.list")
+                return items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+            return ""
+        return self.execute_with_quota_retry(call_fn, "channels.list")
+
+    @staticmethod
+    def extract_video_ids(text: str) -> Tuple[List[str], Optional[str]]:
+        """
+        Parses video URLs, playlist URLs, and raw IDs from input text.
+        Returns (video_ids_list, playlist_id_or_None).
+        """
+        lines = text.strip().splitlines()
+        video_ids = []
+        playlist_id = None
+        
+        pl_match = re.search(r"[?&]list=([a-zA-Z0-9_-]+)", text)
+        if pl_match:
+            playlist_id = pl_match.group(1)
+
+        vid_pattern = re.compile(
+            r"(?:https?://)?(?:www\.)?(?:youtube\.com/(?:watch\?v=|shorts/|embed/|v/)|youtu\.be/)([a-zA-Z0-9_-]{11})"
+        )
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            matches = vid_pattern.findall(line)
+            if matches:
+                for vid in matches:
+                    if vid not in video_ids:
+                        video_ids.append(vid)
+            else:
+                tokens = re.findall(r"\b[a-zA-Z0-9_-]{11}\b", line)
+                for tok in tokens:
+                    if tok not in video_ids:
+                        video_ids.append(tok)
+                        
+        return video_ids, playlist_id
+
+    @staticmethod
+    def parse_iso_duration(dur_str: str) -> int:
+        """Parses ISO 8601 duration format (e.g. PT1M25S, PT45S, PT1H2M) into total seconds."""
+        if not dur_str:
+            return 0
+        m = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', dur_str)
+        if not m:
+            return 0
+        hrs = int(m.group(1) or 0)
+        mins = int(m.group(2) or 0)
+        secs = int(m.group(3) or 0)
+        return hrs * 3600 + mins * 60 + secs
+
+    @staticmethod
+    def format_duration(seconds: int) -> str:
+        """Formats seconds into readable mm:ss or hh:mm:ss format."""
+        if seconds <= 0:
+            return "00:00"
+        mins = seconds // 60
+        secs = seconds % 60
+        if mins < 60:
+            return f"{mins:02d}:{secs:02d}"
+        hrs = mins // 60
+        mins = mins % 60
+        return f"{hrs}:{mins:02d}:{secs:02d}"
+
+
+
+    def get_videos_by_ids(self, video_ids: List[str]) -> List[Dict[str, Any]]:
+        """Fetches snippet, status, and contentDetails for a list of video IDs."""
+        if not video_ids:
+            return []
+        
+        results = []
+        chunk_size = 50
+        for i in range(0, len(video_ids), chunk_size):
+            chunk = video_ids[i:i + chunk_size]
+            def call_fn(svc):
+                req = svc.videos().list(
+                    part="snippet,status,contentDetails",
+                    id=",".join(chunk)
+                )
+                resp = req.execute()
+                proj = self.cred_manager.get_active_secret_file().stem if self.cred_manager.get_active_secret_file() else "default"
+                quota_tracker.record_action(proj, "videos.list")
+                return resp.get("items", [])
+            
+            items = self.execute_with_quota_retry(call_fn, "videos.list")
+            for item in items:
+                v_id = item["id"]
+                snippet = item.get("snippet", {})
+                status = item.get("status", {})
+                details = item.get("contentDetails", {})
+                thumbnails = snippet.get("thumbnails", {})
+                thumb_url = (thumbnails.get("medium") or thumbnails.get("default") or {}).get("url", "")
+                
+                raw_duration = details.get("duration", "")
+                dur_sec = self.parse_iso_duration(raw_duration)
+
+                title_str = snippet.get("title", "")
+                desc_str = snippet.get("description", "")
+                title_lower = title_str.lower()
+                desc_lower = desc_str.lower()
+
+                # Shorts identification: duration <= 60s, or tagged with #shorts up to 180s
+                is_short = False
+                if 0 < dur_sec <= 60:
+                    is_short = True
+                elif ("#shorts" in title_lower or "#shorts" in desc_lower) and dur_sec <= 180:
+                    is_short = True
+
+                results.append({
+                    "id": v_id,
+                    "title": title_str,
+                    "description": desc_str,
+                    "published_at": snippet.get("publishedAt", ""),
+                    "privacy_status": status.get("privacyStatus", "unknown"),
+                    "publish_at": status.get("publishAt", None),
+                    "upload_status": status.get("uploadStatus", ""),
+                    "duration": raw_duration,
+                    "duration_sec": dur_sec,
+                    "duration_str": self.format_duration(dur_sec),
+                    "is_short": is_short,
+                    "thumbnail_url": thumb_url,
+                    "url": f"https://www.youtube.com/watch?v={v_id}",
+                    "studio_url": f"https://studio.youtube.com/video/{v_id}/edit"
+                })
+        return results
+
+    def get_channel_videos(
+        self,
+        filter_mode: str = "scheduled_and_private",
+        video_type: str = "all",
+        max_count: int = 50,
+        progress_cb: Optional[Callable[[int, int], None]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Fetches channel videos by querying the uploads playlist.
+        Filters based on filter_mode:
+        - 'scheduled_and_private': private or scheduled videos
+        - 'only_scheduled': videos with publishAt
+        - 'only_private': videos private without publishAt
+        - 'all': all videos
+        Filters based on video_type:
+        - 'all': both long-form and shorts
+        - 'regular': only regular / long-form videos
+        - 'shorts': only Shorts videos
+        """
+        uploads_id = self.get_uploads_playlist_id()
+        if not uploads_id:
+            logger.error("[YouTubeUploaderEngine] Could not retrieve uploads playlist ID.")
+            return []
+
+        all_matched_videos: List[Dict[str, Any]] = []
+        next_page_token = None
+
+        while len(all_matched_videos) < max_count and not self._cancel_requested:
+            def fetch_playlist_items(svc):
+                req = svc.playlistItems().list(
+                    part="snippet,contentDetails",
+                    playlistId=uploads_id,
+                    maxResults=min(50, max(10, max_count)),
+                    pageToken=next_page_token
+                )
+                resp = req.execute()
+                proj = self.cred_manager.get_active_secret_file().stem if self.cred_manager.get_active_secret_file() else "default"
+                quota_tracker.record_action(proj, "playlistItems.list")
+                return resp
+
+            resp = self.execute_with_quota_retry(fetch_playlist_items, "playlistItems.list")
+            items = resp.get("items", [])
+            if not items:
+                break
+
+            video_ids = [it["contentDetails"]["videoId"] for it in items if "contentDetails" in it and "videoId" in it["contentDetails"]]
+            if not video_ids:
+                break
+
+            details = self.get_videos_by_ids(video_ids)
+            for v in details:
+                priv = v["privacy_status"]
+                pub_at = v["publish_at"]
+                
+                matched = False
+                if filter_mode == "scheduled_and_private":
+                    matched = (priv == "private") or bool(pub_at)
+                elif filter_mode == "only_scheduled":
+                    matched = bool(pub_at)
+                elif filter_mode == "only_private":
+                    matched = (priv == "private" and not pub_at)
+                elif filter_mode == "all":
+                    matched = True
+                
+                if matched:
+                    if video_type == "regular" and v.get("is_short"):
+                        matched = False
+                    elif video_type == "shorts" and not v.get("is_short"):
+                        matched = False
+
+                if matched:
+                    all_matched_videos.append(v)
+                    if len(all_matched_videos) >= max_count:
+                        break
+
+            if progress_cb:
+                progress_cb(len(all_matched_videos), max_count)
+
+            next_page_token = resp.get("nextPageToken")
+            if not next_page_token:
+                break
+
+        return all_matched_videos
+
+    def get_videos_from_playlist(self, playlist_id: str, max_count: int = 50) -> List[Dict[str, Any]]:
+        """Fetches videos from a specific playlist."""
+        def fetch_fn(svc):
+            req = svc.playlistItems().list(
+                part="snippet,contentDetails",
+                playlistId=playlist_id,
+                maxResults=min(50, max_count)
+            )
+            resp = req.execute()
+            proj = self.cred_manager.get_active_secret_file().stem if self.cred_manager.get_active_secret_file() else "default"
+            quota_tracker.record_action(proj, "playlistItems.list")
+            return resp
+
+        resp = self.execute_with_quota_retry(fetch_fn, "playlistItems.list")
+        items = resp.get("items", [])
+        v_ids = [it["contentDetails"]["videoId"] for it in items if "contentDetails" in it and "videoId" in it["contentDetails"]]
+        return self.get_videos_by_ids(v_ids)
+
+    def update_video_schedule(
+        self,
+        video_id: str,
+        publish_at: Optional[datetime] = None,
+        privacy_status: str = "private"
+    ) -> Dict[str, Any]:
+        """
+        Updates the schedule (publishAt) or privacy status of an uploaded video.
+        Note: When publishAt is set, YouTube strictly requires privacyStatus='private'.
+        """
+        body_status: Dict[str, Any] = {}
+        if publish_at is not None:
+            utc_dt = publish_at.astimezone(timezone.utc)
+            body_status["privacyStatus"] = "private"
+            body_status["publishAt"] = utc_dt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        else:
+            body_status["privacyStatus"] = privacy_status
+
+        body = {
+            "id": video_id,
+            "status": body_status
+        }
+
+        def call_update(svc):
+            req = svc.videos().update(
+                part="status",
+                body=body
+            )
+            resp = req.execute()
+            proj = self.cred_manager.get_active_secret_file().stem if self.cred_manager.get_active_secret_file() else "default"
+            quota_tracker.record_action(proj, "videos.update")
+            return resp
+
+        resp = self.execute_with_quota_retry(call_update, "videos.update")
+        res_status = resp.get("status", {})
+        return {
+            "id": video_id,
+            "privacy_status": res_status.get("privacyStatus", ""),
+            "publish_at": res_status.get("publishAt", None),
+            "updated": True
+        }
 
     # --------------------------------------------------------------------------
     # Thumbnail, Pinned Comment & Transcode Sentinel
@@ -864,22 +1179,25 @@ class YouTubeUploaderEngine:
             if album_nav.get("prev_title"):
                 prev_text = f"⏮️ 上一首 (Previous): {album_nav['prev_title']}"
                 if album_nav.get("prev_url"):
-                    prev_text += f" -> {album_nav['prev_url']}"
+                    prev_text += f" ▶ {album_nav['prev_url']}"
                 nav_lines.append(prev_text)
             if album_nav.get("next_title"):
                 next_text = f"⏭️ 下一首 (Next): {album_nav['next_title']}"
                 if album_nav.get("next_url"):
-                    next_text += f" -> {album_nav['next_url']}"
+                    next_text += f" ▶ {album_nav['next_url']}"
                 nav_lines.append(next_text)
             if album_nav.get("playlist_url"):
                 nav_lines.append(f"📀 完整專輯 4K 清單 (Full Playlist): {album_nav['playlist_url']}")
             nav_lines.append("======================================================================")
             final_desc += "\n".join(nav_lines)
 
+        # YouTube Data API disallows '<' and '>' in video descriptions
+        safe_desc = final_desc.replace("<", "＜").replace(">", "＞")[:5000]
+
         body = {
             "snippet": {
                 "title": safe_title,
-                "description": final_desc[:5000],
+                "description": safe_desc,
                 "tags": tags[:30],
                 "categoryId": category_id
             },

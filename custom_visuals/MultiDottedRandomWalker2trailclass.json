@@ -1,0 +1,24 @@
+{
+    "name": "MultiDottedRandomWalker2trailclass",
+    "code": "// === Tab: mySketch ===\nlet dots = [];\nlet nDots = 50;\nlet dotSize = 30;\nlet displacement = 30;\nlet trailLen = 20\n\n// let dotColors = [\n//   // CMY\n//   [300, 100, 50],\n//   [60, 100, 50],\n//   [180, 100, 50],\n// ];\n\nlet dotColors = [\n  // 4 colors\n  [212, 100, 63],\n  [272, 100, 63],\n  [32, 100, 63],\n  [92, 100, 63],\n  [336, 100, 63],\n  [36, 100, 63],\n  [156, 100, 63],\n  [216, 100, 63],\n];\n\nlet noiseDiff = 1000;\nlet x, y;\n// let bgColor = [120, 100, 50];\nlet bgColor = [0, 0, 90];\n\nasync function setup() {\n  frameRate(5);\n  createCanvas(1080, 1080);\n  colorMode(HSL);\n  background(bgColor);\n  // x = width / 2;\n  // y = height / 2;\n  for (let i = 0; i < nDots; i++) {\n    dots.push(\n      new dotRandomWalker(\n        round(random(width) / displacement) * displacement,\n        round(random(height) / displacement) * displacement,\n        dotSize,\n        displacement,\n        random(dotColors),\n        i * noiseDiff,\n        trailLen\n      )\n    );\n  }\n}\n\nfunction draw() {\n  background(bgColor);\n  noStroke();\n  dots.forEach((dot) => dot.draw(frameCount));\n}\n\nfunction mouseClicked() {\n  dots.forEach((dot) => dot.resetPos());\n}\n\nclass dotRandomWalker {\n  constructor(x, y, dotSize, displacement, dotColor, noiseDiff, trailLen) {\n    this.x = x;\n    this.y = y;\n    this.origX = x;\n    this.origY = y;\n\n    this.dotSize = dotSize;\n    this.displacement = displacement;\n    this.dotColor = dotColor;\n    this.rangeNoise = 1;\n    this.noiseScale = 0.01;\n    this.trailLen = trailLen; // dots left behind\n    this.trail = new Trail(\n      this.trailLen,\n      x,\n      y,\n      dotColor,\n      -(1/this.trailLen),\n      dotSize,\n      -(1/this.trailLen)\n    );\n    this.noiseDiff = noiseDiff;\n  }\n\n  draw(frameCount) {\n    let nX =\n      1 +\n      map(\n        noise((frameCount + this.noiseDiff) * this.noiseScale),\n        0,\n        1,\n        -this.rangeNoise,\n        +this.rangeNoise\n      );\n    let frameColor = [\n      this.dotColor[0],\n      this.dotColor[1],\n      this.dotColor[2] * nX,\n    ];\n    this.trail.draw();\n    this.x += random([-this.displacement, 0, this.displacement]);\n    this.y += random([-this.displacement, 0, this.displacement]);\n    this.x = this.wrapPos(this.x, width);\n    this.y = this.wrapPos(this.y, height);\n\n    fill(frameColor);\n    circle(this.x, this.y, this.dotSize);\n    this.trail.update(this.x, this.y);\n  }\n\n  resetPos() {\n    this.x = this.origX;\n    this.y = this.origY;\n  }\n\n  wrapPos(pos, maxPos) { // \n    if (pos > maxPos) {\n      pos = pos - maxPos;\n    }\n    if (pos < 0) {\n      pos = pos + maxPos;\n    }\n    return pos\n  }\n}\n\nclass Trail {\n  constructor(trailLen, x, y, dotColor, colorChg, dotSize, sizeChg) {\n    // dotColor must be an HSL array\n    this.trailLen = trailLen;\n    this.trailPos = [];\n    this.trailColors = [];\n    this.colorChg = colorChg; // e.g: -0.05 to reduce 5%\n    this.trailSizes = [];\n    this.sizeChg = sizeChg; // e.g: -0.05 to reduce 5%\n    for (let i = 0; i < this.trailLen; i++) {\n      this.trailPos.push([x, y]);\n      this.trailColors.push([\n        dotColor[0],\n        dotColor[1],\n        dotColor[2] * (1 + this.colorChg * (i + 1)),\n      ]);\n      this.trailSizes.push([dotSize * (1 + this.sizeChg * (i + 1))]);\n    }\n  }\n\n  update(x, y) {\n    this.trailPos.pop();\n    this.trailPos.unshift([x, y]);\n  }\n\n  draw() {\n    noStroke();\n    for (let i = this.trailLen - 1; i >= 0; i--) {\n      fill(this.trailColors[i]);\n      circle(this.trailPos[i][0], this.trailPos[i][1], this.trailSizes[i]);\n    }\n  }\n}\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Gustavo Eiji Kaneto",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2985707",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:35:52",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

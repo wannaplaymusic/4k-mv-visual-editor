@@ -1,0 +1,24 @@
+{
+    "name": "Hologram",
+    "code": "// === Tab: mySketch ===\nlet vs = `\n   precision highp float;\n   precision highp int;\n\n   attribute vec3 aPosition;\n   attribute vec2 aTexCoord;\n   varying vec2 vTexCoord;\n   uniform mat4 uProjectionMatrix;\n   uniform mat4 uModelViewMatrix;\n\n    void main() {\n      vec4 positionVec4 = vec4(aPosition, 1.0);\n      gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n      vTexCoord = aTexCoord;\n   }\n`;\n\nlet fs = `\n   precision highp float;\n   precision highp int;\n\n   varying vec2 vTexCoord;\n\n   uniform sampler2D u_tex;\n   uniform float u_time;\n   uniform vec3 u_color0;\n   uniform vec3 u_color1;\n   uniform vec3 u_color2;\n   uniform vec3 u_color3;\n\n   float pi = 3.14159265358979;\n\n   void main() {\n      vec3 c0 = mix(u_color0, u_color1, vTexCoord.y);\n      vec3 c1 = mix(u_color2, u_color3, vTexCoord.y);\n      vec3 color = mix(c0, c1, vTexCoord.x);\n\n      vec2 uv = vTexCoord;\n      uv.x += 0.2*cos( pi*cos(-uv.y*pi*3.0 + u_time)  ) ;\n      uv.y += 0.1*sin( pi*sin(-uv.x*pi*2.0 + u_time)  ) ;\n      vec4 tex = texture2D(u_tex, uv);\n\n      float mask = 3.0*exp2(-1.0*pow((2.0*vTexCoord.x-1.0), 2.0)/0.2) * exp2(-1.0*pow((2.0*vTexCoord.y-1.0), 2.0)/0.2);\n      mask = min(mask, 1.0);\n\n      gl_FragColor = vec4(color, 0.8) * tex * mask ;\n    }\n`;\n\nconst w = 1112;\nlet theShader ;\nlet pg;\nlet color0, color1, color2, color3;\n\nfunction setup() {\n   setAttributes(\"alpha\", false);\n   setAttributes(\"antialias\", true);\n   setAttributes(\"powerPreference\", \"high-performance\");\n\n   createCanvas(w, w*.75, WEBGL);\n\n   rectMode(CENTER);\n   imageMode(CENTER);\n   textureMode(NORMAL);\n   colorMode(HSB);\n   noStroke();\n\n   theShader = createShader(vs, fs);\n   color0 = rand_color();\n   color1 = rand_color();\n   color2 = rand_color();\n   color3 = rand_color();\n\n   pg = createGraphics(w/2, w/2);\n   pg.rectMode(CENTER);\n}\n\nfunction draw(){\n   set_graphics();\n\n   background(100);\n   fill(0, 0, 0, 0);\n\n   shader(theShader);\n   theShader.setUniform(`u_tex`, pg);\n   theShader.setUniform(`u_time`, -frameCount/30);\n   theShader.setUniform(`u_color0`, color0);\n   theShader.setUniform(`u_color1`, color1);\n   theShader.setUniform(`u_color2`, color2);\n   theShader.setUniform(`u_color3`, color3);\n\n   rect(0, 0, w*1.2, w*1.2);\n   box(w*0.3);\n   box(w*0.5);\n}\n\nfunction rand_color() {\n   let rc = color(random(100,360), random(70, 100), random(90, 100));\n   return [red(rc)/255.0, green(rc)/255.0, blue(rc)/255.0];\n}\n\nfunction set_graphics(){\n   const pgw = pg.width/2 ;\n   const pgr = pg.width/4 * 0.8 ;\n   let px, py;\n   pg.background(180);\n   pg.stroke(255);\n   pg.fill(255);\n   pg.rect(pgw, pgw, pgr, pgr);\n\n   pg.noFill();\n   pg.strokeWeight(5);\n\n   for(let i=0;i<40;i++){\n    px = 30*sin(i+frameCount/50) + pgw + pgw*0.7*cos(frameCount/40 + PI/10*i);\n    py = 30*sin(i+frameCount/50) + pgw + pgw*0.7*sin(frameCount/40 + PI/10*i);\n    pg.rect(px, py,  0.3*pgr, 0.3*pgr);\n   }\n\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  // prevents mouse press from registering twice\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + day() + hour() + minute() + second() + \".png\");\n    lapse = millis();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1134406",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:18:32",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

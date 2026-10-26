@@ -1,0 +1,24 @@
+{
+    "name": "MaelstormModoki_20",
+    "code": "// === Tab: mySketch ===\n// UZUSHIO_2.0\n\nlet TATE = 100 ; let YOKO = 100 ; let H = 6 ; let Mmax = 10 ; \n\nlet X[][] = new Array(YOKO)[TATE] ; let Y[][] = new Array(YOKO)[TATE] ;\nlet CX[] = new Array(Mmax) ; let CY[] = new Array(Mmax) ; \nlet dX ; let dY ; let I ; let II ; let III ; let L ; let KX ; let KY ; let M ;\n\n\n\nfunction setup(){\n  \n  createCanvas(600, 600) ; noSmooth() ; stroke(255) ; fill(255) ; \n  \n  for ( I = 0 ; I < YOKO ; I++ ){\n    for ( II = 0 ; II < TATE ; II++ ){\n      X[I][II] = (I-(YOKO/2))*H ; Y[I][II] = (II-(TATE/2))*H ;  \n    }\n  }\n  \n} // setup()\n\n\n\nfunction draw(){\n  \n  background(0) ;\n  \n  for ( I = 0 ; I < YOKO ; I++ ){\n    for ( II = 0 ; II < TATE ; II++ ){\n      KX = 125*cos(X[I][II]/20)+125 ; KY = 125*cos(Y[I][II]/20)+125 ; \n      fill(KX,0,KY) ; stroke(KX,0,KY) ; rect(I*H,II*H,H,H) ; \n      dX = 0 ; dY = 0 ; \n      for ( III = 0 ; III < M ; III++ ){\n        KX = X[I][II]-CX[III] ; KY = Y[I][II]-CY[III] ;\n        L = sqrt((KX*KX)+(KY*KY)) ;\n        if ( int(III/2)*2 == III ){ dX = dX - ((-KX+KY)/pow(L,3)) ; dY = dY - ((-KX-KY)/pow(L,3)) ; }\n                              else{ dX = dX + ((+KX+KY)/pow(L,3)) ; dY = dY - ((+KX-KY)/pow(L,3)) ; }\n      }\n      L = sqrt((dX*dX)+(dY*dY)) ;\n      if ( L > 0 ){ dX = dX/L ; dY = dY/L ; } \n      X[I][II] = X[I][II] + dX ; Y[I][II] = Y[I][II] + dY ;\n    }\n  }\n  \n} // draw()\n\n\n\nfunction mousePressed(){ \n\n  CX[M] = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))-300 ; CY[M] = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))-300 ;\n  M = M + 1 ; if ( M >= Mmax ) { M = 0 ; }\n  setup() ; \n\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "KaijinQ",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/833705",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:51:28",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

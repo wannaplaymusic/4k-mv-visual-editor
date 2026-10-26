@@ -544,9 +544,18 @@ class GenreSemanticClassifier:
         target_path = audio_path or acoustic_meta.get('audio_path')
         path_prior = extract_path_genre_prior(target_path)
         if path_prior and path_prior in scores:
-            scores[path_prior] = scores[path_prior] * 3.5
+            scores[path_prior] = scores[path_prior] * 5.0
             # 若為衍生子風格 (例如 techno -> hard_techno, dub_techno)，同步增益並抑制互斥風格
-            if path_prior == "techno":
+            if path_prior == "hard_techno":
+                if eff_bpm < 100.0:
+                    eff_bpm = eff_bpm * 2.0
+                scores["hard_techno"] *= 4.0
+                if "techno" in scores:
+                    scores["techno"] *= 2.5
+                for conflicting in ("ambient", "lo-fi", "downtempo", "classical", "jazz"):
+                    if conflicting in scores:
+                        scores[conflicting] *= 0.01
+            elif path_prior == "techno":
                 if "hard_techno" in scores:
                     scores["hard_techno"] *= 3.0
                 if "dub_techno" in scores:
@@ -556,6 +565,8 @@ class GenreSemanticClassifier:
             elif path_prior == "ambient":
                 if "techno" in scores:
                     scores["techno"] *= 0.1
+                if "hard_techno" in scores:
+                    scores["hard_techno"] *= 0.05
 
         # 融合 BPM 與節奏懲罰/獎勵權重
         for genre_key, info in GENRE_REGISTRY.items():

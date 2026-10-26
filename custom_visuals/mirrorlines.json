@@ -17,11 +17,14 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 3,
+    "used_count": 6,
     "is_starred": false,
     "used_in_videos": [
+        "Vast Depth.mp4",
         "Dark Signal Frame.mp4",
         "Sharp Edge.mp4",
-        "Vast Depth.mp4"
+        "Synthetic Breath.mp4",
+        "Foundation Block.mp4",
+        "Mindful Pace.mp4"
     ]
 }

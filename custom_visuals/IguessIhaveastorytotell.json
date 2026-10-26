@@ -1,0 +1,28 @@
+{
+    "name": "IguessIhaveastorytotell",
+    "code": "// === Tab: mySketch.js ===\n//day 1\n//me: The challenge theme this week is 'sparkles'. Rolls eyes.\n//wife: You know, no one is making you do it.\n//me: I know.\n\n//day 2\n//Me, to self: Plenty of things in nature sparkle, get over yourself.\n//Codes a fairly convincing representation of sparkling water, with pixel array noise.\n//Realizes it's going to have to be the size of postage stamp in order to run at a fameRate above\n//single digits. Sighs and mutters (yet again) about the need to learn shaders.\n\n\n//day 3\n//F this. I'll just write a sparkle particle class and THEN figure out what to do with it.\n//I do not figure out what to do with it.\n\n\n//day 4\n//Wake up to snow falling.\n//Oh. Ok.\n//Codes. Kind of good.\n//But also kind of sappy pap.\n//shrugs\n\nsparkles=[]\nlet n1, n2, n3, n4\nlet simplex\n\nfunction setup() {\n\tcreateCanvas(300, 600);\n\tsimplex=new OpenSimplexNoise(Date.now())\t\n}\n\nfunction preload(){\n\tme= loadImage('https://openprocessing.org/sketch/1849232/files/me.png')\n}\n\nfunction draw() {\n\tbackground(0);\n\tfill(20)\n\trect(0, 0, width, height)\n\t\n\t//ground\n\tbeginShape()\n\tfill(60)\n\tvertex(0, height)\n\tfor(let x=0; x<=width; x+=1){\n\tlet y=height*0.85+ (simplex.noise2D(x/100, height*0.75)*10)\n\tvertex(x, y\t)\t\t\t\t\t\t\t\t\t\t\t \t\n\t}\n\tvertex(width, height)\n\tendShape(CLOSE)\n\t\n\t//adding glitter particles 'snow'\n\tfor(let i=0; i<1; i+=0.075){\n\t let yPos=random(height)\n\t let xPos=random(width)\n\tlet pos= createVector(xPos+random(-5, 5), yPos+random(-50, 50))\n\tsparkles.push(new sparkle(pos))\n\t}\n\t\n\t\n\tfor(let sparkle of sparkles){\n\t\tsparkle.live()\n\t\tsparkle.shinebriefly()\n\t\tsparkle.die()\n\t\t\n\t}\n\t\n\t//adding 'window'\nnoStroke()\t\nfill(0)\n\trect(0, height/2, width, 30)\n\t\n\t//image of silhouette, slightly drifting, \n\t//white-tinterd version offset from black tinted version \n\t//image previously used in conceptual 'Autobigraphical Clock' :https://openprocessing.org/sketch/1340345\n\tpush()\n\ttranslate(-width/3, height/5)\n\ttint(255, 100)\n\tmoverX=simplex.noise2D(frameCount/100, 100)*2\n\tmoverY= simplex.noise2D(frameCount/100, 200)*5\n\timage(me, -2, moverY)\n\ttint(0)\n  image(me, moverX, moverY)\n\tpop()\n\n}\n\n\n\nclass sparkle{\nconstructor(pos){\n\tthis.pos=pos\n\tthis.theta=-PI\n}\n\t\nlive(){\n\tthis.theta+=0.25\n\tlet xMove= map(simplex.noise2D(this.pos.x/50, frameCount/50), -1, 1, -1, 1)\n\tlet yMove= map(simplex.noise2D(this.pos.y/100, frameCount/50), -1, 1, 0, 2)\n\tlet mover= createVector(xMove, yMove)\n\tthis.pos.add(mover)\n}\n\t\ndie(){\n\tif(this.theta>=PI){\n\t\tlet index = sparkles.indexOf(this);\n      sparkles.splice(index, 1);\n\t}\n\t\n}\n\t\nshinebriefly(){\n\tpush()\n\ttranslate(this.pos.x, this.pos.y)\n\tlet weight= map(sin(this.theta), -1, 1, 0.1, 5)\n\tstroke(255)\n\tstrokeWeight(weight)\n\tpoint(0, 0)\n\tpop()\n\t\n}\t\n}\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Aaron Reuland (a_ soluble_fish)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1849232",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:39:09",
+    "used_in_videos": [
+        "Monotone Current.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

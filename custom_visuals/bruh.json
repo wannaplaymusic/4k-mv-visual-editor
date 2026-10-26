@@ -1,0 +1,27 @@
+{
+    "name": "bruh",
+    "code": "// === Tab: mySketch ===\n/*\n  Based upon this Tutorial by Alexander Mordvintsev:\n  Particle Lenia from scratch\n  https://observablehq.com/@znah/particle-lenia-from-scratch\n  \n  The simulation shows Particle Lenia: the system of \n  particles that move to minimize local energy of their \n  interaction, leading to the formation of complex and \n  diverse structures. \n\t\n\thttps://arxiv.org/pdf/2305.16706\n  \n  This version by Juan Carlos Ponce Campuzano\n  12/Jul/2024\n  https://www.patreon.com/jcponce\n*/\n\nlet params = {\n  mu_k: 4.0, sigma_k: 1.0, w_k: 0.022,\n  mu_g: 0.6, sigma_g: 0.15, c_rep: 1.0,\n  dt: 0.1\n};\n\nlet point_n = 200;\nlet points;\nlet fields;\nlet steps_per_frame; // Adjust this based on desired speed\nlet randomCol;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  points = init(new Float32Array(point_n * 2));\n  fields = {\n    R_val: new Float32Array(point_n),\n    U_val: new Float32Array(point_n),\n    R_grad: new Float32Array(point_n * 2),\n    U_grad: new Float32Array(point_n * 2)\n  };\n  \n  colorMode(RGB, 600, 600, 600, 600);\n  noStroke();\n  \n  steps_per_frame = int(random(3, 12));\n  \n  randomCol = random();\n\t\n  //console.log(randomCol);\n}\n\nfunction draw() {\n  for (let i = 0; i < steps_per_frame; ++i) step();\n  background(0, 30);\n  translate(width / 2, height / 2);\n  scale(width / 45.0);\n  strokeWeight(0.1);\n\n  for (let i = 0; i < point_n; ++i) {\n    let x = points[i * 2], y = points[i * 2 + 1];\n    let r = params.c_rep / (fields.R_val[i] * 5.0);\n    \n    if(randomCol < 0.3){\n      fill((i)/point_n* 310, 70, 100);\n    } else if(0.3 <= randomCol && randomCol < 0.6) {\n      fill(90, 80, (i)/point_n* 200);\n    } else {\n      fill(20, (i)/point_n* 200, 180);\n    }\n    \n    ellipse(x, y, r * 2, r * 2);\n  }\n}\n\nfunction init(points) {\n  for (let i = 0; i < point_n; ++i) {\n    points[i * 2] = (Math.random() - 0.5) * 12;\n    points[i * 2 + 1] = (Math.random() - 0.5) * 12;\n  }\n  return points;\n}\n\nfunction add_xy(a, i, x, y, c) {\n  a[i * 2] += x * c;\n  a[i * 2 + 1] += y * c;\n}\n\nfunction compute_fields() {\n  const { R_val, U_val, R_grad, U_grad } = fields;\n  const { c_rep, mu_k, sigma_k, w_k } = params;\n  R_val.fill(repulsion_f(0.0, c_rep)[0]);\n  U_val.fill(peak_f(0.0, mu_k, sigma_k, w_k)[0]);\n  R_grad.fill(0);\n  U_grad.fill(0);\n\n  for (let i = 0; i < point_n - 1; ++i) {\n    for (let j = i + 1; j < point_n; ++j) {\n      let rx = points[i * 2] - points[j * 2];\n      let ry = points[i * 2 + 1] - points[j * 2 + 1];\n      var r = Math.sqrt(rx * rx + ry * ry) + 1e-20;\n      rx /= r;\n      ry /= r;\n\n      if (r < 1.0) {\n        const [R, dR] = repulsion_f(r, c_rep);\n        add_xy(R_grad, i, rx, ry, dR);\n        add_xy(R_grad, j, rx, ry, -dR);\n        R_val[i] += R;\n        R_val[j] += R;\n      }\n      const [K, dK] = peak_f(r, mu_k, sigma_k, w_k);\n      add_xy(U_grad, i, rx, ry, dK);\n      add_xy(U_grad, j, rx, ry, -dK);\n      U_val[i] += K;\n      U_val[j] += K;\n    }\n  }\n}\n\nfunction repulsion_f(x, c_rep) {\n  const t = Math.max(1.0 - x, 0.0);\n  return [0.5 * c_rep * t * t, -c_rep * t];\n}\n\nfunction fast_exp(x) {\n  var t = 1.0 + x / 32.0;\n  t *= t;\n  t *= t;\n  t *= t;\n  t *= t;\n  t *= t;\n  return t;\n}\n\nfunction peak_f(x, mu, sigma, w = 1.0) {\n  var t = (x - mu) / sigma;\n  const y = w / fast_exp(t * t);\n  return [y, -2.0 * t * y / sigma];\n}\n\nfunction step() {\n  const { R_val, U_val, R_grad, U_grad } = fields;\n  const { mu_g, sigma_g, dt } = params;\n  compute_fields();\n  let total_E = 0.0;\n  for (let i = 0; i < point_n; ++i) {\n    const [G, dG] = peak_f(U_val[i], mu_g, sigma_g);\n    const vx = dG * U_grad[i * 2] - R_grad[i * 2];\n    const vy = dG * U_grad[i * 2 + 1] - R_grad[i * 2 + 1];\n    add_xy(points, i, vx, vy, dt);\n    total_E += R_val[i] - G;\n  }\n  return total_E / point_n;\n}\n\nfunction mousePressed() {\n  params.mu_k = random(1.0, 5.0);\n  params.sigma_k = random(0.1, 2.0);\n  params.w_k = random(0.01, 0.07);\n  params.mu_g = random(0.1, 1.0);\n  params.sigma_g = random(0.05, 0.3);\n  params.c_rep = random(0.1, 2.0);\n  // Debugg\n  //console.log(params);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Gustavo Fischer",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2328727",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:07:27",
+    "used_in_videos": [
+        "Fog Signal 4AM.mp4",
+        "Fusion Blade Berserk.mp4"
+    ],
+    "used_count": 2
+}

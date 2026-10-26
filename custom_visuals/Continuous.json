@@ -1,0 +1,24 @@
+{
+    "name": "Continuous",
+    "code": "// === Tab: mySketch.js ===\nlet angle = 0;\nlet radius = 50;\nlet counter=0\nlet timer=0\nlet focusOnBallNumer=0\nlet stop=false\nlet timer2=0\nfunction setup()\n{\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tbackground(random(255),random(255),random(255));\n\n\tfor(i=0;i<300;i++)\n\t{\n\t\t\teval(\"balls\"+i+\"=createballs(\"+i+\");\")\n\t}\n}\n\nfunction draw()\n{\n\ttimer2++\n\tif(timer2%30==0) stop=!stop\n\tif(stop==false)\n\t{\n\t\ttimer++\n\t\tif(timer%100==0) focusOnBallNumer=round(random(-.1,.1))\n\t\tcounter+=.0001\n\n\t\tlet x = 1000 / 2 + cos(angle) * focusOnBallNumer;\n\t\tlet y = 1000 / 2 + sin(angle) * focusOnBallNumer;\n\t\tangle += 0.02;\n\t\tcamera(-100+x,100+y,-800+y,balls0.x,balls0.y,balls0.z,0,1,0);\n\n\t\tfor(i=0;i<300;i++)\n\t\t{\n\t\t\t\t eval(\"updateballs(balls\"+i+\");\")\n\t\t}\n\t}\n}\n\nfunction createballs(num)\n{\n  let balls={}\n\tballs.num=num\n  balls.x = 0\n  balls.y = 0\n\tballs.z = 0\n\tballs.xOffset  = 0\n  balls.yOffset  = 0\n\tballs.zOffset  = 0\n\tballs.s=random(200)\nreturn balls\n}\n\n\nfunction updateballs(balls)\n{\n\trotateX(counter+random(.1))\n\trotateY(counter+random(.1))\n\trotateZ(counter+random(.1))\n\t\n\tballs.x = noise(balls.xOffset) * 1000;\n  balls.y = noise(balls.xOffset + 100) * 1000;\n\tballs.z = noise(balls.xOffset + 40) * 1000;\n\n\tballs.s = constrain(balls.s, 1, 100);\n\tballs.s=balls.s+random(-1,1)\n\t\n\tpush()\n  translate(balls.x, balls.y, balls.z)\n\tstroke(random(255),random(255),random(255))\n\tstrokeWeight(random(15))\n  sphere(balls.s)\n\tpop()\n\t\n  balls.xOffset += random(.008);\n\n}\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\t<meta charset=\"utf-8\" />\n\t<!-- keep the line below for OpenProcessing compatibility -->\n\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/addons/p5.sound.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nhtml, body {  \n    text-align: center;  \n    background-color: #FFFFFF; \n    margin: 0;\n    padding: 10px;\n}  \ncanvas {\n  margin: 10px auto;\n  width:50%;\n  display: block;\n  border: solid 13px black;\n  padding: 26px 26px;\n  box-shadow: -6px 6px 6px gray;\n}\n\n",
+    "inline_assets": {},
+    "author": "Joe DeNavas (DD89)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2309454",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:22:00",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

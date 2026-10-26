@@ -1,0 +1,29 @@
+{
+    "name": "painting",
+    "code": "// === Tab: mySketch ===\nlet img;\nlet t;\nlet N=3000;\nlet count=0;\nParticle [] particles = new Array(N);\nfunction setup(){\n  background(255);\n  img = loadImage(\"https://openprocessing.org/sketch/1869326/files/20220611-EP5A1587-106.jpg\");\n  createCanvas(1007, 1007);\n  //image(img,0,0);\n  t = 0.0;\n  img.loadPixels();\n  for (i=0; i<N; i++){\n    particles[i] = new Particle(random(200,300));\n  }\n}\nfunction draw(){\n  t+=0.001;\n  count += 1;\n  for(i=0; i<N; i++){\n    particles[i].update();\n    particles[i].display();\n  }\n  if(count%10==0){\n  //  saveFrame(\"JF-#####.png\");\n  }\n  \n}\n\n\n// === Tab: Particle ===\nclass Particle{\n  x,y,lifetime,time,xo,yo;\n  c;\n  constructor(_lifetime){\n    //let r = random(width/3*2);\n    //let theta = radians(random(360));\n    //x = r*cos(theta)+width/2;\n    //y = r*sin(theta)+height/2;\n    x = random(0,width);\n    y = random(0,height);\n    xo = x;\n    yo = y;\n    lifetime = _lifetime;\n    time = 0;\n  }\n  function update(){\n    let dx = 4*noise(x/100,y/100,t)-2;\n    let dy = 4*noise((x+100)/100,(y+100)/100,t)-2;\n    xo = x;\n    yo = y;\n    x += dx;\n    y += dy;\n    \n    time += 1;\n    if (time>lifetime){\n      //let r = random(width/3*2);\n      //let theta = radians(random(360));\n      //x = r*cos(theta)+width/2;\n      //y = r*sin(theta)+height/2;\n      x = random(0,width);\n      y = random(0,height);\n      xo = x;\n      yo = y;\n      time = 0;\n    }\n    if(x<0){\n      x+=width;\n      xo = x;\n    }\n    if(x>=width){\n      x-=width;\n      xo = x;\n    }\n    if(y<0){\n      y+=height;\n      yo = y;\n    }\n    if(y>=height){\n      y-=height;\n      yo = y;\n    }\n  }\n  function display(){\n    //println((int(x)%width) + (int(y)%height) * img.width);\n    c = img.pixels[(int(x)%width) + (int(y)%height) * img.width];\n    stroke(c);\n    strokeWeight(0.1);\n    line(x,y,xo,yo);\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u316795",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1869326",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 16:58:07",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

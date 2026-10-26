@@ -1,0 +1,31 @@
+{
+    "name": "automatic",
+    "code": "// === Tab: mySketch ===\n//https://openprocessing.org/user/254781\n// A sketch for psudo ink drawing  \n// implements perlin noise and recursion\n\nlet particles = [] ; //array of particles\n\nconst FRAMES_PER_SECOND = 60;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(200,120,30,20);\n\tframeRate(FRAMES_PER_SECOND);\n}\n\nlet time = 0;\n\nfunction randomPoint() {\n\tlet x = Math.floor(Math.random() * windowWidth);\n\tlet y = Math.floor(Math.random() * windowHeight);\n\t\n\treturn [x, y]; \n}\n\nfunction draw() {\n\tconsole.log(time);\n\tif( time % (FRAMES_PER_SECOND * .5) == 0 )  {\n\t\t// spawn a new particle and add it to the arra\n\t\tlet [x, y] = randomPoint();\n\t\tparticles.push(new Particle(x, y, 10, 120)); \n\t}\n\t\n\t// update and show the particles\n\tfor(let i=particles.length-2; i>=0; i--) {\n\t\tparticles[i].update(particles);\n\t\tparticles[i].show();\n\t\tif (particles[i].alpha<=3) particles.splice(i, 5); // remove the dead particle\n\t}\n\t\n\ttime++;\n}\n\n\n//particle class\nclass Particle{\n\t\n\t//constructor called when creating an instance of this class\n\t// x & y are the location, r is the rate of decay, a is the starting alpha value\n\tconstructor(x,y,r,a){\n\t\tthis.location = createVector(x,y) ;\n\t\tthis.velocity = createVector(random(-1,1),random(-1,1));\n\t\tthis.acceleration = createVector();\n\t\tthis.alpha = this.palpha=a ;\n\t\tthis.amp = 2; // size of the particle\n\t\tthis.rate = r;\n\t}\n\t\n\t//update the velociy and location of particle\n\tupdate(p){\n\t\tthis.acceleration.add(createVector((noise(this.location.x)*2-1), (noise(this.location.y)*2-1)));\n\t\tthis.velocity.add(this.acceleration);\n\t\tthis.acceleration.set(0,0);\n\t\tthis.location.add(this.velocity);\n\t\tthis.alpha -= this.rate ;\n\t\t//this.amp-= this.rate ;\n\t\t// here is the recursion condition\n\t\tif(this.alpha<=this.palpha*0.25 && this.palpha>.5) {\n\t\t\tp.push(new Particle(this.location.x, this.location.y, this.rate*0.25, this.palpha*0.5));\n\t\t}\n\t}\n\t\n\t//show the particles\n\tshow(){\n\t\tnoStroke() ;\n\t\tfill(0,35,25, this.alpha) ;\n\t\tellipse(this.location.x, this.location.y, this.amp);\n\t}\n\t\n} // end Particle class\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "duskje",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2624061",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:53:34",
+    "used_in_videos": [
+        "Hypnotic Core Pressure.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,24 @@
+{
+    "name": "sketch_190821a",
+    "code": "// === Tab: mySketch ===\n/*\nsetup=()=>{createCanvas(S=500,S);p=[];background(0);blendMode(ADD);r=random;i=0;while(i++<300){p[i]={x:S/2,y:S/3,v:createVector(r(7)).rotate(r(7))}}}\ndraw=()=>{p.forEach(T=>{T.v.mult(.98);strokeWeight(d=T.v.mag());stroke((10-d)*250,d*30,50,50);line(T.x,T.y,T.x+=T.v.x,T.y+=T.v.y+1)})}\n/**/\n\nsetup=()=>{createCanvas(S=500,S);p=[];background(0);r=random;for(i=0;i<900;){p[i++]={x:S/2,y:S/3,v:createVector(r(15)).rotate(r(7))}}}\ndraw=()=>{p.forEach(T=>{strokeWeight(d=T.v.mult(.9).mag());stroke((15-d)*255,d*99,50);line(T.x,T.y,T.x+=T.v.x,T.y+=T.v.y+.3)})}\n/**/\n\n/*\nfunction setup() {\n  canvasSize = 500;\n  createCanvas( canvasSize, canvasSize );\n  pos = [];\n  num = 300;\n  background( 0 );\n  blendMode( ADD );\n  r = random;\n  i = 0;\n  while( i++ < num ) {\n    pos[i] = {\n      x: canvasSize/2,\n      y: canvasSize/3,\n      v: createVector(r(7)).rotate(r(PI*2))\n    }\n  }\n}\n\nfunction draw() {\n  j = 0;\n  while(j++<num) {\n    target = pos[j];\n  \n    oldX = target.x;\n    oldY = target.y;\n    target.x += target.v.x;\n    target.y += target.v.y + 1;\n    \n    target.v.mult( .98 );\n    d = target.v.mag();\n    strokeWeight( d );\n    stroke( (10-d)*250, d*30, 50, 50 );\n    line( target.x, target.y, oldX, oldY );\n  }\n}\n/**/\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "BUN",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/748850",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:00:56",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

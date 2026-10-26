@@ -1,0 +1,22 @@
+{
+    "name": "MoverPtIINew",
+    "code": "// === Tab: mySketch ===\n\n\nParticle [] p = new Array(822);\n\nfunction setup(){\n  createCanvas(800, 800);\n  background(0);\n\tcolorMode(HSB,360,100,100);\n  noStroke();\n  for(i = 0; i < 822; i++){\n    p[i] = new Particle();\n  }\n}\n\nfunction draw(){\n  fill(0,10);\n  rect(0,0,width,height);\n  for(i = 0; i < 822; i++){\n    p[i].display();\n    p[i].check();\n    p[i].move();\n  }\n}\n\n// === Tab: tab2 ===\nclass Particle{\n     \n  x, y, ra, vm;\n  d,s,b;\n  f;\n  let v = new PVector();\n  \n  constructor(){\n    ra = random(1,3);\n    x = random(ra,width-ra);\n    y = random(ra,height-ra);\n    d = int(random(10,100));\n    let a = random(0,1);\n    vm = random(1,5);\n    if(a < 0.25){\n      v.x = vm; v.y = 0;}\n    else\n    if(a < 0.5) {\n      v.x = -vm; v.y = 0;}\n    else\n    if(a < 0.75) {\n      v.x = 0; v.y = vm;}\n    else {\n      v.x = 0; v.y = -vm;}\n\t\ts = random(100);\n\t\tb = random(100);\n    f = color(20,s,b);\n  }\n  \n  function display(){\n\t\tchangecolor();\n    fill(f);\n    ellipse(x,y,2*ra,2*ra);\n  }\n\n  function changecolor(){\n\t\tf = color(20+frameCount%360,s,b);\n\t}\n  \n  function move(){\n    if(d > 0){\n      x += v.x;\n      y += v.y;\n      d--;\n    }\n    else{\n    var a = random(0,1);\n    vm = random(1,5);\n    if(a < 0.25){\n      v.x = vm; v.y = 0;}\n    else\n    if(a < 0.5) {\n      v.x = -vm; v.y = 0;}\n    else\n    if(a < 0.75) {\n      v.x = 0; v.y = vm;}\n    else {\n      v.x = 0; v.y = -vm;}\n    d = int(random(10,100));\n    }   \n  } \n  \n  \n  function check(){\n  if ((x <= ra) || (x >= (width-ra))){\n    v.x *= -1;\n  }\n  if ((y <= ra) || (y >= (height -ra))){\n    v.y *= -1;\n  }\n  \n  }\n  \n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "lilagondwana",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2044593",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:25:16"
+}

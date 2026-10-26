@@ -1,0 +1,26 @@
+{
+    "name": "FlatFacesShaderwithp5Graphics",
+    "code": "// === Tab: flag.js ===\n// CREDIT: http://www.aclockworkberry.com/shader-derivative-functions/\n\nfunction flatFacesShader(p) {\n\tlet canvas;\n  let shader;\n\tlet buffer;\n  \n  p.setup = function() {\n    canvas = p.createCanvas(p.windowWidth, p.windowHeight);\n\t\tbuffer = p.createGraphics(p.width, p.height, p.WEBGL);\n\t\tbuffer.drawingContext.getExtension('OES_standard_derivatives');\n\t\tshader = buffer.createShader(vert, frag);\n    buffer.noStroke();\n\t\tbuffer.shader(shader);\n  };\n  \n  p.draw = function() {\n    p.background('white');\n\n\t\tbuffer.clear();\n\t\tbuffer.push();\n\t\tbuffer.rotateY((p.millis() / 1000) * (p.PI / 4));\n\t\t\t\n\t\t// p.ambientLight(50, 50, 50);\n    // p.pointLight(255, 255, 255, p.mouseX - p.width / 2, p.mouseY - p.height / 2, 210);\n\t\t\n\t\tbuffer.sphere(200);\n\t\tbuffer.pop();\n\t\t\n\t\tp.image(buffer, 0, 0, p.width, p.height);\n  };\n}\n\nlet sketch = new p5(flatFacesShader);\n\n// === Tab: vert.glsl.js ===\nlet vert = `\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\n\nattribute vec3 aPosition;    // Vertex position\n// attribute vec2 aTexCoord;    // Vertex texture coordinate\nattribute vec3 aNormal;      // Vertex normal\n// attribute vec4 aVertexColor; // Vertex color\n\nvarying vec3 pos;\nvarying vec3 normalInterp;\n\nvoid main(){\n    gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);\n    vec4 pos4 = uModelViewMatrix * vec4(aPosition, 1.0);\n\n    normalInterp = uNormalMatrix * aNormal;\n    pos = vec3(pos4) / pos4.w;\n}\n`;\n\n// === Tab: frag.glsl.js ===\nlet frag = `\n#extension GL_OES_standard_derivatives : enable\n\nprecision mediump float;\n\nvarying vec3 pos;\nvarying vec3 normalInterp;\n\n// This shader uses it's own static lighting and coloring\n// If you want to use p5js lighting/coloring see:\n// https://github.com/processing/p5.js/blob/main/src/webgl/shaders/lighting.glsl\n// and\n// https://github.com/processing/p5.js/blob/main/src/webgl/shaders/phong.frag\nconst vec3 lightPos = vec3(200,60,100);\nconst vec3 ambientColor = vec3(0.2, 0.0, 0.0);\nconst vec3 diffuseColor = vec3(0.5, 0.0, 0.0);\nconst vec3 specColor = vec3(1.0, 1.0, 1.0);\n\nvoid main() {\n\t// vec3 normal = normalize(normalInterp);\n\tvec3 normal = normalize(cross(dFdy(pos), dFdx(pos)));\n\tvec3 lightDir = normalize(lightPos - pos);\n\n\tfloat lambertian = max(dot(lightDir,normal), 0.0);\n\tfloat specular = 0.0;\n\n\tif(lambertian > 0.0) {\n\t\tvec3 viewDir = normalize(-pos);\n\t\tvec3 halfDir = normalize(lightDir + viewDir);\n\t\tfloat specAngle = max(dot(halfDir, normal), 0.0);\n\t\tspecular = pow(specAngle, 16.0);\n\t}\n\n\tgl_FragColor = vec4(ambientColor + lambertian * diffuseColor + specular * specColor, 1.0);\n}\n`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "kumupaul",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1492649",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 23:47:12",
+    "used_in_videos": [
+        "Infinite Feedback Spacious.mp4"
+    ],
+    "used_count": 1
+}

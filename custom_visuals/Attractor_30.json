@@ -1,0 +1,29 @@
+{
+    "name": "Attractor_30",
+    "code": "// === Tab: mySketch ===\n// attractor_3.0\n\nlet N = 1112 ; let M = 10 ; let R = 4 ;\n\nlet X[] = new Array(N) ; let Y[] = new Array(N) ; let dX[] = new Array(N) ; let dY[] = new Array(N) ;\nlet CX[] = new Array(M) ; let CY[] = new Array(M) ; let CR[] = new Array(M) ;\nlet I ; let II ; let L ; let KX ; let KY ; \n\n\nfunction setup(){\n  \n  createCanvas(1112, 834) ; noSmooth() ; background(0) ; //stroke(255,0,0) ; \n  colorMode(HSB, 255);\n\tstroke(255);\n  for ( I = 0 ; I < N ; I++ ){\n    KX = random(550,2000) ; KY = random(-PI,+PI) ;\n    X[I] = KX*cos(KY) ; Y[I] = KX*sin(KY) ;\n  }\n  \n  for ( I = 0 ; I < M ; I++ ){\n    CR[I] = random(+60,+200) ; CX[I] = random(-width/2+CR[I],width/2-CR[I]) ; CY[I] = random(-height/2+CR[I],height/2-CR[I]) ; \t\t\n  }\n  \n} // setup()\n\n\nfunction draw(){\n  noStroke();\n  fill(0,0,0,20) ; rect(-1,-1,width+2,height+2) ; fill(255,0,0) ;\n\ttranslate(256, 117);\n  stroke(255);\n  for ( I = 0 ; I < N ; I++ ){\n    for ( II = 0 ; II < M ; II++ ){\n      KX = X[I]-CX[II] ; KY = Y[I]-CY[II] ;\n      L = sqrt((KX*KX)+(KY*KY)) ;\n      dX[I] = dX[I] + ((KX-KY-(KX*((KX*KX)+(KY*KY))/pow(CR[II],2)))/pow(L,5)) ;\n      dY[I] = dY[I] + ((KX+KY-(KY*((KX*KX)+(KY*KY))/pow(CR[II],2)))/pow(L,5)) ;\n    }\n    for ( II = I+1 ; II < N ; II++ ){\n      L = sqrt(pow(X[I]-X[II],2)+pow(Y[I]-Y[II],2)) ;\n      if ( L < 2*R ){\n         dX[I] =  dX[I] + ((X[I]-X[II])/L) ;  dY[I] =  dY[I] + ((Y[I]-Y[II])/L) ;\n        dX[II] = dX[II] - ((X[I]-X[II])/L) ; dY[II] = dY[II] - ((Y[I]-Y[II])/L) ;\n      }\n    }\n  }\n  \n  for ( I = 0 ; I < N ; I++ ){\n    L = sqrt((dX[I]*dX[I])+(dY[I]*dY[I])) ;\n    dX[I] = 2*dX[I]/L ; dY[I] = 2*dY[I]/L ;\n\t\tstroke(I/N*255, 200, 255);\n\t\tfill(I/N*255, 200, 200);\n    ellipse(X[I]+300,Y[I]+300,R,R) ;\n    X[I] = X[I] + dX[I] ; Y[I] = Y[I] + dY[I] ;\n    dX[I] = 0 ; dY[I] = 0 ;\n  }\n  \n} // draw()\n\n\n\nfunction mousePressed(){\n  save('logo2.png');\n  for ( I = 0 ; I < M ; I++ ){\n    CR[I] = random(+60,+200) ; CX[I] = random(-width/2+CR[I],width/2-CR[I]) ; CY[I] = random(-height/2+CR[I],height/2-CR[I]) ; \n  }\n\n}// mousePressed()\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u114598",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1594194",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 17:24:11",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

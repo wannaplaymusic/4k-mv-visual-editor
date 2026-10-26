@@ -1,0 +1,24 @@
+{
+    "name": "ballisticletters",
+    "code": "// === Tab: mySketch ===\nfunction getVel(x,y,v,tx,ty,g){\n\tlet ax = tx-x;\n\tlet ay = ty-y;\n\tlet v2 = v*v;\n\t\n\tlet dy = v2 - sqrt(v2*v2-g*(g*ax*ax+2*ay*v2));\n\tlet dx = g*ax;\n\treturn createVector(dx,dy).normalize().mult(v);\n}\n\n\nfunction getTheta(x,y,v,tx,ty,g){\n\tvar ax = (tx-x);\n\tvar ay = -(ty-y);\n\tvar v2 = v*v;\n\t\n\tvar dy = v2 - sqrt(  v2*v2 -  g*(g*ax*ax + 2*ay*v2)  );\n\tvar dx = g*ax;\n\treturn (Math.atan2(dy,dx));\n}\n\nlet projectiles;\nlet grav = 0.03;\n\nfunction preload() {\n  font = loadFont(\"https://openprocessing.org/sketch/749423/files/Vogue.ttf\");\n}\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(220);\n\tprojectiles=[];\n\treset(\"l\");\n}\n\n\nfunction fireAt(ax,ay,targetx,targety,vel,sync){\n\tlet vec = getVel(ax,ay,vel,targetx,targety,grav);\n\tlet ang = getTheta(ax,ay,vel,targetx,targety,grav);\n\tlet vx = cos(ang)*vel;\n\tlet vy = -sin(ang)*vel;\n\tlet time = abs((ax-targetx)/vx);\n\tlet m = new Projectile(ax,ay, vx,vy,sync-time,time);\n\tprojectiles.push(m);\n}\nfunction reset(char){\n\t//\n\tlet fontsize = width * 0.3;\n\tlet options = {\n    sampleFactor: 0.2,\n    simplifyThreshold: 0\n  };\n\ttxt = char;\n\tlet points = font.textToPoints(txt, width / 2 - fontsize / 3, height/2 + fontsize / 3, fontsize, options);\n\tlet v = height*0.005;\n  for (let p of points) {\n\t\tvar ax = random(width/4,width*0.75);\n\t\tvar ay = height*0.5+random(height*0.1);\n\t\tfireAt(ax,ay,p.x,p.y,v,300);\n\t\t\n  }\n}\nfunction keyPressed() {\n\treset(key);\n}\nfunction draw() {\n\tfill(222,10);\n\trect(0,0,width,height);\n\t//ellipse((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 20, 20);\n\tlet removeArr = [];\n\tfor (let i = 0; i < projectiles.length; i++) {\n    var m = projectiles[i];\n    m.update();\n    m.draw();\n\t\tif (m.pos.y>height) {\n      removeArr.push(i);\n    }\n\t\t\n\t}\n\tfor(let j = removeArr.length-1; j > 0; j--){\n     projectiles.splice(removeArr[j],1);\n  }\n\t\n}\n\n\n\nclass Projectile{\n\tconstructor(x,y,vx,vy,del,time){\n\t\tthis.pos = createVector(x, y);\n\t\tthis.vel = createVector(vx, vy);\n\t\tthis.delay=del;\n\t\tthis.maxdelay=del;\n\t\tthis.time=time;\n\t}\n\tupdate() {\n\t\tif(this.delay<=0){\n\t\t\tvar iterations = 3;\n\t\t\tfor(var i = 0;i<iterations;i++){\n\t\t\t\t\n\t\t\t\tthis.pos.add(this.vel.x/iterations,this.vel.y/iterations);\n\t\t\t\tthis.vel.add(0,grav/iterations);\n\t\t\t\t\n\t\t\t}\n\t\t\tthis.time -= 1;\n\t\t}\n\t\tthis.delay=this.delay-1;\n\t}\n\tdraw(){\n\t\tlet prog = 1- max(0,this.delay/this.maxdelay);\n\t\tfill(0,max(20,(2-abs(this.time) )*100  ));\n\t\tnoStroke();\n\t\tellipse(this.pos.x,this.pos.y,5*prog,5*prog);\n\t\t//line(this.pos.x,this.pos.y,this.pos.x+this.vel.x,this.pos.y+this.vel.y);\n\t}\n\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Xelo",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/749423",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:00:13",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_FLAT_COLOR_SCREEN (All Frames MaxVar=0.00)"
+}

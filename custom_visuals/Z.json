@@ -1,0 +1,31 @@
+{
+    "name": "Z",
+    "code": "// === Tab: mySketch ===\n\nlet particles = [];\nlet circles = [];\nlet squiggliness = 50/100;\nlet interval;\nlet margin = 10;\nlet theEnd = false;\nlet r = 360;\nlet noiseFactor;\n\nfunction setup() {\n  createCanvas(1112, 834);\n  colorMode(HSB, 150);\n  noStroke();\n  \n  background(0);\n\tgenerateCircles();\n  updateParticles();\n\t\n\tsquiggliness = 1/random(200, 200);\n\tnoiseFactor = random(200, 100);\n  \n  interval = setInterval(updateParticles, 1000);\n}\n\nfunction draw() {\n\tif (theEnd) {\n\t\tnoLoop();\n\t} else {\n\t\tfor (let p of particles) {\n\t\t\tp.draw();\n\t\t\tp.move();\n\t\t}\n\t}\n}\n\nfunction updateParticles() {\n  particles = [];\n\tlet xCenter = width/2;\n\tlet yCenter = height/2;\n\tlet n = r*50;\n  for (let i = 0; i < n; i++) {\n\t\tlet theta = map(i, 0, n, -PI, PI);\n    let x_ = xCenter + r*sin(theta);\n    let y_ = yCenter + r*cos(theta);\n\t\tlet s_ = 1;\n    particles.push(new Particle(x_, y_, s_));\n  }\n\tr -= 20;\n\tif (r < 20) {\n\t\tclearInterval(interval);\n\t\ttheEnd = true;\n\t}\n}\n\nfunction Particle(x_, y_, s_) {\n  this.x = x_;\n  this.y = y_;\n  this.size = 6 * s_;\n\t\n  this.alpha = 100;\n  this.dist = 1;\n  \n  this.move = function() {\n    var theta = noise(this.x * squiggliness, this.y * squiggliness, r/100)*PI*noiseFactor;\n    let v = p5.Vector.fromAngle(theta, this.dist);\n    this.x += v.x;\n    this.y += v.y;\n    //this.dist *= 0.999;\n    this.alpha *= 0.99;\n\t\tthis.size *= 0.99;\n  }\n  \n  this.draw = function() {\n\t\tlet d = distanceToCircles(this.x, this.y)*100;\n\t\tfill((d*10)%200, 200, 200);\n    circle(this.x, this.y, this.size);\n  }\n}\n\nfunction generateCircles() {\n\tlet maxCircles = 10;\n\tvar xCenter = width/2;\n\tvar yCenter = height/2;\n\tfor (let i = 0; i < maxCircles; i++) {\n\t\tvar x_ = xCenter + random(-r, r);\n\t\tvar y_ = yCenter + random(-r, r);\n\t\tlet r_ = random(10, 50);\n\t\tif (!intersectsWithOtherCircles(x_, y_, r_)) {\n\t\t\tcircles.push({x: x_, y: y_, r: r_});\n\t\t}\n\t}\n}\n\nfunction intersectsWithOtherCircles(x_, y_, r_) {\n\tfor (let c of circles) {\n\t\tif (dist(c.x, c.y, x_, y_) < c.r + r_ + margin) {\n\t\t\treturn true;\n\t\t}\n\t}\n\treturn false;\n}\n\nfunction distanceToCircles(x_, y_) {\n\tvar d = 0;\n\tfor (let c of circles) {\n\t\td += c.r/dist(c.x, c.y, x_, y_)\n\t}\n\treturn d;\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  // prevents mouse press from registering twice\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1321517",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:07:00",
+    "used_in_videos": [
+        "Concrete Signal Unit.mp4"
+    ],
+    "used_count": 1
+}

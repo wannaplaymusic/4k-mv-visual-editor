@@ -1,0 +1,31 @@
+{
+    "name": "WhirlpoolParticles",
+    "code": "// === Tab: mySketch ===\nlet numParticles = 50;\n\nlet particlePos = [];\nlet particleVel = [];\n\nlet centerAttractMult = 2;\nlet airResistance = 0.99;\nlet dAttract = 0.005;\n\nlet lenDiv = 282.8;\nlet lineBias = 1;\nlet linePow = 1.3;\n\nlet multTimes = 0;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\n\treset();\n\tstrokeWeight(3);\n\tcolorMode(HSB);\n}\n\nfunction draw() {\n\tcolorMode(RGB);\n\tbackground(0, 4);\n\tcolorMode(HSB);\n\tcenterAttractMult -= dAttract;\n\tif (centerAttractMult < -0.2 || centerAttractMult > 4) {\n\t\tdAttract *= -1;\n\t\tif (centerAttractMult > 4) {\n\t\t\tdAttract *= 5;\n\t\t\tmultTimes++;\n\n\t\t\tif (multTimes == 5) {\n\t\t\t\tstrokeWeight(6);\n\t\t\t\tbackground(255);\n\t\t\t}\n\t\t}\n\t}\n\tfor (let i = 0; i < numParticles; i++) {\n\t\tfor (let j = 0; j < numParticles; j++) {\n\t\t\tif (j != i) {\n\t\t\t\t// particleVel[i].add(attract(j, particlePos[i].x, particlePos[i].y));\n\t\t\t\tlet gravAttract = attract(j, particlePos[i].x, particlePos[i].y);\n\t\t\t\tlet newAttract = createVector(-gravAttract.y, gravAttract.x + gravAttract.y);\n\t\t\t\tparticleVel[i].add(newAttract);\n\n\t\t\t}\n\t\t}\n\t\tparticleVel[i].add(centerAttract(particlePos[i].x, particlePos[i].y).mult(centerAttractMult));\n\n\t\tparticlePos[i].add(particleVel[i]);\n\t\tparticleVel[i].mult(airResistance);\n\n\t\tstroke((frameCount + (i / numParticles) * 50) % 255, 255, 255);\n\t\tlet lineLength = pow(dist(particlePos[i].x, particlePos[i].y, width / 2, height / 2), linePow) / lenDiv + lineBias;\n\t\tline(particlePos[i].x, particlePos[i].y, particlePos[i].x - particleVel[i].x * lineLength, particlePos[i].y - particleVel[i].y * lineLength);\n\t}\n}\n\nfunction attract(attractIndex, posX, posY) {\n\tlet attractionForce = createVector(posX - particlePos[attractIndex].x, posY - particlePos[attractIndex].y);\n\tattractionForce.normalize();\n\n\tlet amp = 1 / sqrt(dist(posX, posY, particlePos[attractIndex].x, particlePos[attractIndex].y));\n\tamp /= numParticles\n\tattractionForce.mult(-2 * amp);\n\n\treturn attractionForce;\n}\n\nfunction centerAttract(posX, posY) {\n\tvar attractionForce = createVector(posX - width / 2, posY - height / 2);\n\tattractionForce.normalize();\n\tvar amp = 1 / sqrt(dist(posX, posY, width / 2, height / 2));\n\tattractionForce.mult(-4 * amp);\n\treturn attractionForce;\n}\n\nfunction reset() {\n\tbackground(0);\n\n\tfor (let i = 0; i < numParticles; i++) {\n\t\tparticlePos[i] = createVector(random(width), random(height));\n\t\tparticleVel[i] = createVector(0, 0);\n\t}\n}\n\nfunction keyPressed() {\n\tif (keyCode == LEFT_ARROW) numParticles -= ceil(sqrt(numParticles));\n\tif (keyCode == RIGHT_ARROW) numParticles += ceil(sqrt(numParticles));\n\n\tnumParticles = constrain(numParticles, 1, 1000);\n\treset();\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "16384",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/963406",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:36:19",
+    "used_in_videos": [
+        "Gradient of Silence.mp4"
+    ],
+    "used_count": 1
+}

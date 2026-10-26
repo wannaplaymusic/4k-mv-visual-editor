@@ -1,0 +1,26 @@
+{
+    "name": "Planetwithasteroids",
+    "code": "// === Tab: mySketch ===\n/*//I like the animated graphics.\n\n  Inspired from https://www.dwitter.net/d/10534\n  by tomxor\n\n  And from https://openprocessing.org/sketch/2763432\n  by Noel\n  \n  Juan Carlos Ponce Campuzano\n  24/Jan/2026\n  https://www.patreon.com/jcponce\n  \n*/\n\nlet counter = 100;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  background(0);\n  stroke(255);\n  noFill();\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n  background(0);\n}\n\nfunction draw() {\n  background(0, 40); // trails\n  counter += 0.015;\n\n  const cx = width / 2;\n  const cy = height / 2;\n\n  // draw planet first (even)\n  for (let i = 3000; i >= 2; i -= 2) {\n    drawPoints(i, 0, cx, cy);\n  }\n\n  // draw ring on top (odd)\n  for (let i = 1999; i > 1; i -= 2) {\n    drawPoints(i, 1, cx, cy);\n  }\n}\n\nfunction drawPoints(i, parity, cx, cy) {\n  // original distance logic (kept)\n  let r =\n    counter / cos(counter / i) +\n    parity * (counter / 2 + (i % counter));\n\n  let a = counter / 9 + i * i;\n\n  // ---- RING GEOMETRY CONTROL ----\n  let ringFlatten = parity ? 0.28 : 1.0;  // thin disk\n  let ringTilt = parity ? 2.1 : 1.0;      // tilt illusion\n\n  let x =\n    cx +\n    r * sin(a) * cos(!parity * i / counter);\n\n  let y =\n    cy +\n    r * cos(a + parity * 2) * ringFlatten * ringTilt;\n\n  // ---- LIGHTING ----\n  let size = 1 - cos(a);\n\n  // depth shading for ring\n  if (parity) {\n    let depth = sin(a + 2);\n    size *= map(depth, -1, 1, 0.4, 1.3);\n  }\n\n  strokeWeight(size);\n\n  // warmer planet, cooler rings\n  if (parity === 0) {\n    stroke(220, 200, 170, 180);\n  } else {\n    stroke(200, 220, 255, 160);\n  }\n\n  point(x, y);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Emiliano Ramon Obeso",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2859041",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:43:56",
+    "used_in_videos": [
+        "Substructure 9.mp4"
+    ],
+    "used_count": 1
+}

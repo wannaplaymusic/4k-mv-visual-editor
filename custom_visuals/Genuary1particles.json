@@ -1,0 +1,35 @@
+{
+    "name": "Genuary1particles",
+    "code": "// === Tab: mySketch ===\n// Genuary 2024:1 - Particles, lots of them\n//\n// Maybe not really particles, and not a lot of them either\n\nlet cw, ch\nlet ringSize\nlet nRings = 10\n\nfunction setup () {\n  cw = windowWidth\n  ch = windowHeight\n  // Round cw and ch to multiples of 4\n  cw = cw - (cw % 4)\n  ch = ch - (ch % 4)\n  createCanvas(cw, ch, WEBGL)\n  colorMode(HSB, 360, 100, 100, 100)\n  noFill()\n  ringSize = min(cw, ch) / 4\n  rings = []\n  for (let i = 0; i < nRings; i++) {\n    let angle = i * TAU / nRings\n    let nCubes = 20\n    rings.push(new Ring([\n      cos(angle) * ringSize,\n      sin(angle) * ringSize,\n      0\n    ], ringSize, nCubes, ringSize / 10))\n  }\n}\n\nlet cycleSpeed = 0.01\nfunction draw () {\n  background(0, 0, 20)\n  orbitControl()\n\n  push()\n  translate(0, 0, -ringSize / 2)\n  rotateX(PI / 2)\n  rotateZ(frameCount * cycleSpeed)\n\n  noFill()\n  for (let i = 0; i < nRings; i++) {\n    let ring = rings[i]\n    var angle = i * TAU / nRings\n    push()\n    translate(...ring.center)\n    rotateX(PI/2)\n    rotateY(angle)\n    if (i % 2 === 0) {\n      rotateZ(frameCount * 0.02)\n    } else {\n      rotateZ(-frameCount * 0.02)\n    }\n    let za = map((frameCount * cycleSpeed) % TAU, 0, 1, 0, 360) / 2\n    let hue = ((i * 360 / nRings) + za) % 360\n    strokeWeight(map(sin(frameCount * 0.1 + i), -1, 1, 3, 5))\n    rings[i].draw(hue)\n    pop()\n  }\n  pop()\n}\n\nclass Ring {\n  constructor(center, radius, nCubes, cubeSize) {\n    this.center = center\n    this.radius = radius\n    this.nCubes = nCubes\n    this.cubeSize = cubeSize\n    this.cubes = []\n    this.build()\n  }\n\n  build () {\n    let cubeSize = this.cubeSize\n    let radius = this.radius\n    var nCubes = this.nCubes\n    for (let i = 0; i < nCubes; i++) {\n      var angle = i * TAU / nCubes\n      let cubeCenter = [\n        cos(angle) * radius,\n        sin(angle) * radius,\n        0\n      ]\n      let cube = { cubeCenter, cubeSize }\n      this.cubes.push(cube)\n    }\n  }\n\n  p (x, y, z) {\n    push()\n    translate(x, y, z)\n    sphere(this.radius / 100)\n    pop()\n  }\n\n  draw (hue) {\n    for (let i = 0; i < this.nCubes; i++) {\n      var cube = this.cubes[i]\n      let { cubeCenter, cubeSize } = cube\n      let [x, y, z] = cubeCenter\n      push()\n      translate(x, y, z)\n      let newHue = (hue + (i * 360 / this.nCubes)) % 360\n      fill(newHue, 50, 100, 100)\n      noStroke()\n      rotateX(frameCount * 0.01)\n      rotateY(frameCount * 0.02)\n      rotateZ(frameCount * 0.04)\n      this.p(cubeSize / 2, 0, 0)\n      this.p(-cubeSize / 2, 0, 0)\n      this.p(0, cubeSize / 2, 0)\n      this.p(0, -cubeSize / 2, 0)\n      this.p(0, 0, cubeSize / 2)\n      this.p(0, 0, -cubeSize / 2)\n      this.p(cubeSize / 2, cubeSize / 2, cubeSize / 2)\n      this.p(-cubeSize / 2, cubeSize / 2, cubeSize / 2)\n      this.p(cubeSize / 2, -cubeSize / 2, cubeSize / 2)\n      this.p(cubeSize / 2, cubeSize / 2, -cubeSize / 2)\n      this.p(-cubeSize / 2, -cubeSize / 2, cubeSize / 2)\n      this.p(-cubeSize / 2, cubeSize / 2, -cubeSize / 2)\n      this.p(cubeSize / 2, -cubeSize / 2, -cubeSize / 2)\n      this.p(-cubeSize / 2, -cubeSize / 2, -cubeSize / 2)\n      pop()\n    }\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "particles",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible",
+        "batch_2026-10-09"
+    ],
+    "url": "https://openprocessing.org/sketch/2442341",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:01:29",
+    "used_in_videos": [
+        "Circular Horizon.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "is_starred": false
+}

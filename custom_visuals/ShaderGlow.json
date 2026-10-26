@@ -1,0 +1,27 @@
+{
+    "name": "ShaderGlow",
+    "code": "// === Tab: mySketch ===\n// sketch.js\nlet theShader;\n\nfunction preload() {\n  theShader = createShader(vert, frag);\n}\n\nfunction setup() {\n  createCanvas(1112, 834, WEBGL);\n  noStroke();\n}\n\nfunction draw() {\n  shader(theShader);\n\n  theShader.setUniform(\"u_resolution\", [width, height]);\n  theShader.setUniform(\"u_mouse\", [(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, height, 0)]);\n  theShader.setUniform(\"u_time\", millis() / 1000.0);\n\n  rect(0, 0, 0);\n}\n\nfunction windowResized() {\n  resizeCanvas(1112, 834);\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed() {\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\n\n// === Tab: vert ===\n// shader.vert\nlet vert = `\nattribute vec3 aPosition; \nattribute vec2 aTexCoord; \nvarying vec2 vTexCoord; \n\nvoid main() {\n  vTexCoord = aTexCoord;\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  positionVec4.xy = positionVec4.xy * 2.0 - 1.0;\n  gl_Position = positionVec4;\n}\n`;\n\n// === Tab: frag ===\n// **REFERENCE**\n// https://www.shadertoy.com/view/3s3GDn\nlet frag = `\n\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n#define PI 3.1415926535\n\nuniform vec2 u_resolution;\nuniform vec2 u_mouse;\nuniform float u_time;\nvarying vec2 vTexCoord; // uv\n\nmat2 rotate2d(float _angle) {\n  return mat2(\n    cos(_angle), - sin(_angle),\n    sin(_angle), cos(_angle)\n  );\n}\nfloat distanceFrom(vec2 pos) {\n  vec2 pos_rot = pos * rotate2d(sin(0.9));\n  return max(abs(pos.x), abs(pos.y)) * max(abs(pos_rot.x), abs(pos_rot.y));\n}\n\nvoid main() {\n  vec2 pos = 0.5 - vTexCoord;\n  pos.y /= u_resolution.x / u_resolution.y;\n  \n  // 座標変換\n  pos.y *= pos.x - (sin(u_time * 1.0) / 2.0); // 横移動\n  pos.x *= vTexCoord.x * (1.0 - vTexCoord.x) * pow(abs(sin(u_time * 2.0 + PI / 2.0)+0.5), 2.0); // 横拡張\n  pos.y = pos.y + \n    sin(vTexCoord.x * 4.0 + u_time/4.0) / 8.0 + \n    sin(vTexCoord.x * (3000.0 - sin(u_time/2.0)*4.0)) / 10.0; // 縦拡張\n  pos *= rotate2d(sin(u_time * 2.0)); // 画面回転\n  \n  // Glow\n  float dist = 0.0001 / distanceFrom(pos); // Glow\n  dist = pow(dist, 0.5); // Gamma\n  \n  // Coloring\n  vec3 col = dist * vec3(0.6 + sin(u_time) / 2.5, 0.5, 0.9);\n  \n  gl_FragColor = vec4(col, 1.0);\n}\n`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1521094",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 23:44:41",
+    "used_in_videos": [
+        "Cryo Weapon Marauder.mp4",
+        "Plasma Armor Fury.mp4"
+    ],
+    "used_count": 2
+}

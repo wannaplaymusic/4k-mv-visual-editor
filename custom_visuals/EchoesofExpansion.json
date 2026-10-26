@@ -1,0 +1,24 @@
+{
+    "name": "EchoesofExpansion",
+    "code": "// === Tab: mySketch.js ===\nlet sizer = 0\nlet speed = 0.3;\nfunction setup() {\n  createCanvas(400, 400);\n  noStroke();\n\t\n  \n}\n\nfunction draw() {\n  background(0,30);\n\tfill(255,150)\n  let t = millis()/1000;\n  for(let i = 25; i > 0; i--){\n    let a = t+i/8\n           rect(min(395,max(0,200+sizer*sin(a)+random(100)*sin(t/3))),min(395,max(0,200+sizer*cos(a)+200*cos(t/3))),5,5);\n  }\n  sizer+=speed;\n  if(sizer < 0 || sizer > 200){\n    speed *= -1;\n  }\n  \n}\n\n\n/*\nA remix of\nhttps://www.dwitter.net/d/6634\nfor(c.width|=i=25;i--;x.fillRect(M.min(1870,M.max(0,960+400*S(a=t+i/4)+800*S(t))),M.min(1030,M.max(0,540+400*C(a)+400*C(t/3))),50,50))M=Math\n\n*/\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n\t<meta charset=\"utf-8\" />\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/addons/p5.sound.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nhtml, body {\n  margin: 0;\n  height: 100vh;\n  \n  \n  display: flex;\n  justify-content: center; \n  align-items: center;     \n  \n  \n  background-color: #000000; \n}\n\ncanvas {\n\tborder-style: solid;\n\tborder-width: 4px;\n\tborder-color: #30303025;\n  display: block;\n  \n}\n",
+    "inline_assets": {},
+    "author": "megamitts",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2987347",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:34:54",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

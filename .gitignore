@@ -38,11 +38,17 @@ abnormal_previews.*
 repair_report.json
 camera_arvr_cleanup_report.json
 harmful_security_report.json
+audit_quarantine_*_report.json
+audit_quarantine_report_*.json
+audit_batch_candidates.json
+shorts_exporter_config.json
 
 # Quarantined & Backups
 custom_visuals/camera_arvr_backup/
 custom_visuals/abnormal_backup/
 custom_visuals/.batch_manifest/rollback_backup/
+*.bak
+*.backup
 
 # Test media & Scratch files
 scratch/
@@ -53,6 +59,17 @@ test_p5_load.html
 /sandbox_screen.png
 /test_*.png
 upload_failed_videos.py
+resume_upload_*.py
+test_cf_*.py
+test_visible_embed.py
+test_window_sketch.py
+test_real_sketch_fetch.py
+test_inpage_fetch_valid_id.py
+test_curation_sketches.py
+check_sketch_links.py
+inspect_endpoints.py
+audit_batch_*.py
+execute_quarantine_*.py
 
 # OS files
 .DS_Store

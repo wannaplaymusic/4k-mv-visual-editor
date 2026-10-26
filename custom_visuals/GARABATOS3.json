@@ -1,0 +1,63 @@
+{
+    "name": "GARABATOS3",
+    "code": "// === Tab: mySketch ===\n/* ======================= SPLASH + OJOS + CÍRCULOS DE FONDO ======================= */\n\nlet baseLayer;\nlet eyes;\nlet movingCircles = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  colorMode(HSB, 360, 100, 100, 255);\n  baseLayer = new Splash(createVector(width / 2, height / 2), 180, new Palette().randomSoft());\n  eyes = new GooglyEyes(createVector(width / 2, height / 2 + 50), 40);\n\n  // Crear círculos de fondo\n  for (let i = 0; i < 12; i++) {\n    movingCircles.push(new MovingCircle());\n  }\n}\n\nfunction draw() {\n  background(255);\n\n  // Fondo animado con círculos que se mueven\n  for (let c of movingCircles) {\n    c.update();\n    c.display();\n  }\n\n  // Dibujo principal\n  baseLayer.paint();\n  eyes.update();\n  eyes.draw();\n}\n\n/* ======================= CLASE DE CÍRCULOS EN MOVIMIENTO ======================= */\nclass MovingCircle {\n  constructor() {\n    this.reset();\n  }\n\n  reset() {\n    this.x = random(-200, width + 200);\n    this.y = random(height);\n    this.r = random(80, 200);\n    this.speed = random(0.5, 2);\n    this.hue = random(0, 360);\n  }\n\n  update() {\n    this.x += this.speed;\n    if (this.x - this.r > width) {\n      this.reset();\n      this.x = -this.r;\n    }\n  }\n\n  display() {\n    noStroke();\n    fill(this.hue, 80, 90, 80);\n    ellipse(this.x, this.y, this.r);\n  }\n}\n\n/* ======================= SPLASH ======================= */\n\nclass Splash {\n  constructor(c, poolR, pal) {\n    this.c = c.copy();\n    this.poolR = poolR;\n    this.pal = pal;\n\n    this.armCount = Math.floor(random(26, 44));\n    this.minLen = random(140, 210);\n    this.maxLen = random(280, 440);\n    this.branchProb = 0.4;\n    this.wobble = random(1, 50);\n    this.viscosity = random(0.01, 0.1);\n  }\n\n  paint() {\n    push();\n    noStroke();\n\n    const puddleLayers = 28;\n    for (let i = puddleLayers; i >= 1; i--) {\n      const rr = this.poolR * map(i, 1, puddleLayers, 0.55, 1.35) * (1 + 0.1 * noise(i * 0.13));\n      const col = this.pal.mix(map(i, 1, puddleLayers, 0, 1));\n      fill(col);\n      ellipse(\n        this.c.x + randomGaussian() * 6,\n        this.c.y + randomGaussian() * 6,\n        rr * 2,\n        rr * 2\n      );\n    }\n\n    for (let a = 0; a < this.armCount; a++) {\n      const baseAng = TWO_PI * a / this.armCount + random(-0.08, 0.08);\n      const len = random(this.minLen, this.maxLen);\n      const steps = Math.max(1, Math.floor(len / 4));\n      const sw0 = map(this.viscosity, 0, 1, 9, 16) * random(0.8, 1.25);\n      const taperPow = map(this.viscosity, 0, 1, 0.9, 2.3);\n\n      const c0 = this.pal.mix(random(0, 0.6));\n      const c1 = this.pal.mix(random(0.4, 1));\n\n      const start = p5.Vector.fromAngle(baseAng)\n        .mult(this.poolR * 0.9 + random(4, 10))\n        .add(this.c);\n\n      let p = start.copy();\n      let dir = p5.Vector.fromAngle(baseAng);\n      const nOff = random(1000);\n\n      for (let s = 0; s < steps; s++) {\n        const t = s / steps;\n        const ang = baseAng + this.wobble * (noise(nOff + s * 0.03) - 0.5);\n        dir = p5.Vector.fromAngle(ang);\n        const stepLen = 10 + 3 * pow(1 - t, 2);\n        const q = p5.Vector.add(p, p5.Vector.mult(dir, stepLen));\n\n        const cc = lerpColor(c0, c1, easeOutCubic(t));\n        const sw = Math.max(1, sw0 * pow(1 - t, taperPow)) * random(1.5, 2);\n\n        stroke(cc);\n        strokeWeight(sw);\n        line(p.x, p.y, q.x, q.y);\n\n        if (random(1) < this.branchProb * (1 - t)) {\n          const bAng = ang + random(-1.2, 1.2);\n          const bLen = stepLen * random(12, 24);\n          this.drawBranch(q.copy(), bAng, bLen, sw * 0.5, c0, c1);\n        }\n        p = q;\n      }\n    }\n    pop();\n  }\n\n  drawBranch(start, ang, len, sw, c0, c1) {\n    var steps = Math.max(1, Math.floor(len / 3));\n    var nOff = random(1000);\n    var p = start.copy();\n    for (let s = 0; s < steps; s++) {\n      var t = s / steps;\n      const a = ang + 0.5 * (noise(nOff + s * 0.07) - 0.5);\n      var dir = p5.Vector.fromAngle(a);\n      var stepLen = 3;\n      var q = p5.Vector.add(p, p5.Vector.mult(dir, stepLen));\n      var cc = lerpColor(c0, c1, t);\n      stroke(cc);\n      strokeWeight(sw * pow(1 - t, 1.6));\n      line(p.x, p.y, q.x, q.y);\n      p = q;\n    }\n  }\n}\n\n/* ======================= OJOS ======================= */\n\nclass GooglyEyes {\n  constructor(anchor, baseR) {\n    this.anchor = anchor.copy();\n    this.eyeR = constrain(baseR, 20, 25);\n    const gap = this.eyeR * random(1.5, 1.6);\n    const base = this.anchor.copy().add(0, -this.eyeR * 0.25);\n    const leftCenter = base.copy().add(-gap * 0.6, 0);\n    const rightCenter = base.copy().add(gap * 0.6, 0);\n    this.left = new Eye(leftCenter, this.eyeR);\n    this.right = new Eye(rightCenter, this.eyeR);\n  }\n\n  update() {\n    this.left.update();\n    this.right.update();\n  }\n\n  draw() {\n    this.left.draw();\n    this.right.draw();\n    noFill();\n    stroke(0, 0, 40, 150);\n    strokeWeight(5);\n    const wSmile = this.eyeR * 2.5;\n    arc(this.anchor.x, this.anchor.y + this.eyeR * 0.95, wSmile, wSmile * 0.7, 0.15, PI - 0.15);\n  }\n}\n\nclass Eye {\n  constructor(c, r) {\n    this.c = c.copy();\n    this.r = r;\n    this.pupilR = r * 0.4;\n    this.nOffX = random(1000);\n    this.nOffY = random(2000);\n    this.pupilCx = this.c.x;\n    this.pupilCy = this.c.y;\n  }\n\n  update() {\n    const range = this.r * 0.4;\n    let tx = map(noise(this.nOffX + frameCount * 0.01), 0, 1, -range, range);\n    let ty = map(noise(this.nOffY + frameCount * 0.014), 0, 1, -range, range);\n\n    if (dist((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), this.c.x, this.c.y) < this.r * 10) {\n      const toM = createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - this.c.x, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - this.c.y);\n      toM.limit(range * 2);\n      tx = lerp(tx, toM.x, 0.5);\n      ty = lerp(ty, toM.y, 0.5);\n    }\n\n    this.pupilCx = lerp(this.pupilCx, this.c.x + tx, 0.15);\n    this.pupilCy = lerp(this.pupilCy, this.c.y + ty, 0.15);\n  }\n\n  draw() {\n    noStroke();\n    fill(255);\n    ellipse(this.c.x, this.c.y, this.r * 2, this.r * 2);\n    fill(25);\n    ellipse(this.pupilCx, this.pupilCy, this.pupilR * 2, this.pupilR * 2);\n    fill(255, 230);\n    ellipse(this.pupilCx - this.pupilR * 0.35, this.pupilCy - this.pupilR * 0.35, this.pupilR * 0.6, this.pupilR * 0.6);\n  }\n}\n\n/* ======================= UTILIDADES ======================= */\n\nclass Palette {\n  randomSoft() {\n    var base = random(0, 360);\n    this.h1 = base;\n    this.h2 = base + random(110, 160);\n    this.h3 = base + random(200, 260);\n    return this;\n  }\n\n  mix(t) {\n    colorMode(HSB, 360, 100, 100, 255);\n    const h = lerp(this.h1, this.h2, t);\n    const s = 70;\n    const b = 90;\n    const c = color(h % 360, s, b);\n    colorMode(RGB, 255);\n    return c;\n  }\n}\n\nfunction easeOutCubic(t) {\n  const tt = constrain(t, 0, 1);\n  return 1 - pow(1 - tt, 3);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "belenmontemurro",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2811971",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:01:52",
+    "expressive_profile": {
+        "module_id": "GARABATOS3.json",
+        "primary_psychological_state": "hypnotic_trance",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "時間之流",
+            "自相似分形",
+            "脈動波紋"
+        ],
+        "narrative_function": "tension_accelerator",
+        "jungian_archetype": "the_animus",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                195.0,
+                165.0
+            ],
+            "mean_lightness": 0.317,
+            "mean_chroma": 0.037,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 1.11,
+            "curl_vorticity": 0.091,
+            "divergence": 0.004,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 17:38:33"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Authentic Essence Momentum.mp4",
+        "Intergalactic Savage Dominion.mp4"
+    ],
+    "used_count": 2
+}

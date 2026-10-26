@@ -1,0 +1,28 @@
+{
+    "name": "CloudySkies",
+    "code": "// === Tab: mySketch ===\n//code forked from reddit user victx https://www.reddit.com/r/p5js/comments/1h4yygb/animated_grid_warping/\nfunction setup() \n{\n  createCanvas(1400, 600);\n  stroke(\"#1d1d1b\");\n}\n\nfunction draw() \n{\n  background(\"#f9f0de\");\n\tlet border=4\n\tlet resolution=4\n  randomSeed(1);\n  let xT = random(), yT = random();\n  let xInc = 1/random(25000);\n  let yInc = 1/random(50);\n  for(let i = border; i < width - border; i+=resolution)\n\t{\n    yT = 0;\n    for(let j = border; j < height - border; j+=resolution)\n\t\t{\n      strokeWeight(map(noise(xT,yT, frameCount/150),0,1,1,6))\n      let angle = map(noise(xT,yT, frameCount/150),0,1,-TAU,TAU);\n      point(i,j);\n      xT+=xInc;\n      yT+=yInc;\n    }   \n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Joe DeNavas (DD89)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2478178",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:15:38",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Liquid Concrete.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,26 @@
+{
+    "name": "looptest",
+    "code": "// === Tab: mySketch ===\n/*\nEclipse (Smooth Fade Transition Version)\nJoe 20250714\n*/\n\nlet y;\n\n// --- 新增的状态管理变量 ---\nlet animationState; // 'drawing' 或 'fading'\nlet fadeAlpha;      // 用于控制渐变透明度\n\nfunction setup() {\n\tdescribe(`A grayscale generative art image of a total solar eclipse. The scene animates, then smoothly fades to black before regenerating a new, unique scene.`);\n\tcreateCanvas(500, 700);\n\tbackground(30);\n\t\n\t// 初始化/重置所有变量\n\ty = random(300, 400);\n\tanimationState = 'drawing';\n\tfadeAlpha = 0;\n\t\n\t// 绘制日冕（这部分不变）\n\tlet sunX = random(100, width - 100);\n\tlet sunY = random(50, 150);\n\tlet sunD = random(30, 50);\n\t\n\tpush();\n\ttranslate(sunX, sunY);\n\tfor (let i = 0; i < 4000; i++) {\n\t\tlet r = sunD + random(random()) * 15;\n\t\tlet theta = random(2 * PI);\n\t\tlet x = cos(theta) * r;\n\t\tvar y = sin(theta) * r;\n\t\tfill(255, 30);\n\t\tnoStroke();\n\t\tcircle(x, y, random(2));\n\t}\n\tpop();\n}\n\nfunction draw() {\n\t\n\t// 根据当前状态执行不同操作\n\tif (animationState === 'drawing') {\n\t\t// --- 状态1: 正常绘制动画 ---\n\t\t\n\t\tfor (let x = 0; x < width; x++) {\n\t\t\tlet n1 = noise(x * 0.002, y * 0.008);\n\t\t\tlet n2 = noise(x * 0.01 + 1000000, y * 0.01 + 1000000);\n\t\t\tlet n3 = noise(x * 0.002 + 10000, y * 0.01 + 10000);\n\t\t\t\n\t\t\tlet h = 10 + n1 * 150;\n\t\t\t\n\t\t\tnoStroke();\n\t\t\tfill(n1 * 255 + random(-5, 5));\n\t\t\trect(x, y, 3, -h);\n\t\t\t\n\t\t\tif (random() < 0.01 && n2 < 0.4) {\n\t\t\t\tfill(0, 5);\n\t\t\t\trect(x, y - h, randomGaussian(5, 3), -randomGaussian(300, 10));\n\t\t\t}\n\t\t\t\n\t\t\tif (n3 > 0.5 && n3 < 0.51) {\n\t\t\t\tfor (let j = 0; j < 100; j++) {\n\t\t\t\t\tlet dotX = x;\n\t\t\t\t\tlet dotY = y - h - (random(random()) * 200);\n\t\t\t\t\tfill(255, 5);\n\t\t\t\t\tcircle(dotX, dotY, random(2));\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\t\n\t\ty++;\n\t\t\n\t\t// 当动画滚动出屏幕时，切换到 'fading' 状态\n\t\tif (y > height + 200) {\n\t\t\tanimationState = 'fading';\n\t\t}\n\t\t\n\t} else if (animationState === 'fading') {\n\t\t// --- 状态2: 渐变至黑色 ---\n\t\t\n\t\t// 绘制一个半透明的黑色矩形，并逐渐增加其不透明度\n\t\tfill(0, fadeAlpha);\n\t\tnoStroke();\n\t\trect(0, 0, width, height);\n\t\t\n\t\tfadeAlpha += 4; // 控制渐变速度，数值越大越快\n\t\t\n\t\t// 当画面完全变黑后，调用 setup() 重新开始\n\t\tif (fadeAlpha >= 255) {\n\t\t\tsetup();\n\t\t}\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "trumpliu",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2942222",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:39:20",
+    "used_in_videos": [
+        "Coastal Delay.mp4"
+    ],
+    "used_count": 1
+}

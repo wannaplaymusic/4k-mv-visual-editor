@@ -1,0 +1,24 @@
+{
+  "name": "Spectrumrays",
+  "code": "// === Tab: mySketch ===\n/*\nSpectrum rays\n\nControls:\n\t- Hold mouse button to add particles.\n\t- Move mouse along x-axis to change shapes threshold.\n\nAuthor:\n  Jason Labbe\n\nSite:\n  jasonlabbe3d.com\n*/\n\nvar bobs = [];\nvar fRate = 0;\nvar threshold;\n\n\nfunction setup() {\n\tcreateCanvas(1000, 600);\n\tcolorMode(HSB, 255);\n\twindow.simulatedMouseX = width / 2;\n}\n\n\nfunction draw() {\n\t// Spawn a new Bob.\n\tif (frameCount % 5 == 0) {\n\t\tbobs.push(new Bob(\n\t\t\t-50, random(height / 2 -50, height / 2 + 50), \n\t\t\trandom(1, 2), 0));\n\t}\n\t\n\t// Spawn Bobs triggered from user.\n\tif (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) {\n\t\tif (frameCount % 2 == 0) {\n\t\t\tbobs.push(new Bob((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), random(2, 3), 0));\n\t\t}\n\t}\n\t\n\tbackground(0);\n\t\n\tthreshold = map(constrain((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width), 0, width, 0, 200);\n\t\n\tfor (let i = bobs.length - 1; i > -1; i--) {\n\t\tlet bob = bobs[i];\n\t\t\n\t\t// Have the Bob always steer to the height's center.\n\t\tlet vec = new p5.Vector(bob.pos.x, bob.pos.y);\n\t\tvec.sub(bob.pos.x, height / 2);\n\t\tvec.normalize();\n\t\tvec.mult(-0.15);\n\t\tbob.vel.add(vec);\n\t\t\n\t\tbob.pos.add(bob.vel);\n\t\tbob.pos.x += bob.vel.x;\n\t\t\n\t\t// Kill Bob if it goes out of bounds.\n\t\tif (bob.pos.y < -100 || bob.pos.x < -100 || bob.pos.x > width + 100) {\n\t\t\tbobs.splice(i, 1);\n\t\t}\n\t}\n\t\n\tfor (let i = 0; i < bobs.length; i++) {\n\t\tvar bob = bobs[i];\n\t\t\n\t\t// Bob's position define's its hue.\n\t\tlet h = map(bob.pos.x, 0, width, 0, 255);\n\t\t\n\t\t// Display Bob!\n\t\tstroke(h, 255, 255, 125);\n\t\tstrokeWeight(3);\n\t\tpoint(bob.pos.x, bob.pos.y);\n\t\t\n\t\t// Look for Bob's neighbors.\n\t\tlet neighbors = [];\n\t\t\n\t\tfor (let j = 0; j < bobs.length; j++) {\n\t\t\tif (neighbors.length > 8) {\n\t\t\t\tbreak;\n\t\t\t}\n\t\t\t\n\t\t\tif (i == j) {\n\t\t\t\tcontinue;\n\t\t\t}\n\t\t\t\n\t\t\tlet d = dist(bob.pos.x, bob.pos.y, bobs[j].pos.x, bobs[j].pos.y);\n\t\t\tif (d < threshold) {\n\t\t\t\tneighbors.push(bobs[j]);\n\t\t\t}\n\t\t}\n\t\t\n\t\t// If Bob has neighbors then draw a shape from them.\n\t\tif (neighbors.length > 0) {\n\t\t\tstrokeWeight(0.5);\n\t\t\tstroke(h, 255, 255, 50);\n\t\t\tfill(h, 255, 255, 50);\n\t\t\t\n\t\t\tbeginShape();\n\t\t\t\tcurveVertex(bob.pos.x, bob.pos.y);\n\n\t\t\t\tfor (let j = 0; j < neighbors.length; j++) {\n\t\t\t\t\tcurveVertex(neighbors[j].pos.x, neighbors[j].pos.y);\n\t\t\t\t}\n\t\t\tendShape(CLOSE);\n\t\t}\n\t}\n\t\n\t// Periodically update the frame rate.\n\tif (frameCount % 10 == 0) {\n\t\tfRate = frameRate();\n\t}\n\t\n\t// Display debugging info.\n\tnoStroke();\n\tfill(255);\n\t\n\tlet debugInfo = \"\".concat(\n\t\t\"fps: \", nf(fRate, 2, 2), \"\\n\",\n\t\t\"threshold: \", nf(threshold, 2, 2));\n\t\n\ttext(debugInfo, 20, 20);\n\ttext(\"(Hold mouse down to add new particles)\", 20, height - 20);\n}\n\n\n// It's Bob!\nfunction Bob(x, y, vx, vy) {\n\tthis.pos = new p5.Vector(x, y);\n\tthis.vel = new p5.Vector(vx, vy);\n}\n\n",
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "custom_html": "",
+  "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+  "inline_assets": {},
+  "author": "Jason Labbe",
+  "license": "CC BY-NC-SA",
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "batch_2026-09-25"
+  ],
+  "url": "https://openprocessing.org/sketch/806365",
+  "batch_id": "batch_20260925_103420",
+  "batch_date": "2026-09-25",
+  "date_added": "2026-09-25 12:53:45",
+  "needs_qc_repair": true,
+  "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

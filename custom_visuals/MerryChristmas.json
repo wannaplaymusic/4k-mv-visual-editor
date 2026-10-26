@@ -1,0 +1,26 @@
+{
+    "name": "MerryChristmas",
+    "code": "// === Tab: mySketch.js ===\n// Merry Christmas y'all!\n\nlet theShader;\n\nfunction windowResized() {\n  resizeCanvas(windowHeight*4/3, windowHeight);\n}\n\nfunction preload(){\n\ttheShader = loadShader('https://openprocessing.org/sketch/2573260/files/vert.glsl', 'frag.glsl');\n}\n\nfunction setup() {\n  pixelDensity(1);\n  canvas = createCanvas(windowHeight*4/3, windowHeight, WEBGL);\n\tcanvas.position(140,0);\n}\n\nfunction draw() {\n\tif (frameCount%200==0)  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n  shader(theShader);\n  theShader.setUniform(\"resolution\", [width, height]);\n  theShader.setUniform(\"time\", millis() / 1000.0);\n  rect(0,0,width,height);\n}\n\np5.RendererGL.prototype._initContext = function() {\n\ttry { this.drawingContext = this.canvas.getContext('webgl2', this._pInst._glAttributes) ||\n\t\t\tthis.canvas.getContext('experimental-webgl', this._pInst._glAttributes);\n\t\tif (this.drawingContext === null) { throw new Error('Error creating webgl context');\n\t\t} else { const gl = this.drawingContext; gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);\n\t\t\tgl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);\n\t\t\tthis._viewport = this.drawingContext.getParameter(this.drawingContext.VIEWPORT);\n\t\t} } catch (er) { throw er; }\n};\n\n\n\n// === Tab: vert.glsl ===\n#version 300 es \nin vec3 aPosition; void main() { gl_Position=vec4(aPosition*2.-1., 1.0); }\n\n// === Tab: frag.glsl ===\n#version 300 es\n/**********************/\n/** Merry Christmas! **/\n/**********************/\nprecision highp float;\nout vec4 O;\nuniform vec2 resolution;\nuniform float time;\n#define FC gl_FragCoord.xy\n#define R resolution\n#define T (-.5+.6*time)\n#define MN min(R.x,R.y)\n#define hue(a) (.6+.6*cos(5.3*(a)+vec3(0,23,21)))\nvec3 star(vec2 p) {\n\tvec2 q=p;\n\tp*=44.;\n\tp=vec2(atan(p.x,p.y),length(p));\n\tp.y+=.2*floor(cos(p.x*6.)*15.);\n\tp.y+=.1*floor(cos(p.x*30.)*10.);\n\tp=vec2(p.y*cos(p.x),p.y*sin(p.x));\n\tfloat d=length(p);\n\treturn 1./d*hue(length(q)-T);\n}\nfloat tri(vec2 p, vec2 s) {\n\tp.x=abs(p.x);\n\treturn max(-p.y-s.y,dot(p,vec2(1.7,.7))-s.x);\n}\nvec3 tree(vec2 p, float k) {\n\tvec2 q=p;\n\tp.x=abs(p.x)-sin(p.y*88.)*5e-3;\n\tp.y-=sin(q.x*77.)*5e-3;\n\tfloat d=tri(p+vec2(0,.2),vec2(.25,.5));\n\treturn (3e-3*(1.+k))/abs(d)*hue(length(p)+T);\n}\nvoid main(void) {\n\tvec2 uv=(FC-.5*R)/MN;\n\tif (R.x>R.y*.5) uv*=2.;\n\tvec2 p=uv;\n\tvec3 col=vec3(0);\n\tfor (float i=.0; i<5.; i++) {\n\t\tp*=vec2(1.+i*min(1.,(1.-log(i))),1.-i*.01);\n\t\tcol+=tree(p-vec2(0,i*.02),i);\n\t}\n\tcol=max(col,star(uv-vec2(0,.5)));\n\tcol=max(col,.08);\n\tO=vec4(col,1);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\t<meta charset=\"utf-8\" />\n\t<!-- keep the line below for OpenProcessing compatibility -->\n\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t<script src=\"https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\nhtml,\nbody {\n\tmargin: 0;\n\tpadding: 0;\n\toverflow: hidden;\n}\ncanvas {\n  object-fit: contain;\n  touch-action: none;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/2573260",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 22:01:39",
+    "used_in_videos": [
+        "Cryo Weapon Marauder.mp4"
+    ],
+    "used_count": 1
+}

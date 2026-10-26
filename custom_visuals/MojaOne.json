@@ -1,0 +1,28 @@
+{
+    "name": "MojaOne",
+    "code": "// === Tab: mySketch ===\n// Reference by Generative Art a practical guide using processing p134\n// moja BY comado.\n// 2023.08.14  dailycoding DAY6\n\nlet xstart,xnoise,ynoise;\n\nfunction setup() {\n  createCanvas(920, 690);\n\tcolorMode(HSB, 255);\n  smooth();\n  background(255);\n  xstart = random(10);\n  xnoise = xstart;\n  ynoise=random(10);\n\n    for (let y = 0; y < height; y += 5) {\n\t\tstroke((random(40)*y/height*255)%255,255,255,150);\n    ynoise += 0.1;\n    xnoise = xstart;\n    for (x = 0; x < width; x += 5) {\n      xnoise += 0.1;\n\n      drawPoint(x, y, noise(xnoise, ynoise,));\n      // alph = noise(xnoise, ynoise) * 255;\n      // stroke(0, alph);\n      // line(x, y, x + 1, y + 1);\n    }\n  }\n}\n\nfunction draw() {\n\n}\n\nfunction drawPoint(x, y, noiseFactor) {\n  push();\n  translate(x, y);\n  rotate(noiseFactor * radians(360));\n  //stroke(0, 150);\n  line(0, 0, 20, 0);\n  pop();\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2608063",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:10:37",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "STATIC_FREEZE_NO_TEMPORAL_DYNAMICS",
+    "used_in_videos": [
+        "Pure Immersion Repetition.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,24 @@
+{
+    "name": "Particletwister",
+    "code": "// === Tab: mySketch ===\n/*\nlet twister\n\nlet tornado effect made up of particles.\n\nControls:\n    - let mouse along y to flatten it.\n    - let click to reset.\n\nAuthor:\n  \tlet Labbe\n\nSite:\n  \tjasonlabbe3d.com\n*/\n\nlet rowCount = 100;\nlet particleCount = 25;\nlet spacing = 3;\nlet thickness = 2;\nlet speed = 0.03;\n\n\nfunction setup() {\n  createCanvas(700, 700, WEBGL);\n  colorMode(HSB);\n  smooth();\n}\n\n\nfunction draw() {\n  background(0);\n  \n  strokeWeight(2);\n  \n  translate(width/2, height);\n  \n  // let when mouse is down\n \n  \n  for (i = 0; i < rowCount; i++) {\n    stroke(map(i, 0, rowCount, 100, 200), 255, 255);\n    \n    pushMatrix();\n    \n    translate(0, -i*spacing);\n    rotateY(radians(frameCount*i*speed));\n    \n    for (x = 0; x < particleCount; x++) {\n      pushMatrix();\n      \n      let pos = PVector.fromAngle(radians((360.0/i)*x));\n      pos.mult(i*thickness*map(spacing, 0, 3, 2, 1));\n      translate(pos.x, 0, pos.y);\n      point(0, 0, 0);\n      \n      popMatrix();\n    }\n    \n    popMatrix();\n  }\n}\n\n\n\nfunction mousePressed() {\n  frameCount = 0;\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Nicole Rodriguez",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/708542",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:09:27",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,27 @@
+{
+    "name": "HyperbolicHeptagonalTiling",
+    "code": "// === Tab: mySketch ===\nconst p=7;\nlet q=3;\nlet d;\nlet r;\nlet basis=[];\nlet Shader;\nfunction preload(){\n  Shader=getShader(this._renderer);\n}\n\nfunction setup() {\n\t// if (windowHeight<windowWidth) {createCanvas(windowHeight,windowHeight,WEBGL);}\n\t// else {createCanvas(windowWidth,windowWidth,WEBGL);}\n\tcreateCanvas(834, 834, WEBGL);\n\tbackground(50);\n\t\n\tpixelDensity(1);\n}\n\nfunction draw() {\n\t//q=map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),0,width,3,4);\n\tbasis=[];\n\td=sqrt((1/tan(PI/q)-tan(PI/p))/(tan(PI/p)+1/tan(PI/q)));\n\tr=(1/d-d)/(2*sin(PI/q));\n\tlet v=createVector((d+1/d)/2,tan(PI/p)*(d+1/d)/2);\n\t//console.log(v.mag()-r);\n\tfor (let i=0;i<p;i++) {\n\t\tbasis.push(v.copy());\n\t\tv.rotate(2*PI/p);\n\t}\n\tlet data=[];\n\tfor (let b of basis) {data.push(b.x,b.y);}\n\tshader(Shader);\n\tShader.setUniform(\"basis\",data);\n\tShader.setUniform(\"r\",r);\n\t//Shader.setUniform(\"seed\",map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),0,width,0,1000000000,true));\n  rect(0,0,width,height);\n\tnoFill();\n\tstrokeWeight(20);\n\tstroke(0);\n\tfor (let b of basis) {ellipse(b.x*width/2,b.y*width/2,2*r*height/4);}\n\tfill(255);\n}\n\nfunction inverse(m,v) {\n\t\tu=p5.Vector.sub(v,m);\n\t\tu.setMag(r**2/u.mag()).add(m);\n\t\treturn u;\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\nfunction getShader(_renderer) {\n\treturn new p5.Shader(_renderer,`\n\t\tprecision highp float;\n\t\tattribute vec3 aPosition;\n\t\tattribute vec2 aTexCoord;\n\t\tvarying vec2 vTexCoord;\n\t\tvoid main() {\n\t\t\tvTexCoord = aTexCoord;\n\t\t\tvec4 positionVec4=vec4(aPosition,1.);\n\t\t\tpositionVec4.xy=positionVec4.xy*2.-1.; \n\t\t\tgl_Position = positionVec4;\n\t\t}\n\t`, `\n\t\tprecision highp float;\n\t\tvarying vec2 vTexCoord;\n\t\tuniform vec2 basis[${p}];\n\t\tuniform float r;\n\t\tvoid main() {\n\t\t\tvec2 u=vec2(vTexCoord.x*2.-1.,(1.-vTexCoord.y)*2.-1.);\n\t\t\tvec3 c=vec3(.2,.2,.2);\n\t\t\tfor (int t=0;t<10;t++) {\n\t\t\t\tif (length(u)>1.) {/*c=vec3(.2,.2,.2);*/break;}\n\t\t\t\tint b=0;\n\t\t\t\tfloat ds=r*r+1.;\n\t\t\t\tfor (int B=0;B<${p};B++) {\n\t\t\t\t\tfloat DS=(u.x-basis[B].x)*(u.x-basis[B].x)+(u.y-basis[B].y)*(u.y-basis[B].y);\n\t\t\t\t\tif (DS<ds) {ds=DS;b=B;}\n\t\t\t\t}\n\t\t\t\t/*if (u.y>0.) {b=int(floor(mod(acos(u.x/length(u))/(2.*3.1415926535)*7.+.5,7.)));} \n\t\t\t\telse  {b=int(floor(mod((1.-acos(u.x/length(u))/(2.*3.1415926535))*7.+.5,7.)));}*/\n\t\t\t\tif (ds>r*r) {\n\t\t\t\t\tc=vec3(0.,(u.x+1.)-.7,(u.y+1.)-.7);\n\t\t\t\t\tc+=vec3(\n\t\t\t\t\t\t1./(1.+pow(158148434879843159164645468466.,(ds-r*r-(ds-r*r)*0.5)))\n\t\t\t\t\t);\n\t\t\t\t\t//if (ds-r*r<0.01) {\n\t\t\t\t\t//\tc=vec3(0.,0.,0.);\n\t\t\t\t\t//}\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t\t//c=vec3(float(b)/7.);\n\t\t\t\t//break;\n\t\t\t\tfor (int i=0;i<${p};i++) {\n\t\t\t\t\tif (i==b) {u=normalize(u-basis[i])*r*r/length(u-basis[i])+basis[i];}\n\t\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t\tgl_FragColor=vec4(c,1.);\n\t\t}\n\t`);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1756029",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 23:19:40",
+    "used_in_videos": [
+        "Cryo Weapon Marauder.mp4",
+        "Singularity Vortex Tribe.mp4"
+    ],
+    "used_count": 2
+}

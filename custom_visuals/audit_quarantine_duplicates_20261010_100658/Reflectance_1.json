@@ -1,0 +1,26 @@
+{
+    "name": "Reflectance",
+    "code": "// === Tab: mySketch ===\n\nlet noiseMax = 0.01;\nlet goal = 5;\n\nlet start = 0;\nlet z = 0;\n\nlet posM;\nlet lastM;\n\nlet x1=[]\nlet y1=[]\n\nlet a=0\nlet b=9\n\nvar ranges;\nlet seed = Math.random() * 12;\n\n // colors\nlet colors1 = \"fef9fb-fafdff-ffffff-fcfbf4-f9f8f6\".split(\"-\").map((a) => \"#\" + a);\nlet colors2 = \"8c75ff-c553d2-2dfd60-2788f5-23054f-f21252-8834f1-c4dd92-184fd3-f9fee2-2E294E-541388-F1E9DA-FFD400-D90368-e9baaa-ffa07a-164555-ffe1d0-acd9e7-4596c7-6d8370-e45240-21d3a4-3303f9-cd2220-173df6-244ca8-a00360-b31016\".split(\"-\").map((a) => \"#\" + a);\nlet color1, color2;\n\nfunction setup() \n{\n \tpixelDensity(2);\n \trandomSeed(seed);\n \tcreateCanvas(windowWidth, windowHeight);\n \tbackground(\"#202020\");\n \tranges = 50;\n \tcolor1 = random(colors1);\n \tcolor2 = random(colors2);\n\n\tfor (let y = 0; y < height; y++)\n\t{\n\t\t\tstroke(random(colors2)); \t\n\t\t\tline(0,y,width,y)\n\t}\n\t\n\tfor(p=0;p<20;p++)\n\t{\n\t\tappend(x1,random(width))\n\t\tappend(y1,random(height))\n\t}\n}\n\nfunction draw() \n{\n\tif(b>=-52)\n\t{\n\t\tb=b-.15\n\t\tseed=100\n\t\tblendMode(DIFFERENCE);\n\t\tnoFill();\n\t\tstrokeWeight(5);\n\t\ta=a+.01 \n\t\tif(!lastM) lastM = createVector(0,0);\n\t\telse if(posM) lastM = posM;\n\t\tposM = createVector(0,0);\n\n\t\tlet distance = sqrt( pow(posM.x-lastM.x, 2) + pow(posM.y - lastM.y,2)   ) / 10;\n\t\tif(distance > 5) goal = distance;\n\t\tdistance = 0;\n\n\t\tif(noiseMax < goal) noiseMax *= 1.1;\n\t\telse \n\t\t{\n\t\t\t goal = 5;\n\t\t\tnoiseMax *= 0.99;\n\t\t}\n\t\n    \n  \tnoFill();\n  \tstroke(color2);\n \t\tdrawingContext.shadowColor = random(colors1);\n \t\tdrawingContext.shadowOffsetX = 1;\n \t\tdrawingContext.shadowOffsetY = 1;\n \t\tdrawingContext.shadowBlur = 0;\n  \n\t\tfor(p=0;p<20;p++)\n\t\t{\n\t\t\tstrokeWeight(random(10))\n\t\t\tbeginShape();\n\t\t\tfor(let i = 0; i < TWO_PI; i += (PI/100)) \n\t\t\t{\n\t\t\t\txoff = map(cos(i+start),-1,1,0,noiseMax);\n\t\t\t\tyoff = map(sin(i),-1,1,0,noiseMax);\n\t\t\t\tlet r = map(noise(xoff,yoff,z),p+0,5,-500,1000);\n\t\t\t\tlet x = r * sin(i)/b ;\n\t\t\t\tlet y = r * cos(i)/b ;\n\t\t\t\tvertex(x+x1[p],y+y1[p]);\n\t\t\t}  \n  \t\tendShape(CLOSE);  \n\t\t}\n  \tz += 0.01;\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Marine",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2095849",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:24:29",
+    "used_in_videos": [
+        "Compressed Void.mp4"
+    ],
+    "used_count": 1
+}

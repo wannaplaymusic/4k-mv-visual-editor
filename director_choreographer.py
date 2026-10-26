@@ -127,26 +127,51 @@ class DirectorChoreographer:
 
             is_climax = "drop" in sec_name.lower() or "climax" in sec_name.lower() or "chorus" in sec_name.lower()
             is_build = "build" in sec_name.lower() or "pre" in sec_name.lower()
+            genre_str = str(audio_telemetry.get("genre", "")).lower()
+            is_ambient = "ambient" in genre_str or "drone" in genre_str
+            is_hard_techno = any(ht in genre_str for ht in ("hard techno", "hard_techno", "schranz", "industrial techno"))
+
+            if is_ambient:
+                tension = min(0.35, tension * 0.4)
+            elif is_hard_techno:
+                tension = min(1.0, max(0.55, tension * 1.25))
 
             # 1. 計算有機心靈著色器參數 (注入彈道阻尼平滑)
             expressive_uniforms = self.modulator.update_expressive_uniforms(
-                raw_bass=tension * 0.9,
-                raw_energy=assigned.get("target_energy", 0.5),
+                raw_bass=tension * 0.95 if is_hard_techno else tension * 0.9,
+                raw_energy=0.95 if is_hard_techno and is_climax else (assigned.get("target_energy", 0.5) if not is_ambient else 0.25),
                 section_tension_base=tension,
                 section_progress=accumulated_time / max(1.0, total_duration),
-                is_climax_or_drop=is_climax
+                is_climax_or_drop=(is_climax or is_hard_techno) and not is_ambient
             )
 
-            # 2. 零顯存時間軸微移 J-Cut / L-Cut 錯位剪輯判定
-            # 當即將進入 Drop/Chorus 高潮時，啟用 J-Cut 提前 150~350ms 弱拍切入
+            # 2. 零顯存時間軸微移 J-Cut / L-Cut / Strobe Cut 錯位剪輯判定
             cut_offset_sec = 0.0
-            cut_style = "standard_cut"
-            if is_climax:
+            if is_ambient:
+                prev_assigned = assigned_modules[idx - 1] if idx > 0 and idx - 1 < len(assigned_modules) else {}
+                prev_id = prev_assigned.get("assigned_module_id") or prev_assigned.get("module_name")
+                if idx > 0 and mod_id == prev_id:
+                    cut_style = "seamless_continuous_drift"
+                else:
+                    cut_style = "ambient_slow_dissolve"
+            elif is_hard_techno:
+                # ⚡ Hard Techno 四拍重擊剪輯協議：Drop 採用極速頻閃跳接 (Strobe Jump Cut)
+                if is_climax:
+                    cut_offset_sec = -min(0.12, max(0.04, round(beat_duration * 0.25, 3)))
+                    cut_style = "strobe_jump_cut"
+                elif is_build:
+                    cut_offset_sec = min(0.15, max(0.05, round(beat_duration * 0.25, 3)))
+                    cut_style = "machine_ratchet_cut"
+                else:
+                    cut_style = "four_on_floor_hard_cut"
+            elif is_climax:
                 cut_offset_sec = -min(0.35, max(0.15, round(beat_duration * 0.5, 3)))
                 cut_style = "j_cut_anticipation"
             elif is_build:
                 cut_offset_sec = min(0.25, max(0.10, round(beat_duration * 0.25, 3)))
                 cut_style = "l_cut_suspense"
+            else:
+                cut_style = "standard_cut"
 
             # 構圖模式動態選擇
             if "intro" in sec_name.lower() or "outro" in sec_name.lower():
@@ -156,9 +181,16 @@ class DirectorChoreographer:
             else:
                 framing_mode = "fill"
 
-            # 視線引導連續性評估
+            # 視線引導連續性評估 (預測當前模組焦點質心並計算與上一鏡頭的視覺動勢向量)
+            predicted_next_centroid = SaliencyEyeTraceBridge.estimate_module_saliency_centroid(
+                module_id=mod_id,
+                psychological_state=curr_psy_state,
+                section_index=idx,
+                tension=tension
+            )
             continuity_info = SaliencyEyeTraceBridge.compute_cut_transition_continuity(
                 prev_centroid=prev_centroid,
+                next_target_centroid=predicted_next_centroid,
                 is_high_tension_drop=is_climax and tension > 0.88
             )
 
@@ -199,6 +231,11 @@ class DirectorChoreographer:
                 is_shock_counterpoint=is_counterpoint
             )
 
+            if is_hard_techno:
+                trans_style = "strobe_invert" if (is_climax or idx % 2 == 1) else "hard_cut"
+            else:
+                trans_style = continuity_info["recommended_transition"]
+
             shot_list.append({
                 "section_index": idx,
                 "section_name": sec_name,
@@ -209,7 +246,7 @@ class DirectorChoreographer:
                 "symbolic_metaphors": assigned.get("symbolic_metaphors", []),
                 "framing_mode": framing_mode,
                 "target_fx_intensity": target_fx,
-                "transition_style": continuity_info["recommended_transition"],
+                "transition_style": trans_style,
                 "expressive_uniforms": expressive_uniforms,
                 "cinematic_meta": {
                     "cut_style": cut_style,

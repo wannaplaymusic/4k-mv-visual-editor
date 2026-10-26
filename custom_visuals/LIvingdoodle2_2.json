@@ -1,0 +1,28 @@
+{
+    "name": "LIvingdoodle2",
+    "code": "// === Tab: mySketch ===\n\n//var colors = [\"#E8E8E8\",\"#F05454\",\"#30475E\",\"#222831\"];       \n\nvar colors   =  [\"#ff0100\",\"#fab30f\",\"#0ab4f7\",\"#ffffff\"];;  \n\n//var colors = [\"#AA2B1D\",\"#CC561E\",\"#EF8D32\",\"#BECA5C\"];\n\n//var colors = [\"#A03C78\",\"#ED8E7C\",\"#CDF3A2\",\"#93D9A3\"];\n\nvar weights = [1,1,1,1,1];\n\nlet border = 100;\n\nlet np = 5;\n\nlet graphs = [] \n\nfunction setup() {\n\tcreateCanvas(800,800);\n\tcolorMode(HSB, 360, 100, 100,100);\n\trectMode(CENTER);\n\tbackground(0);\n\tfor(let i=0;i < 5;i++)\n\t{\n\t\t let xx = random(border,width-border);\n\t\t let yy = random(border,height-border);\n\t\t //graphs[i] = new Graph(xx,yy);\n\t   graphs[i] = new Graph(width*0.5,height*0.5);\n\t}\n\t\n\n\tbackground(100);\n\tframeRate(60);;\n\n\t\n}\n\n\nfunction draw() {\n\t//background(100);\n\t\n\t\n\t\n\tfor(let i=0; i < graphs.length;i++)\n  {\n\t\tgraphs[i].move();\n\t  graphs[i].display();\n\t\t\n\t}\n\t\n\tnoFill();\n\tstroke(100);\n\tstrokeWeight(300);\n\tellipse(width/2,height/2,850,850);\n\t\n\tstroke(0);\n\tstrokeWeight(5);\n\tellipse(width/2,height/2,570,570);\n\t\n}\n\nclass Graph {\n  constructor(centerX,centerY) {\n    this.np  = 50;\n    this.x = [];\n\t  this.y = [];\n\t\tthis.rad = 350;\n    this.speed = [];\n\t\tthis.dist = []\n\t\tthis.direction = [];\n\t\tthis.radius = [];\n\t\tthis.centerX = centerX;\n\t\tthis.centerY = centerY;\n\t\tthis.angle = [];\n\t\tthis.lineProb = random(0,1);\n\t\tlet temp = colors[floor(random(0,4))];\n\t\tthis.colorLines = color(hue(temp),saturation(temp) + randomGaussian()*10,brightness(temp) + randomGaussian()*10,100);\n\t\ttemp = colors[floor(random(0,4))];\n\t\tthis.colorFill = color(hue(temp),saturation(temp) + randomGaussian()*10,brightness(temp) + randomGaussian()*10,100);\n\t\tthis.width = 1;\n\t\tnoStroke();\n\t  for(let i=0; i < this.np;i++)\n\t  {\n\t\t\tlet r       = random(0,this.rad - this.rad/10-10);\n\t\t\tlet angle   = random(0,2*PI);\n\t\t\tvar xx = this.centerX + r*cos(angle);\n\t\t\tvar yy = this.centerY + r*sin(angle);\n\t\t  append(this.x,xx);\n\t\t  append(this.y,yy);\n\t\t\tappend(this.speed,random(-0.025,0.025));\n\t\t\tif(random(0,1) > 0.5) \n\t\t\t{\n\t\t  \tappend(this.direction,1);\n\t\t\t}else\n\t\t\t{\n\t\t\t\tappend(this.direction,-1);\n\t\t\t}\n\t\t\tappend(this.angle,angle); \n\t\t\tappend(this.radius,r);\n\t  }\n  }\n\n\t\n  move() {\n\t\n\n\t\tfor(let i=0;i < this.np;i++)\n\t\t{\n\t\t\t\n\t\t\tthis.angle[i] += this.direction[i]*this.speed[i];\n\t\t\t\n\t\t\tvar xx = this.centerX + this.radius[i]*cos(this.angle[i]);\n\t\t\tvar yy = this.centerY + this.radius[i]*sin(this.angle[i]);\n\t\t\t\n\t\t\tthis.x[i] = xx;\n\t\t\tthis.y[i] = yy;\n\t\t\t\n\t\t}\t\t\n\t\t\n\t}\n\n\n  display() {\n\t\t\n\t\n\t\t//strokeWeight(10);\n\t\t//stroke(0);\n\t\t//rect(this.centerX,this.centerY,2*this.rad,2*this.rad);\n\t\t\n\t\t\n\t  for(let i=0;i < this.np;i++)\n\t\t{\n\t\t\tif (dist(this.x[i],this.y[i],this.centerX,this.centerY) > this.rad)\n\t\t\t{\n\t\t\t\tthis.direction[i] *= -1;\n\t\t\t}\n\t\t}\n\t\t\n\t\tif (this.lineProb < 1)\n\t\t{\n\t\t\n\t\t\tnoStroke();\n\t\tbeginShape();\n\t\tnoFill();\n\t\t//stroke(0);\n\t\tstrokeWeight(this.width);\n\t\tfor(let i=0;i < this.np;i++)\n\t\t{\n\t\t\tcurveVertex(this.x[i]-2,this.y[i]);\n\t\t}\n\t\tendShape();\n\t\t\n    beginShape();\n\t\tnoFill();\n\t\tstroke(this.colorLines);\n\t\tstrokeWeight(this.width);\n\t\tfor(let i=0;i < this.np;i++)\n\t\t{\n\t\t\tcurveVertex(this.x[i],this.y[i]);\n\t\t}\n\t\tendShape();\n\t\t\n\t\t\n\t\tbeginShape();\n\t\tfill(this.colorFill);\n\t\tstrokeWeight(this.width);\n\t\tfor(let i=0;i < this.np/2;i++)\n\t\t{\n\t\t\tcurveVertex(this.x[i],this.y[i]);\n\t\t}\n\t\tendShape(CLOSE);\n\t\t}else\n\t\t{\n\t\t\t\n\n\t\t\t\tbeginShape();\n\t\t    noFill();\n\t\t    stroke(0);\n\t\t    strokeWeight(1);\n\t\t\t\tfor(let i=0;i < this.np;i++)\n\t\t\t\t{\n\t\t\t\t\tcurveVertex(this.x[i]-1,this.y[i]);\n\t\t\t\t}\n\t\t\t\tendShape();\n\t\t\t\n\t\t}\n\n\n\t\t\n\n\t}\n}\n\n\n\n\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "garabatospr",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1235160",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:13:32",
+    "used_in_videos": [
+        "Dub of the Meridian.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

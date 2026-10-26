@@ -1,0 +1,27 @@
+{
+    "name": "dotflourish",
+    "code": "// === Tab: mySketch ===\nvar ratio;\nvar adjust;\nvar couleur; \nvar x, y;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tratio = 0;\n\tnoStroke();\n}\n\nfunction draw(){\n\t\n\tfill(254,243,198, 200);\n\trect(0,0,windowWidth, windowHeight);\n\ttranslate(width/2, height/2);\n\t\n\tratio = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 85, 95);\n\tadjust = 500/ratio;\n\t\n\tfor(var i=-50; i<50; i++){\n\t\tfor(var j=-50; j<50 ; j++){\n\t\t\t\n\t\t\tcolorize(abs(i*j)%2);\n\t\t\tfill(couleur);\n\t\t\tx = ((i*cos(j)*300)%ratio)*adjust;\n\t\t\ty = ((j*cos(i)*300)%ratio)*adjust;\n\t\t\t\n\t\t\tif(x!=0 && y!=0 && abs(x)!=abs(y)) ellipse(x,y,4,4);\n\t\t}\n\t}\n}\n\nfunction colorize(a){\n\tswitch(a){\n\t\tcase 0 : couleur = '#7F70FF';\n\t\t\tbreak;\n\t\tcase 1 : couleur = '#7B449D';\n\t\t\tbreak;\n\t\tcase 2 : couleur = '#FD4505';\n\t\t\tbreak;\n\t\tcase 3 : couleur = '#E9B508';\n\t\t\tbreak;\n\t}\n}\n\t\t\t\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "tito senpai",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1941569",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:33:09",
+    "used_in_videos": [
+        "Thunderous Drive Flow.mp4",
+        "Ion Blast Barbarian.mp4"
+    ],
+    "used_count": 2
+}

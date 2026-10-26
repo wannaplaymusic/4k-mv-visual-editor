@@ -1,0 +1,24 @@
+{
+    "name": "Attractor_100",
+    "code": "// === Tab: mySketch ===\n// Attractor_10.0\n\nlet A = 50 ; let CZ = 100 ; let KL = 100 ; let K = 0.01 ; \nlet dPXmin = 0.00001 ; let KdPX = 0.1 ; let PXmin = -150 ; let PXmax = 0 ; let dT = 0.01 ;\n\nlet PX ; let PY ; let T ; let Tmax ; let X ; let Y ; let Z ; \nlet dPX ; let Q ; let Qmax ; let L ; let F ; let BX ; let BY ; long MLS ; let I ;\n\nfunction setup(){\n  \n  createCanvas(900, 600) ; noSmooth() ; background(0) ; fill(0,0,0,20) ; stroke(255) ;\n  dPX = KdPX ; PX = PXmin ; PY = 0 ; X = PX ; Y = PY ; BX = X ; BY = Y ; \n  \n}//setup()\n\nfunction draw(){\n  \n  if ( I == 0 ){\n    \n    for ( Q = 0 ; Q < Qmax ; Q++ ){\n      \n      for( T = 0 ; T < Tmax ; T = T + dT ){\n        Z = A*sin(T)+CZ ;\n        L = sqrt((X*X)+(Z*Z)) ;\n        F = (L-KL)*K ;\n        Y = Y - (F*X/L) ;\n        X = X + Y ; \n      }\n    \n      point(+X*4+450,+Y*40+300) ; point(-X*4+450,-Y*40+300) ;\n      L = sqrt(pow(X-BX,2)+pow(Y-BY,2)) ;\n      if ( L > 0 ){ dPX = dPX/L*KdPX ; }\n      if ( dPX < dPXmin ){ dPX = dPXmin ; }\n    \n      PX = PX + dPX ; PY = 0 ;      \n      BX = X ; BY = Y ; X = PX ; Y = PY ;\n      if ( PX > PXmax || mousePressed ){ Q = Qmax ; I = 1 ; }\n    \n    }// Q \n    \n    if ( millis() - MLS > 20 && Qmax > 1 ){ Qmax = Qmax - 1 ; }else{ Qmax = Qmax + 1 ; }\n    MLS = millis() ; \n    \n  }// I == 0\n  \n  if ( I > 0 ){\n   \n    rect(-1,-1,901,601) ; I = I + 1 ;\n    if ( I > 40 ){ \n      I = 0 ;  Tmax = Tmax + 0.5 ;\n      PX = PXmin ; PY = 0 ; dPX = KdPX ; X = PX ; Y = PY ;\n    }\n    \n  }// I > 0\n  \n} // draw()\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "KaijinQ",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/850226",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:47:51",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

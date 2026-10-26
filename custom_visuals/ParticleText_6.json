@@ -1,0 +1,70 @@
+{
+    "name": "ParticleText",
+    "code": "// === Tab: mySketch ===\nconst text = \"WELL DONE,\\nMY LOVE!\",\n\t\t\tnum = 3000;\n\nlet poss = [], vels = [], targets = [];\n\nfunction setup() {\n\tcreateCanvas(Math.min(windowWidth, 1000), Math.min(windowHeight, 700));\n\tcolorMode(HSB);\n\tlet graphics = createGraphics(width, height);\n\t//graphics.pixelDensity(1);\n\tgraphics.pixelDensity(1);\n\tgraphics.textFont(\"Georgia\");\n\tgraphics.textAlign(CENTER);\n\tgraphics.textSize(120);\n\t//graphics.noStroke();\n\tgraphics.fill(255);\n\t\n\tgraphics.background(0);\n\tgraphics.text(text, width / 2, height / 4);\n\n\tgraphics.fill(255, 100, 50);\n\tgraphics.loadPixels();\n\t\n\tlet j = 0,\n\t\t\tp = graphics.pixels.filter((_, i) => i % 4 === 0),\n\t\t\tspacing = p.filter(x => x).length / num;\n\tfor (let i = 0; i < p.length; i++) {\n\t\tif (p[i] !== 0) {\n\t\t\tj = (j + 0.5 + Math.random()) % spacing;\n\t\t\tif (Math.floor(j) === 0) {\n\t\t\t\tposs.push(new p5.Vector(random(width), random(height)));\n\t\t\t\tvels.push(p5.Vector.random2D());\n\t\t\t\ttargets.push(new p5.Vector(i % width, Math.floor(i / height)));\n\t\t\t}\n\t\t}\n\t}\n\t\n\tstroke(255);\n}\n\nfunction draw() {\n\tbackground(0, 10);\n\ttargets.forEach(function(pos, i) {\n\t\tlet vel = vels[i],\n\t\t\t\tdir = p5.Vector.sub(targets[i], pos).normalize();\n\t\t//vel.add(dir);\n\t\t//vel.mult(0.9);\n\t\t//pos.add(vel);\n\t\tstroke(i/5000*360,55,255);\n\t\tpoint(pos.x, pos.y);\n\t\tpoint(pos.x+1, pos.y);\n\t\tpoint(pos.x, pos.y+1);\n\t\tpoint(pos.x+1, pos.y+1);\n\t\t\n\t});\n}\n\n\nfunction draw2() {\n\tbackground(0, 10);\n\tposs.forEach(function(pos, i) {\n\t\tvar vel = vels[i],\n\t\t\t\tdir = p5.Vector.sub(targets[i], pos).normalize();\n\t\tvel.add(dir);\n\t\tvel.mult(0.9);\n\t\tpos.add(vel);\n\t\tstroke(i/5000*360,55,255);\n\t\tpoint(pos.x, pos.y);\n\t\tpoint(pos.x+1, pos.y);\n\t\tpoint(pos.x, pos.y+1);\n\t\tpoint(pos.x+1, pos.y+1);\n\t\t\n\t});\n}\n\n",
+    "frequency": 10,
+    "storyboard_weight": 5,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Nat",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "unstable_blackscreen",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible",
+        "batch_2026-10-09"
+    ],
+    "url": "https://openprocessing.org/sketch/862890",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:46:57",
+    "expressive_profile": {
+        "module_id": "ParticleText_6.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                135.0,
+                15.0
+            ],
+            "mean_lightness": 0.003,
+            "mean_chroma": 0.019,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.28,
+            "curl_vorticity": 0.014,
+            "divergence": 0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 13:52:53"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Underground Relay.mp4"
+    ],
+    "used_count": 1,
+    "is_starred": false
+}

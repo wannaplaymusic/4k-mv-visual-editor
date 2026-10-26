@@ -1,0 +1,25 @@
+{
+    "name": "AnimatedFractalShader",
+    "code": "// === Tab: mySketch ===\n//Slight modification of code posted by it looks like 4 different people on OpenProcessing\n//Don't know who to credit but this is super cool, I only edited it but it is teaching me a lot about shaders\n\nlet Shader,palette;\nlet speed = 111;//256;\nlet n = 0.7;//0.8;\nfunction setup() {\n  createCanvas(windowWidth,windowHeight,WEBGL);\n\tpixelDensity(1);\n  noStroke();\n}\nfunction draw() {\n  shader(Shader);\n\tShader.setUniform('pal',palette);\n\tShader.setUniform('c',[sin(frameCount/speed)*n,cos(frameCount/speed)*n]);\n  rect(0,0,width,height);\n}\nfunction mousePressed() {save(\"Frozen_Fractal\");}\nfunction preload() {\n  Shader=new p5.Shader(this._renderer,`\n\t\tprecision highp float;\n\t\tattribute vec3 aPosition;\n\t\tattribute vec2 aTexCoord;\n\t\tvarying vec2 vTexCoord;\n\t\tvoid main() {\n\t\t\tvTexCoord=aTexCoord;\n\t\t\tvec4 positionVec4=vec4(aPosition,1.);\n\t\t\tpositionVec4.xy=positionVec4.xy*2.-1.; \n\t\t\tgl_Position=positionVec4;\n\t\t}\n\t`,`\n\t\tprecision highp float;\n\t\tvarying vec2 vTexCoord;\n\t\tuniform sampler2D pal;\n\t\tuniform vec2 c;\n\t\tvoid main() {\n\t\t\tvec2 z=vec2(5.*vTexCoord.x-2.5,(5.*vTexCoord.y-2.5)*${windowHeight/windowWidth});\n\t\t\tint iter=100;\n\t\t\tfor(int i=0;i<100;i++) {\n\t\t\t\tfloat x=(z.x)*(z.x)-(z.y)*(z.y)+c.x;\n\t\t\t\tfloat y=2.*(z.x)*(z.y)+c.y;\n\t\t\t\tif((x*x+y*y)>4.) {iter=i;break;}\n\t\t\t\tz.x=x;\n\t\t\t\tz.y=y;\n\t\t\t}\n\t\t\tgl_FragColor=texture2D(pal,vec2(iter==100?0.:float(iter)/100.,1));\n\t\t}\n\t`);\n\tpalette=loadImage(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAAXNSR0IArs4c6QAAAGRJREFUOE9jZGBg+M8ABiwMDAwcSDQyGyZHSIyQPDZzOJCsZoE6AUaDnIRDDGwUmjqYGNwrUHmQOnQxFoQc3FVIykE+AWNai7EwMPxhQOAfFLBB5gyE/uHlAeTYGM5sUEphYAAAjJafAWvSA74AAAAASUVORK5CYII=\");\n}\n\n// float x=(z.x+z.y)*(z.x-z.y)+c.x;\n// \t\t\t\tfloat y=2.*z.y*z.x+c.y;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "carloslopezcharles",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1822958",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 23:12:23",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

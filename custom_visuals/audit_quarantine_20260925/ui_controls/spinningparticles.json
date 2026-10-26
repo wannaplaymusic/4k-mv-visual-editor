@@ -1,0 +1,22 @@
+{
+    "name": "spinningparticles",
+    "code": "// === Tab: mySketch ===\nlet radius = 100;\nconst maxParticles = 2000;\nlet particleCount = 500;\nlet centerSpread = 50;\nlet particleSize = 5;\n\nlet particles = [];\n\nlet radiusSlider, countSlider, spreadSlider, sizeSlider;\nlet controlsDiv;\n\nclass Particle {\n  constructor(x, y) {\n    this.centerX = x;\n    this.centerY = y;\n    this.angle = random(TWO_PI);\n    this.speed = random(0.01, 0.05);\n    this.phase = random(TWO_PI);\n  }\n  \n  update() {\n    this.angle += this.speed;\n    if (this.angle > TWO_PI) this.angle -= TWO_PI;\n  }\n  \n  display() {\n    let x = this.centerX + radius * cos(this.angle + this.phase);\n    let y = this.centerY + radius * sin(this.angle + this.phase);\n    ellipse(x, y, particleSize, particleSize);\n  }\n}\n\nfunction setup() {\n  createCanvas(1000, 800);\n  noStroke();\n  fill(255, 150);\n  \n  // Vytvoření kontejneru pro ovládací prvky\n  controlsDiv = createDiv();\n  controlsDiv.position(10, 10);\n  controlsDiv.style('background-color', 'rgba(0, 0, 0, 0.6)');\n  controlsDiv.style('padding', '10px');\n  controlsDiv.style('border-radius', '8px');\n  controlsDiv.style('color', 'white');\n  controlsDiv.style('font-family', 'Arial, sans-serif');\n  controlsDiv.style('width', '220px');\n  \n  // Funkce pro vytvoření popisku + slideru\n  function createLabeledSlider(labelText, min, max, start, step=1) {\n    let label = createP(labelText);\n    label.parent(controlsDiv);\n    label.style('margin', '5px 0 2px 0');\n    label.style('font-weight', 'bold');\n    label.style('font-size', '14px');\n    let slider = createSlider(min, max, start, step);\n    slider.parent(controlsDiv);\n    slider.style('width', '200px');\n    slider.style('margin-bottom', '10px');\n    return slider;\n  }\n  \n  radiusSlider = createLabeledSlider('Radius', 10, 200, radius);\n  countSlider = createLabeledSlider('Particle Count', 100, maxParticles, particleCount);\n  spreadSlider = createLabeledSlider('Center Spread', 0, 200, centerSpread);\n  sizeSlider = createLabeledSlider('Particle Size', 1, 20, particleSize);\n  \n  initializeParticles();\n}\n\nfunction draw() {\n  background(0);\n  \n  radius = radiusSlider.value();\n  let newCount = countSlider.value();\n  if (newCount !== particleCount) {\n    particleCount = newCount;\n  }\n  let newSpread = spreadSlider.value();\n  if (newSpread !== centerSpread) {\n    centerSpread = newSpread;\n    initializeParticles();\n  }\n  particleSize = sizeSlider.value();\n  \n  for (let i = 0; i < particleCount; i++) {\n    particles[i].update();\n    particles[i].display();\n  }\n}\n\nfunction initializeParticles() {\n  particles = [];\n  for (let i = 0; i < maxParticles; i++) {\n    let centerX = width / 2 + random(-centerSpread, centerSpread);\n    let centerY = height / 2 + random(-centerSpread, centerSpread);\n    particles.push(new Particle(centerX, centerY));\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Awake",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2822522",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:46:16"
+}

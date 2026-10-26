@@ -1,0 +1,24 @@
+{
+    "name": "LeapFrog",
+    "code": "// === Tab: mySketch ===\n// gobal variables\nlet frogs = [];\nlet bColour;\nlet amountOfFrogs = 100;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\n\tfor(i = 0; i < amountOfFrogs; i++){\n\tfrogs[i] = new Frog();\n\t}\n\t bColour = color(random(255), random(255), random(255));\n\tbackground(bColour);\n}\n\n////////////////////////////////\n\nfunction draw() {\n\tbackground(0);\n\n\tfor(let frog of frogs){\n\t\tfrog.draw();\n\t}\n\tfill(frogs[0].hue,255,255);\n\tstrokeWeight(2);\n\tellipse(width * 0.5, height * 0.125, 30);\n}\n\n\n\n// === Tab: frog ===\nclass Frog {\n\tconstructor() {\n\t\tthis.floor = this.y = height*0.9;\t\t\n\t\tthis.x = width * 0.5;\n\t\tthis.counter = this.whichWay = 0;\n\t\tthis.jumpHeight = 30;\n\t\tthis.increment = 0.03\n\t\tthis.hue = random(255);\n\t\tthis.speed = random(5,10);\n\t}\n\n\tdraw(){\n\t\tcolorMode(HSB, 255);\t\n\t \tstroke(this.hue+=0.004, 255, 150);\n\t\tstrokeWeight(4);\n\t\t\n\t\tfor (let i = 0; i < this.speed; i++) { // Changes how quick and long the frog is\n\t\t\tthis.step();\n\t\t\tpoint(this.x, this.y);\n\t\t}\n\t\t\n\t\tif(this.hue>=255){\n\t\t\tthis.hue = 0;\n\t\t\t }\n\t}\n\t\n\tstep() {\t\n\t\t\tthis.y = this.floor - (sin(this.counter += this.increment) * this.jumpHeight);\n\t\t\tthis.x += this.whichWay;\n\t\t\tif (this.y > this.floor)this.newDirection()\n\t}\n\t\n\tnewDirection(){\t\t\n\t\t\tthis.y = this.floor;\n\t\t\n\t\t\tlet maxMove = 1;\n\t\t\tlet minMove = 0.4;\n\t\t\tlet randomValue = int(random(2));\n\t\t\t// Maps the amount of friction based on new direction and position. \n\t\t\tlet edgeFriction = map(this.x, 0, width, (randomValue?0:1), (randomValue?-1:0)); \n\t\t\tthis.whichWay = random(minMove*edgeFriction, maxMove*edgeFriction);\n\t\t\t\n\t\t\tthis.jumpHeight = random(20, 500);\n\t\t\tthis.increment = abs(0.9/(this.jumpHeight*1.32)/this.whichWay);\n\t\t\tthis.counter = 0;\n\t\t\tthis.y = this.floor - sin(this.counter += this.increment);\t\t\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Matt Martin",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/890428",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:44:41",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

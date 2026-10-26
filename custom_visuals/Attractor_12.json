@@ -1,0 +1,32 @@
+{
+    "name": "Attractor_12",
+    "code": "// === Tab: mySketch ===\n// attractor_1.2\n\nlet N = 4000 ; let M = 10 ;\n\nlet X[] = new Array(N) ; let Y[] = new Array(N) ;\nlet CX[] = new Array(M) ; let CY[] = new Array(M) ; let R[] = new Array(M) ;\nlet dX ; let dY ; let I ; let II ; let L ; let KX ; let KY ;\n\n\n\nfunction setup(){\n  \n  createCanvas(600, 600) ; noSmooth() ; background(0) ; stroke(255,0,0) ; fill(0,0,0,10) ;\n  \n  for ( I = 0 ; I < N ; I++ ){\n    X[I] = random(-300,+300) ; Y[I] = random(-300,+300) ;\n  }\n  \n  for ( I = 0 ; I < M ; I++ ){\n    R[I] = random(+60,+200) ; CX[I] = random(-300+R[I],+300-R[I]) ; CY[I] = random(-300+R[I],+300-R[I]) ; \n  }\n  \n} // setup()\n\n\n\nfunction draw(){\n  \n  rect(-1,-1,601,601) ;\n  \n  for ( I = 0 ; I < N ; I++ ){\n    dX = 0 ; dY = 0 ; \n    for ( II = 0 ; II < M ; II++ ){\n      KX = X[I]-CX[II] ; KY = Y[I]-CY[II] ;\n      L = sqrt((KX*KX)+(KY*KY)) ;\n      dX = dX + ((KX-KY-(KX*((KX*KX)+(KY*KY))/pow(R[II],2)))/pow(L,5)) ;\n      dY = dY + ((KX+KY-(KY*((KX*KX)+(KY*KY))/pow(R[II],2)))/pow(L,5)) ;\n    }\n    L = sqrt((dX*dX)+(dY*dY)) ;\n    dX = 2*dX/L ; dY = 2*dY/L ; \n    line(X[I]+300,Y[I]+300,X[I]+dX+300,Y[I]+dY+300) ;\n    X[I] = X[I] + dX ; Y[I] = Y[I] + dY ;\n  }\n  \n} // draw()\n\n\n\nfunction mousePressed(){ setup() ; }\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u73804",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1895682",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 16:53:58",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

@@ -1,0 +1,26 @@
+{
+    "name": "Nightsky",
+    "code": "// === Tab: mySketch ===\nvar points\nvar n = 2000\nvar angle\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight)\n\tbackground(0)\n\t\n\tinitCanvas()\n}\n\nfunction draw() {\n\ttranslate(width/2, height/2);\n  noFill();\n  stroke(255,5);\n  \n  rectMode(CENTER);\n  rect(0, 0, w, w);\n  \n  for(let i = 0; i < points.length; i++) {\n    angle = noise(points[i].x / 100, points[i].y / 100) * TAU * 100;\n    points[i].add(createVector(cos(angle) * TAU, sin(angle) * TAU));\n    \n    if(points[i].y < -wi || points[i].y > wi || points[i].x < -wi || points[i].x > wi)\n      points[i] = createVector(random(-width/2,width/2), random(-height/2, height/2));\n    else\n      point(points[i].x, points[i].y);\n  }\n}\n\nfunction initCanvas() {\n\tpoints = []\n\t\n\tw = height - 100\n\twi = w/2 - 20\n\t\n\tfor(let i = 0; i < n; i++) {\n\t\tpoints.push(createVector(random(-width, width), random(-height, height)))\n\t}\n}\n\nfunction mousePressed() {\n\tbackground(0);\n  noiseSeed(random(100));\n  initCanvas();\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "raf_rgb",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1582533",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:54:19",
+    "used_in_videos": [
+        "Darkroom Oscillation.mp4"
+    ],
+    "used_count": 1
+}

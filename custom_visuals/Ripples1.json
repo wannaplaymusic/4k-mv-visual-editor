@@ -1,0 +1,26 @@
+{
+    "name": "Ripples1",
+    "code": "// === Tab: mySketch ===\n// Translated to p5.js fork: oggy  https://openprocessing.org/sketch/555063\n\nconst gridSize = 55;\nconst dotSpacing = 8;\nconst maxDistortion = 15;\n\nlet dots = [];\nlet ripples = []; // ✅ 儲存所有水波\n\nlet bgTop, bgBottom;      // 背景漸層\nlet dotColorInner, dotColorOuter; // 點的顏色漸層\n\nfunction setup() {\n  createCanvas(600, 600);\n  noStroke();\n\n  // 背景顏色（上深下淺）\n  bgTop = color(5, 25, 60);\n  bgBottom = color(20, 80, 140);\n\n  // 點的顏色（位移小 → 大）\n  dotColorInner = color(180, 220, 255); // 微亮\n  dotColorOuter = color(90, 200, 255);  // 藍綠\n\n  // center grid\n  const offset = (width - gridSize * dotSpacing) / 2;\n\n  // initialize dots\n  for (let i = 0; i < gridSize; i++) {\n    dots[i] = [];\n    for (let j = 0; j < gridSize; j++) {\n      dots[i][j] = new Dot(i * dotSpacing + offset, j * dotSpacing + offset);\n    }\n  }\n}\n\nfunction draw() {\n  drawGradientBackground();\n\n  // 更新所有水波\n  for (let i = ripples.length - 1; i >= 0; i--) {\n    ripples[i].update();\n    if (ripples[i].isDead()) {\n      ripples.splice(i, 1);\n    }\n  }\n\n  // 用加法混色讓光暈感更明顯\n  blendMode(ADD);\n\n  // 更新 & 繪製點\n  for (let i = 0; i < gridSize; i++) {\n    for (let j = 0; j < gridSize; j++) {\n      dots[i][j].update(ripples);\n    }\n  }\n\n  blendMode(BLEND);\n}\n\n// 滑鼠點一下，新增一個水波\nfunction mousePressed() {\n  ripples.push(new Ripple((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))));\n}\n\n// -------------------- Ripple class：水波本體 --------------------\nclass Ripple {\n  constructor(x, y) {\n    this.pos = createVector(x, y);\n    this.radius = 0;\n    this.speed = 3;       // 擴散速度\n    this.bandWidth = 30;  // 波紋「有效帶」的寬度\n    this.maxRadius = 350; // 最遠擴散距離\n  }\n\n  update() {\n    this.radius += this.speed;\n  }\n\n  isDead() {\n    return this.radius > this.maxRadius;\n  }\n}\n\n// -------------------- Dot class：每一個點 --------------------\nclass Dot {\n  constructor(x, y) {\n    this.originalPosition = createVector(x, y);\n    this.position = this.originalPosition.copy();\n  }\n\n  update(ripples) {\n    // 以原始位置為基準，每禎重算（像「水」暫時扭曲空間）\n    let basePos = this.originalPosition.copy();\n    let totalOffset = createVector(0, 0);\n\n    // 看每一個水波對這個點造成多少位移\n    for (let r of ripples) {\n      let dir = p5.Vector.sub(basePos, r.pos);\n      let dist = dir.mag();\n\n      // 只在「波紋帶」附近有影響：距離約等於 r.radius\n      let inner = r.radius - r.bandWidth;\n      let outer = r.radius + r.bandWidth;\n\n      if (dist > inner && dist < outer) {\n        // 將 dist 映射到 0 ~ PI 之間，做 sin 波形\n        let phase = map(dist, inner, outer, 0, PI);\n\n        dir.normalize();\n        // 位移量：隨著 sin 變化，看起來像水面上下起伏\n        let amp = maxDistortion * sin(phase) * map(r.radius, 0, r.maxRadius, 1.0, 0.2);\n        dir.mult(amp);\n\n        totalOffset.add(dir);\n      }\n    }\n\n    this.position = p5.Vector.add(basePos, totalOffset);\n\n    // 位移大小用來決定顏色漸層\n    let offsetMag = totalOffset.mag();\n    let t = constrain(offsetMag / maxDistortion, 0, 1);\n    let c = lerpColor(dotColorInner, dotColorOuter, t);\n\n    stroke(c);\n    strokeWeight(2);\n    point(this.position.x, this.position.y);\n  }\n}\n\n// -------------------- 畫背景漸層 --------------------\nfunction drawGradientBackground() {\n  for (let y = 0; y < height; y++) {\n    var t = y / height;\n    var c = lerpColor(bgTop, bgBottom, t);\n    stroke(c);\n    line(0, y, width, y);\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "StoneCat",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2793894",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:46:25",
+    "used_in_videos": [
+        "Obscured Sector.mp4"
+    ],
+    "used_count": 1
+}

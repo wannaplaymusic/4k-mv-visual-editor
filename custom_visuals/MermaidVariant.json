@@ -1,0 +1,24 @@
+{
+    "name": "MermaidVariant",
+    "code": "// === Tab: mySketch ===\n//music from Music by <a href=\"https://pixabay.com/users/kulakovka-47183261/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=270241\">Alehandro Vodnik</a> from <a href=\"https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=270241\">Pixabay</a>\n\nlet numThings = 200;\nlet things = [];\n\nfunction preload()\n{\n\tmusic = loadSound(\"https://openprocessing.org/sketch/2566933/files/lost-in-dreams-abstract-chill-downtempo-cinematic-future-beats-270241.mp3\")\n}\n\nfunction setup() \n{\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n\tcolorMode(HSB);\n\tnoStroke();\n\tfor(let z = 0; z < 9; z++) \n\t{\n\t\tfor(let i = 0; i < numThings; i++) \n\t\t{\n\t\t\tlet x = map(i, 0, numThings, -30, width);\n\t\t\tlet y = height/2 + sin(map(i,     0, numThings,     0, 2*PI)) * height/2;\n\t\t\tthings.push(new Thing(x+z+random(-300,500), y-z*70, i));\n\t\t}\n\t}\n\tfft = new p5.FFT();\n  fft.setInput(music);\t\n  music.play()\n}\nlet B=60\n\nlM = 0\nM = 0\nhM = 0\nT = 0\n\nfunction draw() \n{\n\t\n\tnumThings=lM/2\n\tframeRate(B+10)\n\tbackground(B, 0.03);\n\tfor(let z = 0; z < 9; z++) \n\t{\n\t\tfor (let i = 0; i < things.length; i++) \n\t\t{\n\t\t\tthings[i].update();\n\t\t}\n\t}\n\t\n\tlet spectrum = fft.analyze();\n\tlet bass, lowMid, mid, highMid, treble; \n\n\tbass = fft.getEnergy(\"bass\");\n\tlowMid = fft.getEnergy(\"lowMid\");\n\tmid = fft.getEnergy(\"mid\");\n\thighMid = fft.getEnergy(\"highMid\");\n\ttreble = fft.getEnergy(\"treble\");\n\n\t B = map(bass, 0, 300, -30, 60, true);\n\t lM = map(lowMid, 0, 100, 0, 200, true);\n\t M = map(mid, 0, 300, 0, 200, true);\n\t hM = map(highMid, 0, 100, 0, 130, true);\n\t T = map(treble, 0, 300, 0, 200, true);\n\t\n}\n\nclass Thing \n{\t\n\tconstructor(x, y, i) \n\t{\n\t\tthis.x = x;\n\t\tthis.y = y;\t\n\t\tthis.i = i;\n\t\tthis.hue = map(this.i, 0, numThings, 0, 360);\n\t\tthis.size = random(50, 100);\n\t\tthis.c=round(random(1))\n\t\tthis.c2=round(random(1))\n\t}\n\tupdate() \n\t{\n\t\tthis.x = (this.x + height/2/B) % width;\n\t\tthis.size = random(M, hM/2);\n\t\tthis.hue = (this.hue + 1) % 360;\n\t\tif(this.c2==0) \n\t\t{\n\t\t\tnoStroke()\n\t\t\tfill(this.hue, 35, B+30,B);\n\t\t}\n\t\telse\n\t\t{\n\t\t\tstrokeWeight(2)\n\t\t\tnoFill()\n\t\t\tstroke(this.hue, 35, B+30,B)\n\t\t}\n\t\t\n\t\tif(this.c==0) ellipse(this.x + noise(frameCount/100 + this.i) * 50, this.y, this.size-height/10);\n\t\telse rect(this.x + noise(frameCount/100 + this.i) * 50, this.y, this.size-height/10);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Variant",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2566933",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:12:45",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

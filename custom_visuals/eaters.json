@@ -1,0 +1,27 @@
+{
+    "name": "eaters",
+    "code": "// === Tab: mySketch ===\nlet bg\nlet eaters=[]\nlet colors=['#bf1a2f', '#f00699','#454e9e','#018e42','#f7d002']\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(255)\n\tbg= createGraphics(windowWidth, windowHeight);\n\tbg.noFill()\n\t\n\t\n\tbg.background(255, 70)\n\t\n\n\t\n\tfor(let i=0; i<300; i++){\n\t\teaters.push(new eater(random(width), random(height), random(5, 10)))\n\t}\n}\n\nfunction draw() {\n\t//may put them in a petri dish mask\n\t//background(255, 70)\n\timage(bg, 0, 0)\n\tfor(let eater of eaters){\n\t\tif(frameCount>30){\n\t\teater.move();\n\t\t}\n     eater.full();\n\t\teater.eat();\n\t\teater.show();\n\t}\n\n}\n\nclass eater{\n\nconstructor(x, y, s){\n\tthis.pos= createVector(x, y)\n\tthis.vel= p5.Vector.random2D();\n  this.color=color (random(colors))\n\tthis.vel.setMag(1)\n  this.s=s\n  }\n\t\nmove(){\n\tlet weight= this.s/500\n\tthis.vel.setMag(1- weight)\n\tthis.pos.add(this.vel)\n\t//edges\n  if(this.pos.x < 2 || this.pos.x > width -2){\n\t\tthis.vel.mult(-1, 1) \n\t}\n\t if(this.pos.y < 2 || this.pos.y > height -2){\n\t\tthis.vel.mult(1, -1) \n\t}\t\n}\n\t\neat(){\n//if touches other eater, the bigger eater eats the smaller\n\t\n\tlet index = eaters.indexOf(this);\n\t\t\n\tfor(let i=0; i<eaters.length; i++)\n\t{\n\tif(index!=i){\n\t\t\tif(dist(this.pos.x, this.pos.y, eaters[i].pos.x, eaters[i].pos.y)< this.s/2+ eaters[i].s/2){\n\t\t\t\t//bigger one eats smaller one\n\t\t\t\t\n\t\t\t\tif(this.s > eaters[i].s){\n\t\t\t\t\tthis.s+= eaters[i].s/2;\n\t\t\t\t\teaters.splice(i, 1);\n\t\t\t\t} \n\t\t\t\t\n     }\n\t}\n\t}\n}\n\t\nfull(){\n\tif(this.s>150){\n\t\tlet divider= int(random(40,120))\n\t\tlet pie= this.s *4\n\t\twhile(pie>0){\n\t\t\tlet piece= random(5, 10)\n\t\t\tpie-=piece\n\t\t\tlet xey= constrain(this.pos.x+ random(-this.s, this.s), 3, width-3)\n\t\t\tlet yey= constrain(this.pos.y+ random(-this.s, this.s), 3, height-3)\n\t\t\teaters.push(new eater(xey, yey, piece))\n\t\t\t\n\t\t}\n\t\t\n\t\tvar index = eaters.indexOf(this);\n\t\t eaters.splice(index, 1);\n\t}\n}\n\t\nshow(){\n\t//eventually blobs, but just ellipses for now\n\tnoStroke()\n\tfill(this.color);\n\tellipse(this.pos.x, this.pos.y, this.s)\n}\n\n\n\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Aaron Reuland (a_ soluble_fish)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1514129",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:57:48",
+    "used_in_videos": [
+        "Obsidian Repetition.mp4",
+        "Fusion Blade Berserk.mp4"
+    ],
+    "used_count": 2
+}

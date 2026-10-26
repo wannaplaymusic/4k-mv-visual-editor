@@ -1,0 +1,31 @@
+{
+    "name": "Vectorfields",
+    "code": "// === Tab: Main ===\nlet fieldCount = 8;\n\nlet dx = 8;\nlet dy = 8;\n\nfunction setup() {\n\tcreateCanvas(min(512, windowWidth), min(512, windowHeight));\n\tsmooth();\n\tcolorMode(RGB, 255, 255, 255, 1);\n\tbackground(20);\n\tstroke(180, 180, 220, 0.1);\n\tstrokeWeight(1);\n\tcolorMode(HSB);\n\t\n\tlet hue = random(0, 360);\n\tfor (let i = 0; i < fieldCount; i++)\n\t\tvectorFields.push(new VectorField(random(50, width-50), random(50, height-50),\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\trandom([-1, 1])*random(50, 200), 10000,\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tcolor(hue, random(40,100), random(50, 100), 0.05)));\n\t\n\tfor (let y = 0; y < height; y += dy)\n\t\tfor (let x = 0; x < width; x += dx)\n\t\t\tparticles.push(new Particle(x, y, closestFieldTo(x, y).color));\n}\n\nfunction draw() {\n\tlet v = createVector(0, 0);\n\tfor (let particle of particles) {\n\t\tlet x1 = particle.position.x;\n\t\tlet y1 = particle.position.y;\n\t\t\n\t\tv.set(0, 0);\n\t\tfor (let vectorField of vectorFields) {\n\t\t\tv.add(vectorField.value(x1, y1));\n\t\t}\n\t\t\n\t\tlet x2 = x1 + v.x*0.04;\n\t\tlet y2 = y1 + v.y*0.04;\n\t\t\n\t\tstroke(particle.color);\n\t\tline(x1, y1, x2, y2);\n\t\tparticle.moveTo(x2, y2);\n\t}\n}\n\n\n// === Tab: VectorField ===\nclass VectorField {\n\tconstructor(x, y, radius, intensity, color) {\n\t\tthis.center = createVector(x, y);\n\t\tthis.squareRadius = radius * radius;\n\t\tthis.intensity = intensity/(radius*sqrt(2*PI));\n\t\tthis.power = -0.5/this.squareRadius;\n\t\tthis.color = color;\n\t}\n\t\n\tvalue(x, y) {\n\t\t// Gaussian distribution\n\t\tlet direction = p5.Vector.sub(createVector(x, y), this.center);\n\t\tlet squareMagnitude = direction.magSq();\n\t\tdirection.normalize();\t\n\t\treturn p5.Vector.mult(direction, this.intensity*exp(this.power*squareMagnitude));\n\t}\n}\n\nvectorFields = []\n\nfunction closestFieldTo(x, y) {\n\tlet position = createVector(x, y);\n\tlet closestField, distance, minDistance = 1000000;\n\tfor(let vectorField of vectorFields) {\n\t\tdistance = p5.Vector.dist(position, vectorField.center);\n\t\tif (distance < minDistance) {\n\t\t\tminDistance  = distance;\n\t\t\tclosestField = vectorField;\n\t\t}\n\t}\n\t\n\treturn closestField;\n}\n\n\n// === Tab: Particle ===\nclass Particle {\n\tconstructor(x, y, c) {\n\t\tthis.position = createVector(x, y);\n\t\tthis.color = c;\n\t}\n\t\n\tmoveTo(x, y) {\n\t\tthis.position.set(x, y);\n\t}\n}\n\nlet particles = [];\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "oliviernocent",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1060223",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:26:59",
+    "used_in_videos": [
+        "Circular Horizon.mp4"
+    ],
+    "used_count": 1
+}

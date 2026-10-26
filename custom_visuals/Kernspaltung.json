@@ -1,0 +1,33 @@
+{
+    "name": "Kernspaltung",
+    "code": "// === Tab: mySketch ===\nlet particles = [];\nlet flashDuration = 200; // 強光持續時間，單位為毫秒\nlet lastFlashTime = 0; // 記錄上一次強光的時間\n\nclass Particle {\n  constructor(x, y) {\n    this.pos = createVector(x, y);\n    this.vel = p5.Vector.random2D().mult(random(2, 5));\n    this.acc = createVector();\n    this.lifespan = 255;\n    this.size = random(3, 10);\n    this.isProton = random() > 0.5;\n    this.color = this.isProton ? color(255, 100, 100) : color(100, 100, 255);\n  }\n\n  applyForce(force) {\n    this.acc.add(force);\n  }\n\n  update() {\n    this.vel.add(this.acc);\n    this.pos.add(this.vel);\n    this.acc.mult(0);\n\n    // 邊界檢測，使中子粒子在碰到邊框時反彈\n    if (this.isProton) {\n      if (this.pos.x < 0 || this.pos.x > width) {\n        this.vel.x *= -1;\n      }\n      if (this.pos.y < 0 || this.pos.y > height) {\n        this.vel.y *= -1;\n      }\n    }\n\n    this.lifespan -= 2;\n  }\n\n  show() {\n    fill(this.color, this.lifespan);\n    ellipse(this.pos.x, this.pos.y, this.size);\n  }\n\n  isDead() {\n    return this.lifespan <= 0;\n  }\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight); // \n  background(0); // \n  noFill(); // 確保只繪製粒子而不形成連接線\n}\n\nfunction draw() {\n  // 檢查是否超過強光的持續時間，如果是則繪製黑色背景\n  if (millis() - lastFlashTime > flashDuration) {\n    background(0);\n  }\n\n\n  particles = particles.filter(p => p instanceof Particle);\n\n  for (let i = particles.length - 1; i >= 0; i--) {\n    let p = particles[i];\n    p.applyForce(p5.Vector.random2D().mult(0.1));\n\n    p.update();\n    p.show();\n\n    if (p.isDead()) {\n      particles.splice(i, 1);\n    }\n  }\n}\n\nfunction mousePressed() {\n \n  lastFlashTime = millis();\n\n \n  background(255);\n\n  for (let i = 0; i < 100; i++) {\n    var p = new Particle((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n    particles.push(p);\n  }\n\n  frameRate(60);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "zolic",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1977367",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:30:33",
+    "used_in_videos": [
+        "Pure Immersion Repetition.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

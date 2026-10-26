@@ -1,0 +1,24 @@
+{
+    "name": "DiffusionLimitedAggregation",
+    "code": "// === Tab: mySketch ===\nconst moverAmount = 1200; //how many particles are added at the beginning of the sketch\nconst pAndMSize = 5; //the side length of each particle (they're rects).\n\nlet pointsAndMovers = []; //container for both moving and fixed particles\n\nlet bgCol;\n\n\nfunction setup() {\n\tcreateCanvas(360, 360);\n\tbackground(bgCol=color(0));\n\n\tnoStroke();\n\tfor (let i = 0; i < moverAmount; i++) {\n\t\tpointsAndMovers.push(new pointMover(rInc(width, pAndMSize), rInc(height, pAndMSize), false));\n\t}\n\tfor (let i = 2; i > 0; i--){\n\tlet fixedStart = random(pointsAndMovers);\n\t//fixedStart.pos.set(inc(width/2, pAndMSize), inc(height/2, pAndMSize));\n\tfixedStart.fixed = true;                   //choose one of the particles at random from the container and make it \"fixed\".\n\t}\n\tframeRate(60);\n}\n\nfunction draw() {\n\tbackground(bgCol);\n\tfor (let point of pointsAndMovers) {\n\t\t\tif (point.fixed===false){\n\t\tpoint.move();                        //only call the particle's move() method if it's not fixed\n\t\t\t} else if (point.fixed===true){\n\t\tpoint.show();  \n\t\t\t}//draw the particle.\n\t}\n\t\n}\n\nclass pointMover {\n\tconstructor(x, y, fixed = true, shade=rCol(), size = pAndMSize) {\n\t\tthis.pos = createVector(x, y);\n\t\tthis.fixed = fixed;\n\t\tthis.shade=shade;\n\t\tthis.size = size;\n\t}\n\t\n\tshow() {\n\t\t\tfill(this.shade);\n\t\t\trect(this.pos.x, this.pos.y, this.size , this.size);\n\t}\n\n\tmove() {\n\t\t\tlet direction = random([1, 0])\n\t\t\tif (direction === 1) {\n\t\t\t\tthis.pos.x += randOne(this.size);\n\t\t\t} else if (direction === 0) {\n\t\t\t\t\tthis.pos.y += randOne(this.size);\n\t\t\t}\n\t\t\tpgWrap(this.pos, [0, inc(width, this.size), 0, inc(height, this.size)]); //using a wrap function from my personal function library to wrap moving particles' positions.\n\t\t\tfor (let otherPoint of pointsAndMovers) {\n\t\t\t\tif (otherPoint !== this && otherPoint.fixed === true && abs(dist(this.pos.x, this.pos.y, otherPoint.pos.x, otherPoint.pos.y)) <= this.size) {\n\t\t\t\t\tthis.fixed = true;\n\t\t\t\t\tif(this.pos.x<=this.size){\n\t\t\t\t\t\tthis.pos.x=width-this.size;\n\t\t\t\t\t} else if (this.pos.y <=this.size){\n\t\t\t\t\t\tthis.pos.y = height-this.size;\n\t\t\t\t\t} else if (this.pos.x >= width-this.size){\n\t\t\t\t\t\tthis.pos.x = this.size;\n\t\t\t\t\t} else if (this.pos.y >= height-this.size){\n\t\t\t\t\t\tthis.pos.y = this.size;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthis.pos = this.pos;\n\t\t\t\t\t}\n\t\t\t\t\t\t\n\t\t\t\t\t\t//the above section ensures that newly fixed particles which whould otherwise wrap to the other side actually fix in a position as if they had been wrapped.\n\t\t\t\t\t\t\n\t\t\t\t\tthis.shade=rLerpColor(lerpColor(this.shade, otherPoint.shade, 0.9)) //make any newly fixed particle shift its shade to something much closer to that of the particle that caused it to \"fix\", creating a gradient effect.\n\t\t\t\t}\n\t\t\t}\n\t\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Justin Turner",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/824772",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:52:43",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

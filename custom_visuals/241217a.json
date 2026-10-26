@@ -1,0 +1,24 @@
+{
+    "name": "241217a",
+    "code": "// === Tab: mySketch ===\n/*\nBy Okazz\n*/ \nlet colors = ['#fdfffc', '#235789', '#c1292e', '#f1d302', '#020100'];\nlet ctx;\nlet circles = [];\nlet motions = [];\nlet noiseFilter;\n\nfunction setup() {\n\tcreateCanvas(900, 900);\n\trectMode(CENTER);\n\tctx = drawingContext;\n\tfor (let i = 0; i < 10000; i++) {\n\t\tlet d = width * random(0.05, 0.15);\n\t\tlet x = (width/2) + (random(-0.35, 0.35) * (width - d/2));\n\t\tlet y = (height/2) + (random(-0.35, 0.35) * (height - d/2));\n\t\tlet newShape = { x: x, y: y, d: d };\n\t\tlet overlap = false;\n\t\tfor (let c of circles) {\n\t\t\tif (checkCircleCollision(newShape, c)) {\n\t\t\t\toverlap = true;\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t\tif (!overlap) {\n\t\t\tcircles.push({x:x, y:y, d:d});\n\t\t}\n\t}\n\tfor(let c of circles){\n\t\tmotions.push(new Motion(c.x, c.y, c.d));\n\t}\n\n\tnoiseFilter = createImage(width, height);\n\tnoiseFilter.loadPixels();\n\tlet pix = noiseFilter.width * noiseFilter.height * 4;\n\tfor (let i = 0; i < pix; i += 4) {\n\t\tvar x = (i / 4) % noiseFilter.width;\n\t\tvar y = floor(map(i, 0, pix, 0, noiseFilter.height));\n\t\tlet alph = random(30);\n\t\tlet c = noise(y * 0.08, x * 0.08) * 240;\n\t\tnoiseFilter.pixels[i] = c;\n\t\tnoiseFilter.pixels[i + 1] = c;\n\t\tnoiseFilter.pixels[i + 2] = c;\n\t\tnoiseFilter.pixels[i + 3] = alph;\n\t}\n\tnoiseFilter.updatePixels();\n}\n\nfunction draw() {\n\tbackground(255);\n\t\tfor(let m of motions){\n\t\t\tm.show();\n\t\t\tm.move();\n\t\t}\n\timage(noiseFilter, 0, 0);\n}\n\nfunction checkCircleCollision(a, b) {\n\tlet distSq = (a.x - b.x) ** 2 + (a.y - b.y) ** 2;\n\tlet radiusSum = (a.d / 2) + (b.d / 2);\n\treturn distSq < radiusSum ** 2;\n}\n\nfunction easeOutCirc(x) {\n\treturn sqrt(1 - Math.pow(x - 1, 2));\n}\n\nclass Motion {\n\tconstructor(x, y, d) {\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.d = d;\n\t\tthis.n = int(random(4, 15));\n\t\tthis.sw = d / this.n;\n\t\tthis.te = int(random(200, 400));\n\t\tthis.t = 0;\n\t\tthis.circles = [];\n\t\tthis.cols = [];\n\t\tshuffle(colors, true);\n\t\tfor (let i = 0; i < this.n; i++) {\n\t\t\tthis.cols.push(colors[i % colors.length]);\n\t\t\tthis.circles.push(new Circle(0, 0, this.d * 1.1, -((this.te / this.n) * i) + this.te, this.te, this.cols[i]));\n\t\t}\n\t\tthis.count = 0;\n\t}\n\n\tshow() {\n\t\tpush();\n\t\ttranslate(this.x, this.y);\n\t\tstrokeWeight(0);\n\t\tstroke(0);\n\t\tnoFill();\n\t\tcircle(0, 0, this.d);\n\t\tdrawingContext.clip();\n\t\tfor (let i = 0; i < this.circles.length; i++) {\n\t\t\tlet r = this.circles[i];\n\t\t\tr.show();\n\t\t\tr.move();\n\t\t}\n\t\tfor (let i = 0; i < this.circles.length; i++) {\n\t\t\tvar r = this.circles[i];\n\n\t\t\tif (r.isDead) {\n\t\t\t\tthis.count++;\n\t\t\t\tthis.circles.splice(i, 1);\n\t\t\t\tthis.circles.push(new Circle(0, 0, this.d*1.1, 0, this.te, this.cols[this.count % this.cols.length]));\n\t\t\t}\n\t\t}\n\t\tpop();\n\n\t}\n\tmove() {\n\t\tthis.t++;\n\t}\n}\n\nclass Circle {\n\tconstructor(x, y, d, t0, t1, col) {\n\t\tlet th = random(TAU);\n\t\tvar r = random(0, 0.5) * d\n\t\tthis.x0 = x + r * cos(th);\n\t\tthis.x1 = x;\n\t\tthis.y0 = y + r * sin(th)\n\t\tthis.y1 = y;\n\t\tthis.x = this.x0;\n\t\tthis.y = this.y0;\n\n\t\tthis.d = 0;\n\t\tthis.d1 = d;\n\t\tthis.t = t0;\n\t\tthis.t1 = t1;\n\t\tthis.isDead = false;\n\t\tthis.col = col;\n\n\t\t\n\t}\n\n\tshow() {\n\t\tnoStroke();\n\t\tfill(this.col);\n\t\tcircle(this.x, this.y, this.d);\n\t}\n\n\tmove() {\n\t\tif (0 < this.t && this.t < this.t1) {\n\t\t\tlet n = norm(this.t, 0, this.t1 - 1);\n\t\t\tthis.d = lerp(0, this.d1, easeOutCirc(n));\n\t\t\tthis.x = lerp(this.x0, this.x1, easeOutCirc(n));\n\t\t\tthis.y = lerp(this.y0, this.y1, easeOutCirc(n));\n\t\t}\n\t\tif (this.t > this.t1) {\n\t\t\tthis.isDead = true;\n\t\t}\n\n\t\tthis.t++;\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Okazz",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2490490",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 16:52:54",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

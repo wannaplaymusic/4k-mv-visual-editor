@@ -1,0 +1,33 @@
+{
+    "name": "RGBCube",
+    "code": "// === Tab: main ===\n/*\n______________________________________________________________________________\n\nRGB Cube\n\nControls:\n\t* Use mouse to rotate around the cube\n\t* Use the scroll to zoom in and out\n\t* Hold keys 'o' or 'p' to increase and decrease the opacity of the balls\n\nAuthor:\n\tGaurav Dubal\n\nContact:\n  gaurav_dubal@hotmail.co.uk\n\t\n______________________________________________________________________________\n\n*/\n\nlet ps;\nvar dist_from_cam = 600; \t\t// default camera distance\nvar cube_size = 10;\t\t\t\t\t// number of balls per edge\nvar particles = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n\n  ps = new ParticleSystem();\n  ps.loadParticles();\n}\n\nfunction draw() {\n  background(0);\n  \n  ps.run();\n  lines();\n  camera_view();\n  keyPressed();\n}\n\n// creating red blue and green lines\nfunction lines() {\n  push();\n  translate(-20 - 255 / 2, -20 - 255 / 2, -20 - 255 / 2);\n  noStroke();\n  fill(255);\n  sphere(5);\n  pop();\n  push();\n  translate(-255 / 2, -255 / 2, -255 / 2);\n  stroke(255, 0, 0);\n  strokeWeight(5);\n  line(-20, -20, -20, 255 + 20, -20, -20);\n  stroke(0, 255, 0);\n  strokeWeight(5);\n  line(-20, -20, -20, -20, 255 + 20, -20);\n  stroke(0, 0, 255);\n  strokeWeight(5);\n  line(-20, -20, -20, -20, -20, 255 + 20);\n  pop();\n}\n\n// changing location of camera based on mouse position\nfunction camera_view() {\n  // rotate around single point\n  var rotation_angle = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 0, TWO_PI);\n  var elevation_angle = map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, 0, PI);\n\t// for screenshotting\n  // var rotation_angle = PI + PI / 4;\n  // var elevation_angle = 2.0709\n  var centerX = dist_from_cam * cos(rotation_angle) * sin(elevation_angle);\n  var centerY = dist_from_cam * sin(rotation_angle) * sin(elevation_angle);\n  var centerZ = dist_from_cam * cos(elevation_angle);\n  camera(centerX, centerY, centerZ, 0, 0, 0, 0, 0, -1);\n}\n\nfunction mouseWheel(event) {\n\t// print(event.delta);\n\tdist_from_cam += event.delta;\n}\n\nfunction keyPressed() {\n  var increment = 2;\n  if (keyIsPressed) {\n    // changing the opacity of particles\n    if (key == \"p\") {\n      for (let p of particles) {\n        if (p.opacity < 255) {\n          p.opacity += increment;\n          // print(\"Opacity = \" + p.opacity);\n        }\n      }\n    }\n    if (key == \"o\") {\n      for (let p of particles) {\n        if (p.opacity > 0) {\n          p.opacity -= increment;\n          // print(\"Opacity = \" + p.opacity);\n        }\n      }\n    }\n  }\n}\n\n// === Tab: particle ===\nclass Particle {\n  constructor(position_, col_, opacity_, diameter) {\n    this.position = position_;\n    this.col = col_;\n    this.opacity = 255;\n    this.diameter = (255 / (cube_size - 1)) / 2;\n  }\n\n  display() {\n    push();\n    translate(this.position.x, this.position.y, this.position.z);\n    noStroke();\n    fill(red(this.col), green(this.col), blue(this.col), this.opacity);\n    sphere(this.diameter);\n    pop();\n  }\n}\n\n// === Tab: particle_system ===\nclass ParticleSystem {\n  ParticleSystem() {\n\n  }\n\n  loadParticles() {\n    var increment = int(255 / (cube_size - 1));\n    for (var i = 0; i <= 255; i += increment) {\n      for (var j = 0; j <= 255; j += increment) {\n        for (var k = 0; k <= 255; k += increment) {\n          let p = new Particle();\n          p.position = new p5.Vector(i - 255 / 2, j - 255 / 2, k - 255 / 2);\n          p.col = color(i, j, k, p.opacity);\n          particles.push(p);\n        }\n      }\n    }\n  }\n\n  run() {\n    for (let p of particles) {\n      p.display();\n    }\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Gaurav Dubal",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/653895",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:16:03",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Monolithic Pulse.mp4"
+    ],
+    "used_count": 1
+}

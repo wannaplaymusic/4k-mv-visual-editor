@@ -1,0 +1,34 @@
+{
+    "name": "particleinknoise",
+    "code": "// === Tab: mySketch ===\n//https://openprocessing.org/user/254781\n// A sketch for psudo ink drawing  \n// implements perlin noise and recursion\n\nlet particles = [] ; //array of particles\n\nfunction preload() {\n  bg = loadImage(\"https://deckard.openprocessing.org/user532950/visual2671664/h124d8cb86b6c164517b710302a634488/DP212993_4_CRD.jpg\"); // Use the exact name of the uploaded file\n}\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\timage(bg, 0, 0, windowWidth, windowHeight);\n}\n\nfunction draw() {\n\t\n\tif(((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)))  {\n\t\t// spawn a new particle and add it to the array\n\t\tparticles.push(new Particle((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 5, 75)); \n\t}\n\t// update and show the particles\n\tfor(let i=particles.length-2; i>=0; i--) {\n\t\tparticles[i].update(particles);\n\t\tparticles[i].show() ;\n\t\tif(particles[i].alpha<=2) particles.splice(i, 5); // remove the dead particle\n\t}\n}\n\n\n//particle class\nclass Particle{\n\t\n\t//constructor called when creating an instance of this class\n\t// x & y are the location, r is the rate of decay, a is the starting alpha value\n\tconstructor(x,y,r,a){\n\t\t\n\t\tthis.location = createVector(x,y) ;\n\t\tthis.velocity = createVector(random(-1,1),random(-1,1));\n\t\tthis.acceleration = createVector();\n\t\tthis.alpha = this.palpha=a ;\n\t\tthis.amp=3; // size of the particle\n\t\tthis.rate = r;\n\t\n\t}\n\t\n\t//update the velociy and location of particle\n\tupdate(p){\n\t\tthis.acceleration.add(createVector((noise(this.location.x)*2-1), (noise(this.location.y)*2-1)));\n\t\tthis.velocity.add(this.acceleration);\n\t\tthis.acceleration.set(0,0);\n\t\tthis.location.add(this.velocity);\n\t\tthis.alpha -= this.rate ;\n\t\t//this.amp-= this.rate ;\n\t\t// here is the recursion condition\n\t\tif(this.alpha<=this.palpha*0.25 && this.palpha>10) {\n\t\t\tp.push(new Particle(this.location.x, this.location.y, this.rate*0.25, this.palpha*0.5));\n\t\t}\n\t}\n\t\n\t//show the particles\n\tshow(){\n\t\tnoStroke() ;\n\t\tfill(55,55,55, this.alpha) ;\n\t\tellipse(this.location.x, this.location.y, this.amp);\n\t}\n\t\n} // end Particle class\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Gavin",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2671664",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:52:26",
+    "used_in_videos": [
+        "Gridlock Oscillator.mp4",
+        "Mist Over Concrete.mp4",
+        "Inner Harbour Dub.mp4"
+    ],
+    "used_count": 3,
+    "is_starred": false
+}

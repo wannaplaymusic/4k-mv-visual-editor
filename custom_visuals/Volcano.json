@@ -1,0 +1,24 @@
+{
+    "name": "Volcano",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\timageMode(CENTER)\n}\nvar fires = []\nfunction preload(){\n\tvol2=loadImage(\"https://openprocessing.org/sketch/931739/files/vol2.jpeg\")\n}\nfunction draw() {\n\tbackground(255)\n\timage(vol2,width/2,height/2+80)\t\n\tnoStroke();\n\tfor(let i = 0; i < 15; i++){\n\t\tfires.push(new fire (width/2,height/2))\n\t}\n\t\n\tfor(let i=0;i<fires.length;i++){\n\t fires[i].render(i);\n\t}\n}\n\nfunction fire(x, y){\n\tthis.x = x;\n\tthis.y = y;\n\tthis.yVel = -random(2+3,7+10);\n\tthis.xVel = random(-this.yVel/3,this.yVel/3);\n\tthis.heat = 201\n\tthis.render = function(num){\n\t\tthis.x+=this.xVel\n\t\tthis.y+=this.yVel\n\t\tthis.yVel+=0.5\n\t\tfill(255,0,0,this.heat)\n\t\tellipse(this.x,this.y,10)\n\t\tthis.heat-=7\n\t\tif(this.heat<0){fires.splice(num,1)}\n\t}\t\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "EliK",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/931739",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:39:48",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

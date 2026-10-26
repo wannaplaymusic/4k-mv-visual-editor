@@ -1,0 +1,26 @@
+{
+    "name": "PulsingConstellationv2",
+    "code": "// === Tab: mySketch ===\nlet constellation = [];\nlet n;\nlet d;\nlet c;\nconst palettes = [\n\t['#00FFaF','#000020'],\n\t['#aF00FF','#000020'],\n];\n\nfunction setup() {\n  createCanvas(420, 420);\n  pixelDensity(1);\n  n = width/2;\n\tc = createVector(width/2, height/2);\n  for (let i = 0; i <= n; i++) {\n    constellation.push(new star());\n  }\n\tstrokeWeight(random(0.05,0.15));\n}\n\nfunction draw() {\n\tnoFill();\n\tstroke(palettes[0][0]);\n  background(palettes[0][1]);\n\n  for (let i = 0; i < constellation.length; i++) {\n\t\tconst s1 = constellation[i];\n    s1.update();\n\t\t\n    for (let j = 0; j < constellation.length; j++) {\n      if (i > j) {\n\t\t\t\tconst s2 = constellation[j];\n\t\t\t\t\n        if (s1.loc.dist(s2.loc) <= width/8) {\n          line(s1.loc.x, s1.loc.y, s2.loc.x, s2.loc.y);\n        }\n      }\n    }\n  }\n\t\n\tfill('#000020');\n\tnoStroke();\n\tellipse(c.x,c.y,width/2.05,width/2.05);\n}\n\nfunction star() {\n\n  this.a = random(5 * TAU);\n  this.r = random(width/8, width/2);\n  this.loc = createVector(c.x + sin(this.a) * this.r, c.y + cos(this.a) * this.r);\n\tthis.speed = p5.Vector.random2D();\n\n  this.update = function() {\n\t\t\tvar d = c.dist(this.loc);\n\t\t\n\t\t\tif(((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) {\n      \tif (d < width/2) {\n\t\t\t\t\tif(c.dist(createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))))) > width/4) {\n\t\t\t\t\t\tthis.loc = p5.Vector.lerp(this.loc, c, random(-0.3,0.2));\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthis.loc = p5.Vector.lerp(this.loc, c, -0.2);\n\t\t\t\t\t}\n\t\t\t\t\tthis.speed.normalize().mult(random(0.5,1.5));\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tif (d > width/4) {\n\t\t\t\t\tthis.loc = p5.Vector.lerp(this.loc, c, 0.02);\n\t\t\t\t}\n\t\t\t}\n\t\t\n\t\t\t// bounds\n      if (dist(this.loc.x, this.loc.y, width/2, height/2) > 3*width/2) {\n        if (this.loc.x < width/2) {\n          this.loc.x = width - this.loc.x-4;\n        } else if (this.loc.x > width/2) {\n          this.loc.x = width - this.loc.x+4;\n        }\n        if (this.loc.y < 3*height/2) {\n          this.loc.y = height - this.loc.y-4;\n        } else if (this.loc.x > height/2) {\n          this.loc.y = height - this.loc.y+4;\n        }\n      }\n\t\t\t\n\t\t\tthis.loc.add(this.speed);\n    }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Vincent Huynh",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/942861",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:37:11",
+    "used_in_videos": [
+        "Pure Immersion Repetition.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,30 +1,31 @@
 {
-  "name": "RecursiveSquares",
-  "code": "// === Tab: mySketch ===\n// For the #WCCChallenge, and genuary2026, day 26, theme \"recursive grids.\"\n\nfunction setup() {\n\tcreateCanvas(windowHeight * 0.95, windowHeight * 0.95);\n\tfill('#FFC00020');\n\tshift = createVector(0, 0);\n\trectMode(CENTER);\n\tnoCursor();\n}\n\nfunction drawSquare(x, y, d, s) {\n\tif (d < height / 60) return;\n\tpush();\n\ttranslate(x, y);\n\tlet reach = atan2(y - shift.y, x - shift.x);\n\trect(0, 0, d, d);\n\tpop();\n\tdrawSquare(x - cos(reach) * s / 2, y - sin(reach) * s / 2, (s - 1) * d / s, s);\n}\n\nfunction draw() {\n\tbackground(255);\n\ttranslate(width / 2, height / 2);\n\tshift.lerp(createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - height / 2), 0.1);\n\tfor (let y of [-0.3 * height, 0, 0.3 * height]) {\n\t\tfor (let x of [-0.3 * height, 0, 0.3 * height]) {\n\t\t\tdrawSquare(x, y, 0.29 * height, 10);\n\t\t}\n\t}\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Ivan Rudnicki",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@u110137/2856999",
-  "date_added": "2026-07-06 20:59:59",
-  "scaling_mode": "auto",
-  "used_in_videos": [
-    "Nebula Hammer Fury.mp4",
-    "Night Drive Momentum.mp4",
-    "Mental Drift.mp4",
-    "Concrete Tides.mp4",
-    "Monolithic Interval.mp4",
-    "Night Drive Core Roll.mp4",
-    "Vacuum Memory.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 8
+    "name": "RecursiveSquares",
+    "code": "// === Tab: mySketch ===\n// For the #WCCChallenge, and genuary2026, day 26, theme \"recursive grids.\"\n\nfunction setup() {\n\tcreateCanvas(windowHeight * 0.95, windowHeight * 0.95);\n\tfill('#FFC00020');\n\tshift = createVector(0, 0);\n\trectMode(CENTER);\n\tnoCursor();\n}\n\nfunction drawSquare(x, y, d, s) {\n\tif (d < height / 60) return;\n\tpush();\n\ttranslate(x, y);\n\tlet reach = atan2(y - shift.y, x - shift.x);\n\trect(0, 0, d, d);\n\tpop();\n\tdrawSquare(x - cos(reach) * s / 2, y - sin(reach) * s / 2, (s - 1) * d / s, s);\n}\n\nfunction draw() {\n\n// [SENTINEL 專家 2 修復] 音訊座標數值防禦\nif(typeof window.simulatedMouseX === 'number' && isNaN(window.simulatedMouseX)) window.simulatedMouseX = width*0.5;\nif(typeof window.simulatedMouseY === 'number' && isNaN(window.simulatedMouseY)) window.simulatedMouseY = height*0.5;\n\n\tbackground(255);\n\ttranslate(width / 2, height / 2);\n\tshift.lerp(createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - height / 2), 0.1);\n\tfor (let y of [-0.3 * height, 0, 0.3 * height]) {\n\t\tfor (let x of [-0.3 * height, 0, 0.3 * height]) {\n\t\t\tdrawSquare(x, y, 0.29 * height, 10);\n\t\t}\n\t}\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Ivan Rudnicki",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@u110137/2856999",
+    "date_added": "2026-07-06 20:59:59",
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Nebula Hammer Fury.mp4",
+        "Night Drive Momentum.mp4",
+        "Mental Drift.mp4",
+        "Concrete Tides.mp4",
+        "Monolithic Interval.mp4",
+        "Night Drive Core Roll.mp4",
+        "Vacuum Memory.mp4",
+        "Ultimate Core Patterns.mp4",
+        "Supernova Armor Pulse.mp4"
+    ],
+    "used_count": 9
 }

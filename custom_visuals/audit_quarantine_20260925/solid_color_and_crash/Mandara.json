@@ -1,0 +1,24 @@
+{
+    "name": "Mandara",
+    "code": "// === Tab: mySketch ===\nclass light{\n  let pos = new PVector(0, 0, 0);\n  let vel = new PVector(0, 0, 0);\n  let acc = new PVector(0, 0, 0);\n  r = 2;\n  constructor(pos, vel){\n    this.pos = pos;\n    this.vel = vel;\n  }\n  function run(){\n    if(pos.x < 0) vel.x = -vel.x;\n    if(pos.x > width) vel.x = -vel.x;\n    if(pos.y < 0) vel.y = -vel.y;\n    if(pos.y > height) vel.y = -vel.y;\n    vel.add(acc);\n    pos.add(vel);\n    noStroke();\n    ellipse(pos.x, pos.y, r, r);\n  }\n}\n\nlight lights[][] = new Array(60)[600]; \nlet n =0;\nlet c;\nlet time = 1;\nfunction setup() {\n  createCanvas(600, 600);\n  colorMode(HSB);\n  background(0);\n  frameRate(60);\n  let vel0 = 4;\n  for (i=0; i<60; i++) {\n    var vel = new PVector();\n    let theta = i * 2*PI/60;\n    vel.x = vel0 * cos(theta);\n    vel.y = vel0 * sin(theta);\n    for (j=0; j<600; j++) {\n      lights[i][j] = new light(new PVector(width/2, height/2), vel);\n    }\n  }\n}\nfunction draw() {\n  fill(0, 0, 0, 20);\n  rect(0, 0, width, height);\n  n = 50 + time % 200;\n  let o = int(time)%300;\n  if (c >= 255)  c=0;  \n  else  c++;\n  fill(c, 200, 255);\n  for (i=0; i<60; i+=1) {\n    for (j=0+o; j<n+o; j++) {\n      lights[i][j].run();\n    }\n  }\n  time++;\n} \n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "kn05",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/741150",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:02:21",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

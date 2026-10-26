@@ -1,0 +1,27 @@
+{
+    "name": "rainydayoriginalcomments",
+    "code": "// === Tab: mySketch.js ===\n// Array to hold all raindrop objects\nvar d = [];\n\nfunction setup() { //runs once at the beginning\n  createCanvas(windowWidth, windowHeight); // create full-window canvas (i like this but need image to scale better)\n\n// Generate initial raindrops, random horizontal position, random vertical position, random speed factor for variety\n  for (var i = 0; i < 500; i++) {\n    d.push(new Drop(random(0, windowWidth), random(0, windowHeight), random(2, 4)));\n\t\t// 500 raindrops are created at the start and reused\n  }\n}\n\nfunction draw() { // this runs continuously to animate the scene\n\n  // Fading effect: draw a semi-transparent black rectangle\t\n  noStroke();\n  fill(0, 25);\n  rect(0, 0, width, height);\n\t\n\t// Update and draw all raindrops\n  for (var i = 0; i < d.length; i++) {\n    d[i].displ(); //call the raindrop's display/update function\n  }\n}\n\nfunction Drop(x, y, sp) {\n  var x1 = x; // horizontal position of drop\n  var y1 = y; // vertical position\n  var x2; //  endpoint\n  var y2; //  endpoint\n  var s = sp; // speed \n\n  this.displ = function() { // displ() is the function called each frame to move and draw the drop\n    // converts mouse position \n\t\tvar mx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) / 120;  // dividing by 120 slows it down\n    if (mx <= 0) {\n      mx = 0.5; // default speed - no mouse\n    }\n\t\t\n    y1 = y1 + s * mx; // scales speed according to mouse position\n    x2 = x1;\n    y2 = y1 + 30; // length of raindrops, change if they're too long/short\n\n    stroke(200);\n    line(x1, y1, x2, y2); // draws raindrop\n\n    if (y1 >= windowHeight - 80) { // did the drop hit the ground?\n\t\t\tnoFill();\n      noStroke();\n      fill(255, 150);\n      ellipse(x1, windowHeight - random(5, 50), random(2, 5), random(1, 4)); // then draw a splash\n      \n\t\t\t// renews the drop by sending it back to the top (no need to generate new ones)\n\t\t\tx1 = random(0, windowWidth);\n      y1 = -120;\n    }\n  }\n\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n\t<meta charset=\"utf-8\" />\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.7/lib/p5.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.7/lib/addons/p5.sound.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nhtml,\nbody {\n\tmargin: 0;\n\tpadding: 0;\n}\n",
+    "inline_assets": {},
+    "author": "Keith Mahony",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2772904",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:47:24",
+    "used_in_videos": [
+        "Remote Signal Bloom.mp4",
+        "Gladiator Star Arena.mp4"
+    ],
+    "used_count": 2
+}

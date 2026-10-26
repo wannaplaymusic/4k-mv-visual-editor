@@ -1,0 +1,67 @@
+{
+    "name": "Repulsivepoly",
+    "code": "// === Tab: mySketch ===\nlet currentSeed = 53;\nlet shapes = [];\nlet particles = [];\nconst numParticles = 4000;\nlet backgroundLines = []; \n\nfunction setup() {\n  createCanvas(1200, 800);\n  colorMode(HSB, 100, 100, 100);\n  generateArt();\n}\n\nfunction generateArt() {\n  randomSeed(currentSeed);\n  background(360, 0, 100);\n  \n  // Clear previous elements\n  shapes = [];\n  particles = [];\n  backgroundLines = [];\n\n  // Create seed-based elements\n  createBackgroundLines();\n  createMainShapes();\n  createGrainEffect();\n  createDotsEffect();\n\n  // Initialize particles\n  for (let i = 0; i < numParticles; i++) {\n    particles.push({\n      x: random(width),\n      y: random(height),\n      size: random(1, 4),\n      baseX: random(width),\n      baseY: random(height),\n      speed: random(0.3, 1.2)\n    });\n  }\n}\n\nfunction createBackgroundLines() {\n  const numLines = int(random(25, 45));\n  for (let i = 0; i < numLines; i++) {\n    const x = random(width);\n    const y = random(height);\n    const angle = random(TWO_PI);\n    const lineLength = width * random(5.5, 6.5);\n    stroke(0, random(15, 40));\n    strokeWeight(random(0.06, 1.8));\n    push();\n    translate(x, y);\n    rotate(angle);\n    line(-lineLength/2, 0, lineLength/2, 0);\n    pop();\n  }\n}\n\nfunction createMainShapes() {\n  const numShapes = int(random(20, 50));\n  const maxSize = random(5, 200);\n\n  for (let i = 0; i < numShapes; i++) {\n    const shape = {\n      baseX: random(width),\n      baseY: random(height),\n      x: 0,\n      y: 0,\n      sides: int(random(3, 9)),\n      size: random(maxSize/2, maxSize),\n      rotation: random(TWO_PI),\n      scaleFactor: random(0.3, 3),\n      scaleAxis: random() < 0.5 ? 'x' : 'y',\n      radiusX: 0,\n      radiusY: 0,\n      aberrationOffset: 0.8\n    };\n    \n    // Set initial position\n    shape.x = shape.baseX;\n    shape.y = shape.baseY;\n    shapes.push(shape);\n  }\n}\n\nfunction draw() {\n  background(360, 0, 100);\n  \n  // Draw interactive elements\n  drawBackgroundElements();\n  drawInteractiveShapes();\n  drawInteractiveParticles();\n  drawVignette();\n  drawSeedInfo();\n}\nfunction createBackgroundLines() {\n  var numLines = int(random(8, 25));\n  for (let i = 0; i < numLines; i++) {\n    backgroundLines.push({\n      x: random(width),\n      y: random(height),\n      angle: random(TWO_PI),\n      length: width * random(5.5, 6.5),\n      strokeAlpha: random(15, 40),\n      strokeWeight: random(0.06, 1.8)\n    });\n  }\n}\n\nfunction drawBackgroundElements() {\n  for (let bgLine of backgroundLines) { // Changed variable name from 'line' to 'bgLine'\n    stroke(0, bgLine.strokeAlpha);\n    strokeWeight(bgLine.strokeWeight);\n    push();\n    translate(bgLine.x, bgLine.y);\n    rotate(bgLine.angle);\n    line(-bgLine.length/2, 0, bgLine.length/2, 0); // Now using p5.js line() function\n    pop();\n  }\n}\n\nfunction drawInteractiveShapes() {\n  for (let shape of shapes) {\n    // Update shape position based on mouse\n    const mouseDist = dist((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), shape.x, shape.y);\n    const repulsionRadius = 300;\n    \n    if (mouseDist < repulsionRadius) {\n      const force = p5.Vector.sub(createVector(shape.x, shape.y), createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))));\n      force.setMag(map(mouseDist, 0, repulsionRadius, 8, 0));\n      shape.x += force.x;\n      shape.y += force.y;\n    } else {\n      // Return to base position\n      shape.x = lerp(shape.x, shape.baseX, 0.1);\n      shape.y = lerp(shape.y, shape.baseY, 0.1);\n    }\n\n    // Calculate scaling\n    if (shape.scaleAxis === 'x') {\n      shape.radiusX = shape.size * shape.scaleFactor;\n      shape.radiusY = shape.size;\n    } else {\n      shape.radiusX = shape.size;\n      shape.radiusY = shape.size * shape.scaleFactor;\n    }\n\n    // Draw chromatic aberration\n    colorMode(RGB);\n    noStroke();\n    fill(255, 0, 0, 50);\n    drawPolygon(shape.x, shape.y, shape.radiusX, shape.radiusY, shape.sides, shape.rotation);\n    fill(0, 255, 0, 50);\n    drawPolygon(shape.x, shape.y, shape.radiusX, shape.radiusY, shape.sides, shape.rotation);\n    fill(0, 0, 255, 50);\n    drawPolygon(\n      shape.x + shape.aberrationOffset,\n      shape.y + shape.aberrationOffset,\n      shape.radiusX,\n      shape.radiusY,\n      shape.sides,\n      shape.rotation\n    );\n    \n    // Draw main shape\n    colorMode(HSB);\n    fill(0, 0, 0);\n    drawPolygon(shape.x, shape.y, shape.radiusX, shape.radiusY, shape.sides, shape.rotation);\n  }\n}\n\nfunction drawInteractiveParticles() {\n  for (let particle of particles) {\n    var mouseDist = dist((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), particle.x, particle.y);\n    var repulsionRadius = 150;\n\n    if (mouseDist < repulsionRadius) {\n      var force = p5.Vector.sub(createVector(particle.x, particle.y), createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))));\n      force.setMag(map(mouseDist, 0, repulsionRadius, 5, 0));\n      particle.x += force.x * particle.speed;\n      particle.y += force.y * particle.speed;\n    } else {\n      // Return to base position\n      particle.x = lerp(particle.x, particle.baseX, 0.05);\n      particle.y = lerp(particle.y, particle.baseY, 0.05);\n    }\n\n    // Draw particle\n    fill(0);\n    noStroke();\n    ellipse(particle.x, particle.y, particle.size);\n  }\n}\n\nfunction drawPolygon(x, y, rx, ry, sides, rotation) {\n  push();\n  translate(x, y);\n  rotate(rotation);\n  beginShape();\n  var angle = TWO_PI / sides;\n  for (let a = 0; a < TWO_PI; a += angle) {\n    vertex(cos(a) * rx, sin(a) * ry);\n  }\n  endShape(CLOSE);\n  pop();\n}\n\nfunction createGrainEffect() {\n  const numGrains = 150000;\n  for (let i = 0; i < numGrains; i++) {\n    fill(0, 0, 0, random(0.3, 1));\n    noStroke();\n    ellipse(random(width), random(height), random(0.3, 0.8));\n  }\n}\n\nfunction createDotsEffect() {\n  const numDots = random(50, 100);\n  for (let i = 0; i < numDots; i++) {\n    fill(0, 0, 0, random(0.1, 1));\n    noStroke();\n    ellipse(random(width), random(height), random(0.5, 6));\n  }\n}\n\nfunction drawVignette() {\n  const ovalRatio = 1.6;\n  const vignetteStrength = 0.7;\n  const vignetteSize = 1.0;\n\n  push();\n  scale(1, ovalRatio);\n  let gradient = drawingContext.createRadialGradient(\n    width/2,\n    height/(2 * ovalRatio),\n    height * 0.1 * vignetteSize,\n    width/2,\n    height/(2 * ovalRatio),\n    height * vignetteSize\n  );\n  gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');\n  gradient.addColorStop(1, `rgba(0, 0, 0, ${vignetteStrength})`);\n  drawingContext.fillStyle = gradient;\n  drawingContext.fillRect(0, 0, width, height/ovalRatio);\n  pop();\n}\n\nfunction drawSeedInfo() {\n  fill(50);\n  textSize(20);\n  text(`Seed: ${currentSeed}`, 20, 30);\n}\n\nfunction keyPressed() {\n  if (key === 'n' || key === 'b') {\n    currentSeed += key === 'n' ? 1 : -1;\n    generateArt();\n  }\n  if (key === 's') saveCanvas(`artwork_seed_${currentSeed}`, 'png');\n}\n\nfunction mouseMoved() {\n  redraw(); // Continuous updates for interaction\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Andy Serra",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2626998",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:09:25",
+    "expressive_profile": {
+        "module_id": "Repulsivepoly.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                255.0,
+                75.0
+            ],
+            "mean_lightness": 0.121,
+            "mean_chroma": 0.001,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 2.06,
+            "curl_vorticity": 0.278,
+            "divergence": 0.003,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-26 10:56:15"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Depth Regulation.mp4"
+    ],
+    "used_count": 1
+}

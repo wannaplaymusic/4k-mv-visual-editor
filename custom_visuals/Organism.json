@@ -1,0 +1,26 @@
+{
+    "name": "Organism",
+    "code": "// === Tab: mySketch ===\nlet layers = 19;\nlet leaf = 7;\n  \nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  strokeWeight(3);\n  colorMode(HSB, 100);\n  background(0);\n}\n\nlet bghue = 0\n\n// Easing function: easeOutElastic\nfunction easeOutElastic(t) {\n  let c4 = (2 * PI) / 3;\n\n  if (t === 0) return 0;\n  if (t === 1) return 1;\n\n  return pow(2, -10 * t) * sin((t * 10 - 0.75) * c4) + 1;\n}\n\nfunction draw() {\n  let bounce = sqrt(easeOutElastic(millis()%1500/1500.0));\n  \n  background(0, 100, 00, 1);\n  for (let i = 0; i < layers; i++) {\n    let timer = millis() / ((millis()%1000/1000)*1000+300)*.1;\n    let rotation = (PI / leaf) * timer * i * 2;\n    \n    // size\n    let size_ = min(width / 2, height / 2);\n    let perlin = pow(noise(millis() / 600.0 + i * 0.2), 2.4);\n    let radius = size_ * (1-(i / layers));\n    radius *= 1.5;\n    \n    // color\n    let epylepsy = noise(millis() / 5000.0) * 400;\n    let perlin2 = noise(millis() / 888.0 + i * 0.07 + 10000) * epylepsy % 100;\n    stroke(\n      perlin2 / 5 + 20,\n      randomGaussian(60, 3) + noise(millis()/100.0)*20,\n      randomGaussian(100, 1),\n      20\n      )\n    fill(\n      perlin2,\n      100+randomGaussian(60, 3) + noise(millis()/100.0)*20,\n      -100-randomGaussian(100, 1),\n      20\n    );\n\n    for (let i = 0; i < leaf; i++) {\n      let c = cos(TAU * i / leaf + rotation) * bounce;\n      let d = sin(TAU * i / leaf + rotation) * bounce;\n      \n      rectMode(CENTER)\n      rect(width / 2 + (c * radius), \n              height / 2 + (d * radius),\n              radius * perlin, \n              radius * perlin,           \n             )\n      // ellipse();\n    }\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Onat Saygı",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2516147",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:58:13",
+    "used_in_videos": [
+        "Thunderous Drive Flow.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,29 @@
+{
+    "name": "240928_Universe2",
+    "code": "// === Tab: mySketch ===\nlet exportRatio = 300 / 72;\nlet Canvas;\nlet a3Paper = {\n  width: 3508,\n  height: 2480\n}\n\nvar particles;\nvar img = [];\nvar n, s, maxR;\nvar indexImg = 0;\n\nfunction setup() {\n\t// createCanvas(windowWidth, windowHeight);\n\t// createCanvas(1000,1000);\n\t\n  // 設定畫布大小，根據 exportRatio 計算\n  let w = a3Paper.width / exportRatio;\n  let h = a3Paper.height / exportRatio;\n  canvas = createCanvas(w, h);\n\t\n  background(0);\n  smooth();\n\n  // 根據螢幕像素密度調整 exportRatio\n  exportRatio /= pixelDensity();\n\n  // 設定初始粒子參數\n  n = 6000;\n  s = 10;\n  maxR = height / 2 - height / 10;\n  particles = [];\n\n  // 置入圖片\n  MyImage();\n}\n\nfunction draw() {\n  // 設置畫布背景及旋轉效果\n\t// background(0,100);\n  translate(width / 2, height / 2);\n\t// rotate(frameCount/1000+sin(frameCount%100))//Version2\n  rotate(frameCount / 1000);//Version3\n  noStroke();\n\t// addNoise()\n  blendMode(LIGHTEST);\n\n  // 繪製粒子效果\n  calculateWork();\n}\n\n// 儲存高品質圖片\nfunction keyTyped() {\n  if (key === \"s\" || key === \"S\") {\n    noLoop(); // 停止繪畫循環\n\n   // 重新縮放與重繪\n    push();\n    scale(exportRatio);\n    pop();\n\n    // 儲存為 PNG 格式\n    saveCanvas(\"Mywork\", 'png');\n\n  }\n}\n\n\n// === Tab: graphic ===\nfunction calculateWork() {\n\tif(s > 1) {\n\t\tif(particles.length != 0) {\n\t\t\tfor(let i = 0; i < particles.length; i++) {\n\t\t\t\tvar p = particles[i];\n\t\t\t\tp.show();\n\t\t\t\tp.move();\n\t\t\t\t\n\t\t\t\tif(p.isDead()) particles.splice(i, 1);\n\t\t\t}\n\t\t} else {\n\t\t\ts -= 2;\n\t\t\tinitParticles();\n\t\t}\n\t}\n\t\n\t\n}\n\nfunction initParticles() {\t\n\tfor(let i = 0; i < n; i++) {\n\t\tparticles.push(new Particle(maxR, s));\n\t\t\n\t\tvar p = particles[i];\n\t\tvar x = int(map(p.pos.x, -maxR, maxR, 0, img[indexImg].width));\n    var y = int(map(p.pos.y, -maxR, maxR, 0, img[indexImg].height));\n\t\tp.c = img[indexImg].get(x, y);\n\t}\n}\n\n// function mousePressed() {\n// \tindexImg = (indexImg + 1) % img.length;\n// \tsetup();\n// }\n\nclass Particle {\n  \n  constructor(maxR_, s_) {\n    this.s = s_;\n    this.c = \"\";\n    this.maxR = maxR_;\n    \n    // this.life = 100;\n\t\tthis.life = 5000;\n    \n    this.init();\n  }\n  \n  init() {\n    this.pos = p5.Vector.random2D();\n    this.pos.normalize();\n    this.pos.mult(random(2, maxR));\n\n    this.vel = createVector();\n  }\n\n  show() {\n    fill(this.c);\n    ellipse(this.pos.x, this.pos.y, random(this.s/8),random(this.s/8));\n\t\t // rect(this.pos.x, this.pos.y, this.s, this.s);\n    this.life -= 1;\n  }\n  \n  move() {\n    // var angle = noise(this.pos.x / 400, this.pos.y / 400) * TAU;\n\t\tvar angle = noise(this.pos.x /100, this.pos.y / 100) * TAU;\n    var fc = frameCount/int(random(10,1000))\n\t\t\n    this.vel.set(cos(angle)/fc*20, sin(angle)/fc*0.8);//Universe\n\t\t // this.vel.set(cos(angle)/fc*20, sin(angle)/fc*60);\n    this.vel.mult(0.25);\n    this.pos.add(this.vel);\n  }\n  \n\n  isDead() {\n    var d = dist(random(this.pos.x), random(this.pos.y), random(100,800), random(100,800));\n \n    if(d > this.maxR+1000 || this.life < 1) return true;\n    else return false;\n  }\n}\n\n// === Tab: image ===\nfunction MyImage() {\n\t\n\t// img.push(loadImage('https://openprocessing.org/sketch/2373472/files/Autorretrato - Vicent Van Gogh.png'));\n\t// img.push(loadImage('https://openprocessing.org/sketch/2373472/files/IMG_20240602_190133.jpg'));\n\t// img.push(loadImage('https://openprocessing.org/sketch/2373472/files/01.jpg'));\n\timg.push(loadImage('https://openprocessing.org/sketch/2373472/files/hole-1.jpg'));\n\t// img.push(loadImage('https://openprocessing.org/sketch/2373472/files/untitled.png'));\n\t\n\t\n\t\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "LeeJrWei",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2373472",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:04:05",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

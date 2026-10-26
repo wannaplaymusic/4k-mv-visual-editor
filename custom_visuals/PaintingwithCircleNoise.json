@@ -1,0 +1,33 @@
+{
+    "name": "PaintingwithCircleNoise",
+    "code": "// === Tab: mySketch ===\nvar particles = [];\nvar img = [];\nvar n, s, maxR;\nvar indexImg = 0;\nvar isTransitioning = false;\n\n// 定义动画阶段的常量\nconst SETTLE_FRAME_COUNT = 300; \nconst FADE_DURATION = 1;\nconst AUTO_SWITCH_FRAME = 250; \n\nfunction preload() {\n\timg.push(loadImage('https://openprocessing.org/sketch/2690894/files/Las amapolas - Claude Monet.png'));\n\timg.push(loadImage('https://openprocessing.org/sketch/2690894/files/Autorretrato - Vicent Van Gogh.png'));\n\timg.push(loadImage('https://openprocessing.org/sketch/2690894/files/La lechera de burdeos - Francisco de Goya.jpg'));\n\timg.push(loadImage('https://openprocessing.org/sketch/2690894/files/Muchacho mirando una aparicion - Francisco de Goya.png'));\n}\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(\"#FFEDDA\");\n\tsmooth();\n\t\n\tn = 10000; \n\ts = 2; \n\tmaxR = height/2 - height/20;\n\t\n\tcreateNewParticles();\n}\n\nfunction draw() {\n    // --- 新增功能 ---\n    // 在第 250 帧时，自动触发一次切换\n    if (frameCount === AUTO_SWITCH_FRAME) {\n        triggerTransition();\n    }\n\n\tif (frameCount > 30) {\n\t\tbackground(255, 237, 218, 2); \n\t}\n\n\ttranslate(width/2, height/2);\n\tnoStroke();\n\t\n\tfor (let i = particles.length - 1; i >= 0; i--) {\n\t\tlet p = particles[i];\n\t\tp.move();\n\t\tp.update();\n\t\tp.show();\n\t\t\n\t\tif (p.isDead()) {\n\t\t\tparticles.splice(i, 1);\n\t\t}\n\t}\n}\n\nfunction createNewParticles() {\n    noiseSeed(millis()); \n    frameCount = 0;\n    \n    for (let i = 0; i < n; i++) {\n        var p = new Particle(maxR, s);\n        let x = int(map(p.pos.x, -maxR, maxR, 0, img[indexImg].width));\n        let y = int(map(p.pos.y, -maxR, maxR, 0, img[indexImg].height));\n        p.c = img[indexImg].get(x, y);\n        particles.push(p);\n    }\n}\n\n// --- 修改点 1：将切换逻辑提取到新函数中 ---\nfunction triggerTransition() {\n    if (isTransitioning) {\n        return; \n    }\n    isTransitioning = true;\n\n    for (let p of particles) {\n        p.beginFadeOut();\n    }\n    \n    // 让图片可以循环切换\n    indexImg = 0;\n    \n    createNewParticles();\n\n    isTransitioning = false;\n}\n\n// --- 修改点 2：mousePressed 现在只调用新函数 ---\nfunction mousePressed() {\n    triggerTransition();\n}\n\nclass Particle {\n  constructor(maxR_, s_) {\n    this.s = s_;\n    this.c = color(0);\n    this.maxR = maxR_; \n    \n    this.state = 'fading_in';\n    this.alpha = 0;\n    this.fadeStep = 255 / FADE_DURATION;\n    \n    this.init();\n  }\n  \n  init() {\n    this.pos = p5.Vector.random2D();\n    this.pos.normalize();\n    this.pos.mult(random(2, this.maxR));\n    this.vel = createVector();\n  }\n\n  update() {\n    if (this.state === 'fading_in') {\n        this.alpha += this.fadeStep;\n        if (this.alpha >= 255) {\n            this.alpha = 255;\n            this.state = 'active';\n        }\n    } else if (this.state === 'fading_out') {\n        this.alpha -= this.fadeStep;\n    }\n  }\n\n  beginFadeOut() {\n    this.state = 'fading_out';\n  }\n\n  isDead() {\n    return this.state === 'fading_out' && this.alpha <= 0;\n  }\n\n  show() {\n    let cWithAlpha = color(this.c);\n    cWithAlpha.setAlpha(this.alpha);\n    fill(cWithAlpha);\n    ellipse(this.pos.x, this.pos.y, this.s, this.s);\n  }\n  \n  move() {\n    if (this.state === 'active' && frameCount < SETTLE_FRAME_COUNT) {\n        var angle = noise(this.pos.x / 400, this.pos.y / 600, frameCount / 150) * TAU;\n        this.vel.set(cos(angle), sin(angle));\n        this.vel.mult(0.2); \n    } else {\n        this.vel.mult(0.97); \n    }\n    this.pos.add(this.vel);\n\n    if (this.state !== 'fading_out') {\n        let d = this.pos.mag();\n        if (d > this.maxR) {\n            this.pos.setMag(this.maxR);\n            this.vel.mult(0);\n        }\n    }\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Joe",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2690894",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:50:33",
+    "used_in_videos": [
+        "Gradient of Silence.mp4",
+        "Infinite Blue Chamber.mp4"
+    ],
+    "used_count": 2,
+    "is_starred": false
+}

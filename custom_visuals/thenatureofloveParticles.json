@@ -1,0 +1,32 @@
+{
+    "name": "thenatureofloveParticles",
+    "code": "// === Tab: Main ===\nlet particle;\nlet num = 10;\nlet mysize = 100;\nlet colors = [\"#f76ca1\", \"#3ef2d4\", \"#83f23e\", \"#fce028\"];\n\nvar counter2 ;\n\n\nvar counter = 0;\n\nfunction setup() {\n\t\n\tcreateCanvas(1200, 800);\n\tstrokeWeight(0.5);\n\tcolorMode(HSB);\nbackground(0);\n\tresetParticles();\n\t\n}\n\nfunction draw() { \n\tfor (let i = 0; i < num; i++) {\n\t\t\n\t\tparticle[i].draw();\n\t\tparticle[i].update();\n\t\t\n\t}\n//\tif(counter2 > 10){\n\t\t\t\t\tfill(colors[counter]);\n\t\t\t\tcounter = counter + 1 ;\n\t\tif(counter > 3){counter = 0;}\n\t\tcounter2 = 0;\n//\t}\n\t{\n\t//save('explosion.png')\t\n\t}\n}\n\nfunction resetParticles() {\n\tparticle = [];\n//\tbackground(0);\n\tfor (let i = 0; i < num; i++) {\n\t\tmysize = random(0.2,2);\n\t\tparticle[i] = new Particle(width / 2, height / 2, 0.01, 0.3, 0.13);\n\t}\n}\n\nfunction mousePressed() {\n\tresetParticles();\n}\nfunction keyTyped() {\n    if (key === \"s\" || key === \"S\") {\n        //noLoop();\n        saveCanvas(\"nature of love-000\", \"png\");\n    }\n}\n\n// === Tab: Particle ===\nclass Particle {\n\tconstructor(xStartingPosition, yStartingPosition, noiseIncreaseAmount, rotationSpeed, movementSpeed) {\n\t\tthis.rOff = random(100);\n\t\tthis.r = random(TWO_PI);\n\t\tthis.x = xStartingPosition;\n\t\tthis.y = yStartingPosition;\n\t\tthis.movementSpeed = movementSpeed;\n\t\tthis.increaseAmount = noiseIncreaseAmount;\n\t\tthis.xv = 0;\n\t\tthis.yv = 0;\n\t\tthis.rotationSpeed = rotationSpeed;\n\n\t}\n\n\tdraw() {\n\t//\tstrokeWeight(10);\nmysize = mysize + 0.05 ;\n\t\tstroke(0);\n\t\t//fill(colors[counter]);\n\t\t//fill(\"#f76ca1\")\n\t\tellipse( this.x-this.xv, this.y-this.yv , mysize,mysize);\n\t\t//rect(this.x-this.xv, this.y-this.yv , mysize,mysize);\n\t\t//line(this.x, this.y, this.x-this.xv, this.y-this.yv);\n\n\t}\n\n\tupdate() {\n\n\t\tcounter2 = counter2 + 2 ;\n\t\t\n\t\tthis.rOff += this.increaseAmount;\n\t\tthis.r += map(noise(this.rOff), 0, 1, -this.rotationSpeed, this.rotationSpeed);\n\n\t\tthis.xv += cos(this.r) * this.movementSpeed*this.r/4;\n\t\tthis.yv += sin(this.r) * this.movementSpeed*this.r/4;\n\n\t\tthis.x += this.xv;\n\t\tthis.y += this.yv;\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "tombomba",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1446888",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:01:12",
+    "used_in_videos": [
+        "Horizon in Dub.mp4",
+        "Infinite Overlook.mp4"
+    ],
+    "used_count": 2
+}

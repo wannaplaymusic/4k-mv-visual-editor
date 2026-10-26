@@ -1,0 +1,31 @@
+{
+    "name": "Particles0003",
+    "code": "// === Tab: mySketch ===\nconst NUMBER_OF_PARTICLES = 1000\n\nfunction setup() {\n\tconst width = windowWidth;\n\tconst height = windowHeight;\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n\tfill(255)\n\t// rect(windowWidth/2, 0, windowWidth, windowHeight)\n\t// rect(0, 0, windowWidth, windowHeight/2)\n\t// rect(windowWidth/2, 0, windowWidth, windowHeight/2)\n\t// rect(0, windowHeight/2, windowWidth/2, windowHeight)\n\n\tstroke(255);\n\tstrokeWeight(1);\n\tframeRate(30)\n\t\n\tconst minBound = createVector(0, 0);\n\tconst maxBound = createVector(width,height);\n\t\n\tparticles = []\n\tfor (let i = 0; i < NUMBER_OF_PARTICLES; i++) {\n\t\tif (i < NUMBER_OF_PARTICLES / 3) {\n\t\t\tx = 3 * width/4\n\t\t\ty = height/2\n\t\t} else if (i < NUMBER_OF_PARTICLES * 2 / 3) {\n\t\t\tx = width/4\n\t\t\ty = height/2\n\t\t}\n\t\telse {\n\t\t\tx = width/2\n\t\t\ty = height / 2\n\t\t}\n\t\tparticle = new Particle(x, y, [minBound, maxBound])\n\t\tparticles.push(particle);\n\t}\n\t\n// \tparticles = [...new Array(NUMBER_OF_PARTICLES).keys()].map(_ => new Particle(random(width - width / 2) + width/4, random(height - height / 2) + height/4, [minBound, maxBound]))\n\t\n}\n\nfunction draw() {\n\tparticles.forEach(particle => {\n\t\tparticle.update();\n\t\tparticle.draw();\n\t\t// stroke(random(100))//random(180), random(180), random(180))\n\t})\n}\n\n// === Tab: Particle ===\nDV_FACTOR = 1\n\nclass Particle {\n\t\n\tconstructor(x, y, bounds) {\n\t\tthis.pos = createVector(x, y);\n\t\tthis.v = createVector(0, 0);\n\t\tthis.bounds = bounds\n\t}\n\t\n\tupdate() {\n\t\t// Update velocity vector\n\t\tlet dv = createVector(random(DV_FACTOR) - DV_FACTOR/2, random(DV_FACTOR) - DV_FACTOR/2);\n\t\tthis.v = this.v.add(dv);\n\t\t\n\t\t// Update position\n\t\tlet newPosition = this.pos.add(this.v)\n\t\tlet bounds = this.bounds\n\t\t\n\t\t// Max Bounds\n\t\tif (newPosition.x > bounds[1].x) { \n\t\t\tnewPosition.x = bounds[1].x + (bounds[1].x - newPosition.x);\n\t\t\tthis.v.x = this.v.x * -1\n\t\t}\n\t\t\n\t\tif (newPosition.y > bounds[1].y) {\n\t\t\tnewPosition.y = bounds[1].y + (bounds[1].y - newPosition.y)\n\t\t\tthis.v.y = this.v.y * -1\n\t\t}\n\t\t\n\t\t// Min Bounds\n\t\tif (newPosition.x <= bounds[0].x) {\n\t\t\tnewPosition.x = bounds[0].x + (bounds[0].x - newPosition.x)\n\t\t\tthis.v.x = this.v.x * -1;\n\t\t}\n\t\n\t\tif (newPosition.y <= bounds[0].y) {\n\t\t\tnewPosition.y = bounds[0].y + (bounds[0].y - newPosition.y)\n\t\t\tthis.v.y = this.v.y * -1;\n\t\t}\n\t}\n\t\n\tdraw() {\n\t\t// if ((this.pos.y > windowHeight/2) && (this.pos.x > windowWidth/2)) stroke(0)\n\t\t// else if ((this.pos.y > windowHeight / 2) && (this.pos.x < windowWidth / 2)) stroke(255)\n\t\t// else if ((this.pos.y < windowHeight / 2) && (this.pos.x < windowWidth / 2)) stroke(0)\n\t\t// else if ((this.pos.y < windowHeight / 2) && (this.pos.x > windowWidth / 2)) stroke(255)\n\t\t// else stroke(255, 0, 0)\n\t\tstroke(255,255,255)\n\t\tstrokeWeight(1)\n\t\tpoint(this.pos.x, this.pos.y);\n\t\tif (frameCount < 120) {\n\t\t\tstroke(255,255,255,4)\n\t\t\tstrokeWeight(8)\n\t\t} else {\n\t\t\tstroke(frameCount * 2.2 % 255, frameCount % 255, frameCount * 4.3 % 255, 12)\n\t\t\tstrokeWeight(12);\n\t\t}\n\t\tpoint(this.pos.x, this.pos.y);\n\t}\n\t\n}\n\n// class Particles {\n// \tcontructor(n, xBounds, yBounds) {\n// \t\tthis.n = n\n// \t\tthis.xBounds = xBounds;\n// \t\tthis.yBounds = yBounds;\n\t\t\n// \t\tthis.particlesPosition = createVector(this.n\n// \t}\n// }\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "dalofeco",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1816096",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:42:25",
+    "used_in_videos": [
+        "Monochrome Current.mp4"
+    ],
+    "used_count": 1
+}

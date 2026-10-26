@@ -1,0 +1,27 @@
+{
+    "name": "TheContraption",
+    "code": "// === Tab: mySketch.js ===\nlet rings = [];\nlet stop=false \n\nfunction setup() \n{\n  createCanvas(1500, 1000,WEBGL);\n}\n\nlet counter=0\n\nfunction draw() \n{\n\tif(stop==false)\n\t{\n\t\tcounter++\n\t\tnoFill();\n\n\t\tif (frameCount % 60 === 0 & counter<500) \n\t\t{\n\t\t\trings.push(new Ring(100, 100, 0));\n\t\t}\n\n\t\tif (rings.length > 9) \n\t\t{\n\t\t\trings.shift();\n\t\t}\n\n\t\trings.forEach((ring) => \n\t\t{\n\t\t\tring.update();\n\t\t});\n\t}\n}\n\nclass Ring \n{\n  constructor(x, y, radius) \n\t{\n    this.x = x;\n    this.y = y;\n\t\tlet choice=round(random(1))\n\t\tif(choice==0) this.c=random(0,50)\n\t\tif(choice==1) this.c=random(200,255)\n\t\tthis.rotateInc=0;\n\t\tthis.size=round(random(3,20))\n    this.radius = radius;\n\t\t\n\t\tthis.fill1=random(255)\n\t\tthis.fill2=random(255)\n\t\tthis.fill3=random(255)\n\t\tthis.fill4=.2\n\t\tthis.choice=round(random(8))\n  }\n  update() \n\t{\n\t\tthis.rotateInc=0+.1\n\t\tpush()\n\t\trotateZ(this.rotateInc)\n    this.radius += 1;\n\t\tstroke(this.c,this.c,this.c)\n\t\ttranslate(this.x,this.y,0)\n\t\tstrokeWeight(1)\n\t\n\t\tif(counter==1950) stop=true\n\t//\tif(this.choice==0) fill(this.fill1,this.fill2,this.fill3,this.fill4)\n\t\ttorus(this.radius,this.radius*2,this.size)\n\t\tpop()\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\t<meta charset=\"utf-8\" />\n\t<!-- keep the line below for OpenProcessing compatibility -->\n\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/addons/p5.sound.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nhtml, body {  \n    text-align: center;  \n    background-color: #FFFFFF; \n    margin: 0;\n    padding: 10px;\n}  \ncanvas {\n  margin: 10px auto;\n  width:50%;\n  display: block;\n  border: solid 13px black;\n  padding: 26px 26px;\n  box-shadow: -6px 6px 6px gray;\n}\n\n",
+    "inline_assets": {},
+    "author": "Owen Park",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2483905",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:16:39",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

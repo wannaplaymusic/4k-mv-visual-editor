@@ -17,11 +17,14 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 3,
+    "used_count": 6,
     "is_starred": false,
     "used_in_videos": [
-        "Road Lines.mp4",
+        "Faint Memory.mp4",
         "Deep Peace.mp4",
-        "Faint Memory.mp4"
+        "Road Lines.mp4",
+        "Constant Pace.mp4",
+        "Deep Sleep.mp4",
+        "Metro Ghost.mp4"
     ]
 }

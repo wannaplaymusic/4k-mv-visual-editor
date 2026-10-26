@@ -1,0 +1,27 @@
+{
+    "name": "HoneycombShader",
+    "code": "// === Tab: mySketch.js ===\np5.RendererGL.prototype._initContext = function() {\n\ttry {\n\t\tthis.drawingContext =\n\t\t\tthis.canvas.getContext('webgl2', this._pInst._glAttributes) ||\n\t\t\tthis.canvas.getContext('webgl', this._pInst._glAttributes) ||\n\t\t\tthis.canvas.getContext('experimental-webgl', this._pInst._glAttributes);\n\t\tif (this.drawingContext === null) {\n\t\t\tthrow new Error('Error creating webgl context');\n\t\t} else {\n\t\t\tconst gl = this.drawingContext;\n\t\t\tgl.enable(gl.DEPTH_TEST);\n\t\t\tgl.depthFunc(gl.LEQUAL);\n\t\t\tgl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);\n\t\t\tthis._viewport = this.drawingContext.getParameter(\n\t\t\t\tthis.drawingContext.VIEWPORT\n\t\t\t);\n\t\t}\n\t} catch (er) {\n\t\tthrow er;\n\t}\n}\n\nlet myShader;\n\nfunction preload() {\n\tmyShader = loadShader('https://openprocessing.org/sketch/1957947/files/basic.vert', 'basic.frag');\n}\n\nfunction setup() {\n\tcreateCanvas(4*windowHeight/3, windowHeight, WEBGL);\n\tpixelDensity(1);\n\tbackground(100);\n\n\tshader(myShader);\n}\n\nfunction draw() {\n\tmyShader.setUniform('u_resolution', [width, height/1.4]);\n\tmyShader.setUniform('u_time', millis() / 500);\n\n\trect(0, 0, width, height);\n}\n\nfunction windowResized() {\n\tresizeCanvas(windowWidth, windowHeight);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1957947",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 22:56:21",
+    "used_in_videos": [
+        "Asteroid Clan Clash.mp4",
+        "Void Vortex Gladiator.mp4"
+    ],
+    "used_count": 2
+}

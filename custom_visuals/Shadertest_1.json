@@ -1,0 +1,22 @@
+{
+    "name": "Shadertest",
+    "code": "// === Tab: mySketch ===\n// reference: https://p5js.org/reference/#/p5/createShader\n\nlet mandel;\nlet x0 = -0.74364388703,\n\ty0 = 0.13182590421,\n\tdelta = 0.000002;\n\nfunction setup() {\n\tpixelDensity(1);\n\tcreateCanvas(800, 800, WEBGL);\n\n\t// create and initialize the shader\n\tmandel = createShader(vs, fs);\n\tshader(mandel);\n\tnoStroke();\n\n\t// 'p' is the center point of the Mandelbrot image\n\tmandel.setUniform('p', [x0, y0]);\n\tmandel.setUniform('resolution', [width, height]);\n\tdescribe('zooming Mandelbrot set. a colorful, infinitely detailed fractal.');\n}\n\nfunction draw() {\n\t// 'r' is the size of the image in Mandelbrot-space\n\tlet r = 2.0 * exp(-6.0 * (1 + sin(millis() / 1000)))\n\t\n\tif (keyIsDown(LEFT_ARROW)) {\n\t\tx0 -= delta;\n\t} else if (keyIsDown(RIGHT_ARROW)) {\n\t\tx0 += delta;\n\t} else if (keyIsDown(UP_ARROW)) {\n\t\ty0 += delta;\n\t} else if (keyIsDown(DOWN_ARROW)) {\n\t\ty0 -= delta;\n\t}\n\n\t\n\tmandel.setUniform('p', [x0, y0]);\n\tmandel.setUniform('r', r);\n\tplane(width, height);\n}\n\n// === Tab: vert ===\n// the vertex shader is called for each vertex\nlet vs = `\nprecision highp float;\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\n\nattribute vec3 aPosition;\nattribute vec2 aTexCoord;\nvarying vec2 vTexCoord;\n\nvoid main() {\n  vTexCoord = aTexCoord;\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n\t// gl_Position = positionVec4;\n }\n`;\n\n\n// === Tab: frag ===\n// the fragment shader is called for each pixel\nlet fs = `\n   precision highp float;\n   uniform vec2 p;\n\t uniform vec2 resolution;\n   uniform float r;\n   const int I = 500;\n\t \n   void main() {\n     vec2 c = p + (gl_FragCoord.xy/resolution.xy - 0.5) * r, z = c;\n     float n = 0.0;\n     for (int i = I; i > 0; i --) {\n       if(z.x*z.x+z.y*z.y > 4.0) {\n         n = float(i)/float(I);\n         break;\n       }\n       z = vec2(z.x*z.x-z.y*z.y, 2.0*z.x*z.y) + c;\n     }\n     // gl_FragColor = vec4(0.5-cos(n*17.0)/2.0,0.5-cos(n*13.0)/2.0,0.5-cos(n*23.0)/2.0,1.0);\n\t\t gl_FragColor = vec4(0.5 - 0.5*cos(n*vec3(17., 13., 23.)), 1.0);\n   }`;\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u159693",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/2185981",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 22:36:06"
+}

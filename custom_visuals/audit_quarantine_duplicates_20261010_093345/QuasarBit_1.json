@@ -1,0 +1,26 @@
+{
+    "name": "QuasarBit",
+    "code": "// === Tab: mySketch.js ===\nlet layers = 49;\nlet leaf = 7;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  strokeWeight(3);\n  background(0);\n  colorMode(HSB, 100);\n\trectMode(CENTER);\n}\n\nfunction draw() {\n  background(0, 4);\n  for (let i = 0; i < layers; i++) {\n    let timer = ((millis()+10035) / 3500);\n    let rotation = (PI / leaf) * timer * i;\n    \n    // size\n    let size_ = min(width / 2, height / 2);\n    let perlin = pow(noise(millis() / 600.0 + i * 0.2), 3.4);\n    let radius = size_ * (1-(i / layers));\n    radius *= 1.0;\n    \n    // color\n    let epylepsy = noise(millis() / 5000.0) * 400;\n    let perlin2 = noise(millis() / 888.0 + i * 0.07 + 10000) * epylepsy % 100;\n    stroke(\n      perlin2,\n      randomGaussian(20, 40) + noise(millis()/100.0)*20,\n      randomGaussian(100, 1),\n      90\n      );\n    fill(\n      100-perlin2,\n      noise(millis()/100.0%1)*20,\n      randomGaussian(100, 1),\n      84\n    );\n    for (let i = 0; i < leaf; i++) {\n      let c = cos(TAU * ((sin(PI*millis()/63777)+2)*i+0.1*noise((millis()/100.0))) / leaf + rotation) / 1.4;\n      let d = sin(TAU * ((1+noise(millis()/10000.0)/2)*i) / leaf + rotation) / (1.2*i+0.1*noise((millis()/100.0)));\n      rect(width / 2 + (c * radius), \n              height / 2 + (d * radius),\n              radius * perlin / 3, \n              radius * perlin / 3,           \n             );\n    }\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "ÜrmArte",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2972296",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:36:52",
+    "used_in_videos": [
+        "Thunderous Drive Flow.mp4"
+    ],
+    "used_count": 1
+}

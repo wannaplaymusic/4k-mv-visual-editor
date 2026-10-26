@@ -1,0 +1,24 @@
+{
+    "name": "Apollonian256bprototype",
+    "code": "// === Tab: mySketch ===\n// Apollonian prototype\n// This is a prototype of a 256 bytes executable graphics presented at the Shadow Party 2021\n// This code was converted to C, the final version which is 256 bytes in size (single executable) output graphics on Linux framebuffer with SIMD saturated arithmetic\n// https://www.pouet.net/prod.php?which=89067\n\nlet x = 0, y = 0, frame = 15000000, index = 0, index2 = 0;\nfunction setup() {\n\tpixelDensity(1);\n\tcreateCanvas(1024, 900);\n\t\n\tbackground(0);\n}\n\nfunction draw() {\n\tloadPixels();\n\t\n\tlet params = [28, // increase for more details (aka iteration)\n\t\t\t\t\t\t\t\t24,\n\t\t\t\t\t\t\t\t5, // scale\n\t\t\t\t\t\t\t\t12, // 13 for less details\n\t\t\t\t\t\t\t\t6,18,12,22];\n  let d = pixelDensity();\n\t\n\tfor(let iter = 0; iter < 222000; iter += 1) {\n\t\tx = (x + (x >> params[0])) - (y << 2) + ((frame >> params[1]));\n\t\ty = (y - (x >> params[2])) + ((x >> 1) - (y >> params[3])) - ((frame >> params[4]) & ((x << params[5])));\n\t\tx = (x + (x >> params[6])) - (y << 2) + ((frame >> params[1]));\n\n    index = (((width >> 1) + (x >> params[7])) + ((height >> 1) + (y >> (params[7]))) * width) * 4 * d;\n\n/*\n\t\t// colors like final\n    int r = (frame >> 23) & 3;\n    int g = (frame >> 22) & 3;\n    int b = (frame >> 24) & 3;\n*/\n\t\t\n\t\tvar rf = 3&iter;\n\t\tvar gf = 2;\n\t\tvar bf = 1;\n\t\t\n\t\tpixels[index + 1] += rf;\n\t\tpixels[index + 2] += gf;\n\t\tpixels[index + 0] += bf;\n\n    frame += 1;\n\t}\n\n\tupdatePixels();\n}\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Julien Verneuil",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1231156",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:14:48",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

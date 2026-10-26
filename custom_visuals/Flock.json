@@ -1,0 +1,29 @@
+{
+    "name": "Flock",
+    "code": "// === Tab: mySketch ===\nlet N = 60; // initial number of particles\nlet L0 = 250; // rest length of the springs\nlet stiffness = 0.1; // stiffness\nlet dt = 0.01; // time step\nlet brownian_motion = 50; // random velocity magnitude\nlet pts = []; // array of particles\nlet c; // color\n\nfunction setup()\n{\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n  //frameRate(50);\n\t\n\tnoiseDetail(2,0.8); // 2 harmonics, 80% falloff\n  \n  // Create particles\n  for(let i = 0; i < N; i++)\n  {\n    pts.push( new Particle( random(width), random(height) ) );\n  }\n}\n\nfunction draw()\n{\n  background(241,240,245, 32);\n  \n\t// resting length of spring force\n  L0 = 200+300*noise(frameCount/100);\n\t\n\t// rotate drawing around center\n\ttranslate(width/2,height/2);\n\trotate(frameCount/380);\n\ttranslate(-width/2,-height/2);\n  \n  // Compute velocities\n  for(let i = 0; i < N; i++)\n  {\n    for(let j = 0; j <= i; j++)\n    {\n      if( i != j )\n      {\n        let L = mag(pts[j].x - pts[i].x, pts[j].y - pts[i].y);\n        let f = stiffness*(L-L0);\n        // vecteur i -> j\n        let cos_ij = (pts[j].x - pts[i].x)/L;\n        let sin_ij = (pts[j].y - pts[i].y)/L;\n        // force of j on i\n        pts[i].vx += f*cos_ij;\n        pts[i].vy += f*sin_ij;\n        // force of i on j\n        pts[j].vx -= f*cos_ij;\n        pts[j].vy -= f*sin_ij;\n      }\n    }\n  }\n\t\n  // Particles\n\tfill(0,0,255,60);\n  for(let i = 0; i < N; i++)\n  {\n    pts[i].vx += brownian_motion*(2*random()-1);\n    pts[i].vy += brownian_motion*(2*random()-1);\n    pts[i].move(dt);\n\t\t//for(let j = 0; j < 3; j++)\n\t\t\tpts[i].disp();\n  }\n\n\t// Connections\n\tif( random() > 0.98 )\n\t{\n\t\tlet i = int(random(0,N));\n\t\tlet j = int(random(0,N));\n\t\tlet k = int(random(0,N));\n\t\tnoFill();\n\t\tstroke(130,130,255,100);\n\t\tstrokeWeight(4);\n\t\tbeginShape();\n\t\t\tvertex(pts[i].x,pts[i].y);\n\t\t\tvertex(pts[j].x,pts[j].y);\n\t\t\tvertex(pts[k].x,pts[k].y);\n\t\tendShape();\n\t\tnoStroke();\n\t}\n\t\n\t//circle(width/2,height/2,500);\n}\n\nfunction mousePressed()\n{\n\t// add a random number of particles\n\tfor(let k = int(random(1,5)); k > 0; k--)\n\t{\n\t\tlet pos = p5.Vector.random2D().mult(height).add(width/2,height/2);\n\t\tpts.shift(); // remove first element\n\t\tpts.push( new Particle( pos.x, pos.y ) );\n\t}\n}\n\n\nclass Particle\n{\n  constructor(x0, y0, couleur)\n  {\n    this.x = x0;\n    this.y = y0;\n    this.vx = 0;\n    this.vy = 0;\n  }\n\n  move(dt)\n  {\n\t\t// Euler method\n    this.x += dt*this.vx;\n    this.y += dt*this.vy;\n\t\t// no inertia\n    this.vx = 0;\n    this.vy = 0;\n  }\n\n  disp()\n  {\n\t\tc = color(100+155*noise( 0.04*(this.x+this.y+frameCount) ) ,150,255);\n\t\tfill( c );\n    circle(this.x, this.y, 7+35*pow(noise( 0.04*(this.x+this.y+frameCount) ),3) );\n\t\t\n\t\tif( random() > 0.998 )\n\t\t{\n\t\t\tpush();\n\t\t\tnoFill();\n\t\t\tstroke(c);\n\t\t\tstrokeWeight(2);\n\t\t\t//line(this.x+random(-30,30),this.y+random(-30,30), this.x+random(-30,30),this.y+random(-30,30));\n\t\t\tcircle(this.x,this.y,random(20,40));\n\t\t\tpop();\n\t\t}\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "tylu",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/966332",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:35:41",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

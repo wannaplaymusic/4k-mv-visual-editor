@@ -1,0 +1,29 @@
+{
+    "name": "Gatherinunity",
+    "code": "// === Tab: mySketch ===\nlet amountParticles = 300;\nlet allParticles = [amountParticles];\nlet colourinRadians;\nlet goToMouse = false;\nlet easing = 0.05;\nlet particleSize = 10;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(100);\n\tcolourinRadians = TWO_PI/255;\n\tfor (let i = 0; i < amountParticles; i++) {\n\t\tallParticles[i] = new particle(i, amountParticles, particleSize);\n\t}\n}\n\nfunction draw() {\n\tbackground(100);\n\tfor (let particle of allParticles) {\n\t\tparticle.update(goToMouse);\n\t\tparticle.draw();\n\t}\n}\n\nfunction mouseReleased() {\n    goToMouse = !goToMouse;\n}\n\n// === Tab: Particle ===\nclass particle {\n\tconstructor(_pNum, _amountParticles, _particleSize) {\n\t\tthis.amountParticles = _amountParticles;\n\t\tthis.pNum = _pNum*(TWO_PI/this.amountParticles);//Particle Number\n\t\tthis.particleSize = _particleSize;\n\t\tthis.radius = random(20, 75); // This is the moving area of object\n\t\n\t\tthis.pos = createVector(random(0, width), random(0, height));\n\t\tthis.origPos = this.pos;\n\t\tthis.moveArea = createVector(this.radius*sin(this.pNum),this.radius*cos(this.pNum));\n\t\tthis.particlePos = p5.Vector.add(this.pos, this.moveArea); // Pos and moveArea change on their own and therefore cannot be final pos\n\t}\n\t\n\tupdate(_goToMouse){\n\t\tlet mousPos = createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\t\tif(_goToMouse){ // track down the mouse position\n\t\t\tthis.goToMouse = _goToMouse;\n\t\t\tthis.pos = this.easingF(this.pos, mousPos);\n\t\t\tthis.radius = random(25, 75);\n\t\t\tthis.updateMoveArea();\n\t\t\t }\n\t\telse if(this.goToMouse){ // go back to where you started\n\t\t\tthis.pos = this.easingF(this.pos, this.origPos);\n\t\t\tthis.particlePos = p5.Vector.add(this.pos, this.moveArea);\n\t\t\n\t\t\t// When the blob is back home and the mouse has given it life again\n\t\t\tif(p5.Vector.dist(this.pos, this.origPos) <=2 && p5.Vector.dist(this.particlePos, mousPos) <= this.particleSize)\n\t\t\t\t\tthis.goToMouse = false;\n\t\t\n\t\t}\n\t\telse{\n\t\t\t\tthis.pNum += 0.01;\n\t\t\t\tthis.updateMoveArea();\n\t\t}\n\t}\n\tdraw() {\t\t\n\t\tcolorMode(HSB, 100);\n\t\tnoStroke();\n\t\tif(this.goToMouse)\n\t\t\tfill(255, 100, 0);\n\t\telse\n\t\t\tfill(abs(sin(this.pNum)*100), 100, 100);\n\t\t\n\t\trect(this.particlePos.x-this.particleSize, this.particlePos.y-this.particleSize, this.particleSize*2);\n\t}\n\t\n\teasingF(_pos, _targetPos){\n  \tlet dist = p5.Vector.sub(_targetPos, _pos);\t\t\n\t\treturn p5.Vector.add(_pos, p5.Vector.mult(dist, easing));\n\t}\n\t\n\tupdateMoveArea(){\n\t\t\t\t\tthis.moveArea = createVector(this.radius* sin(this.pNum), this.radius * cos(this.pNum));\n\t\t\t\t\tthis.particlePos = p5.Vector.add(this.pos, this.moveArea);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Matt Martin",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/922333",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:40:44",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

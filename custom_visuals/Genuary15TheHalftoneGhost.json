@@ -1,0 +1,63 @@
+{
+    "name": "Genuary15TheHalftoneGhost",
+    "code": "// === Tab: mySketch ===\nlet angleX = 0;\nlet angleY = 0;\nlet noiseOffset = 0;\n\n// Halftone settings\nlet dotSize = 8; // Size of the grid\nlet dotDensity = 50; // How many dots across\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n}\n\nfunction draw() {\n  background(245, 240, 235); // Paper color\n  \n  // Update rotation and morphing\n  angleX += 0.01;\n  angleY += 0.015;\n  noiseOffset += 0.01; // Makes the shape \"breath\"\n  \n  translate(width / 2, height / 2);\n  \n  // Riso Blend Mode (Subtracts color like ink)\n  blendMode(MULTIPLY);\n  \n  // --- LAYER 1: CYAN (Top Left Light) ---\n  // We add random() to x/y to simulate \"Misregistration\" (shaky printer)\n  push();\n  let shakeC = random(-2, 2); \n  translate(-30 + shakeC, -30 + shakeC); \n  drawHalftoneShadow(color(0, 255, 255), \"TOP_LEFT\");\n  pop();\n\n  // --- LAYER 2: MAGENTA (Top Right Light) ---\n  push();\n  let shakeM = random(-2, 2);\n  translate(30 + shakeM, -20 + shakeM);\n  drawHalftoneShadow(color(255, 0, 128), \"TOP_RIGHT\");\n  pop();\n  \n  // --- LAYER 3: YELLOW (Bottom Light) ---\n  push();\n  let shakeY = random(-2, 2);\n  translate(0 + shakeY, 40 + shakeY);\n  drawHalftoneShadow(color(255, 255, 0), \"BOTTOM\");\n  pop();\n  \n  // Reset blend mode\n  blendMode(BLEND);\n  \n  // Add Paper Grain (Static Noise)\n  drawPaperTexture();\n}\n\n// --- THE CORE MECHANIC: HALFTONE SHADOWS ---\nfunction drawHalftoneShadow(inkColor, lightPos) {\n  fill(inkColor);\n  \n  // We scan a grid of points\n  for (let x = -150; x <= 150; x += dotSize) {\n    for (let y = -150; y <= 150; y += dotSize) {\n      \n      // 1. IS THIS POINT INSIDE THE SHADOW?\n      // We calculate a \"fake\" 3D shape using math\n      // A morphing sphere/cube hybrid\n      let d = dist(0, 0, x, y);\n      \n      // Create a wobbly radius using Sin/Cos and Noise\n      // This defines the invisible shape's outline\n      let rBase = 100;\n      let deformation = sin(angleX + x*0.02) * cos(angleY + y*0.02) * 30;\n      let noiseVal = noise(x*0.01 + noiseOffset, y*0.01);\n      let rLimit = rBase + deformation + (noiseVal * 40);\n      \n      // If we are inside the shape...\n      if (d < rLimit) {\n        \n        // 2. CALCULATE DOT SIZE (Shading)\n        // Instead of flat color, we change dot size based on \"light\"\n        let shade = 0;\n        \n        // Simple faux-lighting logic\n        if (lightPos === \"TOP_LEFT\") shade = map(x + y, -200, 200, 2, dotSize);\n        if (lightPos === \"TOP_RIGHT\") shade = map(x - y, -200, 200, 2, dotSize);\n        if (lightPos === \"BOTTOM\") shade = map(y, -200, 200, 2, dotSize);\n        \n        // Clamp size\n        shade = constrain(shade, 1, dotSize * 0.9);\n        \n        // Draw the dot\n        circle(x, y, shade);\n      }\n    }\n  }\n}\n\n// Adds gritty texture on top\nfunction drawPaperTexture() {\n  loadPixels();\n  // Only affect 10% of pixels for speed\n  for (let i = 0; i < width * height * 4; i += 40) {\n    // Randomly darken pixels slightly to look like recycled paper\n    if (random() > 0.5) {\n       let grain = random(-10, 10);\n       pixels[i] += grain;\n       pixels[i+1] += grain;\n       pixels[i+2] += grain;\n    }\n  }\n  updatePixels();\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "The Halftone Ghost",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2848988",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:01:12",
+    "expressive_profile": {
+        "module_id": "Genuary15TheHalftoneGhost.json",
+        "primary_psychological_state": "sublime_catharsis",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "破曉昇華",
+            "意識覺醒",
+            "光芒滌蕩"
+        ],
+        "narrative_function": "aftermath_resonance",
+        "jungian_archetype": "the_self",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                45.0,
+                345.0
+            ],
+            "mean_lightness": 0.955,
+            "mean_chroma": 0.028,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.33,
+            "curl_vorticity": 0.023,
+            "divergence": -0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 17:38:00"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Axis of Subtraction.mp4",
+        "Fusion Blade Berserk.mp4"
+    ],
+    "used_count": 2
+}

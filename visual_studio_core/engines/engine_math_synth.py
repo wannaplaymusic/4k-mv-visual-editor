@@ -17,31 +17,24 @@ from visual_studio_core.engines.base_engine import BaseVisualEngine, EngineMetad
 
 
 MATH_TOPOLOGIES = [
+    ("cosmic_stardust", "✨ 01. 超弦星塵渦流場 (Cosmic Stardust - 4D Hopf & Curl)"),
+    ("ferrofluid_mercury", "🫧 02. 液態水銀熔球流體 (Ferrofluid Mercury - SSFR)"),
+    ("chladni_plate", "🔔 03. 克拉尼聲學駐波砂 (Chladni Acoustic Sand)"),
+    ("physarum_network", "🦠 04. 生物螢光黏菌網絡 (Bioluminescent Physarum)"),
+    ("quantum_voronoi", "💎 05. 賽博矩陣碎晶 (Quantum Voronoi Shards)"),
+    ("black_hole_disk", "🕳️ 06. 等離子黑洞吸積盤 (Plasma Accretion Disk)"),
+    ("viscous_magma", "🌋 07. 黏稠熔岩熱對流 (Viscous Magma Convection)"),
+    ("schrodinger_cloud", "⚛️ 08. 量子概率波包雲 (Schrödinger Wave Cloud)"),
     ("lorenz", "🌀 羅倫茲混沌吸引子 (Lorenz Attractor)"),
     ("clifford", "🪐 克利福德超環面 (Clifford Torus)"),
     ("superformula", "🐚 超公式 3D 仿生形態 (Superformula 3D)"),
-    ("reaction_diffusion", "🦠 灰度-霍姆反應擴散流體 (Reaction-Diffusion)"),
-    ("metaballs", "🫧 融球等值面勢場 (Metaballs Field)"),
-    ("calabi_yau", "🌌 卡拉比-丘流形高維投影 (Calabi-Yau 6D)"),
+    ("reaction_diffusion", "🧪 灰度-霍姆反應擴散流體 (Reaction-Diffusion)"),
     ("gyroid", "🧱 陀螺面週期極小曲面 (Gyroid Minimal Surface)"),
-    ("hopf_fibration", "🍩 霍普夫纖維化四維球體 (Hopf Fibration)"),
-    ("quantum_wave", "⚛️ 薛丁格量子波包概率雲 (Quantum Wave Cloud)"),
-    ("poincare_disk", "🕸️ 雙曲幾何龐加萊圓盤 (Poincaré Disk)"),
     ("julia_fractal", "❄️ 茱莉亞四元數分形 (Quaternion Julia)"),
     ("lissajous_knot", "🎗️ 利薩如 3D 拓撲三葉結 (Lissajous Knot)"),
-    ("voronoi_mesh", "💎 泰森多邊形晶胞碎裂 (Voronoi Tessellation)"),
-    ("black_hole", "🕳️ 引力透鏡黑洞吸積盤 (Gravitational Lensing)"),
-    ("chladni_plate", "🔔 克拉尼聲學駐波共振面 (Chladni Plate)"),
-    ("mandelbulb", "🪐 曼德球三維分形 (Mandelbulb 3D)"),
-    ("klein_bottle", "🏺 克萊因瓶無定向曲面 (Klein Bottle 4D)"),
     ("boids_swarm", "🐦 仿生鳥群自組織湧現 (Boids Flocking Swarm)"),
-    ("phyllotaxis", "🌻 斐波那契黃金螺旋葉序 (Phyllotaxis Spiral)"),
     ("strange_attractor", "🌪️ 艾涅爾-盧德奇怪吸引子 (Aizawa Attractor)"),
-    ("neon_mandala", "✨ 霓虹對稱共振曼陀羅 (Neon Sacred Mandala)"),
-    ("cyber_waves", "⚡ 賽博空間拓撲音頻波紋 (Cyber Audio Waves)"),
-    ("fluid_automata", "🌊 格子玻爾茲曼流體胞機 (Lattice Boltzmann)"),
-    ("cosmic_ribbon", "🎀 宇宙射線時空纖維束 (Cosmic String Ribbon)"),
-    ("torus_knot", "🧬 雙螺旋四維紐結 (4D Torus Knot)")
+    ("neon_mandala", "✨ 霓虹對稱共振曼陀羅 (Neon Sacred Mandala)")
 ]
 
 
@@ -182,19 +175,55 @@ function draw() {{
     let u = p.u + t * 0.2;
     let v = p.v + t * 0.3;
 
-    // 拓撲幾何運算: {topo}
-    {"// 羅倫茲混沌方程" if topo == "lorenz" else "// 拓撲幾何方程"}
-    let r = 120 + 40 * sin(u * 3.0 + t) + bassMod * 60;
-    px = r * cos(u) * cos(v) + sin(p.seed + t) * (15 * chaosIntensity);
-    py = r * sin(u) * cos(v) + cos(p.seed + t) * (15 * chaosIntensity);
-    pz = r * sin(v) + sin(u * 2.0 + t) * 30 * chaosIntensity;
+    // 拓撲動力學方程矩陣: {topo}
+    let r = 120 + 35 * sin(u * 3.0 + t) + bassMod * 50;
+    if ("{topo}" === "cosmic_stardust") {{
+      // 01. 超弦星塵: 4D 纖維螺線
+      let q = u * 2.0 + t;
+      px = (r * 0.8 + 20 * sin(q)) * cos(u) * cos(v);
+      py = (r * 0.8 + 20 * sin(q)) * sin(u) * cos(v);
+      pz = r * sin(v) + cos(q) * 40;
+    }} else if ("{topo}" === "ferrofluid_mercury") {{
+      // 02. 水銀熔球: 凝聚態勢能場
+      let blob = sin(u * 4.0) * cos(v * 4.0) * 30;
+      px = (r * 0.9 + blob) * cos(u) * cos(v);
+      py = (r * 0.9 + blob) * sin(u) * cos(v);
+      pz = (r * 0.9 - blob) * sin(v);
+    }} else if ("{topo}" === "chladni_plate") {{
+      // 03. 克拉尼駐波砂: 幾何節線
+      let cx = sin(u * 5.0) * cos(v * 3.0);
+      let cy = cos(u * 3.0) * sin(v * 5.0);
+      px = u * 50 + cx * 25;
+      py = v * 50 + cy * 25;
+      pz = (cx + cy) * (15 + bassMod * 30);
+    }} else if ("{topo}" === "quantum_voronoi") {{
+      // 05. 賽博碎晶: 離散多面體躍遷
+      let stepU = Math.floor(u * 3.0) / 3.0;
+      let stepV = Math.floor(v * 3.0) / 3.0;
+      px = r * cos(stepU) * cos(stepV) + (pulse * 25);
+      py = r * sin(stepU) * cos(stepV);
+      pz = r * sin(stepV);
+    }} else if ("{topo}" === "black_hole_disk") {{
+      // 06. 黑洞吸積盤: 差動自轉與極限引力透鏡
+      let distRad = 40 + Math.abs(u) * 60 + bassMod * 20;
+      let ang = v * 2.0 + (100.0 / (distRad + 5.0)) * t;
+      px = distRad * cos(ang);
+      py = distRad * sin(ang) * 0.35; // 傾角投影
+      pz = sin(distRad * 0.1 - t * 2.0) * 15;
+    }} else {{
+      // 預設通用混沌/拓撲模型
+      px = r * cos(u) * cos(v) + sin(p.seed + t) * (15 * chaosIntensity);
+      py = r * sin(u) * cos(v) + cos(p.seed + t) * (15 * chaosIntensity);
+      pz = r * sin(v) + sin(u * 2.0 + t) * 30 * chaosIntensity;
+    }}
 
-    let d = dist(0, 0, 0, px, py, pz);
-    let h = (hueBase + d * 0.3 + highMod * 80 + t * 20) % 360;
-    let s = 80 + midMod * 20;
-    let b = 85 + bassMod * 15 + pulse * 20;
+    // 數值安全防除零與防純白 (Zero-division & Over-saturation Guard)
+    let d = Math.sqrt(px * px + py * py + pz * pz + 0.001);
+    let h = (hueBase + d * 0.25 + highMod * 70 + t * 15) % 360;
+    let s = Math.min(95, 75 + midMod * 25);
+    let b = Math.min(98, 80 + bassMod * 18 + pulse * 15);
 
-    stroke(h, s, b, 85);
+    stroke(h, s, b, Math.max(20, trailAlpha));
     vertex(px, py, pz);
   }}
   glEndShape = endShape();

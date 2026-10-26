@@ -203,7 +203,7 @@ class PixelModuleTestDialog(QDialog):
             QTextEdit {
                 background-color: #0d0d11;
                 color: #a1a1aa;
-                font-family: 'JetBrains Mono', 'Fira Code', monospace;
+                font-family: 'Menlo', 'Monaco', 'JetBrains Mono', 'Courier New', monospace;
                 font-size: 11px;
                 border: 1px solid #27272a;
                 border-radius: 6px;

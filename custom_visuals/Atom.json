@@ -1,0 +1,64 @@
+{
+    "name": "Atom",
+    "code": "// === Tab: mySketch ===\nvar particles = [];\nvar trail = [];\nvar attractor;\nvar colors;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(100);\n\n\tattractor = new Attractor();\n\tcolors = [color(255, 0, 0), color(255, 153, 0), color(51, 102, 0), color(51, 102, 204)]\n\n\tfor (let i = 0; i < 25; i++) {\n\t\tparticles.push(new Particle(random(200, windowWidth -200), random(150, windowHeight - 150), random(5, 40)))\n\t}\n\n}\n\nclass Particle {\n\tconstructor(x, y, size) {\n\t\tthis.pos = createVector(x, y);\n\t\tthis.vel = createVector(random(1, 5), random(1, 5));\n\t\tthis.neg = createVector(floor(random(0, 2)), floor(random(0, 2)));\n\t\tif (this.neg.x < 1) {\n\t\t\tthis.vel.x *= -1\n\t\t}\n\t\tif (this.neg.y < 1) {\n\t\t\tthis.vel.y *= -1\n\t\t}\n\t\tthis.acc = createVector(0, 0);\n\t\tthis.size = size;\n\t\tthis.mass = size / 10;\n\t\tthis.color = random(colors)\n\t}\n\n\tdisplay() {\n\t\tnoStroke();\n\t\tfill(this.color);\n\t\tellipse(this.pos.x, this.pos.y, this.size, this.size);\n\t}\n\n\tupdate() {\n\t\tthis.vel.add(this.acc);\n\t\tthis.pos.add(this.vel);\n\n\t\tthis.acc.mult(0);\n\n\t\tthis.lifeTime--;\n\t}\n\n\tapplyForce(force) {\n\t\tthis.acc.add(force);\n\t}\n\n}\n\nclass Attractor {\n\tconstructor() {\n\t\tthis.pos = createVector(windowWidth/2, windowHeight/2);\n\t\tthis.mass = 50;\n\t\tthis.G = 1;\n\t\tthis.dragOffset = createVector(0.0, 0.0);\n\t}\n\n\tattract(planet) {\n\t\tvar force = p5.Vector.sub(this.pos, planet.pos);\n\t\tvar d = force.mag();\n\t\td = constrain(d, 5, 25);\n\t\tforce.normalize();\n\t\tvar strength = (this.G * this.mass * planet.mass) / (d * d);\n\t\tforce.mult(strength);\n\n\t\tplanet.applyForce(force);\n\t}\n}\n\nfunction draw() {\n\tbackground(0);\n\tif (trail.length < 3000) {\n\t\tfor (let i = 0; i < particles.length; i++) {\n\t\t\ttrail.push(particles[i]);\n\t\t}\n\t}\n\n\tfor (let i = 0; i < trail.length; i++) {\n\t\ttrail[i].display();\n\t\tattractor.attract(trail[i]);\n\t\ttrail[i].update();\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Morgan Eidam",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/848119",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:48:40",
+    "expressive_profile": {
+        "module_id": "Atom.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [],
+            "mean_lightness": 0.0,
+            "mean_chroma": 0.0,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.49,
+            "curl_vorticity": 0.063,
+            "divergence": 0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 13:50:54"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Classic Spirit Foundation.mp4"
+    ],
+    "used_count": 1
+}

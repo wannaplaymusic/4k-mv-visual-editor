@@ -1,0 +1,27 @@
+{
+    "name": "NoiseWaves_02",
+    "code": "// === Tab: mySketch ===\n// by SamuelYAN\n// more works //\n   // https://twitter.com/SamuelAnn0924\n   // https://www.instagram.com/samuel_yan_1990/\n\nlet slider;\nlet phase = 0;\nlet zoff = 0;\nlet angle =0.1;\nvar seed = Math.random() * 1000;\nlet colors0 = \"8a77b7BF-181a2140-e7e9f4BF-f16034b3-6e8fd380\".split(\"-\").map((a) => \"#\" + a);\nlet colors1 = \"e3d7a3BF-f5989d33-ea618e40-fce4d6b3-caac7180\".split(\"-\").map((a) => \"#\" + a);\nlet colors2 = \"6cbbd4BF-5863b140-5282a1BF-fee8f733-c1f29b80\".split(\"-\").map((a) => \"#\" + a);\nlet colors3 = \"1b1b1bBF-29292940-f3f3f3BF-222222b3-ff000080\".split(\"-\").map((a) => \"#\" + a);\nlet colors4 = \"70c1b3BF-aaf0d340-50514f33-ffe066b3-247ba080\".split(\"-\").map((a) => \"#\" + a);\nlet colors5 = \"3c1642BF-38637540-08637533-b2ff9eb3-1dd3b080\".split(\"-\").map((a) => \"#\" + a);\nlet colorbg = \"fff9e4\".split(\"-\").map((a) => \"#\" + a);\nlet colorbg2 = \"fff9e403\".split(\"-\").map((a) => \"#\" + a);\nvar noiseMax;\nvar mySize;\nvar color_setup;\n\nfunction setup() {\n\trandomSeed(seed);\n\t// pixelDensity(5);\n\tmySize = max(windowWidth, windowHeight);\n  createCanvas(mySize, mySize);\n  background(colorbg);\n\tnoiseMax = random(5);\n\tcolor_setup = random([colors0,colors1,colors2,colors3,colors4,colors5]);\n\tlet filter = new makeFilter();\n}\n\nfunction draw() {\n\tlet color_c = random(color_setup);\n\t//randomSeed(seed);\n  // background(colorbg2);\n\tpush();\n  translate(width / 2, height / 2);\n\t// rotate(angle);\n  noFill();\n  for (var i = 0; i < 20; i += 2) {\n\t  strokeWeight(random(1));\n    stroke(color_c);\n    beginShape();\n    for (var a = 0; a < TWO_PI; a += 0.01) {\n      let xoff = map(cos(a + phase), -1, 1, 0, noiseMax);\n      let yoff = map(sin(a + phase / 2), -1, 1, 0, noiseMax);\n      let r = map(noise(xoff, yoff, zoff), 0, 1, 0, 800);\n\t\t\tlet r1 = map(noise(xoff, yoff, zoff), 0, 1, 0, 200);\n      let x = r * cos(a);\n      let y = r1 * sin(a);\n      vertex(x, y);\n    }\n    endShape(CLOSE);\n    \n  }\n\tpop();\n\tphase += 0.01;\n  zoff += 0.01;\n\tangle += TAU / 10 / random(360, 300);\n  // image(overAllTexture, 0, 0);\n\t\n}\n\nfunction makeFilter() {\n\trandomSeed(seed);\n\t// noiseのフィルターをつくる\n\tcolorMode(HSB, 360, 100, 100, 100);\n\tdrawingContext.shadowColor = color(0, 0, 5, 10);\n\toverAllTexture = createGraphics(windowWidth, windowHeight);\n\toverAllTexture.loadPixels();\n\tfor (var i = 0; i < width; i++) {\n\t\tfor (var j = 0; j < height; j++) {\n\t\t\toverAllTexture.set(\n\t\t\t\ti,\n\t\t\t\tj,\n\t\t\t\tcolor(46, 90, 90, noise(i / 3, j / 3, (i * j) / 50) * random(1))\n\t\t\t);\n\t\t}\n\t}\n\toverAllTexture.updatePixels();\n}\n\nfunction keyTyped() {\n\tif (key === \"s\" || key === \"S\") {\n\t\tsaveCanvas(\"NoiseWaves_02\", \"png\");\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u334714",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-05"
+    ],
+    "url": "https://openprocessing.org/sketch/1615543",
+    "batch_id": "batch_20261005_141539",
+    "batch_date": "2026-10-05",
+    "date_added": "2026-10-05 16:49:11",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

@@ -1,0 +1,32 @@
+{
+    "name": "ParticleText",
+    "code": "// === Tab: sketch377231 ===\nlet p;\nlet system;\n\nlet bg = color(0);\n\nlet trails = true;\n\n//let image bounds. -1 for\n//endX or endY means the width\n//or height of the used image\n\nlet startX = 0, endX = -1;\nlet startY = 0, endY = -1;\n\n//let skip variables work well when\n//they're the same value as size\n\n//let xSkip, ySkip and particleSize to 1\n//for a mostly perfect image, although\n//this will be very demanding. Even\n//setting them both to 2 can be dramatically\n//easier to render.\nlet xSkip = 3;\nlet ySkip = 3;\n\nlet particleSize = 1;\n\nlet recording = false;\n\n//let true, uses colours from the generated\n//text image. Otherwise, uses particleColour\nlet imageColour = false;\nlet particleColour = color(255);\n\nfunction generateTextImage(text, textSize) {\n  let g = createGraphics(width, 400);\n  g.beginDraw();\n  g.fill(255);\n  g.textSize(textSize);\n  let textHeight = g.textAscent() + g.textDescent();\n  let newLines = floor(g.textWidth(text)/g.width) + text.split(\"\\n\").length;\n  g.textAlign(CENTER);\n  g.background(0);\n  g.rectMode(CENTER);\n  g.text(text, 0, 0, g.width, textHeight * 1.2 * max(1, newLines));\n  g.endDraw();\n  return g.get();\n}\n\nfunction setup() {\n  createCanvas(900, 900);\n\n  //let skip value can be 0 or at least\n  //one of the loops will never stop\n  if (xSkip <= 0) {\n    xSkip = 1;\n  }\n  if (ySkip <= 0) {\n    ySkip = 1;\n  }\n  noStroke();\n  background(bg);\n  //let can be an arbitrary image\n  p = generateTextImage(\"ieieieieiei\", 120);\n  system = new ParticleSystem(p);\n}\n\nfunction mouseReleased() {\n  system.resetParticles();\n}\n\nfunction draw() {\n  if (trails) {\n    noStroke();\n    fill(bg, 20);\n    rectMode(CORNER);\n    rect(0, 0, width, height);\n    rectMode(CENTER);\n  } else {\n    background(bg);\n  }\n  //long t = millis();\n  for (p : system.particles) {\n    p.update(1/60);\n    p.draw();\n  }\n  //println(millis() - t);\n  if (recording) {\n    saveFrame(\"frames/PIF-####.tif\");\n  }\n}\n\nclass Particle {\n  start, anchor, end;\n  let current = new PVector();\n  f = 0;\n  size;\n  duration;\n  c;\n\n  constructor(ex, ey, size, d, c) {\n    this.start = new PVector(width/2, height/2);\n    //let a = round(random(16)) * QUARTER_PI * 0.5;\n    //this.anchor = new PVector(cos(a) * 300 + width/2, sin(a) * 300 + height/2);\n    let a = random(TWO_PI);\n    this.anchor = new PVector(cos(a) * random(100, 800) + width/2, sin(a) * random(100, 800) + height/2);\n    this.end = new PVector(ex, ey);\n    this.size = size;\n    duration = d;\n    this.c = c;\n  }\n\n  function update(delta) {\n    if (f >= 1) {\n      f = 1;\n      return;\n    }\n    f += delta/duration;\n    if (f > 1) {\n      f = 1;\n    }\n    b();\n  }\n\n  interpolate(f) {\n    return 1 - pow(1 - f, 2);\n  }\n\n  function b() {\n    let fi = interpolate(f);\n    let x = lerp(lerp(start.x, anchor.x, fi), lerp(anchor.x, end.x, fi), fi);\n    let y = lerp(lerp(start.y, anchor.y, fi), lerp(anchor.y, end.y, fi), fi);\n    current.set(x, y);\n  }\n\n  function draw() {\n    //rect() is a let faster than ellipse()\n    //and point()\n    stroke(c);\n    strokeWeight(particleSize);\n    point(current.x, current.y);\n  }\n}\n\nclass ParticleSystem {\n\n  ArrayList<Particle> particles = new ArrayList();\n\n  constructor(p) {\n    addParticles(p);\n  }\n\n  function addParticles(p) {\n    let ex = endX != -1 ? endX : p.width;\n    let ey = endY != -1 ? endY : p.height;\n    for (x = startX; x<ex; x += xSkip) {  \n      for (y = startY; y<ey; y += ySkip) {\n        let pix = p.get(x, y);\n        if(pix != bg) {\n          particles.add(new Particle(width/2 + x - ex/2, height/2 + y - ey/2, size, random(0.5, 3), imageColour ? pix : particleColour));\n        }\n      }\n    }\n  }\n\n  function resetParticles() {\n    background(0);\n    for (let p of particles) {\n      p.f = 0;\n      p.start.set((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n    }\n  }\n\n  function updateAndDraw(delta) {\n    for (let p of particles) {\n      p.update(delta);\n      p.draw();\n    }\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u337522",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1628161",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 17:17:55",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

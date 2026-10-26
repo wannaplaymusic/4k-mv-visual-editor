@@ -1,31 +1,31 @@
 {
-  "name": "op_2742525",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n  createCanvas(700,700);\nvar x;\nvar y;\n}\nfunction draw() {\n  translate(700/ 2,700/ 2);\n  background(0);\n\n  for (let i = 0; i < 600; i++) {\n    ellipse(i * 10 + 5, i * 10 + 5, i * 30);\n    rotate(radians(2.5));\n    noFill();\n    x = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n    y = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n    stroke(255, x, y);\n  }\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "2025H2515",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@u521683/2742525",
-  "date_added": "2026-07-06 22:05:28",
-  "used_in_videos": [
-    "4AM Tollbooth.mp4",
-    "Mental Drift.mp4",
-    "Prime Anchor.mp4",
-    "Subterranean Flow.mp4",
-    "Echo Directive.mp4",
-    "Monolithic Interval.mp4",
-    "Subfloor Transmission.mp4",
-    "Vacuum Memory.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 9,
-  "scaling_mode": "auto"
+    "name": "op_2742525",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n  createCanvas(700,700);\nvar x;\nvar y;\n}\nfunction draw() {\n\n// [SENTINEL 專家 2 修復] 音訊座標數值防禦\nif(typeof window.simulatedMouseX === 'number' && isNaN(window.simulatedMouseX)) window.simulatedMouseX = width*0.5;\nif(typeof window.simulatedMouseY === 'number' && isNaN(window.simulatedMouseY)) window.simulatedMouseY = height*0.5;\n\n  translate(700/ 2,700/ 2);\n  background(0);\n\n  for (let i = 0; i < 600; i++) {\n    ellipse(i * 10 + 5, i * 10 + 5, i * 30);\n    rotate(radians(2.5));\n    noFill();\n    x = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n    y = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n    stroke(255, x, y);\n  }\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "2025H2515",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@u521683/2742525",
+    "date_added": "2026-07-06 22:05:28",
+    "used_in_videos": [
+        "4AM Tollbooth.mp4",
+        "Mental Drift.mp4",
+        "Prime Anchor.mp4",
+        "Subterranean Flow.mp4",
+        "Echo Directive.mp4",
+        "Monolithic Interval.mp4",
+        "Subfloor Transmission.mp4",
+        "Vacuum Memory.mp4",
+        "Ultimate Core Patterns.mp4"
+    ],
+    "used_count": 9,
+    "scaling_mode": "auto"
 }

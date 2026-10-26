@@ -1,0 +1,24 @@
+{
+    "name": "Attractor_20",
+    "code": "// === Tab: mySketch ===\n// Attractor_2.0\n\nlet N = 4000 ; let H = 20 ;\nlet X[] = new Array(N) ; let Y[] = new Array(N) ; let G[] = new Array(N) ;\nlet I ; let NX ; let NY ; let A ; let S ; let M ; let dA ; let dM ; \n\nfunction setup(){\n  createCanvas(600, 600) ; noSmooth() ; background(0) ; stroke(255,0,0) ; fill(0,0,0,10) ;\n  for ( I = 0 ; I < N ; I++ ){\n    X[I] = random(-H,+H) ; Y[I] = random(-H,+H) ; \n    G[I] = (M*X[I])+((2*(1-M)*X[I]*X[I])/(1+(X[I]*X[I]))) ;\n  }\n  A = +0.00905 ; S = +0.05 ; M = -0.81625 ; dA = -0.0000005 ; dM = +0.0001525 ;  \n} // setup()\n\nfunction draw(){\n  rect(-1,-1,601,601) ;\n  for ( I = 0 ; I < N ; I++ ){\n    NX = Y[I] + (A*Y[I]*(1-(S*Y[I]*Y[I]))) + G[I] ;\n    G[I] = (M*NX)+((2*(1-M)*NX*NX)/(1+(NX*NX))) ;\n    NY = -X[I] + G[I] ;\n    point(X[I]*(300/H)+275,Y[I]*(300/H)+300) ;\n    X[I] = NX ; Y[I] = NY ;\n  }\n  A = A + dA ; M = M + dM ; if ( A < 0.0050 || A > 0.0091 ){ dA = -dA ; dM = -dM ; }\n} // draw()\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "KaijinQ",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/826224",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:52:14",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

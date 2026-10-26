@@ -1,0 +1,24 @@
+{
+    "name": "ForcesofNature",
+    "code": "// === Tab: mySketch ===\nlet dotCnt = 512;\nlet dot = new Array(dotCnt);\n\nclass Dot {\n  x;\n  y;\n  vx;\n  vy;\n\n  constructor() {\n    do {\n      x = random(width);\n      y = random(height);\n    } while (get(int(x), int(y))==color(0));\n\n    let rad=random(TWO_PI);\n    vx=cos(rad);\n    vy=sin(rad);\n  }\n\n  function update() {\n    x+=vx;\n    if (x<0 || x>width) {\n      vx=-vx;\n      x+=vx*2;\n    }\n    y+=vy;\n    if (y<0 || y>width) {\n      vy=-vy;\n      y+=vy*2;\n    }\n    if (get(int(x), int(y))!=color(0)) {\n      point(x, y);\n      do {\n        x = random(width);\n        y = random(height);\n      } while (get(int(x), int(y))==color(0));\n      var rad=random(TWO_PI);\n      vx=cos(rad);\n      vy=sin(rad);\n    }\n  }\n}\n\nlet ballCnt =4;\nlet ball = new Array(ballCnt);\n\nclass Ball {\n  x;\n  y;\n  vx;\n  vy;\n\n  constructor() {\n    x = width/2; \n    y = height/2;\n    vx=0;\n    vy=0;\n  }\n\n  function update() {\n    vx += random(-1, 1);\n    vy += random(-1, 1);\n    if (abs(vx) > 10) vx=0;\n    if (abs(vy) > 10) vy=0; \n    x+=vx;\n    y+=vy;\n    if (x<0 || x>width ) { \n      x -=vx ; \n      vx = -vx;\n    }\n    if (y<0 || y>height) { \n      y -=vy ; \n      vy = -vy;\n    }\n    point (x, y);\n  }\n}\n\nfunction setup() {\n  createCanvas(640, 640);\n  background(0);\n  strokeWeight(10);\n  stroke(255);\n  noFill();\n  ellipse(width/2, height/2, height/2, height/2);\n\n  stroke(255);\n  for (i=0; i<dot.length; i++) {\n    dot[i] = new Dot();\n  }\n  for (i=0; i < ball.length; i++) {\n    ball[i] = new Ball();\n  }\n}\n\nfunction draw() {\n  stroke(0);\n  strokeWeight(70);\n  for (let b of ball) {\n    b.update();\n  }\n\n  strokeWeight(9);\n  stroke(255);\n  for (let d of dot) {\n    d.update();\n  }\n  fill(0);\n  noStroke();\n  ellipse((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 60, 60);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Naoki Tsutae",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/701515",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:10:29",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,31 @@
+{
+    "name": "opArtParticlesbr",
+    "code": "// === Tab: mySketch ===\n// opArtParticles\n// No interaction. \n// particle system, particles, boolean, vector, color, array, grayscale, Bridget Riley, square, rect\n// From Bridget Riley's \"Movement in Squares\" (1961).\n//\n'use strict'\nvar generatorsRght, generatorsLft;;\nvar yPos, goRight;\nvar strtCol, black, white;\n//\n//\nfunction setup() {\n\tcreateCanvas(1200, 650);\n\tblack = color(0);\n\twhite = color(245);\n\tstrtCol = black;\n\tgoRight = true;\n\tyPos = 75;\n\tgeneratorsRght = [];\n\t//\n\tfor (var i = 0; i < 10; i++) {\n\t\tgeneratorsRght.push(new ParticleGenerator(createVector(250, yPos), strtCol, goRight));\n\t\tif (strtCol === black) strtCol = white;\n\t\telse strtCol = black;\n\t\tyPos += 50;\n\t}\n\tgoRight = false;\n\tyPos = 75;\n\tgeneratorsLft = [];\n\tfor (var i = 0; i < 10; i++) {\n\t\tgeneratorsLft.push(new ParticleGenerator(createVector(1085, yPos), strtCol, goRight));\n\t\tif (strtCol === black) strtCol = white;\n\t\telse strtCol = black;\n\t\tyPos += 50;\n\t}\n}\n\nfunction draw() {\n\tbackground(255);\n\tfor (var i = 0; i < 10; i++) {\n\t\tvar gr = generatorsRght[i];\n\t\tvar gl = generatorsLft[i];\n\t\tgr.run();\n\t\tgl.run();\n\t}\n\tdrawCurtains();\n}\n\nfunction drawCurtains() {\n\tnoStroke();\n\tfill(255);\n\trect(0, 0, 300, 650);\n\trect(900, 0, 300, 650);\n}\n//\n//\n// %%%%%%%%%%%% \"classes\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n//\nvar ParticleGenerator = function (pgpos, c, grght) {\n\t\tthis.origin = pgpos.copy();\n\t\tthis.particles = [];\n\t\tthis.index = 0;\n\t\tthis.col = c;\n\t\tthis.particles.push(new Particle(this.origin, this.col, grght)); // prime the generator\n\t\t//\n\t\tthis.run = function () {\n\t\t\tvar p = this.particles[this.index];\n\t\t\t//\n\t\t\t// insert  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\t\t\tif (grght) {\n\t\t\t\tif (p.pos.x >= this.origin.x + 50) {\n\t\t\t\t\tif (this.col === black) this.col = white;\n\t\t\t\t\telse this.col = black;\n\t\t\t\t\tthis.particles.push(new Particle(this.origin, this.col, grght));\n\t\t\t\t\tthis.index = this.particles.length - 1;\n\t\t\t\t}\n\t\t\t}\n\t\t\telse { // goRight is false\n\t\t\t\tif (p.pos.x + p.wdth <= this.origin.x) {\n\t\t\t\t\tif (this.col === black) this.col = white;\n\t\t\t\t\telse this.col = black;\n\t\t\t\t\tthis.particles.push(new Particle(this.origin, this.col, grght));\n\t\t\t\t\tthis.index = this.particles.length - 1;\n\t\t\t\t}\n\t\t\t}\n\t\t\t//\n\t\t\t// dress the squares shoulder to shoulder %%%%%%%%%%%%%%%\n\t\t\tif (this.particles.length >= 2) {\n\t\t\t\tfor (var i = 0; i < this.particles.length - 1; i++) {\n\t\t\t\t\tvar lead = this.particles[i];\n\t\t\t\t\tvar next = this.particles[i + 1];\n\t\t\t\t\tif (grght) lead.pos.x = next.pos.x + next.wdth;\n\t\t\t\t\telse lead.pos.x = next.pos.x - lead.wdth;\n\t\t\t\t}\n\t\t\t}\n\t\t\t//\n\t\t\t//\n\t\t\t// run/remove %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\t\t\tfor (var i = this.particles.length - 1; i >= 0; i--) {\n\t\t\t\tvar p = this.particles[i];\n\t\t\t\tp.run();\n\t\t\t\tif (p.wdth <= 0) {\n\t\t\t\t\tthis.particles.splice(i, 1);\n\t\t\t\t\tthis.index--;\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\t//\n\t//\nfunction Particle(p, c, gr) {\n\tthis.wdth = 50;\n\tif (gr === true) this.vel = createVector(.5, 0);\n\telse this.vel = createVector(-.5, 0);\n\tthis.pos = p.copy();\n\t//\n\tthis.run = function () {\n\t\tthis.wdth -= .031;\n\t\tthis.pos.add(this.vel);\n\t\tif (c != black && this.wdth < 30) c = color(map(this.wdth, 30, 0, 255, 120));\n\t\tfill(c);\n\t\tstroke(140, 50);\n\t\tstrokeWeight(3);\n\t\trect(this.pos.x, this.pos.y, this.wdth, 50);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "amei_design",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1442337",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:01:25",
+    "used_in_videos": [
+        "Shadow Frequency.mp4"
+    ],
+    "used_count": 1
+}

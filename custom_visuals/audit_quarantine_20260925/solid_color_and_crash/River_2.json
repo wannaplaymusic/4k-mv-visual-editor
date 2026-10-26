@@ -1,0 +1,24 @@
+{
+    "name": "River",
+    "code": "// === Tab: main ===\nconst CALM = false;\n\nvar p, t;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tp = [{pos: new p5.Vector(), vel: new p5.Vector()}];\n\tt = [new p5.Vector()];\n\tnoStroke();\n}\n\nfunction draw() {\n\tbackground(0);\n\tfill(20, 80, 120);\n\tfor(let i in p){\n\t\tellipse(p[i].pos.x, p[i].pos.y, 5, 5);\n\t\tt[i].x += cos(CALM ? noise(t[i].x/100, t[i].y/100) : noise(t[i].x/100, t[i].y/100, frameCount/100)*HALF_PI/2)*2;\n\t\tt[i].y += sin(CALM ? noise(t[i].x/100, t[i].y/100) : noise(t[i].x/100, t[i].y/100, frameCount/100)*HALF_PI/2)*2;\n\t\tif(p[i].x > width || p[i].y > height) {\n\t\t\tp = p.filter(x => x != p[i]);\n\t\t\tt = t.filter(x => x != t[i]);\n\t\t}\n\t\tlet toT = new p5.Vector(t[i].x-p[i].pos.x, t[i].y-p[i].pos.y);\n\t\ttoT.normalize();\n\t\ttoT.mult(p[i].pos.dist(t[i])*4);\n\t\tlet acc = p5.Vector.sub(toT, p[i].vel);\n\t\tacc.normalize();\n\t\tacc.mult(0.1);\n\t\tp[i].pos.add(p[i].vel);\n\t\tp[i].vel.add(acc);\n\t}\n\tif(frameCount % 1 == 0) {\n\t\tp.push({pos: p5.Vector.random2D().mult(2), vel: new p5.Vector()});\n\t\tt.push(new p5.Vector());\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "fuzzyastrocat",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/736264",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:04:19",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

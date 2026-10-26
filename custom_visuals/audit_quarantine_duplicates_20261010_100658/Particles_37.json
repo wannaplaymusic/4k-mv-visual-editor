@@ -1,0 +1,63 @@
+{
+    "name": "Particles",
+    "code": "// === Tab: mySketch.js ===\nvar Particles = [];\nfunction setup() {\n    createCanvas(windowHeight, windowHeight);\n    var maxP = 100;\n    for (var i = 0; i < maxP; i++) {\n        var particle = {\n            px : random(width),\n            py : random(height),\n            vx : 0,\n            vy : 0,\n            ax : 0,\n            ay : 0,\n            pc : randomColor()\n        }\n        Particles.push(particle);\n    }\n    background(0);\n    stroke(255, 100);\n}\nfunction draw() {\n    background(0);\n    for (var i = 0; i < Particles.length; i++) {\n        show(i);\n        update(Particles[i]);\n        checkEdges(Particles[i]);\n    }\n}\nfunction show(index) {\n    var p = Particles[index];\n    var powerMinDist = pow(80, 2);\n    ellipse(p.px, p.py, 5, 5);\n    for (var j = index + 1; j < Particles.length; j++) {\n        var o = Particles[j];\n        var dx = o.px - p.px;\n        var dy = o.py - p.py;\n        var powerDist =  dx * dx + dy * dy;\n        if (powerDist < powerMinDist) {\n            var alpha = map(powerDist, 0, powerMinDist, 255, 0);\n            stroke(p.pc.r, p.pc.g, p.pc.b, alpha);\n            line(p.px, p.py, o.px, o.py);\n        }\n    }\n}\nfunction update(p) {\n    p.ax = random(-0.1, 0.1);\n    p.ay = random(-0.1, 0.1);\n    p.vx += p.ax;\n    p.vy += p.ay;\n    limit(p, 1)\n    p.px += p.vx;\n    p.py += p.vy;\n}\nfunction checkEdges(p){\n    if (p.px > width) {\n        p.px = width;\n        p.vx *= -1;\n    } else if (p.px < 0) {\n        p.px = 0;\n        p.vx *= -1;\n    }\n    if (p.py > height) {\n        p.py = height;\n        p.vy *= -1;\n    } else if (p.py < 0) {\n        p.py = 0;\n        p.vy *= -1;\n    }\n}\nfunction limit(p, limit){\n    var powerLimit = pow(limit, 2);\n    var powerVel = p.vx * p.vx + p.vy * p.vy;\n    if (powerVel > powerLimit){\n        var vel = sqrt(powerVel);\n        p.vx = (p.vx / vel) * limit;\n        p.vy = (p.vy / vel) * limit;\n    }\n}\nfunction randomColor() {\n    return c = {\n        r : random(120, 255),\n        g : random(120, 255),\n        b : random(120, 255)\n    }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u248191",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1016744",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 18:01:56",
+    "expressive_profile": {
+        "module_id": "Particles_37.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                15.0,
+                135.0
+            ],
+            "mean_lightness": 0.002,
+            "mean_chroma": 0.018,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.75,
+            "curl_vorticity": 0.016,
+            "divergence": -0.006,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-10-09 19:01:16"
+    },
+    "is_new_semantic_ingested": true
+}

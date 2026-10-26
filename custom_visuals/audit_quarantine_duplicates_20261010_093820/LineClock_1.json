@@ -1,0 +1,28 @@
+{
+    "name": "LineClock",
+    "code": "// === Tab: mySketch ===\nvar font;\nvar vehicles = [];\n\nvar formattedTime = \"00:00:00\";\nvar prevSec = -1;\nvar maxChangeForce = 5;\n\nfunction preload() {\n\tfont = loadFont('https://openprocessing.org/sketch/1307458/files/JosefinSans-Regular.ttf');\n}\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n\t\n\tvar points = settingPoints();\n\tfor (var i = 0; i < points.length; i++) {\n\t\tvar pt = points[i];\n\t\tvar vehicle = new Vehicle(pt.x, pt.y);\n\t\tvehicles.push(vehicle);\n\t}\n}\n\nfunction draw() {\n\tbackground(0);\n\n\tcalcTime();\n\n\tfor (var i = 0; i < vehicles.length; i++) {\n\t\tvar v = vehicles[i];\n\t\tv.behaviors();\n\t\tv.update();\n\t\tv.show();\n\t}\n}\n\nfunction calcTime() {\n\tvar hours = hour();\n\tvar minutes = minute();\n\tvar seconds = second();\n\n\tif(seconds != prevSec) {\n\t\tprevSec = seconds;\n\t\thours = nf(hours, 2, 0);\n\t\tminutes = nf(minutes, 2, 0);\n\t\tseconds = nf(seconds, 2, 0);\n\t\tupdateText(hours + \":\" + minutes + \":\" + seconds);\n\t}\n}\n\nfunction updateText(newText) {\n\tformattedTime = newText;\n\tvar points = settingPoints();\n\n\tif (points.length < vehicles.length) {\n\t\tvar toSplice = vehicles.length - points.length;\n\t\tvehicles.splice(points.length - 1, toSplice);\n\n\t\tapplyForce(points);\n\t} else if (points.length > vehicles.length) {\n\t\tfor (var i = vehicles.length; i < points.length; i++) {\n\t\t\tvar v = vehicles[i - 1].clone();\n\t\t\tvehicles.push(v);\n\t\t}\n\n\t\tapplyForce(points);\n\t} else {\n\t\tapplyForce(points);\n\t}\n}\n\nfunction settingPoints() {\n\tvar bounds = font.textBounds(formattedTime, 0, 0, 192);\n\tvar posx = width / 2 - bounds.w / 2;\n\tvar posy = height / 2 + bounds.h / 2;\n\n\tvar points = font.textToPoints(formattedTime, posx, posy, 192, {\n\t\tsampleFactor: 0.1\n\t});\n\treturn points;\n}\n\nfunction applyForce(points) {\n\tfor (var i = 0; i < points.length; i++) {\n\t\tvehicles[i].target.x = points[i].x;\n\t\tvehicles[i].target.y = points[i].y;\n\t\tvar force = p5.Vector.random2D();\n\t\tforce.mult(random(maxChangeForce));\n\t\tvehicles[i].applyForce(force);\n\t}\n}\n\nfunction mousePressed() {\n\tmaxChangeForce += 1;\n}\n\n// === Tab: Vehicle ===\nfunction Vehicle(x, y, size) {\n\tthis.pos = createVector(random(width), random(height));\n\tthis.target = createVector(x, y);\n\tthis.vel = p5.Vector.random2D();\n\tthis.acc = createVector();\n\tif (size != null) {\n\t\tthis.r = size;\n\t} else {\n\t\tthis.r = 8;\n\t}\n\tthis.maxspeed = 10;\n\tthis.maxforce = 1;\n}\n\nVehicle.prototype.behaviors = function () {\n\tvar arrive = this.arrive(this.target);\n\tarrive.mult(1);\n\tthis.applyForce(arrive);\n}\n\nVehicle.prototype.applyForce = function (f) {\n\tthis.acc.add(f);\n}\n\nVehicle.prototype.update = function () {\n\tthis.pos.add(this.vel);\n\tthis.vel.add(this.acc);\n\tthis.acc.mult(0);\n}\n\nVehicle.prototype.show = function () {\n\tstroke(random(255));\n\tstrokeWeight(3);\n\tline(this.pos.x, 0, this.pos.x, this.pos.y);\n}\n\n\nVehicle.prototype.arrive = function (target) {\n\tvar desired = p5.Vector.sub(target, this.pos);\n\tvar d = desired.mag();\n\tvar speed = this.maxspeed;\n\tif (d < 100) {\n\t\tspeed = map(d, 0, 100, 0, this.maxspeed);\n\t}\n\tdesired.setMag(speed);\n\tvar steer = p5.Vector.sub(desired, this.vel);\n\tsteer.limit(this.maxforce);\n\treturn steer;\n}\n\nVehicle.prototype.clone = function () {\n\tvar v = new Vehicle(this.pos.x, this.pos.y);\n\n\tv.pos.x = this.pos.x;\n\tv.pos.y = this.pos.y;\n\n\tv.vel.x = this.vel.x;\n\tv.vel.y = this.vel.y;\n\n\tv.acc.x = this.acc.x;\n\tv.acc.y = this.acc.y;\n\n\treturn v;\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "量産型",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1307458",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:06:36",
+    "used_in_videos": [
+        "Gradient of Silence.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

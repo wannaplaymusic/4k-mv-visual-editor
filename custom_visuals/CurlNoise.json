@@ -1,0 +1,68 @@
+{
+    "name": "CurlNoise",
+    "code": "// === Tab: mySketch ===\nvar detail = 0.02; \nvar pot_scale = 25; \nvar dx = 1e-4; \nvar view_scale = 5;\n\nvar nx = 100; \nvar ny = 100; \nvar vel = []; \nvar particles = [];\nvar num_particles = 500; \n\nfunction setup() {\n\tcreateCanvas(nx * view_scale, ny * view_scale);\n\tbackground(0);\n\tloadPixels();\n\t\n\t// Init the velocity field\n\tfor (var i=0; i<nx*ny; ++i) {\n\t\tvel[i] = {\"x\": 0, \"y\": 0};\n\t}\n\t// Generate the particles\n\tseed_particles(particles, num_particles);\n}\n\nfunction seed_particles(parts, num) {\n\tvar center_x = nx / 2;\n\tvar center_y = ny / 2;\n\tvar radius = min(nx / 2, ny / 2);\n\tfor (var p=0; p<num; ++p) {\n\t\tvar rangle = random() * TWO_PI;\n\t\tvar rdist = random() * radius;\n\t\tparts[p] = {\"x\": center_x + cos(rangle) * rdist, \"y\": center_y + sin(rangle) * rdist, \"len\": 0};\n\t\tparts[p].px = parts[p].x;\n\t\tparts[p].py = parts[p].y;\n\t}\n}\n\nfunction get_potential(x, y, res_x, res_y, time) {\n\tvar distmult = pow(1 / (min(res_x, res_y)/2), 2);\n\tvar dist_center = max(1 - (pow(x - res_x/2, 2) + pow(y - res_y/2, 2)) * distmult, 0);\n\treturn (noise(x*detail, y*detail, time) * 2 - 1) * pot_scale * dist_center;\n}\n\n\nfunction vel_from_pot(vel_arr, res_x, res_y) {\n\tvar time = frameCount * 0.005;\n\tfor (var y=1; y<res_y-1; ++y) {\n\t\tfor (var x=1; x<res_x-1; ++x) {\n\t\t\tvel_arr[IX(x,y)] = {\"x\": -(get_potential(x,y+dx, res_x, res_y, time) - get_potential(x,y-dx, res_x, res_y, time)) / (2*dx), \n\t\t\t\t\t\t\t\t\t\t\t\t\t\"y\":  (get_potential(x+dx,y, res_x, res_y, time) - get_potential(x-dx,y, res_x, res_y, time)) / (2*dx)};\n\t\t}\n\t}\n}\n\nfunction draw() {\n\tvel_from_pot(vel, nx, ny);\n\tfill(0, 0, 0, 10);\n\tnoStroke();\n\trect(0,0,width,height);\n\tfor (var p=0; p<num_particles; ++p) {\n\t\tadvect_particle(particles[p], vel, nx, ny);\n\t\tstroke(255 - min(int(abs(particles[p].x-particles[p].px) * 100), 255), 255 - min(int(abs(particles[p].y-particles[p].py) * 100), 255), min(int(particles[p].len * 500), 255));\n\t\tstrokeWeight(particles[p].len * 3);\n\t\tline(particles[p].px * view_scale, particles[p].py * view_scale, particles[p].x * view_scale, particles[p].y * view_scale);\n\t\tparticles[p].px = particles[p].x;\n\t\tparticles[p].py = particles[p].y;\n\t}\n}\n\n// === Tab: util ===\nfunction IX(x, y) {\n\treturn x + y * nx;\n}\n\n\nfunction sample_2d(arr, x, y, res_x, res_y) {\n\tx = min(max(x, 0), res_x-2);\n\ty = min(max(y, 0), res_y-2);\n\tvar ix = floor(x);\n\tvar iy = floor(y);\n\tvar s0 = arr[IX(ix,   iy  )];\n\tvar s1 = arr[IX(ix+1, iy  )];\n\tvar s2 = arr[IX(ix,   iy+1)];\n\tvar s3 = arr[IX(ix+1, iy+1)];\n\tvar tx = x - ix;\n\tvar ty = y - iy;\n\tvar sx0 = {\"x\": s0.x + (s1.x - s0.x) * tx, \"y\": s0.y + (s1.y - s0.y) * tx};\n\tvar sx1 = {\"x\": s2.x + (s3.x - s2.x) * tx, \"y\": s2.y + (s3.y - s2.y) * tx};\n\treturn {\"x\": sx0.x + (sx1.x - sx0.x) * ty, \"y\": sx0.y + (sx1.y - sx0.y) * ty};\n}\n\nfunction advect_particle(p, vel_arr, res_x, res_y) {\n\tvar h = 0.2;\n\tvar steps = 1 / h;\n\tvar ox = p.x;\n\tvar oy = p.y;\n\t// RK3\n\tvar k1, k2, k3, tx, ty;\n\tfor (var s = 0; s < steps; ++s) {\n\t\tk1 = sample_2d(vel_arr, p.x, p.y, res_x, res_y);\n\t\ttx = p.x + k1.x * 0.5 * h;\n\t\tty = p.y + k1.y * 0.5 * h;\n\t\tk2 = sample_2d(vel_arr, tx, ty, res_x, res_y);\n\t\ttx = tx + k2.x * 2.0 * h;\n\t\tty = ty + k2.y * 2.0 * h;\n\t\tk3 = sample_2d(vel_arr, tx, ty, res_x, res_y);\n\t\tp.x += k3.x * h;\n\t\tp.y += k3.y * h;\n\t}\n\t\n\tp.len = sqrt(pow(p.x-ox,2) + pow(p.y-oy,2));\n\t\n\tif (p.x < 1) p.x = 1;\n\tif (p.x > width-2) p.x = width-2;\n\tif (p.y < 1) p.y = 1;\n\tif (p.y > height-2) p.y = height-2;\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Michel Siegert",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2006924",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:27:30",
+    "expressive_profile": {
+        "module_id": "CurlNoise.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                255.0,
+                135.0
+            ],
+            "mean_lightness": 0.002,
+            "mean_chroma": 0.007,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.51,
+            "curl_vorticity": 0.03,
+            "divergence": 0.0,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-26 11:15:54"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Depth Regulation.mp4"
+    ],
+    "used_count": 1,
+    "is_starred": false
+}

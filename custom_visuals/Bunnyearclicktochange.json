@@ -1,0 +1,28 @@
+{
+    "name": "Bunnyearclicktochange",
+    "code": "// === Tab: mySketch ===\nlet texture;\n\nfunction preload() {\n  texture = loadImage(\"https://openprocessing.org/sketch/2601413/files/texture.jpg\");\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noLoop();\n  generateCactus();\n}\n\nfunction draw() {\n  // Nothing needed here\n}\n\nfunction mousePressed() {\n  generateCactus();\n}\n\nfunction generateCactus() {\n  background(\"#E9E6DB\"); // Clear with background color\n\n  const w = 200;\n  const h = 70;\n\n  // Sand texture dots\n  for (let i = 0; i < 140000; i++) {\n    const t = 1;\n    const r = pow(random(0, pow(10, t)), 1 / t) / 10;\n    stroke(\"#877E75\");\n    strokeWeight(random(1));\n    const a = random(TWO_PI);\n    const x = width / 2 + cos(a) * w * r;\n    const y = height / 2 + sin(a) * h * r;\n    const yOffset = sin(r * 50) * (1 - r) * 5;\n    point(x, y + yOffset);\n  }\n\n  for (let i = 0; i < 140000; i++) {\n    var t = -1;\n    var r = pow(random(0, pow(10, t)), 1 / t) / 10;\n    stroke(\"#877E75\");\n    strokeWeight(random(1));\n    var a = random(TWO_PI);\n    var x = width / 2 + cos(a) * w * r;\n    var y = height / 2 + sin(a) * h * r;\n    var yOffset = sin(r * 50) * (1 - r) * 5;\n    point(x, y + yOffset);\n  }\n\n  // Draw cactus\n  bunnyEarCactus(\n    width / 2,\n    height / 2,\n    random(40, 60),\n    random(60, 100),\n    0,\n    random([3, 4])\n  );\n\n  // Overlay texture softly (no multiply!)\n  tint(255, 40); // Transparent white (subtle effect)\n  image(texture, 0, 0, width, height);\n}\n\nasync function bunnyEarCactusLeaf(x, y, w, h) {\n  fill(\"#C3CDBE\");\n  noStroke();\n  ellipse(0, -h * 0.4, w, h);\n\n  strokeWeight(1);\n  for (let i = 0; i < w * h * 0.5; i++) {\n    var a = random(TWO_PI);\n    var r = 1 - random(random());\n    colorMode(HSB);\n    stroke(randomGaussian(109, 10), randomGaussian(10, 10), randomGaussian(60, 20));\n    point(cos(a) * w * r / 2, sin(a) * h * r / 2 - h * 0.4);\n  }\n\n  for (let i = 0; i < w * h * 0.5; i++) {\n    var a = random(TWO_PI);\n    var r = 1 - random(random(random()));\n    colorMode(HSB);\n    stroke(randomGaussian(109, 10), randomGaussian(30, 10), randomGaussian(50, 20));\n    point(cos(a) * w * r / 2, sin(a) * h * r / 2 - h * 0.4);\n  }\n}\n\nasync function bunnyEarCactus(x, y, w, h, rAngle, step) {\n  push();\n  colorMode(HSB);\n  translate(x, y);\n  strokeWeight(2);\n  rotate(rAngle);\n  bunnyEarCactusLeaf(x, y, w, h);\n  point(0, 0);\n\n  if ((step > 0 && random() < 0.7) || step >= 3) {\n    translate(0, -h * 0.4);\n    point(0, 0);\n    if (random() < 0.5) {\n      bunnyEarCactus(\n        cos(-PI / 2 + 1) * w / 2,\n        sin(-PI / 2 + 1) * h / 2,\n        w * random(0.7, 0.9),\n        h * random(0.7, 0.9),\n        random(1, 0),\n        step - 1\n      );\n      bunnyEarCactus(\n        cos(-PI / 2 - 1) * w / 2,\n        sin(-PI / 2 - 1) * h / 2,\n        w * random(0.7, 0.9),\n        h * random(0.7, 0.9),\n        random(-1, 0),\n        step - 1\n      );\n    } else {\n      bunnyEarCactus(\n        0,\n        -h * 0.4,\n        w * random(0.7, 0.9),\n        h * random(0.7, 0.9),\n        random(-0.5, 0.5),\n        step - 1\n      );\n    }\n  }\n\n  pop();\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "click to change",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2601413",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:54:43",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "STATIC_FREEZE_NO_TEMPORAL_DYNAMICS",
+    "used_in_videos": [
+        "Pure Immersion Repetition.mp4"
+    ],
+    "used_count": 1
+}

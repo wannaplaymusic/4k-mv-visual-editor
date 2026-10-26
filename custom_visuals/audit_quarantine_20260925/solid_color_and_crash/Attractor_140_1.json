@@ -1,0 +1,24 @@
+{
+    "name": "Attractor_140",
+    "code": "// === Tab: mySketch ===\n// Attractor_14.0\n\nlet N = 3000 ; let Q = 6 ;\nlet M = 0.25 ; let W = 0.05 ; ; let K = 0.1 ; let H = 0.01 ; let A = 0.1 ; let S = 0.02 ; let G = 150 ;\n\nlet X[] = new Array(N) ; let Y[] = new Array(N) ; let Z[] = new Array(N) ;\nlet KX ; let KY ; let L ; let KdX ; let KdY ; let dX ; let dY ; let dZ ;\nlet I ; let T ; let NX ; let NY ; let NZ ; let KN ;\n\nfunction setup(){\n  \n  createCanvas(1112, 834) ; noSmooth() ; background(0) ; stroke(255) ; textSize(20) ;\n  colorMode(HSB, 255);\n  X[0] = random(100,200) ; Y[0] = 0 ; ; Z[0] = 0 ;\n  for ( I = 1 ; I < N ; I++ ){\n    X[I] = X[0]*cos(I*2*PI/Q) + random(-0.1,+0.1) ;\n    Y[I] = X[0]*sin(I*2*PI/Q) + random(-0.1,+0.1) ;\n    Z[I] = Z[0] + random(-0.1,+0.1) ;\n  }\n  KN = N ;\n  \n}// setup()\n\nfunction draw(){\n\ttranslate(-280, - 200);\n  scale(1.5);\n  if ( KN == N ){ fill(0,0,0,20) ; rect(-1,-1,1113,835) ; fill(255) ; }\n  /*line(50,300,550,300) ; line(550,300,540,290) ; line(550,300,540,310) ; text(\"X\",560,305) ;\n  line(300,50,300,550) ; line(300,50,290,60) ; line(300,50,310,60) ; text(\"Z\",295,40) ;\n  line(450,150,150,450) ; line(150,450,150,435) ; line(150,450,165,450) ; text(\"Y\",130,470) ;*/\n  \n  for ( I = 0 ; I < KN ; I++ ){\n    \n    L = sqrt(pow(X[I],2)+pow(Y[I],2)) ;\n    KX = L-G ; KY = Z[I] ; T = atan(Y[I]/X[I])*2 ;\n    KdY = (M*sin(W*KX)) - (K*W*KX) - (H*KY) + (A*sin(T)) ; \n    KdX = KY ;\n    dX = KdX*X[I]/L + (-Y[I]*S) ; dY = KdX*Y[I]/L + (X[I]*S) ; dZ = KdY ;\n    NX = X[I] + dX ; NY = Y[I] + dY ; NZ = Z[I] + dZ ;\n    stroke(I/KN*255, 200, 255);\n    line(X[I]-(Y[I]/2)+width / 2,(-Z[I]*10)+(Y[I]/2)+height / 2,NX-(NY/2)+width / 2,(-NZ*10)+(NY/2)+height / 2) ;\n    X[I] = NX ; Y[I] = NY ; Z[I] = NZ ;    \n    \n  }// I\n  \n}// draw()\n\nfunction mousePressed(){\n  \n  background(0) ;\n  \n  if ( KN != N ){ \n    KN = N ; \n    for ( I = 1 ; I < N ; I++ ){\n      X[I] = (X[0]*cos(I*2*PI/Q)) - (Y[0]*sin(I*2*PI/Q)) + random(-0.1,+0.1) ;\n      Y[I] = (X[0]*sin(I*2*PI/Q)) + (Y[0]*cos(I*2*PI/Q)) + random(-0.1,+0.1) ;\n      Z[I] = Z[0] + random(-0.1,+0.1) ;\n    }\n  }else{ KN = 1 ; }\n  \n}// mousePressed()\n\nfunction keyPressed(){save('pix.jpg');}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/902230",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:44:10",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

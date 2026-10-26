@@ -17,11 +17,14 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 3,
+    "used_count": 6,
     "is_starred": false,
     "used_in_videos": [
-        "Submerged Echoes.mp4",
+        "Subtle Collapse.mp4",
         "Delayed Aurora.mp4",
-        "Subtle Collapse.mp4"
+        "Submerged Echoes.mp4",
+        "Tunnel Vision.mp4",
+        "Slow Expansion.mp4",
+        "Concrete Resonance Unit.mp4"
     ]
 }

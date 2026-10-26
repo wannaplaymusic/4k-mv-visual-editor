@@ -12,7 +12,14 @@
         "batch_import",
         "openprocessing",
         "audio_reactive",
-        "restored"
+        "restored",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible",
+        "batch_2026-10-08",
+        "batch_2026-09-25"
     ],
     "frequency": 50,
     "storyboard_weight": 50,

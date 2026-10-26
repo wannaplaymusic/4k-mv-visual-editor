@@ -1,0 +1,29 @@
+{
+    "name": "Experiment10",
+    "code": "// === Tab: mySketch ===\nlet amplitude = 20;     // Height of vibration\nlet frequency = 0.1;    // Frequency of wave\nlet speed = 0.1;        // Speed of vibration\nlet segments = 40;      // Number of segments in the line\nlet particles = [];     // Array to store particles\nlet lines = [];         // Array to store lines\nlet palette;          // Color palette\n\nfunction preload() {\n  let file = 'city_night_colors.txt';\n  // Load each line of the file into an array\n  lines = loadStrings(file, (result) => {\n    console.log(\"File loaded successfully:\", result);\n  }, (err) => {\n    console.error(\"Error loading file:\", err);\n  });\n}\n\nfunction setup() {\n    let canvas = createCanvas(800, 800);\n    background(\"#F6EEE3\"); // Light beige background\n    frameRate(30);         // Set frame rate\n    palette = takeColor(lines);\n}\n\nfunction draw() {\n    background(\"#F6EEE3\");\n\n    stroke(0);\n    noFill();\n\n    let position = height / 4;\n\n    // Draw the vibrating lines and emit particles with specific directions\n    drawWave(position, 1.5, amplitude, 'down');    // First wave emits downward\n    drawWave(2 * position, 1, amplitude * 1.5, 'both'); // Second wave emits in both directions\n    drawWave(3 * position, 1.5, amplitude, 'up');  // Third wave emits upward\n\n    // Update and display particles\n    for (let i = particles.length - 1; i >= 0; i--) {\n        particles[i].update();\n        particles[i].display();\n\n        // Remove particles that are off-screen\n        if (particles[i].isOffScreen()) {\n            particles.splice(i, 1);\n        }\n    }\n}\n\nfunction takeColor(content) {\n    let colors = [];\n    for (let i = 0; i < content.length; i++) {\n      let line = content[i].replace(/\\(/g, '').replace(/\\)/g, '');\n      let [r, g, b] = line.split(\",\").map(Number);\n      let col = color(r, g, b);\n      colors.push(col);\n    }\n    return colors;\n  }\n\nfunction drawWave(position, speedMultiplier, amp, direction = 'up') {\n    beginShape();\n    let frameOffset = frameCount * speed * speedMultiplier; // Precompute frame offset\n    for (let i = 0; i <= segments; i++) {\n        let x = map(i, 0, segments, 100, width - 100);\n        let y = position + sin(i * frequency + frameOffset) * amp;\n        vertex(x, y);\n\n        // Emit a particle at the vertex\n        if (frameCount % 5 === 0) { // Emit particles every 5 frames\n            particles.push(new Particle(x, y, direction));\n        }\n    }\n    endShape();\n}\n\n// Particle class\nclass Particle {\n    constructor(x, y, direction) {\n        this.x = x;\n        this.y = y;\n        this.vy = this.getVelocity(direction); // Vertical speed based on direction\n        this.alpha = 255;                      // Transparency\n        this.color = random(palette)\n    }\n\n    getVelocity(direction) {\n        if (direction === 'down') {\n            return random(2, 5); // Move downward\n        } else if (direction === 'both') {\n            return random(-5, 5); // Move in both directions\n        } else {\n            return random(-2, -5); // Default: Move upward\n        }\n    }\n\n    update() {\n        this.y += this.vy;       // Move vertically\n        this.alpha -= 10;        // Fade out faster\n    }\n\n    display() {\n        noStroke();\n        let particleColor = color(red(this.color), green(this.color), blue(this.color), this.alpha); // Set alpha explicitly\n        fill(particleColor);\n        ellipse(this.x, this.y, 5, 5); // Draw particle as a small circle\n    }\n\n    isOffScreen() {\n        return this.alpha <= 0;  // Check if the particle is invisible\n    }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Yn0t",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2626221",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:51:58",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

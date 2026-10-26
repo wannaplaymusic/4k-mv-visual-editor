@@ -1,0 +1,27 @@
+{
+    "name": "linesss",
+    "code": "// === Tab: mySketch ===\nvar nmobiles=15000;\nvar mobiles=[];\nvar noisescale;\nvar a1, a2, a3, a4, a5, amax;\nvar bw=false;\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  background(255);\n  noFill();  \n  colorMode(HSB, 333, 222, 150, 200);\n  strokeWeight(.1);\n  reset();\n}\nfunction reset() {\n  noisescale=random(.01, 500.0);\n  noiseDetail(int(random(2,10)));\n  amax=random(5);\n  a1=random(1, amax);\n  a2=random(1, amax);\n  a3=random(1, amax);\n  a4=random(1, amax);\n  a5=30;\n  for (var i = 0; i < nmobiles; i++) {\n    mobiles[i] = new Mobile(i);\n  }\n}\nfunction draw() {\n\t//noiseSeed(millis()*.00005);\n  for (var i = 0; i < nmobiles; i++) {\n    mobiles[i].run();\n  }\n}\nfunction keyReleased() {\n  if (key==\"s\" || key==\"S\")save(\"svimg\" + day() + \"_\" + month() + \"_\" + hour() + \"_\" + minute() + \"_\" + second() + \".jpg\");\n  if (keyCode==32) reset();\n  if(key==\"r\" || key==\"R\")setup();\n  if(key==\"b\" || key==\"B\")bw=!bw;\n}\n\nfunction Mobile(index) {\n  this.index=index;\n  this.velocity=createVector(0, 0);\n  this.acceleration=createVector(0, 0);\n  this.position0=createVector(random(0, width), random(0, height));\n  this.position=this.position0.copy();\n  this.trans=random(50, 200);\n  this.hu=(noise(a1*sin(PI*this.position.x/width), a1*sin(PI*this.position.y/height))*720)%360;//random(360);\n  this.sat=noise(a2*sin(PI*this.position.x/width), a2*sin(PI*this.position.y/height))*255;\n  this.bri=noise(a3*cos(PI*this.position.x/width), a3*cos(PI*this.position.y/height))*255;\n}\n\nMobile.prototype.run = function() {\n  this.update();\n  this.display();\n};\n\n// Method to update position\nMobile.prototype.update = function() {\n  this.velocity=createVector(1-2*noise(a4+a2*sin(PI*this.position.x/width), a4+a2*sin(PI*this.position.y/height)), 1-2*noise(a2+a3*cos(PI*this.position.x/width), a4+a3*cos(PI*this.position.y/height)));\n  this.velocity.mult(a5);//100*fbm(this.position));\n  //this.velocity.rotate(10*noise(a4+a3*sin(PI*this.position.x/width)));\n  this.position0=this.position.copy();\n  this.position.add(this.velocity);\n};\n\n// Method to display\nMobile.prototype.display = function() {\n  if(bw)stroke(0,this.trans); else stroke(this.hu,this.sat,this.bri,this.trans);\n  line(this.position0.x, this.position0.y, this.position.x, this.position.y);\n  if (this.position.x>width || this.position.x<0||this.position.y>height||this.position.y<0) {\n    this.position0=createVector(random(0, width), random(0, height));\n    this.position=this.position0.copy();\n  }\n};\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "sarah",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1000948",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:31:17",
+    "used_in_videos": [
+        "Reflected in Water.mp4",
+        "Fusion Blade Berserk.mp4"
+    ],
+    "used_count": 2
+}

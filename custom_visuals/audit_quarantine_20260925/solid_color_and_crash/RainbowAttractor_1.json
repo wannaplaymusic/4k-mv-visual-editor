@@ -1,0 +1,24 @@
+{
+    "name": "RainbowAttractor",
+    "code": "// === Tab: mySketch ===\n// attractor_1.0\n\nlet N = 4000 ; let M = 10 ;\n\nlet X[] = new Array(N) ; let Y[] = new Array(N) ;\nlet CX[] = new Array(N) ; let CY[] = new Array(N) ; let R[] = new Array(M) ;\nlet dX ; let dY ; let I ; let II ; let L ; let KX ; let KY ;\n\n\n\nfunction setup(){\n  \n  createCanvas(1112, 834) ; noSmooth() ; background(0) ; stroke(255,0,0) ; fill(0,0,0,2) ;\n  colorMode(HSB, 255);\n  for ( I = 0 ; I < N ; I++ ){\n    X[I] = random(-556,+556) ; Y[I] = random(-417,+417) ;\n  }\n  \n  for ( I = 0 ; I < M ; I++ ){\n    R[I] = random(+60,+200) ; CX[I] = random(-556+R[I],+556-R[I]) ; CY[I] = random(-417+R[I],+417-R[I]) ; \n  }\n  \n} // setup()\n\n\n\nfunction draw(){\n  \n  //rect(-1,-1,601,601) ;\n  \n  for ( I = 0 ; I < N ; I++ ){\n    dX = 0 ; dY = 0 ; \n    for ( II = 0 ; II < M ; II++ ){\n      KX = X[I]-CX[II] ; KY = Y[I]-CY[II] ;\n      L = sqrt((KX*KX)+(KY*KY)) ;\n      dX = dX + ((KX-KY-(KX*((KX*KX)+(KY*KY))/pow(R[II],2)))/pow(L,5)) ;\n      dY = dY + ((KX+KY-(KY*((KX*KX)+(KY*KY))/pow(R[II],2)))/pow(L,5)) ;\n    }\n    L = sqrt((dX*dX)+(dY*dY)) ;\n    dX = 2*dX/L ; dY = 2*dY/L ;\n\t\tstroke(I/N*255, 255, 255);\n    line(X[I]+556,Y[I]+417,X[I]+dX+556,Y[I]+dY+417) ;\n    X[I] = X[I] + dX ; Y[I] = Y[I] + dY ;\n  }\n  \n} // draw()\n\n\n\nfunction mousePressed(){ save('pix.jpg'); }\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "fengwubing",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/888848",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:44:38",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

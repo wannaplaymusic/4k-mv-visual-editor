@@ -17,12 +17,14 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 3,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
-        "Lost Signal.mp4",
+        "Urban Drift.mp4",
         "Deep Decay.mp4",
-        "Urban Drift.mp4"
+        "Lost Signal.mp4",
+        "Audio Blur.mp4",
+        "Filter Sweep.mp4"
     ],
     "needs_qc_repair": true,
     "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"

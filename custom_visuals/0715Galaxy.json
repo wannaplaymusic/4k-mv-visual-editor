@@ -1,0 +1,33 @@
+{
+    "name": "0715Galaxy",
+    "code": "// === Tab: mySketch ===\nlet colors = \"ffc857-e9724c-c5283d-481d24-255f85-a9e5bb-2d1e2f-777da7-94c9a9-074f57\".split(\"-\").map(a => \"#\" + a);\nlet total;\n\nfunction setup() {\n    createCanvas(window.innerWidth, window.innerHeight);\n    noStroke()\n    total = 1200;\n}\n\nfunction draw() {\n    background(0);\n    push();\n    translate(width / 2, height / 2);\n    rotate(frameCount * 0.002);\n    for (let i = 0; i < total; i++) {\n        let angle = sin(i + frameCount * 0.002) * 10;\n        let angle2 = cos(i + frameCount * 0.004) * 650;\n\n        let inc = 85;\n        let waveX = map(sin(frameCount * 0.01), -1, 1, -inc, inc);\n        let waveY = map(cos(frameCount * 0.01), -1, 1, -inc, inc);\n\n        let a = -394;\n        let x = sin(radians(i)) * (angle2 + a) + waveX;\n        let y = cos(radians(i)) * (angle2 + a) + waveY;\n\n        let w = 860;\n        let x1 = sin(radians(i)) * (w / angle);\n        let y1 = cos(radians(i)) * (w / angle);\n\t\t\t\t\n\t\t\t  fill(255);\n        circle(x, y, 1);\n        let size = map(sin(i * frameCount * 0.0002), -1, 1, 0, 4);\n\t\t\t\tfill(colors[i % colors.length]);\n        circle(x1, y1, size);\n    }\n    pop();\n}\n\nfunction windowResized() {\n    resizeCanvas(windowWidth, windowHeight);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "HenDaSheng",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1235349",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:14:17",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Black Corridor Echo.mp4"
+    ],
+    "used_count": 1
+}

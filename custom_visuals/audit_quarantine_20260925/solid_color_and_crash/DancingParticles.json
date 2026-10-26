@@ -1,0 +1,24 @@
+{
+    "name": "DancingParticles",
+    "code": "// === Tab: main ===\nlet particles = [];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(244);\n\tnoStroke();\n\t\n\tlet amount = round((width * height) / 11070.72);\n\tfor (let i = 0; i < amount; i++)\n\t\tparticles.push(new Particle(random(width), random(height)));\n}\n\nfunction draw() {\n\tbackground(244, 10);\n\tfor (let i in particles) {\n\t\tparticles[i].move(particles);\n\t\tparticles[i].draw();\n\t}\n}\n\n// === Tab: boid ===\nfunction Particle(x, y) {\n\tthis.pos = createVector(x, y);\n\tthis.vel = createVector(random(-5, 5), random(-5, 5));\n\tthis.diameter = random(20, 25);\n\tthis.distance = 100;\n\t\n\tlet c = floor(random(3));\n\tif (c == 0)\n\t\tthis.color = color(142, 198, 197);\n\telse if (c == 1)\n\t\tthis.color = color(105, 131, 170);\n\telse if (c == 2)\n\t\tthis.color = color(133, 102, 170);\n}\n\nParticle.prototype.move = function(particles) {\n\tlet validParticles = [];\n\tfor (let i in particles)\n\t\tif (particles[i].pos.dist(this.pos) < this.distance)\n\t\t\tvalidParticles.push(particles[i]);\n\t\n\tfor (let i in validParticles) {\n\t\tthis.vel.sub(validParticles[i].pos);\n\t\tthis.vel.add(this.pos);\n\t}\n\t\n\tthis.vel.limit(5);\n\tthis.pos.add(this.vel);\n\t\n\tif (this.pos.x > width ) this.pos.x -= width;\n\tif (this.pos.x < 0     ) this.pos.x += width;\n\tif (this.pos.y > height) this.pos.y -= height;\n\tif (this.pos.y < 0     ) this.pos.y += height;\n}\n\nParticle.prototype.draw = function() {\n\tfill(this.color);\n\tellipse(this.pos.x, this.pos.y, this.diameter, this.diameter);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Kai",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/877116",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:45:59",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

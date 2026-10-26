@@ -1,0 +1,24 @@
+{
+    "name": "NeuralResonance",
+    "code": "// === Tab: mySketch ===\nlet neurons = [];\nlet connections = [];\nlet numNeurons = 100;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  \n  // 初期ニューロンを配置\n  for (let i = 0; i < numNeurons; i++) {\n    neurons.push(new Neuron(random(width), random(height)));\n  }\n  \n  // 初期のニューロン間接続\n  for (let i = 0; i < numNeurons; i++) {\n    let neuron = neurons[i];\n    for (let j = 0; j < numNeurons; j++) {\n      if (i !== j && random() < 0.05) {\n        connections.push(new Synapse(neuron, neurons[j]));\n      }\n    }\n  }\n}\n\nfunction draw() {\n  background(0);\n  \n  // 接続を描画\n  for (let synapse of connections) {\n    synapse.display();\n  }\n  \n  // ニューロンを描画し、発火させる\n  for (let neuron of neurons) {\n    neuron.update();\n    neuron.display();\n  }\n  \n  // 発火のルーチン\n  for (let neuron of neurons) {\n    if (random() < 0.01) {\n      neuron.fire();\n    }\n  }\n}\n\n// マウスがクリックされたときに新しいニューロンを追加\nfunction mousePressed() {\n  let newNeuron = new Neuron((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n  neurons.push(newNeuron);\n  \n  // 新しいニューロンと既存のニューロンをランダムに接続\n  for (let i = 0; i < neurons.length - 1; i++) {\n    if (random() < 0.05) {\n      connections.push(new Synapse(neurons[i], newNeuron));\n    }\n    if (random() < 0.05) {\n      connections.push(new Synapse(newNeuron, neurons[i]));\n    }\n  }\n}\n\n// ニューロンのクラス\nclass Neuron {\n  constructor(x, y) {\n    this.position = createVector(x, y);\n    this.fireRate = 0;  // 発火の強さ\n    this.color = color(255, 0, 0);\n  }\n\n  // 発火を制御\n  fire() {\n    this.fireRate = 255; // 最大強度で発火\n    setTimeout(() => {\n      this.fireRate = 0; // 発火後、強度を元に戻す\n    }, 100);\n  }\n\n  update() {\n    // 発火中は周囲にシナプスを通じて信号を送る\n    for (let synapse of connections) {\n      if (synapse.inputNeuron === this && this.fireRate > 0) {\n        synapse.transmit();\n      }\n    }\n  }\n\n  // ニューロンの描画\n  display() {\n    stroke(255);\n    fill(this.color.levels[0], this.color.levels[1], this.color.levels[2], this.fireRate);\n    ellipse(this.position.x, this.position.y, 20, 20);\n  }\n}\n\n// シナプス（ニューロン間の接続）\nclass Synapse {\n  constructor(inputNeuron, outputNeuron) {\n    this.inputNeuron = inputNeuron;\n    this.outputNeuron = outputNeuron;\n    this.transmission = false;\n    this.oscillator = null;\n  }\n\n  // 信号を伝達\n  transmit() {\n    if (!this.transmission) {\n      this.transmission = true;\n      \n      // ランダムな周波数を生成（0.5 Hz ～ 30 Hz）\n      let freq = random(0.5, 30);\n      \n      // 新しいオシレーターを生成\n      this.oscillator = new p5.Oscillator('sine');\n      this.oscillator.freq(freq);\n      this.oscillator.amp(0.1);  // 音量の設定\n      this.oscillator.start();\n      this.oscillator.stop(0.1); // 0.1秒後に停止\n      \n      // 伝達が終わるまで少し待つ\n      setTimeout(() => {\n        this.transmission = false;\n      }, 100);\n    }\n  }\n\n  // シナプスの描画\n  display() {\n    if (this.transmission) {\n      stroke(0, 255, 0, 150); // 信号が伝達中は緑色\n    } else {\n      stroke(255, 100); // 信号がないときは白\n    }\n    line(this.inputNeuron.position.x, this.inputNeuron.position.y,\n         this.outputNeuron.position.x, this.outputNeuron.position.y);\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "NeXus__VeRse",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2498636",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:14:27",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,65 @@
+{
+    "name": "ColorfulWaves",
+    "code": "// === Tab: mySketch ===\n// by SamuelYAN\n// more works //\n// https://twitter.com/SamuelAnn0924\n// https://www.instagram.com/samuel_yan_1990/\n\n// reference: https://gorillasun.de/blog/Smooth-Curves-with-Perlin-Noise-and-Recreating-the-Unknown-Pleasures-Album-Cover-in-P5\n\nvar seed = Math.random() * 1000;\nvar xOff, yOff, dir, plus, wave_h, t;\nvar color1, color2,color0;\nlet colors1 = \"e3d7a3-f5989d-ea618e-fce4d6-caac71\".split(\"-\").map((a) => \"#\" + a + \"1a\"); //\nlet colors12 = \"e3d7a3-f5989d-ea618e-fce4d6-caac71\".split(\"-\").map((a) => \"#\" + a + \"00\");\nlet colors2 = \"6cbbd4-5863b1-5282a1-fee8f7-c1f29b\".split(\"-\").map((a) => \"#\" + a + \"1a\");\nlet colors22 = \"6cbbd4-5863b1-5282a1-fee8f7-c1f29b\".split(\"-\").map((a) => \"#\" + a + \"00\");\nlet colors3 = \"1b1b1b-292929-f3f3f3-222222-ff0000\".split(\"-\").map((a) => \"#\" + a + \"1a\");\nlet colors32 = \"1b1b1b-292929-f3f3f3-222222-ff0000\".split(\"-\").map((a) => \"#\" + a + \"00\");\nlet colors4 = \"70c1b3-aaf0d3-50514f-ffe066-247ba0\".split(\"-\").map((a) => \"#\" + a + \"1a\");\nlet colors42 = \"70c1b3-aaf0d3-50514f-ffe066-247ba0\".split(\"-\").map((a) => \"#\" + a + \"00\");\nlet colors5 = \"3c1642-386375-086375-b2ff9e-1dd3b0\".split(\"-\").map((a) => \"#\" + a + \"1a\");\nlet colors52 = \"3c1642-386375-086375-b2ff9e-1dd3b0\".split(\"-\").map((a) => \"#\" + a + \"00\");\nlet colorbg = \"ffffff\".split(\"-\").map((a) => \"#\" + a);\nlet colorbg2 = \"ffffff07\".split(\"-\").map((a) => \"#\" + a);\nvar grad;\nlet filter;\n\nfunction setup() {\n\trandomSeed(seed);\n\tcreateCanvas(4/3*windowHeight, windowHeight);\n\t// pixelDensity(5);\n\tcolor0 = random([colors1, colors2, colors3, colors4, colors5]);\n\tcolor1 = random([colors1, colors2, colors3, colors4, colors5]);\n\tcolor2 = random([colors12, colors22, colors32, colors42, colors52]);\n\tbackground(colorbg);\n\tyOff = 0;\n\tdir = 1;\n\tplus = 0.1;\n\twave_h = int(random(100, 50));\n\tt = 0;\n\tfilter = new makeFilter();\n}\n\nfunction draw() {\n\trandomSeed(seed);\n\t// background(colorbg);\n\tnoFill();\n\tlet num = int(random(20, 20));\n\tlet mountain_h = int(height / num);\n\tfor (let n = 0; n < height; n += mountain_h) {\n\t\tpush();\n\t\ttranslate(0, mountain_h / 2 + n);\n\t\tif (n == int(random(num / 2, num / 3 * 2)) * mountain_h) {\n\t\t\tcolor1 = \"b05aff-a260bf-704cbc-836dc5\".split(\"-\").map((a) => \"#\" + a + \"1a\");\n\t\t} \n\t\telse {\n\t\t\tcolor1 = color0;\n\t\t}\n\t\tgrad = drawingContext.createLinearGradient(0, -mountain_h, 0, mountain_h);\n\t\tgrad.addColorStop(0, random(color1));\n\t\tgrad.addColorStop(1, random(color1));\n\t\tdrawingContext.strokeStyle = grad;\n\n\t\tstrokeWeight(random(1));\n\t\txOff = random(100, 50);\n\t\tbeginShape();\n\t\tcurveVertex(xOff, 0)\n\t\tfor (let i = xOff * 3; i < width - 3 * xOff; i += int(random(25, 50))) {\n\t\t\tlet p = 0;\n\t\t\tif (int(i) % 3 == 1) {\n\t\t\t\tp = random(-1, 1);\n\t\t\t}\n\n\t\t\tcurveVertex(i, sin(i + t) * random([-1, 1]) * p * yOff)\n\t\t}\n\t\tcurveVertex(width - 3 * xOff, yOff)\n\t\tendShape();\n\t\tpop();\n\t}\n\tif (dir == 1) {\n\t\tif (yOff < wave_h) {\n\t\t\tdir = 1;\n\t\t} else if (yOff >= wave_h) {\n\t\t\tdir = -1;\n\t\t\tplus = random(0.1);\n\t\t}\n\t} else if (dir == -1) {\n\t\tif (yOff > 0) {\n\t\t\tdir = -1;\n\t\t} else if (yOff <= 0) {\n\t\t\tdir = 1;\n\t\t\tplus = random(0.1);\n\t\t}\n\t}\n\n\tyOff += plus * dir;\n\tt += 1;\n\t// image(overAllTexture, 0, 0);\n}\n\nfunction makeFilter() {\n\t// noiseのフィルターをつくる\n\tcolorMode(HSB, 360, 100, 100, 100);\n\tdrawingContext.shadowColor = color(0, 0, 5, 95);\n\toverAllTexture = createGraphics(width, height);\n\toverAllTexture.loadPixels();\n\tfor (var i = 0; i < width; i++) {\n\t\tfor (var j = 0; j < height; j++) {\n\t\t\toverAllTexture.set(\n\t\t\t\ti,\n\t\t\t\tj,\n\t\t\t\tcolor(\n\t\t\t\t\t0,\n\t\t\t\t\t0,\n\t\t\t\t\t99,\n\t\t\t\t\tnoise(i / 3, j / 3, (i * j) / 50) * random(5, 15)\n\t\t\t\t)\n\t\t\t);\n\t\t}\n\t}\n\toverAllTexture.updatePixels();\n}\n\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n// prevents mouse press from registering twice\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() +\n    \".png\");\n    lapse = millis();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Steve Snyder",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2322133",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:21:29",
+    "expressive_profile": {
+        "module_id": "ColorfulWaves.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                75.0,
+                135.0
+            ],
+            "mean_lightness": 0.014,
+            "mean_chroma": 0.027,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.36,
+            "curl_vorticity": 0.01,
+            "divergence": -0.004,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-26 11:03:39"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Fading Coordinates.mp4",
+        "Ultimate Driving Immersion.mp4",
+        "Galactic Tribal Assault.mp4"
+    ],
+    "used_count": 3,
+    "is_starred": false
+}

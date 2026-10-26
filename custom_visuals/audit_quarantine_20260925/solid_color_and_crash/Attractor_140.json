@@ -1,0 +1,22 @@
+{
+    "name": "Attractor_140",
+    "code": "// === Tab: mySketch ===\n// Attractor_14.0\n\nlet N = 3000 ; let Q = 100 ;\nlet M = 0.25 ; let W = 0.05 ; ; let K = 0.1 ; let H = 0.01 ; let A = 0.1 ; let S = 0.02 ; let G = 150 ;\n\nlet X[] = new Array(N) ; let Y[] = new Array(N) ; let Z[] = new Array(N) ;\nlet KX ; let KY ; let L ; let KdX ; let KdY ; let dX ; let dY ; let dZ ;\nlet I ; let T ; let NX ; let NY ; let NZ ; let KN ;\n\nfunction setup(){\n  \n  createCanvas(1112, 834) ; noSmooth() ; background(0) ; stroke(255) ; textSize(20) ;\n  \n  X[0] = random(-400, 400) ; Y[0] = 0 ; ; Z[0] = 0 ;\n  for ( I = 1 ; I < N ; I++ ){\n    X[I] = X[0]*cos(I*2*PI/Q) + random(-20,20) ;\n    Y[I] = X[0]*sin(I*2*PI/Q) + random(-20,20) ;\n    Z[I] = Z[0] + random(-20,20) ;\n  }\n  KN = N ;\n  \n}// setup()\n\nfunction draw(){\n\tlet lapse = 0;    // mouse timer\n  scale(1.5);\n  if ( KN == N ){ fill(0,0,0,10) ; rect(-1,-1, width + 2, height + 2) ; fill(255) ; }\n\ttranslate(70, -30);\n  \n  for ( I = 0 ; I < KN ; I++ ){\n    L = sqrt(pow(X[I],2)+pow(Y[I],2)) ;\n    KX = L-G ; KY = Z[I] ; T = atan(Y[I]/X[I])*3 ;\n    KdY = (M*sin(W*KX)) - (K*W*KX) - (H*KY) + (A*sin(T)) ; \n    KdX = KY ;\n    dX = KdX*X[I]/L + (-Y[I]*S) ; dY = KdX*Y[I]/L + (X[I]*S) ; dZ = KdY ;\n    NX = X[I] + dX ; NY = Y[I] + dY ; NZ = Z[I] + dZ ;\n    stroke(KX*10+50, NY*50+50, KY*100+50);\n    line(X[I]-(Y[I]/2)+300,(-Z[I]*10)+(Y[I]/2)+300,NX-(NY/2)+300,(-NZ*10)+(NY/2)+300) ;\n    X[I] = NX ; Y[I] = NY ; Z[I] = NZ ;    \n    \n  }// I\n  \n}// draw()\n\nfunction mousePressed(){\n  \n  background(0) ;\n  \n  if ( KN != N ){ \n    KN = N ; \n    for ( I = 1 ; I < N ; I++ ){\n      X[I] = (X[0]*cos(I*2*PI/Q)) - (Y[0]*sin(I*2*PI/Q)) + random(-0.1,+0.1) ;\n      Y[I] = (X[0]*sin(I*2*PI/Q)) + (Y[0]*cos(I*2*PI/Q)) + random(-0.1,+0.1) ;\n      Z[I] = Z[0] + random(-0.1,+0.1) ;\n    }\n  }else{ KN = 1 ; }\n  \n}// mousePressed()\n\nfunction keyPressed(){\n  save('pix.jpg');\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Navyanth Kusampudi",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1056469",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:27:36"
+}

@@ -1,0 +1,28 @@
+{
+    "name": "Movementsonasphere",
+    "code": "// === Tab: mySketch ===\n// September 22, 2020\n\nconst N = 400; // number of points\nconst R = 250;\nlet pts = [];\nlet palette = [\"70c0ec\",\"4dafe3\",\"8fd0f3\",\"1aa4ef\",\"4cbaf6\"];\nlet noise_scale = 0.1;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL); // WEBGL\n\n\tnoFill();\n\n\tfor (let i = 0; i < N; i++) {\n\t\tpts.push(new Point());\n\t}\n}\n\nfunction draw() {\n\tbackground(0);\n\n\t//translate(width / 2, height / 2);\n\t\n\t//rotateZ(2 * (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) / height);\n\t//rotateX(2 * (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) / width);\n\t\n\trotateX(TWO_PI * (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) / height);\n\trotateZ(TWO_PI * (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) / width);\n\n\t/*\n\t// move\n\tfor (let pt of pts) {\n\t\tlet speed = createVector(pt.y, -pt.x, pt.y).div(1000);\n\n\t//let a1 = my_noise(pt);\n\t//let a2 = my_noise(pt);\n\t//let a3 = my_noise(pt);\n\t//let speed = createVector(a1, a2, a3).cross(pt).normalize();\n\t\t\n\t\tpt.p.add(speed.mult(2)).normalize().mult(R);\n\t}\n\t// draw\n\tfor (let pt of pts) {\n\t\t//strokeWeight(map(pt.x, -R, R, 1, 10));\n\t\tpoint(pt.p);\n\t}\n\t*/\n\n\tfor (let pt of pts) {\n\t\t\tpt.move();\n\t\t\tpt.draw();\n\t}\n}\n\nfunction my_noise(pt) {\n\treturn 2*noise(noise_scale*pt.x, noise_scale*pt.y, noise_scale*pt.z)-1;\n}\n\nclass Point {\n\tconstructor() {\n\t\tthis.p = new p5.Vector.random3D().mult(R);\n\t\t\tthis.c = \"#\"+random(palette);\n\t}\n\tmove() {\n\t\tvar speed = createVector(this.p.y, -this.p.x, this.p.y).mult(1/R);\n\t\tthis.p.add(speed.mult(2)).normalize().mult(R);\n\t}\n\tdraw() {\n\t\tstroke(this.c);\n\t\tstrokeWeight(map(this.p.x, -R, R, 3, 10));\n\t\t//let new_p = this.p.copy().mult(map(this.p.x,-R/2,R/2,0.4,1,false));\n\t\t//let new_p = this.p.copy();\n\t\t//point(new_p);\n\t\tpoint(this.p);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "tylu",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/968650",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:35:18",
+    "used_in_videos": [
+        "Spring Echo Distant.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

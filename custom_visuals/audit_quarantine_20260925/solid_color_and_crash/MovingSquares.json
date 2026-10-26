@@ -1,0 +1,22 @@
+{
+    "name": "MovingSquares",
+    "code": "// === Tab: mySketch ===\nArrayList <particula> particulas;\n\nfunction setup()\n{\n  createCanvas(450, 450);\n  particulas = new ArrayList <particula>();\n  \n  for(i = 0; i<900; i++)\n  {\n    particulas.add(new particula());\n  }\n}\n\nfunction draw()\n{\n  background(0);\n  \n  for(particula p: particulas)\n  {\n    p.display();\n    p.movimiento();\n  }\n  \n}\n\nfunction mousePressed()\n{\n  particula foo = new particula((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n  particulas.add(foo);\n \n}\n\nclass particula\n{\n  x,y,v,a,t;\n  c;\n  \n  constructor(x_, y_, v_, a_, t_, c_)\n  {\n    x = x_;\n    y = y_;\n    v = v_;\n    a = a_;\n    t = t_;\n    c = c_;\n  }\n  \n  constructor()\n  {\n    x = random(10);\n    y = random(700);\n    v = random(10);\n    a = random(TWO_PI);\n    t = random(1,30);\n    c = color(random(550), random(250), random(250));\n  }\n  \n  constructor(x_, y_)\n  {\n    x = x_;\n    y = y_;\n    v = random(5);\n    a = random(TWO_PI);\n    t = random(10,30);\n    c = color(random(250));\n  }\n  \n  function display()\n  {\n    pushMatrix();\n    translate(x,y);\n    fill(c);\n    rect (0,0,t,t); \n    noStroke();\n    popMatrix();\n  }\n  \n  function movimiento()\n  {\n    x += random(-a,v);\n    y -= random(-a,v);\n  }\n}\n\n \n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Cecia Murl",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1051345",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:28:53"
+}

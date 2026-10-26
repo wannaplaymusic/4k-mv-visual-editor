@@ -1,0 +1,27 @@
+{
+    "name": "Shorttermrelationships",
+    "code": "// === Tab: mySketch ===\n\nlet avoiders=[]\nlet colors= [\"#721121\",\"#a5402d\",\"#f15156\",\"#ffc07f\",\"#ffcf99\"]\nlet overAllTexture\n\nfunction setup() {\n  createCanvas(600, 600);\n  b=createGraphics(700, 700)\n  angleMode(DEGREES)\n  blendMode(MULTIPLY)\n  for(let i=0; i<35; i++){\n    avoiders.push(new avoider())\n  }\n  \n  background(255);\n  overAllTexture=createGraphics(width,height)\n\toverAllTexture.loadPixels()\n\tfor(var i=0;i<width+50;i++){\n\t\tfor(var o=0;o<height+50;o++){\n\t\t\toverAllTexture.set(i,o,color(150,noise(i/10,o/10)*random([0,0,0,50,100])))\n}\n    }\n  overAllTexture.updatePixels()\n    }\n\nfunction draw() {\n  clear()\n  background(255, 240, 235);\n\tpush()\n\t\tblendMode(MULTIPLY)\n\t\timage(overAllTexture,0,0)\n\tpop()\n  for(let avoider of avoiders){\n    avoider.update()\n    avoider.relate()\n    avoider.display()\n  }\n  b. background(255)\n  b.erase();\n  b.rect(50, 50, 600, 600);\n  b.noErase();\n  blendMode(SCREEN)\n  drawingContext.shadowBlur = 75;\n  drawingContext.shadowColor = 'white';\n  image(b, -45, -45, 690, 690)\n  drawingContext.shadowBlur= 0\n  blendMode(MULTIPLY)\n}\n\nclass avoider{\n  constructor(){\n    this.pos= createVector(random(0, width), random(0, height))\n    this.vel= createVector(0, 0)\n    this.acc= p5.Vector.random2D();\n    this.color=color (random(colors))\n    // this.acc.setMag(1)\n  }\n  \n  update(){\n    this.acc.setMag(0.01)\n    this.vel.add(this.acc)\n    this.pos.add(this.vel)\n    this.vel.limit(2)\n    \n    //edges\n    if(this.pos.x<-10){\n      this.pos.x=width+10\n    }\n    if(this.pos.x>width+10){\n      this.pos.x=-10\n    }\n    if(this.pos.y<-10){\n      this.pos.y=height+10\n    }\n    if(this.pos.y>height+10){\n      this.pos.y=-10\n    }\n    \n  }\n  \n  relate(){\n    for(let j=0; j<avoiders.length; j++){\n      let distance = p5.Vector.dist(this.pos, avoiders[j].pos)\n      if(distance < 50){\n         this.pos.rotate(0.2)\n        stroke(this.color)\n        line(this.pos.x, this.pos.y, avoiders[j].pos.x, avoiders[j].pos.y)\n         }\n    }\n    \n  }\n  \n  display(){\n    noStroke()\n    // this.color.setAlpha(255)\n    // stroke(this.color)\n    this.color.setAlpha(255)\n    fill(this.color)\n    ellipse(this.pos.x, this.pos.y, 25)\n    \n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Aaron Reuland (a_ soluble_fish)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1248873",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:08:36",
+    "used_in_videos": [
+        "Substructure 9.mp4",
+        "Gladiator Star Arena.mp4"
+    ],
+    "used_count": 2
+}

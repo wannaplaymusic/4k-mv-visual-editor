@@ -1,0 +1,27 @@
+{
+    "name": "240610_Flame",
+    "code": "// === Tab: mySketch ===\nvar particles;\nvar img = []\nvar n, s, maxR;\nvar indexImg = 0;\n\n\nfunction setup() {\n\t// createCanvas(windowWidth, windowHeight);\n\tcreateCanvas(1000,1000);\n\t\t// pixelDensity(2)\n\t// background(\"#FFEDDA\");\n\t// background(255, 240, 221);\n\t// background(0);\n\tsmooth();\n\t\n\tn = 6000;\n\t// s = 20;\n\ts = 10;\n\tmaxR = height/2 - height/10;\n\t\n\tparticles = [];\n\t\n\t// img.push(loadImage('https://openprocessing.org/sketch/2296619/files/A.jpg'));\n\t// img.push(loadImage('https://openprocessing.org/sketch/2296619/files/B.jpg'));\n\timg.push(loadImage('https://openprocessing.org/sketch/2296619/files/C.jpg'));\n\t// img.push(loadImage('https://openprocessing.org/sketch/2296619/files/D.jpg'));\n\t\n}\n\nfunction draw() {\n\t// background(0,100);\n\ttranslate(width/2, height/2);\n\t// rotate(frameCount/1000+sin(frameCount%100))//Version2\n\trotate(frameCount/50000/sin(10))//Version3\n\tnoStroke();\n\t// addNoise()\n\t// blendMode(LIGHTEST)\n\t// blendMode(MULTIPLY)\n\t\n\tif(s > 1) {\n\t\tif(particles.length != 0) {\n\t\t\tfor(let i = 0; i < particles.length; i++) {\n\t\t\t\tvar p = particles[i];\n\t\t\t\tp.show();\n\t\t\t\tp.move();\n\t\t\t\t\n\t\t\t\tif(p.isDead()) particles.splice(i, 1);\n\t\t\t}\n\t\t} else {\n\t\t\ts -= 2;\n\t\t\tinitParticles();\n\t\t}\n\t}\n}\n\nfunction initParticles() {\t\n\tfor(let i = 0; i < n; i++) {\n\t\tparticles.push(new Particle(maxR, s));\n\t\t\n\t\tvar p = particles[i];\n\t\tvar x = int(map(p.pos.x, -maxR, maxR, 0, img[indexImg].width));\n    var y = int(map(p.pos.y, -maxR, maxR, 0, img[indexImg].height));\n\t\tp.c = img[indexImg].get(x, y);\n\t}\n}\n\n// function mousePressed() {\n// \tindexImg = (indexImg + 1) % img.length;\n// \tsetup();\n// }\n\nclass Particle {\n  \n  constructor(maxR_, s_) {\n    this.s = s_;\n    this.c = \"\";\n    this.maxR = maxR_;\n    \n    // this.life = 100;\n\t\tthis.life = 5000;\n    \n    this.init();\n  }\n  \n  init() {\n    this.pos = p5.Vector.random2D();\n    this.pos.normalize();\n    this.pos.mult(random(2, maxR));\n  \n    this.vel = createVector();\n  }\n\n  show() {\n    fill(this.c);\n    ellipse(this.pos.x, this.pos.y, random(this.s/4),random(this.s/4));\n\t\t // rect(this.pos.x, this.pos.y, this.s, this.s);\n    this.life -= 1;\n  }\n  \n  move() {\n    // var angle = noise(this.pos.x / 400, this.pos.y / 400) * TAU;\n\t\tvar angle = noise(this.pos.x / 50, this.pos.y / 50) * TAU;\n    var fc = frameCount/int(random(100,1000))\n\t\t\n    this.vel.set(cos(angle)/fc*0.125, sin(angle)/fc*0.2);\n    this.vel.mult(0.3);\n    this.pos.add(this.vel);\n  }\n  \n\n  isDead() {\n    var d = dist(random(this.pos.x), random(this.pos.y), random(100,800), random(100,800));\n \n    if(d > this.maxR+1000 || this.life < 1) return true;\n    else return false;\n  }\n}\n\n\n\nfunction keyTyped() {\n  if (key === \"s\" || key === \"S\") {\n    noLoop();\n    saveCanvas(\"Img-001\", \"png\");\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u369620",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2296619",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 16:18:06"
+}

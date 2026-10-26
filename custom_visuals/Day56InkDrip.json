@@ -1,0 +1,24 @@
+{
+    "name": "Day56InkDrip",
+    "code": "// === Tab: sketch192912 ===\nlet cx, cy;\nlet num = 16;\nlet test, w, a;\nlet inkArray = [];\nlet prevPos;\nlet maxSize = [];\nlet opacityArray = []; // New array for opacity\n\nfunction setup() {\n  // Calculate a canvas size that fits the screen while maintaining a 1080:1920 ratio\n  let canvasHeight = window.innerHeight * 0.8;\n  let canvasWidth = (1080 / 1920) * canvasHeight;\n\n  createCanvas(canvasWidth, canvasHeight);\n  background(20, 15, 10); // Sets a solid black background\n  cx = width / 2;\n  cy = height / 2;\n\n  for (let i = 0; i < num; i++) {\n    inkArray[i] = createVector(random(width), 0);a\n    maxSize[i] = random(height);\n    opacityArray[i] = random(50, 255); // Initialize opacity for each drip\n  }\n}\n\nfunction draw() {\n  // We do not clear the background here, so the previous lines will remain.\n\n  for (let i = 0; i < num; i++) {\n    // Save the previous position\n    prevPos = inkArray[i].copy();\n\n    // Update the position\n    inkArray[i].x += random(-0.5, 0.5);\n\n    inkArray[i].y += random(4);\n    w = abs(maxSize[i] / (inkArray[i].y + 18));\n    a = map(inkArray[i].y, maxSize[i], 0, 0, 200);\n\n    strokeWeight(w + 3);\n    stroke(255, 180, 100, opacityArray[i]); // Use the individual opacity value\n\n    if (inkArray[i].y < maxSize[i]) {\n      line(prevPos.x, prevPos.y, inkArray[i].x, inkArray[i].y);\n    } else {\n      // When the drip resets, also reset its opacity\n      inkArray[i] = createVector(random(-100, 100) + cx, 0);\n      maxSize[i] = random(height);\n      opacityArray[i] = random(50, 255); // Reset opacity\n    }\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "tiantianxu",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2810895",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:02:24",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

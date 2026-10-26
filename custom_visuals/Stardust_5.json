@@ -1,0 +1,31 @@
+{
+    "name": "Stardust",
+    "code": "// === Tab: mySketch ===\n// The particle of index 0 is related to the position of the mouse.\n\nvar particlesQuantity = 8000; // 18000\n\nvar positionX = new Array(particlesQuantity);\nvar positionY = new Array(particlesQuantity);\nvar velocityX = new Array(particlesQuantity).fill(0);\nvar velocityY = new Array(particlesQuantity).fill(0);\n\nconst drag = 0.96;\n\n// const falloff_intensity = 400;\n//let falloff_curve = x => 0.2*pow(exp(-(x / falloff_intensity) ^ 2) , 0.25); // bell curve\n//const area_of_influence = 30;\n//let falloff_curve = x => 0.6 * area_of_influence * Math.tanh(1 / (x / area_of_influence));\nconst area_of_influence = 60;\nlet falloff_curve = x => area_of_influence * ( Math.tanh(Math.log(1 / (x / area_of_influence))) + 1);\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tstroke(64, 255, 255);\n\t//strokeWeight(5);\n\n\tfor (var particle = 1; particle < particlesQuantity; particle++) {\n\t\tpositionX[particle] = random(0, width);\n\t\tpositionY[particle] = random(0, height);\n\t}\n\n\tpositionX[0] = 0;\n\tpositionY[0] = 0;\n}\n\nfunction draw() {\n\t//blendMode(BLEND)\n\tbackground(0, 50)\n\t//blendMode(ADD)\n\n\tvelocityX[0] = velocityX[0] * 0.5 + ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - positionX[0]) * 0.3;\n\tvelocityY[0] = velocityY[0] * 0.5 + ((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - positionY[0]) * 0.3;\n\n\tpositionX[0] += velocityX[0];\n\tpositionY[0] += velocityY[0];\n\n\tfor (var particle = 1; particle < particlesQuantity; particle++) {\n\t\tconst falloff = falloff_curve(sq(positionX[0] - positionX[particle]) + sq(positionY[0] - positionY[particle]));\n\n\t\tvelocityX[particle] = velocityX[particle] * drag + (velocityX[0] - velocityX[particle]) * falloff //* random()\n\t\tvelocityY[particle] = velocityY[particle] * drag + (velocityY[0] - velocityY[particle]) * falloff //* random()\n\n\t\tpositionX[particle] += 1.5 * velocityX[particle];\n\t\tpositionY[particle] += 1.5 * velocityY[particle];\n\n\t\t// loop position\n\t\tif (positionX[particle] < 0 && velocityX[particle] < 0) {\n\t\t\t//velocityX[particle] = -velocityX[particle];\n\t\t\tpositionX[particle] = width;\n\t\t}\n\n\t\tif (positionY[particle] < 0 && velocityY[particle] < 0) {\n\t\t\t//velocityY[particle] = -velocityY[particle];\n\t\t\tpositionY[particle] = height;\n\t\t}\n\n\t\tif (positionX[particle] > width && velocityX[particle] > 0) {\n\t\t\t//velocityX[particle] = -velocityX[particle];\n\t\t\tpositionX[particle] = 0;\n\t\t}\n\n\t\tif (positionY[particle] > height && velocityY[particle] > 0) {\n\t\t\t//velocityY[particle] = -velocityY[particle];\n\t\t\tpositionY[particle] = 0;\n\t\t}\n\n\t\t// draw the particles\n\t\tpoint(positionX[particle], positionY[particle]);\n\t}\n\n\t/*\n\t// random displacements\n\tfor (let i = 0; i < 0.1 * particlesQuantity; i++) {\n\t\tconst k = floor(random(1, particlesQuantity));\n\t\tpositionX[k] = random(0, width);\n\t\tpositionY[k] = random(0, height);\n\t}\n\t*/\n}\n\nfunction mousePressed() {\n\tfor (var particle = 1; particle < particlesQuantity; particle++) {\n\t\tpositionX[particle] = random(0, width);\n\t\tpositionY[particle] = random(0, height);\n\t\tvelocityX[particle] = 0;\n\t\tvelocityY[particle] = 0;\n\t}\n\tstroke(random(100, 255), random(100, 255), random(100, 255));\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "tylu",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/983580",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:33:38",
+    "used_in_videos": [
+        "Echoes in Suspension.mp4"
+    ],
+    "used_count": 1
+}

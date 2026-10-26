@@ -1,29 +1,30 @@
 {
-  "name": "simplefeedbacktutorialusingget",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(20);\n}\n\nfunction draw() {\n\tlet g=get()\n\timage(g, 0, 0, width, height*0.99)\n\tnoFill()\n\tstroke(250)\n\tbeginShape()\n\tfor(let a=0; a<TAU; a+=TAU/200){\n\t\tlet r= noise(sin(a), cos(a), frameCount/100)*height*0.333\n\t\tvertex(width/2+ sin(frameCount/100)*width/5+ sin(a)*r, height*0.666+cos(a)*r)\n\t}\n\t\n\tendShape()\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Aaron Reuland (a_ soluble_fish)",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@a_soluble_fish/2239520",
-  "date_added": "2026-07-06 22:05:12",
-  "scaling_mode": "auto",
-  "used_in_videos": [
-    "Mental Drift.mp4",
-    "Prime Anchor.mp4",
-    "Blue Hour Resonance.mp4",
-    "Echo Directive.mp4",
-    "Monolithic Interval.mp4",
-    "Vacuum Memory.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 7
+    "name": "simplefeedbacktutorialusingget",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(20);\n}\n\nfunction draw() {\n\tlet g=get()\n\timage(g, 0, 0, width, height*0.99)\n\tnoFill()\n\tstroke(250)\n\tbeginShape()\n\tfor(let a=0; a<TAU; a+=TAU/200){\n\t\tlet r= noise(sin(a), cos(a), frameCount/100)*height*0.333\n\t\tvertex(width/2+ sin(frameCount/100)*width/5+ sin(a)*r, height*0.666+cos(a)*r)\n\t}\n\t\n\tendShape()\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Aaron Reuland (a_ soluble_fish)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@a_soluble_fish/2239520",
+    "date_added": "2026-07-06 22:05:12",
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Mental Drift.mp4",
+        "Prime Anchor.mp4",
+        "Blue Hour Resonance.mp4",
+        "Echo Directive.mp4",
+        "Monolithic Interval.mp4",
+        "Vacuum Memory.mp4",
+        "Ultimate Core Patterns.mp4",
+        "Meteor Core Berserker.mp4"
+    ],
+    "used_count": 8
 }

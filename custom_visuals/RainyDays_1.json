@@ -1,0 +1,24 @@
+{
+    "name": "RainyDays",
+    "code": "// === Tab: mySketch ===\n//New Store Link: https://joescodeart.etsy.com\n//Music by <a href=\"https://pixabay.com/users/juliush-3921568/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=7804\">Julius H.</a> from <a href=\"https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=7804\">Pixabay</a>\nfunction preload()\n{\n\tsoundFormats('mp3', \"wav\");\n  song = loadSound('https://openprocessing.org/sketch/2138012/files/rain.mp3');//load song\n}\nfunction setup() \n{\n\tbackground(0);\n\tsong.play()\n  amp = new p5.Amplitude();\n\tsong.loop()\n  createCanvas(1900, 1000);\n\tfor(i=0;i<100;i++)\n\t{\n\t\t eval(\"leWave\"+i+\"=createleWave(\"+i+\");\")\n\t}\n}\n\nfunction draw() \n{\n\tvar vol = amp.getLevel();\n  volumeLevel = round(map(vol, 0, 0.3,5, 60));\n\tframeRate(volumeLevel)\n\tfor(i=0;i<100;i++)\n\t{\n\t\t\t eval(\"updateleWave(leWave\"+i+\");\")\n\t}\n}\n\nfunction createleWave(i)\n{\n    let leWave={}\n\t\tleWave.xspacing = 15; // Distance between each horizontal location\n\t\tleWave.w; // Width of entire wave\n\t\tleWave.theta = 0.0; // Start angle at 0\n\t\tleWave.amplitude = 35.0; // Height of wave\n\t\tleWave.period = 500.0; // How many pixels before the wave repeats\n\t\tleWave.dx; // Value for incrementing x\n\t\tleWave.yvalues; // Using an array to store height values for the wave\n\t\tleWave.w = width + 16;\n\t\tleWave.dx = (TWO_PI / leWave.period) * leWave.xspacing;\n\t\tleWave.yvalues = new Array(floor(leWave.w / leWave.xspacing));\n\t\tleWave.x=random(10)\n\t\tleWave.r=random(10)\n\t\tleWave.y=random(-500,500)\n\t\tleWave.r1=random(255)\n\t\tleWave.g1=random(0)\n\t\tleWave.b1=random(255)\n\t\treturn leWave\n}\n\n\nfunction updateleWave(leWave)\n{\n  leWave.theta += 0.08;\n\n  // For every x value, calculate a y value with tan function\n  let x = leWave.theta;\n  for (let i = 0; i < leWave.yvalues.length; i++) \n\t{\n    leWave.yvalues[i] = tan(x) * leWave.amplitude+leWave.y;\n    x += leWave.dx+leWave.x;\n  }\n  noStroke();\n  fill(leWave.r1,leWave.g1,leWave.b1,leWave.b1);\n  // A simple way to draw the wave with an ellipse at each location\n  for (let x = 0; x < leWave.yvalues.length; x++) {\n    ellipse(x * leWave.xspacing, height / 2 + leWave.yvalues[x], leWave.r+random(10));\n  }\n}\n\n\n\n\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Joe DeNavas (DD89)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2138012",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:29:10",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,24 @@
+{
+    "name": "SuperPixelLand",
+    "code": "// === Tab: mySketch ===\nsetup = function() {\n\tsize(400,400);\n\tbackground(0);\n\tloadPixels();\n    var px=this.imageData.data,bpx;\n    if (true) { bpx=px.slice(0); }\n\tangleMode = \"radians\";\n\tvar scaling = 0.8,\n\t\te = [],\n\t\ts = 150,\n\t\tpn = 100,\n\t\ta = (s * 2) / pn,\n\t\tps = ceil(a * 1.2),\n\t\tr = ~~random(0, 10e6);\n\tvar getNoC = function(y) {\n\t   \n\t\tif (y >= 22) {\n\t\t\treturn color(0, 76, 102);\n\t\t}\n\t\tif (y >= 4) {\n\t\t\treturn color(222, 188, 17);\n\t\t}\n\t\tif (y >= -20) {\n\t\t\treturn color(0, 255, 0);\n\t\t}\n\t\tif (y >= -50) {\n\t\t\treturn color(145, 145, 145);\n\t\t}\n\t\treturn color(255, 255, 255);\n\t\t\n\t};\n\tvar E = [];\n\tfor (var i = 0; i < pn; i++) {\n\t\tE.push([]);\n\t}\n\t\n\tvar _Y = 0;\n\tfor (var Y = -s; Y < s; Y += a) {\n\t\tvar _X = 0;\n\t\tfor (var X = -s; X < s; X += a) {\n\t\t\tvar n = map(noise((X + r) / 120, (Y + r) / 120), 0, 1, -250, 250);\n\t\t\tn += dist(X, Y, -0, 0) * 0.1;\n\t\t\tE[_Y][_X] = {\n\t\t\t\tx: ~~X,\n\t\t\t\ty: ~~0 + (n * 1),\n\t\t\t\tz: Y + random(),\n\t\t\t\tc: getNoC(n)\n\t\t\t};\n\t\t\tvar c = E[_Y][_X].c;\n\t\t\tif (_Y === 0 || _Y === pn - 1 || _X === 0 || _X === pn - 1) {\n\t\t\t\tc = color(1);\n\t\t\t} else\n\t\t\tif (E[_Y][_X].y < 22) {\n\t\t\t\tif (_Y < pn - 1 && _Y !== 0) {\n\t\t\t\t\tvar sh = ((E[_Y - 1][_X].y) - (E[_Y][_X].y)) * 0.15;\n\t\t\t\t\tc = lerpColor(c, 0, constrain(sh, 0, 0.7));\n\t\t\t\t\tc = lerpColor(c, -1, constrain(-sh, 0, 0.6));\n\t\t\t\t}\n\t\t\t} else\n\t\t\tif (E[_Y][_X].y <= 45) {\n\t\t\t\tif (_Y < pn - 1 && _Y !== 0) {\n\t\t\t\t\tc = lerpColor(color(0, 192, 255), 0, constrain(-map(E[_Y][_X].y, 0, 28, 1, 0), 0, 0.6));\n\t\t\t\t}\n\t\t\t} else\n\t\t\tif (E[_Y][_X].y <= 60) {\n\t\t\t\tc = color(1);\n\t\t\t}\n\t\t\tE[_Y][_X].c = blue(c) << 16 | green(c) << 8 | red(c);\n\t\t\t_X++;\n\t\t}\n\t\t_Y++;\n\t}\n\n\tvar i = 0;\n\tfor (var Y = 0; Y < pn; Y++) {\n\t\tfor (var X = 0; X < pn; X++) {\n\t\t\tE[X][Y].y = constrain(E[X][Y].y, -1000, 23);\n\t\t\tif (E[X][Y].c !== 6704128) {\n\t\t\t\te[i] = E[X][Y];\n\t\t\t\ti++;\n\t\t\t}\n\t\t}\n\t}\n\tvar aa = 0;\n\tframeRate(60);\n\tthis.draw = function() {\n\t\tpx.set(bpx);\n\t\tvar ts = 0.01 + map(this.__frameRate, 0, 60, 0, 0.01);\n\t\tvar r = ps * scaling,\n\t\t\tyaw = ts,\n\t\t\tpitch = 0;\n\n\t\tscaling = constrain(scaling, 0.5, 3);\n\t\tvar sx = sin(yaw),\n\t\t\tcx = cos(yaw),\n\t\t\tsy = sin(pitch),\n\t\t\tcy = cos(pitch);\n            aa += yaw;\n            if(round(aa%1.5)===1){\n                aa=0;\n                e = e.sort(function(av, bv) {\n                    return (av.z - bv.z);\n                });\n            }\n\t\tvar lb = 0,rb = 0,l = 0;\n\t\tfor (var j in e) {\n\t\t\tvar i = j;\n\t\t\tvar x = e[i].x,\n\t\t\t\ty = e[i].y,\n\t\t\tz = e[i].z;\n\t\t\tx = x * cx + z * sx;\n\t\t\tz = z * cx - e[i].x * sx;\n\t\t\ty = y * cy + z * sy;\n\t\t\tz = z * cy - e[i].y * sy;\n\t\t\te[i].x = x;\n\t\t\te[i].y = y;\n\t\t\te[i].z = z;\n\t\t\tc = e[i].c;\n\t\t\tx = ~~(200 + x * scaling);\n\t\t\ty = ~~((-z / 2) + 200 + y * scaling);\n\t\t\tl |= 0;\n\t\t\trb |= 0;\n\t\t\tlb |= 0;\n\t\t\trb = x + r;\n\t\t\tif (rb > 400) {\n\t\t\t\trb = 400;\n\t\t\t}\n\t\t\tlb = x;\n\t\t\tif (lb < 0) {\n\t\t\t\tlb = 0;\n\t\t\t}\n\t\t\tfor (var k = lb; k < rb; k++) {\n\t\t\t\tvar _y = 0;\n\t\t\t\tl = k + y * 400 << 2;\n\t\t\t\twhile (_y < 100) {\n\t\t\t\t\tif ( px[l + 1] !== 0) {\n\t\t\t\t\t\t_y = 1000;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tpx[l] = c & 255;\n\t\t\t\t\t\tpx[l + 1] = c >> 8 & 255;\n\t\t\t\t\t\tpx[l + 2] = c >> 16 & 255;\n\t\t\t\t\t}\n\t\t\t\t\t_y++;\n\t\t\t\t\tl += 1600;\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tupdatePixels();\n\t\tfill(255, 0, 0);\n\t\ttext(~~this.__frameRate, 10, 10);\n\t};\n};\nsetup();\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Tazal",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/671904",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:14:04",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

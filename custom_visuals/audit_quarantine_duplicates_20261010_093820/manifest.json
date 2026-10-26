@@ -1,0 +1,4634 @@
+{
+    "timestamp": "20261010_093820",
+    "quarantine_directory": "/Users/unclerm/Vibe Coding/4K MV Visual Integration Editor/custom_visuals/audit_quarantine_duplicates_20261010_093820",
+    "total_scanned_before": 5361,
+    "total_kept_unique": 5006,
+    "total_quarantined": 355,
+    "total_quarantined_thumbnails": 353,
+    "duplicate_groups_count": 161,
+    "groups": [
+        {
+            "canonical_file": "0238_1.json",
+            "canonical_name": "0238",
+            "canonical_url": "https://openprocessing.org/sketch/1108281",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "0238_2.json",
+                    "name": "0238",
+                    "url": "https://openprocessing.org/sketch/1064874",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "20250926.json",
+            "canonical_name": "20250926",
+            "canonical_url": "https://openprocessing.org/sketch/2735840",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ShaderPsychedelicSpiral.json",
+                    "name": "ShaderPsychedelicSpiral",
+                    "url": "https://openprocessing.org/sketch/2588861",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ShaderPsychedelicSpiral_1.json",
+                    "name": "ShaderPsychedelicSpiral",
+                    "url": "https://openprocessing.org/sketch/2505996",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ShaderPsychedelicSpiral_2.json",
+                    "name": "ShaderPsychedelicSpiral",
+                    "url": "https://openprocessing.org/sketch/2531278",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ShaderPsychedelicSpiral_3.json",
+                    "name": "ShaderPsychedelicSpiral",
+                    "url": "https://openprocessing.org/sketch/2488135",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "2405152.json",
+            "canonical_name": "2405152",
+            "canonical_url": "https://openprocessing.org/sketch/2486422",
+            "merged_used_in": [
+                "Dimensional Haze.mp4",
+                "Phantom Platform.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "2405152_1.json",
+                    "name": "2405152",
+                    "url": "https://openprocessing.org/sketch/2272267",
+                    "used_count": 1,
+                    "used_in": [
+                        "Phantom Platform.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "2512CellularAutomata.json",
+            "canonical_name": "2512CellularAutomata",
+            "canonical_url": "https://openprocessing.org/sketch/2961557",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "2512CellularAutomata_1.json",
+                    "name": "2512CellularAutomata",
+                    "url": "https://openprocessing.org/sketch/2791954",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "2512CellularAutomata_2.json",
+                    "name": "2512CellularAutomata",
+                    "url": "https://openprocessing.org/sketch/1611064",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "2AM.json",
+            "canonical_name": "2AM",
+            "canonical_url": "https://openprocessing.org/sketch/648903",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "2AM_1.json",
+                    "name": "2AM",
+                    "url": "https://openprocessing.org/sketch/701898",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "2AM_2.json",
+                    "name": "2AM",
+                    "url": "https://openprocessing.org/sketch/707507",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "2AM_3.json",
+            "canonical_name": "2AM",
+            "canonical_url": "https://openprocessing.org/sketch/666100",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "2AM_5.json",
+                    "name": "2AM",
+                    "url": "https://openprocessing.org/sketch/663495",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "2AM_6.json",
+                    "name": "2AM",
+                    "url": "https://openprocessing.org/sketch/668670",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "2AM_7.json",
+                    "name": "2AM",
+                    "url": "https://openprocessing.org/sketch/672339",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Oil.json",
+            "canonical_name": "Oil",
+            "canonical_url": "https://openprocessing.org/sketch/1524527",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "2_2.json",
+                    "name": "2",
+                    "url": "https://openprocessing.org/sketch/1985363",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "2_3.json",
+                    "name": "2",
+                    "url": "https://openprocessing.org/sketch/1956535",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Oil_2.json",
+                    "name": "Oil",
+                    "url": "https://openprocessing.org/sketch/1170129",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Rule.json",
+                    "name": "Rule",
+                    "url": "https://openprocessing.org/sketch/892725",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Zebra.json",
+                    "name": "Zebra",
+                    "url": "https://openprocessing.org/sketch/892960",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Stainless.json",
+                    "name": "Stainless",
+                    "url": "https://openprocessing.org/sketch/1159077",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Oil_3.json",
+                    "name": "Oil",
+                    "url": "https://openprocessing.org/sketch/1035994",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Oil_4.json",
+                    "name": "Oil",
+                    "url": "https://openprocessing.org/sketch/996308",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Oil_7.json",
+                    "name": "Oil",
+                    "url": "https://openprocessing.org/sketch/892371",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Ink_35.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1027126",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Ink_36.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1008613",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Ink_37.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/892979",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Inferior_2.json",
+                    "name": "Inferior",
+                    "url": "https://openprocessing.org/sketch/893686",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "FireGlass_3.json",
+                    "name": "FireGlass",
+                    "url": "https://openprocessing.org/sketch/894949",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Glasswall_1.json",
+                    "name": "Glasswall",
+                    "url": "https://openprocessing.org/sketch/896913",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Stainless_1.json",
+                    "name": "Stainless",
+                    "url": "https://openprocessing.org/sketch/895971",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "3_1.json",
+            "canonical_name": "3",
+            "canonical_url": "https://openprocessing.org/sketch/2457588",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Face2.json",
+                    "name": "Face2",
+                    "url": "https://openprocessing.org/sketch/2157043",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Face2_1.json",
+                    "name": "Face2",
+                    "url": "https://openprocessing.org/sketch/1716661",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Absoluteinfinitemagicroom.json",
+            "canonical_name": "Absoluteinfinitemagicroom",
+            "canonical_url": "https://openprocessing.org/sketch/2337969",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Magicroombackgroundforfictionalgoogology.json",
+                    "name": "Magicroombackgroundforfictionalgoogology",
+                    "url": "https://openprocessing.org/sketch/2334493",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Staywoke.json",
+            "canonical_name": "Staywoke",
+            "canonical_url": "https://openprocessing.org/sketch/2974978",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "blackhole.json",
+                    "name": "blackhole",
+                    "url": "https://openprocessing.org/sketch/2973172",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "AccretionbyXor_1.json",
+                    "name": "AccretionbyXor",
+                    "url": "https://openprocessing.org/sketch/2936267",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "AccretionbyXor_2.json",
+                    "name": "AccretionbyXor",
+                    "url": "https://openprocessing.org/sketch/2925992",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "AccretionbyXor_3.json",
+                    "name": "AccretionbyXor",
+                    "url": "https://openprocessing.org/sketch/2709835",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "AccretionbyXor_4.json",
+                    "name": "AccretionbyXor",
+                    "url": "https://openprocessing.org/sketch/2713629",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "AccretionbyXor_5.json",
+                    "name": "AccretionbyXor",
+                    "url": "https://openprocessing.org/sketch/2696126",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Attractor100.json",
+            "canonical_name": "Attractor100",
+            "canonical_url": "https://openprocessing.org/sketch/1221406",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Attractor0_17.json",
+                    "name": "Attractor0",
+                    "url": "https://openprocessing.org/sketch/673738",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Billit7.json",
+            "canonical_name": "Billit7",
+            "canonical_url": "https://openprocessing.org/sketch/2302760",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ParticlestexteffectsSTAYCONNECT_2.json",
+                    "name": "ParticlestexteffectsSTAYCONNECT",
+                    "url": "https://openprocessing.org/sketch/2324807",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ParticlestexteffectsSTAYCONNECT_4.json",
+                    "name": "ParticlestexteffectsSTAYCONNECT",
+                    "url": "https://openprocessing.org/sketch/2264032",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Blorb.json",
+            "canonical_name": "Blorb",
+            "canonical_url": "https://openprocessing.org/sketch/2022540",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "gradientshader_1.json",
+                    "name": "gradientshader",
+                    "url": "https://openprocessing.org/sketch/1908393",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "BlobSchneiderShader_3.json",
+                    "name": "BlobSchneiderShader",
+                    "url": "https://openprocessing.org/sketch/2059469",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "BlobSchneiderShader_5.json",
+                    "name": "BlobSchneiderShader",
+                    "url": "https://openprocessing.org/sketch/1824639",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "BlobSchneiderShader_7.json",
+                    "name": "BlobSchneiderShader",
+                    "url": "https://openprocessing.org/sketch/1732356",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "BlobSchneiderShader_9.json",
+                    "name": "BlobSchneiderShader",
+                    "url": "https://openprocessing.org/sketch/1707183",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "BlobSchneiderShader_10.json",
+                    "name": "BlobSchneiderShader",
+                    "url": "https://openprocessing.org/sketch/1691356",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "BlobSchneiderShader_11.json",
+                    "name": "BlobSchneiderShader",
+                    "url": "https://openprocessing.org/sketch/1642664",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "BlobSchneiderShader_13.json",
+                    "name": "BlobSchneiderShader",
+                    "url": "https://openprocessing.org/sketch/1638178",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "BlobSchneiderShader_4.json",
+                    "name": "BlobSchneiderShader",
+                    "url": "https://openprocessing.org/sketch/1962234",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "BoxedupNoise.json",
+            "canonical_name": "BoxedupNoise",
+            "canonical_url": "https://openprocessing.org/sketch/2064573",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "BoxedupNoise_1.json",
+                    "name": "BoxedupNoise",
+                    "url": "https://openprocessing.org/sketch/1766486",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Boxedupnoise_2.json",
+            "canonical_name": "Boxedupnoise",
+            "canonical_url": "https://openprocessing.org/sketch/1765913",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Boxedupnoise_3.json",
+                    "name": "Boxedupnoise",
+                    "url": "https://openprocessing.org/sketch/1572118",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "CanadaFlagPointCloud.json",
+            "canonical_name": "CanadaFlagPointCloud",
+            "canonical_url": "https://openprocessing.org/sketch/2546553",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "CanadaFlagPointCloud_1.json",
+                    "name": "CanadaFlagPointCloud",
+                    "url": "https://openprocessing.org/sketch/1624946",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "ChainBrush.json",
+            "canonical_name": "ChainBrush",
+            "canonical_url": "https://openprocessing.org/sketch/1945884",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ChainBrush_2.json",
+                    "name": "ChainBrush",
+                    "url": "https://openprocessing.org/sketch/1614378",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Clock_2.json",
+            "canonical_name": "Clock",
+            "canonical_url": "https://openprocessing.org/sketch/1085903",
+            "merged_used_in": [
+                "Negative Delay Chamber.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Clock.json",
+                    "name": "Clock",
+                    "url": "https://openprocessing.org/sketch/2035912",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Clock_1.json",
+                    "name": "Clock",
+                    "url": "https://openprocessing.org/sketch/1605683",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Clock_3.json",
+                    "name": "Clock",
+                    "url": "https://openprocessing.org/sketch/1044606",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ClockTimeHagia315_1.json",
+            "canonical_name": "ClockTimeHagia315",
+            "canonical_url": "https://openprocessing.org/sketch/1988362",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ClockTimeHagia315_2.json",
+                    "name": "ClockTimeHagia315",
+                    "url": "https://openprocessing.org/sketch/1988375",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "CobaCoba.json",
+            "canonical_name": "CobaCoba",
+            "canonical_url": "https://openprocessing.org/sketch/1988386",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "SteeringBehaviorText_5.json",
+                    "name": "SteeringBehaviorText",
+                    "url": "https://openprocessing.org/sketch/1988369",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "ColorfulRingsNoise.json",
+            "canonical_name": "ColorfulRingsNoise",
+            "canonical_url": "https://openprocessing.org/sketch/2221665",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ColorfulRingsNoise_1.json",
+                    "name": "ColorfulRingsNoise",
+                    "url": "https://openprocessing.org/sketch/2157085",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ColorfulRingsNoise_2.json",
+                    "name": "ColorfulRingsNoise",
+                    "url": "https://openprocessing.org/sketch/2074753",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ColorfulRingsNoise_4.json",
+                    "name": "ColorfulRingsNoise",
+                    "url": "https://openprocessing.org/sketch/1967502",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "ColorfulSmoke_4.json",
+            "canonical_name": "ColorfulSmoke",
+            "canonical_url": "https://openprocessing.org/sketch/981210",
+            "merged_used_in": [
+                "Authentic Essence Energy.mp4",
+                "Berlin Depth Module.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ColorfulSmoke_5.json",
+                    "name": "ColorfulSmoke",
+                    "url": "https://openprocessing.org/sketch/993831",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "LightningDrop.json",
+            "canonical_name": "LightningDrop",
+            "canonical_url": "https://openprocessing.org/sketch/1624078",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "DragonScale_gaz.json",
+                    "name": "DragonScale_gaz",
+                    "url": "https://openprocessing.org/sketch/1161002",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Colors_1.json",
+                    "name": "Colors",
+                    "url": "https://openprocessing.org/sketch/1218673",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "LightningDrop_1.json",
+                    "name": "LightningDrop",
+                    "url": "https://openprocessing.org/sketch/1196690",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Ice.json",
+                    "name": "Ice",
+                    "url": "https://openprocessing.org/sketch/900657",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Time.json",
+                    "name": "Time",
+                    "url": "https://openprocessing.org/sketch/898246",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "LastBoss.json",
+                    "name": "LastBoss",
+                    "url": "https://openprocessing.org/sketch/897935",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Metallic.json",
+                    "name": "Metallic",
+                    "url": "https://openprocessing.org/sketch/903796",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "GoldenMagma.json",
+                    "name": "GoldenMagma",
+                    "url": "https://openprocessing.org/sketch/1035990",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Sun_1.json",
+                    "name": "Sun",
+                    "url": "https://openprocessing.org/sketch/904502",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Colors_2.json",
+                    "name": "Colors",
+                    "url": "https://openprocessing.org/sketch/980212",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Colors_3.json",
+                    "name": "Colors",
+                    "url": "https://openprocessing.org/sketch/897589",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "IceTea_2.json",
+                    "name": "IceTea",
+                    "url": "https://openprocessing.org/sketch/903260",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "DragonScale_2.json",
+                    "name": "DragonScale",
+                    "url": "https://openprocessing.org/sketch/898889",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "GlassGarden_2.json",
+                    "name": "GlassGarden",
+                    "url": "https://openprocessing.org/sketch/899770",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "GoldenMagma_1.json",
+                    "name": "GoldenMagma",
+                    "url": "https://openprocessing.org/sketch/902415",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "LightningDrop_3.json",
+                    "name": "LightningDrop",
+                    "url": "https://openprocessing.org/sketch/902304",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "LightningCorrosion_2.json",
+                    "name": "LightningCorrosion",
+                    "url": "https://openprocessing.org/sketch/902826",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Edgemetalandfrostedglass_3.json",
+                    "name": "Edgemetalandfrostedglass",
+                    "url": "https://openprocessing.org/sketch/963039",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Edgemetalandfrostedglass_4.json",
+                    "name": "Edgemetalandfrostedglass",
+                    "url": "https://openprocessing.org/sketch/904039",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Lightningcorrosiongravity_2.json",
+                    "name": "Lightningcorrosiongravity",
+                    "url": "https://openprocessing.org/sketch/963037",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Lightningcorrosiongravity_3.json",
+                    "name": "Lightningcorrosiongravity",
+                    "url": "https://openprocessing.org/sketch/905410",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "CornellForwardTrace.json",
+            "canonical_name": "CornellForwardTrace",
+            "canonical_url": "https://openprocessing.org/sketch/1968308",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "cornellforwardtrace_1.json",
+                    "name": "cornellforwardtrace",
+                    "url": "https://openprocessing.org/sketch/1606172",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "CovidPledge.json",
+            "canonical_name": "CovidPledge",
+            "canonical_url": "https://openprocessing.org/sketch/1232532",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "CovidPledge_1.json",
+                    "name": "CovidPledge",
+                    "url": "https://openprocessing.org/sketch/931312",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "CrazyColorsChladnipatterns.json",
+            "canonical_name": "CrazyColorsChladnipatterns",
+            "canonical_url": "https://openprocessing.org/sketch/2510985",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "CrazyColorsChladnipatterns_1.json",
+                    "name": "CrazyColorsChladnipatterns",
+                    "url": "https://openprocessing.org/sketch/2334874",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "CrazyColorsChladnipatterns_2.json",
+                    "name": "CrazyColorsChladnipatterns",
+                    "url": "https://openprocessing.org/sketch/2336867",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "CurlNoise.json",
+            "canonical_name": "CurlNoise",
+            "canonical_url": "https://openprocessing.org/sketch/2006924",
+            "merged_used_in": [
+                "Depth Regulation.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "CurlNoise_2.json",
+                    "name": "CurlNoise",
+                    "url": "https://openprocessing.org/sketch/1866346",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "RecursiveTetrahedro.json",
+            "canonical_name": "RecursiveTetrahedro",
+            "canonical_url": "https://openprocessing.org/sketch/1185394",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "DragonScale_1.json",
+                    "name": "DragonScale",
+                    "url": "https://openprocessing.org/sketch/1161045",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "LightningCorrosion_1.json",
+                    "name": "LightningCorrosion",
+                    "url": "https://openprocessing.org/sketch/1185391",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Liquid.json",
+            "canonical_name": "Liquid",
+            "canonical_url": "https://openprocessing.org/sketch/2944767",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Eatwater.json",
+                    "name": "Eatwater",
+                    "url": "https://openprocessing.org/sketch/2572214",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Liquid_1.json",
+                    "name": "Liquid",
+                    "url": "https://openprocessing.org/sketch/2646784",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Liquid_2.json",
+                    "name": "Liquid",
+                    "url": "https://openprocessing.org/sketch/2504371",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Eatwater_1.json",
+                    "name": "Eatwater",
+                    "url": "https://openprocessing.org/sketch/2491832",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "IceTea.json",
+            "canonical_name": "IceTea",
+            "canonical_url": "https://openprocessing.org/sketch/1159076",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Edgemetalandfrostedglass_2.json",
+                    "name": "Edgemetalandfrostedglass",
+                    "url": "https://openprocessing.org/sketch/1159075",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ElectronSimulator10.json",
+            "canonical_name": "ElectronSimulator10",
+            "canonical_url": "https://openprocessing.org/sketch/1184538",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ElectronSimulator10_1.json",
+                    "name": "ElectronSimulator10",
+                    "url": "https://openprocessing.org/sketch/1055289",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "MAR.json",
+            "canonical_name": "MAR",
+            "canonical_url": "https://openprocessing.org/sketch/2571956",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Eroded.json",
+                    "name": "Eroded",
+                    "url": "https://openprocessing.org/sketch/2596863",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Eroded_1.json",
+                    "name": "Eroded",
+                    "url": "https://openprocessing.org/sketch/2587630",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "dino.json",
+            "canonical_name": "dino",
+            "canonical_url": "https://openprocessing.org/sketch/1984123",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Face4.json",
+                    "name": "Face4",
+                    "url": "https://openprocessing.org/sketch/2431748",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Face3a.json",
+                    "name": "Face3a",
+                    "url": "https://openprocessing.org/sketch/2712111",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "FSfacecrurl.json",
+                    "name": "FSfacecrurl",
+                    "url": "https://openprocessing.org/sketch/2315084",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Face3_1.json",
+                    "name": "Face3",
+                    "url": "https://openprocessing.org/sketch/2428791",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Face3_2.json",
+                    "name": "Face3",
+                    "url": "https://openprocessing.org/sketch/2312871",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Face3_3.json",
+                    "name": "Face3",
+                    "url": "https://openprocessing.org/sketch/2305813",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Face3_4.json",
+                    "name": "Face3",
+                    "url": "https://openprocessing.org/sketch/2026104",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Face3_5.json",
+                    "name": "Face3",
+                    "url": "https://openprocessing.org/sketch/1951787",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Portrait_5.json",
+                    "name": "Portrait_5",
+                    "url": "https://openprocessing.org/sketch/2600113",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Face3_7.json",
+                    "name": "Face3",
+                    "url": "https://openprocessing.org/sketch/1878176",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Face3_12.json",
+                    "name": "Face3",
+                    "url": "https://openprocessing.org/sketch/1779413",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "FaceNebenan.json",
+            "canonical_name": "FaceNebenan",
+            "canonical_url": "https://openprocessing.org/sketch/2975709",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "TheFairyTruthFather.json",
+                    "name": "TheFairyTruthFather",
+                    "url": "https://openprocessing.org/sketch/1870438",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Face3_11.json",
+                    "name": "Face3",
+                    "url": "https://openprocessing.org/sketch/1799263",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Face3_16.json",
+                    "name": "Face3",
+                    "url": "https://openprocessing.org/sketch/1717043",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "jennie2.json",
+            "canonical_name": "jennie2",
+            "canonical_url": "https://openprocessing.org/sketch/1936378",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Face3_14.json",
+                    "name": "Face3",
+                    "url": "https://openprocessing.org/sketch/1767687",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Face4_1.json",
+            "canonical_name": "Face4",
+            "canonical_url": "https://openprocessing.org/sketch/1959952",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Face4_2.json",
+                    "name": "Face4",
+                    "url": "https://openprocessing.org/sketch/1852836",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Faceskid_1.json",
+            "canonical_name": "Faceskid",
+            "canonical_url": "https://openprocessing.org/sketch/2689455",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Faceskid_2.json",
+                    "name": "Faceskid",
+                    "url": "https://openprocessing.org/sketch/2587238",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "FireworksPartIVExplosionCont_1.json",
+            "canonical_name": "FireworksPartIVExplosionCont",
+            "canonical_url": "https://openprocessing.org/sketch/1538291",
+            "merged_used_in": [
+                "Arctic Delay Lines.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "FireworksPartIVExplosionCont.json",
+                    "name": "FireworksPartIVExplosionCont",
+                    "url": "https://openprocessing.org/sketch/1802529",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Websitedistortion.json",
+            "canonical_name": "Websitedistortion",
+            "canonical_url": "https://openprocessing.org/sketch/1660747",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Websitedistortion01.json",
+                    "name": "Websitedistortion01",
+                    "url": "https://openprocessing.org/sketch/2629182",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Websitedistortion_1.json",
+                    "name": "Websitedistortion",
+                    "url": "https://openprocessing.org/sketch/1298959",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "FishFace.json",
+                    "name": "FishFace",
+                    "url": "https://openprocessing.org/sketch/943740",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Fishcatchingfishfork.json",
+            "canonical_name": "Fishcatchingfishfork",
+            "canonical_url": "https://openprocessing.org/sketch/2870921",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Fishcatchingfish_2.json",
+                    "name": "Fishcatchingfish",
+                    "url": "https://openprocessing.org/sketch/2405190",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Fishcatchingfish_3.json",
+                    "name": "Fishcatchingfish",
+                    "url": "https://openprocessing.org/sketch/2435586",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Flow_1.json",
+            "canonical_name": "Flow",
+            "canonical_url": "https://openprocessing.org/sketch/2999181",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Flow_4.json",
+                    "name": "Flow",
+                    "url": "https://openprocessing.org/sketch/2921798",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Fluid.json",
+            "canonical_name": "Fluid",
+            "canonical_url": "https://openprocessing.org/sketch/2995225",
+            "merged_used_in": [
+                "Atlantic Skyline.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Fluid_2.json",
+                    "name": "Fluid",
+                    "url": "https://openprocessing.org/sketch/2971896",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Frozenbrushcopy.json",
+            "canonical_name": "Frozenbrushcopy",
+            "canonical_url": "https://openprocessing.org/sketch/1111622",
+            "merged_used_in": [
+                "Thunderous Drive Flow.mp4",
+                "Echoes in Suspension.mp4",
+                "Spring Echo Distant.mp4",
+                "Berlin Depth Module.mp4",
+                "Black Signal Depth.mp4",
+                "Nocturnal Infrastructure.mp4",
+                "Substructure 9.mp4",
+                "Compressed Void.mp4",
+                "Eternal Essence Throws.mp4",
+                "Fading Coordinates.mp4",
+                "Authentic Essence Energy.mp4",
+                "Fog Signal 4AM.mp4",
+                "Gridlock Oscillator.mp4",
+                "Concrete Signal Unit.mp4",
+                "Arctic Delay Lines.mp4",
+                "Inner Harbour Dub.mp4",
+                "Reverb Beneath Stars.mp4",
+                "Immersive Core Throws.mp4",
+                "Pure Immersion Repetition.mp4",
+                "Reflected in Water.mp4",
+                "Cold Harbour Loop.mp4",
+                "Dub of the Meridian.mp4"
+            ],
+            "merged_used_count": 23,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Frozenbrush.json",
+                    "name": "Frozenbrush",
+                    "url": "https://openprocessing.org/sketch/2915234",
+                    "used_count": 7,
+                    "used_in": [
+                        "Reverb Beneath Stars.mp4",
+                        "Immersive Core Throws.mp4",
+                        "Pure Immersion Repetition.mp4",
+                        "Reflected in Water.mp4",
+                        "Cold Harbour Loop.mp4",
+                        "Dub of the Meridian.mp4",
+                        "Arctic Delay Lines.mp4"
+                    ],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Pride.json",
+            "canonical_name": "Pride",
+            "canonical_url": "https://openprocessing.org/sketch/2676228",
+            "merged_used_in": [
+                "Soft Collapse.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Fuzz.json",
+                    "name": "Fuzz",
+                    "url": "https://openprocessing.org/sketch/2687208",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "GLSLColorFoxing.json",
+            "canonical_name": "GLSLColorFoxing",
+            "canonical_url": "https://openprocessing.org/sketch/1202519",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "GLSLColorCycling.json",
+                    "name": "GLSLColorCycling",
+                    "url": "https://openprocessing.org/sketch/981092",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "GenerativeLandscapes.json",
+            "canonical_name": "GenerativeLandscapes",
+            "canonical_url": "https://openprocessing.org/sketch/2699528",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "GenerativeLandscapes_1.json",
+                    "name": "GenerativeLandscapes",
+                    "url": "https://openprocessing.org/sketch/2588005",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "GenerativeLandscapes_5.json",
+                    "name": "GenerativeLandscapes",
+                    "url": "https://openprocessing.org/sketch/2498345",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "GenerativeLandscapes2.json",
+            "canonical_name": "GenerativeLandscapes2",
+            "canonical_url": "https://openprocessing.org/sketch/2588006",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "GenerativeLandscapes_2.json",
+                    "name": "GenerativeLandscapes",
+                    "url": "https://openprocessing.org/sketch/2573255",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "GenerativeLandscapes_3.json",
+            "canonical_name": "GenerativeLandscapes",
+            "canonical_url": "https://openprocessing.org/sketch/2515848",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "GenerativeLandscapes_4.json",
+                    "name": "GenerativeLandscapes",
+                    "url": "https://openprocessing.org/sketch/2527001",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Genuary18Whatdoeswindlooklike_1.json",
+            "canonical_name": "Genuary18Whatdoeswindlooklike",
+            "canonical_url": "https://openprocessing.org/sketch/2515398",
+            "merged_used_in": [
+                "Pure Immersion Repetition.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "danielonexGenuary18Whatdoeswindlooklike.json",
+                    "name": "danielonexGenuary18Whatdoeswindlooklike",
+                    "url": "https://openprocessing.org/sketch/2537538",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Genuary18Whatdoeswindlooklike_2.json",
+                    "name": "Genuary18Whatdoeswindlooklike",
+                    "url": "https://openprocessing.org/sketch/2524672",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "GlassGarden.json",
+            "canonical_name": "GlassGarden",
+            "canonical_url": "https://openprocessing.org/sketch/1549893",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "LightningCorrosionGravity_1.json",
+                    "name": "LightningCorrosionGravity",
+                    "url": "https://openprocessing.org/sketch/1309784",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "shader_Example.json",
+            "canonical_name": "shader_Example",
+            "canonical_url": "https://openprocessing.org/sketch/1549818",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "GlassGarden_1.json",
+                    "name": "GlassGarden",
+                    "url": "https://openprocessing.org/sketch/1281788",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Growth.json",
+            "canonical_name": "Growth",
+            "canonical_url": "https://openprocessing.org/sketch/2679978",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Growth_2.json",
+                    "name": "Growth",
+                    "url": "https://openprocessing.org/sketch/2686202",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Halftonesquare.json",
+            "canonical_name": "Halftonesquare",
+            "canonical_url": "https://openprocessing.org/sketch/1845098",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Halftonesquare_1.json",
+                    "name": "Halftonesquare",
+                    "url": "https://openprocessing.org/sketch/1820721",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Halftonesquare_4.json",
+                    "name": "Halftonesquare",
+                    "url": "https://openprocessing.org/sketch/1685782",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Hexagontunnel.json",
+            "canonical_name": "Hexagontunnel",
+            "canonical_url": "https://openprocessing.org/sketch/2335272",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Octagonaltunnel.json",
+                    "name": "Octagonaltunnel",
+                    "url": "https://openprocessing.org/sketch/2334958",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Hexagontunnelbackgroundforfictionalgoogology.json",
+                    "name": "Hexagontunnelbackgroundforfictionalgoogology",
+                    "url": "https://openprocessing.org/sketch/2335273",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "op_2298415.json",
+            "canonical_name": "op_2298415",
+            "canonical_url": "https://openprocessing.org/sketch/2298415",
+            "merged_used_in": [
+                "Marina at Dusk.mp4",
+                "Pure Immersion Meditation.mp4",
+                "Inner Harbour Dub.mp4",
+                "Restricted Frequency.mp4",
+                "Reinforced Silence.mp4"
+            ],
+            "merged_used_count": 5,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "dog.json",
+                    "name": "dog",
+                    "url": "https://openprocessing.org/sketch/1980922",
+                    "used_count": 1,
+                    "used_in": [
+                        "Reinforced Silence.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "HilmaSwirlyKlint.json",
+                    "name": "HilmaSwirlyKlint",
+                    "url": "https://openprocessing.org/sketch/2971247",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Shaderdisplace.json",
+            "canonical_name": "Shaderdisplace",
+            "canonical_url": "https://openprocessing.org/sketch/1969046",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "IMAGENCUADRITOS.json",
+                    "name": "IMAGENCUADRITOS",
+                    "url": "https://openprocessing.org/sketch/1987612",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shaderdisplace_1.json",
+                    "name": "Shaderdisplace",
+                    "url": "https://openprocessing.org/sketch/1826229",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "ImageFlowfield_1.json",
+            "canonical_name": "ImageFlowfield",
+            "canonical_url": "https://openprocessing.org/sketch/1522925",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ImageFlowfield_2.json",
+                    "name": "ImageFlowfield",
+                    "url": "https://openprocessing.org/sketch/1526762",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ImageFlowfieldnic.json",
+            "canonical_name": "ImageFlowfieldnic",
+            "canonical_url": "https://openprocessing.org/sketch/2019735",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ImageFlowfield_3.json",
+                    "name": "ImageFlowfield",
+                    "url": "https://openprocessing.org/sketch/1412643",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "ImageFlowfield_4.json",
+                    "name": "ImageFlowfield",
+                    "url": "https://openprocessing.org/sketch/1168844",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "ImageFlowfield_5.json",
+                    "name": "ImageFlowfield",
+                    "url": "https://openprocessing.org/sketch/1140860",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "ImageFlowfieldnic_1.json",
+                    "name": "ImageFlowfieldnic",
+                    "url": "https://openprocessing.org/sketch/1629194",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "ImageFlowfieldnic_3.json",
+                    "name": "ImageFlowfieldnic",
+                    "url": "https://openprocessing.org/sketch/1309407",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "ImageFlowfieldnic_4.json",
+                    "name": "ImageFlowfieldnic",
+                    "url": "https://openprocessing.org/sketch/1302300",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "ImageFlowfieldnic_5.json",
+                    "name": "ImageFlowfieldnic",
+                    "url": "https://openprocessing.org/sketch/1255773",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ImageMorph2.json",
+            "canonical_name": "ImageMorph2",
+            "canonical_url": "https://openprocessing.org/sketch/2654068",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ImageMorph2_1.json",
+                    "name": "ImageMorph2",
+                    "url": "https://openprocessing.org/sketch/2634418",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ImageMorph2_2.json",
+                    "name": "ImageMorph2",
+                    "url": "https://openprocessing.org/sketch/996477",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ImfromTaiwan_1.json",
+            "canonical_name": "ImfromTaiwan",
+            "canonical_url": "https://openprocessing.org/sketch/1963329",
+            "merged_used_in": [
+                "Negative Delay Chamber.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ImfromTaiwan_3.json",
+                    "name": "ImfromTaiwan",
+                    "url": "https://openprocessing.org/sketch/2061696",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ImfromTaiwan.json",
+                    "name": "ImfromTaiwan",
+                    "url": "https://openprocessing.org/sketch/1962386",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Inferior.json",
+            "canonical_name": "Inferior",
+            "canonical_url": "https://openprocessing.org/sketch/1296532",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Ink_6.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1727383",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Inferior_1.json",
+                    "name": "Inferior",
+                    "url": "https://openprocessing.org/sketch/1185404",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Pimpon.json",
+                    "name": "Pimpon",
+                    "url": "https://openprocessing.org/sketch/1020091",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Ink_34.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1040435",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Ink_1.json",
+            "canonical_name": "Ink",
+            "canonical_url": "https://openprocessing.org/sketch/1944336",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Ink_12.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1281786",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Ink_18.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1248391",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Ink_7.json",
+            "canonical_name": "Ink",
+            "canonical_url": "https://openprocessing.org/sketch/1700486",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Ink_10.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1458580",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Ink_15.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1248443",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ShaderTest_3.json",
+                    "name": "ShaderTest",
+                    "url": "https://openprocessing.org/sketch/1281776",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Ink_14.json",
+            "canonical_name": "Ink",
+            "canonical_url": "https://openprocessing.org/sketch/1281778",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Ink_20.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1247848",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Ink_8.json",
+            "canonical_name": "Ink",
+            "canonical_url": "https://openprocessing.org/sketch/1700487",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Ink_16.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1248422",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Ink_19.json",
+            "canonical_name": "Ink",
+            "canonical_url": "https://openprocessing.org/sketch/1248407",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Ink_21.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1248419",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Ink_9.json",
+            "canonical_name": "Ink",
+            "canonical_url": "https://openprocessing.org/sketch/1700491",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Ink_22.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1255095",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Ink_25.json",
+            "canonical_name": "Ink",
+            "canonical_url": "https://openprocessing.org/sketch/1227873",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Ink_27.json",
+                    "name": "Ink",
+                    "url": "https://openprocessing.org/sketch/1217458",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "InteractiveLogos_21.json",
+            "canonical_name": "InteractiveLogos",
+            "canonical_url": "https://openprocessing.org/sketch/1242560",
+            "merged_used_in": [
+                "Blackout Interval.mp4",
+                "Obscured Sector.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "InteractiveLogo.json",
+                    "name": "InteractiveLogo",
+                    "url": "https://openprocessing.org/sketch/1236266",
+                    "used_count": 1,
+                    "used_in": [
+                        "Obscured Sector.mp4"
+                    ],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "InteractiveSnow.json",
+            "canonical_name": "InteractiveSnow",
+            "canonical_url": "https://openprocessing.org/sketch/2131711",
+            "merged_used_in": [
+                "Spring Echo Distant.mp4",
+                "Pure Modern Percussion.mp4",
+                "Dub of the Meridian.mp4",
+                "Negative Field.mp4",
+                "Berlin Depth Module.mp4",
+                "Pulse of the Estuary.mp4",
+                "Remote Signal Bloom.mp4",
+                "Reverb Beneath Stars.mp4",
+                "Gravity in Reverb.mp4",
+                "Obscured Sector.mp4",
+                "Arctic Delay Lines.mp4",
+                "Horizon in Dub.mp4"
+            ],
+            "merged_used_count": 12,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "InteractiveLogos_5.json",
+                    "name": "InteractiveLogos",
+                    "url": "https://openprocessing.org/sketch/1984312",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Kaleidoscope.json",
+            "canonical_name": "Kaleidoscope",
+            "canonical_url": "https://openprocessing.org/sketch/2569360",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Kaleidoscope_1.json",
+                    "name": "Kaleidoscope",
+                    "url": "https://openprocessing.org/sketch/2363816",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "LOSTINTHEDESERT.json",
+            "canonical_name": "LOSTINTHEDESERT",
+            "canonical_url": "https://openprocessing.org/sketch/1711040",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "LOSTINTHEDESERT_1.json",
+                    "name": "LOSTINTHEDESERT",
+                    "url": "https://openprocessing.org/sketch/1542219",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "LineClock.json",
+            "canonical_name": "LineClock",
+            "canonical_url": "https://openprocessing.org/sketch/1622053",
+            "merged_used_in": [
+                "Highway Cruise Atmosphere.mp4",
+                "Gradient of Silence.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "LineClock_1.json",
+                    "name": "LineClock",
+                    "url": "https://openprocessing.org/sketch/1307458",
+                    "used_count": 1,
+                    "used_in": [
+                        "Gradient of Silence.mp4"
+                    ],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "monnsaLinesBrush.json",
+            "canonical_name": "monnsaLinesBrush",
+            "canonical_url": "https://openprocessing.org/sketch/1617710",
+            "merged_used_in": [
+                "Vaporized Structures.mp4",
+                "Obscured Sector.mp4",
+                "Horizon in Dub.mp4",
+                "Mist Over Concrete.mp4"
+            ],
+            "merged_used_count": 4,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "LinesBrush_4.json",
+                    "name": "LinesBrush",
+                    "url": "https://openprocessing.org/sketch/954233",
+                    "used_count": 1,
+                    "used_in": [
+                        "Mist Over Concrete.mp4"
+                    ],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "YourMagical.json",
+            "canonical_name": "YourMagical",
+            "canonical_url": "https://openprocessing.org/sketch/2681207",
+            "merged_used_in": [
+                "Liquid Concrete.mp4",
+                "Pure Modern Percussion.mp4",
+                "Driving Essence Swells.mp4",
+                "Black Signal Depth.mp4",
+                "Vaporized Structures.mp4",
+                "Nocturnal Infrastructure.mp4",
+                "Immersive Core Throws.mp4",
+                "Classic Spirit Foundation.mp4",
+                "Authentic Essence Pulse.mp4",
+                "Deep Axis Control.mp4",
+                "Substructure 9.mp4",
+                "Deep Channel Pulse.mp4",
+                "Compressed Void.mp4",
+                "Negative Space Silence.mp4",
+                "Reinforced Silence.mp4",
+                "Obscured Sector.mp4",
+                "Pure Immersion Meditation.mp4"
+            ],
+            "merged_used_count": 17,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Magicaltrailshader_51.json",
+                    "name": "Magicaltrailshader",
+                    "url": "https://openprocessing.org/sketch/1526176",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Magicaltrailshader_66.json",
+                    "name": "Magicaltrailshader",
+                    "url": "https://openprocessing.org/sketch/1255316",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Magicaltrail.json",
+                    "name": "Magicaltrail",
+                    "url": "https://openprocessing.org/sketch/2290071",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Magicaltrailshader_54.json",
+            "canonical_name": "Magicaltrailshader",
+            "canonical_url": "https://openprocessing.org/sketch/1485203",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Magicaltrailshader_73.json",
+                    "name": "Magicaltrailshader",
+                    "url": "https://openprocessing.org/sketch/1165775",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Marching.json",
+            "canonical_name": "Marching",
+            "canonical_url": "https://openprocessing.org/sketch/2690248",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "MarchingJaylin.json",
+                    "name": "MarchingJaylin",
+                    "url": "https://openprocessing.org/sketch/2786026",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Marching_1.json",
+                    "name": "Marching",
+                    "url": "https://openprocessing.org/sketch/2682438",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "MengerJourneybySyntopia.json",
+            "canonical_name": "MengerJourneybySyntopia",
+            "canonical_url": "https://openprocessing.org/sketch/2967482",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "MengerJourneybySyntopia_1.json",
+                    "name": "MengerJourneybySyntopia",
+                    "url": "https://openprocessing.org/sketch/1888751",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "MonaShader.json",
+            "canonical_name": "MonaShader",
+            "canonical_url": "https://openprocessing.org/sketch/1781342",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Transmogrifier.json",
+                    "name": "Transmogrifier",
+                    "url": "https://openprocessing.org/sketch/2671955",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "MonkeytypingShakespearescompleteworks.json",
+            "canonical_name": "MonkeytypingShakespearescompleteworks",
+            "canonical_url": "https://openprocessing.org/sketch/2734456",
+            "merged_used_in": [
+                "Remote Signal Bloom.mp4",
+                "Infinite Blue Chamber.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "MonkeytypingShakespearescompleteworks_2.json",
+                    "name": "MonkeytypingShakespearescompleteworks",
+                    "url": "https://openprocessing.org/sketch/2220803",
+                    "used_count": 1,
+                    "used_in": [
+                        "Infinite Blue Chamber.mp4"
+                    ],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Movingthroughspace_2.json",
+            "canonical_name": "Movingthroughspace",
+            "canonical_url": "https://openprocessing.org/sketch/2684574",
+            "merged_used_in": [
+                "Highway Cruise Atmosphere.mp4",
+                "Driving Essence Swells.mp4",
+                "Classic Spirit Repetition.mp4"
+            ],
+            "merged_used_count": 3,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Movingthoughspace.json",
+                    "name": "Movingthoughspace",
+                    "url": "https://openprocessing.org/sketch/2688278",
+                    "used_count": 1,
+                    "used_in": [
+                        "Classic Spirit Repetition.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "MusicPainter.json",
+            "canonical_name": "MusicPainter",
+            "canonical_url": "https://openprocessing.org/sketch/1207380",
+            "merged_used_in": [
+                "Cold Harbour Loop.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "MusicPainter_1.json",
+                    "name": "MusicPainter",
+                    "url": "https://openprocessing.org/sketch/1207378",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Noiseringsshader.json",
+            "canonical_name": "Noiseringsshader",
+            "canonical_url": "https://openprocessing.org/sketch/1848299",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Noiseringsshader_2.json",
+                    "name": "Noiseringsshader",
+                    "url": "https://openprocessing.org/sketch/1711158",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Noiseringsshader_3.json",
+                    "name": "Noiseringsshader",
+                    "url": "https://openprocessing.org/sketch/1612234",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Noiseringsshader_4.json",
+                    "name": "Noiseringsshader",
+                    "url": "https://openprocessing.org/sketch/1571327",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "OceanFlight.json",
+            "canonical_name": "OceanFlight",
+            "canonical_url": "https://openprocessing.org/sketch/1851369",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "PlasticSeascape.json",
+                    "name": "PlasticSeascape",
+                    "url": "https://openprocessing.org/sketch/1454906",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "OctagonTunnelMegafast.json",
+            "canonical_name": "OctagonTunnelMegafast",
+            "canonical_url": "https://openprocessing.org/sketch/2509527",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "OctagonTunnelMegafast_1.json",
+                    "name": "OctagonTunnelMegafast",
+                    "url": "https://openprocessing.org/sketch/2509537",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "mouvement.json",
+            "canonical_name": "mouvement",
+            "canonical_url": "https://openprocessing.org/sketch/2522565",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "OctagonTunnelSuperfast.json",
+                    "name": "OctagonTunnelSuperfast",
+                    "url": "https://openprocessing.org/sketch/2446710",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Oil_5.json",
+            "canonical_name": "Oil",
+            "canonical_url": "https://openprocessing.org/sketch/929984",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Oil_6.json",
+                    "name": "Oil",
+                    "url": "https://openprocessing.org/sketch/935448",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "OrderedDithering_2.json",
+            "canonical_name": "OrderedDithering",
+            "canonical_url": "https://openprocessing.org/sketch/2327452",
+            "merged_used_in": [
+                "Marina at Dusk.mp4",
+                "Shadow Frequency.mp4",
+                "Pristine Layer Vibration.mp4"
+            ],
+            "merged_used_count": 3,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "OrderedDithering.json",
+                    "name": "OrderedDithering",
+                    "url": "https://openprocessing.org/sketch/2608039",
+                    "used_count": 1,
+                    "used_in": [
+                        "Pristine Layer Vibration.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "OrderedDithering_5.json",
+                    "name": "OrderedDithering",
+                    "url": "https://openprocessing.org/sketch/2228670",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "OrderedDithering_6.json",
+                    "name": "OrderedDithering",
+                    "url": "https://openprocessing.org/sketch/2200174",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "PaintBox.json",
+            "canonical_name": "PaintBox",
+            "canonical_url": "https://openprocessing.org/sketch/1244539",
+            "merged_used_in": [
+                "Infinite Blue Chamber.mp4",
+                "Negative Space Silence.mp4",
+                "Echoes in Suspension.mp4"
+            ],
+            "merged_used_count": 3,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "PaintBox_6.json",
+                    "name": "PaintBox",
+                    "url": "https://openprocessing.org/sketch/654366",
+                    "used_count": 1,
+                    "used_in": [
+                        "Negative Space Silence.mp4"
+                    ],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "PaintBox_7.json",
+                    "name": "PaintBox",
+                    "url": "https://openprocessing.org/sketch/657873",
+                    "used_count": 1,
+                    "used_in": [
+                        "Echoes in Suspension.mp4"
+                    ],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "PaintBox_5.json",
+                    "name": "PaintBox",
+                    "url": "https://openprocessing.org/sketch/686450",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "PaintBox_8.json",
+                    "name": "PaintBox",
+                    "url": "https://openprocessing.org/sketch/655734",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "PaintingwithCircleNoiseFork.json",
+            "canonical_name": "PaintingwithCircleNoiseFork",
+            "canonical_url": "https://openprocessing.org/sketch/2232980",
+            "merged_used_in": [
+                "Evolving Repetition Momentum.mp4",
+                "Low End Directive.mp4",
+                "Pressure Lines.mp4",
+                "Hypnotic Core Pressure.mp4",
+                "Contemporary Core Universe.mp4",
+                "Pulse of the Estuary.mp4",
+                "Black Pressure Grid.mp4"
+            ],
+            "merged_used_count": 7,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "PaintingwithCircleNoise_2.json",
+                    "name": "PaintingwithCircleNoise",
+                    "url": "https://openprocessing.org/sketch/2222287",
+                    "used_count": 1,
+                    "used_in": [
+                        "Low End Directive.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PaintingwithCircleNoise_4.json",
+                    "name": "PaintingwithCircleNoise",
+                    "url": "https://openprocessing.org/sketch/2141314",
+                    "used_count": 1,
+                    "used_in": [
+                        "Pressure Lines.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PaintingwithCircleNoise_5.json",
+                    "name": "PaintingwithCircleNoise",
+                    "url": "https://openprocessing.org/sketch/1990618",
+                    "used_count": 1,
+                    "used_in": [
+                        "Hypnotic Core Pressure.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PaintingwithCircleNoise_9.json",
+                    "name": "PaintingwithCircleNoise",
+                    "url": "https://openprocessing.org/sketch/1912813",
+                    "used_count": 1,
+                    "used_in": [
+                        "Contemporary Core Universe.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PaintingwithCircleNoise_10.json",
+                    "name": "PaintingwithCircleNoise",
+                    "url": "https://openprocessing.org/sketch/1927431",
+                    "used_count": 1,
+                    "used_in": [
+                        "Pulse of the Estuary.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PaintingwithCircleNoise_12.json",
+                    "name": "PaintingwithCircleNoise",
+                    "url": "https://openprocessing.org/sketch/1859416",
+                    "used_count": 1,
+                    "used_in": [
+                        "Black Pressure Grid.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "PaintingwithCircleNoise_13.json",
+            "canonical_name": "PaintingwithCircleNoise",
+            "canonical_url": "https://openprocessing.org/sketch/1860882",
+            "merged_used_in": [
+                "Phantom Platform.mp4",
+                "Obscured Sector.mp4",
+                "Nocturnal Infrastructure.mp4",
+                "Negative Field.mp4"
+            ],
+            "merged_used_count": 4,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "PaintingwithCircleNoise_14.json",
+                    "name": "PaintingwithCircleNoise",
+                    "url": "https://openprocessing.org/sketch/1793389",
+                    "used_count": 1,
+                    "used_in": [
+                        "Obscured Sector.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PaintingwithCircleNoise_15.json",
+                    "name": "PaintingwithCircleNoise",
+                    "url": "https://openprocessing.org/sketch/1593476",
+                    "used_count": 1,
+                    "used_in": [
+                        "Nocturnal Infrastructure.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PaintingwithCircleNoise_17.json",
+                    "name": "PaintingwithCircleNoise",
+                    "url": "https://openprocessing.org/sketch/1339564",
+                    "used_count": 1,
+                    "used_in": [
+                        "Negative Field.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Pallasbackgroundforfictionalgoogology.json",
+            "canonical_name": "Pallasbackgroundforfictionalgoogology",
+            "canonical_url": "https://openprocessing.org/sketch/2415733",
+            "merged_used_in": [
+                "Hypnotic Core Pressure.mp4",
+                "Pure Immersion Repetition.mp4",
+                "Thunderous Drive Flow.mp4",
+                "Sub Pressure Loop.mp4",
+                "Meditative Core Trail.mp4",
+                "Vaporized Structures.mp4",
+                "Nocturnal Infrastructure.mp4",
+                "Black Pressure Grid.mp4",
+                "Deep Channel Pulse.mp4",
+                "2026 Core Thump.mp4",
+                "Fog Signal 4AM.mp4",
+                "Darkroom Oscillation.mp4",
+                "Concrete Signal Unit.mp4",
+                "Obscured Sector.mp4"
+            ],
+            "merged_used_count": 14,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "WobblySwarm_25.json",
+                    "name": "WobblySwarm",
+                    "url": "https://openprocessing.org/sketch/1306653",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "ParticleClock_5.json",
+            "canonical_name": "ParticleClock",
+            "canonical_url": "https://openprocessing.org/sketch/1190395",
+            "merged_used_in": [
+                "Immersive Core Throws.mp4",
+                "Hypnotic Core Repetition.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ParticleClock_6.json",
+                    "name": "ParticleClock",
+                    "url": "https://openprocessing.org/sketch/1020655",
+                    "used_count": 1,
+                    "used_in": [
+                        "Hypnotic Core Repetition.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ParticleClock2.json",
+                    "name": "ParticleClock2",
+                    "url": "https://openprocessing.org/sketch/2320478",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ParticleClock_4.json",
+                    "name": "ParticleClock",
+                    "url": "https://openprocessing.org/sketch/1217753",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ParticleClock_7.json",
+                    "name": "ParticleClock",
+                    "url": "https://openprocessing.org/sketch/981115",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "ParticleClock_16.json",
+                    "name": "ParticleClock",
+                    "url": "https://openprocessing.org/sketch/657752",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ParticleClock_2.json",
+            "canonical_name": "ParticleClock",
+            "canonical_url": "https://openprocessing.org/sketch/1435032",
+            "merged_used_in": [
+                "Pure Immersion Repetition.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ParticleClock_1.json",
+                    "name": "ParticleClock",
+                    "url": "https://openprocessing.org/sketch/1520673",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "ParticleName.json",
+            "canonical_name": "ParticleName",
+            "canonical_url": "https://openprocessing.org/sketch/684308",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ParticleName_1.json",
+                    "name": "ParticleName",
+                    "url": "https://openprocessing.org/sketch/667744",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ParticleRaysSDF_1.json",
+            "canonical_name": "ParticleRaysSDF",
+            "canonical_url": "https://openprocessing.org/sketch/1952054",
+            "merged_used_in": [
+                "Gradient of Silence.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ParticleRaysSDF_9.json",
+                    "name": "ParticleRaysSDF",
+                    "url": "https://openprocessing.org/sketch/2440443",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "texture.json",
+            "canonical_name": "texture",
+            "canonical_url": "https://openprocessing.org/sketch/2256710",
+            "merged_used_in": [
+                "Ultra Sparse Foundation.mp4",
+                "Nocturnal Infrastructure.mp4",
+                "Pressure Chamber Dub.mp4",
+                "High Fidelity Production.mp4",
+                "Hypnotic Core Pressure.mp4"
+            ],
+            "merged_used_count": 5,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ParticleRaysSDF_3.json",
+                    "name": "ParticleRaysSDF",
+                    "url": "https://openprocessing.org/sketch/1942848",
+                    "used_count": 1,
+                    "used_in": [
+                        "Nocturnal Infrastructure.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ParticleRaysSDF_5.json",
+                    "name": "ParticleRaysSDF",
+                    "url": "https://openprocessing.org/sketch/1860417",
+                    "used_count": 1,
+                    "used_in": [
+                        "Pressure Chamber Dub.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ParticleRaysSDF_7.json",
+                    "name": "ParticleRaysSDF",
+                    "url": "https://openprocessing.org/sketch/1795491",
+                    "used_count": 1,
+                    "used_in": [
+                        "High Fidelity Production.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ParticleRaysSDF_8.json",
+                    "name": "ParticleRaysSDF",
+                    "url": "https://openprocessing.org/sketch/1787375",
+                    "used_count": 1,
+                    "used_in": [
+                        "Hypnotic Core Pressure.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Particlesoverlay.json",
+            "canonical_name": "Particlesoverlay",
+            "canonical_url": "https://openprocessing.org/sketch/2551865",
+            "merged_used_in": [
+                "Contemporary Core Universe.mp4",
+                "Hypnotic Core Pressure.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Particlesoverlay_1.json",
+                    "name": "Particlesoverlay",
+                    "url": "https://openprocessing.org/sketch/2397510",
+                    "used_count": 1,
+                    "used_in": [
+                        "Hypnotic Core Pressure.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "star.json",
+                    "name": "star",
+                    "url": "https://openprocessing.org/sketch/2434692",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Particlestexteffects_1.json",
+            "canonical_name": "Particlestexteffects",
+            "canonical_url": "https://openprocessing.org/sketch/2862836",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Particlestexteffects_4.json",
+                    "name": "Particlestexteffects",
+                    "url": "https://openprocessing.org/sketch/2679302",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Particlestexteffects_9.json",
+                    "name": "Particlestexteffects",
+                    "url": "https://openprocessing.org/sketch/2231240",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Particlestexteffects_12.json",
+                    "name": "Particlestexteffects",
+                    "url": "https://openprocessing.org/sketch/2095940",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Particlestexteffects_16.json",
+                    "name": "Particlestexteffects",
+                    "url": "https://openprocessing.org/sketch/1910497",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Particlestexteffects_8.json",
+            "canonical_name": "Particlestexteffects",
+            "canonical_url": "https://openprocessing.org/sketch/2313520",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Particlestexteffects_18.json",
+                    "name": "Particlestexteffects",
+                    "url": "https://openprocessing.org/sketch/1806524",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Particlestexteffects_20.json",
+                    "name": "Particlestexteffects",
+                    "url": "https://openprocessing.org/sketch/1638841",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Particlestexteffects_2.json",
+            "canonical_name": "Particlestexteffects",
+            "canonical_url": "https://openprocessing.org/sketch/2799928",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Particlestexteffects_25.json",
+                    "name": "Particlestexteffects",
+                    "url": "https://openprocessing.org/sketch/1524040",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ParticlestoImagetest.json",
+            "canonical_name": "ParticlestoImagetest",
+            "canonical_url": "https://openprocessing.org/sketch/2691063",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ParticlestoImage_8.json",
+                    "name": "ParticlestoImage",
+                    "url": "https://openprocessing.org/sketch/2325699",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ParticlestoImage_12.json",
+                    "name": "ParticlestoImage",
+                    "url": "https://openprocessing.org/sketch/2097742",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Particlestoimage_11.json",
+            "canonical_name": "Particlestoimage",
+            "canonical_url": "https://openprocessing.org/sketch/2102044",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "particlestoimage_10.json",
+                    "name": "particlestoimage",
+                    "url": "https://openprocessing.org/sketch/2248094",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Particlestoimage_15.json",
+            "canonical_name": "Particlestoimage",
+            "canonical_url": "https://openprocessing.org/sketch/1975875",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Particlestoimage_16.json",
+                    "name": "Particlestoimage",
+                    "url": "https://openprocessing.org/sketch/1976827",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "PixelCollapse.json",
+            "canonical_name": "PixelCollapse",
+            "canonical_url": "https://openprocessing.org/sketch/2962094",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "PixelCollapseExperiment.json",
+                    "name": "PixelCollapseExperiment",
+                    "url": "https://openprocessing.org/sketch/2960098",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PixelCollapse_2.json",
+                    "name": "PixelCollapse",
+                    "url": "https://openprocessing.org/sketch/2899204",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PixelCollapse_6.json",
+                    "name": "PixelCollapse",
+                    "url": "https://openprocessing.org/sketch/2920052",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "PixelMagnets.json",
+            "canonical_name": "PixelMagnets",
+            "canonical_url": "https://openprocessing.org/sketch/2329739",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "STIPLEMAGNET.json",
+                    "name": "STIPLEMAGNET",
+                    "url": "https://openprocessing.org/sketch/2350200",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PixelMagnets_1.json",
+                    "name": "PixelMagnets",
+                    "url": "https://openprocessing.org/sketch/2311227",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PixelMagnets_2.json",
+                    "name": "PixelMagnets",
+                    "url": "https://openprocessing.org/sketch/1982591",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PixelMagnets_3.json",
+                    "name": "PixelMagnets",
+                    "url": "https://openprocessing.org/sketch/1982582",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PixelMagnets_5.json",
+                    "name": "PixelMagnets",
+                    "url": "https://openprocessing.org/sketch/1968446",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PixelMagnets_6.json",
+                    "name": "PixelMagnets",
+                    "url": "https://openprocessing.org/sketch/1961564",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PixelMagnets_7.json",
+                    "name": "PixelMagnets",
+                    "url": "https://openprocessing.org/sketch/1968293",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "PixelMagnetsJOSEPH.json",
+                    "name": "PixelMagnetsJOSEPH",
+                    "url": "https://openprocessing.org/sketch/1750577",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "PixelMagnets_10.json",
+                    "name": "PixelMagnets",
+                    "url": "https://openprocessing.org/sketch/1809796",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "PixelMagnets_13.json",
+                    "name": "PixelMagnets",
+                    "url": "https://openprocessing.org/sketch/1620978",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "PixelMagnets_8.json",
+            "canonical_name": "PixelMagnets",
+            "canonical_url": "https://openprocessing.org/sketch/1869366",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "PixelMagnets_11.json",
+                    "name": "PixelMagnets",
+                    "url": "https://openprocessing.org/sketch/1698255",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "PixelMagnets_9.json",
+            "canonical_name": "PixelMagnets",
+            "canonical_url": "https://openprocessing.org/sketch/1765810",
+            "merged_used_in": [
+                "Pure Modern Percussion.mp4",
+                "Sub Pressure Loop.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "PixelMagnets_12.json",
+                    "name": "PixelMagnets",
+                    "url": "https://openprocessing.org/sketch/1626890",
+                    "used_count": 1,
+                    "used_in": [
+                        "Sub Pressure Loop.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "RainbowChladnipatterns.json",
+            "canonical_name": "RainbowChladnipatterns",
+            "canonical_url": "https://openprocessing.org/sketch/2460688",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "RainbowChladnipatterns_1.json",
+                    "name": "RainbowChladnipatterns",
+                    "url": "https://openprocessing.org/sketch/2334461",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "RainbowGravity_4.json",
+            "canonical_name": "RainbowGravity",
+            "canonical_url": "https://openprocessing.org/sketch/1776969",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "RainbowGravity_7.json",
+                    "name": "RainbowGravity",
+                    "url": "https://openprocessing.org/sketch/1601126",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "ReactionDiffusion_5.json",
+            "canonical_name": "ReactionDiffusion",
+            "canonical_url": "https://openprocessing.org/sketch/2500690",
+            "merged_used_in": [
+                "Hypnotic Core Pressure.mp4",
+                "Low End Directive.mp4",
+                "Northern Concrete.mp4"
+            ],
+            "merged_used_count": 3,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ReactionDiffusion_8.json",
+                    "name": "ReactionDiffusion",
+                    "url": "https://openprocessing.org/sketch/2405704",
+                    "used_count": 1,
+                    "used_in": [
+                        "Low End Directive.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ReactionDiffusion_13.json",
+                    "name": "ReactionDiffusion",
+                    "url": "https://openprocessing.org/sketch/2272173",
+                    "used_count": 1,
+                    "used_in": [
+                        "Northern Concrete.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ReactionDiffusion_4.json",
+                    "name": "ReactionDiffusion",
+                    "url": "https://openprocessing.org/sketch/2598462",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ReactionDiffusion_9.json",
+                    "name": "ReactionDiffusion",
+                    "url": "https://openprocessing.org/sketch/2326527",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Reproduction.json",
+            "canonical_name": "Reproduction",
+            "canonical_url": "https://openprocessing.org/sketch/2596871",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Reproduction_1.json",
+                    "name": "Reproduction",
+                    "url": "https://openprocessing.org/sketch/2434004",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Repulsion_6.json",
+            "canonical_name": "Repulsion",
+            "canonical_url": "https://openprocessing.org/sketch/1029519",
+            "merged_used_in": [
+                "Obscured Sector.mp4",
+                "Black Pressure Grid.mp4",
+                "Gradient of Silence.mp4",
+                "Hypnotic Core Repetition.mp4",
+                "Reflected in Water.mp4",
+                "Chamber 17.mp4"
+            ],
+            "merged_used_count": 7,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Repulsion.json",
+                    "name": "Repulsion",
+                    "url": "https://openprocessing.org/sketch/1308777",
+                    "used_count": 3,
+                    "used_in": [
+                        "Gradient of Silence.mp4",
+                        "Reflected in Water.mp4",
+                        "Chamber 17.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Repulsion_11.json",
+            "canonical_name": "Repulsion",
+            "canonical_url": "https://openprocessing.org/sketch/1195871",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Repulsion_17.json",
+                    "name": "Repulsion",
+                    "url": "https://openprocessing.org/sketch/1065346",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "SICKTRIPPYText.json",
+            "canonical_name": "SICKTRIPPYText",
+            "canonical_url": "https://openprocessing.org/sketch/2470431",
+            "merged_used_in": [
+                "Pulse of the Estuary.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "SICKTRIPPYText_3.json",
+                    "name": "SICKTRIPPYText",
+                    "url": "https://openprocessing.org/sketch/667747",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "SICKTRIPPYText_4.json",
+                    "name": "SICKTRIPPYText",
+                    "url": "https://openprocessing.org/sketch/668023",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "SaturnSakushu.json",
+            "canonical_name": "SaturnSakushu",
+            "canonical_url": "https://openprocessing.org/sketch/2989047",
+            "merged_used_in": [
+                "Obscured Sector.mp4",
+                "Filtered Pad Immersion.mp4",
+                "Thunderous Drive Flow.mp4",
+                "Black Signal Depth.mp4"
+            ],
+            "merged_used_count": 4,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Saturnauthortomxo.json",
+                    "name": "Saturnauthortomxo",
+                    "url": "https://openprocessing.org/sketch/2844841",
+                    "used_count": 2,
+                    "used_in": [
+                        "Thunderous Drive Flow.mp4",
+                        "Black Signal Depth.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "ScribblyDoods.json",
+            "canonical_name": "ScribblyDoods",
+            "canonical_url": "https://openprocessing.org/sketch/2816690",
+            "merged_used_in": [
+                "Authentic Essence Momentum.mp4",
+                "Monotone Current.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ScribblyDoods_3.json",
+                    "name": "ScribblyDoods",
+                    "url": "https://openprocessing.org/sketch/2823861",
+                    "used_count": 1,
+                    "used_in": [
+                        "Monotone Current.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Shader20211217.json",
+            "canonical_name": "Shader20211217",
+            "canonical_url": "https://openprocessing.org/sketch/1771862",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Shader20211222.json",
+                    "name": "Shader20211222",
+                    "url": "https://openprocessing.org/sketch/1771866",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader20211223.json",
+                    "name": "Shader20211223",
+                    "url": "https://openprocessing.org/sketch/1771867",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader20211229.json",
+                    "name": "Shader20211229",
+                    "url": "https://openprocessing.org/sketch/1771869",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader20220109.json",
+                    "name": "Shader20220109",
+                    "url": "https://openprocessing.org/sketch/1771872",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader20220116.json",
+                    "name": "Shader20220116",
+                    "url": "https://openprocessing.org/sketch/1771874",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Shader3D.json",
+            "canonical_name": "Shader3D",
+            "canonical_url": "https://openprocessing.org/sketch/1749834",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Shader_1.json",
+                    "name": "Shader",
+                    "url": "https://openprocessing.org/sketch/1260666",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader3D_2.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/1366256",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader3D_3.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/1241177",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader3D_4.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/1241170",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader3D_5.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/1241541",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader3D_7.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/1216677",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader3D_8.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/1196957",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Shader3D_11.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/1151319",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Shader3D_12.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/1116844",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Shader3D_14.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/956152",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Shader3D_15.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/946615",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Shader3D_16.json",
+                    "name": "Shader3D",
+                    "url": "https://openprocessing.org/sketch/848049",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ShaderGradient_1.json",
+            "canonical_name": "ShaderGradient",
+            "canonical_url": "https://openprocessing.org/sketch/818528",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ShaderGradient_2.json",
+                    "name": "ShaderGradient",
+                    "url": "https://openprocessing.org/sketch/817747",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ShaderTextDistortionvCoco_2.json",
+            "canonical_name": "ShaderTextDistortionvCoco",
+            "canonical_url": "https://openprocessing.org/sketch/1949422",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ShaderTextDistortion_10.json",
+                    "name": "ShaderTextDistortion",
+                    "url": "https://openprocessing.org/sketch/1050448",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ShaderTextDistortion_7.json",
+            "canonical_name": "ShaderTextDistortion",
+            "canonical_url": "https://openprocessing.org/sketch/1189343",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ShaderTextDistortion_9.json",
+                    "name": "ShaderTextDistortion",
+                    "url": "https://openprocessing.org/sketch/1144789",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ShaderasTexture.json",
+            "canonical_name": "ShaderasTexture",
+            "canonical_url": "https://openprocessing.org/sketch/1624001",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ShaderasTexture_1.json",
+                    "name": "ShaderasTexture",
+                    "url": "https://openprocessing.org/sketch/769385",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ShadersForkandFckwithit.json",
+            "canonical_name": "ShadersForkandFckwithit",
+            "canonical_url": "https://openprocessing.org/sketch/495155",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Shaderexample_1.json",
+                    "name": "Shaderexample",
+                    "url": "https://openprocessing.org/sketch/729414",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ShadertoyExample2.json",
+            "canonical_name": "ShadertoyExample2",
+            "canonical_url": "https://openprocessing.org/sketch/1945864",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ShadertoyExample2_1.json",
+                    "name": "ShadertoyExample2",
+                    "url": "https://openprocessing.org/sketch/1853792",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "ShadyBlobs.json",
+            "canonical_name": "ShadyBlobs",
+            "canonical_url": "https://openprocessing.org/sketch/2034985",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "ShadyBlobs_1.json",
+                    "name": "ShadyBlobs",
+                    "url": "https://openprocessing.org/sketch/1726004",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ShadyBlobs_2.json",
+                    "name": "ShadyBlobs",
+                    "url": "https://openprocessing.org/sketch/1652196",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "ShadyBlobs_3.json",
+                    "name": "ShadyBlobs",
+                    "url": "https://openprocessing.org/sketch/1632658",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Soft.json",
+            "canonical_name": "Soft",
+            "canonical_url": "https://openprocessing.org/sketch/2553155",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Soft_1.json",
+                    "name": "Soft",
+                    "url": "https://openprocessing.org/sketch/2515600",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Spiral.json",
+            "canonical_name": "Spiral",
+            "canonical_url": "https://openprocessing.org/sketch/2725823",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Spiral2.json",
+                    "name": "Spiral2",
+                    "url": "https://openprocessing.org/sketch/2876884",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Spiral_1.json",
+                    "name": "Spiral",
+                    "url": "https://openprocessing.org/sketch/2678743",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Spiral_2.json",
+                    "name": "Spiral",
+                    "url": "https://openprocessing.org/sketch/2662875",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Spiral_4.json",
+                    "name": "Spiral",
+                    "url": "https://openprocessing.org/sketch/2669174",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "SteeringBehaviorText.json",
+            "canonical_name": "SteeringBehaviorText",
+            "canonical_url": "https://openprocessing.org/sketch/2035913",
+            "merged_used_in": [
+                "Pulse of the Estuary.mp4",
+                "Reverb Beneath Stars.mp4",
+                "Dark Meditative Roll.mp4"
+            ],
+            "merged_used_count": 3,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "SteeringBehaviorText_3.json",
+                    "name": "SteeringBehaviorText",
+                    "url": "https://openprocessing.org/sketch/1988342",
+                    "used_count": 1,
+                    "used_in": [
+                        "Reverb Beneath Stars.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "SteeringBehaviorText_11.json",
+                    "name": "SteeringBehaviorText",
+                    "url": "https://openprocessing.org/sketch/947078",
+                    "used_count": 1,
+                    "used_in": [
+                        "Dark Meditative Roll.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "StickyBlob.json",
+            "canonical_name": "StickyBlob",
+            "canonical_url": "https://openprocessing.org/sketch/2442933",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "StickyBlob_1.json",
+                    "name": "StickyBlob",
+                    "url": "https://openprocessing.org/sketch/1619721",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "StickyBlob_2.json",
+                    "name": "StickyBlob",
+                    "url": "https://openprocessing.org/sketch/1533995",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "SunGoingNova.json",
+            "canonical_name": "SunGoingNova",
+            "canonical_url": "https://openprocessing.org/sketch/1027693",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "SunGoingNova_1.json",
+                    "name": "SunGoingNova",
+                    "url": "https://openprocessing.org/sketch/982444",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "SunGoingNova_2.json",
+                    "name": "SunGoingNova",
+                    "url": "https://openprocessing.org/sketch/848587",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "SunGoingNova_3.json",
+                    "name": "SunGoingNova",
+                    "url": "https://openprocessing.org/sketch/848655",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Test3Eurorack.json",
+            "canonical_name": "Test3Eurorack",
+            "canonical_url": "https://openprocessing.org/sketch/1897330",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Test3Eurorack_1.json",
+                    "name": "Test3Eurorack",
+                    "url": "https://openprocessing.org/sketch/1834477",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Theuncannytrailshader.json",
+            "canonical_name": "Theuncannytrailshader",
+            "canonical_url": "https://openprocessing.org/sketch/2514754",
+            "merged_used_in": [
+                "Obscured Sector.mp4",
+                "Pure Immersion Repetition.mp4",
+                "Immersive Core Throws.mp4",
+                "Cold Harbour Loop.mp4",
+                "Substructure 9.mp4"
+            ],
+            "merged_used_count": 5,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Theuncannytrailshader_3.json",
+                    "name": "Theuncannytrailshader",
+                    "url": "https://openprocessing.org/sketch/1610520",
+                    "used_count": 1,
+                    "used_in": [
+                        "Pure Immersion Repetition.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Theuncannytrailshader_4.json",
+                    "name": "Theuncannytrailshader",
+                    "url": "https://openprocessing.org/sketch/1443772",
+                    "used_count": 1,
+                    "used_in": [
+                        "Immersive Core Throws.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Theuncannytrailshader_7.json",
+                    "name": "Theuncannytrailshader",
+                    "url": "https://openprocessing.org/sketch/1263795",
+                    "used_count": 1,
+                    "used_in": [
+                        "Cold Harbour Loop.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Theuncannytrailshader_9.json",
+                    "name": "Theuncannytrailshader",
+                    "url": "https://openprocessing.org/sketch/1245832",
+                    "used_count": 1,
+                    "used_in": [
+                        "Substructure 9.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Theuncannytrailshader_11.json",
+                    "name": "Theuncannytrailshader",
+                    "url": "https://openprocessing.org/sketch/1192847",
+                    "used_count": 1,
+                    "used_in": [
+                        "Immersive Core Throws.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Theuncannytrailshader_12.json",
+                    "name": "Theuncannytrailshader",
+                    "url": "https://openprocessing.org/sketch/1232799",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Theuncannytrailshader_14.json",
+                    "name": "Theuncannytrailshader",
+                    "url": "https://openprocessing.org/sketch/1217234",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Theuncannytrailshader_1.json",
+            "canonical_name": "Theuncannytrailshader",
+            "canonical_url": "https://openprocessing.org/sketch/2332101",
+            "merged_used_in": [
+                "Hypnotic Core Pressure.mp4",
+                "Pressure Lines.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Theuncannytrailshader_2.json",
+                    "name": "Theuncannytrailshader",
+                    "url": "https://openprocessing.org/sketch/2296678",
+                    "used_count": 1,
+                    "used_in": [
+                        "Pressure Lines.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Theuncannytrailshader_5.json",
+            "canonical_name": "Theuncannytrailshader",
+            "canonical_url": "https://openprocessing.org/sketch/1304739",
+            "merged_used_in": [
+                "Black Signal Depth.mp4",
+                "Gravity in Reverb.mp4",
+                "Iron Delay Structure.mp4"
+            ],
+            "merged_used_count": 3,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Theuncannytrailshader_6.json",
+                    "name": "Theuncannytrailshader",
+                    "url": "https://openprocessing.org/sketch/1263810",
+                    "used_count": 1,
+                    "used_in": [
+                        "Gravity in Reverb.mp4"
+                    ],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "Theuncannytrailshader_8.json",
+                    "name": "Theuncannytrailshader",
+                    "url": "https://openprocessing.org/sketch/1269688",
+                    "used_count": 1,
+                    "used_in": [
+                        "Iron Delay Structure.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "TinyTipsnTricks.json",
+            "canonical_name": "TinyTipsnTricks",
+            "canonical_url": "https://openprocessing.org/@u113782/683375",
+            "merged_used_in": [
+                "Concrete Resonance Unit.mp4",
+                "Perimeter Glow.mp4",
+                "Underground Relay.mp4",
+                "Glass Partition.mp4",
+                "Null Frequency.mp4",
+                "Filter Sweep.mp4"
+            ],
+            "merged_used_count": 6,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "TinyTipsnTricks_1.json",
+                    "name": "TinyTipsnTricks_1",
+                    "url": "https://openprocessing.org/@u113782/683375",
+                    "used_count": 2,
+                    "used_in": [
+                        "Null Frequency.mp4",
+                        "Filter Sweep.mp4"
+                    ],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "Untitled_time6_2.json",
+            "canonical_name": "Untitled_time6",
+            "canonical_url": "https://openprocessing.org/sketch/2772381",
+            "merged_used_in": [
+                "Reverb District.mp4",
+                "Negative Delay Chamber.mp4",
+                "Monotone Current.mp4",
+                "Mist Over Concrete.mp4",
+                "Berlin Depth Module.mp4"
+            ],
+            "merged_used_count": 5,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Untitled_time6_1.json",
+                    "name": "Untitled_time6",
+                    "url": "https://openprocessing.org/sketch/2829364",
+                    "used_count": 2,
+                    "used_in": [
+                        "Mist Over Concrete.mp4",
+                        "Berlin Depth Module.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Vague.json",
+            "canonical_name": "Vague",
+            "canonical_url": "https://openprocessing.org/sketch/1189279",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Vague_1.json",
+                    "name": "Vague",
+                    "url": "https://openprocessing.org/sketch/1009068",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "WebGL2Raymarching.json",
+            "canonical_name": "WebGL2Raymarching",
+            "canonical_url": "https://openprocessing.org/sketch/2528097",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "WebGL2Raymarching_1.json",
+                    "name": "WebGL2Raymarching",
+                    "url": "https://openprocessing.org/sketch/2394625",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Weboflines.json",
+            "canonical_name": "Weboflines",
+            "canonical_url": "https://openprocessing.org/sketch/2957889",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Weboflines_1.json",
+                    "name": "Weboflines",
+                    "url": "https://openprocessing.org/sketch/1459661",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "hi.json",
+            "canonical_name": "hi",
+            "canonical_url": "https://openprocessing.org/sketch/973279",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Whoareyou.json",
+                    "name": "Whoareyou",
+                    "url": "https://openprocessing.org/sketch/971530",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "WiggleShaderAuto.json",
+            "canonical_name": "WiggleShaderAuto",
+            "canonical_url": "https://openprocessing.org/sketch/1927840",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "WiggleShaderAuto_1.json",
+                    "name": "WiggleShaderAuto",
+                    "url": "https://openprocessing.org/sketch/1183889",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "WiggleShaderAuto_2.json",
+                    "name": "WiggleShaderAuto",
+                    "url": "https://openprocessing.org/sketch/1143168",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "anoshades.json",
+            "canonical_name": "anoshades",
+            "canonical_url": "https://openprocessing.org/sketch/2448448",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "WiggleShader_1.json",
+                    "name": "WiggleShader",
+                    "url": "https://openprocessing.org/sketch/1255182",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "Wobblycat_1.json",
+            "canonical_name": "Wobblycat",
+            "canonical_url": "https://openprocessing.org/sketch/2398048",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "Wobblyme.json",
+                    "name": "Wobblyme",
+                    "url": "https://openprocessing.org/sketch/831205",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Wobblycat_5.json",
+                    "name": "Wobblycat",
+                    "url": "https://openprocessing.org/sketch/678958",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                },
+                {
+                    "duplicate_file": "Wobblycat_6.json",
+                    "name": "Wobblycat",
+                    "url": "https://openprocessing.org/sketch/699004",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "curlinessclayGURJAO.json",
+            "canonical_name": "curlinessclayGURJAO",
+            "canonical_url": "https://openprocessing.org/sketch/2970753",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "curlinessclayGURJAO_1.json",
+                    "name": "curlinessclayGURJAO",
+                    "url": "https://openprocessing.org/sketch/2971327",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "curlinessclayGURJAO_2.json",
+                    "name": "curlinessclayGURJAO",
+                    "url": "https://openprocessing.org/sketch/2971176",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "entropicnightovertherhone.json",
+            "canonical_name": "entropicnightovertherhone",
+            "canonical_url": "https://openprocessing.org/sketch/2894809",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "entropicnightovertherhone_1.json",
+                    "name": "entropicnightovertherhone",
+                    "url": "https://openprocessing.org/sketch/1623889",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "entropicnightovertherhone_3.json",
+                    "name": "entropicnightovertherhone",
+                    "url": "https://openprocessing.org/sketch/1624129",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "entropicnightovertherhone_5.json",
+                    "name": "entropicnightovertherhone",
+                    "url": "https://openprocessing.org/sketch/1593240",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "entropicnightovertherhone_6.json",
+                    "name": "entropicnightovertherhone",
+                    "url": "https://openprocessing.org/sketch/2862086",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "entropicnightovertherhone_7.json",
+                    "name": "entropicnightovertherhone",
+                    "url": "https://openprocessing.org/sketch/1601566",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "linestilesOPGU.json",
+            "canonical_name": "linestilesOPGU",
+            "canonical_url": "https://openprocessing.org/sketch/2872955",
+            "merged_used_in": [
+                "Dimensional Haze.mp4"
+            ],
+            "merged_used_count": 1,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "linestiles240530.json",
+                    "name": "linestiles240530",
+                    "url": "https://openprocessing.org/sketch/2356292",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "ondas.json",
+            "canonical_name": "ondas",
+            "canonical_url": "https://openprocessing.org/sketch/1963168",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "waveyvibessssedit_1.json",
+                    "name": "waveyvibessssedit",
+                    "url": "https://openprocessing.org/sketch/1954725",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "waveyvibessssedit_2.json",
+                    "name": "waveyvibessssedit",
+                    "url": "https://openprocessing.org/sketch/1963111",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "waveyvibessssedit_3.json",
+                    "name": "waveyvibessssedit",
+                    "url": "https://openprocessing.org/sketch/1819791",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "outofbounds_3.json",
+            "canonical_name": "outofbounds",
+            "canonical_url": "https://openprocessing.org/sketch/1709793",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "outofbounds_4.json",
+                    "name": "outofbounds",
+                    "url": "https://openprocessing.org/sketch/1540595",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "outofboundsglsltutorial.json",
+            "canonical_name": "outofboundsglsltutorial",
+            "canonical_url": "https://openprocessing.org/sketch/1574301",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "outofboundsglsltutorial_1.json",
+                    "name": "outofboundsglsltutorial",
+                    "url": "https://openprocessing.org/sketch/1546046",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "painting.json",
+            "canonical_name": "painting",
+            "canonical_url": "https://openprocessing.org/sketch/2691941",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "painting_4.json",
+                    "name": "painting",
+                    "url": "https://openprocessing.org/sketch/1611128",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "painting_1.json",
+            "canonical_name": "painting",
+            "canonical_url": "https://openprocessing.org/sketch/1927146",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "painting_3.json",
+                    "name": "painting",
+                    "url": "https://openprocessing.org/sketch/1792801",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "particleinknoisedanielone.json",
+            "canonical_name": "particleinknoisedanielone",
+            "canonical_url": "https://openprocessing.org/sketch/2134512",
+            "merged_used_in": [
+                "Coastal Delay.mp4",
+                "Thunderous Drive Flow.mp4",
+                "Rolling Groove Meditation.mp4",
+                "Negative Field.mp4",
+                "Berlin Depth Module.mp4",
+                "Compressed Void.mp4",
+                "Echo Chamber Pulse.mp4",
+                "Dimensional Haze.mp4",
+                "Reinforced Silence.mp4",
+                "Obscured Sector.mp4",
+                "Monolithic Pulse.mp4",
+                "Spatial Core Swells.mp4",
+                "Pulse of the Estuary.mp4"
+            ],
+            "merged_used_count": 14,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "particleinknoise_16.json",
+                    "name": "particleinknoise",
+                    "url": "https://openprocessing.org/sketch/1934040",
+                    "used_count": 2,
+                    "used_in": [
+                        "Pulse of the Estuary.mp4",
+                        "Reinforced Silence.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "pleasereflectupon_2.json",
+            "canonical_name": "pleasereflectupon",
+            "canonical_url": "https://openprocessing.org/sketch/1636518",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "pleasereflectupon_3.json",
+                    "name": "pleasereflectupon",
+                    "url": "https://openprocessing.org/sketch/1605919",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "proceduralnightreflectionsII.json",
+            "canonical_name": "proceduralnightreflectionsII",
+            "canonical_url": "https://openprocessing.org/sketch/2433766",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "proceduralnightreflectionsII_42.json",
+                    "name": "proceduralnightreflectionsII",
+                    "url": "https://openprocessing.org/sketch/794082",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "rainbowebat.json",
+            "canonical_name": "rainbowebat",
+            "canonical_url": "https://openprocessing.org/sketch/2964633",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "rainbowgravity.json",
+                    "name": "rainbowgravity",
+                    "url": "https://openprocessing.org/sketch/2921828",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "rainbowgravity_1.json",
+                    "name": "rainbowgravity",
+                    "url": "https://openprocessing.org/sketch/2281578",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "rainbowgravity_3.json",
+                    "name": "rainbowgravity",
+                    "url": "https://openprocessing.org/sketch/1858845",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "rainbowgravity_5.json",
+                    "name": "rainbowgravity",
+                    "url": "https://openprocessing.org/sketch/1621711",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "rainbowgravity_6.json",
+                    "name": "rainbowgravity",
+                    "url": "https://openprocessing.org/sketch/1600774",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "rainbowgravity_8.json",
+                    "name": "rainbowgravity",
+                    "url": "https://openprocessing.org/sketch/2921830",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                },
+                {
+                    "duplicate_file": "rainbowgravity_9.json",
+                    "name": "rainbowgravity",
+                    "url": "https://openprocessing.org/sketch/1889100",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "rainbowgravityHomepageEdition.json",
+            "canonical_name": "rainbowgravityHomepageEdition",
+            "canonical_url": "https://openprocessing.org/sketch/2691734",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "rainbowgravityHomepageEdition_1.json",
+                    "name": "rainbowgravityHomepageEdition",
+                    "url": "https://openprocessing.org/sketch/2858177",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "sketch_191203a.json",
+            "canonical_name": "sketch_191203a",
+            "canonical_url": "https://openprocessing.org/sketch/1578118",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "sketch_191203a_1.json",
+                    "name": "sketch_191203a",
+                    "url": "https://openprocessing.org/sketch/804193",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "tilesmotion240503_3.json",
+            "canonical_name": "tilesmotion240503",
+            "canonical_url": "https://openprocessing.org/sketch/2335512",
+            "merged_used_in": [
+                "Phantom Platform.mp4",
+                "Cold Metric.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "tilesmotion240503.json",
+                    "name": "tilesmotion240503",
+                    "url": "https://openprocessing.org/sketch/2605886",
+                    "used_count": 1,
+                    "used_in": [
+                        "Cold Metric.mp4"
+                    ],
+                    "needs_qc": true
+                }
+            ]
+        },
+        {
+            "canonical_file": "untitled.json",
+            "canonical_name": "untitled",
+            "canonical_url": "https://openprocessing.org/sketch/2292631",
+            "merged_used_in": [
+                "Ultimate Driving Immersion.mp4",
+                "Sub Pressure Loop.mp4"
+            ],
+            "merged_used_count": 2,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "untitled_1.json",
+                    "name": "untitled",
+                    "url": "https://openprocessing.org/sketch/1941132",
+                    "used_count": 1,
+                    "used_in": [
+                        "Sub Pressure Loop.mp4"
+                    ],
+                    "needs_qc": false
+                }
+            ]
+        },
+        {
+            "canonical_file": "wormhole.json",
+            "canonical_name": "wormhole",
+            "canonical_url": "https://openprocessing.org/sketch/1751767",
+            "merged_used_in": [],
+            "merged_used_count": 0,
+            "duplicates_quarantined": [
+                {
+                    "duplicate_file": "wormhole_1.json",
+                    "name": "wormhole",
+                    "url": "https://openprocessing.org/sketch/1540160",
+                    "used_count": 0,
+                    "used_in": [],
+                    "needs_qc": false
+                }
+            ]
+        }
+    ]
+}

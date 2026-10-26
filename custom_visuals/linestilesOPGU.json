@@ -1,0 +1,29 @@
+{
+    "name": "linestilesOPGU",
+    "code": "// === Tab: mySketch ===\nlet P = {\n\ttiles: 5,\n\tpadding: 0.2,\n\tedgesMax: 15,\n\tedgesAttempts: 20,\n\tedgesBreak: 4,\n\tinnerGrid: 3,\n\tstartPoint: [1, 1],\n\tsymmetry: 'reflect'\n}\n\nlet pointsData\n\nfunction quadrant(points, size) {\n\tlet step = size / P.innerGrid\n\tstrokeWeight(3)\n\tstroke('#fff')\n\tfor (let i = 1; i < points.length; i++) {\n\t\tlet p1 = points[i - 1]\n\t\tlet p2 = points[i]\n\t\tif (p1 === false || p2 === false) continue // continue breaks the current for loop iteration and loops round again at that point\n\t\tlet [x1, y1] = p1\n\t\tlet [x2, y2] = p2\n\t\tline(x1 * step, y1 * step, x2 * step, y2 * step)\n\t}\n}\n\nfunction mirroredQuadrants(points, size) {\n\tvar step = size / 2\n\tpush()\n\tif (P.symmetry === 'reflect') {\n\t\ttranslate(step, step)\n\t\tscale(1, -1)\n\t\tquadrant(points, step)\n\t\tscale(1, -1)\n\t\tquadrant(points, step)\n\t\tscale(-1, 1)\n\t\tquadrant(points, step)\n\t\tscale(1, -1)\n\t\tquadrant(points, step)\n\t} else if (P.symmetry === 'rotate') {\n\t\ttranslate(step, step)\n\t\tquadrant(points, step)\n\t\trotate(Math.PI / 2)\n\t\tquadrant(points, step)\n\t\trotate(Math.PI / 2)\n\t\tquadrant(points, step)\n\t\trotate(Math.PI / 2)\n\t\tquadrant(points, step)\n\t}\n\tpop()\n}\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tpointsData = []\n\tfor (let i = 0; i < P.tiles ** 2; i++) {\n\t\tpointsData.push(getPoints())\n\t}\n\t\n\tnoLoop()\n}\n\nfunction draw() {\n\tbackground('#121212')\n\tlet m = max(width, height) * 0.85\n\tpush() \n\ttranslate((width - m) / 2, (height - m) / 2)\n\tlet blockStep = m / P.tiles \n\tlet padding = blockStep * P.padding \n\tlet blockSize = blockStep - padding * 2\n\tpointsData.forEach(({ points }, i) => {\n\t\tlet x = i % P.tiles \n\t\tlet y = floor(i / P.tiles) \n\t\tpush() \n\t\ttranslate(x * blockStep + padding, y * blockStep + padding)\n\t\tmirroredQuadrants(points, blockSize)\n\t\tpop()\n\t})\n\tpop()\n}\n\nfunction windowResized() {\n\tresizeCanvas(window.innerWidth, window.innerHeight) \n\tredraw()\n}\n\nfunction mousePressed() {\n\tpointsData = []\n\tfor (let i = 0; i < P.tiles ** 2; i++) {\n\t\tpointsData.push(getPoints())\n\t}\n\tredraw()\n}\n\n// === Tab: getPoints ===\nlet directions = [\n    [1, 0],\n    [0, -1],\n    [0, 1],\n    [-1, 0],\n]\n\nfunction getPoints() {\n\tlet [x, y] = P.startPoint \n\tlet points = [[x, y]] \n\tlet edges = {} \n\tlet xMax = P.innerGrid \n\tlet yMax = P.innerGrid \n\t\n\tconst getEdges = (x, y) => {\n\t\t\tlet key = `${x}-${y}`\n\t\t\tif (!edges[key]) {\n\t\t\t\t\tedges[key] = []\n\t\t\t}\n\t\t\treturn edges[key]\n\t}\n\t\n    let i = 0\n    let pointsCount = 0\n    let needToPushPoint1 = false\n    while (i < P.edgesAttempts && pointsCount < P.edgesMax) {\n        let visited = getEdges(x, y)\n        let options = [...directions].filter(([xd, yd]) => {\n            if (x + xd < 0 || x + xd > xMax) return false\n            if (y + yd < 0 || y + yd > yMax) return false\n            if (visited.find(([vx, vy]) => vx === x + xd && vy === y + yd)) return false\n            return true\n        })\n\n        if (options.length === 0) {\n            x = Math.floor(Math.random() * (xMax + 1))\n            y = Math.floor(Math.random() * (yMax + 1))\n            i++\n            points.push(false)\n            points.push([x, y])\n            continue\n        }\n\n        if (needToPushPoint1) {\n            points.push([x, y])\n            needToPushPoint1 = false\n            pointsCount++\n        }\n        let prevX = x\n        let prevY = y\n\n        let dir = random(options)\n        x += dir[0]\n        y += dir[1]\n        visited.push([x, y])\n        getEdges(x, y).push([prevX, prevY])\n        points.push([x, y])\n        pointsCount++\n        i++\n\n        if (i % P.edgesBreak === 0) {\n            points.push(false)\n            x = Math.floor(Math.random() * (xMax + 1))\n            y = Math.floor(Math.random() * (yMax + 1))\n            needToPushPoint1 = true\n        }\n    }\t\n\t\n\t\treturn { points, edges }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u584230",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-05",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2872955",
+    "batch_id": "batch_20261005_141539",
+    "batch_date": "2026-10-05",
+    "date_added": "2026-10-05 14:34:52",
+    "used_in_videos": [
+        "Dimensional Haze.mp4",
+        "Stellar Horde Invasion.mp4"
+    ],
+    "used_count": 2,
+    "is_starred": false
+}

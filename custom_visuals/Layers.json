@@ -1,0 +1,26 @@
+{
+    "name": "Layers",
+    "code": "// === Tab: mySketch.js ===\n/*\nIt is a 2D shader made for the weekly Creative Coding Challenge\n(https://openprocessing.org/curation/78544) on the theme \"Layers\".\n\nFirst, there is a pattern layer which is then repeated three\ntimes and bent into a tunnel shape.\n*/\n\nconst scale = Math.max(1, devicePixelRatio)\nlet theShader\n\nfunction preload(){\n\ttheShader = loadShader('https://openprocessing.org/sketch/2820269/files/vert.glsl', 'frag.glsl')\n}\n\nfunction setup() {\n\tpixelDensity(scale)\n  createCanvas(windowWidth, windowHeight, WEBGL)\n}\n\nfunction windowResized() {\n\tpixelDensity(scale)\n  resizeCanvas(windowWidth, windowHeight)\n}\n\nfunction draw() {\n  shader(theShader)\n  theShader.setUniform(\"resolution\", [width * scale, height * scale])\n  theShader.setUniform(\"time\", millis() / 1000.0)\n  rect(0, 0, width, height)\n}\n\n// === Tab: vert.glsl ===\n#version 300 es \nin vec3 aPosition; void main() { gl_Position=vec4(aPosition*2.-1., 1.0); }\n\n// === Tab: frag.glsl ===\n#version 300 es\n/*********\n* made by Matthias Hurrle (@atzedent)\n*/ \nprecision highp float;\nout vec4 O;\nuniform float time;\nuniform vec2 resolution;\n\n#define FC gl_FragCoord.xy\n#define R resolution\n#define T time\n#define S smoothstep\n#define MN min(R.x,R.y)\n#define MX max(R.x,R.y)\n#define SE(v,s) S(s+1./MN,s-1./MN,v)\n#define palette(a) (.5+.5*cos(6.3*((a)+vec3(0,.1,.2))))\n#define reveal(p) SE(MN/MX*length(p),sqrt(S(1.,.0,1./T)))\n\nvec3 aces(vec3 p) {\n  p=max(p*.6,.0);\n  float\n  a=2.51,\n  b=0.03,\n  c=2.43,\n  d=0.59,\n  e=0.14;\n  return clamp((p*(a*p+b))/(p*(c*p+d)+e),.0,1.);\n}\n\nvec2 layer(vec2 p, vec2 off, float zoom, float a) {\n\tfloat s=sin(a), c=cos(a);\n\tmat2 m=mat2(c,-s,s,c);\n\treturn (p-off)*m*zoom;\n}\n\nvoid main() {\n\tvec2 uv=(FC-.5*R)/MN, p=uv;\n\tvec3 col=vec3(0);\n\t\n\t// form a tunnel (comment out to see the pattern)\n\tp=vec2(.5/length(p),atan(p.x,p.y)*2./6.28318);\t\n\t\n\t// add layer upon layer \n\tconst float n=3.;\n\tfor (float i=.0; i++<n;) {\n\t\tfloat k=i+1.;\n\t\tvec2 q=layer(p,vec2(-.1*k*T,sin(T*.1)),k,.0);\n\t\tq=fract(q*vec2(1,.25))-.5;\n\t\t\n\t\tfloat d=max(abs(q.x),abs(q.y));\n\t\td=sin(12.*d+T*.2);\n\t\td=abs(d);\n\t\tcol+=SE(d,.5)*palette(length(q)+T*.125+k)/k*S(.0,1.5,.5+.5*(n-i));\n\t}\n\t\n\t// post processing\n\tcol=mix(vec3(0),col,pow(S(.0,.3,length(uv)),2.));\n\tcol=aces(col);\n\tcol=sqrt(col);\n\t\n\t// reveal effect\n\tcol*=reveal(uv);\n\n\t// vignette\n\tvec2 c=FC/R;\n\tc*=1.-c.yx;\n\tfloat vig=c.x*c.y*25.;\n\tvig=pow(vig,.5);\n\tcol*=vig;\n\n\tO=vec4(col,1);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\t<meta charset=\"utf-8\" />\n\t<!-- keep the line below for OpenProcessing compatibility -->\n\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t<script src=\"https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/p5.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\nhtml,\nbody {\n\tmargin: 0;\n\tpadding: 0;\n\toverflow: hidden;\n\tbackground: #fff;\n}\n",
+    "inline_assets": {},
+    "author": "atzedent",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/2820269",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 21:29:26",
+    "used_in_videos": [
+        "Acid Line Vanguard.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,26 @@
+{
+    "name": "XmasTree",
+    "code": "// === Tab: mySketch.js ===\nlet palette = ['#ffff8c', '#8cffc6', '#8c8cff', '#ff8cc6'];\nlet vmin, vmax;\nlet gl, glsl;\nlet radius;\nlet depth;\nlet thickness;\nlet angle;\nlet h;\nlet NUM = 280;\nlet sphereArr = [];\n\nfunction preload() {\n  glsl = loadShader('https://openprocessing.org/sketch/1416184/files/shader.vert', 'shader.frag');\n}\n\nfunction getTreePos(u, radius, rOffset, depth, thickness, angle) {\n  let a = u * angle;\n  let r = (1 - u) + rOffset;\n  let v = 0.5;\n  let x = cos(a) * r;\n  let y = map(v + u * depth, 0, 1, 0, -1) * thickness;\n  let z = sin(a) * r;\n  return {\n    x: x * radius,\n    y: y * radius,\n    z: z * radius\n  }\n}\n\nfunction setup() {\n  createCanvas(1112, 834, WEBGL);\n\tcolorMode(HSB, 255);\n  noStroke();\n  gl = drawingContext;\n  vmin = max(width, height);\n  vmax = max(width, height);\n  \n  radius = vmin / 4;\n  depth = 14;\n  thickness = 0.2;\n  angle = TWO_PI * 11;\n  h = radius * thickness * depth;\n  \n  for (let i = 0; i < NUM; i++) {\n    sphereArr[i] = getTreePos(i / NUM, radius, 0.03, depth, thickness, angle);\n    Object.assign(sphereArr[i], {\n      i,\n      c: color(i*100%255, 255, 255)\n    });\n  }\n}\n\nfunction draw() {\n  let sec = millis() / 1000;\n  let ry = -sec * 0.5;\n  \n  background('#001710');\n  \n  rotateY(ry);\n  \n  gl.enable(gl.DEPTH_TEST);\n  gl.depthFunc(gl.ALWAYS);\n  gl.enable(gl.BLEND);\n  gl.blendFunc(gl.SRC_ALPHA, gl.ONE);\n  \n  for (let { i, x, y, z, c } of sphereArr) {\n    push();\n    {\n      translate(x, y + h / 2, z);\n      rotateY(-ry);\n      scale(1 + (1 - (i / NUM)) * 2);\n      shader(glsl);\n      glsl.setUniform('uColor', color(c)._array)\n      plane(vmin / 6);\n    }\n    pop();\n  }\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\n\n// === Tab: shader.vert ===\nattribute vec3 aPosition;\nattribute vec2 aTexCoord;\nattribute vec3 aNormal;\n\nuniform mat4 uProjectionMatrix;\nuniform mat4 uModelViewMatrix;\n\nvarying vec2 vTexCoord;\n\nvoid main() {\n  vTexCoord = aTexCoord;\n  vec4 position = vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * position;\n}\n\n// === Tab: shader.frag ===\nprecision mediump float;\n\nvarying vec2 vTexCoord;\nuniform vec3 uColor;\n\nvoid main() {\n  vec2 uv = vTexCoord;\n  float d = 0.02 / length(uv - vec2(0.5));\n  d = pow(d, 2.5);\n  gl_FragColor = vec4(uColor, d);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\t<meta charset=\"utf-8\" />\n\t<!-- keep the line below for OpenProcessing compatibility -->\n\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t<script src=\"https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js\"></script>\n\t<script src=\"https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\nhtml,\nbody {\n\tmargin: 0;\n\tpadding: 0;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1416184",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 23:53:36",
+    "used_in_videos": [
+        "Afterhours Signal.mp4"
+    ],
+    "used_count": 1
+}

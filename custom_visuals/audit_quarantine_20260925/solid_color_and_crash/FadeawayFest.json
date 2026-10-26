@@ -1,0 +1,22 @@
+{
+  "name": "FadeawayFest",
+  "code": "// === Tab: mySketch ===\nlet particles = [];\n\nfunction setup() {\n  createCanvas(4*windowHeight/3, windowHeight);\n\tcolorMode(HSB, 255);\n  background(0);\n\twindow.simulatedMouseX = -1000;\n\twindow.simulatedMouseY = -1000;\n}\n\nfunction draw() {\n  background(0, 5); // Slowly fade out the background\n\n  // Create new particles\n  for (let i = 0; i < 5; i++) {\n    particles.push(new Particle((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), random(255), 255, 255));\n  }\n\n  // Update and display particles\n  for (let i = particles.length-1; i >= 0; i--) {\n    let p = particles[i];\n    p.update();\n    p.display();\n    if (p.isDead()) {\n      // Remove dead particles\n      particles.splice(i, 1);\n    }\n  }\n}\n\nclass Particle {\n  constructor(x, y, r, g, b) {\n    this.pos = createVector(x, y);\n    this.vel = p5.Vector.random2D();\n    this.vel.mult(random(2, 5)); // Set initial velocity\n    this.alpha = 255;\n    this.r = r;\n    this.g = g;\n    this.b = b;\n  }\n\n  update() {\n    this.alpha -= 2; // Fade out over time\n    this.pos.add(this.vel);\n  }\n\n  display() {\n    noStroke();\n    fill(this.r, this.g, this.b, this.alpha);\n    ellipse(this.pos.x, this.pos.y, 10, 10);\n  }\n\n  isDead() {\n    return this.alpha < 0;\n  }\n}\n\nfunction keyPressed(){\n  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n}\n\n\n",
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "custom_html": "",
+  "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+  "inline_assets": {},
+  "author": "Richard Bourne",
+  "license": "CC BY-NC-SA",
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "batch_2026-09-25"
+  ],
+  "url": "https://openprocessing.org/sketch/1976140",
+  "batch_id": "batch_20260925_103420",
+  "batch_date": "2026-09-25",
+  "date_added": "2026-09-25 11:32:00"
+}

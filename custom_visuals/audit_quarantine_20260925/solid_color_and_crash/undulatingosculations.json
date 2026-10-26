@@ -1,0 +1,22 @@
+{
+    "name": "undulatingosculations",
+    "code": "// === Tab: undulating_osculations ===\n/*\n * undulating osculations\n * by  scott_me \n * edited by let circles are subject to two forces: an attraction to a neighbour,\n and a force perpendicular to that one.  however, because that \n perpendicular force is defined with a sine function, some circles want\n to travel clockwise and some counter.\n */\n\nlet NUM=1<<8,  //number of circle elements\n                 IDX=NUM-1, \n                 DIAM=5;    //diameter of circles\nlet RATE=0.2,    //rate of attraction between neighbour circles\n                   P_RATE=0.2,   //rate of perpendicular force\n                   LIMIT=5.0;   //preferred distance between neigbours\n\nlet places[]=new Array(NUM);\n\nlet perp = new Array(NUM);\nlet hues = new Array(NUM);\n\nfunction setup() {\n  createCanvas(600, 600);\n  smooth(8);\n  noStroke();\n\n  ellipseMode(CENTER);\n  colorMode(HSB, NUM, 1, 1);\n\n  for (i=0; i<NUM; i++) {\n    places[i]=new PVector(random(width), random(height)); //creates new circles\n    perp[i]=sin(TWO_PI*i/NUM )*P_RATE;  //calculates perpendicular forces\n    hues[i]=color(float(i), 1, 1);   //calculates colour of circles\n  }\n}\n\nfunction draw() {\n  background(20);\n  let pos=places[0];\n\n  for (i=0; i<NUM; ) {\n    display(hues[i], pos);\n    move(perp[i], pos, pos=places[++i&IDX]);\n  }\n}\n\nfunction keyTyped() {\n  for (let p of places)\n    p.set(random(width), random(height), 0);\n}\n\nfunction mousePressed() {\n  if (mouseButton = LEFT)  keyTyped();\n}\n\nfunction display(wheel, place) {\n  fill(wheel);\n  ellipse(place.x, place.y, DIAM, DIAM);\n}\n\nfunction move(right, p, n) {\n  v=new PVector();\n  v.set(n);\n  v.sub(p);  //v becomes vector separating a circle from its neighbour\n\n  let len=v.mag();\n  adjust=(len-LIMIT)/len;\n\n  v.mult(adjust*RATE);  //attraction to neighbour calculated\n  p.add(v);  //attraction to neighbour is added to position\n\n  v.normalize();\n  p.add(v.y*right, -v.x*right, 0);  //perpendicular force is added to position\n\n  p.x=constrain(p.x, DIAM, width-DIAM);  //  keeps circles  \n  p.y=constrain(p.y, DIAM, height-DIAM);  //  within frame\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "anthony",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1546234",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:56:56"
+}

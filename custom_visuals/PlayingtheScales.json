@@ -1,0 +1,24 @@
+{
+    "name": "PlayingtheScales",
+    "code": "// === Tab: mySketch ===\n// 普通にfractすると整数1ごとにグリッドができる。\n// これを2本の一次独立なベクトルを使ってやってみるわけ。\n// 基本は(0, 1)と(1, 0)でやってるけど・・内積取って座標を算出する感じ。\n\nlet myShader;\n\nlet vs =\n\"precision mediump float;\" +\n\"attribute vec3 aPosition;\" +\n\"void main(void){\" +\n\"  gl_Position = vec4(aPosition, 1.0);\" +\n\"}\";\n\nlet fs =\n\"precision mediump float;\" +\n\"uniform vec2 u_resolution;\" +\n\"uniform vec2 u_mouse;\" +\n\"uniform float u_time;\" +\n\"const float pi = 3.14159;\" +\n// hsbで書かれた(0.0～1.0)の数値vec3をrgbに変換する魔法のコード\n\"vec3 getHSB(float r, float g, float b){\" +\n\"    vec3 c = vec3(r, g, b);\" +\n\"    vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);\" +\n\"    rgb = rgb * rgb * (3.0 - 2.0 * rgb);\" +\n\"    return c.z * mix(vec3(1.0), rgb, c.y);\" +\n\"}\" +\n// e1, e2は単位ベクトルでなくていいけど一次独立でないと('ω'乂)ﾀﾞﾒｰ\n\"vec2 getGrid(vec2 p, vec2 e1, vec2 e2){\" +\n\"  float a = dot(e1, e1);\" +\n\"  float b = dot(e1, e2);\" +\n\"  float c = dot(e2, e2);\" +\n\"  float det = a * c - b * b - b;\" +\n\"  float coeff_x = (c * dot(p, e1) + b * dot(p, e2)) / det;\" +\n\"  float coeff_y = (-b * dot(p, e1) + a * dot(p, e2)) / det;\" +\n\"  return fract(vec2(coeff_x, coeff_y));\" +\n\"}\" +\n\"void main(void){\" +\n\"  vec2 st = gl_FragCoord.xy * 0.1 / min(u_resolution.x, u_resolution.y);\" +\n\"  st *= 2.0;\" +\n\"  float angle = u_time * pi * 0.1;\" +\n\"  float radius = 1.0 + 0.2 * sin(angle * 3.0);\" +\n\"  vec2 e1 = radius * vec2(cos(angle), sin(angle));\" +\n\"  vec2 e2 = radius * vec2(cos(angle + pi / 3.0), sin(angle + pi / 3.0));\" +\n\"  vec2 f = getGrid(st, e1, e2);\" +\n\"  float sat = 0.5 * (f.x + f.y);\" +\n\"  float hue = mod(u_time * 0.07, 1.0);\" +\n\"  gl_FragColor = vec4(getHSB(hue, sat, 1.0 - sat * 0.3), 1.0);\" +\n\"}\";\n\nlet lapse = 0;    // mouse timer\n\nfunction setup(){\n  createCanvas(1112, 834, WEBGL);\n\tbackground(0);\n\tframeRate(60);\n  myShader = createShader(vs, fs);\n  shader(myShader);\n  //noLoop();\n}\n\nfunction draw(){\n  myShader.setUniform(\"u_resolution\", [width, height]);\n  myShader.setUniform(\"u_mouse\", [(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))]);\n  myShader.setUniform(\"u_time\", millis() / 1000);\n  quad(-1, -1, -1, 1, 1, 1, 1, -1);\n}\n\nfunction mousePressed(){\n// prevents mouse press from registering twice\n  if (frameCount - lapse > 15){\n    save('pix.jpg');\n    lapse = frameCount;\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/865431",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:41:18",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

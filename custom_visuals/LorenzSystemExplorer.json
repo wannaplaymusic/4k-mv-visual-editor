@@ -1,0 +1,67 @@
+{
+    "name": "LorenzSystemExplorer",
+    "code": "// === Tab: mySketch ===\nclass Particle{\n\tconstructor(x,y,z){\n\t\tthis.x=x;\n\t\tthis.y=y;\n\t\tthis.z=z;\n\t}\n\t\n\trender(){\n\t\tlet posVec = createVector(this.x,this.y,this.z).sub(centerVector);\n\t\tnoStroke();\n\t\tlet zVal = posVec.dot(zProjVector);\n\t\tlet z_colorFactor = constrain(zVal*zoom*1.5, -1, 1);\n\t\t//fill(255,255*(1-z_colorFactor)/2, 255*(1-z_colorFactor)/2);\n\t\tfill(255*(1-z_colorFactor)%255, 255, 255);\n\t\tellipse((posVec.dot(xProjVector)*zoom+1)*width/2,(posVec.dot(yProjVector)*zoom+1)*width/2,width/160*(2/(z_colorFactor+2)));\n\t}\n\t\n\tupdate(){\n\t\tlet xyz = [this.x*scaleFactor,this.y*scaleFactor,this.z*scaleFactor];\n\t\tlet dxyz = [0,0,0];\n\t\tfor(let i=0; i<3; i++){\n\t\t\tdxyz[i] += coeffs[i][0];\n\t\t\tfor(let j=0; j<3; j++){\n\t\t\t\tdxyz[i] += coeffs[i][1][j]*xyz[j];\n\t\t\t}\n\t\t\tfor(let j=0; j<6; j++){\n\t\t\t\tdxyz[i] += coeffs[i][2][j]*xyz[coeff_2o_guide[j][0]]*xyz[coeff_2o_guide[j][1]];\n\t\t\t}\n\t\t}\n\t\tlet dxyz_mag = createVector(...dxyz).mag();\n\t\tfor(let i=0; i<3; i++){\n\t\t\tdxyz[i] *= dt / dxyz_mag;\n\t\t}\n\t\tthis.x += dxyz[0];\n\t\tthis.y += dxyz[1];\n\t\tthis.z += dxyz[2];\n\t}\n}\n\nlet zoom = 0.0329;\nlet centerVector = new p5.Vector(0.4570127572475542, -1.381966741254599, 26.34838169640624);\nlet xProjVector = new p5.Vector(-0.25596383973117576, 0.5888093340113723, 0.7666720817475731);\nlet yProjVector;\nlet zProjVector = new p5.Vector(-0.3350913277416947, 0.6898762675470864, -0.6417044004427654);\n\nlet paused = false;\nlet scaleFactor = 1;\nlet dt = 0.3;\nlet coeffs = [\n\t[0,[-10,10,0],[0,0,0,0,0,0]],\n\t[0,[28,-1,0],[0,0,-1,0,0,0]],\n\t[0,[0,0,-2.66],[0,1,0,0,0,0]]\n];\n\ncoeff_2o_guide = [[0,0],[0,1],[0,2],[1,1],[1,2],[2,2]];\n\nlet particles = [];\n\nfunction print_stuffs(){\n\tprint(JSON.stringify(coeffs));\n\tprint(JSON.stringify(xProjVector));\n\tprint(JSON.stringify(zProjVector));\n\tprint(JSON.stringify(centerVector));\n\tprint(JSON.stringify(zoom));\n}\n\nfunction randomize_coeffs(){\n\tlet deviation = 0.1;\n\tfor(let i=0; i<3; i++){\n\t\t//coeffs[i][0]=random(2)-1;\n\t\tfor(let j=0; j<3; j++){\n\t\t\tcoeffs[i][1][j] += (random(2)-1);\n\t\t}\n\t\tfor(let j=0; j<6; j++){\n\t\t\tcoeffs[i][2][j] += (random(2)-1);\n\t\t}\n\t}\n}\n\nfunction re_init(){\n\tbackground(0);\n\tparticles=[];\n\tfor(let i=0; i<500; i++){\n\t\tlet ff = 12;\n\t\tparticles.push(new Particle((random(2)-1)*ff+0.3,(random(2)-1)*ff,(random(2)-1)*ff+1));\n\t}\n\t//randomize_coeffs();\n\t//print_stuffs();\n}\n\nfunction setup() {\n\t//pixelDensity(1.0);\n\tcreateCanvas(4/3*max(windowWidth, windowHeight),max(windowWidth, windowHeight));\n\tcolorMode(HSB, 255);\n\tre_init();\n}\n\nfunction draw() {\n\ttranslate(0, -60);\n\tscale(.9);\n\thandleRotation();\n\thandleMove();\n\tbackground(0,0,0,40);\n\tfor(let i=0; i<5; i++){\n\tfor(p of particles){\n\t\tp.render();\n\t}\n\tif(!paused)\n\t  for(p of particles){\n\t\t  p.update();\n\t  }\n\t}\n}\n\nfunction handleMove(){\n\tlet movSpeed = 0.012/zoom;\n\tif (keyIsPressed){\n\t\tswitch(key){\n\t\t\tcase 'w':\n\t\t\t\tcenterVector.add(p5.Vector.mult(yProjVector,movSpeed));\n\t\t\t\tbreak;\n\t\t\tcase 'a':\n\t\t\t\tcenterVector.add(p5.Vector.mult(xProjVector,movSpeed));\n\t\t\t\tbreak;\n\t\t\tcase 's':\n\t\t\t\tcenterVector.add(p5.Vector.mult(yProjVector,-movSpeed));\n\t\t\t\tbreak;\n\t\t\tcase 'd':\n\t\t\t\tcenterVector.add(p5.Vector.mult(xProjVector,-movSpeed));\n\t\t\t\tbreak;\n\t\t\tcase 'r':\n\t\t\t\tzoom *= 1.04;\n\t\t\t\tbreak;\n\t\t\tcase 'f':\n\t\t\t\tzoom *= 0.96;\n\t\t\t\tbreak;\n\t\t\tcase 'z':\n\t\t\t\tcenterVector.add(p5.Vector.mult(zProjVector,-movSpeed));\n\t\t\t\tbreak;\n\t\t\tcase 'x':\n\t\t\t\tcenterVector.add(p5.Vector.mult(zProjVector,movSpeed));\n\t\t\t\tbreak;\n\t\t}\n\t}\n}\n\nfunction handleRotation(){\n\tlet rotSpeed = 0.04;\n\tif (keyIsPressed){\n\t\tswitch(keyCode){\n\t\t\tcase LEFT_ARROW:\n\t\t\t\tzProjVector.add(p5.Vector.mult(xProjVector,-rotSpeed));\n\t\t\t\tbreak;\n\t\t\tcase RIGHT_ARROW:\n\t\t\t\tzProjVector.add(p5.Vector.mult(xProjVector,rotSpeed));\n\t\t\t\tbreak;\n\t\t\tcase UP_ARROW:\n\t\t\t\tzProjVector.add(p5.Vector.mult(yProjVector,-rotSpeed));\n\t\t\t\tbreak;\n\t\t\tcase DOWN_ARROW:\n\t\t\t\tzProjVector.add(p5.Vector.mult(yProjVector,rotSpeed));\n\t\t\t\tbreak;\n\t\t}\n\t\tswitch(key){\n\t\t\tcase 'q':\n\t\t\t\txProjVector.add(p5.Vector.mult(xProjVector.cross(zProjVector),rotSpeed))\n\t\t\t\tbreak;\n\t\t\tcase 'e':\n\t\t\t\txProjVector.add(p5.Vector.mult(xProjVector.cross(zProjVector),-rotSpeed))\n\t\t\t\tbreak;\n\t\t}\n\t}\n\txProjVector.normalize();\n\tzProjVector.normalize();\n\tyProjVector = xProjVector.cross(zProjVector).normalize();\n\txProjVector = zProjVector.cross(yProjVector).normalize();\n}\n\nfunction keyPressed(){\n\tif(key == 'p'){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n\t}\n\tif(key == ' '){\n\t\tpaused = ~paused;\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2474702",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:59:55",
+    "used_in_videos": [
+        "Coastal Delay.mp4"
+    ],
+    "used_count": 1,
+    "expressive_profile": {
+        "module_id": "LorenzSystemExplorer.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                15.0,
+                255.0
+            ],
+            "mean_lightness": 0.012,
+            "mean_chroma": 0.014,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.4,
+            "curl_vorticity": 0.029,
+            "divergence": 0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-10-05 14:11:46"
+    },
+    "is_new_semantic_ingested": true
+}

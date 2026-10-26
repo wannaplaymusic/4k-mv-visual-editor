@@ -1,0 +1,24 @@
+{
+    "name": "20210920",
+    "code": "// === Tab: mySketch.js ===\n/**********************************\n* dailycoding -20210920 / graphic\n* by E.C.H (Eiichi Ishii)\n**********************************/\n\nlet pg, msk, dis, g;\n\nfunction setup() {\n  createCanvas((w = windowHeight), w);\n  noLoop();\n\n  g = w / 10;\n}\n\nfunction draw() {\n  background(255);\n\n  pg = createGraphics(w, w);\n  pg.rectMode(CENTER);\n  pg.background(255);\n\n  for (let x = g / 2; x <= w - g / 2; x += g) {\n    for (let y = g / 2; y <= w - g / 2; y += g) {\n      pg.push();\n      pg.translate(x, y);\n\n      let vg = int(random(1, 40));\n      let sg = g / vg;\n\n      for (let sx = -g / 2 + sg / 2; sx <= g / 2 - sg / 2; sx += sg) {\n        for (let sy = -g / 2 + sg / 2; sy <= g / 2 - sg / 2; sy += sg) {\n          pg.stroke(0);\n          pg.strokeWeight(random(1, sg));\n          pg.point(sx + random(-g / 2, g / 2), sy + random(-g / 2, g / 2));\n        }\n      }\n      pg.pop();\n    }\n  }\n\n  msk = createGraphics(w, w);\n  msk.angleMode(DEGREES);\n  msk.stroke(255);\n  msk.noFill();\n  let cr = w / 1.2;\n\n  for (let h = 0; h < 4; h++) {\n    msk.push();\n    msk.translate(w / 2, w / 2);\n    msk.rotate(random(360));\n    msk.drawingContext.shadowOffsetX = random(-cr / 30, cr / 30);\n    msk.drawingContext.shadowOffsetY = random(cr / 30, cr / 30);\n    msk.drawingContext.shadowBlur = 10;\n    msk.drawingContext.shadowColor = \"black\";\n    msk.strokeWeight(random(1, w / 20));\n    msk.beginShape();\n    for (let i = 0; i <= 8; i++) {\n      let angle = random(360);\n      msk.curveVertex((cr / 2) * cos(angle), (cr / 2) * sin(angle));\n    }\n    msk.endShape();\n    msk.pop();\n  }\n\n  (dis = pg.get()).mask(msk);\n\n  filter(INVERT);\n  image(pg, 0, 0, w, w);\n  filter(INVERT);\n  image(dis, 0, 0, w, w);\n}\n\nfunction keyPressed() {\n  redraw();\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\t<meta charset=\"utf-8\" />\n\t<!-- keep the line below for OpenProcessing compatibility -->\n\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t<script src=\"https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js\"></script>\n\t<script src=\"https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nhtml, body {  \n    text-align: center;  \n    background-color: #FFFFFF; \n    margin: auto;\n    padding: 10px;\n}  \ncanvas {\n  margin: 10px auto;\n  width:100%;\n  display: block;\n  border: solid 13px black;\n  padding: 26px 26px;\n  box-shadow: -6px 6px 6px gray;\n}\n",
+    "inline_assets": {},
+    "author": "E.C.H",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1270210",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 16:53:13",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_WHITE_SCREEN (All Frames Mean=255.00)"
+}

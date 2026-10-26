@@ -1,0 +1,33 @@
+{
+    "name": "GravParticleRandom",
+    "code": "// === Tab: mySketch ===\nlet img;\nlet attForce = 0.03;\nlet repForce = 0.05;\n\nlet particles = [];\nlet numParticle = 10000;\n\nfunction preload() {\n\timg = loadImage('https://lf9-survey.bytetos.com/obj/web.business.image/202201025d0dabbaed2554fc4f389142');\n}\n\nfunction setup() {\n\tlet canvasSize = max(windowWidth, windowHeight);\n\tcreateCanvas(1112, 834);\n\timg.resize(height, 0);\n\tstrokeWeight(5);\n\tbackground(0);\n\t\n\tfor (let i = 0; i < numParticle; i++) {\n\t\tparticles.push(new Particle(random(width), random(height)));\n\t}\n}\n\nfunction draw() {\n\ttranslate(80, -40);\n\tfill(0, 20);\n\tnoStroke();\n\trect(0, 0, width, height);\n\t\n\tfor (let p of particles) {\n\t\tp.move();\n\t\tp.display();\n\t}\n}\n\nclass Particle {\n\tconstructor(_x, _y) {\n\t\tthis.pos = createVector(_x, _y);\n\t\tthis.target = this.pos.copy();\n\t\tthis.vel = createVector(0, 0);\n\t\tthis.acc = createVector(0, 0);\n\t\tthis.color = img.get(_x, _y);\n\t}\n\t\n\tmove() {\n\t\tlet attraction = p5.Vector.sub(this.target, this.pos);\n\t\tattraction.mult(attForce);\n\t\tlet tmpForce = p5.Vector.sub(createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))), this.pos).limit(30);\n\t\tlet repulsion = tmpForce.copy().normalize().mult(-30).sub(tmpForce);\n\t\trepulsion.mult(repForce);\n\t\t\n\t\tthis.acc = p5.Vector.add(attraction, repulsion);\n\t\tthis.vel.mult(0.97);\n\t\tthis.vel.add(this.acc);\n\t\tthis.vel.limit(3);\n\t\tthis.pos.add(this.vel);\n\t}\n\t\n\tdisplay() {\n\t\tstroke(this.color);\n\t\tpoint(this.pos.x, this.pos.y);\n\t}\n\t\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1422876",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:00:45",
+    "used_in_videos": [
+        "Berlin Depth Module.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

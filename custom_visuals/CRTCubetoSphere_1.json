@@ -1,0 +1,30 @@
+{
+    "name": "CRTCubetoSphere",
+    "code": "// === Tab: mySketch.js ===\n/*\n  粒子流莫比乌斯环\n  粒子沿环的参数方程运动，新粒子不断从起点喷出，形成动态流动效果\n  鼠标按下时切换CRT复古滤镜\n*/\n\nlet radius =220;        // 环的主半径\nlet widthBand = 50;      // 环的宽度\nlet particles = [];\nlet flowSpeed = 0.009;   // 粒子沿环移动的速度\nlet spawnRate = 2;       // 每帧生成的新粒子数量\nlet maxParticles = 1000;\n\nlet crtShader;\nlet useCRT = false;      // 改用鼠标按下时触发，每帧判断\n\n// CRT着色器（不变）\nconst crtShaderSrc = `\nprecision highp float;\nuniform sampler2D tex0;\nvarying vec2 vTexCoord;\n\nvec2 curveRemapUV(vec2 uv) {\n  uv = 2.0 * uv - 1.0;\n  vec2 curvature = vec2(16.0);\n  vec2 offset = abs(uv.yx) / curvature;\n  uv = uv + uv * offset * offset;\n  uv = uv * 0.5 + 0.5;\n  return uv;\n}\n\nvec4 adjBrightness(vec2 inUV, vec4 clr) {\n  float r = 0.5;\n  vec2 cornerUV = min(2.0 * (0.5 - abs(inUV - vec2(0.5))) + r, 1.0);\n  float br = pow(cornerUV.x * cornerUV.y, 2.2) + 0.45;\n  br = clamp(br * br * br * br + 0.55, 0.0, 1.0);\n  return clr * br;\n}\n\nvoid main() {\n  vec2 remappedUV = curveRemapUV(vTexCoord);\n  vec4 baseColor = texture2D(tex0, remappedUV);\n  if (remappedUV.x < 0.0 || remappedUV.y < 0.0 || remappedUV.x > 1.0 || remappedUV.y > 1.0){\n    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n  } else {\n    gl_FragColor = adjBrightness(vTexCoord, baseColor);\n  }\n  gl_FragColor *= abs(sin(remappedUV.y * 576.0));\n  float lum = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));\n  vec3 greenPhosphor = vec3(0.2, 1.0, 0.3);\n  gl_FragColor.rgb = lum * greenPhosphor;\n  gl_FragColor.a = 1.0;\n}\n`;\n\nclass Particle {\n  constructor(phi, t, speed) {\n    this.phi = phi;           // 环向角度 0~2PI\n    this.t = t;              // 宽度方向 -1~1\n    this.speed = speed;      // 移动速度\n    this.age = 0;\n    this.lifespan = TWO_PI / speed;  // 走完一圈所需帧数\n  }\n  \n  // 根据当前phi和t计算3D坐标\n  updatePosition() {\n    let halfPhi = this.phi / 2;\n    let cosHalf = cos(halfPhi);\n    let sinHalf = sin(halfPhi);\n    let r = radius + this.t * widthBand * cosHalf;\n    this.x = r * cos(this.phi);\n    this.y = r * sin(this.phi);\n    this.z = this.t * widthBand * sinHalf;\n  }\n  \n  update() {\n    this.phi += this.speed;\n    this.age++;\n    this.updatePosition();\n    return this.phi < TWO_PI; // 返回false表示生命周期结束\n  }\n  \n  display() {\n    push();\n    translate(this.x, this.y, this.z);\n    // 每个小粒子立方体自转，增加动感\n    rotateX(frameCount * 0.2);\n    rotateY(frameCount * 0.1);\n    rotateZ(frameCount * 0.1);\n    \n    // 颜色随phi和t变化，体现流动感\n    let hue = (degrees(this.phi) + degrees(this.t * PI)) % 360;\n    let sat = map(abs(this.t), 0, 1, 60, 100);\n    let bri = map(sin(this.phi), -1, 1, 70, 100);\n    fill(hue, sat, bri);\n    box(4);\n    pop();\n  }\n}\n\nfunction setup() {\n  createCanvas(600, 600, WEBGL);\n  noStroke();\n  colorMode(HSB, 360, 100, 100);\n  crtShader = createFilterShader(crtShaderSrc);\n  pixelDensity(1);\n  \n  // 初始生成一些粒子，随机分布在环上，制造初始流动感\n  for (let i = 0; i < 200; i++) {\n    let phi = random(TWO_PI);\n    let t = random(-1, 1);\n    let p = new Particle(phi, t, flowSpeed);\n    p.updatePosition();\n    particles.push(p);\n  }\n}\n\nfunction draw() {\n  background(10);\n  \n  // 整体场景缓慢旋转\n  rotateY(frameCount * 0.005);\n  rotateX(frameCount * 0.003);\n  \n  // 生成新粒子（喷出效果）\n  for (let i = 0; i < spawnRate; i++) {\n    if (particles.length < maxParticles) {\n      // 新粒子从 phi=0 附近开始，t 随机分布，体现从一点喷出后扩散到整个环面\n      var phi = random(-0.2, 0.2);   // 起点集中在起始角\n      var t = random(-1, 1);\n      var p = new Particle(phi, t, flowSpeed);\n      p.updatePosition();\n      particles.push(p);\n    }\n  }\n  \n  // 更新并绘制所有粒子，移除生命周期结束的\n  for (let i = particles.length - 1; i >= 0; i--) {\n    var p = particles[i];\n    let alive = p.update();\n    p.display();\n    if (!alive) {\n      particles.splice(i, 1);\n    }\n  }\n  \n  // 鼠标按下时应用CRT滤镜\n  if (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) {\n    filter(crtShader);\n  }\n  \n  // 显示粒子数量（可选，调试用）\n  // fill(0, 0, 100);\n  // text(`particles: ${particles.length}`, -width/2 + 50, -height/2 + 30);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u593681",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2919793",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 21:16:13",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

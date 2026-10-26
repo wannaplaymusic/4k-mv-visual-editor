@@ -1,0 +1,31 @@
+{
+    "name": "ValentinesDay",
+    "code": "// === Tab: mySketch ===\n// need to find a better song option, something more upbeat and appropriate for the theme\n\nlet sound, amplitude;\nlet particles=[]; // array of particle objects\nlet dImg;\nlet gravity;\nlet wind;\n\nfunction preload(){\n  sound = loadSound('https://openprocessing.org/sketch/1835918/files/Heart Beat.mp3');\n\tdImg = loadImage(\"https://openprocessing.org/sketch/1835918/files/Heart.png\"); \n\ttImg = loadImage(\"https://openprocessing.org/sketch/1835918/files/Heart2.png\"); \n\tfontAdvent = loadFont('https://openprocessing.org/sketch/1835918/files/Adventuro.ttf');\n}\n\nfunction setup() {\n  let cnv = createCanvas(windowWidth, windowHeight); \n\tsound.loop(); \n  amplitude = new p5.Amplitude();\n\tnoStroke(); \n\tgravity = createVector(0,0.01);\n\twind = createVector(0,0.004);\n\n}\n\nfunction draw() { \n  background('#40130F');\n\t\tlet level = amplitude.getLevel(); //using amp to control size of the hearts \n\t\tlet size = map(level, 2, 1, 2, 15); //size of hearts\n\n\n  if(((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) {\n  \tparticles.push(new Particle((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), dImg)) //add new particle to array      //ellipse(width/2, height/2, size, size);\n\t\tparticles.push(new Particle((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), tImg))\n\t\t}\n\t\n\tfor(let i=0; i<particles.length; i++) {\n\t\tparticles[i].addForce(gravity); \n\t\tparticles[i].addForce(wind);\n\t\tparticles[i].update(); \n}\n\t// font, size, position and fill of text\n\ttextFont(fontAdvent);\n\ttextAlign(CENTER);\n\ttextSize(size*2); //using amp x2 to control size of hearts \n\tfill(255);\n  text('Happy Valentines Day', width/2, height/2); \n}\nclass Particle {\n\n\tconstructor(x, y, c, b) {\n\t\tthis.loc = createVector(x, y); // location vec\n\t\tthis.vel = createVector(random(0,1), random(-0.5,0.5));\n\t  this.img = c; \n\t} // end constructor\n\n\taddForce(force) {\n\t\tthis.vel.add(force) ;\n\t}\n\t\n\tupdate() {\n\t\tthis.loc.add(this.vel);\n\t\tpush();\n\t\ttranslate(this.loc.x, this.loc.y);\n\t\tvar level = amplitude.getLevel(); //using amp to control size of the hearts \n\t\tvar size = map(level, 2, 1, 2, 15); //size of hearts\n\t\timage(this.img, 0, 0, size, size); \n\t\tpop();\n\t\t\n\t\tif(this.loc.y > height || this.loc.y <= 0){\n\t\t\tthis.vel.y = -(this.vel.y); // bounce on floor\n\t\t}\n\t\tif(this.loc.x > width || this.loc.x <= 0){\n\t\t\tthis.vel.x = -(this.vel.x); // bounce on right wall\n\t\t}\n\t\t\n\t} // end update\n\n} // end class Particle\n\n\nfunction togglePlay() {\n  if (sound.isPlaying() ){\n    sound.pause();\n  } else {\n    sound.loop();\n\t\tamplitude = new p5.Amplitude();\n\t\tamplitude.setInput(sound);\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Kailee",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1835918",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:41:26",
+    "used_in_videos": [
+        "Ultra Sparse Foundation.mp4"
+    ],
+    "used_count": 1
+}

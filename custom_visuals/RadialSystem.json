@@ -1,0 +1,26 @@
+{
+    "name": "RadialSystem",
+    "code": "// === Tab: mySketch ===\nlet nodes = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  background(8, 10, 18);\n\n  for (let i = 0; i < 90; i++) {\n    nodes.push(new NeuralCircle(random(width), random(height)));\n  }\n}\n\nfunction draw() {\n  background(8, 10, 18, 35);\n\n  for (let n of nodes) {\n    n.move();\n    n.display();\n  }\n\n  connectNodes();\n}\n\nfunction connectNodes() {\n  for (let i = 0; i < nodes.length; i++) {\n    for (let j = i + 1; j < nodes.length; j++) {\n      let d = dist(nodes[i].x, nodes[i].y, nodes[j].x, nodes[j].y);\n\n      if (d < 130) {\n        let alpha = map(d, 0, 130, 160, 0);\n        stroke(120, 180, 255, alpha);\n        strokeWeight(1);\n        line(nodes[i].x, nodes[i].y, nodes[j].x, nodes[j].y);\n      }\n    }\n  }\n}\n\nclass NeuralCircle {\n  constructor(x, y) {\n    this.x = x;\n    this.y = y;\n    this.r = random(8, 28);\n    this.baseR = this.r;\n    this.angle = random(TWO_PI);\n    this.speed = random(0.003, 0.012);\n    this.phase = random(TWO_PI);\n  }\n\n  move() {\n    this.angle += random(-0.04, 0.04);\n\n    this.x += cos(this.angle) * 0.45;\n    this.y += sin(this.angle) * 0.45;\n\n    this.x = (this.x + width) % width;\n    this.y = (this.y + height) % height;\n\n    this.r = this.baseR + sin(frameCount * 0.04 + this.phase) * 5;\n  }\n\n  display() {\n    noFill();\n\n    stroke(180, 220, 255, 120);\n    strokeWeight(1.4);\n    circle(this.x, this.y, this.r * 2);\n\n    stroke(80, 140, 255, 45);\n    circle(this.x, this.y, this.r * 3.4);\n\n    noStroke();\n    fill(180, 230, 255, 180);\n    circle(this.x, this.y, 3);\n  }\n}\n\nfunction mousePressed() {\n  for (let i = 0; i < 12; i++) {\n    nodes.push(new NeuralCircle((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) + random(-40, 40), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) + random(-40, 40)));\n  }\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Neha N",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2954457",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:40:10",
+    "used_in_videos": [
+        "Iron Horizon.mp4"
+    ],
+    "used_count": 1
+}

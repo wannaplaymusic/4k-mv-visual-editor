@@ -1,0 +1,29 @@
+{
+    "name": "Faces",
+    "code": "// === Tab: mySketch ===\n// let design is from a let Pearson sketch at http://www.abandonedart.org \n// let mouths are a bit wobbly, let think they are talking to each other.\n// particle system, particles, PVector, ArrayList, array, frameCount, class\n// let interaction\n\nparticleGenerator  pg;\n\nfunction setup() {\n  createCanvas(1112, 834);\n  colorMode(HSB, 360, 100, 100, 100);\n  ellipseMode(RADIUS);\n  pg = new particleGenerator(40, 0);\n}\n\nfunction draw() {\n  background(360);\n  pg.run();\n  stroke(0);\n  strokeWeight(2);\n  noFill();\n  //rect(0, 0, width-1, height-1);\n}\n\n\n// === Tab: tab2 ===\nclass particleGenerator {\n  ArrayList<Particle> particles;\n  emitPos;\n\n  constructor(x, y) {\n    emitPos = new PVector(x, y);\n    particles = new ArrayList<Particle>();\n  }\n\n  function run() {\n    // limit particle generation frequency\n    if (frameCount % 60 == 0) {\n      particles.add(new Particle(emitPos));\n    }\n    for (i = particles.size ()-1; i >= 0; i--) {\n      let p = particles.get(i);\n      p.run();\n      if (p.pos.y > height + 35) {\n        particles.remove(i);\n      }\n    }\n  }\n}\n\n// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\nclass Particle {\n  pos, vel;\n  numFaces = 22;\n  let faces = new Array(numFaces);\n  let gap = random(10), incr;\n\n  constructor(v) {\n    vel = new PVector(0, .75);\n    pos = v.get();\n    for (i = 0; i < numFaces; i++) {\n      faces[i] = new Face();\n    }\n  }\n\n  function run() {\n    pos.add(vel);\n    incr = gap;\n    for (i = 0; i < numFaces; i++) {\n      faces[i].drawFace(pos.x + incr, pos.y);\n      incr += 40 + gap;\n    }\n  }\n}\n\n// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\nclass Face {\n  faceXrad, faceYrad, eyerad, pupilrad, \n  eyeY, mouthY, h, hlfMouthWdth, tilt, alpha, movePupilX;\n\n  constructor() {\n    faceXrad = random(10, 25);\n    faceYrad = random(10, 35);\n    eyerad = random(2, 8);\n    pupilrad = random(.5, eyerad-1);\n    eyeY = random(faceYrad) + eyerad;\n    mouthY = (random((faceYrad-eyerad)/2.0));\n    hlfMouthWdth = faceXrad - (mouthY/(faceYrad/faceXrad));\n    h = random(360);\n    tilt = alpha = 0;\n  }\n\n  function drawFace(cx, cy) { \n    tilt += .005;\n    if (tilt > 1) tilt = 1;\n    alpha += .45;\n    if (alpha > 100) alpha = 100;\n    strokeWeight(2);\n    stroke(0, alpha);\n    fill(h, 50, 100, alpha);\n    ellipse(cx, cy, faceXrad, faceYrad* tilt);\n    strokeWeight(1);\n    fill(360, alpha);\n    ellipse(cx-10, cy-eyeY* tilt, eyerad, eyerad* tilt);\n    ellipse(cx +10, cy-eyeY* tilt, eyerad, eyerad* tilt);\n    fill(0, alpha);\n    movePupilX = 4 * sin(frameCount * .02);\n    ellipse(cx-10+movePupilX, cy-eyeY* tilt, pupilrad, pupilrad* tilt);\n    ellipse(cx+10+movePupilX, cy-eyeY* tilt, pupilrad, pupilrad* tilt);\n    line(cx-hlfMouthWdth, cy+(mouthY* tilt), cx+hlfMouthWdth, cy + (mouthY * tilt));\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1596785",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 17:22:33",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

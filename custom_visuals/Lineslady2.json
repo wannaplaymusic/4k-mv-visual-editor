@@ -1,0 +1,28 @@
+{
+    "name": "Lineslady2",
+    "code": "// === Tab: mySketch.js ===\nlet t = 0;\n\n\nfunction setup() {\n\tcreateCanvas(1920, 800);\n\tbackground(0);\n\t\n}\n\nfunction draw() {\n\tstroke(255);\n\tstrokeWeight(2);\n\tbackground(0);\n\tfor(let j = 0; j < height; j+= windowHeight ){\n\tbeginShape();\n\tfill(0);\n\tfor(let i = 0; i < width; i+= 200){\n\t\n\tcurveVertex(i, j + (height)*noise(i + ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/1000) + t + j));\n\t\n\t}\n  endShape();\n\t}\n\tt+= 0.002\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Martin Pospíšil",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2101807",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:31:00",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Hypnotic Core Pressure.mp4"
+    ],
+    "used_count": 1
+}

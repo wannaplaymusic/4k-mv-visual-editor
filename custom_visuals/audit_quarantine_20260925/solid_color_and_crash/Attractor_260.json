@@ -1,0 +1,22 @@
+{
+    "name": "Attractor_260",
+    "code": "// === Tab: mySketch ===\n// Attractor_26.0\nlet N = 10000 ; let A = 0.01 ; let X[] = new Array(N) ; let Y[] = new Array(N) ; let FX ; let FY ; let I ;\nfunction setup(){\tcreateCanvas(600, 600) ; noSmooth() ; background(0) ; stroke(255,0,0) ; fill(0,0,0,10) ; }\nfunction mousePressed(){ for ( I = 0 ; I < N ; I++ ){ X[I] = random(0,600) ; Y[I] = random(0,600) ; } }\nfunction draw(){ rect(0,0,599,599) ; FX = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/5000 ; FY = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))/5000 ; for ( I = 0 ; I < N ; I++ ){ point(X[I],Y[I]) ;\n\t             if ( X[I] < 300 ){ X[I] = X[I]*(A*sin(+Y[I]*FY)+1) ; }else{ X[I] = (X[I]-600)*(A*sin(-Y[I]*FY)+1)+600 ; } \n\t\t\t\t\t\t\t if ( Y[I] < 300 ){ Y[I] = Y[I]*(A*sin(-X[I]*FX)+1) ; }else{ Y[I] = (Y[I]-600)*(A*sin(+X[I]*FX)+1)+600 ; } } }\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "KaijinQ",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1600030",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:52:52"
+}

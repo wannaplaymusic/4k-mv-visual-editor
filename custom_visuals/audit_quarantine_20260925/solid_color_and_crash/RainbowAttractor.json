@@ -1,0 +1,22 @@
+{
+    "name": "RainbowAttractor",
+    "code": "// === Tab: mySketch ===\n// Attractor_17.0\n\nlet N = 10000 ; let RR = 300 ; let H = 100 ; let dQ = 0.002 ;\nlet hu = 0;\nlet X[] = new Array(N) ; let Y[] = new Array(N) ; \nlet R ; let A ; let I ; let Q ; let BX ; let BY ;\n\nfunction setup(){\n  createCanvas(1112, 834) ; background(0) ;\n\tcolorMode(HSB, 255);\n  fill(0,0,0,10) ; stroke(255,0,0) ;\n  for ( I = 0 ; I < N ; I++ ){\n    X[I] = random(-300,+300) ; Y[I] = random(-300,+300) ;\n  }//let Q = -PI ;\n}//setup()\n\nfunction draw(){\n  //rect(0,0,599,599) ;\n  for ( I = 0 ; I < N ; I++ ){\n    BX = X[I] ; BY = Y[I] ;\n    Y[I] = (RR+Y[I])/2 ;\n    R = sqrt(pow(X[I],2)+pow(Y[I],2)) ; \n    A = atan(Y[I]/X[I]) ;\n    if ( X[I] < 0 ){ A = A+PI ; }  \n    A = A*2 + Q ;\n    X[I] = R*cos(A) ; Y[I] = R*sin(A) ;\n\t\tstroke((hu+R)%255, 200, 255);\n    point(X[I]+556,Y[I]+417) ; \n  }//let Q = Q + dQ ; \n\thu++;\n}//draw()\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1226506",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:14:07"
+}

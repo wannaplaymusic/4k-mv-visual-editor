@@ -1,0 +1,27 @@
+{
+    "name": "ReflectIIICommunity",
+    "code": "// === Tab: mySketch ===\n//Code by Aaron Reuland\n//For the #wccChallenge on the theme of \"community\".\n//in a series with https://openprocessing.org/sketch/2308229  &  https://openprocessing.org/sketch/2344494\n\nlet lights = []\nlet colors = [\"#3d4635\", \"#2a734c\", \"#8e472c\", \"#a7713b\", \"#252b21\", \"#304543\", \"#b18961\", \"#cab68c\"]\nlet simplex\n\nfunction setup() {\n\tcreateCanvas(400, 400);\n\tsimplex = new openSimplexNoise(Date.now())\n\tbackground(\"#131611\");\n\tnoStroke()\n\n\tfor (let a = 0; a < TAU; a += TAU / 60) {\n\t\tlet h = random(height / 15, height / 3.6)\n\t\tlights.push(new light(width / 2 + cos(a) * width / 3, height * 0.66 + sin(a) * height / 3, h, 0, a, 166))\n\t\tlights.push((new light(width / 2 + cos(a) * width / 3, height * 0.66 + sin(a) * height / 3, h * 0.66, 1, a, 0)))\n\t}\n\n\tflex({\n\t\tcanvas: {\n\t\t\tfit: SCALE_DOWN\n\t\t}\n\t})\n\n}\n\nfunction draw() {\n\tif (frameCount == 165) {\n\t\tblendMode(BLEND)\n\t\tlet filler = color(\"#131611\")\n\t\tfiller.setAlpha(100)\n\t\tfill(filler)\n\t\tellipse(width / 2, height * 0.66, width * 0.666, height * 0.666)\n\t\tnoFill()\n\t\tstroke(255, 14)\n\t\tstrokeWeight(0.4)\n\t\tfor (let r = 0; r < 0.666; r += 0.002) {\n\t\t\tlet roff = simplex.noise2D(r * 15, 0.1) * 0.04\n\t\t\tlet rc = constrain(r + roff, 0, 0.66)\n\t\t\tellipse(width / 2, height * 0.66, width * rc, height * rc)\n\n\t\t}\n\t\tnoStroke()\n\t}\n\n\tfor (let l of lights) {\n\t\tl.raise();\n\t\tl.rite();\n\t\tl.risen();\n\t}\n\n\n}\n\n\nclass light {\n\tconstructor(x, y, baseH, type, angle, delay) {\n\t\tthis.x = x\n\t\tthis.y = y\n\t\tthis.pos = createVector(x, y)\n\t\tthis.startPos = createVector(x, y)\n\t\tthis.h = height * 0.4\n\t\tthis.type = type\n\t\tthis.baseH = baseH\n\t\tthis.angle = angle + PI\n\t\tthis.color = color(colorMixer(this.x, colors))\n\t\tthis.targetPos = createVector(0, 0)\n\t\tthis.delay = delay\n\n\t\tif (this.type == 0) {\n\t\t\tthis.targetH = this.y + abs(this.baseH) * -1\n\t\t\tthis.targetPos = createVector(this.pos.x, this.y + abs(this.baseH) * -1)\n\t\t\tthis.color.setAlpha(40)\n\t\t} else {\n\t\t\tthis.targetH = this.y + sin(this.angle) * (this.baseH)\n\t\t\tthis.targetPos = createVector(this.x + cos(this.angle) * this.baseH, this.y + sin(this.angle) * (this.baseH))\n\t\t\tthis.color.setAlpha(20)\n\t\t}\n\n\t\tthis.frames = this.baseH\n\t\tthis.currentFrame = 0\n\t}\n\n\traise() {\n\t\tif (this.delay < 1) {\n\t\t\tif (this.currentFrame < this.frames) {\n\t\t\t\tlet framesMap = map(this.currentFrame, 0, this.frames, 0, 1);\n\t\t\t\tthis.pos = p5.Vector.lerp(this.startPos, this.targetPos, easeOutQuart(framesMap))\n\t\t\t}\n\t\t\tthis.currentFrame++\n\t\t}\n\t}\n\n\trite() {\n\t\tif (this.delay < 1) {\n\t\t\tvar framesMap = map(this.currentFrame, 0, this.frames, 0, 1);\n\t\t\tlet s = lerp(width / 200, width / 50, easeOutQuart(framesMap))\n\t\t\tfill(this.color)\n\t\t\tif (this.type == 0) {\n\t\t\t\tellipse(this.pos.x, this.pos.y, s)\n\t\t\t} else {\n\t\t\t\tlet xoff = simplex.noise2D(this.pos.y / 5, this.pos.x / 70) * (this.frames / 10)\n\t\t\t\tlet yoff = simplex.noise2D(this.pos.y / 5, this.pos.x / 200) * (this.frames / 100)\n\t\t\t\tellipse(this.pos.x + xoff, this.pos.y + yoff, s)\n\t\t\t}\n\t\t}\n\t}\n\n\trisen() {\n\t\tthis.delay--\n\t\tif (this.currentFrame > this.frames) {\n\t\t\tlet index = lights.indexOf(this)\n\t\t\tlights.splice(index, 1)\n\t\t}\n\n\t}\n\n}\n\nfunction colorMixer(x, colorArray) {\n\n\tlet c = noise(x) * colorArray.length\n\tlet c1 = floor(c)\n\tlet c2 = floor(c + 1) % colorArray.length\n\tlet color1 = colorArray[c1]\n\tlet color2 = colorArray[c2]\n\tlet mix = fract(c)\n\tlet coloring = spectral.mix(color1, color2, mix)\n\treturn coloring\n}\n\nfunction easeOutQuart(x) {\n\treturn 1 - Math.pow(1 - x, 4);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Hanako.S",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2468215",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:16:09",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

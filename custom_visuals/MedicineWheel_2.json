@@ -1,0 +1,24 @@
+{
+    "name": "MedicineWheel",
+    "code": "// === Tab: mySketch ===\nlet points = [];\n\nfunction setup() {\n\tcreateCanvas(1024, 800);\n\tangleMode(DEGREES);\n\n\tfor (let r = height / 2 * 0.85; r > 0; r -= height / 2 / 20) {\n\t\tlet angleStep = map(r, height / 2 * 0.85, 0, .1, 10);\n\t\tlet startAngle = random(360);\n\t\tfor (let angle = startAngle; angle < startAngle + 360; angle += angleStep) {\n\t\t\tlet x = width + cos(angle) * r;\n\t\t\tlet y = height + sin(angle) * r;\n\t\t\tpoints.push(new Mover(x, y));\n\t\t}\n\t}\n\tbackground(0, 47, 64);\n}\n\nfunction draw() {\n\tfor (let p of points) {\n\t\tp.update();\n\t\tp.display();\n\t}\n}\n\nclass Mover {\n\tconstructor(_x, _y, _nx = 50, _ny = 50) {\n\t\tthis.pos = createVector(_x, _y);\n\t\tlet nx = 1 / 100;\n\t\tlet ny = 1 / 50;\n\t\tlet nz = 1 / 50;\n\t\tthis.noiseScale = createVector(nx, ny, nz);\n\t\tthis.life = 100;\n\t\tthis.lifeRatio = this.life / 500;\n\t}\n\tupdate() {\n\t\tlet n = noise(this.pos.x * this.noiseScale.x, this.pos.y * this.noiseScale.y);\n\t\tlet angle = map(-n, 0, 1, -90, 90);\n\t\t\n\t\tangle = (angle + frameCount / 10) % 360;\n\t\tlet vel = createVector(2 * sin(angle), 2 * cos(angle));\n\t\t\n\t\tthis.pos.add(vel);\n\t\tthis.life -= this.lifeRatio;\n\t}\n\tdisplay() {\n\t\tstroke(255,237,237, this.life / 2);\n\t\t// stroke(this.life / 2, 100, 80, this.life / 2);\n\t\tpoint(this.pos.x, this.pos.y);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "@drv",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/926054",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:40:47",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

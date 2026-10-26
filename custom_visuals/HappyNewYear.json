@@ -1,0 +1,33 @@
+{
+    "name": "HappyNewYear",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(1112,834);\n\tbackground(0);\n\tcolorMode(HSB);\n\tframeCount=90\n}\n\nvar bounce = false\nvar firepower = 20;\nvar g = 20\nvar particles=[];\nvar ar=0;\nvar sp=false\n\nfunction draw() {\n\tbackground(0,.1)\n\tif(frameCount%50==0){\n\t  fireWork(random(width),random(height),random(50,100))\n\t}if(frameCount%100==0){\n\t   fireWork(random(width),random(height),random(50,150))\n\t}if(frameCount%10==0){\n\t   fireWork(random(width),random(height),random(50,60))\n\t}\n\tar=0\n\tfor(let i=0;i<particles.length;i++){\n    sp=false\n\t\tparticles[i].update();\n\t\tif(particles[i].x>width||particles[i].x<0){if(bounce){particles[i].xv*=-0.5}else{sp=true}}\n\t\tif(particles[i].y<0){if(bounce){particles[i].yv*=-0.3}else{sp=true}}\n\t\t\t\t\t\tif(particles[i].y>height){sp=true}\n\t\tar++;\n\t\tif(sp){particles.splice(i,1);\n\t\t\t\t\ti--;\n\t\t\t\t\t}\n\t}\n  fill(255);\n\tstroke(0);\n\tstrokeWeight(4);\n\ttextAlign(CENTER)\n\ttextSize(100)\t\n\ttext(\"Happy New Year!\",width/2,200)\n\tfill(45, 200, 255);\n\ttextSize(80)\n\ttext(\"First day of 2022!\",width/2,350)\n\tnoStroke();\n}\n\nfunction mousePressed(){fireWork((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),random(50,100))}\n\nfunction fireWork(x,y,s){\n\tfor(let i=0;i<s;i++){\n  particles.push(new Particle(x,y))}\n}\n\nfunction Particle(x,y){\n\tthis.x=x;\n\tthis.y=y;\n\tthis.xv=random(firepower-random(firepower),-firepower+random(firepower));\n\tthis.yv=random(firepower-random(firepower),-firepower+random(firepower));\n\tthis.g=2;\n\tthis.fill=random(255)\n\tthis.fill2=255\n\tthis.fill3=255\n\tthis.fill4=1\n\tthis.update=function(){\n\t\tthis.x+=this.xv\n\t\tthis.y+=this.yv\n\t\tthis.y+=this.g\n\t\tthis.g+=this.g/(50-g)\n\t\t\nfill(this.fill,this.fill2,this.fill3,this.fill4)\n\t\tnoStroke();\n\t\tellipse(this.x,this.y,5)\n\t}\n} \n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1422501",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:01:39",
+    "used_in_videos": [
+        "Black Pressure Grid.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

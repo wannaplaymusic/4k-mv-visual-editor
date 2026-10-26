@@ -1,0 +1,24 @@
+{
+    "name": "GARABATOS2",
+    "code": "// === Tab: mySketch ===\n// Versión simplificada de tu código Splash con círculos grandes\n\nlet splashes = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noStroke();\n  for (let i = 0; i < 5; i++) {\n    splashes.push(new Splash(random(width), random(height), random(100, 300)));\n  }\n}\n\nfunction draw() {\n  background(255, 10); // fondo que se desvanece suavemente\n  for (let s of splashes) {\n    s.paint();\n  }\n}\n\nclass Splash {\n  constructor(x, y, poolR) {\n    this.x = x;\n    this.y = y;\n    this.poolR = poolR;\n    this.c = color(random(255), random(255), random(255), 100);\n  }\n\n  paint() {\n    fill(this.c);\n    let numCircles = 10;\n    for (let i = 0; i < numCircles; i++) {\n      let r = this.poolR * random(0.2, 1);\n      ellipse(this.x + random(-r / 2, r / 2), this.y + random(-r / 2, r / 2), r);\n    }\n  }\n}\n\n// Si presionás \"S\", cambia los colores\nfunction keyPressed() {\n  if (key === 'S' || key === 's') {\n    for (let s of splashes) {\n      s.c = color(random(255), random(255), random(255), 100);\n    }\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "belenmontemurro",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-26"
+    ],
+    "url": "https://openprocessing.org/sketch/2811970",
+    "batch_id": "batch_20260926_101156",
+    "batch_date": "2026-09-26",
+    "date_added": "2026-09-26 10:20:40",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,24 @@
+{
+    "name": "AncientCliffsidePaths_ge",
+    "code": "// === Tab: mySketch ===\n// Credit to the original sketch creator Antrague and previous forkers\n\nlet particles1 = [];\nlet num = 10000;\nlet counter = 0;\n\nfunction setup() {\n  createCanvas((16/9) * windowHeight, windowHeight);\n  background(0);\n  colorMode(HSB);\n  // 可选：降低帧率省算力\n  // frameRate(30);\n\n  for (let i = 0; i < num; i++) {\n    particles1.push(createVector(random(width), random(height)));\n  }\n}\n\nfunction draw() {\n  counter++;\n\n  // 可选：拖影效果（降低越画越亮的感觉）\n  // noStroke();\n  // fill(0, 0, 0, 8);  // 透明度可调\n  // rect(0, 0, width, height);\n\n  // 颜色逻辑保留，但不再限制帧数\n  if (counter < 10) stroke(\"blue\");\n  else stroke(50 + counter, 20, counter + 10, 20);\n\n  for (let i = 0; i < num; i++) {\n    let p = particles1[i];\n\n    // 绘制\n    if (counter > 10) point(p.x + random(-3, 13), p.y);\n    else point(p.x + random(-3, 10), p.y + random(500));\n\n    // 更新位置（流场）\n    p.x += (noise(p.x / 200, p.y / 200, 300000) - 1) * 2;\n    p.y += (noise(p.x / 200, p.y / 200, 30000) - 0.5) * 20;\n\n    // 出界包回，避免粒子走丢\n    if (p.x < 0) p.x += width;\n    if (p.x > width) p.x -= width;\n    if (p.y < 0) p.y += height;\n    if (p.y > height) p.y -= height;\n  }\n}\n\nfunction keyPressed() {\n  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n}\n\n// 可选：窗口变动时保持 16:9 画布比例\nfunction windowResized() {\n  resizeCanvas((16/9) * windowHeight, windowHeight);\n  // 重新铺一层背景避免拉伸残影\n  background(0);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Gokcen Erkilic",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2832445",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:46:19",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

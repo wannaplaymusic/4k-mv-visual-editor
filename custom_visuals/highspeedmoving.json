@@ -1,0 +1,24 @@
+{
+    "name": "highspeedmoving",
+    "code": "// === Tab: mySketch ===\nconst NUM = 30;\nconst cp = [\n  \"#ffb6b9\",\n  \"#bbded6\",\n  \"#fae3d9\",\n  \"#8ac6d1\",\n  \"#fff1ac\",\n  \"#f9bcdd\",\n  \"#d5a4cf\",\n  \"#b689b0\",\n];\nlet stars = [];\nlet tmpX, tmpY;\nlet target = 0;\nlet angle;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  textSize(40);\n  textAlign(CENTER);\n\n  for (let i = 0; i < NUM; i++) {\n    tmpX = random(width);\n    tmpY = random(height);\n    stars.push({\n      x: tmpX,\n      y: tmpY,\n      middleX: tmpX,\n      middleY: tmpY,\n      size: random(10, 30),\n      ellipseColor: \"#fff\",\n      lineColor: random(cp),\n    });\n  }\n  stars[NUM - 1] = stars[0];\n}\n\nfunction draw() {\n  background(0);\n\n  if (target + 1 < NUM) {\n    push();\n    stroke(stars[target].lineColor);\n    strokeWeight(5);\n    line(\n      stars[target].middleX,\n      stars[target].middleY,\n      stars[target].x,\n      stars[target].y,\n    );\n    // point(stars[target].middleX, stars[target].middleY);\n    push();\n    translate(stars[target].middleX, stars[target].middleY);\n    angle = atan2(\n      stars[target + 1].y - stars[target].middleY,\n      stars[target + 1].x - stars[target].middleX,\n    );\n    rotate(angle + QUARTER_PI);\n    text(\"🚀\", 0, 0);\n    pop();\n    pop();\n    stars[target].middleX = lerp(\n      stars[target].middleX,\n      stars[target + 1].x,\n      0.3,\n    );\n    stars[target].middleY = lerp(\n      stars[target].middleY,\n      stars[target + 1].y,\n      0.3,\n    );\n\n    if (\n      dist(\n        stars[target].middleX,\n        stars[target].middleY,\n        stars[target + 1].x,\n        stars[target + 1].y,\n      ) <\n      stars[target + 1].size / 2\n    ) {\n      stars[target].ellipseColor = stars[target].lineColor;\n\t\t\tfill(stars[target].lineColor)\n\t\t\tellipse(stars[target].x, stars[target].y, 40)\n      target++;\n    }\n\n    if (target + 1 === NUM) {\n      for (let i = 0; i < NUM; i++) {\n        stars[i].middleX = stars[i].x;\n        stars[i].middleY = stars[i].y;\n      }\n      target = 0;\n    }\n  }\n\n\tpush();\n  for (star of stars) {\n    noStroke();\n    fill(star.ellipseColor);\n    drawingContext.shadowBlur = 8;\n    drawingContext.shadowColor = star.ellipseColor;\n    ellipse(star.x, star.y, star.size, star.size);\n  }\n  pop();\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "kkeeth",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-05"
+    ],
+    "url": "https://openprocessing.org/sketch/1856523",
+    "batch_id": "batch_20261005_141539",
+    "batch_date": "2026-10-05",
+    "date_added": "2026-10-05 16:18:53",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

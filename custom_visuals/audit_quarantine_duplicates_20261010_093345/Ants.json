@@ -1,0 +1,24 @@
+{
+    "name": "Ants",
+    "code": "// === Tab: mySketch ===\nvar particlesQ = 1024;\nvar c = 0;\n\nvar x = new Array(particlesQ);\nvar y = new Array(particlesQ);\nvar vx = new Array(particlesQ);\nvar vy = new Array(particlesQ);\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n  background(255);\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction draw() {\n\tfor (var a = 0; a < c; a++) {\n\t\tvar ax = 0, ay = 0;\n\t\t\n\t\tfor (var b = 0; b < c; b++) {\n\t\t\tif (a != b) {\n\t\t\t\tdx = x[a] - x[b];\n\t\t\t\tdy = y[a] - y[b];\n\n\t\t\t\tvar d = sqrt(dx*dx + dy*dy);\n\t\t\t\tif (d < 1) d = 1;\n\n\t\t\t\tvar common = cos(d) / d;\n\n\t\t\t\tax += common * dx;\n\t\t\t\tay += common * dy;\n\t\t\t}\n\t\t}\n\n\t\tvx[a] += ax * 0.01;\n\t\tvy[a] += ay * 0.01;\n\t}\n\t\n\tfor (var i = 0; i < c; i++) {\n\t\tx[i] += vx[i];\n\t\ty[i] += vy[i];\n\t\t\n\t\tset(x[i], y[i], 0);\n\t}\n\n\tupdatePixels();\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction addNewParticle() {\n\tx[c] = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n\ty[c] = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n\tvx[c] = 0;\n\tvy[c] = 0;\n\n\tc++;\n\tif (c >= particlesQ) c = 0;\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction mouseClicked() {\n\taddNewParticle();\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction mouseDragged() {\n\taddNewParticle();\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "cameron marshall",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2199971",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:16:12",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_WHITE_SCREEN (All Frames Mean=255.00)"
+}

@@ -1,0 +1,29 @@
+{
+    "name": "DadrasAttractor",
+    "code": "// === Tab: mySketch ===\nvar dots = 10000;\nvar x = new Array(dots);\nvar y = new Array(dots);\nvar z = new Array(dots);\nvar nx = new Array(dots);\nvar ny = new Array(dots);\nvar nz = new Array(dots);\nvar px = new Array(dots);\nvar py = new Array(dots);\nvar pz = new Array(dots);\nvar dt = 0.002;\nvar r = 20;\nvar l = 0;\nvar s = 1;\nvar per = \"xz\";\nvar p = 3;\nvar o = 2.7;\nvar q = 1.7;\nvar c = 2;\nvar e = 9;\n\nfunction setup() {\n\tcreateCanvas(920, 690);\n\tcolorMode(HSB);\n\tbackground(255);\n\t\n\tfor (i = 0; i < dots; i++) {\n\t\tx[i] = (random(-10, 10));\n\t\ty[i] = (random(-10, 10));\n\t\tz[i] = (random(-10, 10));\n\t}\n}\n\nfunction draw() {\t\n\tif (l === 0) {\n\t\tbackground(255);\n\t}\n\t\n\tif (s === 0) {\n\t\tstrokeWeight(1);\n\t}\n\t\n\tfor (i = 0; i < dots; i++) {\n\n\t\tpx[i] = x[i];\n\t\tpy[i] = y[i];\n\t\tpz[i] = z[i];\n\t\tstroke(i%360, 100, 100);\n    nx[i] = y[i] - p*x[i] + o*y[i]*z[i];\n    ny[i] = q*y[i] - x[i]*z[i] + z[i];\n    nz[i] = c*x[i]*y[i] - e*z[i];\n\t\t\n\t\tx[i] += nx[i]*dt;\n\t\ty[i] += ny[i]*dt;\n\t\tz[i] += nz[i]*dt;\n\t\t\n\t\tif (s === 1) {\n\t\t\tif (per === \"xy\") {\n\t\t\t\tstrokeWeight(map(z[i], -r/3, r/3, 2, 3));\n\t\t\t} else if (per === \"xz\") {\n\t\t\t\tstrokeWeight(map(y[i], -r/3, r/3, 3, 2));\n\t\t\t} else {\n\t\t\t\tstrokeWeight(map(x[i], -r/3, r/3, 2, 3));\n\t\t\t}\n\t\t}\n\t\t\n\t\tif (l === 0) {\n\t\t\t\n\t\t\tif (per === \"xy\") {\n\n\t\t\t\tpoint(map(x[i], -r, r, 0, width), map(y[i], -r, r, height, 0));\n\t\t\t} else if (per === \"xz\") {\n\t\t\t\tpoint(map(x[i], -r, r, 0, width), map(z[i], -r, r, height, 0));\n\t\t\t} else {\n\t\t\t\tpoint(map(y[i], -r, r, 0, width), map(z[i], -r, r, height, 0));\n\t\t\t}\n\t\t} else {\n\t\t\t\n\t\t\tif (per === \"xy\") {\n\t\t\t\tline(map(px[i], -r, r, 0, width), map(py[i], -r, r, height, 0), map(x[i], -r, r, 0, width), map(y[i], -r, r, height, 0));\n\t\t\t} else if (per === \"xz\") {\n\t\t\t\tline(map(px[i], -r, r, 0, width), map(pz[i], -r, r, height, 0), map(x[i], -r, r, 0, width), map(z[i], -r, r, height, 0));\n\t\t\t} else {\n\t\t\t\tline(map(py[i], -r, r, 0, width), map(pz[i], -r, r, height, 0), map(y[i], -r, r, 0, width), map(z[i], -r, r, height, 0));\n\t\t\t}\n\t\t}\n\t}\n}\n\nfunction mouseClicked(){\n  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2615328",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:53:24",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

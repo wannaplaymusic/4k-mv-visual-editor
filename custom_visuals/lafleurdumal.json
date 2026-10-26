@@ -1,0 +1,24 @@
+{
+    "name": "lafleurdumal",
+    "code": "// === Tab: mySketch ===\nlet simplex\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\trs = random(10000)\n\tsimplex = new OpenSimplexNoise(Date.now());\n}\n\nfunction draw() {\n\tbackground(255);\n\t\n\t//flower\n\tfill(0, 30)\n\tnoStroke()\n\tfor (let j = 0; j < 16; j += 0.5) {\n\t\tpush()\n\t\ttranslate(width / 2, height / 2)\n\t\trotate(j)\n\t\tbeginShape()\n\t\tlet d = map(simplex.noise2D(j / 3, millis() / 2000), -1, 1, height / 6, height / 2)\n\t\tlet inc = TWO_PI / 13\n\t\tfor (let i = 0; i <= TWO_PI; i += inc) {\n\t\t\tlet xer = cos(i) * d\n\t\t\tlet yer = sin(i) * d\n\t\t\tlet midxer = cos(i + inc / 2) * (d / 3)\n\t\t\tlet midyer = sin(i + inc / 2) * (d / 3)\n\t\t\tcurveVertex(xer, yer)\n\t\t\tcurveVertex(midxer, midyer)\n\t\t}\n\t\tcurveVertex(cos(0) * d, sin(0) * d)\n\t\tendShape()\n\t\tpop()\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "larry larryson",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1911835",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:37:50",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

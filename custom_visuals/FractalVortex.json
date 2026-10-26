@@ -1,0 +1,33 @@
+{
+    "name": "FractalVortex",
+    "code": "// === Tab: mySketch ===\nlet particles = [];\nlet layers = 3;\nlet singularity;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  colorMode(HSB);\n  noStroke();\n  for (let l = 0; l < layers; l++) {\n    for (let i = 0; i < 600; i++) {\n      particles.push(new VortexParticle(l));\n    }\n  }\n  singularity = createVector(width / 2, height / 2);\n  background(0);\n}\n\nfunction draw() {\n  // Dim background for ghost trails\n  fill(0, 0.05);\n  rect(0, 0, width, height);\n\n  translate(width / 2, height / 2);\n\n  // Move singularity with slight lag toward mouse\n  singularity.lerp(createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))), 0.05);\n  let singularityOffset = createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - width / 2, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - height / 2).div(200);\n\n  for (let p of particles) {\n    p.update(singularityOffset);\n    p.show();\n  }\n}\n\nclass VortexParticle {\n  constructor(layer) {\n    this.layer = layer;\n    this.reset();\n  }\n\n  reset() {\n    this.radius = random(50, width / 2);\n    this.angle = random(TWO_PI);\n    this.z = random(0.5, 2) + this.layer * 0.4;\n    this.hueBase = map(this.layer, 0, layers, 200, 360);\n    this.size = map(this.z, 0.5, 3, 0.5, 2);\n    this.alpha = random(100, 255);\n    this.phase = random(TWO_PI); // for wave jitter\n  }\n\n  update(singularityOffset) {\n    this.radius -= this.z;\n    this.angle += 0.003 * this.z;\n\n    // wave distortion\n    this.wave = sin(this.phase + frameCount * 0.05 + this.z) * 10;\n    this.phase += 0.005;\n\n    if (this.radius < 10) this.reset();\n\n    // simulate attraction toward mouse-altered singularity\n    this.offset = singularityOffset.copy().mult(this.radius * 0.2);\n  }\n\n  show() {\n    let x = cos(this.angle) * (this.radius + this.wave) + this.offset.x;\n    let y = sin(this.angle) * (this.radius + this.wave) + this.offset.y;\n\n    // glow & hue shift\n    let h = (this.hueBase + frameCount * 0.5 + this.wave) % 255;\n    let alpha = map(this.radius, 10, width / 2, 255, 0);\n\n    fill(h, 200, 255, alpha);\n    ellipse(x, y, this.size * 2);\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "gilgamesh",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2635834",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:52:49",
+    "used_in_videos": [
+        "Gradient of Silence.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

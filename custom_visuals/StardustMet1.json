@@ -1,0 +1,31 @@
+{
+    "name": "StardustMet1",
+    "code": "// === Tab: mySketch ===\n////////Paso uno de la metodología de creación de DI\nvar whatever = 0;\n\n//\nvar grosorP = 1;\n\n// cantidad de partículas\nvar particlesQuantity = 4000;\n\nvar positionX = new Array(particlesQuantity);\nvar positionY = new Array(particlesQuantity);\nvar velocityX = new Array(particlesQuantity).fill(0);\nvar velocityY = new Array(particlesQuantity).fill(0);\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\t// color de las particulas\n\tstroke(random(125, 255), random(75, 150), 0);\n\t//stroke(255, 0, 0);\n\t\n\tfor (var particle = 1; particle < particlesQuantity; particle++) {\n\t\tpositionX[particle] = random(0, width);\n\t\tpositionY[particle] = random(0, height);\n\t}\n\t//bug\n\tpositionX[0] = 0;\n\tpositionY[0] = 0;\n}\n\nfunction draw() {\n\t// color del fondo y cantidad de barrido\n\tbackground(0, 125);\n\t\n\t// aquí es donde juego\n\tvelocityX[0] = velocityX[0] * 0.5 + ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - positionX[0]) * 0.1;\n\tvelocityY[0] = velocityY[0] * 0.5 + ((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - positionY[0]) * 0.1;\n\t\n\tpositionX[0] += velocityX[0];\n\tpositionY[0] += velocityY[0];\n\t\n\tfor (var particle = 1; particle < particlesQuantity; particle++) {\n\t\t// esta variable es muy interesante, esta es importante tenerla en cuenta\n\t\t whatever = 100 / (sq(positionX[0] - positionX[particle]) + sq(positionY[0] - positionY[particle]));\n\t\t\n\t\t\t\t//estas son las partes de la acción\n\t\tvelocityX[particle] = velocityX[particle] * 0.95 + (velocityX[0] - velocityX[particle]) * whatever;\n\t\tvelocityY[particle] = velocityY[particle] * 0.95 + (velocityY[0] - velocityY[particle]) * whatever;\n\t\t\n\t\t//aqui pasa la magia\n\t\tpositionX[particle] += velocityX[particle];\n\t\tpositionY[particle] += velocityY[particle];\n\t\t\n\t\t// limites de las particulas es importante poder ponerlo o quitarlo\n\t\t\n\t\tif ((positionX[particle] < 0 && velocityX[particle] < 0) || (positionX[particle] > width && velocityX[particle] > 0)) {\n\t\t\tvelocityX[particle] = -velocityX[particle];\n\t\t}\n\t\t\n\t\tif ((positionY[particle] < 0 && velocityY[particle] < 0) || (positionY[particle] > height && velocityY[particle] > 0)) {\n\t\t\tvelocityY[particle] = -velocityY[particle];\n\t\t}\n\t\t\n\t\t//ellipse(positionX[particle], positionY[particle], 20, 20);\n\t\tpoint(positionX[particle], positionY[particle]);\n\t}\n}\n\n// con esta funcion se reinicia el interactivo\n// aqui tambien podemos agregar más cosas\nfunction mousePressed() {\n\tgrosorP++;\n\twhatever+=100;\n\tstroke(random(125, 255), random(60, 125), 0);\n\t//strokeWeight(random(1, 2));\n\tstrokeWeight(grosorP);\t\n\t//push;\n\t//pop;\n\tfor (var particle = 1; particle < particlesQuantity; particle++) {\n\t\tpositionX[particle] = random(0, width);\n\t\tpositionY[particle] = random(0, height);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Joaku2",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1159590",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:21:23",
+    "used_in_videos": [
+        "Rolling Groove Meditation.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,31 @@
+{
+    "name": "PerlinNoiseParticles",
+    "code": "// === Tab: Main ===\nlet particle;\nlet num = 200;\n\nfunction setup() {\n\tcreateCanvas(windowHeight*4/3, windowHeight);\n\tstrokeWeight(1.3);\n\tcolorMode(HSB);\n\n\tresetParticles();\n}\n\nfunction draw() {\n\tfor (let i = 0; i < num; i++) {\n\t\tparticle[i].draw();\n\t\tparticle[i].update();i\n\t}\n}\n\nfunction resetParticles() {\n\tparticle = [];\n\tbackground(0);\n\tfor (let i = 0; i < num; i++) {\n\t\tparticle[i] = new Particle(width / 2, height / 2, 0.01, 0.3, 0.03);\n\t}\n}\n/*\nfunction mousePressed() {\n\tresetParticles();\n}*/\n\n// === Tab: Particle ===\nclass Particle {\n\tconstructor(xStartingPosition, yStartingPosition, noiseIncreaseAmount, rotationSpeed, movementSpeed) {\n\t\tthis.rOff = random(100);\n\t\tthis.r = random(TWO_PI);\n\t\tthis.x = xStartingPosition;\n\t\tthis.y = yStartingPosition;\n\t\tthis.movementSpeed = movementSpeed;\n\t\tthis.increaseAmount = noiseIncreaseAmount;\n\t\tthis.xv = 0;\n\t\tthis.yv = 0;\n\t\tthis.rotationSpeed = rotationSpeed;\n\t}\n\n\tdraw() {\n\t\tstroke((frameCount*3) % 255, 255, 255);\n\t\tline(this.x, this.y, this.x-this.xv, this.y-this.yv);\n\t}\n\n\tupdate() {\n\t\tthis.rOff += this.increaseAmount;\n\t\tthis.r += map(noise(this.rOff), 0, 1, -this.rotationSpeed, this.rotationSpeed);\n\n\t\tthis.xv += cos(this.r) * this.movementSpeed;\n\t\tthis.yv += sin(this.r) * this.movementSpeed;\n\n\t\tthis.x += this.xv;\n\t\tthis.y += this.yv;\n\t}\n}\n\nfunction mouseClicked(){\n  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2584967",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:55:27",
+    "used_in_videos": [
+        "Nocturnal Infrastructure.mp4"
+    ],
+    "used_count": 1
+}

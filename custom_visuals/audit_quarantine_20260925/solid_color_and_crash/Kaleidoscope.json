@@ -1,0 +1,24 @@
+{
+    "name": "Kaleidoscope",
+    "code": "// === Tab: main ===\nvar particles = [];\nvar colors = [[]];\nvar colorsIndex = 0;\nvar sides = 8;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n\t\n\tcolors[0] = [\n\t\tcolor(211, 84, 0),\n\t\tcolor(231, 76, 60),\n\t\tcolor(241, 196, 15),\n\t\tcolor(230, 126, 34)\n\t];\n\t\n\tcolors[1] = [\n\t\tcolor(84, 153, 199),\n\t\tcolor(93, 173, 226),\n\t\tcolor(52, 152, 219),\n\t\tcolor(88, 214, 141)\n\t];\n\t\n\tcolors[2] = [\n\t\tcolor(142, 68, 173),\n\t\tcolor(165, 105, 189),\n\t\tcolor(251, 252, 252),\n\t\tcolor(215, 219, 221)\n\t];\n\t\n\tfor (let i = 0; i < 50; i++)\n\t\tparticles.push(new Particle());\n\t\n\tfill(0);\n\tstrokeWeight(7);\n\t// frameRate(40);\n}\n\nfunction draw() {\n\tbackground(0, 10);\n\t\n\tparticles.forEach(particle => particle.update());\n\t\n\tpush();\n\ttranslate(width / 2, height / 2);\n\tfor (let i = 0; i < sides; i++) {\n\t\tparticles.forEach(particle => particle.draw());\n\t\trotate(TAU / sides);\n\t}\n\tpop();\n\t\n\tnoStroke();\n\tfill(25);\n\tbeginShape();\n\tvertex(width, height);\n\tvertex(width, 0     );\n\tvertex(0    , 0     );\n\tvertex(0    , height);\n\tvertex(width, height);\n\tfor (let i = 0; i < sides; i++)\n\t\tvertex(320 * cos(i * TAU / sides) + width / 2, 320 * sin(i * TAU / sides) + height / 2);\n\tvertex(320 + width / 2, height / 2);\n\tendShape(CLOSE);\n}\n\nParticle = function() {\n\tthis.position = createVector(random(640), random(640));\n\tthis.velocity = createVector(random(-1, 1), random(-1, 1));\n\tthis.velocity.setMag(2);\n\tthis.index = floor(random(colors[colorsIndex].length));\n\t\n\tthis.draw = function() {\n\t\tstroke(colors[colorsIndex][this.index]);\n\t\tpoint(this.position.x - 320, this.position.y - 320);\n\t}\n\t\n\tthis.update = function() {\n\t\tthis.position.add(this.velocity);\n\t\t\n\t\tif (this.position.x < 0 || this.position.x > 640) this.velocity.x *= -1;\n\t\tif (this.position.y < 0 || this.position.y > 640) this.velocity.y *= -1;\n\t}\n}\n\nfunction mouseMoved() {\n\tsides = constrain(map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), 0, width, 2, 12), 4, 10);\n}\n\nfunction mousePressed() {\n\tcolorsIndex ++;\n\tif (colorsIndex >= colors.length)\n\t\tcolorsIndex = 0;\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Kai",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/901523",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:43:27",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

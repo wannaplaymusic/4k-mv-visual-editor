@@ -1,0 +1,31 @@
+{
+    "name": "Day16BornandReborn",
+    "code": "// === Tab: mySketch ===\nlet particles = [] // 存储要生成的粒子（Particle对象）的列表/数组\nlet particleNum = 0 // 粒子总数，初始为0\nlet pg // 用于在画布上绘制（图形）的层/缓冲区（p5.Graphics 对象）\nlet font // 文本的字体\nlet tileSize = 0.5\nlet tileGap = 0.5\n\n// 💡 NEW CONTROL VARIABLE: Adjust this value to change the particle animation speed.\n// 0.1 = Very Slow, 1.0 = Original Speed, 2.0 = Double Speed\nlet animationSpeedMultiplier = 0.3 \n\n\n// 初始化设置函数，只运行一次\nfunction setup() {\n  // --- UPDATED CANVAS SIZE LOGIC START ---\n  let canvasHeight = window.innerHeight * 0.8;\n  let canvasWidth = (1080 / 1920) * canvasHeight; // Maintains an aspect ratio of 1080:1920\n  createCanvas(canvasWidth, canvasHeight);\n  \n  // 💡 Add this line to control the overall speed:\n  frameRate(90); // Sets the animation to 30 frames per second (half speed)\n  // --- UPDATED CANVAS SIZE LOGIC END ---\n  background(255, 40) // **UPDATED: White background (255) with slight alpha (40)**\n\n  pg = createGraphics(width, height) // 创建一个与主画布大小相同的图形缓冲区\n  pg.background(255) // **UPDATED: White background (255) for the buffer**\n  pg.textFont('Georgia')\n  pg.textSize(24)\n  pg.fill(0) // **UPDATED: Black text color (0)**\n  pg.textAlign(LEFT, TOP)\n  // The poem with newline characters\n  const poem = \"Dear Axin,\\n \\nToday we run\\nwe chase for sun\\nThe sun burns us\\nwe live in fire\\nAnd then reborn\\nLife keeps on like this\\nburn & reborn\\nA new Axin, rise\"\n  pg.text(poem, 50, 50)\n\n  // 遍历整个画布，以 tileGap 为步长进行采样\n  for (let x = 0; x < width; x += tileGap ) {\n    for (let y = 0; y < height; y += tileGap ) {\n      // 检查当前 (x, y) 坐标在图形缓冲区 pg 上是否为文本\n      // [0, 0, 0, 255] 是纯黑色（RGB=0, A=255）\n      // **UPDATED LOGIC: Now checking if the pixel IS pure black (the text color)**\n      let isTEXT = JSON.stringify(pg.get(x, y)) === JSON.stringify([0, 0, 0, 255])\n      \n      // 如果该位置是文本的一部分，就创建一个粒子\n      if (isTEXT) {\n        particles.push(new Particle(x, y, tileSize, '#000000'))\n      }\n    }\n  }\n}\n\n// 绘制循环函数，每帧运行\nfunction draw() {\n  background(255, 40) // **UPDATED: White background (255) with slight alpha (40)**\n  translate(0, 250); // 将整个坐标系向下平移 100 像素\n  \n  // 遍历所有粒子并调用它们的 display 方法进行绘制和更新\n  for (let i = 0; i < particles.length; i++) {\n    particles[i].display(i)\n  }\n}\n\n\n\n// ===================================\n// PARTICLE CLASS DEFINITION\n// ===================================\n\nclass Particle {\n  // 构造函数：在创建新粒子时被调用\n  constructor(x, y, size, color) {\n    this.x = x // 粒子的目标 X 坐标 \n    this.y = y // 粒子的目标 Y 坐标 \n    this.size = size // 粒子的大小\n    this.color = color // 粒子的颜色\n    \n    // 粒子的当前位置 (未在 display/update 中使用，但已定义)\n    this.pos = createVector(x, random(-30, -10)) \n    this.vel = createVector(0, 0.1) \n    this.acc = createVector(0, random(0, 1))\n  }\n\n  // 更新粒子的状态（当前为空，运动逻辑在 display 中实现）\n  update() {\n    const roundPosY = Math.round(this.pos.y/100) * 100 \n  }\n\n  // 绘制粒子\n  display(ind) {\n    // 基于帧数、索引和 animationSpeedMultiplier 计算运动\n    // 💡 Speed is controlled here by multiplying frameCount by the global variable\n    let n = ((frameCount * animationSpeedMultiplier) % 100) / 100 // n 在 0 到 1 之间循环\n    let v = map(n, 0, 1, 0, TWO_PI)\n    let motion = tan(v) * ind * 0.01 // 水平运动量\n    \n    let col = this.color \n    \n    // 计算粒子的大小，使其周期性变化\n    let size = sin((motion+0.5)) * this.size\n    //let size = this.size\n\n    fill(col) \n    noStroke() \n    \n    // 绘制矩形粒子，X 坐标受 motion 影响\n    rect(this.x + motion, this.y, size, size)\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "tiantianxu",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2850626",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 15:43:08",
+    "used_in_videos": [
+        "Depth Perception Unit.mp4"
+    ],
+    "used_count": 1
+}

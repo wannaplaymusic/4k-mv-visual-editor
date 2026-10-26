@@ -1,0 +1,24 @@
+{
+    "name": "RandomVelocityparticles",
+    "code": "// === Tab: mySketch ===\n// noprotect\n//Made by 16384, Feb. 2020\n\nlet num = 1500;\nlet pos, vel;\nlet bakedCSVelLength = 5;\nlet bakedCSVel = [];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\n\tresetParticles();\n\tcolorMode(HSB);\n\tfor(let i = 0; i < bakedCSVelLength; i++) {\n\t\t//precalculating velocities to randomly add to particle velocity vectors over time\n\t\t//this reduces the number of sine and cosine calls, (possibly...?) improving performance (though most likely negligibly)\n\t\tbakedCSVel[i] = createVector(cos(i * (TWO_PI/bakedCSVelLength)), sin(i * (TWO_PI/bakedCSVelLength))).mult(0.1);\n\t}\n}\n\nfunction draw() {\n\tfor (let i = 0; i < pos.length; i++) {\n\t\tpos[i].add(vel[i]);\n\t\tvel[i].add(bakedCSVel[floor(random(bakedCSVelLength))]);\n\n\t\t//Next line sets the stroke color, smoothly randomized in respect to the current time, just to add some diversity \n\t\tstroke((frameCount / 2 + map(noise(minute()) + noise(second()/100) * 0.1, 0, 1.1, 0, 255)) % 255, 255, 255);\n\t\tline(pos[i].x, pos[i].y, pos[i].x + vel[i].x * 2, pos[i].y + vel[i].y * 2);\n\t}\n}\n\nfunction keyPressed() {\n\tif (key == 'r') resetParticles();\t\t\n}\n\nfunction resetParticles() {\n\tpos = [];\n\t\tvel = [];\n\t\tfor (let i = 0; i < num; i++) {\n\t\t\tpos[i] = createVector(width / 2, height / 2);\n\t\t\tvel[i] = createVector(0, 0);\n\t\t}\n\tbackground(0);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "16384",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/842011",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:49:45",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

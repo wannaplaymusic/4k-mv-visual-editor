@@ -1,0 +1,24 @@
+{
+    "name": "PerlinNoiseParticles",
+    "code": "// === Tab: mySketch ===\nvar particles = [];\n//let button;\nvar xoff_ = 200;\n\nfunction setup() {\n  createCanvas(600, 600);\n  //button = createButton(\"switch\");\n  //button.position(580, 580);\n}\n\nfunction mousePressed() {\n  particles.push(new Particle((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))));\n}\n\nfunction draw() {\n  var back_col = map(noise(xoff_), 0, 1, 0 , 200);\n  background(255);\n  xoff_ += .0004;\n\n for (var i = 0; i < particles.length; i++) {\n  // if (button.mousePressed()) {\n  //   particles[i].switch();\n  // }\n    //let gravity = createVector(0, 0.5);\n    //particles[i].applyForce(gravity);\n    particles[i].update();\n    particles[i].show();\n }\n\n}\n\n\n// === Tab: particle ===\nclass Particle {\n  constructor(x,y) {\n  this.pos = createVector(x, y);\n  this.ranCol = random(3);\n\n  this.history = [];\n  this.xoff = random(10000);\n  this.yoff = random(20000);\n  this.vel = p5.Vector.random2D();\n\n  this.follow_mode = false;\n\n}\n\n  switch() {\n  if (!this.follow_mode) {\n    this.follow_mode = true;\n  } else {\n    this.follow_mode = false;\n  }\n  }\n  applyForce(force) {\n    this.acc.add(force);\n  }\n  update() {\n    this.mouse = createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n    //this.vel = createVector(map(noise(this.xoff),0,1, 0, width), map(noise(this.yoff), 0, 1, 0, height));\n    //this.pos.add(this.vel);\n    //if (this.follow_mode) {\n      this.acc = p5.Vector.sub(this.mouse, this.pos);\n      this.acc.setMag(5);\n  //  }\n    this.pos.x = map(noise(this.xoff),0,1, 0, width);\n    this.pos.y = map(noise(this.yoff), 0, 1, 0, height);\n    this.xoff += .007;\n    this.yoff += .007;\n  //  if (this.follow_mode) {\n      this.vel.add(this.acc);\n      this.pos.add(this.vel);\n  //  }\n\n    var v = createVector(this.pos.x, this.pos.y);\n\n    this.history.push(v);\n\n    if (this.history.length > 35) {\n      this.history.splice(0, 1);\n    }\n\n\n  }\n\n  show() {\n    stroke(0);\n   //noStroke();\n    fill(0, 100);\n    ellipse(this.pos.x, this.pos.y, 24, 24);\n\n    for (var i = 0; i < this.history.length;i++) {\n      this.col = map(noise(this.xoff),0,1, 0, 100);\n      this.col1 = map(noise(this.xoff),0,1, 0, 100);\n      this.col2 = map(noise(this.xoff),0,1, 0, 100);\n      noStroke();\n      colorMode(RGB);\n      if (this.ranCol < 1) {\n        fill(this.col, 0, 0, 100);\n      } else if (1 < this.ranCol < 2) {\n        fill(0, this.col2, this.col1, 100);\n      } else {\n        fill(0, 100);\n      }\n      var pos_his = this.history[i];\n      ellipse(pos_his.x, pos_his.y, i+2, i+2);\n    }\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Chris Barber",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/894536",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:43:54",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

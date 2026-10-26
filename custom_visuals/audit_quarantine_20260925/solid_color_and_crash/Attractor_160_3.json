@@ -1,0 +1,24 @@
+{
+    "name": "Attractor_160",
+    "code": "// === Tab: mySketch ===\n// Attractor_16.0\n\nlet N = 4000 ; \nlet S = 0.02 ; let G = 0.012 ; let H = 0.1 ; let R = 150 ; let Q = 10 ;\n\nlet X[] = new Array(N) ; let Y[] = new Array(N) ; let Z[] = new Array(N) ;\nlet L ; let dX ; let dY ; let dZ ; let P ; let U ;\nlet I ; let NX ; let NY ; let NZ ; let KN ;\n\nfunction setup(){\n  \n  createCanvas(600, 600) ; noSmooth() ; background(0) ; stroke(255) ; textSize(20) ;\n  for ( I = 0 ; I < N ; I++ ){\n    X[I] = random(+10,+90) ;\n    Y[I] = random(-90,+90) ;\n    Z[I] = random(+10,+90) ;\n  }\n  KN = N ;\n  \n}// setup()\n\nfunction draw(){\n  \n  if ( KN == N ){ fill(0,0,0,40) ; rect(-1,-1,601,601) ; fill(255) ; }\n  line(50,400,550,400) ; line(550,400,540,390) ; line(550,400,540,410) ; text(\"X\",560,405) ;\n  line(300,50,300,550) ; line(300,50,290,60) ; line(300,50,310,60) ; text(\"Z\",295,40) ;\n  line(450,250,150,550) ; line(150,550,150,535) ; line(150,550,165,550) ; text(\"Y\",130,570) ;\n  \n  for ( I = 0 ; I < KN ; I++ ){\n    \n    L = sqrt(pow(X[I],2)+pow(Y[I],2)) ;\n    P = (atan((L-R)/Z[I])+(PI/2))/PI ;\n    U = abs(Y[I])/L ;\n    dX = (-Z[I]*H*P*U*X[I]/L) + (L*G*X[I]/L) + (-Y[I]*S) + (Q*X[I]/pow(L,3)) ; \n    dY = (-Z[I]*H*P*U*Y[I]/L) + (L*G*Y[I]/L) + (+X[I]*S) + (Q*Y[I]/pow(L,3)) ; \n    dZ = ((L-R)*H*P*U) ;\n    NX = X[I] + dX ; NY = Y[I] + dY ; NZ = Z[I] + dZ ;\n    line(X[I]-(Y[I]/2)+300,-Z[I]+(Y[I]/2)+400,NX-(NY/2)+300,-NZ+(NY/2)+400) ;\n    X[I] = NX ; Y[I] = NY ; Z[I] = NZ ;    \n    \n  }// I\n  \n}// draw()\n\nfunction mousePressed(){\n  \n  background(0) ;\n  if ( KN != N ){\n    for ( I = 1 ; I < N ; I++ ){\n      X[I] = X[0] + random(-10,+10) ;\n      Y[I] = Y[0] + random(-10,+10) ;\n      Z[I] = Z[0] + random(-10,+10) ;\n    }\n    KN = N ;\n  }else{ KN = 1 ; }\n  \n}// mousePressed()\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "KaijinQ",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/869619",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:45:36",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

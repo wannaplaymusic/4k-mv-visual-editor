@@ -1,0 +1,31 @@
+{
+    "name": "CompositeAttractor",
+    "code": "// === Tab: mySketch ===\nlet hu = 0;\n\nfunction setup() {\n\tcreateCanvas(w=1112, h=834);\n\tcolorMode(HSB);\n\tbackground(100);\n\t//noLoop();\n}\n\nfunction draw(){\n\tbackground(100);  // try commenting out this line\n\thu = random(360);\n \n\tpush();\n\tstrokeWeight(1);\n\tstroke(hu, 100, 100, 0.2);\n\tfill(0,0);\n \n\ttranslate(w/2, h/2);\n \n\t//Attractor Parameter\n\tlet a0 = PI*random(-1,1);\n\tlet b0 = PI*random(-1,1);\n\tlet c0 = PI*random(-1,1);\n\tlet d0 = PI*random(-1,1);\n\n\tlet a1 = PI*random(-1,1);\n\tlet b1 = PI*random(-1,1);\n\tlet c1 = PI*random(-1,1);\n\tlet d1 = PI*random(-1,1);\n\n\tlet a2 = PI*random(-1,1);\n\tlet b2 = PI*random(-1,1);\n\tlet c2 = PI*random(-1,1);\n\tlet d2 = PI*random(-1,1);\n\t\n\t//Draw Parameter\n\tlet draw_scale = 180;\n\tlet N = 600000;\n \n\tlet x = random(-1,1);\n\tlet y = random(-1,1);\n\n\tfor(let i=0;i<N;i++){\n\t\tlet I = random([0, 1, 2]);\n\t\tlet dx, dy;\n\t\tswitch(I){\n\t\t\tcase 0:\n\t\t\t  //Peter De Jong Attractor\n\t\t\t  dx = sin(a0*y) + cos(b0*x);\n\t\t\t  dy = sin(c0*x) + cos(d0*y);\n\t\t\t\tpoint(draw_scale * dx, draw_scale * dy);\n\t\t\t  break;\n\t\t\tcase 1:\n\t\t\t  //Peter De Jong Attractor\n\t\t\t  dx = sin(a1*y) + cos(b1*x);\n\t\t\t  dy = sin(c1*x) + cos(d1*y);\n\t\t\t  break;\n\t\t\tcase 2:\n\t\t\t  //Peter De Jong Attractor\n\t\t\t  dx = sin(a2*y) + cos(b2*x);\n\t\t\t  dy = sin(c2*x) + cos(d2*y);\n\t\t\t  break;\n\t\t\tdefault: break;\n\t\t}\n\n\t\tx = dx;\n\t\ty = dy;\n\n\t}\n\tpop();\n\tframeRate(1);\n}\n \n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1512821",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:58:19",
+    "used_in_videos": [
+        "Shadow Frequency.mp4"
+    ],
+    "used_count": 1
+}

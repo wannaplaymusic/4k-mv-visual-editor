@@ -1,0 +1,59 @@
+{
+    "name": "HeavyBubbles",
+    "code": "// === Tab: mySketch ===\nlet bubbles = [];\nnbubbles = 150;\nattractStrength = -0.3;\n\n\nfunction setup() {\n\tcreateCanvas(600, 450);\n\tfor (i = 0; i < nbubbles; i++) {\n\t\tbubbles.push(new bubble(random(0, width), random(0, height), random(10, 30), 0));\n\t}\n\tellipseMode(RADIUS);\n}\n\nfunction draw() {\n\tbackground(0);\n\tnoFill();\n\n\tif (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) {\n\t\ti = int(random(bubbles.length));\n\t\tbubbles[i].pos.set(float((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))), float((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))));\n\t}\n\n\tfor (i = 0; i < nbubbles; i++) {\n\t\tb = bubbles[i];\n\n\t\tif (dist((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), b.pos.x, b.pos.y) < b.r) {\n\t\t\tb.m = min(b.m + 0.01, 1.0);\n\t\t} else {\n\t\t\tb.m = max(b.m - 0.001, 0.0);\n\t\t}\n\n\t\tb.resetForce();\n\t\tb.inForce(gravity(b));\n\n\t\tfor (j = 0; j < nbubbles; j++) {\n\t\t\tif (i != j) {\n\t\t\t\tb.inForce(bubbles[j].outForce(b));\n\t\t\t}\n\t\t}\n\t\tb.updatePos(0.5);\n\n\t\tfor (j = 0; j < nbubbles; j++) {\n\t\t\tif (i != j) {\n\t\t\t\tb.inForce(bubbles[j].outForce(b));\n\t\t\t}\n\t\t}\n\t\tb.updatePos(0.8);\n\n\t\tfor (j = 0; j < nbubbles; j++) {\n\t\t\tif (i != j) {\n\t\t\t\tb.inForce(bubbles[j].outForce(b));\n\t\t\t}\n\t\t}\n\t\tb.updatePos(0.2);\n\n\t\tb.display();\n\t}\n}\n\nfunction gravity(b) {\n\treturn createVector(0, 30 * b.m + 1);\n}\n\nclass bubble {\n\tconstructor(x_, y_, r_, m_) {\n\t\tthis.pos = createVector(x_, y_);\n\t\tthis.r = r_;\n\t\tthis.m = m_;\n\t\tthis.force = createVector(0, 0);\n\t\tthis.cs = color(random(255), random(255), random(255));\n\t\tthis.cf = color(random(255), random(255), random(255));\n\t}\n\n\tresetForce() {\n\t\tthis.force.set(0, 0);\n\t}\n\n\tinForce(f) {\n\t\tthis.force.add(f);\n\t}\n\n\tupdatePos(a) {\n\t\tthis.pos.add(this.force.mult(a));\n\t\tif (this.pos.y + this.r > height) {\n\t\t\tthis.pos.y = height - this.r;\n\t\t}\n\t\tthis.pos.x = constrain(this.pos.x, 0, width);\n\t}\n\n\tdisplay() {\n\t\tstroke(this.cs);\n\t\tnoFill();\n\t\tellipse(this.pos.x, this.pos.y, this.r - 1.5, this.r - 1.5);\n\t\tfill(this.cf);\n\t\tif (this.m == 1) {\n\t\t\tellipse(this.pos.x, this.pos.y, this.r - 1.5, this.r - 1.5);\n\t\t} else if (this.m > 0) {\n\t\t\tarc(this.pos.x, this.pos.y, this.r - 1.5, this.r - 1.5, HALF_PI - PI * this.m, HALF_PI + PI * this.m, OPEN);\n\t\t}\n\t}\n\n\toutForce(b) {\n\t\tthis.f = b.pos.copy();\n\t\tthis.f.sub(this.pos);\n\t\tthis.d = this.f.mag();\n\t\tif (this.d > b.r + this.r) {\n\t\t\treturn this.f.mult(attractStrength * (this.d - b.r - this.r) / this.d / this.d / this.d);\n\t\t} else {\n\t\t\treturn this.f.mult(-(this.d - b.r - this.r) / this.d);\n\t\t}\n\t}\n\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "XavierM",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/663456",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:15:42",
+    "expressive_profile": {
+        "module_id": "HeavyBubbles.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [],
+            "mean_lightness": 0.067,
+            "mean_chroma": 0.0,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.3,
+            "curl_vorticity": 0.029,
+            "divergence": 0.098,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 13:20:32"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Weight of Reverb.mp4"
+    ],
+    "used_count": 1
+}

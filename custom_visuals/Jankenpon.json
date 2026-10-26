@@ -1,0 +1,28 @@
+{
+    "name": "Jankenpon",
+    "code": "// === Tab: mySketch ===\n/******************\nCode by Vamoss\nOriginal code link:\nhttps://openprocessing.org/sketch/2179512\n\nAuthor links:\nhttp://vamoss.com.br\nhttp://twitter.com/vamoss\nhttp://github.com/vamoss\n******************/\n\nconst TYPES = [\"🪨\", \"📄\", \"✂️\"];\nconst TOTAL = Math.sqrt(innerWidth * innerHeight) / 2;\nconst SIZE = 30;\nconst VEL = 10;\nvar itens = [];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\ttextSize(SIZE);\n\ttextAlign(CENTER, CENTER);\n\t\n\tfor(var i = 0; i < TOTAL; i++){\n\t\titens.push(new Item(TYPES.indexOf(random(TYPES))));\n\t}\n}\n\nfunction draw() {\n\tbackground(0);\n\titens.forEach(i => i.update());\n\titens.forEach(i => i.draw());\n}\n\nclass Item {\n  constructor(type) {\n    this.type = type;\n    this.label = TYPES[type];\n\t\tthis.pos = createVector(random(width), random(height))\n\t\tthis.easePos = createVector(this.pos.x, this.pos.y)\n  }\n\t\n\tupdate() {\n\t\t//move\n\t\tthis.pos.x += random(-VEL, VEL);\n\t\tthis.pos.y += random(-VEL, VEL);\n\t\tthis.pos.x = constrain(this.pos.x, 0, width);\n\t\tthis.pos.y = constrain(this.pos.y, 0, height);\n\t\tthis.easePos.x += (this.pos.x - this.easePos.x) * 0.09;\n\t\tthis.easePos.y += (this.pos.y - this.easePos.y) * 0.09;\n\t\t\n\t\t//collision detect\n\t\titens.forEach(i => {\n\t\t\tif(i.type != this.type){\n\t\t\t\tif(distsq(i.easePos.x, i.easePos.y, this.easePos.x, this.easePos.y) < SIZE*SIZE){\n\t\t\t\t\t//bitwise xor logic\n\t\t\t\t\t//logic demonstration\n\t\t\t\t\t//https://docs.google.com/spreadsheets/d/1dLO03Cu0vyThZu33KF0yAsntYMUZ6J6uUbT8WlY9CzQ/edit?usp=sharing\n\t\t\t\t\tvar result = i.type ^ this.type;\n\t\t\t\t\tif(result == 2) result = 0;\n\t\t\t\t\telse if(result == 3) result = 2;\n\t\t\t\t\t\n\t\t\t\t\tthis.type = i.type = result;\n\t\t\t\t\tthis.label = i.label = TYPES[result];\n\t\t\t\t}\n\t\t\t}\n\t\t})\n\t}\n\t\n\tdraw() {\n\t\ttext(this.label, this.easePos.x, this.easePos.y);\n\t}\n}\n\nfunction distsq(x1, y1, x2, y2) {\n   return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Vamoss",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2179512",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:17:32",
+    "used_in_videos": [
+        "2026 Core Thump.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

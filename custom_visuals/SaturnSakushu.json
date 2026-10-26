@@ -1,0 +1,30 @@
+{
+    "name": "SaturnSakushu",
+    "code": "// === Tab: mySketch.js ===\n// Author: tomxor. Translated and extended from https://www.dwitter.net/d/10534\n// Original one-liner x.fillRect(0,0,i=2e3,i);for(t+=160;p=i&1,m=t/C(t/i)+p*(t/2+i%t),i--;);x.clearRect(960+m*S(n=t/9+i*i)*C(!p*i/t),540+m*C(n+p*2),s=3-C(n)*3,s)\n\n// 元作者：tomxor 氏\n// このスケッチは、「Dwitter」で投稿されている作品を読みやすく、かつ画面サイズに合わせて動くように翻訳・拡張したものです。\n// 元作品URL: https://www.dwitter.net/d/10534\n// 元の1行のコード：x.fillRect(0,0,i=2e3,i);for(t+=160;p=i&1,m=t/C(t/i)+p*(t/2+i%t),i--;);x.clearRect(960+m*S(n=t/9+i*i)*C(!p*i/t),540+m*C(n+p*2),s=3-C(n)*3,s)\n\n\nlet counter = 100;\nlet parity_flag = 0;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tstroke(255);\n\tdescribe(\"An animated rendering of Saturn-like planet, viewed from space with a tilted ring system, \" +\n\t\t\"created using densely plotted points that vary in size to simulate 3D shading and rotation over time.\")\n}\n\nfunction draw() {\n\tbackground(0);\n\tcounter += 0.01;\n\n\tfor (let i = 2000; i >= 0; i -= 2) { // i が「偶数」のときだけループ：土星の本体（球体）を描く\n\t\tparity_flag = 0; // フラグを 0（false）にして、本体モードに切り替え\n\t\tdrawPoints(i);\n\t}\n\tfor (let i = 1999; i > 0; i -= 2) { // i が「奇数」のときだけループ：土星の周りの輪っかを描く\n\t\tparity_flag = 1;\n\t\tdrawPoints(i);\n\t}\n\n\tfunction drawPoints(i) {\n\t\tlet radial_offset = counter / cos(counter / i) + parity_flag * (counter / 2 + i % counter);\n\t\t// 1. 中心からの距離（半径）を計算。parity_flag が 0なら「球体の半径」、1なら「輪（リング）の半径」を計算している。\n\t\t\n\t\tlet angular_phase = counter / 9 + i * i; \n\t\t// 2. 回転の角度を計算。 counter（時間）を使って、全体がゆっくり宇宙で自転するような角度を作っている。\n\t\t\n\t\tlet x_position = (windowWidth / 2 - 100) + radial_offset * sin(angular_phase) * cos(!parity_flag * i / counter);\n\t\t// 3. 画面の横位置（X座標）を計算。　画面の中心を基準にして、サイン波（sin）を使って点を左右に振り分けている。\n\t\t\n\t\tlet y_position = 400 + radial_offset * cos(angular_phase + parity_flag * 2);\n\t\t// 4. 画面の縦位置（Y座標）を計算。　「輪」の時だけ角度をズラす（+ parity_flag * 2）ことで、輪が斜めに傾いて見える。\n\n\t\tlet point_size = 1 - cos(angular_phase);\n\t\t// 5. 点の大きさを計算（これで光と影の立体感を出す）。　角度（angular_phase）に合わせて大きさを「0 〜 2」の間で変化させる。\n\t\t// これにより、手前にある点は大きく（明るく）、奥や影になる点は小さく（暗く）なります。\n\n\t\t\n\t\tstrokeWeight(point_size);\n\t\tpoint(x_position, y_position);\n\t\t// 6. 決定したサイズと位置で「点」を打つ\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "咪咪",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2989047",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:34:35",
+    "used_in_videos": [
+        "Obscured Sector.mp4",
+        "Filtered Pad Immersion.mp4",
+        "Thunderous Drive Flow.mp4",
+        "Black Signal Depth.mp4"
+    ],
+    "used_count": 4,
+    "is_starred": false
+}

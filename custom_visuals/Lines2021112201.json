@@ -1,0 +1,24 @@
+{
+    "name": "Lines2021112201",
+    "code": "// === Tab: mySketch ===\n// by SamuelYAN\n// more works //\n   // https://twitter.com/SamuelAnn0924\n   // https://www.instagram.com/samuel_yan_1990/\n\nvar nOff = 0;\nvar pointDensity = 10;\nvar colors;\n\nfunction setup() {\n  //let mySize = max(windowWidth, windowHeight);\n  createCanvas(windowWidth, windowHeight);\n  //frameRate(30);\n  colorMode(HSB, 360, 100, 100, 100);\n\n  pixelDensity(5);\n  background(0, 0, 95, 100);\n}\n\nfunction draw() {\n  colors = [\n    color(200, random(90, 70), random(20), random(85, 100)),\n    color(120, random(30, 50), 90, random(85, 100)),\n    color(280, random(30, 50), 90, random(85, 100)),\n    color(180, random(30, 50), 90, random(85, 100)),\n    color(280, random(30, 50), 90, random(85, 100)),\n    color(30, random(90, 50), 90, random(85, 100)),\n    color(90, random(30, 50), 90, random(85, 100)),\n    color(150, random(10, 50), 90, random(85, 100)),\n    color(210, random(70, 50), 90, random(85, 100)),\n  ];\n  nOff = nOff + 1;\n  for (let x = -width * 0.1; x < width * 1.1; x += pointDensity * 2) {\n    for (let y = -height * 0.1; y < height * 1.1; y += pointDensity) {\n      push();\n      translate(x, y);\n      strokeCap(SQUARE);\n      strokeWeight(0.5);\n      let num = noise((x + nOff) / 10, y / 10);\n\n      if (num < 0.15) {\n        noStroke();\n        fill(random(colors));\n      } else if (num >= 0.15 && num < 0.55) {\n        stroke(random(colors));\n        fill(random(colors));\n      } else if (num >= 0.55 && num < 0.65) {\n        noFill();\n        stroke(random(colors));\n      } \n      let quadX = pointDensity;\n      let quadY = pointDensity;\n      let plusY = 2 * pointDensity;\n      //quad(0, 0, 0, quadY, quadX, quadY-plusY, quadX,  - plusY);\n      quad(0, 0, 0, quadY, -quadX, quadY - plusY, -quadX, -plusY);\n\n      pop();\n    }\n  }\n\n  for (let x = -width * 0.1; x < width * 1.1; x += pointDensity * 2) {\n    for (let y = -height * 0.1; y < height * 1.1; y += pointDensity) {\n      noStroke();\n      push();\n      translate(x, y);\n      var num = noise((x + nOff) / 10, y / 10);\n      //print(num);\n      if (num < 0.25) {\n        fill(random(colors));\n      } else if (num >= 0.25 && num < 0.5) {\n        fill(random(colors));\n      } else if (num >= 0.5 && num < 0.7) {\n        fill(random(colors));\n      }\n      var quadX = pointDensity;\n      var quadY = pointDensity;\n      var plusY = 2 * pointDensity;\n      quad(0, 0, 0, quadY, quadX, quadY - plusY, quadX, -plusY);\n      //quad(0, 0, 0, quadY, -quadX, quadY-plusY, -quadX,  - plusY);\n\n      pop();\n    }\n  }\n  noLoop();\n}\n\nfunction mouseClicked(){\n\tloop();\n}\n\nfunction keyTyped() {\n  if (key === \"s\" || key === \"S\") {\n    noLoop();\n    saveCanvas(\"DotandDashLine-004\", \"png\");\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Samuel YAN",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1362967",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:06:07",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

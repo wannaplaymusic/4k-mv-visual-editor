@@ -77,7 +77,7 @@ class StudioCodeEditor(QPlainTextEdit):
                 color: #e4e4e7;
                 border: 1px solid #27272a;
                 border-radius: 6px;
-                font-family: 'JetBrains Mono', 'Menlo', 'Courier New', monospace;
+                font-family: 'Menlo', 'Monaco', 'JetBrains Mono', 'Courier New', monospace;
                 font-size: 12px;
                 line-height: 1.4;
             }

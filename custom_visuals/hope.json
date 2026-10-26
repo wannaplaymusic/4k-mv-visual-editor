@@ -1,0 +1,31 @@
+{
+    "name": "hope",
+    "code": "// === Tab: mySketch ===\n// This sketch uses as image from the artist 8machine _ on unsplash that is free to use. \n//It also uses a beat created on freesound by Cloud-10 called \"EDM Sample 2\"\nlet song;\nvar fft;\n\nconst MAX_TRAIL_COUNT = 30;\nvar colorScheme = [\"#0A1B28\", \"#071F43\", \"#357D7E\", \"#35EEEE\", \"#919DF0\"];\nvar trail = [];\nvar particles = [];\nlet color1;\nlet color2;\nlet colorArray = [];\nlet noiseScale = 0.01\nvar img;\nlet vibrations = [];\n\nfunction preload() {\n\tsong = loadSound('https://openprocessing.org/sketch/2096215/files/536163__cloud-10__edm-sample-2.mp3')\n\timg = loadImage('https://openprocessing.org/sketch/2096215/files/8machine.jpg')\n}\n\nfunction setup() {\n\tcreateMetaTag();\n\tcreateCanvas(window.innerWidth, window.innerHeight);\n\tconst tone = [random(225, 255), random(225, 255), random(225, 255)]\n\tangleMode(DEGREES)\n\timageMode(CENTER)\n\trectMode(CENTER)\n\tfft = new p5.FFT(0.000003);\n\t\n\timg.filter(BLUR, 0.4);\n\t\n\tcolorMode(HSB);\n\t//colors\n}\n\nclass Particle {\n\tconstructor() {\n\t\tthis.pos = p5.Vector.random2D().mult(255)\n\t\tthis.vel = createVector(0, 0)\n\t\tthis.acc = this.pos.copy().mult(random(0.00001, 0.00001))\n\t\t\n\t\tthis.w = random(1,( 0.3 * amp))\n\t\t//this.color = [random(200,220), random(45,315), random(45,90)]\n\t\tthis.color = [random(200,400), random(0,150), 90, random(0.3, 1)]\n\t\tdrawingContext.shadowBlur = 300\n\t\tdrawingContext.shadowColor = (this.color);\n\t\tthis.vel.mult(random(10));\n\t\tthis.vel.rotate(radians(random(-25, 25)));\n\t\tthis.mass = random(1, 50);\n\t\tthis.airDrag = random(0.92, 0.98);\n\t\tthis.life = 6;\n\t\tthis.lifeSteps = random(-1, 1);\n\t\tthis.pos.rotate(radians(this.life * 0.002));\n\t\tthis.vel.mult(this.airDrag);\n\t\tthis.pos.add(this.vel);\n\t\tthis.life += this.lifeSteps;\n\t}\n\t updateColor() {\n    this.hue = (this.hue + 0.5) % 360\n\t }\n\t display() {\n    noStroke();\n    beginShape();\n    for (let point of this.history) {\n      fill(this.hue, 100, 100, 50);\n      ellipse(point.x, point.y, this.radius * 2);\n    }\n    endShape();\n\t }\n\tupdate(cond) {\n\t\tthis.vel.add(this.acc)\n\t\tthis.pos.add(this.vel)\n\t\t\n\t\tif (cond) {\n\t\t\tthis.pos.add(noise *(this.vel) * 100)\n\t\t\tthis.pos.add(noise *(this.vel) - 50)\n\t\t\tthis.pos.add((this.vel) * 100)\n\t\t\tthis.pos.add((this.vel) * 100)\n\t\t\tthis.pos.add(this.vel)\n\t\t\tthis.pos.add(this.vel)\n\t\t\tthis.pos.add(this.vel)\n\t\t\tthis.pos.add(this.vel)\n\t\t\tthis.pos.add(this.vel)\n\t\t\tthis.pos.add(this.vel)\n\t\t\tthis.pos.add(noise *(this.vel) - 50)\n\t\t\tthis.pos.add(noise *(this.vel) - 50)\n\t\t\tthis.pos.add(noise *(this.vel) - 50)\n\t\t}\n\t}\n\tedges() {\n\t\tif(this.pos.x < -width / 2 || this.pos.x > width / 2 ||\n\t\tthis.pos.y < -height / 2 || this.pos.y > height / 2) {\n\t\treturn true\n\t} else {\n\t\treturn false\n\t\t}\n\t}\n\tshow() {\n\t\tnoStroke()\n\t\tfill(this.color)\n\t\tellipse(this.pos.x, this.pos.y,this.w);\n\t}\n}\n\nfunction draw() {\n\tbackground(0,1);\n\tnoFill()\n\tcolorMode (HSB)\n\n\ttranslate(width / 2, height / 2)\n\t\n\tfft.analyze()\n\tamp = fft.getEnergy(20, 255)\n\t\n\tpush()\n\tif (amp > 230) {\n\t\trotate(random(-4, 4))\n\t}\n\t\n\timage(img, 0, 0, width/2, height)\n\tpop()\n\t\n\tvar alpha = map(amp, 0, 255, 180, 150)\n\tfill(0, alpha - 153)\n\tnoStroke()\n\trect(0, 0, width, height)\n\t\n\tvar wave = fft.waveform();\n\t\n\tstroke(random(200,500), random(200,400), 100, 1)\n\tstrokeWeight(random(3, 15))\n\tnoFill()\n\t\nfor (var t = -1; t <= 1; t += 2) {\t\n\tbeginShape()\n\tfor (var i = 0; i <= 180; i+= 0.7) { \n\t\tvar index = floor(map(i, 0, 180, 0, wave.length - 1))\n\t\t\n\t\tlet r = map(wave[index], -1, 1, 150, 500)\n\t\t\n\t\tlet x = r * sin(i) *t \n\t\tlet y = r * cos(i)\n\t\t//let x = 200 * cos(r) * sin(r);\n\t\t//let y = 200 * cos(r) * sin(r * 6);\n\t\t//vertex(x,y)\n\t\t//var x2 = x + (100 * noise( y / 50) - 50);\n\t\t//var y2 = y + (100 * noise(x / 50) - 50);\n\t\tvertex(x, y)\n\t\t}\n\tdrawingContext.shadowBlur = 400\n\tdrawingContext.shadowColor = (random(200,500), random(200,400), 100, 1);\n\t\tendShape()\n\t}\nvar p = new Particle()\nparticles.push(p)\nvibrations.push(p)\n\n\tfor (let i = particles.length - 1; i >= 0; i--) {\n\t\tif (!particles[i].edges()) {\n\t\t\tparticles[i].update(amp > 230)\n\t\t\tparticles[i].show()\n\t} else {\n\t\t\tparticles.splice(i, 0.1)\n\t\t\t}\n\t\t}\n}\nfunction mouseClicked() {\n\tif (song.isPlaying()) {\n\t\tsong.pause()\n\t\tnoLoop()\n\t} else {\n\t\tsong.play()\n\t\tloop()\n\t}\n}\nfunction windowResized() {\n  resizeCanvas(window.innerWidth, window.innerHeight);\n}\n\nfunction createMetaTag() {\n\tlet meta = createElement('meta');\n\tmeta.attribute('name', 'viewport');\n\tmeta.attribute('content', 'user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width,height=device-height');\n\n\tlet head = select('head');\n\tmeta.parent(head);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Mary Francis Cheeseman",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2096215",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:23:53",
+    "used_in_videos": [
+        "Gravity in Reverb.mp4"
+    ],
+    "used_count": 1
+}

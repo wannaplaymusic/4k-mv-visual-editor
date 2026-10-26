@@ -1,0 +1,26 @@
+{
+    "name": "paintthetown",
+    "code": "// === Tab: sketch.js ===\n// hey u!\n//          )      (\\_\n//         ((    _/{  \"-;\n//          )).-' {{ ;'`\n//         ( (  ;._ \\\\     \n// @od3zza is here.\n\n// Array que armazenará todas as partículas\nlet particles1 = [];\n\n// Número total de partículas\nlet num = 1000;\n\n// Variáveis para o microfone\nlet mic;\nlet vol;\nlet smoothedVol = 0;\n\nfunction setup() {\n    createCanvas(windowWidth, windowHeight);\n    background(0);\n\n    for (let i = 0; i < num; i++) {\n        let p = createVector(random(width), random(height));\n        p.prevX = p.x;\n        p.prevY = p.y;\n        p.life = 180;\n        p.hue = random(360);\n        particles1.push(p);\n    }\n\n    colorMode(HSB, 360, 100, 100, 1);\n\n    mic = new p5.AudioIn();\n    mic.start();\n}\n\nfunction draw() {\n    blendMode(BLEND);\n\n    vol = mic.getLevel();\n    smoothedVol = lerp(smoothedVol, vol, 0.2);\n\n    // --- MUDANÇA: Aumenta a força mínima e máxima para movimento constante e intenso\n    let minStrength = 10; // Aumentado para 10, garantindo movimento constante\n    let maxStrength = 80;  // Aumentado para 80, para um impacto visual mais forte\n\n    let mappedVol = pow(smoothedVol, 2);\n    let strength = map(mappedVol, 0, pow(0.15, 2), minStrength, maxStrength);\n    strength = constrain(strength, minStrength, maxStrength);\n\n    let zoom = 300;\n    background(0, 40);\n    strokeWeight(1);\n\n    for (let i = 0; i < num; i++) {\n        var p = particles1[i];\n        let angle = noise(p.x / zoom, p.y / zoom, frameCount / 600) * TWO_PI;\n\n        p.prevX = p.x;\n        p.prevY = p.y;\n\n        p.x += cos(angle) * strength * 3;\n        p.y += sin(angle) * strength * 3;\n\n        if (p.x < 0) p.x = width;\n        if (p.x > width) p.y = 0;\n        if (p.y < 0) p.y = height;\n        if (p.y > height) p.y = 0;\n\n        p.life--;\n\n        if (p.life <= 0) {\n            p.x = random(width);\n            p.y = random(height);\n            p.prevX = p.x;\n            p.prevY = p.y;\n            p.life = 180;\n        }\n\n        // --- MUDANÇA: Mapeia a transparência (alpha) diretamente do volume\n        // A transparência agora reflete a intensidade do som\n        let alpha = map(vol, 0, 0.3, 0.1, 1);\n        \n        stroke(0, 0, 100, alpha); \n        line(p.prevX, p.prevY, p.x, p.y);\n    }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"pt\" lang=\"pt-BR\">\n\t<head>\n\t\t<meta charset=\"utf-8\">\n\t\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.10/lib/p5.js\"></script>\n\t\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.10/lib/addons/p5.sound.min.js\"></script>\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n\t\t<title>paintthetown by od3zza</title>\n\t\t<meta name=\"author\" content=\"od3zza\">\n\t\t<meta name=\"description\" content=\"Just another shit particles audio interactive p5.js.\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\t</head>\n\t\n\t<!-- @od3zza says hi!  \n          )      (\\_\n         ((    _/{  \"-;\n          )).-' {{ ;'`\n         ( (  ;._ \\\\       -->\n  \n\t<body>\n\t\t<main>\n\t\t</main>\n\t\t<script src=\"sketch.js\"></script>\n\t</body>\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nhtml,\nbody {\n\tmargin: 0;\n\tpadding: 0;\n}\n",
+    "inline_assets": {},
+    "author": "od3zza",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2712610",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:48:05",
+    "used_in_videos": [
+        "Gradient of Silence.mp4"
+    ],
+    "used_count": 1
+}

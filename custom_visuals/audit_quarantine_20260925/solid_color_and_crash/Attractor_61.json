@@ -1,0 +1,24 @@
+{
+    "name": "Attractor_61",
+    "code": "// === Tab: mySketch ===\n// attractor_6.0\n\nlet N = 10000 ; let M = 3 ; let dT = 0.01 ; let B = 40 ; let A = 0.4 ;\n\nlet X[] = new Array(N) ; let Y[] = new Array(N) ; \nlet CX[] = new Array(M) ; let CY[] = new Array(M) ; let F[] = new Array(M) ;\nlet dX ; let dY ; let I ; let II ; let L ; let KX ; let KY ; let T ; \n\n\n\nfunction setup(){\n  \n  createCanvas(400, 400) ; noSmooth() ; background(0) ; stroke(255,0,0) ;\n  \n  for ( I = 0 ; I < N ; I++ ){\n    X[I] = 80*sin(I*2*PI/N) ; Y[I] = 80*cos(I*2*PI/N) ;\n  }\n  \n  for ( II = 0 ; II < M ; II++ ){\n    F[II] = random(3,6) ;\n    CX[II] = 100*sin(II*2*PI/M) ; CY[II] = 100*cos(II*2*PI/M) ;\n  }\n  \n} // setup()\n\n\n\nfunction draw(){\n  \n  background(0) ;\n  \n  for ( I = 0 ; I < N ; I++ ){\n    dX = 0 ; dY = 0 ; \n    for ( II = 0 ; II < M ; II++ ){\n      KX = X[I]-CX[II] ; KY = Y[I]-CY[II] ;\n      L = sqrt((KX*KX)+(KY*KY)) ;\n      dX = dX + ((+KY-(KX*A*sin(F[II]*T)))/L/L) ;\n      dY = dY + ((-KX-(KY*A*sin(F[II]*T)))/L/L) ;\n    }\n    dX = dX*B ; dY = dY*B ; \n    point(X[I]+200,Y[I]+200) ;\n    X[I] = X[I] + dX ; Y[I] = Y[I] + dY ;\n  }\n  \n  for ( II = 0 ; II < M ; II++ ){\n    CX[II] = 100*sin(II*2*PI/M-T) ; CY[II] = 100*cos(II*2*PI/M-T) ;\n  }\n  \n  T = T + dT ;\n  \n} // draw()\n\n\n\nfunction mousePressed(){ setup() ; }\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "KaijinQ",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/838206",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:50:17",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

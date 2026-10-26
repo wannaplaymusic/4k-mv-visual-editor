@@ -1,0 +1,29 @@
+{
+    "name": "94noise2",
+    "code": "// === Tab: mySketch ===\nlet span = 5000;\nlet particles=[];\nlet hu = 0;\n\nfunction setup() {\n\tcreateCanvas(1112, 834);\n\tbackground(0);\n\tcolorMode(HSB);\n\thu = random(360);\n\t\n\tfor(var i=0; i<span; i+=1){\n\t\tparticles.push({\n\t\t\tx:random(width),\n\t\t\ty:height/2+random(-10,10),\n\t\t\tr:random(5),\n\t\t\tclr:color((hu+random(0, 60))%360,100,100)\n\t\t})\n\t}\n}\n\nfunction draw() {\n\tnoStroke()\n\tfor(let p of particles){\n\t\tfill(p.clr)\n\t\tellipse(p.x,p.y,p.r)\n\t\tp.x+=(noise(p.x/100,p.y/100,100)-0.5)*5\n\t\tp.y+=(noise(p.x/100,p.y/1000,100)-0.5)*10\n\t\tp.r-=0.001\n\t}\n}\n\n//save JPG\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  // prevents mouse press from registering twice\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "OTIS",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1223196",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:17:40",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

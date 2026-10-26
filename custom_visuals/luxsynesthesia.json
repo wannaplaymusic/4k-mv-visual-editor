@@ -1,0 +1,27 @@
+{
+    "name": "luxsynesthesia",
+    "code": "// === Tab: mySketch ===\n// LUX SYNESTHESIA ∞ | v2: Experiencia audiovisual expandida\n\nlet activeNotes = {};\nlet fft, reverb;\nlet kickOsc, kickEnv;\nlet lastBeat = 0;\nlet beatInterval = 500;\n\nlet currentScale = [];\nlet scaleColor = [255, 255, 255];\n\nlet scales = {\n  'A': [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88],\n  'S': [261.63, 293.66, 311.13, 349.23, 392.00, 415.30, 466.16],\n  'D': [261.63, 293.66, 329.63, 392.00, 440.00],\n  'F': [261.63, 277.18, 311.13, 349.23, 392.00, 466.16, 523.25]\n};\n\nlet scaleThemes = {\n  'A': [240, 240, 255],\n  'S': [255, 200, 220],\n  'D': [200, 255, 180],\n  'F': [160, 220, 255]\n};\n\nlet sculptures = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  fft = new p5.FFT();\n  reverb = new p5.Reverb();\n\n  kickOsc = new p5.Oscillator('sine');\n  kickEnv = new p5.Envelope();\n  kickEnv.setADSR(0.001, 0.1, 0.2, 0.2);\n  kickEnv.setRange(1.2, 0);\n  kickOsc.amp(kickEnv);\n  kickOsc.start();\n  reverb.process(kickOsc, 4, 3);\n\n  currentScale = scales['A'];\n  scaleColor = scaleThemes['A'];\n  noCursor();\n  colorMode(HSB, 360, 100, 100, 255);\n}\n\nfunction draw() {\n  background(0);\n  orbitControl(0.8, 0.8, 0.1);\n\n  // BEAT\n  beatInterval = map((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), -width / 2, width / 2, 1400, 100);\n  if (millis() - lastBeat > beatInterval) {\n    playKick();\n    lastBeat = millis();\n  }\n\n  let pulse = map(sin(millis() / beatInterval * PI), -1, 1, 40, 160);\n  let hueColor = map(pulse, 40, 160, 180, 360);\n  pointLight(hueColor, 80, 100, 0, 0, 400);\n  ambientLight(20);\n  noStroke();\n  fill(hueColor, 80, 100, 100);\n  sphere(pulse, 48, 48);\n\n  // AUDIO REACTIVO 3D FIELD\n  let spectrum = fft.analyze();\n  for (let i = 0; i < spectrum.length; i += 20) {\n    let angle = map(i, 0, spectrum.length, 0, TWO_PI);\n    let radius = map(spectrum[i], 0, 255, 50, 600);\n    push();\n    rotateY(frameCount * 0.002 + angle);\n    rotateX(frameCount * 0.001);\n    translate(cos(angle) * radius, sin(angle * 2) * radius / 2, sin(angle) * radius);\n    let col = map(i, 0, spectrum.length, 180, 360);\n    fill(col, 80, 100, 90);\n    sphere(6 + sin(frameCount * 0.01 + i) * 3, 8, 6);\n    pop();\n  }\n\n  // ESCULTURAS DINÁMICAS\n  for (let s of sculptures) {\n    s.update();\n    s.display();\n  }\n  sculptures = sculptures.filter(s => s.life > 0);\n}\n\nfunction playKick() {\n  kickOsc.freq(50);\n  kickEnv.play();\n}\n\nfunction keyPressed() {\n  getAudioContext().resume();\n  let k = key.toUpperCase();\n  if (scales[k]) {\n    currentScale = scales[k];\n    scaleColor = scaleThemes[k];\n    return;\n  }\n\n  if (k >= '1' && k <= '7') {\n    let i = int(k) - 1;\n    if (currentScale[i] && !activeNotes[k]) {\n      let freq = currentScale[i];\n      let osc = new p5.Oscillator('sawtooth');\n      let env = new p5.Envelope();\n      env.setADSR(0.05, 0.2, 0.6, 0.5);\n      env.setRange(0.5, 0);\n      osc.amp(env);\n      osc.freq(freq);\n      osc.start();\n      env.play();\n      reverb.process(osc, 6, 3);\n      activeNotes[k] = { osc, env };\n      sculptures.push(new Sculpture(freq));\n    }\n  }\n}\n\nfunction keyReleased() {\n  var k = key.toUpperCase();\n  if (activeNotes[k]) {\n    let { osc, env } = activeNotes[k];\n    env.triggerRelease();\n    setTimeout(() => osc.stop(), 600);\n    delete activeNotes[k];\n  }\n}\n\nclass Sculpture {\n  constructor(freq) {\n    this.pos = createVector(0, 0, 0);\n    this.vel = p5.Vector.random3D().mult(random(3, 6));\n    this.size = map(freq, 200, 800, 20, 50);\n    this.life = 255;\n    this.hue = map(freq, 200, 800, 180, 360);\n    this.rot = random(TWO_PI);\n  }\n\n  update() {\n    this.pos.add(this.vel);\n    this.life -= 2;\n  }\n\n  display() {\n    push();\n    translate(this.pos);\n    rotateY(this.rot + frameCount * 0.01);\n    fill(this.hue, 80, 100, this.life);\n    box(this.size * (this.life / 255));\n    pop();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "m0n1c4g0m3z",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2652345",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:52:54",
+    "used_in_videos": [
+        "Berlin Depth Module.mp4",
+        "Fusion Rift Dominion.mp4"
+    ],
+    "used_count": 2
+}

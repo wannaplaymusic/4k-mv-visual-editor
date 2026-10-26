@@ -1,0 +1,27 @@
+{
+    "name": "NoisePlanet_GAMMA",
+    "code": "// === Tab: mySketch ===\n\nlet seed, mySize;\nlet angle_c;\nlet colors = [];\nlet colors7 = \"fefefe-292929-ffffff-222222-202020\".split(\"-\").map((a) => \"#\" + a);\nlet colors8 = \"000000-ffffff\".split(\"-\").map((a) => \"#\" + a);\nvar color_setup1, color_setup2;\nlet color_bg;\nlet branch;\n\nfunction setup() {\n\t// pixelDensity(5);\n\tmySize = max(windowWidth, windowHeight);\n\tcreateCanvas(mySize, mySize);\n\t// createCanvas(windowWidth, windowHeight);\n\tseed = int(random(10000));\n\tcolorMode(HSB, 360, 100, 100, 100);\n\tcolor_setup1 = colors7;\n\tcolor_setup2 = colors8;\n\tcolor_bg = \"#000000\";\n\tbackground(color_bg);\n\tangle_c = 0;\n\tbranch = 4;\n}\n\nfunction draw() {\n\n// [SENTINEL 專家 2 修復] 音訊座標數值防禦\nif(typeof window.simulatedMouseX === 'number' && isNaN(window.simulatedMouseX)) window.simulatedMouseX = width*0.5;\nif(typeof window.simulatedMouseY === 'number' && isNaN(window.simulatedMouseY)) window.simulatedMouseY = height*0.5;\n\n\trandomSeed(seed);\n\tdrawingContext.shadowColor = str(random(color_setup1)) + \"00\";\n\tdrawingContext.shadowOffsetX = 0;\n\tdrawingContext.shadowOffsetY = 0;\n\tdrawingContext.shadowBlur = 0;\n\ttranslate(width / 2, height / 2);\n\trotate(angle_c);\n\tfor (let i = 0; i < 1; i++) {\n\t\tcolors[0] = random(color_setup2);\n\t\tcolors[1] = random(color_setup2);\n\t\tcolors[2] = random(color_setup2);\n\t\tcolors[3] = random(color_setup1);\n\t\tcolors[4] = random(color_setup2);\n\t\tcircleForm(0, 0, mySize * 1.7 * (i + 1)/2);\n\t}\n\n\tif (frameCount % 5 == 0 && branch < 1200) {\n\t\tbranch += 10;\n\t\tangle_c += TAU / 4;\n\t} else if (branch >= 1200) {\n\t\tbranch += 0;\n\t\tangle_c += 0;\n\t}\n\tif (frameCount >= 1200) {\n\t\tseed = int(random(92821));\n\t\tbackground(color_bg);\n\t\trandomSeed(seed);\n\t\tframeCount = 0;\n\t\tbranch = 4;\n\t\tangle_c = 0;\n\t}\n}\n\nfunction circleForm(x, y, d) {\n\tlet ang = TAU / branch;\n\tlet angles = [];\n\tfor (let i = 0; i < branch; i++) {\n\t\tangles.push(ang * (i + iteration(0.1, 0.25)));\n\t}\n\tfor (let i = 0; i < branch; i++) {\n\t\tlet ang1 = angles[i];\n\t\tlet ang2 = angles[(i + int(random(6))) % angles.length];\n\t\tlet dd = d * iteration(0, 1);\n\t\tnoFill();\n\t\tdrawingContext.shadowColor = random(color_setup1);\n\t\tdrawingContext.shadowOffsetX = random(-5, 5);\n\t\tdrawingContext.shadowOffsetY = random(-5, 5);\n\t\tdrawingContext.shadowBlur = 0;\n\t\tstroke(colors[random([0, 1, 2, 3, 4])]);\n\t\tstrokeWeight(random(1));\n\t\tcircle(x, y, dd, dd, ang1, ang2);\n\t}\n}\n\nfunction iteration(s, e) {\n\tlet t = random(1, 100);\n\tlet v = random(0.001, 0.01);\n\treturn map(cos(t + frameCount * v), -1, 1, s, e);\n}\n\nfunction keyTyped() {\n\tif (key === \"s\" || key === \"S\") {\n\t\tsaveCanvas(\"NoisePlanet_GAMMA_2022\", \"png\");\n\t}\n}\n\n//fullscreen\nfunction mousePressed() {\n  if ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) > 0 && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) < width && (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) > 0 && (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) < height) {\n    let fs = fullscreen();\n    fullscreen(!fs);\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u332753",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-05"
+    ],
+    "url": "https://openprocessing.org/sketch/1833338",
+    "batch_id": "batch_20261005_141539",
+    "batch_date": "2026-10-05",
+    "date_added": "2026-10-05 16:22:40",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

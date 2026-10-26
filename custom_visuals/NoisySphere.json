@@ -1,0 +1,26 @@
+{
+    "name": "NoisySphere",
+    "code": "// === Tab: mySketch ===\nconst vs = `\nattribute vec3 aPosition;\nattribute vec4 aMaterialColor;\nattribute vec3 aNoiseArray;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\n\nvarying vec4 vColor;\n\nuniform float uMixcoef;\n\nvoid main(void) {\n   vec3 position = aPosition + aNoiseArray * uMixcoef;\n   gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(position, 1.0);\n   vColor = aMaterialColor;\n}\n`;\n\nconst fs = `\nprecision highp float;\n\nvarying vec4 vColor;\n\nvoid main(void) {\n   gl_FragColor = vColor;\n}\n`;\n\nconst w = 1112;\nconst fps = 24;\nconst P = 64;\nconst l = w/4;\nlet theShader;\n\nfunction setup() {\n   _gl = createCanvas(w, w*.75, WEBGL);\n   frameRate(fps);\n\n   colorMode(HSB);\n   noStroke();\n\n   theShader = createShader(vs, fs);\n   _gl.retainedMode.buffers.fill.push(new p5.RenderBuffer(3, \"noiseArray\", \"noiseBuffer\", \"aNoiseArray\", _gl));\n}\n\nfunction draw() {\n   shader(theShader);\n   theShader.setUniform('uMixcoef', sin(frameCount/64));\n\n   background(20);\n   push();\n   rotateX(frameCount/27);\n   rotateY(-frameCount/33);\n   translate(0, 0, 0);\n   noisy_sphere(l, P, P);\n   pop();\n\n   resetShader();\n}\n\nfunction noisy_sphere(size, detailX, detailY) {\n   const gId = `noisy_sphere|${size}|${detailX}|${detailY}`;\n\n   if (!this._renderer.geometryInHash(gId)) {\n      let geom = new p5.Geometry(detailX, detailY);\n      geom.noiseArray = [];\n\n       for (var i = 0; i <= detailY; i++) {\n         var v = i / detailY;\n         var phi = Math.PI * v - Math.PI / 2;\n         var cosPhi = Math.cos(phi);\n         var sinPhi = Math.sin(phi);\n\n         for (var j = 0; j <= detailX; j++) {\n           var u = j / detailX;\n           var theta = 2 * Math.PI * u;\n           var cosTheta = Math.cos(theta);\n           var sinTheta = Math.sin(theta);\n           var p = new p5.Vector(\n             cosPhi * sinTheta,\n             sinPhi,\n             cosPhi * cosTheta\n           );\n           geom.vertices.push(p);\n           geom.vertexNormals.push(p);\n           geom.uvs.push(u, v);\n\n           geom.vertexColors.push(1,\n            .4, sin((i-detailY/2)/10)*0.3+0.3,\n            sin((i-detailY/2)/10)*0.4+0.6);\n         }\n       }\n\n       let dd = 1.1;\n       let weight = 0.05;\n       let p0 = [];\n       let k=random();\n       for (var i = 0; i <= detailY; i++) {\n         for (var j = 0; j <= detailX; j++) {\n            var p = [\n               dd*(noise(i*weight, j*weight, k+0) - 0.5),\n               dd*(noise(i*weight, j*weight, k+1) - 0.5),\n               dd*(noise(i*weight, j*weight, k+2) - 0.5)\n            ];\n\n           if(j==0){p0=p;}\n           if(j==detailX || i==0 || i==detailY){p=p0;}\n           geom.noiseArray.push(...p);\n         }\n       }\n     geom.computeFaces();\n     geom._makeTriangleEdges()._edgesToVertices();\n     this._renderer.createBuffers(gId, geom);\n   }\n   this._renderer.drawBuffersScaled(gId, size, size, size);\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  // prevents mouse press from registering twice\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u281842",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1349356",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 23:58:10",
+    "used_in_videos": [
+        "Cosmic Rift Barbarians.mp4"
+    ],
+    "used_count": 1
+}

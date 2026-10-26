@@ -1,0 +1,26 @@
+{
+    "name": "Salt1",
+    "code": "// === Tab: mySketch ===\nlet randomDuration = Math.floor(Math.random() * (9000 - 3000 + 1) + 3000);\nlet powerFactor = 0.3;\nlet speedValue = 15;\nlet intensityValue = 1;\nlet followers = [];\n\nlet offsetX = 0;\nlet offsetY = 0;\nlet easingFactor = 0.15;\n\nlet noisePower = Math.floor(Math.random() * (10 - 5 + 1) + 5);\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  background(20);\n  for (let i = 0; i < randomDuration; i++) {\n    followers[i] = new Follower();\n  }\n}\n\nfunction draw() {\n  background(20);\n\n  //fill(220, 50);\n  //rect(0, 0, width, 125);\n\n  for (let i = 0; i < followers.length; i++) {\n    followers[i].update();\n    followers[i].render();\n  }\n\n  stroke(255, 50);\n  strokeWeight(50);\n  let dx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - offsetX;\n  offsetX += dx * easingFactor;\n  let dy = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - offsetY;\n  offsetY += dy * easingFactor;\n  point(offsetX, offsetY);\n  noStroke();\n\n  noiseEffect();\n}\n\nfunction noiseEffect() {\n  strokeWeight(1);\n  for (let i = -width / noisePower; i < width / noisePower - 1; i += 5) {\n    for (let j = -height / noisePower; j < height / noisePower - 1; j += 5) {\n      fill(random(100, 255), random(20, 40));\n      rect(random(0, width), random(0, height), random(1, 2), random(1, 2));\n    }\n  }\n  for (let i = 0; i < 15; i++) {\n    fill(random(0, 255), 255);\n    rect(random(0, width), random(0, height), 2, 2);\n  }\n}\n\nclass Follower {\n  constructor() {\n    this.loc = createVector(random(width), random(height));\n    this.vel = createVector();\n    this.acc = createVector();\n  }\n\n  render() {\n    if (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)) && mouseButton === LEFT) {\n      fill(247, 37, 133, 50);\n    } else if (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)) && mouseButton === RIGHT) {\n      fill(76, 201, 241, 50);\n    } else {\n      fill(255, 255, 255, 50);\n    }\n    noStroke();\n\t\tfill(255);\n    ellipse(this.loc.x, this.loc.y, 1.8, 1.8);\n  }\n\n  update() {\n    this.acc.set(offsetX - this.loc.x, offsetY - this.loc.y);\n\n   /* if (keyIsPressed && key === '+') {\n      powerFactor += 0.00001;\n    } else if (keyIsPressed && key === '-') {\n      powerFactor -= 0.00001;\n    } else if (keyIsPressed && (key === 'q' || key === 'Q')) {\n      powerFactor = 0.3;\n    } else if (keyIsPressed && (key === 's' || key === 'S')) {\n      powerFactor = 0.8;\n    } else if (keyIsPressed && (key === 'd' || key === 'D')) {\n      powerFactor = 1.1;\n    } else if (keyIsPressed && (key === 'f' || key === 'F')) {\n      powerFactor = 5;\n    } else if (keyIsPressed && (key === 'g' || key === 'G')) {\n      powerFactor = 10;\n    } */\n\n    this.acc.limit(powerFactor);\n\n    this.vel.add(this.acc);\n\n    /*if (keyIsPressed && (key === 'v' || key === 'V')) {\n      speedValue = 100;\n    } else {\n      speedValue = 15;\n    }*/\n\n    this.vel.limit(speedValue);\n\n    this.loc.add(this.vel);\n\n    /*if (keyIsPressed && (key === 'a' || key === 'A')) {\n      intensityValue = 2;\n    } else if (keyIsPressed && (key === 'z' || key === 'Z')) {\n      intensityValue = 3;\n    } else {\n      intensityValue = 1;\n    }*/\n\n    this.vel.mult(intensityValue);\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Myra",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2138726",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:21:10",
+    "used_in_videos": [
+        "Pure Immersion Meditation.mp4"
+    ],
+    "used_count": 1
+}

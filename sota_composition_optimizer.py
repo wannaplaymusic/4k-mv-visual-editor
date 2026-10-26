@@ -95,6 +95,37 @@ class SOTACompositionOptimizer:
         golden_angle = 137.5 * (np.pi / 180.0)
         current_torque = np.array([0.0, 0.0])
 
+        # 引入 SAVAP 構圖物理引擎進行力矩最佳化
+        try:
+            from savap_physics_layout_optimizer import SAVAPPhysicsEngine
+            engine = SAVAPPhysicsEngine(canvas_w=self.cw, canvas_h=self.ch)
+            # 轉換格式進行力矩尋優
+            opt_input = [{"id": a["id"], "image": a["img"], "keyword": a.get("keyword", "")} for a in analyzed]
+            balanced_res = engine.generate_balanced_layout(opt_input)
+            
+            # 使用 SAVAP 全局佈局結果替換
+            placed_elements = []
+            for idx, item in enumerate(balanced_res):
+                placed_elements.append({
+                    "id": item["id"],
+                    "keyword": item.get("keyword", ""),
+                    "role": item.get("role", "hero" if idx == 0 else "satellite"),
+                    "pos": item["pos"],
+                    "scale": item["scale"],
+                    "z_depth": item["z_depth"],
+                    "mass": item["mass"],
+                    "cavity_socket": [float(cavity_norm[0]), float(cavity_norm[1])] if idx == 0 else [0.5, 0.5],
+                    "orbit_radius": float(120.0 + idx * 50.0),
+                    "angle_offset": float(idx * golden_angle),
+                    "orbit_speed": float(0.012 + (0.004 * idx)),
+                    "semantic_distance": item.get("semantic_distance_to_hero", 0.3),
+                    "is_poetic": item.get("is_poetic", True)
+                })
+            return placed_elements
+        except Exception as e:
+            # 安全回退
+            pass
+
         for i, item in enumerate(analyzed[1:], start=1):
             if i == 1:
                 # 【維度 2：SDF 負空間咬合鑲嵌】

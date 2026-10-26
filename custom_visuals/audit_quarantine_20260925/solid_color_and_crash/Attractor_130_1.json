@@ -1,0 +1,24 @@
+{
+    "name": "Attractor_130",
+    "code": "// === Tab: mySketch ===\n// Attractor?_13.0\n\nlet N = 10000 ; let M = 3 ; let K = 0.01 ; let V = 0.4 ; let R = 300 ;\n\nlet X[] = new Array(N) ; let Y[] = new Array(N) ; let Z[] = new Array(N) ; let CX[] = new Array(M) ; let CY[] = new Array(M) ;\nlet L ; let I ; let II ; let KX ; let KY ; let KZ ; let KdX ; let KdY ; let NKX ; let NKY ; let NX ; let NY ; let NZ ; let KN ;\n\nfunction setup(){\n  \n  createCanvas(600, 600) ; noSmooth() ; background(0) ; stroke(255) ; textSize(20) ;\n  \n  X[0] = 200 ; Y[0] = 0 ; Z[0] = 0 ;\n  for ( I = 0 ; I < N ; I++ ){\n    X[I] = X[0]+random(-1,+1) ; Y[I] = Y[0]+random(-1,+1) ; Z[I] = Z[0]+random(-1,+1) ; \n  }\n  \n  for ( I = 0 ; I < M ; I++ ){\n    CX[I] = (R-20)*2/sqrt(3)*cos(2*PI*I/M)+200 ; CY[I] = (R-20)*2/sqrt(3)*sin(2*PI*I/M) ; \n  }\n  \n  KN = N ; \n  \n}// setup()\n\nfunction draw(){\n  \n  if ( KN == N ){ background(0) ; }\n  line(50,300,550,300) ; line(550,300,540,290) ; line(550,300,540,310) ; text(\"X\",560,305) ;\n  line(300,50,300,550) ; line(300,50,290,60) ; line(300,50,310,60) ; text(\"Z\",295,40) ;\n  line(450,150,150,450) ; line(150,450,150,435) ; line(150,450,165,450) ; text(\"Y\",130,470) ;\n  \n  for ( I = 0 ; I < KN ; I++ ){\n    \n     L = sqrt(pow(X[I],2)+pow(Y[I],2)) ;\n     KX = L ; KY = Z[I] ; KdX = X[I]/L ; KdY = Y[I]/L ;\n     \n     for ( II = 0 ; II < M ; II++ ){\n       L = sqrt(pow(KX-CX[II],2)+pow(KY-CY[II],2)) ;\n       if ( L < R ){\n         KdX = KdX + ((R-L)*K*(KX-CX[II])/L) ;\n         KdY = KdY + ((R-L)*K*(KY-CY[II])/L) ; \n       }\n     }\n     \n     L = sqrt(pow(KdX,2)+pow(KdY,2)) ;\n     if ( L > 0 ){ KdX = KdX*V/L ; KdY = KdY*V/L ; }\n     L = sqrt(pow(KdX,2)+pow(KdY,2)) ;\n     NKX = KX + KdX ; NKY = KY + KdY ;\n     NX = NKX*KdX/L ; NY = NKX*KdY/L ; NZ = NKY ;\n     \n     line(NX-(NY/2)+300,-NZ+(NY/2)+300,X[I]-(Y[I]/2)+300,-Z[I]+(Y[I]/2)+300) ;\n     X[I] = NX ; Y[I] = NY ; Z[I] = NZ ;\n    \n  }// I\n  \n}// draw()\n\nfunction mousePressed(){\n  \n  background(0) ;\n  \n  if ( KN != N ){ \n    KN = N ; \n    for ( I = 0 ; I < N ; I++ ){\n      X[I] = X[0]+random(-1,+1) ; Y[I] = Y[0]+random(-1,+1) ; Z[I] = Z[0]+random(-1,+1) ; \n    }\n  }else{ KN = 1 ; }\n  \n}// mousePressed()\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "KaijinQ",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/860421",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:47:48",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

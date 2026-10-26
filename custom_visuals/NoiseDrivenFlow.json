@@ -1,0 +1,31 @@
+{
+    "name": "NoiseDrivenFlow",
+    "code": "// === Tab: mySketch ===\nlet particles = [];\nlet num = 2000; // 粒子の数（重ければ1000に減らしてください）\nlet noiseScale = 0.01;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(10); // 背景色（ほぼ黒）\n\t\n\t// 粒子を初期化\n\tfor(let i = 0; i < num; i ++) {\n\t\tparticles.push(createVector(random(width), random(height)));\n\t}\n}\n\nfunction draw() {\n\t// 軌跡を残すために薄く背景を塗り重ねる\n\tbackground(0, 10);\n\t\n\tfor(let i = 0; i < num; i ++) {\n\t\tlet p = particles[i];\n\t\t\n\t\t// 位置によって色を変える（高度に見えるポイント）\n\t\tlet r = map(p.x, 0, width, 50, 255);\n\t\tlet g = map(p.y, 0, height, 50, 255);\n\t\tlet b = map(dist(width/2, height/2, p.x, p.y), 0, width/2, 255, 50);\n\t\tstroke(r, g, b, 200);\n\t\tstrokeWeight(1.5);\n\t\t\n\t\tpoint(p.x, p.y);\n\t\t\n\t\t// ノイズを使って有機的な動きを作る\n\t\tlet n = noise(p.x * noiseScale, p.y * noiseScale, frameCount * 0.005);\n\t\tlet a = TWO_PI * n; // 角度を決定\n\t\t\n\t\t// マウスの位置で動きに変化を与える（インタラクション要素）\n\t\tif (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) {\n\t\t\ta = atan2((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - p.y, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - p.x); // マウスに吸い寄せられる\n\t\t}\n\t\t\n\t\tp.x += cos(a) * 2;\n\t\tp.y += sin(a) * 2;\n\t\t\n\t\t// 画面外に出たらランダムな位置に戻す\n\t\tif(!onScreen(p)) {\n\t\t\tp.x = random(width);\n\t\t\tp.y = random(height);\n\t\t}\n\t}\n}\n\n// 画面内判定\nfunction onScreen(v) {\n\treturn v.x >= 0 && v.x <= width && v.y >= 0 && v.y <= height;\n}\n\n// ウィンドウサイズが変わったらキャンバスも合わせる\nfunction windowResized() {\n\tresizeCanvas(windowWidth, windowHeight);\n\tbackground(10);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "007",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2808113",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:46:00",
+    "used_in_videos": [
+        "Classic Spirit Patterns.mp4"
+    ],
+    "used_count": 1
+}

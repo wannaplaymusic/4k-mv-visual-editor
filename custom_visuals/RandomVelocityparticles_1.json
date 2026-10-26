@@ -1,0 +1,31 @@
+{
+    "name": "RandomVelocityparticles",
+    "code": "// === Tab: mySketch ===\n//Made by 16384 - Feb. 2020\n\nlet num = 500;\nlet pos = [];\nlet vel = [];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n\n\tfor (let i = 0; i < num; i++) {\n\t\tpos[i] = createVector(width / 2, height / 2);\n\t\tvel[i] = createVector(0, 0);\n\t}\n\tcolorMode(HSB);\n}\n\nfunction draw() {\n\tfor (let i = 0; i < pos.length; i++) {\n\t\tpos[i].add(vel[i]);\n\n\t\tlet rotation = random(TWO_PI);\n\t\tvel[i].x += cos(rotation) * 0.1;\n\t\tvel[i].y += sin(rotation) * 0.1;\n\n\t\tif (pos[i].x < 0 || pos[i].x > width || pos[i].y < 0 || pos[i].y > height) {\n\t\t\tvel[i].mult(0);\n\t\t}\n\n\t\tstroke(0,86,123);\n\t\tstroke(frameCount / 2 % 255, 255, 255);\n\t\tline(pos[i].x, pos[i].y, pos[i].x + vel[i].x * 2, pos[i].y + vel[i].y * 2);\n\t}\n}\n\nfunction keyPressed() {\n\tif (key == 'r') {\n\t\tpos = [];\n\t\tvel = [];\n\t\tfor (let i = 0; i < num; i++) {\n\t\t\tpos[i] = createVector(width / 2, height / 2);\n\t\t\tvel[i] = createVector(0, 0);\n\t\t}\n\t\tbackground(0);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Rustom Ichhaporia",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1015571",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:31:20",
+    "used_in_videos": [
+        "Cold Metric.mp4"
+    ],
+    "used_count": 1
+}

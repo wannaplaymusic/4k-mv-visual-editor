@@ -1,0 +1,22 @@
+{
+    "name": "DanceFloor",
+    "code": "// === Tab: mySketch ===\ni=l=0\ns=100\ndraw=_=>{\n  i||createCanvas(W=600, W, WEBGL)\n\tZ=stroke\n\tcolorMode(HSB)\n  background(0)\n\tscale(1.8)\n  rotateY(i/3)\n  for(z=-s; z<s; z+=5){\n  \tfor(x=-s; x<s; x+=5){\n      Z(abs(z*4)%360,W,W)\n      if(noise(x/s,i,z/s)>.5){\n        point(x,-s,z)\n        point(x,s,z)\n        Z(abs(z*4)%360,W,W,.1)\n        line(x,-s,z,x,s,z)\n        drawingContext.clear(256)\n      }\n    }\n  }\n  i+=.015\n}\nmousePressed=()=>{if (millis()-l>400){save('pix.jpg');l=millis();}}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1997007",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:33:44"
+}

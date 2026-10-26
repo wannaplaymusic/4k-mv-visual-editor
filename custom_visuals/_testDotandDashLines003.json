@@ -1,0 +1,27 @@
+{
+    "name": "_testDotandDashLines003",
+    "code": "// === Tab: mySketch ===\nlet colors = [];\n//let angles = [];\n\nfunction setup() {\n  pixelDensity(5);\n  let mySize = max(windowWidth, windowHeight);\n  createCanvas(mySize, mySize);\n  colorMode(HSB, 360, 100, 100, 100);\n  background(0, 0, 95, 100);\n}\n\nfunction draw() {\n  background(0, 0, 95, 100);\n  colors[0] = color(0, 0, 95, random(80, 50));\n  colors[1] = color(30, 70, 95, random(100, 90));\n  colors[2] = color(60, 60, 95, random(80, 50));\n  creativeLine();\n  noLoop();\n}\n\nfunction creativeLine() {\n  let lineNum = random(height / 10, height / 20);\n\n  noFill();\n\n  for (let i = 1; i < lineNum / 5; i += random()) {\n    let offset = random(-2 * width, 2 * width);\n    strokeCap(SQUARE);\n\t\t//strokeWeight(random(1000));\n    strokeWeight(random(10));\n    //rotate(PI/3);\n    gradientLine(\n      (i / lineNum) * random(width) + offset,\n      (height / lineNum) * i,\n      width - (i / lineNum) * random(width) - offset,\n      (height / lineNum) * i,\n      random(colors),\n      random(colors)\n    );\n  }\n}\n\nfunction gradientLine(x1, y1, x2, y2, color1, color2) {\n  // linear gradient from start to end of line\n  // color from color1 to color2\n  var grad = this.drawingContext.createLinearGradient(x1, y1, x2, y2);\n  grad.addColorStop(0, color1);\n  grad.addColorStop(1, color2);\n\n  this.drawingContext.strokeStyle = grad;\n\n  drawingContext.setLineDash([\n    random(random(1) * sin(x1 / x2) + frameCount / random(0.1)),\n    random(random(100, 200) * cos(y1 / y2) - frameCount / random(125, 75)),\n  ]);\n  rect(x1, y1, x2, y2);\n}\n\nfunction mouseClicked(){\n  loop();\n}\n\n\nfunction keyTyped() {\n  if (key === \"s\" || key === \"S\") {\n    noLoop();\n    saveCanvas(\"DotAndDashLines-003-4-2\", \"png\");\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "genevieve le guerrier-aubry",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1990771",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:28:23",
+    "used_in_videos": [
+        "Echo Chamber Pulse.mp4",
+        "Neutron Forge Vanguard.mp4"
+    ],
+    "used_count": 2
+}

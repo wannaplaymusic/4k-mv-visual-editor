@@ -1,0 +1,24 @@
+{
+    "name": "Snowtrees",
+    "code": "// === Tab: mySketch ===\nlet particles = new Array(8192);\nArrayList<int> deadPixelsUnicoords = new ArrayList<int>();\nboolean[][] deadPixelsMap;\n\nlet widt, heigh;\nlet wid, heig;\n\nint[][] unicoord;\n\nlet black = color(0);\nlet white = color(255);\nlet blue = color(0, 128, 255);\n\n////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction setup() {\n  createCanvas(1024, 768);\n\t\n\twidt = width-1;\n\theigh = height-1;\n\t\n\twid = width-2;\n\theig = height-2;\n\t\n\tunicoord = new Array(width)[height];\n  let pixel = 0;\n  for (y = 0; y < height; y++) {\n    for (x = 0; x < width; x++) {\n      unicoord[x][y] = pixel++;\n    }\n  }\n\t\n\tdeadPixelsMap = new Array(width)[height];\n\t\n\tfor (x = 0; x < width; x += int(random(16, 256))) {\n\t\tdeadPixelsMap[x][heigh] = true;\n\t  deadPixelsUnicoords.add(unicoord[x][heigh]);\n\t}\n\t\n\tfor (i = 0; i < particles.length; i++) {\n\t\tparticles[i] = new Particle();\n\t}\n}\n\n////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction draw() {\n\tbackground(blue);\n\tloadPixels();\n\t\n\tfor (i = 0; i < particles.length; i++) {\n\t\tparticles[i].move();\n\t\tparticles[i].checkForDeath();\n\t\t\n\t\tpixels[unicoord[particles[i].int_px][particles[i].int_py]] = white;\n\t}\n\t\n\tfor (let deadPixelUnicoord of deadPixelsUnicoords) {\n\t\tpixels[deadPixelUnicoord] = black;\n\t}\n\t\n  updatePixels();\n}\n\n////////////////////////////////////////////////////////////////////////////////////////////////////\n\nclass Particle {\n\tpx, py, vx, vy;\n  int_px, int_py;\n\n  constructor() {\n\t\tpx = random(1, wid);\n\t\tpy = random(1, heig);\n\t\t\n\t\tint_px = int(px);\n\t\tint_py = int(py);\n\t}\n\t\n\tfunction move() {\n\t\tvx = vx * 0.98 + randomGaussian() * 0.01;\n\t\tvy = vy * 0.98 + randomGaussian() * 0.01 + 0.01;\n\t\t\n\t\tvx = constrain(vx, -1, 1);\n\t\tvy = constrain(vy, -1, 1);\n\t\t\n\t\tpx += vx;\n\t\tpy += vy;\n\t\t\n\t\tif (px < 1) {\n\t\t\tpx = 1;\n\t\t\tvx = -vx;\n\t\t}\n\t\telse if (px > wid) {\n\t\t\tpx = wid;\n\t\t\tvx = -vx\n\t\t}\n\t\t\n\t\tif (py < 1) {\n\t\t\tpy = 1;\n\t\t\tvy = -vy;\n\t\t}\n\t\telse if (py > heigh) {\n\t\t\tpx = random(1, wid);\n\t\t\tpy = 1;\n\t\t\tvx = 0;\n\t\t\tvy = 0;\n\t\t}\n\t\t\n\t\tint_px = int(px);\n\t\tint_py = int(py);\n\t}\n\n  function checkForDeath() {\n\t\tif (deadPixelsMap[int_px][int_py + 1] ||\n\t\t\t\tdeadPixelsMap[int_px - 1][int_py + 1] ||\n\t\t\t  deadPixelsMap[int_px + 1][int_py + 1]) {\n\t\t\t\n\t\t\tdeadPixelsMap[int_px][int_py] = true;\n\t\t\tdeadPixelsUnicoords.add(unicoord[int_px][int_py]);\n\t\t\t\t\n\t\t\tpx = random(1, wid);\n\t\t  py = 1;\n\t\t\t\n\t\t\tint_px = int(px);\n\t\t  int_py = int(py);\n\t\t\t\n\t\t\tvx = 0;\n\t\t\tvy = 0;\n\t\t}\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/738647",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:04:22",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

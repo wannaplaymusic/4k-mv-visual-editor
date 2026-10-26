@@ -1,0 +1,27 @@
+{
+    "name": "ParticleswithPeriodicBoundaryConditions",
+    "code": "// === Tab: mySketch ===\n// Illustration of periodic (wrap around) boundary conditions for a particle system.\n// Doug L. James, Sept 2020, http://graphics.stanford.edu/~djames\nlet particles = [];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\trandomizeParticles();\n}\n\nfunction draw() {\n\tsetBackground();\n\t\n\tif(keyIsPressed) randomizeParticles();\n\t\n\tfor(let p of particles) {\n\t\tp.update(deltaTime);// timestep pos\n\t\tapplyPeriodicBC(p);\n\t\tp.draw();\n\t}\n\t\n}\n\nfunction applyPeriodicBC(particle) {\n\t// Periodic Boundary Conditions:\n\tlet A = particle; \n\tif(A.pos.x < 0)      A.pos.x += width;\n\tif(A.pos.x > width)  A.pos.x -= width;\n\tif(A.pos.y < 0) \t\t A.pos.y += height;\n\tif(A.pos.y > height) A.pos.y -= height;\n}\n\nfunction randomizeParticles() {\n\tparticles = [];\n\tfor(let k=0; k<500; k++)  \n\t\tparticles.push(createRandomParticle());\n}\n\nfunction setBackground() {\n\tbackground(\"black\");//SVG color names :)\n}\n\n\n// A simple particle class\nclass Particle {\n\tconstructor(x,y,vx,vy,r,c) {\n\t\tthis.pos = createVector(x,y);\n\t\tthis.vel = createVector(vx,vy);\n\t\tthis.r  = r;//radius\n\t\tthis.c  = c;//color\n\t}\n\tupdate(dt) {\n\t\t// Update velocity:\n\t\t// no change\n\t\t\n\t\t// Update position:\n\t\tthis.pos.x += dt * this.vel.x;\n\t\tthis.pos.y += dt * this.vel.y;\n\t}\n\t\n\tdraw() {\n\t\tfill(this.c);\n\t\tcircle(this.pos.x, this.pos.y, this.r);\n\t}\n}\n\nfunction createRandomParticle() {\n\tlet radius  = abs(randomGaussian(5,15));\n\tlet velMax  = 2;\n\tlet randVel = p5.Vector.random2D().mult(random(velMax)/radius);\n\tcolorMode(HSB,255);\n\treturn new Particle(random(width), random(height), \n\t\t\t\t\t\t\t\t\t\t\trandVel.x, randVel.y, radius, \n\t\t\t\t\t\t\t\t\t\t\tcolor(random(255),random(60),random(200)));\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Doug L. James",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/966504",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:35:28"
+}

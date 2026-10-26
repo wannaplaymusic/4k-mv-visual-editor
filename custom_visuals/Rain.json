@@ -1,0 +1,24 @@
+{
+    "name": "Rain",
+    "code": "// === Tab: mySketch ===\nfunction Dot(x_, y_, z_, r_)\n{\n  this.pos = new p5.Vector(x_, y_, z_);\n  this.vel = new p5.Vector();\n  this.acc = new p5.Vector();\n  this.r = r_;\n  this.apply = function(x)\n  {\n    this.acc.add(x);\n  }\n  this.update = function()\n  {\n    this.vel.add(this.acc);\n    this.pos.add(this.vel);\n    this.acc.mult(0);\n    translate(this.pos.x, this.pos.y, this.pos.z);\n    ellipse(0, 0, this.r, this.r);\n    translate(-this.pos.x, -this.pos.y, -this.pos.z);\n  }\n}\n\nfunction Splash(x_, y_, z_, r_)\n{\n  this.x = x_;\n  this.y = y_;\n  this.z = z_;\n  this.r = 0;\n  this.limit = r_;\n  this.speed = 3;\n  this.update = function()\n  {\n    if (this.limit <= 0) return true;\n    this.r += this.speed;\n    this.limit -= this.speed;\n    noStroke();\n    fill(map(this.x, 0, width, 0, 360), 360, 360)\n    translate(this.x, this.y, this.z);\n    rotateX(HALF_PI);\n    ellipse(0, 0, this.r, this.r);\n    rotateX(-HALF_PI);\n    translate(-this.x, -this.y, -this.z);\n    return false;\n  }\n}\nlet dots = [];\nlet splashes = [];\nlet ground;\n\nfunction setup()\n{\n  createCanvas(1000, 580, WEBGL);\n  colorMode(HSB);\n  ground = height * 7/8;\n  for (let i = 0; i < 100; i++) dots[i] = new Dot(random(width), random(ground), random(-width / 1), 5);\n}\n\nfunction draw()\n{\n  background(0);\n  translate(-width / 2, -height / 2);\n  for (let i = 0; i < dots.length; i++)\n  {\n    dots[i].apply(new p5.Vector(0, 0.08));\n    noStroke();\n    fill(map(dots[i].pos.y, 0, height, 0, 360), 360, 360);\n    dots[i].update();\n    if (dots[i].pos.y > ground)\n    {\n      splashes.push(new Splash(dots[i].pos.x, dots[i].pos.y, dots[i].pos.z, dots[i].r * 10));\n      dots[i] = new Dot(random(width), 0, random(-width / 2), 5);\n    }\n  }\n  for (let i = 0; i < splashes.length; i++)\n    if (splashes[i].update()) splashes.splice(i, 1);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Agustin",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/648542",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:16:00",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

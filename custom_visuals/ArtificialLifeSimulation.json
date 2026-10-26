@@ -1,0 +1,33 @@
+{
+    "name": "ArtificialLifeSimulation",
+    "code": "// === Tab: mySketch.js ===\ncanvasSize = 500;\nparticles = [];\nredP = [];\nyellowP = [];\ngreenP = [];\n\n// SETUP\nfunction setup() {\n\tcreateCanvas(canvasSize, canvasSize);\n\tbackground(100);\n\tredP = group(200, color(255,0,0), 5);\n\tyellowP = group(200, color(255,255,0), 5);\n\tgreenP = group(200,color(0,255,0), 5);\n}\n\n// ALGORITHM\nclass Particle {\n\tconstructor(loc, color, diameter = 20) {\n\t\tthis.loc = loc;\n\t\tthis.diameter = diameter;\n\t\tthis.vel = createVector(1,1);\n\t\tthis.color = color;\n\t}\n\tshow() {\n\t\tnoStroke();\n\t\tfill(this.color);\n\t\tconst {x, y} = this.loc;\n\t\tcircle(x, y, this.diameter);\n\t}\n\tradius() {\n\t\treturn this.diameter / 2;\n\t}\n\tedge(coordinate) {\n\t\treturn this.radius() + this.loc[coordinate];\n\t}\n}\n\nfunction group(number, color, radius) {\n\tconst g = [];\n\tfor(let i = 0; i < number; i++) {\n\t\tconst loc = createVector(random(canvasSize), random(canvasSize));\n\t\tg.push(new Particle(loc, color, radius));\n\t\tparticles.push(g[i]);\n\t\t\n\t}\n\treturn g;\n}\n\nfunction single(p1, g) {\n\tlet fx = 0;\n\tlet fy = 0;\n\tlet dx = p1.edge(\"x\") - (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n\tlet dy = p1.edge(\"y\") - (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n\tlet d = Math.sqrt(dx*dx + dy*dy);\n\tif(d > 0 && d < 80) {\n\t\tlet F = g * (1/d);\n\t\tfx += (F * dx);\n\t\tfy += (F * dy);\n\t}\n\tp1.vel.x = (p1.vel.x + fx) * 0.5;\n\tp1.vel.y = (p1.vel.y + fy) * 0.5;\n\tp1.loc.x += p1.vel.x;\n\tp1.loc.y += p1.vel.y;\n}\n\nfunction rule(p1, p2, g) {\n\tfor(let i = 0; i < p1.length; i++) {\n\t\tvar fx = 0;\n\t\tvar fy = 0;\n\t\tlet a = p1[i];\n\t\tfor(let j = 0; j < p2.length; j++) {\n\t\t\tlet b = p2[j];\n\t\t\tvar dx = a.edge(\"x\") - b.edge(\"x\");\n\t\t\tvar dy = a.edge(\"y\") - b.edge(\"y\");\n\t\t\tvar d = Math.sqrt(dx*dx + dy*dy);\n\t\t\tif(d > 0 && d < 80) {\n\t\t\t\tvar F = g * (1/d);\n\t\t\t\tfx += (F * dx);\n\t\t\t\tfy += (F * dy);\n\t\t\t}\n\t\t}\n\t\ta.vel.x = (a.vel.x + fx) * 0.5;\n\t\ta.vel.y = (a.vel.y + fy) * 0.5;\n\t\ta.loc.x += a.vel.x;\n\t\ta.loc.y += a.vel.y;\n\t\tif(a.edge(\"x\") <= 0 || a.edge(\"x\") >= canvasSize) a.vel.x*=-1;\n\t\tif(a.edge(\"y\") <= 0 || a.edge(\"y\") >= canvasSize) a.vel.y*=-1;\n\t\t\n\t}\n}\n\n// ANIMATE\nfunction draw() {\n\trule(redP, redP, 0.1);\n\trule(yellowP, redP, 0.15);\n\trule(greenP, greenP, -0.7);\n\trule(greenP, redP, -0.2);\n\trule(redP, greenP, -0.1);\n\tbackground(0);\n\tfor(let i = 0; i < particles.length; i++) {\n\t\tsingle(particles[i], 1);\n\t\tparticles[i].show();\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Emilio",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1642892",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:47:53",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Chamber 17.mp4"
+    ],
+    "used_count": 1
+}

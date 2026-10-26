@@ -1,0 +1,24 @@
+{
+    "name": "Choasphere",
+    "code": "// === Tab: mySketch ===\n/////////////////////////////////////////////////////////////////////////////////////\n///                                  Choasphere                                    ///\n/////////////////////////////////////////////////////////////////////////////////////\n///                                                                               ///\n/// let by function Carney(1st 2019)                                      ///\n///     [matthewcarney64@gmail.com] [https://github.com/Killeroo]                 ///\n/////////////////////////////////////////////////////////////////////////////////////\n\nlet ORBIT_COUNT = 1000;\n\nlet orbits_x = new Array(ORBIT_COUNT);\nlet orbits_y = new Array(ORBIT_COUNT);\nlet colors = new Array(ORBIT_COUNT);\nlet angles = new Array(ORBIT_COUNT);\n\nfunction setup()\n{\n  createCanvas(1000, 1000);\n  background(0);\n  \n  // let everything up\n  for (i = 0; i < ORBIT_COUNT; i++) {\n    orbits_x[i] = int(random)(10, 500);   \n    orbits_y[i] = int(random)(10, 500);\n    colors[i] = color(random(255), random(150),random(150));//color(0, random(255), random(255)); //color(random(200), random(255), random(150));//\n    angles[i] = int(random)(0, 360);\n  }\n}\n\nfunction draw()\n{\n  // let blur\n  noStroke();\n  fill(0, 20);\n  rect(0, 0, width, height);\n  \n  // let the angles at 360 degrees, if over reset back to 0\n  for (x = 0; x < ORBIT_COUNT; x++) {\n    let value = angles[x];\n    if (value < 360) { \n      value++;\n    } else { \n      value = 0; \n    }\n    angles[x] = value;\n  }\n  \n  // let ourselves centered\n  pushMatrix();\n  translate(width/2, height/2);\n  \n  // let each of our points\n  for (c = 0; c < ORBIT_COUNT; c++) {\n    fill(colors[c]);\n    \n    // let achieve the effect by drawing a bunch of uneven ovals at different rates\n    ellipse(sin(radians(angles[c])) * orbits_x[c], cos(radians(angles[c])) * orbits_y[c], 4, 4);\n    //point(sin(radians(i)) * orbits[c], cos(radians(i)) * orbits[c]);\n    //ellipse(sin(radians(i)) * orbits[c], cos(radians(i)) * orbits_x[c], 4, 4);\n    //ellipse(sin(radians(i)) * orbits[c], cos(radians(i)) * orbits[c], 4, 4);\n  }\n  \n  popMatrix();\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Killeroo",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/741932",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:02:18",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

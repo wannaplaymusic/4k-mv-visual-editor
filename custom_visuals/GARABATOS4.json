@@ -1,0 +1,28 @@
+{
+    "name": "GARABATOS4",
+    "code": "// === Tab: mySketch ===\nlet circles = [];\nlet pal;\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  colorMode(HSB, 255);\n  noStroke();\n  pal = new Palette().randomSoft();\n  for (let i = 0; i < 50; i++) {\n    circles.push(new ColorCircle());\n  }\n}\n\nfunction draw() {\n  background(255);\n\n  for (let c of circles) {\n    c.update();\n    c.show();\n  }\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}\n\nclass ColorCircle {\n  constructor() {\n    this.reset();\n  }\n\n  reset() {\n    this.x = random(width);\n    this.y = random(height);\n    this.r = random(20, 80);\n    this.c = pal.mix(random(1));\n    this.alpha = 0;\n    this.alphaSpeed = random(1, 3);\n    this.fadeIn = true;\n  }\n\n  update() {\n    if (this.fadeIn) {\n      this.alpha += this.alphaSpeed;\n      if (this.alpha >= 255) this.fadeIn = false;\n    } else {\n      this.alpha -= this.alphaSpeed;\n      if (this.alpha <= 0) this.reset();\n    }\n  }\n\n  show() {\n    fill(this.c.levels[0], this.c.levels[1], this.c.levels[2], this.alpha);\n    ellipse(this.x, this.y, this.r * 2);\n  }\n}\n\nclass Palette {\n  constructor() {\n    this.h1 = 0;\n    this.h2 = 0;\n    this.h3 = 0;\n    this.s = 0;\n    this.b = 0;\n  }\n\n  randomSoft() {\n    const base = random(0, 360);\n    this.h1 = base;\n    this.h2 = base + random(110, 160);\n    this.h3 = base + random(200, 260);\n    this.s = random(0.55, 0.85);\n    this.b = random(0.8, 0.98);\n    return this;\n  }\n\n  mix(t) {\n    const seg = random(1) < 0.5 ? 0 : 1;\n    const hA = seg === 0 ? this.h1 : this.h2;\n    const hB = seg === 0 ? this.h2 : this.h3;\n    colorMode(HSB, 360, 1, 1, 1);\n    const c = lerpColor(\n      color(this.normHue(hA), this.s, this.b, 1),\n      color(this.normHue(hB), this.s, this.b, 1),\n      constrain(t, 0, 1)\n    );\n    colorMode(HSB, 255);\n    return c;\n  }\n\n  normHue(h) {\n    let nh = h % 360;\n    if (nh < 0) nh += 360;\n    return nh;\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "belenmontemurro",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2811972",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:02:27",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Evolving Repetition Momentum.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,28 @@
+{
+    "name": "Intertwined",
+    "code": "// === Tab: mySketch.js ===\n//New Store Link: https://joescodeart.etsy.com\n\n/*\n\nHey Sableraph and Friends!\n\nHope you all enjoy this sketch of Intertwined!\n\nTo use the border I have on any of your sketches:\n1) Click on the settings button at the top right of your sketch (it is an icon with 3 lines, and a dot on each line)\n2) A new window will opn on the right side of the sketch. Click on the \"SKETCH\" tab on the window that opened. \n3) For the \"Mode\" option choose \"HTML/CSS/JS\" in the same window, and you will then have 2 additional tabs on your sketch: \"style.ss\" and \"index.html\"\n4) Copy the code from my \"style.css\" tab above, to your \"style.css\" tab that was created, and you should now have a frame around your sketch!\n\n*/\n\n\n\nlet timer=0\n\nfunction setup() \n{\n\tcreateCanvas(windowWidth, windowHeight,WEBGL);\n\tbackground(100);\n}\n\nfunction draw() \n{\n\trotateX(timer/90)\n\trotateY(timer/20)\n\trotateZ(timer/90)\n\ttimer++\n\tfor(x=-50;x<50;x++)//creates grid - X axis coordinates\n\t{\n\t\tfor(y=-50;y<50;y++)//creates grid - Y axis coordinates\n\t\t{\n\t\t\tpush()\n\t\t\tfor(z=0;z<10;z++)\n\t\t\t{\n\t\t\t\ttranslate(x*20,y*20,0)\n\t\t\t}\n\t\t\tif(timer%10==0 && timer<61) //creates spheres\n\t\t\t{\n\t\t\t\t if(x==0 & y==0) stroke(random(255),random(255),random(255),200)\n\t\t\t\t else if(x==0 & y==1 & timer<30) stroke(random(255),random(255),random(255),200)\n\t\t\t\t else if(x==0 & y==-1 & timer<30) stroke(random(255),random(255),random(255),200)\n\t\t\t\t else stroke(0)\n\t\t\t\t sphere(random(25))\n\t\t\t}\n\t\t\telse if(timer>=61 && timer<77) //creates touch of light at top right corner at end of sketch\n\t\t\t{\n\t\t\t\tstroke(random(255),20)\n\t\t\t\tnoFill()\n\t\t\t\ttranslate(200,100,-500)\n\t\t\t\tstrokeWeight(.5)\n\t\t\t\tfor(i=0;i<3;i++)\n\t\t\t\t{\n\t\t\t\t\trotateX(timer*4)\n\t\t\t\t\tbox(x*15,-900+x*15,10)\n\t\t\t\t}\n\t\t\t}\n\t\t\telse if(timer<77) //creates giant circles/rings around the spheres\n\t\t\t{\n\t\t\t if(x==0&y==0) stroke(random(255),random(255),random(255),200)\n\t\t\t else if(x==0 & y==1 & timer<30) stroke(random(255),random(255),random(255),200)\n\t\t\t else if(x==0 & y==-1 & timer<30) stroke(random(255),random(255),random(255),200)\n\t\t\t else stroke(0)\n\t\t\t strokeWeight(.5);\n\t\t\t noFill();\n\t\t\t circle(0,0,200)\n\t\t\t}\n\t\t\tpop()\n\t\t}\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\t<meta charset=\"utf-8\" />\n\t<!-- keep the line below for OpenProcessing compatibility -->\n\t<script src=\"https://openprocessing.org/openprocessing_sketch.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/addons/p5.sound.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nhtml, body \n{  \n    text-align: center;  \n    background-color: #FFFFFF; \n    margin: auto;\n    padding: 10px;\n}  \ncanvas {\n  margin: 10px auto;\n  width:75%;\n  display: block;\n  border: solid 13px black;\n  padding: 26px 26px;\n  box-shadow: -6px 6px 6px gray;\n}\n",
+    "inline_assets": {},
+    "author": "Joe DeNavas (DD89)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2187000",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:27:15",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Pure Immersion Repetition.mp4"
+    ],
+    "used_count": 1
+}

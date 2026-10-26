@@ -1,0 +1,32 @@
+{
+    "name": "Attractor_230",
+    "code": "// === Tab: mySketch ===\n// Attractor_23.0\n\nlet N = 100 ; let M = 100 ; let RR = 300 ; \n\nlet X[] = new Array(N) ; let Y[] = new Array(N) ;\nlet R ; let A ; let I ; let II ; let Q ; let QQ ; let P ; let PP ; let S ;\n\nfunction setup(){\n  createCanvas(600, 600) ; background(0) ;\n  fill(0,0,0,10) ; stroke(255,0,0) ;\n  for ( I = 0 ; I < N ; I++ ){\n    X[I] = random(-300,+300) ; Y[I] = random(-300,+300) ;\n  }//let Q = sqrt(2) ; QQ = RR/Q ; P = -PI/2 ; PP = P+PI ;\n}//setup()\n\nfunction draw(){\n  rect(0,0,599,599) ;\n  for ( I = 0 ; I < N ; I++ ){\n\t\tfor ( II = 0 ; II < M ; II++ ){\n\t\t\tif ( X[I] > 0 ){\n\t\t\t\tA = atan(Y[I]/X[I]) ;\n\t\t\t\tR = sqrt(pow(X[I],2)+pow(Y[I],2)) ;\n\t\t\t\tA = A*2 + P ; R = R/Q ;\n\t\t\t\tX[I] = R*cos(A) - (QQ*cos(S)) ;\n\t\t\t\tY[I] = R*sin(A) - (QQ*sin(S)) ;\n\t\t\t}else{\n\t\t\t\tA = atan(Y[I]/X[I]) ;\n\t\t\t\tR = sqrt(pow(X[I],2)+pow(Y[I],2)) ;\n\t\t\t\tA = A*2 + PP ; R = R/Q ;\n\t\t\t\tX[I] = R*cos(A) + (QQ*cos(S)) ;\n\t\t\t\tY[I] = R*sin(A) + (QQ*sin(S)) ;\n\t\t\t}\n      point(X[I]+300,Y[I]+300) ; \n\t\t}//II\n\t\tif( R > 30000 ){ X[I] = random(-300,+300) ; Y[I] = random(-300,+300) ; }\n  }//let P = -PI*float((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))))/600 ; PP = P+PI ;\n\tS = -PI*float((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))))/600 ;\n}//draw()\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u281842",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1349385",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 17:40:19",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

@@ -58,7 +58,7 @@ class CodeEditor(QPlainTextEdit):
                 color: #f4f4f5;
                 border: 1px solid #27272a;
                 border-radius: 6px;
-                font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+                font-family: 'Menlo', 'Monaco', 'JetBrains Mono', 'Courier New', monospace;
                 font-size: 12px;
             }
         """)
@@ -459,6 +459,17 @@ function draw() {
   box(150 + (window.audioLow || 0) * 100);
 }"""
 
+    def override_ambient_palette(self, palette: list, max_saturation: float = 0.35, enabled: bool = True):
+        """運行時動態改動沙盒當前模組配色 (Ambient Per-Shot Palette Override)"""
+        opts = {
+            "enabled": enabled,
+            "maxSaturation": max_saturation,
+            "palette": palette
+        }
+        js = f"if (window.setAmbientColorOverride) window.setAmbientColorOverride({json.dumps(opts)});"
+        if hasattr(self, 'preview_view') and self.preview_view:
+            self.preview_view.page().runJavaScript(js)
+
     def get_sandbox_html(self, user_code):
         freq = self.freq_slider.value()
         weight = self.weight_slider.value()
@@ -522,6 +533,8 @@ function draw() {
     window.currentChordColor = '#0a0a0c';
     window.stereoWidth = 0.5;
     window.custom_time_ms = 0;
+    window.currentGenre = "{getattr(self, 'current_genre', 'ambient')}";
+    window.isAmbientMode = {str(getattr(self, 'current_genre', 'ambient').lower() in ('ambient', 'drone', 'meditative', 'dark_ambient')).lower()};
 
     // Universal Audio-Reactive Proxy Adapter
     window.audioParams = new Proxy({{}}, {{
@@ -548,8 +561,8 @@ function draw() {
       offsetDeg = offsetDeg || 0;
       alpha = (typeof alpha !== 'undefined') ? alpha : 1.0;
       let hue = ((window.chordHue || 0) + offsetDeg) % 360;
-      let sat = window.synthMelodyActive ? 85 : 65;
-      let light = window.isBeat ? 70 : 50;
+      let sat = window.isAmbientMode ? 22 : (window.synthMelodyActive ? 85 : 65);
+      let light = window.isAmbientMode ? 48 : (window.isBeat ? 70 : 50);
       return `hsla(${{Math.round(hue)}}, ${{sat}}%, ${{light}}%, ${{alpha}})`;
     }};
 
@@ -581,8 +594,8 @@ function draw() {
         offsetDeg = offsetDeg || 0;
         alpha = (typeof alpha !== 'undefined') ? alpha : 255;
         let hue = ((window.chordHue || 0) + offsetDeg) % 360;
-        let sat = window.synthMelodyActive ? 85 : 65;
-        let light = window.isBeat ? 70 : 50;
+        let sat = window.isAmbientMode ? 22 : (window.synthMelodyActive ? 85 : 65);
+        let light = window.isAmbientMode ? 48 : (window.isBeat ? 70 : 50);
         if (typeof this.color === 'function') {{
           return this.color(`hsla(${{Math.round(hue)}}, ${{sat}}%, ${{light}}%, ${{alpha / 255}})`);
         }}

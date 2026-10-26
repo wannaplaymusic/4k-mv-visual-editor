@@ -1,0 +1,24 @@
+{
+    "name": "ablueperiod",
+    "code": "// === Tab: mySketch ===\n//Code by Aaron Reuland\n//Palette inspired by paintings from Picasso's Blue Period.\n\nlet blues=['#003c78','#8dc693','#0053ac','#0281a1','#0098ad','#43b6af','#001c2e', '#003c78']\nlet drops=[]\nlet colorSpeed\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(random(blues));\n\tnoStroke()\n}\n\t\nfunction draw(){\n\tclear()\n\tcolorSpeed= frameCount/400\nif(frameCount%5==0){\n\t let y= noise(frameCount/8)*height\n\t let x= noise(frameCount/5+1)*width\n\tdrops.push(new drop(x, y))\n}\nblendMode(BLEND)\n\tfor(let y=0; y<=height+4; y+=4){\n\t\tfill(colorMixer(y, blues, 0, 255))\n\t\trect(0, y, width, 4)\n\t} \n\tblendMode(BURN)\n\tfor(let xoff= 0; xoff<width/3; xoff+=4){\n\t\tlet a= map(xoff, 0, width/3, 255, 1)\n\t\tfill(colorMixer(xoff, blues, 0.3, a))\n\t\trect(xoff, 0, 4, height)\n\t\trect(width-xoff, 0, 4, height)\n\t\t\n\t}\n\t\n\tfor(let i=drops.length-1; i>=0; i--){\n\t\tdrops[i].draw();\n\t\tdrops[i].die();\n\t}\n\t\n}\n\n\n\nfunction colorMixer(y, colorArray, off, alpha) {\n\tlet c = noise(y/400, colorSpeed+off) * colorArray.length\n\tlet c1 = floor(c)\n\tlet c2 = floor(c + 1) % colorArray.length\n\tlet color1 = colorArray[c1]\n\tlet color2 = colorArray[c2]\n\tlet mix = fract(c)\n\tlet coloring = color(spectral.mix(color1, color2, mix))\n\tcoloring.setAlpha(alpha)\n\treturn coloring\n}\n\n\nclass drop{\n\tconstructor(x, y, c){\n\t\tthis.pos=createVector(x, y)\n\t\tthis.life=random(10, 80)\n\t\tthis.drip=1\n\t\tthis.alpha=0\n\t\tthis.color=c\n\t}\n\t\n\tdraw(){\n\t\tpush()\n\t\tblendMode(SOFT_LIGHT)\n\t\tstrokeWeight(1)\n\t\tlet cAlpha= map(abs(this.life/2-this.drip), 0, this.life/2, 255, 0)\n\tnoFill()\n\tfor(let r=1; r<=this.drip; r++){\n\t\tlet stroker=colorMixer(this.pos.y, blues, r/100, cAlpha)\n\t\tstroke(stroker)\n\t\tellipse(this.pos.x, this.pos.y, r)\n\t}\n\t\t\n\tpop()\t\n\t}\n\t\n\tdie(){\n\t\tthis.drip+=0.5\n\t\tthis.pos.y+=0.5\n\t\tif(this.drip>=this.life){\n\t\t\tlet index= drops.indexOf(this)\n\t\t\tdrops.splice(index, 1)\n\t\t}\n\t\t\n\t}\n\t\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Aaron Reuland (a_ soluble_fish)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2388301",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:18:02",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

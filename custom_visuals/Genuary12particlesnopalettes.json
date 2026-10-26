@@ -1,0 +1,33 @@
+{
+    "name": "Genuary12particlesnopalettes",
+    "code": "// === Tab: mySketch ===\n//Code by Aaron Reuland\n\nlet particles=[]\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n\tcolorMode(HSB, 120)\n\tlet hueSetter= random(120)\n\tlet sider=0\n\tfor(let y=0; y<=height; y+=5){\n\t\tlet h= map(y, 0, height, (hueSetter-15)%120, (hueSetter+15)%120)\n\t\tparticles.push(new particle(sider%2, y, h, width, 0, 0))\n\t\tsider++\n\t}\n\t\n\t\n\tfor(let y=3; y<=height; y+=10){\n\t\tvar h=(hueSetter+40)%120+ random(-5, 5)\n\t\tlet wide=noise(y*0.5)*width/2.2\n\t\t\n\t\tparticles.push(new particle(0, y, h, wide, 300, 0))\n\t\tparticles.push(new particle(1, y, h, wide, 300, 0))\t\n\t\tparticles.push(new particle(0, y-4, h, wide*0.99, 300, 1))\n\t\tparticles.push(new particle(1, y-4, h, wide*0.99, 300, 1))\t\t\n\t}\n\n}\n\nfunction draw() {\nfor(let p of particles){\n\tp.move();\n\tp.show()\n}\n}\n\n\nclass particle{\n\tconstructor(side, y, baseHue, length, delay, shadow){\n\t\tthis.side=side\n\t\tif(this.side==0){\n\t\t\tthis.start=createVector(0, y)\n\t\t\tthis.pos=this.start\n\t\t\tthis.end=createVector(length, y)\n\t\t} else {\n\t\t\tthis.start=createVector(width, y)\n\t\t\tthis.pos=this.start\n\t\t\tthis.end=createVector(width-length, y)\n\t\t}\n\t\tthis.base=baseHue\n\t\tthis.length=length\n\t\tthis.finish=0\n\t\tthis.delay=delay\n\t\tthis.between=0\n\t\tthis.frames=width*0.75\n\t\tthis.shadow=shadow\n\t}\n\t\n\t\n\tmove(){\n\t\tif(this.delay>=0){\n\t\t\tthis.delay--\n\t\t}\n\t\t\n\t\tif (this.between < this.frames && this.delay<=0) {\n\t\t\t\tlet framesMap = map(this.between, 0, this.frames, 0, 1);\n\t\t\t\tthis.pos = p5.Vector.lerp(this.start, this.end, easeOutSine(framesMap))\n       \n\t\t\t\tthis.between++\n\t\t\t}\n\t\t\n\t\n\t\t\n\t\tif(this.between>this.frames){\n\t\t\t  let index = particles.indexOf(this);\n\t\tparticles.splice(index, 1);\n\t\t}\n\t}\n\t\n\tshow(){\n\t\tlet hue= this.base+ noise(this.pos.x, this.pos.y)*12\n\t\t\n\t\tlet brightness= map(Math.abs(this.pos.x - width/2), width/2, 0, 0, 120)\n\t\tif(this.shadow==1){\n\t\t\tbrightness*=0.66\n\t\t}\n\t\tlet sat= noise(this.pos.x/200, this.pos.y/200)*120\n\t\tfill(hue, sat, brightness)\n\t\tnoStroke()\n\t\trect(this.pos.x, this.pos.y, 5)\n\t}\n}\n\n\nfunction easeInOutSine(x){\nreturn -(Math.cos(Math.PI * x) -1) / 2;\n\n}\n\nfunction easeOutSine(x){\n  return Math.sin((x * Math.PI) / 2);\n\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Aaron Reuland (a_ soluble_fish)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2135001",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:19:48",
+    "used_in_videos": [
+        "Reverb District.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

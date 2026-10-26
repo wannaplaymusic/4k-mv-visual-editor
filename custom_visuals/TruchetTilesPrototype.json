@@ -1,0 +1,24 @@
+{
+    "name": "TruchetTilesPrototype",
+    "code": "// === Tab: mySketch ===\n// SPDX-License-Identifier: Unlicense\n// This is free and unencumbered software released into the public domain.\n// Anyone is free to copy, modify, publish, use, compile, sell, or distribute this software, either in source code form or as a compiled binary, for any purpose, commercial or non-commercial, and by any means.\n// In jurisdictions that recognize copyright laws, the author or authors of this software dedicate any and all copyright interest in the software to the public domain. We make this dedication for the benefit of the public at large and to the detriment of our heirs and successors. We intend this dedication to be an overt act of relinquishment in perpetuity of all present and future rights to this software under copyright law.\n// THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\nconst cols = 10\nconst rows = 10\nconst cellSize = 60\nconst bgColor = \"#000000\"\nconst SEED = 10000\n\nfunction setup() {\n\tcreateCanvas(cols * cellSize, rows * cellSize)\n\trectMode(CENTER)\n\tnoStroke()\n}\n\nfunction draw() {\n\tbackground(bgColor)\n\trandomSeed(SEED)\n\tfor (let row = 0; row < rows; row++) {\n\t\tfor (let col = 0; col < cols; col++) {\n\t\t\tconst x = col * (width / cols)\n\t\t\tconst y = row * (height / rows)\n\t\t\tTruchet(x, y, cellSize)\n\t\t}\n\t}\n}\n\nfunction Truchet(x, y, s) {\n\tpush()\n\ttranslate(x, y)\n\ttranslate(s / 2, s / 2)\n\trotate(random([0, HALF_PI]))\n\ttranslate(-s / 2, -s / 2)\n\n\tfill(bgColor)\n\tsquare(s / 2, s / 2, s)\n\tlet t = s * (0.5 + 0.45 * sin(frameCount * 0.05))\n\tfill(255)\n\tarc(0, 0, s + t, s + t, 0, HALF_PI)\n\tfill(bgColor)\n\tarc(0, 0, s - t, s - t, 0, HALF_PI)\n\tfill(255)\n\tarc(s, s, s + t, s + t, PI, PI + HALF_PI)\n\tfill(bgColor)\n\tarc(s, s, s - t, s - t, PI, PI + HALF_PI)\n\tpop()\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Zaron Chen",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2224474",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:25:28",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,24 @@
+{
+    "name": "DandelionClock",
+    "code": "// === Tab: mySketch ===\n//  Creative Coding homework Week 8, create a particle system.\n//\n// click mouse to add more seeds\n\n//CLASS DEFINITION\nclass DandelionSeed {\n\n\t//OBJECT CONSTRUCTOR FUNCTION\n\tconstructor(posX, posY, sSize) {\n\t\tthis.posX = posX;\n\t\tthis.posY = posY;\n\t\tthis.col = color(204); //silver grey for seeds\n\t  this.size = sSize;\n\t\tthis.speed = 0.05;\n\t\tthis.lifespan = 100; //to control fade out of seeds\n\t}\n\n\tBreeze() {\n\t\tthis.posX += this.speed;\n\t\tthis.posY -= this.speed;\n\t}\n\n\tFade() {\n\t\tthis.lifespan -= 0.8;\n\t\tthis.col = color(204, this.lifespan);\n\t\tthis.size += 0.2;\n\t}\n} //close class\n\nvar clock = []; //this will hold the floating seeds\nvar head = []; //holds the seeds that make up the dandelion head\n\nfunction setup() {\n\t//frameRate(15);\n\tcreateCanvas(windowWidth, windowHeight);\n\tfor (i = 1; i <= 50; i++) {\n\t\tclock.push(new DandelionSeed(random(i), random(-i, i),1));\n\t}\n\tfor (i = 1; i <= 7; i++) {\n\t\thead.push(new DandelionSeed(0, 0,1));\n\t}\n\tfor (i = 1; i <= 20; i++) {\n\t\thead.push(new DandelionSeed(0, -10,1));\n\t}\n\tfor (i = 1; i <= 40; i++) {\n\t\thead.push(new DandelionSeed(0, -20,1));\n\t}\n\tfor (i = 1; i <= 83; i++) {\n\t\thead.push(new DandelionSeed(0, -30,1));\n\t}\n} //end setup\n\nfunction draw() {\n\ttranslate(width * 0.25, height * 0.60);\n\tbackground(4, 82, 184);\n\ttext(\"Click to blow away the dandelion seeds.\",100,100);\n\tstrokeWeight(5); //draw stalk\n\tstroke(101, 140, 42);\n\tline(0, 0, 0, height);\n\tstroke(204);\n\t//draw stationary dandelion head, centre ring one\n\tfor (var i = 0; i <= 7; i++) {\n\t\tpush();\n\t\trotate(TWO_PI * i / 7);\n\t\tdrawSeed(head[i].posX, head[i].posY, 4);\n\t\tpop();\n\t}\n\t//second ring\n\tfor (i = 8; i <= 28; i++) {\n\t\tpush();\n\t\trotate(TWO_PI * i / 20);\n\t\tdrawSeed(head[i].posX, head[i].posY, 4);\n\t\tpop();\n\t}\n\t// third ring\n\tfor (i = 29; i <= 69; i++) {\n\t\tpush();\n\t\trotate(TWO_PI * i / 40);\n\t\tdrawSeed(head[i].posX, head[i].posY, 4);\n\t\tpop();\n\t}\n\t//fourth ring\n\tfor (i = 70; i < head.length; i++) {\n\t\tpush();\n\t\trotate(TWO_PI * i / 60);\n\t\tdrawSeed(head[i].posX, head[i].posY, 4);\n\t\tpop();\n\t}\n\n\t//draw stalk\n\tstrokeWeight(5);\n\tstroke(101, 140, 42);\n\tline(0, 0, 0, height);\n\n\t//draw free floating seeds, seeds are removed when they have faded or reached the edge.\n\tfor (i = 0; i < clock.length; i++) {\n\t\tstroke(clock[i].col);\n\t\tclock[i].Breeze();\n\t\tclock[i].Fade();\n\t\tdrawSeed(clock[i].posX + clock[i].speed, clock[i].posY + clock[i].speed, clock[i].size);\n\t\tif (clock[i].lifespan <= 10 || clock[i].posX >=width || clock[i].posX <= -width  || clock[i].posY <= -height || clock[i].posY >= height) {\n\t\t\tclock.splice(i, 1);\n\t\t}\n\t\tprint(\"new clock.length  \", clock.length);\n\t}\n} //close draw()\n\n//function to draw the shape of individual seeds\nfunction drawSeed(x, y, size) {\n\tstrokeWeight(2);\n\tbeginShape(LINES);\n\tvertex(x * size / 2, y * size / 2); //centre line\n\tvertex(x * size / 2, (y - 12) * size / 2);\n\tvertex(x * size / 2, (y - 6) * size / 2); //left side\n\tvertex((x - 5) * size / 2, (y - 8) * size / 2);\n\tvertex(x * size / 2, (y - 6) * size / 2); // right side\n\tvertex((x + 5) * size / 2, (y - 8) * size / 2);\n\tendShape();\n}\n\n//add more floating seeds each time the mouse is clicked\nfunction mousePressed() {\n\tfor (i = 1; i <= 100; i++) {\n\t\tclock.push(new DandelionSeed(random(-i,i), random(-i, i),1));\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Jane O&#039;Leary",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1124511",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:23:56",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

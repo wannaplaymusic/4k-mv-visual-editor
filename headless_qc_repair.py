@@ -200,34 +200,67 @@ def fix_syntax_errors(code: str) -> str:
             lines = code.splitlines(keepends=True)
             in_class = False
             brace_depth = 0
+            has_opened_brace = False
             class_blocks = []
             other_lines = []
             current_class = []
+            in_multiline_comment = False
+
             for line in lines:
                 stripped = line.strip()
-                code_part = line.split('//')[0]
+                temp = line
+                if in_multiline_comment:
+                    if '*/' in temp:
+                        in_multiline_comment = False
+                        temp = temp.split('*/', 1)[1]
+                    else:
+                        if in_class:
+                            current_class.append(line)
+                        else:
+                            other_lines.append(line)
+                        continue
+
+                code_part = temp.split('//')[0]
+                if '/*' in code_part:
+                    parts = code_part.split('/*')
+                    code_part = parts[0]
+                    if '*/' not in parts[1]:
+                        in_multiline_comment = True
+                    else:
+                        code_part += parts[1].split('*/', 1)[1]
+
                 if not in_class:
                     if brace_depth == 0 and re.match(r'^(?:export\s+)?class\s+([A-Za-z0-9_$]+)', stripped):
-                        in_class = True
-                        current_class = [line]
-                        brace_depth += code_part.count('{') - code_part.count('}')
-                        if brace_depth <= 0:
-                            in_class = False
-                            brace_depth = 0
-                            class_blocks.append(''.join(current_class))
-                            current_class = []
-                        continue
-                    else:
-                        brace_depth = max(0, brace_depth + code_part.count('{') - code_part.count('}'))
-                        other_lines.append(line)
+                        if not in_multiline_comment and re.search(r'\bclass\s+[A-Za-z0-9_$]+(?:\s+extends\s+[A-Za-z0-9_$\.]+)?\s*\{?', code_part):
+                            in_class = True
+                            has_opened_brace = ('{' in code_part)
+                            current_class = [line]
+                            brace_depth = code_part.count('{') - code_part.count('}')
+                            if has_opened_brace and brace_depth <= 0:
+                                in_class = False
+                                has_opened_brace = False
+                                brace_depth = 0
+                                class_blocks.append(''.join(current_class))
+                                current_class = []
+                            continue
+
+                    brace_depth = max(0, brace_depth + code_part.count('{') - code_part.count('}'))
+                    other_lines.append(line)
                 else:
                     current_class.append(line)
+                    if '{' in code_part:
+                        has_opened_brace = True
                     brace_depth += code_part.count('{') - code_part.count('}')
-                    if brace_depth <= 0:
+                    if has_opened_brace and brace_depth <= 0:
                         in_class = False
+                        has_opened_brace = False
                         brace_depth = 0
                         class_blocks.append(''.join(current_class))
                         current_class = []
+
+            if in_class and current_class:
+                other_lines.extend(current_class)
+
             if class_blocks:
                 code = ''.join(class_blocks) + '\n' + ''.join(other_lines)
         except Exception:

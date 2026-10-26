@@ -1,0 +1,33 @@
+{
+    "name": "AnimatedTitle",
+    "code": "// === Tab: mySketch ===\nlet font;\nconst POINT_SPAN = 5;\nlet particles = [];\nlet spd = 5;\nlet col = 0;\n\nfunction setup() {\n\tcreateCanvas(1112, 834);\n\tcolorMode(HSB, 255);\n\ttextSize(height*0.26);\n\t\n\topentype.load(\"f.otf\",function(err,f){\n\t\tif(err)print(\"PROGRAM\");\n\t\telse\n\t\t{\n\t\t\tfont = f;\n\t\t\ttextFont(f);\n\t\t\tdrawStr('PROGRAM');\n\t\t\tloop();\n\t\t} \n\t});\n}\n\n\nfunction draw(){\n\tbackground('#ECECEC44');\n\tfor(let i = particles.length-1; i >= 0; i--)\n\t{\n\t\tparticles[i].update();\n\t\tif(particles[i].x < 0)particles.splice(i,1);\n\t\tif(particles[i].x < 35) noLoop();\n\t}\n}\n\n//////////\n\nfunction keyPressed() {\n\tif(keyCode >= 48 && keyCode <= 90 && font != null)\n\t{\n\t\tdrawStr(key);\n\t}\n}\n\n//////////\n\nfunction drawStr(st)\n{\n\tlet p = getGPointsFromStr(st);\n\tparticles = particles.concat(getParticlesFromPoints(p));\n}\n\n\nfunction getGPointsFromStr(str)\n{\n\tlet w = textWidth(str);\t\n\tlet tSize = textSize();\n\tlet fontpath = font.getPath(str, width-w, height/2+tSize*0.35, tSize);\n\tlet gpath = new g.Path(fontpath.commands);\n\tgpath = g.resampleByLength(gpath,POINT_SPAN).commands;\n\treturn gpath;\n}\n\n\nfunction getParticlesFromPoints(pathData){\n\tvar p = [];\n\tlet lifeTimeScale = random(1,5);\n\tfor(let i = 0; i < pathData.length; i++)\n\t{\n\t\tif(pathData[i].type == \"Z\")continue;\n\t\tlet x = pathData[i].x;\n\t\tlet y = pathData[i].y;\n\t\tcol = i/pathData.length * 255;\n\t\tp.push(new Particle(x, y, col));\n\t}\n\treturn p;\n}\n\n/////\n\nclass Particle\n{\n\tconstructor(x, y, col)\n\t{\n\t\tthis.x = width + x + random(-.1,.1);\n\t\tthis.y= y + random(-.1,.1);\n\t\tthis.angle = 0;\n\t\tthis.speed = spd;\n\t\tthis.col = col;\n\t}\n\t\n\tupdate()\n\t{\n\t\tthis.x += cos(this.angle) * this.speed;\n\t\tthis.y += sin(this.angle) * this.speed;\n\t\tlet noiseScale = 0.008;\n\t\tlet noiseVal = noise(this.x*noiseScale,this.y *noiseScale);\n\t\tthis.angle = map(noiseVal,0,1,PI-PI/20,PI+PI/20);\n\t\tnoStroke();\n\t\tfill(this.col, 255, 220);\n\t\tcircle(this.x,this.y,POINT_SPAN/2);\n\t}\n\t\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1146165",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:23:27",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Fading Coordinates.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,27 @@
+{
+    "name": "minglei",
+    "code": "// === Tab: sketch149304 ===\n// let Field\n// let trails via let noise. \n// let mouse to change particle motion. \n// let to randomize parameters.\n// let with Processing.js (processingjs.org)\n// by function Turner(airtightinteractive.com)\n\nlet numParticles;\nlet fadeAmount;\nlet maxLen = 120;\nlet strokeAmount;\n\nlet particles = new Array(numParticles);\nlet FIELDWIDTH = 3840;\nlet FIELDHEIGHT = 2160;\n\nfunction setup() {\n    createCanvas(3840, 2160);\n    colorMode(HSB, 100);\n    background(0);  \n    randomize()\n}\n\nfunction randomize(){\n\n    numParticles = random(150,520);\n    fadeAmount = random(.5,20);\n    maxLen = random(30,200);\n    strokeAmount = random(0.02,0.3);\n    \n    for(i=0; i<numParticles; i++){\n        particles[i]=new Particle(i/5000.0);\n    }\n}\n\nfunction mouseClicked() {\n    randomize();\n}\n\nfunction draw() {\n\n    noStroke();\n    fill(0,fadeAmount);\n    rect(0,0,width,height);//fade background\n    translate(-150,-25);\n    translate((width- FIELDWIDTH)/2,(height- FIELDHEIGHT)/2);\n    for(i=0; i<numParticles; i++){\n        particles[i].update();//render particles\n    } \n\n}\n\nclass Particle {\n  id,x,y,xp,yp,s,d,sColor,len,z,zp;\n \n  constructor(_id) {\n    id=_id;\n    init();\n  }\n\n    function init(){\n        x=xp=random(0,FIELDWIDTH);\n        y=yp=random(0,FIELDHEIGHT);\n        z=zp=0;\n        s=random(2,7);\n        sColor = map(x,0,FIELDWIDTH,0,100);\n        len = random(1,maxLen-1);\n    }\n \n    function update(){\n \n        id+=0.01;\n\n        if ((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) == 0|| (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) == 0){\n            window.simulatedMouseY = 1;\n            window.simulatedMouseX = 1;         \n        }\n\n        d=(noise(id,x/(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),y/(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))))-0.5)*(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));  \n        \n        x+=cos(radians(d))*s;\n        y+=sin(radians(d))*s;\n    \n        strokeWeight((maxLen - len)*strokeAmount);\n        stroke(sColor,80,90);\n        line(xp,yp,x,y);\n        xp=x;\n        yp=y;\n        len++;\n        if (len >= maxLen) init();\n    }\n \n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u210445",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2012226",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 16:40:45"
+}

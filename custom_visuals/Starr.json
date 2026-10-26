@@ -1,0 +1,27 @@
+{
+    "name": "Starr",
+    "code": "// === Tab: mySketch ===\nlet num = 2000;\nlet particles = [num];\nlet noiseScale = 500;\nlet noiseStrength = 1;\nlet keypress = 'a';\n\nclass squareBox{\n\n    constructor(loc, dir, speed, color){\n        this.loc = loc;\n        this.size = 2;\n        this.dir = dir;\n        this.speed = speed;\n        this.color = color;\n    }\n\n    move(){\n\n        let mx, my, mag, angle;\n\n        switch (keypress){\n\n            case 'a':\n                angle = noise(this.loc.x/noiseScale, this.loc.y/noiseScale, frameCount/noiseScale)*TWO_PI*noiseStrength;\n                this.dir.x = cos(angle);\n                this.dir.y = sin(angle);\n                break;\n\n            case 'b':\n                mx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - 0.5*width;\n                my = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - 0.5*height;\n                mag = sqrt(mx*mx + my*my);\n                this.dir.x = mx/mag;\n                this.dir.y = my/mag;\n                break;\n\n            case 'c':\n                mx = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - this.loc.x;\n                my = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - this.loc.y;\n                mag = sqrt(mx*mx + my*my);\n                this.dir.x = mx/mag;\n                this.dir.y = my/mag;\n                break;\n\n            case 'd':\n                mx = -(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) + this.loc.x;\n                my = -(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) + this.loc.y;\n                mag = sqrt(mx*mx + my*my);\n                this.dir.x = mx/mag;\n                this.dir.y = my/mag;\n                break;\n\n        }\n\n        let vel = this.dir.copy();\n        let d = 2;\n        vel.mult(this.speed*d);\n        this.loc.add(vel);\n    }\n\n    checkEdges(){\n        if (this.loc.x < 0 || this.loc.x > width || this.loc.y < 0 || this.loc.y > height){\n            this.loc.x = random(width * 1.2);\n            this.loc.y = random(height * 1.2);\n        }\n        if (this.color > 360){\n            this.color = random(0, 360)\n        }\n    }\n\n    update(){\n        fill(this.color);\n        square(this.loc.x, this.loc.y, this.size);\n    }\n\n    run(){\n        this.move();\n        this.checkEdges();\n        this.update();\n    }\n\n}\n\n\nfunction setup(){\n    createCanvas(windowWidth, windowHeight);\n    noStroke();\n    for (let i=0; i<num; i++){\n        let loc = createVector(random(width*1.2), random(height), 2);\n        let angle = 0;\n        let dir = createVector(cos(angle), sin(angle));\n        let speed = random(0.5, 2);\n        let col = 255;\n        particles[i] = new squareBox(loc, dir, speed, col);\n    }\n    background(0);\n    //noCursor();\n\n}\n\nfunction windowResized(){\n    resizeCanvas(windowWidth, windowHeight);\n}\n\nfunction keyPressed(){\n    if (key == 'a' || key == 'b' || key == 'c' || key == 'd'){\n        keypress = key;\n    }\n}\n\nfunction draw(){\n    //background(0);\n    fill(0, 10);\n    noStroke();\n    rect(0, 0, width, height);\n    for (let i=0; i<num; i++){\n        particles[i].run();\n    }\n    print(keypress)\n}\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Srivatsa M R",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1433883",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:02:10",
+    "used_in_videos": [
+        "Pure Immersion Repetition.mp4",
+        "Galactic Tribal Assault.mp4"
+    ],
+    "used_count": 2
+}

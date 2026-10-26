@@ -1,0 +1,24 @@
+{
+    "name": "connectedparticle",
+    "code": "// === Tab: mySketch ===\nvar pos = [];\nvar rangeMax=150.;\nvar drawPoint=true, drawLine=true; //set false to hide it\nvar parNumb=150, vel;\nvar slider, slider1, button;\nlet fontsize = 40;\n\nfunction setup() {\n\tblendMode(ADD);\n  createCanvas(1920, 1080);\n  smooth(8);\n\t\n\tslider = createSlider(0, 350, 200, 10);\n  slider.position(10, 10);\n  slider.style('width', '100px');\n\t\n\tslider1 = createSlider(.1, 20, 4, .5);\n  slider1.position(120, 10);\n  slider1.style('width', '100px');\n\t\n\tbutton = createButton('particle');\n  button.position(10, 50);\n  button.mousePressed(showHideParticle);\n\t\n\tbutton = createButton('line');\n  button.position(10, 75);\n  button.mousePressed(showHideLine);\n\t\n  // creating points loop\n  for (var i=0; i<parNumb; i+=1) {\n    var momPos = createVector();\n    momPos.x=random(width);\n    momPos.y=random(height);\n    pos.push(momPos);\n  }\n}\n\nfunction draw() {\n\trangeMax = slider.value();\n  background(0);\n\t\n\t\n  if (drawPoint) {\n    stroke(0, 75, 255);\n    strokeWeight(5);\n    for (var i=0; i<pos.length; i+=1) {\n      point(pos[i].x, pos[i].y);\n    }\n  }\n\n  if (drawLine) {\n    stroke(150, 30);\n\t\tstrokeWeight(1);\n    for (var i=0; i<pos.length; i+=1) {\n      for (var y=1; y<pos.length; y+=1) {\n        if (pos[i].dist(pos[y])<rangeMax) {\n          line(pos[i].x, pos[i].y, pos[y].x, pos[y].y);\n        }\n      }\n    }\n  }\n  bounds();\n  movePos();\n\tfill(255);\n\ttextAlign(LEFT);\n\ttext(slider.value()+' rangeMax', 10, 45);\n\ttext(slider1.value()+' velocity', 120, 45);\n}\n\nfunction movePos() {\n\tvel = slider1.value();\n  for (var i=0; i<pos.length; i+=1) {\n    //var jit = createVector(sin(frameCount*i*0.0004)*vel, sin(frameCount*i*0.0006)*vel); // sin movement\n\t\tvar jit = createVector((noise(frameCount*i*0.0003)*vel, sin(frameCount*i*0.0007)-.5)*vel, (noise(frameCount*i*0.0005)*vel, sin(frameCount*i*0.0008)-.5)*vel); //noise movement\n    pos[i].add(jit);\n  }\n}\n\nfunction bounds() {\n  for (var i=0; i<pos.length; i+=1) {\n    if (pos[i].x>width) pos[i].x=0;\n    if (pos[i].x<0) pos[i].x=width;\n    if (pos[i].y>height) pos[i].y=0;\n    if (pos[i].y<0) pos[i].y=height;\n  }\n}\n\nfunction showHideParticle() {\n\tdrawPoint=!drawPoint;\n}\n\nfunction showHideLine() {\n\tdrawLine=!drawLine;\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "pietro lama",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/675479",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:12:49",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

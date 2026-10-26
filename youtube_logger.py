@@ -22,8 +22,10 @@ LOGGER_NAME = "YouTubeUploader"
 # API Quota Costs (Units)
 QUOTA_COSTS = {
     "videos.insert": 1600,
+    "videos.update": 50,
     "playlists.insert": 50,
     "playlistItems.insert": 50,
+    "playlistItems.list": 1,
     "thumbnails.set": 50,
     "commentThreads.insert": 50,
     "channels.list": 1,

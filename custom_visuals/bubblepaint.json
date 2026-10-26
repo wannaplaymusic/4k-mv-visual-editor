@@ -1,0 +1,24 @@
+{
+    "name": "bubblepaint",
+    "code": "// === Tab: mySketch ===\nlet gamen;\n//const palette = [\"#e9dfe5\", \"#d8e698\", \"#bce2e8\", \"#abced8\"];\nconst palette = [\"#e9dfe5\", \"#d8e698\", \"#bce2e8\"];\n\nlet x;\nlet y;\nlet R = 0.7; //ハートの大きさ調整用\n\nlet color; \n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tframeRate(360);  \n\tbackground(255);  \n  gamen = 1;  \n\t\n\tcolor = 0; \n\t\n\t//noFill();\n}\n\nfunction draw() {\n\n// [SENTINEL 專家 2 修復] 音訊座標數值防禦\nif(typeof window.simulatedMouseX === 'number' && isNaN(window.simulatedMouseX)) window.simulatedMouseX = width*0.5;\nif(typeof window.simulatedMouseY === 'number' && isNaN(window.simulatedMouseY)) window.simulatedMouseY = height*0.5;\n\t\n\t  color = color + 0.2 ; \n   if ( color >= 3 ) { color = 0;} \n\t\n\tpaintmode();\n\tif(frameCount % 3 ==0 ){gamen = !gamen;}\n\tif(gamen == 1){blendMode(BLEND);}\n  if(gamen == 0){blendMode(ADD);}\n}\n\nfunction paintmode(){ \n\n\tfor(let i = 0; i < 15; i++){\n      let radious = random(1) * 50 ; \n\t\t\tfill(palette[int(color)]);\n\t\t\n      noStroke();\n\t\t\tif(frameCount % 3 == 0 ){\n      // ellipse((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) + random(-200,120), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) +random(-100,100), radious, radious);\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n    \t\tpush();\n        translate((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\t\t  \trotate( PI * 1.9  );\n\t\t\t  \n\t \t\tbeginShape();\n\n\t\tfor (let theta = 0; theta < 360; theta++) {\n        x = R * (16 * sin(radians(theta)) * sin(radians(theta)) * sin(radians(theta)));\n        y = (-1) * R * (13 * cos(radians(theta)) - 5 * cos(radians(2 * theta))  - 2 * cos(radians(3 * theta)) - cos(radians(4 * theta)));\n        vertex(x, y);\n       }\n\t\t\t\t\n      endShape(CLOSE);\n\t\t\t\t\n\t\t\t\tpop();\n\t\t\t\n      }\n    }\n\t\n\t\n}\n\n\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "未知作者",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-05"
+    ],
+    "url": "https://openprocessing.org/sketch/1232902",
+    "batch_id": "batch_20261005_141539",
+    "batch_date": "2026-10-05",
+    "date_added": "2026-10-05 17:22:25",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

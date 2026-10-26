@@ -1,0 +1,29 @@
+{
+    "name": "CliffordAttractor2",
+    "code": "// === Tab: mySketch ===\nlet colors = []\nlet parameters = [] // [1.24, -1.25, -1.81, -1.91], [1.37, -1.85, -1.68, -1.38]\nlet canvasSize = 900\nlet loopCount = 0\nlet hits = Array(canvasSize).fill(0).map(x => Array(canvasSize).fill(0));\n\nfunction setup() {\n\tcreateCanvas(canvasSize, canvasSize);\n\tbackground(255);\n\t\n\t// Add parameters\n\tif (parameters.length == 0) {\n\t\tfor (let i = 0; i < 4; i++) {\n\t\t\tparameters.push(random(0, 1) + random([1, -2])) // random(-3, 3)\n\t\t}\n\t}\n\t\n\t// Add colors\n\tcolorMode(HSB, 100);\n\tlet mean = random(0, 100)\n\tfor (let i = 0; i < 10; i++) {\n\t\tcolors.push(abs(randomGaussian(mean, 10)) % 100)\n\t}\n}\n\nfunction draw() {\n\t\n\t// Plot\n\tif (loopCount >= 0) {\n\t\timage(getImage(), 0, 0);\n\t} else blend(getImage(), 0, 0, canvasSize, canvasSize, 0, 0, canvasSize, canvasSize, SOFT_LIGHT);\n\tloopCount++\n\t\n\t// Display parameters\n\t// fill(255)\n\t// noStroke()\n\t// rect(0, 0, canvasSize, 40)\n\t// fill(0)\n\t// textSize(30)\n\t// text(loopCount.toString(), 30, 30)\n\t// text(parameters.map(x => x.toFixed(2)).join(', '), 30, 30)\n}\n\n// Move particles\nfunction next(x, y) {\n\tlet nx = (sin(parameters[0]*y) + parameters[2] * cos(parameters[0]*x))\n\tlet ny = (sin(parameters[1]*x) + parameters[3] * cos(parameters[1]*y))\n\treturn [nx, ny]\n}\n\nfunction getImage() {\n\t// Calculate hits with blur\n\tlet maxHits = 0;\n\tlet x = 0;\n\tlet y = 0;\n\tfor (let round = 0; round < 5*10**4; round++) {\n\t\t[nx, ny] = next(x, y)\n\t\t\n\t\t// blur\n\t\tnx += random(-0.001, 0.001);\n\t\tny += random(-0.001, 0.001);\n\t\t\n\t\tx = nx\n\t\ty = ny\n\t\t\n\t\timgX = map(x, -3, 3, 0, canvasSize);\n\t\timgY = map(y, -3, 3, 0, canvasSize);\n\t\thits[int(imgX)][int(imgY)]++;\n\t\tmaxHits = max(maxHits, hits[int(imgX)][int(imgY)])\n\t}\n\n\t// Create image by hits\n\tlet newImage = createImage(canvasSize, canvasSize);\n\tnewImage.loadPixels();\n\tfor (let m = 0; m < canvasSize; m++) {\n\t\tfor (let n = 0; n < canvasSize; n++) {\n\t\t\tif (hits[m][n] > 0) {\n\t\t\t\tnum = map(hits[m][n], 0, maxHits, 0, 1);\n\t\t\t\tnewImage.set(m, n, color(colors[0], 10+num*90, 100-num*80));\n\t\t\t}\n\t\t}\n\t}\n\tnewImage.updatePixels();\n\treturn newImage\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "isomochism",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1841705",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:42:02",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

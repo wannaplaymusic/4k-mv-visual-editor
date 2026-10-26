@@ -1,0 +1,28 @@
+{
+    "name": "GENUARY8",
+    "code": "// === Tab: mySketch.js ===\nlet x, y;\nlet a, b, c, d;\nlet points = [];\nlet limit;\nlet colors1 = ['#f23b52', '#f3262e', '#f1060f'];\nlet colors2 = ['#0534f2', '#1e46ea', '#2042cb'];\nlet colors3 = ['#f8cd2b', '#f4c618', '#fcc703'];\n\nlet encoder;\nconst frate = 30; // frame rate\nconst numFrames = 1800; // num of frames to record\nlet recording = false;\nlet recordedFrames = 0;\n\nfunction preload() {\n\tw = 800;\n\th = 800;\n\tHME.createH264MP4Encoder().then(enc => {\n\t\t\tencoder = enc\n\t\t\tencoder.outputFilename = 'test'\n\t\t\tencoder.width = 2*w\n\t\t\tencoder.height = 2*h\n\t\t\tencoder.frameRate = frate\n\t\t\tencoder.kbps = 50000 // video quality\n\t\t\tencoder.groupOfPictures = 10 // lower if you have fast actions.\n\t\t\tencoder.initialize()\n\t})\n}\n\nfunction setup() {\n\tcreateCanvas(w, h);\n\tframeRate(frate);\n\tbackground('white');\n\t\n\t// Clifford Attractor\n\ta = -1.4; b = 1.6; c = 1.0; d = 0.7;\n\t\n\tlimit = 1;\n\tfor(let i = 0; i < limit; i += 1) {\n\t\tpoints.push({\n\t\t\tx: width/2,\n\t\t\ty: 5*i + height/2, \n\t\t\tvx: 0,\n\t\t\tvy: 0\n\t\t})\n\t}\n}\n\nfunction draw() {\n\tfor(let i = 0; i < points.length; i++) {\n    // get each point and do what we did before with a single point\n    let p = points[i];\n\t\t\n    let value = getValue(p.x, p.y);\n    p.vx += cos(value) * 0.3;\n  \tp.vy += sin(value) * 0.3;\n\t\t\n\t\tx = p.x + p.vx;\n\t\ty = p.y + p.vy;\n\n\t\tstrokeWeight(5);\n\t\tif((value >= -1)&&(value <= 1)){\n\t\t\tstroke(random(colors1));\n\t\t} else if(value > 1) {\n\t\t\tstroke(random(colors2));\n\t\t} else if(value < -1) {\n\t\t\tstroke(random(colors3));\n\t\t} \n\t\t\n\t\tline(p.x, p.y, x, y);\n\n    // add velocity to position and line to new position\n    p.x += p.vx;\n    p.y += p.vy;\n\t\t\n    // apply some friction so point doesn't speed up too much\n    p.vx *= 0.99;\n    p.vy *= 0.99;\n\n    // wrap around edges of screen\n    if(p.x > width) p.x = 0;\n\t\tif(p.y > height) p.y = 0;\n\n\t\tif(p.x < 0) p.x = width;\n\t\tif(p.y < 0) p.y = height;\n  }\n\t\n\t\t// keep adding new frame\n\tif (recording) {\n\t\t\tencoder.addFrameRgba(drawingContext.getImageData(0, 0, encoder.width, encoder.height).data);\n\t\t\trecordedFrames++;\n\t}\n\t// finalize encoding and export as mp4\n\tif (recordedFrames === numFrames) {\n\t\t\trecording = false;\n\t\t\trecordedFrames = 0;\n\n\t\t\tencoder.finalize()\n\t\t\tconst uint8Array = encoder.FS.readFile(encoder.outputFilename);\n\t\t\tconst anchor = document.createElement('a');\n\t\t\tanchor.href = URL.createObjectURL(new Blob([uint8Array], { type: 'video/mp4' }));\n\t\t\tanchor.download = encoder.outputFilename;\n\t\t\tanchor.click();\n\t\t\tencoder.delete();\n\n\t\t\tpreload(); // reinitialize encoder\n\t}\n}\n\nfunction getValue(x, y) {\n\tlet scale = 0.01;\n  x = (x - width / 2) * scale;\n  y = (y - height / 2)  * scale;\n\n  // Clifford attactor gives new x, y for old one. \n  let x1 = sin(a * y) + (c * cos(a * x));\n  let y1 = sin(b * x) + (d * cos(b * y));\n\n  // find angle from old to new. that's the value.\n\treturn atan2(y1 - y, x1 - x);\n}\n\nfunction mouseClicked() { \n  if(recording == false) {\n\t\trecording = true;\n\t} else {\n\t\trecording = false;\n\t} \n}\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Peter Stephens",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1427998",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:01:53",
+    "used_in_videos": [
+        "Thunderous Drive Flow.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

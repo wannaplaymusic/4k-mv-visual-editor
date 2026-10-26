@@ -1,0 +1,28 @@
+{
+    "name": "selfportrait",
+    "code": "// === Tab: mySketch ===\nlet bubbles=[]\nlet self, c\n\nfunction preload(){\nself= loadImage('https://openprocessing.org/sketch/1939128/files/繪名.png');\n\n}\n\nfunction setup() {\n\tcreateCanvas(1191,1684);\n\tfor(let i=0; i<200; i++){\n\t\tbubbles.push(new colorbubble());\n\t}\n}\n\nfunction draw() {\n\tclear();\n\tfor(let i=0; i<100; i++){\n\tbubbles.push(new colorbubble())\n\t}\n\tfor(let colorbubble of bubbles){\n\t\tcolorbubble.move();\n\t\tcolorbubble.delete();\n\t\tcolorbubble.display();\n\t}\n}\n\nclass colorbubble {\n\tconstructor(){\n\t\tthis.pos= new p5.Vector(randomGaussian(width/2, 10), random(0, height))\n\t\tthis.vel= new p5.Vector(0, 0)\n\t\tthis.acc= new p5.Vector(random(-0.1, 0.1), -0.05)\n\t\tthis.size= random (1, 20)\n\t}\n\t\n\tmove(){\n\t\tthis.vel.add(this.acc);\n\t\tthis.pos.add(this.vel);\n\t}\n\t\n\tdelete(){\n\t\tif (this.pos.x > width + this.size*2 || this.pos.x < 0- this.size*2) {\n      let index = bubbles.indexOf(this);\n      bubbles.splice(index, 1);\n    }\n\t}\n\t\n\tdisplay(){\n\t\tnoStroke();\n\t\tc=self.get(this.pos.x, this.pos.y)\n\t\tfill(c)\n\t\tellipse(this.pos.x, this.pos.y, this.size)\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "De an",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1939128",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:33:33",
+    "used_in_videos": [
+        "Hypnotic Core Pressure.mp4",
+        "Negative Space Silence.mp4"
+    ],
+    "used_count": 2,
+    "is_starred": false
+}

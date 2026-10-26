@@ -1,0 +1,26 @@
+{
+    "name": "foamsimulation",
+    "code": "// === Tab: mySketch ===\nvar constellation = [];\nvar eSize = []; // array for various sizes of foambubbles\nvar n;\nvar d;\nvar f = 0;\nvar alpha;\nvar col;\npos = 0;\np = 0;\n\nfunction mouseWheel(event) {\n\tprint(event.delta);\n}\n\nfunction setup() {\n  createCanvas(500, 500);\n\tcolorMode(HSB,100);\n  pixelDensity(1); // Set 1 because it's too slow on firefox\n  \n  n = 200;\n\talpha = 5; // initial alpha value ellipse fillcolor\n\tcol = 240 ; //initial HSB color Hue\n\n  for (var i = 0; i <= n; i++) {\n    constellation.push(new star());\n\t\teSize[i] = random(5,50);\n  }\n  strokeWeight(1.75);\n  stroke('#FFFFFF');\n}\n\nfunction draw() {\n\n  background('#000000');\n\t\n\t\n\n  for (var i = 0; i < constellation.length; i++) {\n    constellation[i].update();\n    for (var j = 0; j < constellation.length; j++) {\n      if (i > j) { // \"if (i > j)\" => to check one time distance between two stars\n        d = constellation[i].loc.dist(constellation[j].loc); // Distance between two stars\n        if (d <= width / 10) { // if d is less than width/10 px, we draw a line between the two stars\n          line(constellation[i].loc.x, constellation[i].loc.y, constellation[j].loc.x, constellation[j].loc.y)\n\t\t\t\t\tpush();\n\t\t\t\t\tnoStroke();\n\t\t\t\t\t//fill(255,20);\n\t\t\t\t\t//fill((f/10)%100,100,100,5);\n\t\t\t\t\t//fill((f/10)%100,100,100,alpha);\n\t\t\t\t\tfill(col,100,100,alpha);\n\t\t\t\t\t\n\t\t\t\t\t//ellipse(constellation[i].loc.x+i, constellation[i].loc.y-i,30,30);\n\t\t\t\t\tellipse(constellation[i].loc.x+i, constellation[i].loc.y-i,eSize[i],eSize[i]);\n\t\t\t\t\tellipse(constellation[i].loc.x, constellation[i].loc.y,100,100);\n\t\t\t\t\t\n\t\t\t\t\tpop();\n        }\n      }\n    }\n\t\talpha = map(eSize[i],1,95,8,3); // map alpha to eSize[i] , to make small bubbles appear less transparent\n\t\teSize[i] += 1.1;\n\t\tif (eSize[i] >= 95){ // make bubble burst at size 95 by setting value back to 1\n\teSize[i] = 1;\n\teSize[i]+=0.01;\n  }\n}\n/*\t\n\n\n*/\nf++;\n}\n\nfunction star() {\n\n  this.a = random(5 * TAU); // \"5*TAU\" => render will be more homogeneous\n  this.r = random(width * .2, width * .25); // first position will looks like a donut\n  this.loc = createVector(width / 2 + sin(this.a) * this.r, height / 2 + cos(this.a) * this.r);\n  this.speed = createVector();\n  this.speed = p5.Vector.random2D();\n  //this.speed.random2D();\n  this.bam = createVector();\n  this.m;\n\nthis.update = function mouseWheel(event){\n      this.bam = p5.Vector.random2D(); // movement of star will be a bit erractic\n      //this.bam.random2D();\n      this.bam.mult(0.45);\n      this.speed.add(this.bam);\n      // speed is done according distance between loc and the mouse :\n\t\t\tthis.m = constrain(map(dist(this.loc.x, this.loc.y, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))), 0, width, 8, .05), .05, 8); // constrain => avoid returning \"not a number\"\n\t\t\tthis.speed.normalize().mult(this.m);\n      // No colision detection, instead loc is out of bound\n      // it reappears on the opposite side :\n      if (dist(this.loc.x, this.loc.y, width / 2, height / 2) > (width / 2) * 0.98) {\n        if (this.loc.x < width / 2) {\n          this.loc.x = width - this.loc.x - 4; // \"-4\" => avoid blinking stuff\n        } else if (this.loc.x > width / 2) {\n          this.loc.x = width - this.loc.x + 4; // \"+4\"  => avoid blinking stuff\n        }\n        if (this.loc.y < height / 2) {\n          this.loc.y = width - this.loc.y - 4;\n        } else if (this.loc.x > height / 2) {\n          this.loc.y = width - this.loc.y + 4;\n        }\n      }\n      this.loc = this.loc.add(this.speed);\n    } // End of update()\n} // End of class\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "dirxon",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1042180",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:29:40",
+    "used_in_videos": [
+        "Vaporized Structures.mp4"
+    ],
+    "used_count": 1
+}

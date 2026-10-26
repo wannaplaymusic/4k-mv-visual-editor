@@ -1,0 +1,34 @@
+{
+    "name": "Particlesinframe",
+    "code": "// === Tab: mySketch ===\n\n// let pal = [\"#2A9D8F\", \"#E76A4B\", \"#235610\", \"#F25E3F\", \"#C77F56\"];\nlet pal = [\"#E4FDE1\", \"#8ACB88\", \"#648381\", \"#575761\", \"#FFBF46\"];\nconst N = 100;\nconst RMAX = 10;\nconst DIS = 60;\nlet offset1 = 30;\nlet offset2 = offset1 / 3;\nvar c1, c2;\nlet particles=[];\nlet t=0.05;\nlet scale = 0.00001;\n\nfunction setup() {\n  createCanvas(800, 600);\n  frameRate(30);\n  background(20);\n\n  c1 = pal[int(random(pal.length))];\n  c2 = pal[int(random(pal.length))];\n  while (c2 == c1) {\n    c2 = pal[int(random(pal.length))];\n  }\n\tfor(let i=0; i<N; i++) {\n\t\tlet p = new Particle(random(offset1, width-offset1), random(offset1, height-offset1));\n\t\tparticles.push(p);\n\t}\n  frame();\n\n}\n\nfunction draw() {\n\t// clear();\n\tframe();\n\n\tfor(let i=0; i<particles.length; i++) {\n\t\tvar p = particles[i];\n\t\tp.update();\n\t\tfor(let j=0; j<particles.length; j++) {\n\t\t\tif(j!=i) {\n\t\t\t\tlet o = particles[j];\n\t\t\t\tif(dist(p.pos.x, p.pos.y, o.pos.x, o.pos.y)<=DIS) {\n\t\t\t\t\tline(p.pos.x, p.pos.y, o.pos.x, o.pos.y);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tp.show();\n\t}\n\tt+=0.015;\n\n}\n\nclass Particle {\n\tconstructor(x, y) {\n\t\tthis.pos = createVector(x, y);\n\t\tthis.center = createVector(x, y);\n\t\tthis.vel = createVector(random(-1,1), random(-1, 1));\n\t\tthis.vel.normalize().mult(3);\n\t\tthis.acc = createVector(0, 0);\n\t\t// this.acc.sub(this.center);\n\t\tthis.r = 2;\n\t\tthis.growth = 1;\n\t}\n\n\tupdate(){\n\t\t// let angle = noise(this.pos.x*scale, this.pos.y*scale, t)*TAU;\n\t\t// this.acc = p5.Vector.fromAngle(angle);\n\t\t// this.acc.mult(1);\n\t\tthis.acc = p5.Vector.sub(this.pos, this.center);\n\t\tlet pull = this.acc.mag();\n\t\tlet mg = map(pull, 0, sqrt(sq(width)+sq(height)),2,0);\n\t\tthis.acc.setMag(0.02*mg);\n\t\t// this.vel.sub(this.acc);\n\t\tthis.vel.add(createVector(-this.acc.y, this.acc.x));\n\t\tthis.vel.limit(3);\n\n\t\tif(this.pos.x<=offset1+1 || this.pos.x>=width-offset1-1) {\n\t\t\tthis.vel.x *= (-1);\n\t\t}\n\t\tif(this.pos.y<=offset1+1 || this.pos.y>=height-offset1-1) {\n\t\t\tthis.vel.y *= (-1);\n\t\t}\n\t\tthis.pos.add(this.vel);\n\n\t\tif(this.r >= RMAX || this.r<2) {\n\t\t\tthis.growth *= -1;\n\t\t}\n\t\tthis.r += this.growth;\n\t}\n\n\tshow() {\n\t\tlet rgrad = drawingContext.createLinearGradient(\n\t\t\toffset1,\n\t\t\toffset1,\n\t\t\twidth-offset1,\n\t\t\theight - offset1\n\t\t);\n\t\trgrad.addColorStop(0, c1);\n\t\trgrad.addColorStop(1, c2);\n\t\tdrawingContext.strokeStyle = rgrad;\n\t\tfill(20);\n\t\tcircle(this.pos.x, this.pos.y, this.r*2);\n\t}\n}\n\n\n\nfunction frame() {\n  drawingContext.fillStyle = '#00000';\n  drawingContext.globalAlpha = 0.5;\n  background(20);\n   drawingContext.globalAlpha = 1;\n  //Draw a picture frame\n  rectMode(CENTER);\n  fill(255);\n  rect(width / 2, height / 2, width - offset2 * 2, height - offset2 * 2);\n  fill(20);\n  rect(width / 2, height / 2, width - offset1 * 2, height - offset1 * 2);\n\tdrawingContext.fillStyle = '#00000';\n\tstroke(20);\n\tstrokeWeight(2);\n  line(offset1, offset1, offset2, offset2);\n  line(width - offset1, offset1, width - offset2, offset2);\n  line(offset1, height - offset1, offset2, height - offset2);\n  line(width - offset1, height - offset1, width - offset2, height - offset2);\n\n\n  let vgrad = drawingContext.createLinearGradient(\n    0,\n    offset1,\n    0,\n    height - offset1\n  );\n\n  vgrad.addColorStop(0, c1);\n  vgrad.addColorStop(1, c2);\n  // vgrad.addColorStop(random(1), color(255));\n  drawingContext.strokeStyle = vgrad;\n  // stroke(150, 50);\n  strokeWeight(0.8);\n  let step = 25;\n  for (let i = offset1; i < width - offset1; i += step) {\n    line(i, offset1, i, height - offset1);\n  }\n  let hgrad = drawingContext.createLinearGradient(\n    offset1,\n    0,\n    width - offset1,\n    0\n  );\n  hgrad.addColorStop(0, c1);\n  hgrad.addColorStop(1, c2);\n  // hgrad.addColorStop(random(1), color(255));\n  drawingContext.strokeStyle = hgrad;\n  for (let j = offset1; j < height - offset1; j += step) {\n    line(offset1, j, width - offset1, j);\n  }\n\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Eric Ly",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible",
+        "batch_2026-10-09"
+    ],
+    "url": "https://openprocessing.org/sketch/1700123",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:46:58",
+    "used_in_videos": [
+        "Gravity in Reverb.mp4",
+        "Boreal Horizon.mp4"
+    ],
+    "used_count": 2,
+    "is_starred": false
+}

@@ -1,0 +1,24 @@
+{
+    "name": "WobblySwarmAuto",
+    "code": "// === Tab: mySketch ===\nvar mass = [];\nvar positionX = [];\nvar positionY = [];\nvar velocityX = [];\nvar velocityY = [];\nvar lapse = 0;\nvar randx, randy;\nvar partMax = 200;\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction setup() {\n\tcreateCanvas(1132, 834);\n\tnoStroke();\n\tcolorMode(HSB, 255);\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction draw() {\n\tbackground(32);\n\tif (frameCount - lapse > 2){\n    lapse = frameCount;\n\t  randX = random(width);\n\t  randY = random(height);\n\t  if (mass.length < partMax) party();  // change partMax to maximum particles you want to allow.\n\t}\n\tfor (var particleA = 0; particleA < mass.length; particleA++) {\n\t\tvar accelerationX = 0, accelerationY = 0;\n\t\t\n\t\tfor (var particleB = 0; particleB < mass.length; particleB++) {\n\t\t\tif (particleA != particleB) {\n\t\t\t\tvar distanceX = positionX[particleB] - positionX[particleA];\n\t\t\t\tvar distanceY = positionY[particleB] - positionY[particleA];\n\n\t\t\t\tvar distance = sqrt(distanceX * distanceX + distanceY * distanceY);\n\t\t\t\tif (distance < 1) distance = 1;\n\n\t\t\t\tvar force = (distance - 320) * mass[particleB] / distance;\n\t\t\t\taccelerationX += force * distanceX;\n\t\t\t\taccelerationY += force * distanceY;\n\t\t\t}\n\t\t}\n\t\t\n\t\tvelocityX[particleA] = velocityX[particleA] * 0.99 + accelerationX * mass[particleA];\n\t\tvelocityY[particleA] = velocityY[particleA] * 0.99 + accelerationY * mass[particleA];\n\t}\n\t\n\tfor (var particle = 0; particle < mass.length; particle++) {\n\t\tpositionX[particle] += velocityX[particle];\n\t\tpositionY[particle] += velocityY[particle];\n\t\tfill(particle/mass.length * 255, 255, 255, 192);\n\t\tellipse(positionX[particle], positionY[particle], mass[particle] * 1000, mass[particle] * 1000);\n\t}\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction addNewParticle() {\n\tmass.push(random(0.003, 0.03));\n  positionX.push(randX);\n  positionY.push(randY);\n\tvelocityX.push(0);\n\tvelocityY.push(0);\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction party() {\n\taddNewParticle();\n}\n\n/////////////////////////////////////////////////////////////////////////////////////////////////////\n\nfunction mouseClicked() {\n\tsave('pix.jpg');\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/831369",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:50:43",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

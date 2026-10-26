@@ -1,0 +1,31 @@
+{
+    "name": "ParticlesemitterDLA",
+    "code": "// === Tab: mySketch ===\n//DLA with particles Pierre MARZIN 19/09/2017\nvar parts=[];\nvar nparts=3000;\nvar maxspeed;\n\nvar leftBias=1;\nvar rightBias=12;\nvar upBias=1;\nvar downBias=12;\n\nvar heat;\nvar mainlayer, uplayer;\nvar showparts, end;\nfunction setup() {\n  createCanvas(600, 600);\n  init();\n}\nfunction init() {\n  showparts=true;\n  end=false;\n  maxspeed=random(1.5, 4);\n  heat=pow(random(.2,1),.2);\n  uplayer=createGraphics(width, height);\n  uplayer.background(0, 0);\n  uplayer.fill(255, 255, 0);\n  uplayer.noStroke();\n  mainlayer=createGraphics(width, height);\n  mainlayer.background(0);\n  mainlayer.stroke(255, 0, 0);\n  mainlayer.strokeWeight(3);\n  mainlayer.noFill();\n  mainlayer.ellipse(width/2, height/2, 500, 500);\n  mainlayer.noStroke();\n  for (var i=0; i<nparts; i++) {\n    parts[i]=new Part();\n  }\n  mainlayer.loadPixels();\n}\nfunction draw() {\n  end=true;\n  image(mainlayer, 0, 0);\n  uplayer.clear();\n  for (var i=0; i<nparts; i++) {\n    if (parts[i].age<2.5)parts[i].update();\n  }\n  mainlayer.loadPixels();\n  if (showparts)image(uplayer, 0, 0);\n  if (end)setup();\n}\nfunction mousePressed() {\n  showparts=!showparts;\n}\nfunction Part() {\n  this.age=0;\n  this.position=createVector(300, 300);//random(width), random(height));\n  this.velocity=createVector(random(-maxspeed*leftBias, maxspeed*rightBias), random(-maxspeed*upBias, maxspeed*downBias));\n  this.velocity.limit(maxspeed*10);\n}\nPart.prototype.update=function() {\n  end=false;\n  this.position.add(this.velocity);\n  if (this.position.x>width ||this.position.x<0||this.position.y>height ||this.position.y<0)this.relocate();\n  uplayer.fill(255,255-this.age*100,0);\n  uplayer.ellipse(this.position.x, this.position.y, 3.5-this.age, 3.5-this.age);\n  if (random(1)>heat) {\n    this.velocity.x+=random(-maxspeed, maxspeed);\n    this.velocity.y+=random(-maxspeed, maxspeed);\n    this.velocity.limit(maxspeed);\n  }\n  if (mainlayer.pixels[4*(int(this.position.y)*width+int(this.position.x))]!=0) {\n    //var vel=this.velocity.copy();\n    //vel.normalize();\n    this.position.sub(this.velocity);//vel);\n    mainlayer.fill(255, this.age*100, 0);\n    mainlayer.ellipse(this.position.x, this.position.y, 3.5-this.age, 3.5-this.age);\n    this.age+=.5;\n    this.relocate();\n  }\n}\nPart.prototype.relocate=function() {\n  this.position=createVector(300, 300);//random(width), random(height));\n  this.velocity=createVector(random(-maxspeed, maxspeed), random(-maxspeed, maxspeed));\n  this.velocity.limit(maxspeed);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "squiddie",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1555359",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:54:32",
+    "used_in_videos": [
+        "Spring Echo Distant.mp4"
+    ],
+    "used_count": 1
+}

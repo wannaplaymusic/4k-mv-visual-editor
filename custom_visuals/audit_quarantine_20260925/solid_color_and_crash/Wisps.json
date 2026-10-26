@@ -1,0 +1,24 @@
+{
+  "name": "Wisps",
+  "code": "// === Tab: mySketch ===\n/*\nWisps\n\nEach wisp records its position to create its long streak.\nThey try to follow the mouse and settle at its position.\n\nControls:\n\t- Move the mouse to lead the particles.\n\nAuthor:\n  \tJason Labbe\n\nSite:\n  \tjasonlabbe3d.com\n*/\n\nvar particles = [];\nvar particleCount = 20;\n\n\nfunction Particle(x, y) {\n  this.pos = new p5.Vector(x, y);\n  this.vel = p5.Vector.random2D();\n  this.vel.mult(10);\n  this.acc = new p5.Vector(0, 0);\n  this.target = new p5.Vector(0, 0);\n  this.history = [];\n  \n  this.baseHue = 200;\n  \n  this.variation = random(0.75, 1);\n  this.speed = random(0.25, 0.75);\n  this.maxSpeed = random(5, 10);\n  \n  this.move = function() {\n    this.target.x = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n    this.target.y = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n    \n    var steer = new p5.Vector(this.target.x, this.target.y);\n    steer.sub(this.pos);\n    steer.sub(this.vel); // Makes it come to a stop.\n    steer.normalize();\n    steer.mult(this.speed*this.variation);\n    this.acc.add(steer);\n    \n    this.vel.add(this.acc);\n    this.vel.limit(this.maxSpeed);\n    this.pos.add(this.vel);\n    this.acc.mult(0);\n    \n    this.history.splice(0, 0, new p5.Vector(this.pos.x, this.pos.y));\n    \n    var maxHistoryCount = 20;\n    if (this.history.length > maxHistoryCount) {\n      this.history.splice(maxHistoryCount, 1);\n    }\n  }\n  \n  this.display = function() {\n    var maxSize = 8;\n    \n    var hueDif = 50;\n    \n    for (var i = this.history.length-1; i > 0; i--) {\n      strokeWeight(map(i, 0, this.history.length, maxSize, 0));\n      var h = map(i, 0, this.history.length, this.baseHue, this.baseHue+hueDif);\n      stroke(h, 360, 360);\n      \n      // Using points performs faster, but lines give a more 'crisp' look.\n      line(this.history[i].x, this.history[i].y, this.history[i-1].x, this.history[i-1].y);\n    }\n    \n    // Increase hue if it's below threshold.\n    if (dist(this.pos.x, this.pos.y, this.target.x, this.target.y) < 100) {\n      this.baseHue += 1;\n      if (this.baseHue > 360-hueDif) {\n        this.baseHue = -hueDif;\n      }\n    }\n  }\n}\n\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight); \n  \n  colorMode(HSB, 360);\n  \n  for (var i = 0; i < particleCount; i++) {\n    particles.push(new Particle(random(width/4, width-width/4), \n                                random(height/4, height-height/4)));\n  }\n  \n  // Set default target to the center.\n  window.simulatedMouseX = width/2;\n  window.simulatedMouseY = height/2;\n} \n\n\nfunction draw() {\n  background(0);\n  \n  for (var i = 0; i < particles.length; i++) {\n    particles[i].move();\n    particles[i].display();\n  }\n}\n\n",
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "custom_html": "",
+  "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+  "inline_assets": {},
+  "author": "artinzhang",
+  "license": "CC BY-NC-SA",
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "batch_2026-09-25"
+  ],
+  "url": "https://openprocessing.org/sketch/686453",
+  "batch_id": "batch_20260925_103420",
+  "batch_date": "2026-09-25",
+  "date_added": "2026-09-25 13:13:01",
+  "needs_qc_repair": true,
+  "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

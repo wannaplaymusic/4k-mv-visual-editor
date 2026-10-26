@@ -1,0 +1,24 @@
+{
+    "name": "critique",
+    "code": "// === Tab: mySketch ===\n//Code and pallette by Aaron Reuland\n//Abstract art using a video feedback loop \n\nlet colors = [\"#a7f7f7\", \"#82964e\", \"#567963\", \"#5981a5\", \"#264b5d\", \"#323227\"]\nlet points = []\nlet dots = []\nlet liners = []\nlet colorIndex = 0\nlet bgFiller, bgPt\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tlet bgColorIndex = floor(random(colors.length))\n\tlet bgColor = colors[0]\n\tcolors.splice(0, 1)\n\tbackground(bgColor);\n\tbgFiller = color(bgColor)\n\tbgFiller.setAlpha(5)\n\n\n\tfor (let i = 0; i < 25; i++) {\n\t\tlet x = width / 2 + randomGaussian(0, width / 4)\n\t\tlet y = height / 2 + randomGaussian(0, height / 4)\n\t\tlet r = random(height / 10, height / 50)\n\t\tdots.push(new dot(x, y, r, colorIndex))\n\t\tcolorIndex++\n\t}\n\n\tfor (let i = 0; i < 8; i++) {\n\t\tvar x = random(width)\n\t\tlet w = random(width / 50, width / 15)\n\t\tliners.push(new liner(x, w, colorIndex))\n\t\tcolorIndex++\n\t}\n}\n\nfunction draw() {\n\n\tfilter(BLUR, 2)\n\tfill(bgFiller)\n\tpush()\n\tblendMode(SCREEN)\n\trect(0, 0, width, height)\n\tpop()\n\t\n\n\tlet g = get()\n\tranScale = random(-.02, 0.2)\n\timage(g, 0, 0, width + ranScale, height + ranScale)\n\n\n\tfor (let d of dots) {\n\t\td.die()\n\t\td.dye();\n\t}\n\n\tfor (let l of liners) {\n\t\tl.drawn();\n\t\tl.draw();\n\t}\n\n\n\tif (frameCount % 60 == 0) {\n\t\tfor (let i = 0; i < 25; i++) {\n\t\t\tvar x = width / 2 + randomGaussian(0, width / 4)\n\t\t\tvar y = height / 2 + randomGaussian(0, height / 4)\n\t\t\tvar r = random(height / 10, height / 50)\n\t\t\tdots.push(new dot(x, y, r, colorIndex))\n\t\t\tcolorIndex++\n\t\t}\n\t}\n\n\tif (frameCount % 33 == 0) {\n\t\tfor (let i = 0; i < 8; i++) {\n\t\t\tvar x = random(width)\n\t\t\tvar w = random(width / 50, width / 15)\n\t\t\tliners.push(new liner(x, w, colorIndex))\n\t\t\tcolorIndex++\n\t\t}\n\t}\n\n\n}\n\n\n\nfunction colorMixer(x, y, colorArray, it) {\n\n\tlet c = noise(x / 50, y / 50, it / 30) * colorArray.length\n\tlet c1 = floor(c)\n\tlet c2 = floor(c + 1) % colorArray.length\n\tlet color1 = colorArray[c1]\n\tlet color2 = colorArray[c2]\n\tlet mix = fract(c)\n\tlet coloring = color(spectral.mix(color1, color2, mix))\n\treturn coloring\n}\n\nclass dot {\n\tconstructor(x, y, s, colorSeed) {\n\t\tthis.x = x\n\t\tthis.y = y\n\t\tthis.s = s\n\t\tthis.c = colorSeed\n\t\tthis.totalFrames = 60\n\t}\n\n\tdie() {\n\t\tthis.totalFrames--\n\t\tif (this.totalFrames <= 0) {\n\t\t\tlet index = dots.indexOf(this)\n\t\t\tdots.splice(index, 1)\n\t\t}\n\t\tthis.y++\n\t\tthis.x += random(-1, 1)\n\t}\n\n\tdye() {\n\t\tnoStroke()\n\t\tvar c = colorMixer(this.x, this.y, colors, this.c)\n\t\tfill(c)\n\t\t//\tlet s= map(this.totalFrames, 60, 0, this.s, this.s/10)\n\t\tellipse(this.x, this.y, this.s)\n\t}\n\n}\n\n\nclass liner {\n\tconstructor(x, w, colorIndex) {\n\t\tthis.x = x;\n\t\tthis.w = w;\n\t\tthis.frames = 33\n\t\tthis.color = colors[colorIndex % colors.length]\n\t}\n\n\tdrawn() {\n\t\tthis.frames--\n\t\tif (this.frames <= 0) {\n\t\t\tvar index = liners.indexOf(this)\n\t\t\tliners.splice(index, 1)\n\t\t}\n\n\t}\n\n\tdraw() {\n\t\tnoStroke()\n\t\tfill(this.color)\n\t\tlet shift = map(noise(this.x, frameCount / 100), 0, 1, -this.w / 2, this.w / 2)\n\t\tbeginShape()\n\t\tfor (let y = -10; y < height + 10; y += 10) {\n\t\t\tlet bark = noise(this.x, y) * this.w / 10\n\t\t\tvertex(this.x + bark + shift, y)\n\t\t}\n\t\tfor (let y = height + 10; y > -10; y -= 10) {\n\t\t\tvar bark = noise(this.x + this.w, y) * this.w / 10\n\t\t\tvertex(this.x + shift - bark, y)\n\t\t}\n\t\tendShape(CLOSE)\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "VKS",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2379345",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:19:01",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_FLAT_COLOR_SCREEN (All Frames MaxVar=0.00)"
+}

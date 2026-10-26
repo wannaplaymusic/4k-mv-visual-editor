@@ -1,0 +1,34 @@
+{
+    "name": "FromChaostoOrder",
+    "code": "// === Tab: mySketch ===\nconst targetDamping = 0.72;\nconst targetChaseForce = 1.5;\n\nlet damping = targetDamping;\nlet chaseForce = targetChaseForce;\nconst distanceToDrawLine = 70;\n\nlet particles = [];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tframeRate(60);\n\tpixelDensity(2);\n\tcolorMode(HSB, 360,100,100,100);\n\tcurveTightness(-0.2);\n\t\n\t\n\tparticles = new Array(600).fill().map(_ => [\n\t\trandom(width), \t\t\t\t// x\n\t\trandom(height), \t\t\t// y\n\t\trandom(-1, 1), \t\t\t\t// velocityX\n\t\trandom(-1, 1)\t\t\t\t\t// velocityY\n\t]);\n\t\n\twindow.addEventListener('resize', () => resizeCanvas(windowWidth, windowHeight));\n}\n\nfunction draw() {\n\tconst fadeSpeed = 0.01;\n\tif(((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))){\n\t\tdamping = lerp(damping, 1.0, fadeSpeed);\n\t\tchaseForce = lerp(chaseForce, 0.0, fadeSpeed);\n\t}\n\telse {\n\t\tdamping = lerp(damping, targetDamping, fadeSpeed);\n\t\tchaseForce = lerp(chaseForce, targetChaseForce, fadeSpeed);\n\t}\n\t\n\tbackground(100);\n\tstroke(0);\n\t\n\tlet curves = [];\n\tlet curvePoints;\n\t\n\tparticles = particles.map(([x,y,velocityX,velocityY], i, _particles) => {\n\t\tlet nextX = x;\n\t\tlet nextY = y;\n\t\tlet nextVelocityX = velocityX * damping;\n\t\tlet nextVelocityY = velocityY * damping;\n\t\tlet forceX = 0;\n\t\tlet forceY = 0;\n\n\t\tconst [chaseeX, chaseeY] = _particles[(i + 1) % _particles.length];\n\t\tconst distanceX = chaseeX - x;\n\t\tconst distanceY = chaseeY - y;\n\t\tconst distance = sqrt(distanceX * distanceX + distanceY * distanceY);\n\t\tif(distance > 0) {\n\t\t\tforceX += distanceX / distance * chaseForce;\n\t\t\tforceY += distanceY / distance * chaseForce;\n\t\t}\n\n\t\t// Draw loose particles + collect curves\n\t\tif(distance < distanceToDrawLine){\n\t\t\tif(!curvePoints){\n\t\t\t\tcurvePoints = [[x,y]];\n\t\t\t}\n\t\t\tcurvePoints.push([chaseeX, chaseeY]);\n\t\t}\n\t\telse {\n\t\t\tif(curvePoints){\n\t\t\t\tcurves.push(curvePoints);\n\t\t\t\tcurvePoints = undefined;\n\t\t\t}\n\t\t\tstrokeWeight(4);\n\t\t\tstroke(forceX*360%360, 100, 100);\n\t\t\tpoint(x, y);\n\t\t}\n\n\t\t// Keep the particles inside the window\n\t\tif(x<0){ nextX = 0; nextVelocityX = max(nextVelocityX, -nextVelocityX); }\n\t\telse if(x>width){ nextX = width; nextVelocityX = min(nextVelocityX, -nextVelocityX); }\n\t\tif(y<0){ nextY = 0; nextVelocityY = max(nextVelocityY, -nextVelocityY); }\n\t\telse if(y>height){ nextY = height; nextVelocityY = min(nextVelocityY, -nextVelocityY); }\n\t\t\n\t\t// Apply velocities and forces\n\t\treturn [\n\t\t\tnextX + velocityX,\n\t\t\tnextY + velocityY,\n\t\t\tnextVelocityX + forceX,\n\t\t\tnextVelocityY + forceY\n\t\t];\n\t});\n\t\n\t// Add unfinished curve if any\n\tif(curvePoints){\n\t\tcurves.push(curvePoints);\n\t\tcurvePoints = undefined;\n\t}\n\t\n\t// Draw curves\n\tnoFill();\n\tstroke(curvePoints+1%360, 100, 100);\n\tstrokeWeight(8);\n\t\n\tif(curves.length===1 && curves[0].length-1 === particles.length){\n\t\tcurvePoints = curves[0];\n\t\tcurvePoints.pop();\n\t\tconst len = curvePoints.length;\n\t\tbeginShape();\n\t\tfor(let i=0; i<len+3; i++){\n\t\t\tconst [x,y] = curvePoints[i%len];\n\t\t\tcurveVertex(x,y);\n\t\t}\n\t\tendShape();\n\t}\n\telse {\n\t\tcurves.forEach((curvePoints) => {\n\t\t\tbeginShape();\n\t\t\tcurvePoints.forEach(([x,y]) => curveVertex(x,y));\n\t\t\tendShape();\n\t\t});\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1854653",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:39:16",
+    "used_in_videos": [
+        "Spatial Core Swells.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "is_starred": false
+}

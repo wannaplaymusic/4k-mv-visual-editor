@@ -1,0 +1,28 @@
+{
+    "name": "esferacentrada",
+    "code": "// === Tab: mySketch ===\n// by SamuelYAN\n// more works //\n// https://twitter.com/SamuelAnn0924\n// https://www.instagram.com/samuel_yan_1990/\n\n// genuary25\n// JAN. 17. (credit: Roni Kaufman)\n// What happens if pi=4?\n\nlet mySize;\n\n// a shader variable\nlet theShader;\n\nfunction preload(){\n  theShader = createShader(vert, frag);\n}\n\nfunction setup() {\n  mySize = max(windowWidth, windowHeight) * 1.0;\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  noStroke();\n}\n\nfunction draw() {\n  shader(theShader);\n  \n  theShader.setUniform(\"u_resolution\", [width, height]);\n  theShader.setUniform(\"u_time\", millis() / 1000.0); \n  theShader.setUniform(\"u_frame\", frameCount / 1.0);\n  theShader.setUniform(\"u_mouse\", [(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) / 100.0, map((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 0, height, height, 0) / 100.0]);\n\n  rect(0, 0, width, height);\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}\n\n\n// === Tab: frag ===\nconst frag = `\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform vec2 u_resolution;\nuniform float u_time;\nuniform int u_frame;\nuniform vec2 u_mouse;\n\n#define pi 4.0\n#define MAX_STEPS 5\n#define MAX_DIST 10.0\n#define SURF_DIST 0.1\n\nmat2 Rot(float a) {\n  float s = sin(a), c = cos(a);\n  return mat2(c, -s, s, c);\n}\n\nfloat sdBox(vec3 p, vec3 s) {\n  float a = atan(p.z, p.x);\n  float b = atan(p.z, p.y);\n  p = 1.0 + .5 * cos(p + p.x * pi + u_time) - s;\n  p.xz += .5 + .5 * cos(8.0 * p.y + u_time);\n  return length(max(p, 0.0)) + min(max(p.x, max(p.y, p.z)), 0.0);\n}\n\nfloat GetDist(vec3 p) {\n  float d = sdBox(p, vec3(1.0));\n  d = mix(length(p) - 3.0, d, 0.15);\n  return 2.0 * d;\n}\n\nfloat RayMarch(vec3 ro, vec3 rd) {\n  float dO = 0.0;\n\n  for (int i = 0; i < MAX_STEPS; i++) {\n    vec3 p = ro + rd * dO;\n    float dS = GetDist(p);\n    dO += dS;\n    if (dO > MAX_DIST || abs(dS) < SURF_DIST) break;\n  }\n\n  return dO;\n}\n\nvec3 GetNormal(vec3 p) {\n  float d = GetDist(p);\n  vec2 e = vec2(.01, 0.0);\n  \n  vec3 n = d - vec3(\n    GetDist(p - e.xyy),\n    GetDist(p - e.yxy),\n    GetDist(p - e.yyx)\n  );\n  \n  return normalize(n);\n}\n\nvec3 GetRayDir(vec2 uv, vec3 p, vec3 l, float z) {\n  vec3 f = normalize(l - p);\n  vec3 r = normalize(cross(vec3(0.0, 1.0, 0.0), f));\n  vec3 u = cross(f, r);\n  vec3 c = f * z;\n  vec3 i = c + uv.x * r + uv.y * u;\n  return normalize(i);\n}\n\nvec3 Bg(vec3 rd) {\n  float k = rd.y * 0.5 + 0.5;\n  vec3 col = mix(vec3(0.5, 0.0, 0.0), vec3(0.0), k);\n  return col;\n}\n\nvoid main() {\n  vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / u_resolution.y * 2.0;\n  \n  vec3 ro = vec3(0.0, 0.0, 5.0);  // Cámara estática y más cercana\n  \n  vec3 rd = GetRayDir(uv, ro, vec3(2.5, -2.0, 0.0), 1.0);\n  vec3 col = vec3(0.0);\n\n  float d = RayMarch(ro, rd);\n\n  if (d < MAX_DIST) {\n    vec3 p = ro + rd * d;\n    vec3 n = GetNormal(p);\n    vec3 r = reflect(rd, n);\n    vec3 rf = refract(rd, n, 0.2);\n    \n    // Ajuste de colores con mayor contraste y movimiento\n    float dif = dot(n, normalize(vec3(1.0, 2.0, 3.0))) * 0.5 + 0.0;\n    col = 0.25 * vec3(dif);\n    \n    col.r += 0.5 + 0.4 * cos(10.0 * rf.y + 4.0 * u_time);\n    col.g += 0.3 + 0.3 * sin(6.0 * rf.y + 3.0 * u_time);\n    col.b += 0.5 + 0.3 * cos(8.0 * rf.y + 5.0 * u_time);\n  }\n\n  col = pow(col, vec3(0.4545));\n  gl_FragColor = vec4(col, 1.0);\n}\n`;\n\n\n\n// === Tab: vert ===\nconst vert = `\nattribute vec3 aPosition;\nattribute vec2 aTexCoord;\n\nvoid main() {\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  positionVec4.xy = positionVec4.xy * 2.0 - 1.0;\n  gl_Position = positionVec4;\n}\n`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Ximena",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2631613",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:09:22",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Authentic Essence Energy.mp4"
+    ],
+    "used_count": 1
+}

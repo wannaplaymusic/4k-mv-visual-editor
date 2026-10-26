@@ -1,0 +1,22 @@
+{
+    "name": "Saturn",
+    "code": "// === Tab: mySketch ===\n/*\nHey sableraph and friends! \nThis is a fork of a fork that is suppose to resemble the planet Saturn!\nThe background, planet and rings all change to the music.\nCan be viewed with music or without!\n\nHope you all enjoy!\n\nMusic by <a href=\"https://pixabay.com/users/lexin_music-28841948/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=115667\">Aleksey Chistilin</a> from <a href=\"https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=115667\">Pixabay</a>\nAttribution: KomaTebe\n*/\n\nlet f=0;\nlet W=900;\nlet counter=0\npreload=_=> \n{\n\tsoundFormats('mp3', \"wav\");\n  song = loadSound('https://openprocessing.org/sketch/2132175/files/spaceMusic.mp3');//load song\n}\n\nsetup=_=>\n{\n\tcreateCanvas(1300, 700);\n\tpixelDensity(.42)\n\tsong.play()\n  amp = new p5.Amplitude();\n\tsong.loop()\n}\ndraw=_=>\n{\n\tvar vol = amp.getLevel();\n  volumeLevel = round(map(vol, 0, 0.3,1, 50));\n\tcounter++\n  let r=W;\n  background(volumeLevel/4);\n  translate(1300/2,700/2);\n  rotate(f/W);\n  if(r>0)\n\t{\n    for(z=255; z>=0; z-=2+random(1))\n\t\t{\n\t\t\tfor(n=0;n<2;n++) \n\t\t\t\t{\n\t\t\t\t\tfill(255)\n\t\t\t\t\tstroke(255)\n\t\t\t\t\tstrokeWeight(random(1,2))\n\t\t\t\t\tarc(random(-1300,1300),random(-700,700),random(1),random(1),0.1,3.14)      //stars\n\t\t\t\t}\n      \tfor(i=0;i<TAU;i+=PI/(28-random(2))) \n\t\t\t\t{\n\t\t\t\t\tlet n=noise(i,tan(i)/90000,(f+z)/10);\n\t\t\t\t\tpush();\n\t\t\t\t\trotate(i);\n\t\t\t\t\tstrokeWeight( (volumeLevel/8.5) - random(3) )\n\t\t\t\t\tstroke(W-z);\n\t\t\t\t\tfill(34,34,34,35)\n\t\t\t\t\tarc(0,n,random(0,80),random(0,80),1,2);\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t//saturn\n\t\t\t\t\tnoFill()\n\t\t\t\t\tstroke(i+W,47);\n\t\t\t\t\tarc(0,z*n,200,200,1,2);\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t//inner rings\n\t\t\t\t\tarc(0,z*n,500,500,1,2);\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t//outer rings\n\t\t\t\t\tpop();\n\t\t\t\t\tr--;\n      \t}\n     }\n   }\n  f-=2;\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Joe DeNavas (DD89)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2132175",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:29:38"
+}

@@ -4,6 +4,48 @@
 
 ---
 
+## 🚀 [v1.6.0] - 2026-10-26
+### 🌌 SAVAP 空間氛圍渲染架構、Ambient Drone Studio 獨立工作站、27 大電影作者世界觀、全庫代碼指紋去重與 YouTube 智慧排程發布
+
+- **🌌 SAVAP (Spatial Audio-Visual Ambient Pipeline) 空間音畫氛圍架構與 10-bit 4K 渲染管線**：
+  - **`SAVAPUniversalAsset` 空間資產標準 (`savap_asset_schema.py`)**：統一跨引擎資產規格、動態響應分級（Static/Slow/Pulse/Chaotic）、感知哈希與空間張力定義。
+  - **`SAVAPPhysicsEngine` 微重力構圖與佈局優化 (`savap_physics_layout_optimizer.py`)**：支援微重力布朗漂移、負空間構圖比例控制（Golden Ratio / Minimalist Breathing），實現無拘束有機流動感。
+  - **`SAVAPAudioKinematics` 彈道式音訊運動學求解器 (`savap_audio_kinematics.py`)**：多頻段慣性阻尼與彈簧動力學求解，杜絕生硬突兀跳變。
+  - **`SAVAPDeterministic4KPipe` 10-bit 抗色帶輸出管線 (`savap_deterministic_4k_pipe.py`)**：引入 Blue Noise 空間抖動（Dithering）與 10-bit 色彩空間編碼，杜絕 4K 漸層色帶斷階（Color Banding）。
+  - **GLSL 全域氛圍著色器 (`shaders/`)**：
+    - `ambient_ganzfeld_fog.frag`：多層感知甘茲菲爾德無邊界光霧場。
+    - `screen_space_fluid.frag`：螢幕空間即時流體 Navier-Stokes 數值模擬。
+    - `unified_harmonizer.frag`：統一調和濾鏡與色調映射。
+
+- **🧘 Ambient Drone Studio 沉浸式獨立工作站與 Chronos 長鏡頭導演**：
+  - **`AmbientDroneStudioTab` 專屬工作室分頁 (`ambient_drone_studio_tab.py`, `launch_ambient_studio.py`)**：打造極簡沉浸視覺介面、即時流體呼吸感調控、預覽與批次排程。
+  - **`AmbientChronosDirector` 長鏡頭演化分鏡引擎 (`ambient_chronos_director.py`)**：專為 Drone / Ambient 音樂打造數十秒至數分鐘單鏡頭平滑演變，維持超長時序的意境完整性。
+  - **`AmbientModuleCompatibilityGate` 三色門禁 (`ambient_module_compatibility_gate.py`)**：綠燈（原生相容）、黃燈（調製適應）、紅燈（高刺激黑名單）智慧分類，確保氛圍純度。
+  - **`AmbientColorGuard` 瀏覽器動態色域防護 (`ambient_color_guard.js`)**：動態箝位對比度與高頻閃爍，保證觀看舒適。
+
+- **🎭 27 大電影作者美學世界觀矩陣 & 13 大美學風格池 (`llm_director.py`, `post_processor.py`)**：
+  - **本體論矩陣擴展至 27 款作者世界觀**：新增「東方虛無、禪宗寂滅與時間雕刻」美學流派（涵蓋塔可夫斯基時間雕刻、重慶森林霓虹搖曳、涅槃火鳥灰燼復甦等），總流派達 7 大體系。
+  - **美學風格池升級為 13 大池**：新增 `CosmicVoid` 宇宙虛空池；嚴格限制微眼震顫（`ocular_tremor`）僅限專屬風格池，避免視覺疲勞。
+  - **`ColorPaletteBarWidget` AI 導演動態調色盤彩色視覺條 (`main.py`)**：主畫面即時呈現 AI 導演推演出的色彩漸變、色相角度（HSL）與視覺色標。
+
+- **🧬 模組全庫智能去重、代碼指紋清查與視覺模組庫分頁**：
+  - **`scripts/audit_and_deduplicate_visual_modules.py`**：依實質代碼正規化指紋進行全庫 3000+ 模組深度清查，安全隔離重複收錄/Fork 副本，無損融合使用次數、歷史播放與星標。
+  - **`CustomVisualsLibraryTab` 視覺模組庫分頁 (`custom_visuals_library_tab.py`)**：直覺瀏覽、多維標籤篩選、動態縮圖網格與模組審查編輯。
+  - **`VirtualModuleGrid` 虛擬化滾動網格 (`virtual_module_grid.py`)**：突破數千模組渲染效能瓶頸，毫秒級平滑捲動。
+
+- **📈 YouTube 全自動化批次發布、SEO 標籤最佳化與 Quota 智慧輪替**：
+  - **`YouTubeVideoOptimizerTab` 影片優化分頁 (`youtube_video_optimizer_tab.py`)**：自動產出 YouTube / Instagram Reels / TikTok 多平台標題、敘述與 SEO 標籤。
+  - **`YouTubeBatchScheduler` 批次發布排程器 (`youtube_batch_scheduler.py`)**：支援多組 API 憑證配額自動輪替，實現 24 小時間隔平滑自動預約發布。
+  - **背景守護服務**：整合 `daemon_aurora_auto_queue.py` 與 `run_shorts_background_export.py` 提供不中斷匯出與發布監控。
+
+- **🛡️ 系統架構健全化與沙盒補丁**：
+  - **`ast_sandbox_patcher.py` & `aura_fallback_engine.py`**：AST 等級沙盒靜態檢測與毫秒級零感平滑故障切換，徹底消除黑畫面。
+  - **`FrameBufferPool` (`frame_buffer_pool.py`)**：高併發 4K 幀緩衝池，大幅降低垃圾回收（GC）與記憶體峰值。
+  - **`MultiTrackTimelineWidget` (`timeline_widget.py`)**：多軌即時時間軸可視化組件。
+  - **單元測試全數通過**：87 項單元測試、SAVAP 整合測試與作者矩陣驗證 100% 綠燈通過。
+
+---
+
 ## 🚀 [v1.5.1] - 2026-09-25
 ### 🛠️ 無頭品質檢驗修復增強、類別提升防 TDZ 崩潰、靜默頁面防對話方塊阻塞與視覺模組修補
 

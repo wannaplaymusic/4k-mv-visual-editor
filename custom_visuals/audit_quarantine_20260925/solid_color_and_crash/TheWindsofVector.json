@@ -1,0 +1,24 @@
+{
+    "name": "TheWindsofVector",
+    "code": "// === Tab: mySketch ===\nlet pArr=[];\n\nfunction setup() {\n\tcreateCanvas(540, 540);\n\tbackground(0,12,33);\ncolorMode(RGB, 255)\n\tangleMode(DEGREES);\n\tellipseMode(CENTER);\n\tnoStroke();\n\tfor (let i = 0; i <1080; i++){\n\t\tpArr.push(new Mover(width/2+i/4*cos(i), height/2+i/4*sin(i), sin(i), 255*(1-noise(sin(i)*4,cos(i)*4)))); //parameters are x position, y position, size, and greyscale color\n\t}\n}\n\nfunction draw() {\n//background(0,12,33);\n\tfor (let p of pArr) { \n\t\tp.move();\n\t}\n}\n\nclass Mover {\n\t\nconstructor(x,y,size,c){\n\tthis.x=x; \n\tthis.y=y; \n\tthis.sizeReference = size; \n\tthis.size = size*3;\n\tthis.xSpeed = -0.5/size;\n\tthis.ySpeed = 0.005/tan(size);\n\tthis.c = color(c, 255-c, c, 3);\n\tthis.w = round(width);\n\tthis.h = round(height);\n\tthis.px = x;\n\tthis.py = y;\n}\n\t\n\t\tmove(){\n\t\tthis.wrap();\n\t\tthis.px=this.x;\n\t\tthis.py=this.y;\n\t\tthis.x+=this.xSpeed*Math.cos((this.px/this.size)/(this.px/this.py))\n\t\tthis.x+=this.xSpeed*(Math.cos(1/this.size*(this.px/(this.py/this.size))/(this.px/this.py)));\n    this.y+=this.ySpeed*Math.sin((this.py/this.size)/(this.py/this.px))\n    this.y+=this.ySpeed*(Math.sin(-1/this.size*(this.py/(this.px/this.size))/(this.py/this.px)));\n\t\t//this.px = this.x;\n\t\t//this.py= this.y;\n\t\tstroke(this.c); \nstrokeWeight(this.size);\n\t\tline(this.x, this.y, this.px, this.py);\n\t}\n\t\n\twrap(){\n\t\tif (this.x > width) this.x = this.size*1.5;\n\t\tif (this.x < 0) this.x = width-this.size*1.5;\n\t\tif (this.y > height) this.y = this.size*1.5;\n\t\tif (this.y < 0) this.y = height-this.size*1.5;\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Justin Turner",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/838336",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:51:24",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

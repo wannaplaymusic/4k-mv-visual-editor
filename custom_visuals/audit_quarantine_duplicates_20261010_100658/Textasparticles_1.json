@@ -1,0 +1,31 @@
+{
+    "name": "Textasparticles",
+    "code": "// === Tab: mySketch ===\n    \t\t// Text as particles\n        // Words from Sol LeWitt \"Sentences on Conceptual Art\", https://www.moma.org/collection/works/146945, \n        // by Henrique Silva, 2023-10-28\n        // https://openprocessing.org/sketch/2065046\n        // #p5js #generativeart #creativecoding #sollewitt \n\n        let font;\n        'use strict';\n\n        var joinedText;\n\n        var excludedWords = ['the', 'is', 'of', 'a', 'they', 'that', 'an', 'to', 'in', 'his', 'are', 'may', 'and', 'by', 's',\n            'it', 'sol', 'its', \"than\", \"cannot\", \"but\", \"who\", \"goes\", \"rather\", \"others\", \"for\", \"as\", \"too\", \"there\"]\n\n\n        function preload() {\n            font = loadFont('https://openprocessing.org/sketch/2065046/files/FreeSans.otf');\n            joinedText = loadStrings('https://deckard.openprocessing.org/user5362/visual1053499/h907d14b78c742717022d1f171303fbf3/SolLeWitt_sentences.txt');\n\n        }\n\n        let font_size = 36\n\n        const DRAW_BALLS = true;\n        const LERP_AMOUNT = 0.0000001;\n        var balls = [];\n\n\n        function setup() {\n            createCanvas(windowHeight, windowHeight);\n\n            strokeWeight(2)\n\n            textFont(font);\n            textSize(font_size);\n\n            joinedText = joinedText.join(' '); // array para string\n            var words = joinedText.match(/\\w+/g); // retorna array com as palavras individuais\n\n            let words_ = []\n            for (var i = 0; i < words.length; i++) {\n                var w = words[i].toLowerCase();\n                if (!excludedWords.includes(w))\n                    words_.push(w);\n            }\n\n            let words_no_duplicates = removeDuplicates(words_)\n\n\n            words_no_duplicates.forEach(function (item) {\n                let v = createVector(random(width - 100), random(100, height-100))\n                if (random() < 0.1) balls.push(\n                    {\n                        pos: v,\n                        vel: p5.Vector.fromAngle(random(TAU), 2),\n                        bounds: font.textBounds(item, v.x, v.y, font_size),\n                        txt: item\n                    }\n                )\n\n\n            })\n\n\n        }\n\n        function removeDuplicates(arr) {\n            return arr.filter((item,\n                index) => arr.indexOf(item) === index);\n        }\n\n\n        function draw() {\n            background(0);\n            for (var ball of balls) {\n                // add velocity vector\n                ball.pos.add(ball.vel);\n                ball.bounds = font.textBounds(ball.txt, ball.pos.x, ball.pos.y, font_size)\n                // check limits, change signal of velocity vector\n                if (ball.bounds.x < 0 || ball.bounds.x + ball.bounds.w > width) {\n                    ball.vel.x = -ball.vel.x;\n                }\n                if (ball.bounds.y < 0 || ball.bounds.y + ball.bounds.h > height) {\n                    ball.vel.y = -ball.vel.y;\n                }\n                let points = []\n                if (DRAW_BALLS) {\n\n                    fill(255)\n                    noStroke()\n                    text(ball.txt, ball.pos.x, ball.pos.y)\n\t\t\t\t\t\t\t//ellipse(ball.pos.x, ball.pos.y,10,10)\n\n                }\n                // check distance with other particles\n                for (var ball2 of balls) {\n                    if (ball2 == ball) continue;\n                    // indexOf index of first element found -> this is for not compare all particles to all particles ->and then check the distance\n                    if (balls.indexOf(ball) > balls.indexOf(ball2) && \n\t\t\t\t\t\t((ball2.pos.x - ball.pos.x) * (ball2.pos.x - ball.pos.x) + \n\t\t\t\t\t\t (ball2.pos.y - ball.pos.y) * (ball2.pos.y - ball.pos.y)) < 20000) {\n                        noFill()\n                        stroke(240, 150, 20);\n                        rect(ball.bounds.x, ball.bounds.y, ball.bounds.w, ball.bounds.h)\n                        rect(ball2.bounds.x, ball2.bounds.y, ball2.bounds.w, ball2.bounds.h)\n\n                        line(ball.pos.x, ball.pos.y, ball2.pos.x, ball2.pos.y);\n\n                        fill(240, 150, 20);\n                        text(ball.txt, ball.pos.x, ball.pos.y)\n                        text(ball2.txt, ball2.pos.x, ball2.pos.y)\n\n                    }\n                    // lerp linear interpolation of diference vector by LERP_AMOUNT\n                    ball.vel.lerp(p5.Vector.sub(ball2.pos, ball.pos), LERP_AMOUNT);\n                }\n            }\n\n        }\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Henrique Silva",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2065046",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:23:00",
+    "used_in_videos": [
+        "Infinite Blue Chamber.mp4"
+    ],
+    "used_count": 1
+}

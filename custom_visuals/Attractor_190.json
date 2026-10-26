@@ -1,0 +1,33 @@
+{
+    "name": "Attractor_190",
+    "code": "// === Tab: mySketch ===\n// Attractor_19.0\n\nlet N = 8000 ; let M = 20 ; let RR = 300 ; let H = 20 ;\nlet X ; let Y ; let R ; let A ; let I ; let II ; let Q ; \n\nfunction setup(){\n  createCanvas(600, 600) ; background(0) ; fill(0,0,0,10) ; \n}//setup()\n\nfunction draw(){\n  stroke(0) ; rect(0,0,599,599) ;\n\tfor ( II = 0 ; II < N ; II++ ){\n\t\tX = random(-RR,+RR) ; Y = random(-RR,+RR) ;\n\t\tstroke(sin(Y/H)*125+125,0,cos(Y/H)*125+125) ;\n    for ( I = 0 ; I < M ; I++ ){\n      Y = (Y/2) + (RR/2) ;\n      R = sqrt(pow(X,2)+pow(Y,2)) ; \n      A = atan(Y/X) ;\n      if ( X < 0 ){ A = A+PI ; }  \n      A = A*2 + Q ;\n      X = R*cos(A) ; Y = R*sin(A) ;\n    }//I\n\t\tpoint(X+300,Y+300) ; \n\t}//let Q = 2*PI*(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/600 ;\n}//draw()\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "KaijinQ",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1236661",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:13:38",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Monolithic Pulse.mp4"
+    ],
+    "used_count": 1
+}

@@ -90,6 +90,61 @@ class SaliencyEyeTraceBridge:
         return {"cx": 0.5, "cy": 0.45, "confidence": 0.5, "mode": "rule_of_thirds"}
 
     @classmethod
+    def estimate_module_saliency_centroid(
+        cls,
+        module_id: str,
+        psychological_state: str = "hypnotic_trance",
+        section_index: int = 0,
+        tension: float = 0.5
+    ) -> Dict[str, Any]:
+        """
+        根據模組形態學關鍵字、心理狀態與黃金分割相空間預測該鏡頭之預期視覺顯著性質心 (cx, cy)
+        """
+        mid_lower = str(module_id or "").lower()
+        # 1. 中心對稱隧道/旋渦/萬花筒/引力場 -> 強中心匯聚，帶微小動態偏心
+        if any(k in mid_lower for k in ("tunnel", "vortex", "mandala", "sphere", "orb", "blackhole", "torus", "radial")):
+            phase = (hash(mid_lower) % 360) * (math.pi / 180.0) + section_index * 1.1
+            r = 0.06 + 0.08 * tension
+            return {
+                "cx": round(0.5 + r * math.cos(phase), 4),
+                "cy": round(0.5 + r * math.sin(phase), 4),
+                "confidence": 0.88,
+                "mode": "radial_convergence"
+            }
+        # 2. 地形/水平線/波浪/山脈 -> 視覺重心偏下黃金分割線 (cy ~ 0.618)
+        if any(k in mid_lower for k in ("terrain", "wave", "landscape", "horizon", "ocean", "sea", "mountain", "grid")):
+            h_hash = ((hash(mid_lower) >> 4) % 100) / 100.0
+            cx = 0.35 + 0.30 * h_hash
+            cy = 0.58 + 0.08 * math.sin(section_index * 1.7)
+            return {
+                "cx": round(cx, 4),
+                "cy": round(cy, 4),
+                "confidence": 0.82,
+                "mode": "horizon_thirds"
+            }
+        # 3. 依據黃金分割四焦點與心理張力進行確定性相空間分佈
+        golden_anchors = [
+            (0.382, 0.382),
+            (0.618, 0.382),
+            (0.618, 0.618),
+            (0.382, 0.618),
+            (0.280, 0.500),
+            (0.720, 0.500),
+        ]
+        anchor_idx = (abs(hash(f"{mid_lower}_{psychological_state}")) + section_index * 2) % len(golden_anchors)
+        base_cx, base_cy = golden_anchors[anchor_idx]
+        jitter_angle = (abs(hash(mid_lower)) % 628) / 100.0
+        spread = 0.04 + 0.12 * tension
+        cx = max(0.15, min(0.85, base_cx + spread * math.cos(jitter_angle)))
+        cy = max(0.15, min(0.85, base_cy + spread * math.sin(jitter_angle)))
+        return {
+            "cx": round(cx, 4),
+            "cy": round(cy, 4),
+            "confidence": 0.76,
+            "mode": "golden_ratio_trajectory"
+        }
+
+    @classmethod
     def compute_cut_transition_continuity(
         cls,
         prev_centroid: Dict[str, Any],
@@ -104,10 +159,10 @@ class SaliencyEyeTraceBridge:
 
         if is_high_tension_drop:
             # 震撼切 (Shock Cut): 故意反轉質心，產生視神經電位反衝
-            target_cx = 1.0 - p_cx
-            target_cy = 1.0 - p_cy
+            target_cx = round(1.0 - p_cx, 4)
+            target_cy = round(1.0 - p_cy, 4)
             transition_style = "glitch_displacement_flash"
-            camera_compensation = [0.0, 0.0]
+            camera_compensation = [round((0.5 - target_cx) * 0.35, 4), round((0.5 - target_cy) * 0.35, 4)]
             continuity_score = 0.35  # 刻意降低連續性以最大化情緒衝擊
         else:
             # 平滑動勢導引 (Smooth Eye-Trace Follow)
@@ -115,8 +170,9 @@ class SaliencyEyeTraceBridge:
                 target_cx = next_target_centroid.get("cx", 0.5)
                 target_cy = next_target_centroid.get("cy", 0.5)
             else:
-                target_cx = p_cx
-                target_cy = p_cy
+                # 若未提供下一鏡頭質心，使用黃金分割對偶位移估算
+                target_cx = round(0.382 if p_cx >= 0.5 else 0.618, 4)
+                target_cy = round(0.382 if p_cy >= 0.5 else 0.618, 4)
 
             dx = target_cx - p_cx
             dy = target_cy - p_cy

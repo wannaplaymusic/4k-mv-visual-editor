@@ -1,0 +1,24 @@
+{
+    "name": "BubbleTrouble",
+    "code": "// === Tab: mySketch ===\nlet bubbles = [];\nlet nums = [100, 25, 12, 72];\nlet num = 23;\nlet mousePos = p5.Vector(0,0,0);\nconst mouseRadius = 30;\nlet size, radius, center;\nlet mouseOver = false;\n\nfunction setup() {\n\t\n\t\tsize = max(windowWidth, windowHeight);\n\t\tcreateCanvas(size, size);\n\t\n\t\tcenter = createVector(width/2, height/2);\t\n\t\tradius = 120;\n\t\n\tfor(let i = 0; i<1000; i++){\n\t\tlet x = random(width);\n\t\tlet y = random(height);\n\t\tlet r = random(10, 40);\n\t\tbubbles[i] = new Bubble(x, y, r);\n\t}\n}\n\nfunction draw() {\n\tbackground(0);\n\tif(!mouseOver){\n\t\tmousePos = createVector(width/2,height/2);\n\t}\n\telse{\n\t\tmousePos = createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\t\t\n\t\tfor (let bubble of bubbles){\n\t\tlet d1 = bubble.dest;\n\t\tlet s1 = bubble.r;\n\t\tlet minMouseDist = mouseRadius*4 + s1/2;\n\t\t\n\t\t\n\t\t//distance from mouse\n\t\tif(d1.dist(mousePos) < minMouseDist){\n\t\t\tlet a = atan2(d1.y - mousePos.y, d1.x - mousePos.x);\n\t\t\td1.x = mousePos.x + cos(a) * minMouseDist;\n\t\t\td1.y = mousePos.y + sin(a) * minMouseDist;\n\t\t}\n\t\t\n\t\t//circular constrain\n\t\tlet maxRadius = radius * 0.9;\n\t\tif(d1.dist(center) < maxRadius){\n\t\t\tvar a = atan2(d1.y - center.y, d1.x - center.x);\n\t\t\td1.x = center.x + cos(a) * (maxRadius - s1);\n\t\t\td1.y = center.y + sin(a) * (maxRadius - s1);\n\t\t}\n\t\t\n\t\t//smooth\n\t\tbubble.pos.x += (d1.x - bubble.pos.x) * 0.09;\n\t\tbubble.pos.y += (d1.y - bubble.pos.y) * 0.09;\n}\n\t}\n\t\t\n\tfill(mouseOver?color(205,0,0):255);\n\tellipse(mousePos.x, mousePos.y, mouseRadius);\n\t\n\tfor (let bubble of bubbles){\n\t\tbubble.move();\n\t\tbubble.show();\n\t}\n}\n\nclass Bubble{\n\t\n\tconstructor(x, y, r){\n\t\tthis.pos = createVector(x, y);\n\t\tthis.dest = createVector(x, y);\n\t\tthis.r = r;\n\t\tthis.colour = createVector(random(255), random(255), random(255));\n\t}\n\t\n\t move(){\n\t\tthis.pos.x += random(-1,1);\n\t\t this.pos.y += random(-1,1);\n\t}\n\t\n\t show(){\n\t\tnoStroke();\n\t\tfill(this.colour.x, this.colour.y, this.colour.z, 60);\t \n\t\tellipse(this.pos.x, this.pos.y, this.r*2);\n\t}\n}\n\nfunction mousePressed(){\n\tif(dist((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), mousePos.x, mousePos.y)<mouseRadius/2){\n\t\tmouseOver = true;\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Matt Martin",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/882811",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:44:31",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

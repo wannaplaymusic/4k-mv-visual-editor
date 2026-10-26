@@ -1,29 +1,30 @@
 {
-  "name": "kikagaku",
-  "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(400,400);\n\tbackground(255);\n\tcolorMode(HSB);\n}\n\nfunction draw() {\n\t\tfill(40,40,100-(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/10);\n\t\trect(200,0,200);\n\trect(0,200,200);\n\tfor(let j=0;j<50;j++){\n\t\tfor(let i=0;i<100;i++){\n\t\t\tfill(176,(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),96,0.5);\n\t\t\tnoStroke();\n\t\t\trect(i*20+j*10-400,i*20-j*10+200,20);\n\t\t\tfill(270,36,100,0.5);\n\t\t\tellipse(20-i*20+j*10+200,i*20+j*10-400,20);\n\t\t}\n\t}\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "2025H2506",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@u521692/2720400",
-  "date_added": "2026-07-06 22:16:02",
-  "used_in_videos": [
-    "Bare Relaxed Relaxed.mp4",
-    "Digital Haze.mp4",
-    "Kinetic Beat.mp4",
-    "Mental Drift.mp4",
-    "Monolithic Interval.mp4",
-    "Night Drive Core Roll.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 7,
-  "scaling_mode": "auto"
+    "name": "kikagaku",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(400,400);\n\tbackground(255);\n\tcolorMode(HSB);\n}\n\nfunction draw() {\n\n// [SENTINEL 專家 2 修復] 音訊座標數值防禦\nif(typeof window.simulatedMouseX === 'number' && isNaN(window.simulatedMouseX)) window.simulatedMouseX = width*0.5;\nif(typeof window.simulatedMouseY === 'number' && isNaN(window.simulatedMouseY)) window.simulatedMouseY = height*0.5;\n\n\t\tfill(40,40,100-(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/10);\n\t\trect(200,0,200);\n\trect(0,200,200);\n\tfor(let j=0;j<50;j++){\n\t\tfor(let i=0;i<100;i++){\n\t\t\tfill(176,(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))),96,0.5);\n\t\t\tnoStroke();\n\t\t\trect(i*20+j*10-400,i*20-j*10+200,20);\n\t\t\tfill(270,36,100,0.5);\n\t\t\tellipse(20-i*20+j*10+200,i*20+j*10-400,20);\n\t\t}\n\t}\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "2025H2506",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@u521692/2720400",
+    "date_added": "2026-07-06 22:16:02",
+    "used_in_videos": [
+        "Bare Relaxed Relaxed.mp4",
+        "Digital Haze.mp4",
+        "Kinetic Beat.mp4",
+        "Mental Drift.mp4",
+        "Monolithic Interval.mp4",
+        "Night Drive Core Roll.mp4",
+        "Ultimate Core Patterns.mp4",
+        "Meteor Blade Berserk.mp4"
+    ],
+    "used_count": 8,
+    "scaling_mode": "auto"
 }

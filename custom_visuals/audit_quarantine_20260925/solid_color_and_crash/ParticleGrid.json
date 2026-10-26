@@ -1,0 +1,24 @@
+{
+    "name": "ParticleGrid",
+    "code": "// === Tab: sketch132237 ===\nlet nFrames = 32;\nlet phasor = 0.0;\nlet phasorInc = 1.0 / float(nFrames);\nlet circles;\nlet coal;\n\nfunction setup() {\n  createCanvas(1024, 768);\n\n  circles = new ArrayList();\n  let nCircles = 256.0;\n\n  for (i = 0; i < int(nCircles); i++) {\n    let n = float(i) / nCircles;\n    let d = n * 256 + 1;\n    let randomAngle = 0.25 * (1 - n);\n\n    circles.add(new CirclesOnALine(new PVector(0.618 * width, n * height * 0.618 + height * (1 - 0.618)),\n                n * 6 + 0.5,\n                d,\n                i % 2 * PI * random(-randomAngle, randomAngle)));\n  }\n}\n \nfunction draw() {\n  background(0);\n\tcolorMode(HSB, 360, 255, 255);\n  noStroke();\n  fill(255);\n\n  let lsSize = circles.size();\n \n  for (i = 0; i < lsSize; i++) {\n\t\tfill(random(360), 255, 255);\n    let thisCircle = (CirclesOnALine) circles.get(i);\n    thisCircle.draw();\n  }\n     \n  updatePhasor();\n\n/*\n  // let creating animated gif\n  if (true) {\n    if (frameCount - 1 < nFrames) {\n      saveFrame(\"output-####.gif\");\n      println(frameCount);\n    }\n\n    if (frameCount - 1 == nFrames) {\n      exit();\n    }\n  }\n*/\n}\n\nfunction getVCoordinates(v, d, a) {\n  return new PVector(v.x + d * cos(a), v.y + d * sin(a)); \n}\n\nfunction updatePhasor() {\n  phasor += phasorInc;\n   \n  if (phasor >= 1.0) {\n    phasor -= 1.0;\n  }\n}\n \nclass CirclesOnALine {\n  v;\n  r, d, a;  // radius, distance, angle\n \n  constructor(v_, r_, d_, a_) {\n    v = v_;\n    r = r_;\n    d = d_;\n    a = a_;\n  }\n   \n  function draw() {\n    let v1 = getVCoordinates(v, d * phasor, a + PI);\n\n    while (v1.x > -r && v1.x < width + r\n           && v1.y > -r && v1.y < height + r) {\n      v1 = getVCoordinates(v1, d, a + PI);\n    }\n\n    do {\n      fill(random(360), 255, 255);\n      ellipse(v1.x, v1.y, r, r);\n      v1 = getVCoordinates(v1, d, a);\n    } while (v1.x > -r && v1.x < width + r\n             && v1.y > -r && v1.y < height + r);\n  }\n}\n\nfunction inBounds(x, y) {\n  return (x > 0 && x <= width && y > 0 && y < height);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/735760",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:03:36",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

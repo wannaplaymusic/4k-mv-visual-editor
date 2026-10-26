@@ -1,0 +1,33 @@
+{
+    "name": "Mixer",
+    "code": "// === Tab: mySketch ===\nparticles=[]\n\nsetup=()=>{\n  createCanvas(1112, 834)\n  colorMode(HSB,360)\n\tbackground(0)\n  noStroke()\n  for(i=0;i<1000;i++){\n    particles[i]={\n      pos:createVector(random(width),random(height)),\n      vel:createVector(),\n      nbhd:0\n    }\n  }\n}\n\ndraw=()=> {\n  background(0,10)\n  t=frameCount/100\n  mx=noise(t,0)*width\n  my=noise(t,1)*height\n\n\nfor(p of particles){\n  p.nbhd=0\n  dis=sqrt((mx-p.pos.x)**2+(my-p.pos.y)**2)\n  if(dis>200&&dis<300){\n    angle=atan2(my-p.pos.y,mx-p.pos.x)+PI/2\n    p.vel.add(p5.Vector.fromAngle(angle,1))\n  }\n}\n\n  for(i=particles.length;i--;){\n    a=particles[i]\n    for(j=i;j--;){\n      b=particles[j]\n      dis=sqrt((a.pos.x-b.pos.x)**2+(a.pos.y-b.pos.y)**2)\n      if(dis<81){\n        a.nbhd++\n        b.nbhd++\n      }\n      \n      if(dis<16){        \n        angle=atan2(a.pos.y-b.pos.y,a.pos.x-b.pos.x)\n        a.vel.add(p5.Vector.fromAngle(angle,1))\n        b.vel.add(p5.Vector.fromAngle(angle,-1))\n      }\n    }\n  }\n\n  for(p of particles){\n    p.vel.mult(.9)\n    p.pos.add(p.vel)\n    p.pos.x=(p.pos.x+width)%width\n    p.pos.y=(p.pos.y+height)%height\n    fill(p.nbhd*10%360,360,360)\n    ellipse(p.pos.x,p.pos.y,8,8)\n  }\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1516469",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:58:05",
+    "used_in_videos": [
+        "Deep Channel Pulse.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

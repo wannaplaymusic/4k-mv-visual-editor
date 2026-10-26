@@ -925,6 +925,45 @@ class ShortsExporterTab(QWidget):
         scroll_area.setWidget(scroll_content)
         main_layout.addWidget(scroll_area)
 
+        # Load persisted settings if available
+        self.load_config()
+
+    def get_config_path(self):
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "shorts_exporter_config.json")
+
+    def load_config(self):
+        cfg_file = self.get_config_path()
+        if os.path.exists(cfg_file):
+            try:
+                with open(cfg_file, "r", encoding="utf-8") as f:
+                    cfg = json.load(f)
+                if cfg.get("src_folder"):
+                    self.src_folder_input.setText(cfg["src_folder"])
+                if cfg.get("out_folder"):
+                    self.out_folder_input.setText(cfg["out_folder"])
+                if cfg.get("duration"):
+                    self.duration_combo.setCurrentText(str(cfg["duration"]))
+                if cfg.get("num_clips"):
+                    self.clips_combo.setCurrentText(str(cfg["num_clips"]))
+                if "ai_director" in cfg:
+                    self.ai_checkbox.setChecked(bool(cfg["ai_director"]))
+            except Exception as e:
+                logger.warning(f"讀取匯出設定檔失敗: {e}")
+
+    def save_config(self):
+        cfg = {
+            "src_folder": self.src_folder_input.text().strip(),
+            "out_folder": self.out_folder_input.text().strip(),
+            "duration": self.duration_combo.currentText(),
+            "num_clips": self.clips_combo.currentText(),
+            "ai_director": self.ai_checkbox.isChecked()
+        }
+        try:
+            with open(self.get_config_path(), "w", encoding="utf-8") as f:
+                json.dump(cfg, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.warning(f"儲存匯出設定檔失敗: {e}")
+
     def log_to_console(self, msg):
         logger.info(msg)
         self.console_log.append(f"> {msg}")
@@ -936,11 +975,13 @@ class ShortsExporterTab(QWidget):
         folder = QFileDialog.getExistingDirectory(self, "選擇來源資料夾")
         if folder:
             self.src_folder_input.setText(folder)
+            self.save_config()
 
     def browse_out_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "選擇輸出資料夾")
         if folder:
             self.out_folder_input.setText(folder)
+            self.save_config()
 
     def start_scan(self):
         src = self.src_folder_input.text().strip()
@@ -948,6 +989,7 @@ class ShortsExporterTab(QWidget):
             QMessageBox.warning(self, "錯誤", "請選擇有效的來源資料夾")
             return
             
+        self.save_config()
         self.btn_scan.setEnabled(False)
         self.log_to_console(f"開始掃描: {src}")
         
@@ -1055,6 +1097,7 @@ class ShortsExporterTab(QWidget):
             QMessageBox.warning(self, "錯誤", "請指定輸出資料夾。")
             return
             
+        self.save_config()
         self.btn_scan.setEnabled(False)
         self.btn_analyze.setEnabled(False)
         self.btn_export.setEnabled(False)

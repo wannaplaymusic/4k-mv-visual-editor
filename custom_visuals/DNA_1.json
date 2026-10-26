@@ -1,0 +1,27 @@
+{
+    "name": "DNA",
+    "code": "// === Tab: mySketch ===\n\n\n\nlet num = 92; // how many rows and columns\nlet s = 0.7; // size of the dots\nlet reflex = 0.7; // how fast ir reacts when clicked. Range: [0, 1[\nlet aperture = 10; // how much it blurs\n\nlet bg = color(42); // background\nlet fg1 = color(99, 215, 236);// foreground\nlet fg2 = color(126, 197, 232);\n\n\n\nfunction setup() {\n  //createCanvas(800, 800); \n\n\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  noStroke();\n  frameRate(30);\n\n  aa = new Array(18);\n  bb = new Array(aa.length);\n  reset();\n}\n\nfunction mouseClicked() {\n  reset();\n}\n\n\nlet t = 0; // keeps the time\n\nlet aa; \nlet bb;\nlet transition = 0;\n\n\n\n\nfunction reset() {\n  for (i = 0; i<bb.length; i++) {\n    let v = random(1, 8);\n    bb[i] = aa[i];\n    aa[i] = random(2)<1?v:-v;\n  }\n  transition = 1;\n}\nfunction draw() {\n  t+=0.0008; // enables time traveling\n\n  background(bg);\n\n  transition*=(1-reflex);\n\n\n  for (v = 0; v<num; v++) {\n    for (u = 0; u<num; u++) {\n      let h = 42\n        *sin((aa[0]*u-aa[1]*v)/num+4.2*aa[4]*t+aa[6])\n        *cos((aa[2]*v+aa[3]*u )/num+aa[5]*t+aa[7]);\n\n      let h2 = 42\n        *sin((bb[0]*u-bb[1]*v)/num+4.2*bb[4]*t+bb[6])\n        *cos((bb[2]*v+bb[3]*u )/num+bb[5]*t+bb[7]);\n      h = lerp(h, h2, transition);\n\n      let u1 = u/num*2-1;\n      let v1 = v/num*2-1;\n\n      let u2 = cos(t)*u1 + sin(t)*v1;\n      let v2 = sin(t)*u1 - cos(t)*v1; \n\n      let u3 = u2/2+0.5;\n      let v3 = v2/2+0.5;\n\n      let x = u3*max(width, height);\n      let y = v3*max(width, height);\n\n      let a = x-y;\n      let b = x+y;\n\n      pushMatrix();\n      translate(0, 0);\n      translate(width/2, 0);\n      let dist = 1.5-b/2/height-h/300;\n      scale(atan(1/dist)*10);  // a little math\n      translate(-width/2, -height/2.2);\n\n      let blur = (1-dist)*aperture;\n      fill(lerpColor(fg1, fg2, constrain(map(blur, -aperture/2, aperture/2, 0, 1), 0, 1)), // blend the colors\n        min(s*255/max(sq(blur/2), 1), 128)); // add transparency\n\n      translate(0, -h); // creates the waves\n      ellipse(a/4+width/2, b/42+height/2, max(abs(blur), s), max(abs(blur), s));\n      popMatrix();\n    }\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Andy",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2395397",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:03:58",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [],
+    "used_count": 0,
+    "is_starred": false
+}

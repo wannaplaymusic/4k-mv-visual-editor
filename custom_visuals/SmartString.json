@@ -1,0 +1,24 @@
+{
+    "name": "SmartString",
+    "code": "// === Tab: mySketch ===\nlet vs = `\n   precision highp float;\n\n   attribute vec3 aPosition;\n   attribute vec2 aTexCoord;\n   varying vec2 vTexCoord;\n\n   uniform mat4 uProjectionMatrix;\n   uniform mat4 uModelViewMatrix;\n\n   void main() {\n      vec4 positionVec4 = vec4(aPosition, 1.0);\n      vTexCoord = aTexCoord;\n      gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n   }\n`;\n\nlet fs = `\n   precision highp float;\n\n   varying vec2 vTexCoord;\n\n   uniform float u_offset;\n   uniform vec3 u_color;\n\n   void main() {\n      vec2 b = vTexCoord * 2.0 - 1.0;\n      b.y += sin(b.x * 4.0 + u_offset) * sin(0.5 * 4.0) * 0.25;\n\n      float cb = 1.0 - abs(sin(b.y));\n      cb = pow(cb, 16.0);\n      vec3 col = vec3(cb);\n      col *= u_color ;\n\n      float tr = (cb <= 0.6) ? 0.45*cb : 0.8 ;\n      gl_FragColor = vec4(col, tr);\n    }\n`;\n\nlet theShader;\n\nfunction setup() {\n\t setAttributes(\"alpha\", false);\n   setAttributes(\"antialias\", true);\n   setAttributes(\"powerPreference\", \"high-performance\");\n\t\n   createCanvas(v=1112, w=834, WEBGL);\n\n\n   theShader = createShader(vs, fs);\n\n   colorMode(HSB);\n   rectMode(CENTER);\n   noStroke();\n   background(\"#D0F0E0\");\n\n}\n\nconst wh = 200 ;\n\nfunction draw(){\n   let t = frameCount / 5;\n\n   let r = radians(PI * (t + random(-1,1))) ;\n   let x = width/2.5 * cos(r)  + random(-1,1)*10;\n   let y = height/2.5 * sin(r) + random(-1,1)*10;\n\n   let offset = 2*PI/10 * (t);\n   let col = color((t*9)%360, 100, 100);\n   col = [red(col)/255.0, green(col)/255.0, blue(col)/255.0]\n\n   fill(100, 0);\n\n   shader(theShader);\n   theShader.setUniform('u_offset', offset);\n   theShader.setUniform('u_color', col);\n   push();\n   translate(x, y);\n   rotate(r+PI/2);\n   rect(0, 0, wh, wh);\n   pop();\n   resetShader();\n}\n\n//save JPG\nfunction mousePressed() {\n   save(\"img_\"+month()+day()+hour()+minute()+second()+\".jpg\");\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1098383",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:21:30",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

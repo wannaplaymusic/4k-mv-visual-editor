@@ -1,0 +1,26 @@
+{
+    "name": "EggShader",
+    "code": "// === Tab: mySketch ===\nlet theShader;\n\nfunction setup() {\n\tcreateCanvas(1000, 1000,WEBGL);\n\tnoStroke()\n\tbackground(0);\n}\n\n\nfunction preload(){\n\ttheShader = createShader(vert, frag)\n}\n\nfunction draw() {\n\tshader(theShader)\n\ttheShader.setUniform('u_resolution',[width/1000,height/1000])\n\ttheShader.setUniform('u_time',millis()/1000)\n\ttheShader.setUniform('u_mouse',[(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))/width,(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))/height])\n\n\t//translate(sin(frameCount/50)+random(width),sin(frameCount/80)+random(width))\n\ttranslate(0,0)\n\tpush()\n\t\trotate(frameCount/50)\n\t\tellipse(noise(-50,50)*120, noise(-50,50)*120, 400, 600);\n\tpop()\n\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 400){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\n// === Tab: frag ===\n\n\n\nconst frag =`\n\tprecision mediump float;\n\t\n\tuniform vec2 u_resolution;\n\tuniform vec2 u_mouse;\n\tuniform float u_time;\n\t\n\tvarying vec2 var_vertTexCoord;\n\tvoid main() {\n\t\t\tvec2 st = var_vertTexCoord.xy/u_resolution;\n\t\t\tst.x *= u_resolution.x/u_resolution.y;\n\t\t\t\n\t\t\t\n\t\t\tvec3 color = vec3(0.);\n\t\t\t\n\t\t\tcolor = vec3(st.x,st.y,abs(sin(u_time)));\n\t\t\tgl_FragColor = vec4(color,1.0);\n\t}\n\n`\n\n// === Tab: vert ===\n//ref 3d shader from https://www.openprocessing.org/sketch/881537\n\nconst vert = `\n\tprecision highp float;\n\n    // attributes, in\n    attribute vec3 aPosition;\n    attribute vec3 aNormal;\n    attribute vec2 aTexCoord;\n\n    // attributes, out\n    varying vec3 var_vertPos;\n    varying vec3 var_vertNormal;\n    varying vec2 var_vertTexCoord;\n\t\tvarying vec4 var_centerGlPosition;//原点\n    \n    // matrices\n    uniform mat4 uModelViewMatrix;\n    uniform mat4 uProjectionMatrix;\n    uniform mat3 uNormalMatrix;\n\t\tuniform float u_time;\n\n\n    void main() {\n      vec3 pos = aPosition;\n\t\t\tvec4 posOut = uProjectionMatrix * uModelViewMatrix * vec4(pos, 1.0);\n      gl_Position = posOut;\n\n      // set out value\n      var_vertPos      = pos;\n      var_vertNormal   =  aNormal;\n      var_vertTexCoord = aTexCoord;\n\t\t\tvar_centerGlPosition = uProjectionMatrix * uModelViewMatrix * vec4(0., 0., 0.,1.0);\n    }\n`;\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1694942",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 23:22:10",
+    "used_in_videos": [
+        "Asteroid Belt Onslaught.mp4"
+    ],
+    "used_count": 1
+}

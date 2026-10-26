@@ -1,0 +1,24 @@
+{
+    "name": "FlowRider",
+    "code": "// === Tab: mySketch ===\nconst Y_AXIS = 1;\nconst X_AXIS = 2;\nlet b1, b2, c1, c2;\n\nlet z = 0;\nlet points = [];\nvar force = 0.09;\nvar friction = 0.99;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\t\tfor(let y = 0; y < height; y+=15){\n\t\tpoints.push({\n\t\t\tx:Math.random() * width,\n\t\t\ty:Math.random() * height,\n\t\t\tvx:0,\n\t\t\tvy:0,\n\t\t\tpCol: createVector(Math.random()*205, 255, Math.random()*205),\n\t\t\topac: Math.random()*255,\n\t\t\tdir: 0.01\n\t\t});\n}\n\t\n\t// Define colors\n  b1 = color(255);\n  b2 = color(0);\n  c1 = color(204, 102, 0);\n  c2 = color(155, 22, 23);\n}\n\nfunction draw() {\n\t//background(99,37,33);\n\t  setGradient(0, 0, width / 2, height, c1, c2, X_AXIS);\n\n\t\trender();\n}\n\nfunction getValue(x, y) {\n  var scale = 0.005;\n  return noise(x * scale, y * scale, z) * Math.PI * 2;\n}\n\nfunction render() {\n\n for(let i = 0; i < points.length; i++) {\n    \n\t  let p = points[i];\n    let value = getValue(p.x, p.y);\n    p.vx += Math.cos(value) * force;\n    p.vy += Math.sin(value) * force;\n\t \n  \tstroke(p.pCol.x,p.pCol.y,p.pCol.z, p.opac+=p.dir);\n  \tstrokeWeight(6);\n\t \tline(p.x, p.y, p.x+p.vx-8, p.y+p.vy);\n\n\t if(p.opac>255)p.dir*=-1;\n\t  // add velocity to position\n    p.x += p.vx;\n    p.y += p.vy;\n    // apply some friction so point doesn't speed up too much\n    p.vx *= friction;\n    p.vy *= friction;\n\t \n\t // // wrap around edges of screen\n     if(p.x > width ||\n\t\t\t p.y > height ||\n\t\t\t p.x < 0 ||\n\t\t\t p.y < 0) \n\t\t {\n\t\t\t\t p.x = width;\n\t\t\t\t p.y = Math.random() * height;\n \t\t\t}\n }\n  \n\tz +=0.005;\n\t\n// \t\t\t\t///// end point equations from angle and length\n// \t\t\t\tlet endX = Math.round(Math.cos(value) * lineLength + x);\n// \t\t\t\tlet endY = Math.round(Math.sin(value) * lineLength + y);\n\n}\n\nfunction setGradient(x, y, w, h, c1, c2, axis) {\n  noFill();\n\n  if (axis === Y_AXIS) {\n    // Top to bottom gradient\n    for (let i = y; i <= y + h; i++) {\n      let inter = map(i, y, y + h, 0, 1);\n      let c = lerpColor(c1, c2, inter);\n      stroke(c);\n      line(x, i, x + w, i);\n    }\n  } else if (axis === X_AXIS) {\n    // Left to right gradient\n    for (let i = x; i <= x + w; i++) {\n      const inter = map(i, x, x + w, 0, 1);\n      var c = lerpColor(c1, c2, inter);\n      stroke(c);\n      line(i, y, i, y + h);\n    }\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Matt Martin",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/904604",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:42:04",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

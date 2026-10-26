@@ -1,0 +1,24 @@
+{
+    "name": "Maple",
+    "code": "// === Tab: mySketch ===\nconst sketch = (p) => {\n    const W = 800;\n    const H = 800;\n\n\n    p.setup = () => {\n        p.createCanvas(W, H);\n    };\n\n    function draw_leaf(r, angle) {\n        let grad = p.drawingContext.createRadialGradient(0, 0, r/3, 0, 0, r*5);\n        let red = p.random(200, 255);\n        let g1 = p.random(100, 200);\n        let g2 = p.random(0, g1);\n        let co1 = p.color(red, g1, 0);\n        let co2 = p.color(red, g2, 0);\n        p.drawingContext.fillStyle = grad;\n        \n        grad.addColorStop(0,   co1.toString());\n        grad.addColorStop(1.0, co2.toString());\n        p.rotate(p.PI + angle);\n        p.beginShape();\n        let sc = p.random(1.5, 3);\n        for(let a = 0; a < p.TWO_PI; a += p.TWO_PI/360){\n            let r2 = r * 1.5 * (2.5 / sc)\n                    * (sc + 0.9 * p.cos(8 * a))\n                    * (1 + 0.1 * p.cos(24 * a))\n                    * (0.9 + 0.1 * p.cos(200 * a)) * (1 + p.sin(a))\n                    ;\n            p.vertex(\n                r2 * p.cos(a),\n                r2 * p.sin(a)\n            );\n        }\n        p.endShape(p.CLOSE);\n\n        \n        p.stroke(100, 0, 0);\n        p.strokeWeight(1);\n        for(let a = 0; a <= p.PI; a += p.TWO_PI/8){\n            p.beginShape(p.LINES);\n            let f = p.map(p.abs(a - p.PI/2), 0, p.PI/2, 7, 3);\n            for(let i = 0; i < 20; ++i){\n                p.vertex(r * f *(i/20) * p.cos(a) + r*p.random(0.05), r * f * (i/20) * p.sin(a) + r*p.random(0.05));\n            }\n            p.endShape();\n        }\n\n        p.noFill();\n        p.stroke(red, g2, 0);\n        p.strokeWeight(1);\n        let dir = 0.1;\n        if (p.random() < 0.5) {\n            dir = -0.1;\n        }\n        let sr = r * p.random(0.7, 1.2);\n        p.bezier(\n            0, 0,\n            sr * p.cos(p.PI * (1.5 + dir)), sr * p.sin(p.PI * (1.5 + dir)),\n            sr * 3.5 * p.cos(p.PI * (1.5 + dir)), sr * 3.5 * p.sin(p.PI * (1.5 + dir)),\n            sr*5 * p.cos(p.PI * 1.5), sr*5 * p.sin(p.PI * 1.5),\n        );\n        p.fill(red, g2, 0);\n        p.rectMode(p.CENTER);\n        p.rect(sr*5 * p.cos(p.PI * 1.5), sr*5 * p.sin(p.PI * 1.5), 4, 4);\n    }\n\n    p.draw = () => {\n        p.background(30);\n\n        p.noStroke();\n\n        for(let i = 0; i < 70; ++i){\n            let x = p.random(50, W-50);\n            let y = p.random(50, H-50);\n            let a = p.random(0, p.TWO_PI);\n            p.push();\n            p.translate(x, y);\n            draw_leaf(8, a);\n            p.pop();\n        }\n\n        p.noLoop();\n    };\n\t\n\t\tp.mouseClicked = () => {\n\t\t\t\tp.redraw();\n\t\t}\n};\n\n\nnew p5(sketch);\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u332136",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-05"
+    ],
+    "url": "https://openprocessing.org/sketch/1600598",
+    "batch_id": "batch_20261005_141539",
+    "batch_date": "2026-10-05",
+    "date_added": "2026-10-05 16:55:15",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "STATIC_FREEZE_NO_TEMPORAL_DYNAMICS"
+}

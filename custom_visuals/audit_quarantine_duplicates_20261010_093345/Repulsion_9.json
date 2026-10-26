@@ -1,0 +1,31 @@
+{
+    "name": "Repulsion",
+    "code": "// === Tab: main.js ===\n/*\nRepulsion\n\njasonlabbe3d.com\ntwitter.com/russetPotato\n*/\n\nvar count = 500;\nvar spacing = 6;\nvar repulsionRadius = 100;\nvar particles = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n\tcolorMode(HSB, 255);\n\t\n\tfor (let i = 0; i < count; i++) {\n\t\tlet angle = i * 137.5;\n\t\tlet r = spacing * sqrt(i);\n\t\tlet x = r * cos(radians(angle)) + width / 2;\n\t\tlet y = r * sin(radians(angle)) + height / 2;\n\t\tlet distToCenter = dist(x, y, width / 2, height / 2);\n\t\tlet s = 255 - distToCenter * 1.25;\n\t\tlet b = 150 + distToCenter * 1;\n\t\t\n\t\tparticles.push(new Particle(\n\t\t\trandom(width), -200, \n\t\t\tx, y, \n\t\t\t0.5,\n\t\t\ts, b));\n\t}\n} \n\nfunction draw() {\n  background(50);\n\t\n\tfor (let i = 0; i < particles.length; i++) {\n\t\tparticles[i].move();\n\t\tparticles[i].display();\n\t}\n\t\n\tstroke(0, 50);\n\tstrokeWeight(repulsionRadius * 2);\n\tpoint((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n}\n\n// === Tab: particle.js ===\nfunction Particle(x, y, targetX, targetY, maxForce, s, b) {\n  \n  this.pos = new p5.Vector(x, y);\n  this.vel = new p5.Vector(0, 0);\n  this.acc = new p5.Vector(0, 0);\n\tthis.target = new p5.Vector(targetX, targetY);\n  this.maxForce = maxForce * random(0.8, 1.2);\n\tthis.sat = s;\n\tthis.bright = b;\n  \n  this.move = function() {\n    let distThreshold = 20;\n    \n    let steer = new p5.Vector(this.target.x, this.target.y);\n    let distance = dist(this.pos.x, this.pos.y, this.target.x, this.target.y);\n\t\tif (distance > 0.5) {\n\t\t\tsteer.sub(this.pos);\n\t\t\tsteer.normalize();\n\t\t\tsteer.mult(map(min(distance, distThreshold), 0, distThreshold, 0, this.maxForce));\n\t\t\tthis.acc.add(steer);\n\t\t}\n    \n\t\tlet mouseDistance = dist(this.pos.x, this.pos.y, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\t\tif (mouseDistance < repulsionRadius) {\n\t\t\tlet repulse = new p5.Vector(this.pos.x, this.pos.y);\n\t\t\trepulse.sub((window.simulatedPMouseX !== undefined ? window.simulatedPMouseX : (typeof sub_bass_prev !== 'undefined' ? map(sub_bass_prev, 0, 1, width*0.1, width*0.9) : (typeof window.simulatedMouseX !== 'undefined' ? window.simulatedMouseX - 12 : pmouseX))), (window.simulatedPMouseY !== undefined ? window.simulatedPMouseY : (typeof percussive_prev !== 'undefined' ? map(percussive_prev, 0, 1, height, 0) : (typeof window.simulatedMouseY !== 'undefined' ? window.simulatedMouseY - 12 : pmouseY))));\n\t\t\trepulse.mult(map(mouseDistance, 100, 0, 0, 0.5));\n\t\t\tthis.acc.add(repulse);\n\t\t}\n\t\t\n    this.vel.mult(0.95);\n    \n    this.vel.add(this.acc);\n    this.pos.add(this.vel);\n    this.acc.mult(0);\n  }\n  \n  this.display = function() {\n    strokeWeight(1);\n    stroke(0, 100);\n    line(this.target.x, this.target.y, this.pos.x, this.pos.y);\n    \n    strokeWeight(6);\n    stroke(140, this.sat, this.bright);\n    point(this.pos.x, this.pos.y);\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Youssef Taki",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1029518",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:30:29",
+    "used_in_videos": [
+        "Obscured Sector.mp4"
+    ],
+    "used_count": 1
+}

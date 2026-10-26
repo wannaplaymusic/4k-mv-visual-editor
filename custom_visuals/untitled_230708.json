@@ -1,0 +1,63 @@
+{
+    "name": "untitled_230708",
+    "code": "// === Tab: mySketch ===\n // by SamuelYAN\n // more works //\n // https://twitter.com/SamuelAnn0924\n // https://www.instagram.com/samuel_yan_1990/\n\n var ranges;\n let seed = Math.random() * 999999;\n var mySize, margin;\n let str_wei = 0;\n\n // colors\n let colors0 = \"281914-1a1a1a-202020-242e30\".split(\"-\").map((a) => \"#\" + a);\n let colors1 = \"fef9fb-fafdff-ffffff-fcfbf4-f9f8f6\".split(\"-\").map((a) => \"#\" + a);\n let colors2 = \"8c75ff-c553d2-2dfd60-2788f5-23054f-f21252-8834f1-c4dd92-184fd3-f9fee2-2E294E-541388-F1E9DA-FFD400-D90368-e9baaa-ffa07a-164555-ffe1d0-acd9e7-4596c7-6d8370-e45240-21d3a4-3303f9-cd2220-173df6-244ca8-a00360-b31016\".split(\"-\").map((a) => \"#\" + a);\n let colors_cyber = \"ee0cf2-352ef2-1df252-f2e41d\".split(\"-\").map((a) => \"#\" + a);\n let color1, color2;\n let colorselet = [];\n\n let newTone01 = \"FF9494-FFD1D1-FFE3E1-FFF5E4\".split(\"-\").map((a) => \"#\" + a);\n let newTone02 = \"967E76-D7C0AE-EEE3CB-B7C4CF\".split(\"-\").map((a) => \"#\" + a);\n let newTone03 = \"EEF1FF-D2DAFF-AAC4FF-B1B2FF\".split(\"-\").map((a) => \"#\" + a);\n let newTone04 = \"E38B29-F1A661-FFD8A9-FDEEDC\".split(\"-\").map((a) => \"#\" + a);\n let newTone05 = \"FFC3A1-F0997D-D3756B-A75D5D\".split(\"-\").map((a) => \"#\" + a);\n let newTone06 = \"374259-545B77-5C8984-F2D8D8\".split(\"-\").map((a) => \"#\" + a);\n let newTone07 = \"675D50-ABC4AA-F3DEBA-A9907E\".split(\"-\").map((a) => \"#\" + a);\n let newTone08 = \"F5F5F5-E8E2E2-F99417-5D3891\".split(\"-\").map((a) => \"#\" + a);\n let newTone09 = \"EAE0DA-F7F5EB-A0C3D2-EAC7C7\".split(\"-\").map((a) => \"#\" + a);\n let newTone10 = \"FFED00-16FF00-0F6292-202020\".split(\"-\").map((a) => \"#\" + a);\n let newTone11 = \"82954B-BABD42-EFD345-FFEF82\".split(\"-\").map((a) => \"#\" + a);\n let newTone12 = \"146C94-19A7CE-B0DAFF-FEFF86\".split(\"-\").map((a) => \"#\" + a);\n\n\n let pastel_bg = \"ccd4bf-e7cba9-eebab2-f5f3f7-f5e2e4-f4c815-f9cad7-A57283-c1d5de-deede6-AAD9CD-E8D595-E9BBB5-E7CBA9-8DA47E-f7f6cf-b6d8f2-f4cfdf-9ac8eb\".split(\"-\").map((a) => \"#\" + a); //Mini Pastel Pops\n\n\n let unit;\n let count;\n let Cubes = [];\n\n function setup() {\n \trandomSeed(seed);\n \tlet color_sel2 = random([newTone01, newTone02, newTone03, newTone04, newTone05, newTone06, newTone07, newTone08, newTone09, newTone10, newTone11, newTone12]);\n \tmySize = max(windowWidth, windowHeight);\n \t// mySize = 1000;\n \tmargin = mySize / 100;\n \tcreateCanvas(windowWidth, windowHeight);\n \tcolorselet[0] = random(colors1);\n \tcolorselet[1] = random(colors0);\n \tcolorselet[2] = random(color_sel2);\n \tcolorselet[3] = random(color_sel2);\n \tcolorselet[4] = random(color_sel2);\n \tcolorselet[5] = random(color_sel2);\n \tcolorselet[6] = random(color_sel2);\n \tunit = int(random(15, 8));\n\n \tnoStroke();\n \tlet wideCount = width / unit;\n \tlet highCount = height / unit;\n \tcount = wideCount * highCount;\n\n \tlet index = 0;\n \tfor (let y = 0; y < highCount; y++) {\n \t\tfor (let x = 0; x < wideCount; x++) {\n \t\t\tCubes[index++] = new Brush(\n \t\t\t\tx * 1,\n \t\t\t\ty * unit,\n \t\t\t\tunit,\n \t\t\t\tunit,\n \t\t\t\trandom(1, 0.25),\n \t\t\t\t21 * unit / random(0.5, 2)\n \t\t\t);\n \t\t}\n \t}\n \tmakeFilter();\n \tbackground(random(colors1));\n }\n\n function draw() {\n \trandomSeed(seed);\n \tfor (let i = 0; i < count; i++) {\n \t\tCubes[i].update();\n \t\tCubes[i].draw();\n \t}\n \timage(overAllTexture, 0, 0);\n }\n\n class Brush {\n \tconstructor(xOff, yOff, x, y, speed, unit) {\n \t\tthis.xOff = xOff * 2;\n \t\tthis.yOff = yOff * 2;\n \t\tthis.x = x;\n \t\tthis.y = y;\n \t\tthis.speed = speed * 1;\n \t\tthis.unit = unit;\n \t\tthis.xDir = 1;\n \t\tthis.yDir = 1;\n \t}\n\n \tupdate() {\n \t\tthis.x = this.x + this.speed * this.xDir * random(1, 2);\n \t\tif (this.x >= this.unit || this.x <= 0) {\n \t\t\tthis.xDir *= -1;\n \t\t\tthis.x = this.x + 1 * this.xDir;\n \t\t\tthis.y = this.y + 1 * this.yDir;\n \t\t}\n \t\tif (this.y >= this.unit || this.y <= 0) {\n \t\t\tthis.yDir *= -1;\n \t\t\tthis.y = this.y + 1 * this.yDir;\n \t\t}\n \t}\n\n \tdraw() {\n \t\tnoFill();\n \t\tstroke(str(random(colorselet)) + \"33\");\n \t\tstrokeWeight(random(2.5, 5) / 2);\n \t\t// if (int(this.x) % 5 == 0) {\n \t\t// \tnoStroke();\n \t\t// \tfill(str(random(colorselet)) + \"33\");\n \t\t// }\n \t\tdrawingContext.shadowColor = str(random([colors0, colors1])) + \"80\";\n \t\tdrawingContext.shadowOffsetX = 1;\n \t\tdrawingContext.shadowOffsetY = 1;\n \t\tdrawingContext.shadowBlur = 0;\n \t\tlet y_size = 1 * random(height / 4, height / 2) * noise(sin(this.x), cos(this.y), frameCount * 0.001);\n \t\tpush();\n \t\ttranslate(random(-width * 0.2, width * 1.2), 0);\n \t\tarc(this.x + this.xOff, this.y + this.yOff, this.xOff / random(8, 2), y_size / 0.5, -PI / random(2, 12), 0);\n \t\tpop();\n \t}\n }\n\n function makeFilter() {\n \trandomSeed(seed);\n \t// noiseのフィルターをつくる\n \tcolorMode(HSB, 360, 100, 100, 100);\n \tdrawingContext.shadowColor = color(0, 0, 5, 5);\n \toverAllTexture = createGraphics(width, height);\n \toverAllTexture.loadPixels();\n \tfor (var i = 0; i < width; i += 4) { // noprotect\n \t\tfor (var j = 0; j < height; j += 4) { // noprotect\n \t\t\toverAllTexture.set(\n \t\t\t\ti,\n \t\t\t\tj,\n \t\t\t\tcolor(0, 10, 70, noise(i / 3, j / 3, (i * j) / 50) * random(10, 25))\n \t\t\t);\n \t\t}\n \t}\n \toverAllTexture.updatePixels();\n }\n\n// === Tab: save ===\nfunction keyTyped() {\n\tif (key === \"s\" || key === \"S\") {\n\t\tsaveCanvas(\"0708_untitled_2023\", \"png\");\n\t}\n}\n\n",
+    "frequency": 10,
+    "storyboard_weight": 5,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Samuel YAN",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "unstable_blackscreen"
+    ],
+    "url": "https://openprocessing.org/sketch/1968795",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:36:13",
+    "expressive_profile": {
+        "module_id": "untitled_230708.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                15.0,
+                45.0
+            ],
+            "mean_lightness": 0.006,
+            "mean_chroma": 0.042,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.32,
+            "curl_vorticity": 0.027,
+            "divergence": -0.001,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-26 11:11:49"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Depth Regulation.mp4"
+    ],
+    "used_count": 1
+}

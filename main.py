@@ -26,7 +26,10 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineSettings
 from PyQt6.QtWebChannel import QWebChannel
 from PyQt6.QtCore import Qt, QSize, QRect, QTimer, QEventLoop, QUrl, QThread, pyqtSignal, QObject, pyqtSlot
-from PyQt6.QtGui import QColor, QFont, QTextCursor, QPixmap, QImage, QPainter, QPen, QFontMetrics, QPalette
+from PyQt6.QtGui import (
+    QColor, QFont, QTextCursor, QPixmap, QImage, QPainter, QPen,
+    QFontMetrics, QPalette, QBrush, QLinearGradient, QDesktopServices
+)
 from PIL import Image
 
 from llm_director import LLMDirectorAgent
@@ -35,7 +38,11 @@ from pixel_generator_tab import PixelModuleGeneratorTab
 from shorts_exporter_tab import ShortsExporterTab
 from surreal_collage_tab import SurrealCollageTab
 from youtube_uploader_tab import YouTubeUploaderTab
+from youtube_video_optimizer_tab import YouTubeVideoOptimizerTab
+from ambient_drone_studio_tab import AmbientDroneStudioTab
+from custom_visuals_library_tab import CustomVisualsLibraryTab
 from batch_history_manager import BatchHistoryManager
+from timeline_widget import MultiTrackTimelineWidget
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -73,6 +80,95 @@ class AIStatusWorker(QThread):
 
 
 # ----------------------------------------------------
+# 🎨 AI 導演調色盤視覺條 (AI Color Palette Swatch Bar)
+# ----------------------------------------------------
+class ColorPaletteBarWidget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedHeight(24)
+        self.colors = []
+        self.color_labels = []
+
+    def set_palette_text(self, text: str):
+        self.colors = []
+        self.color_labels = []
+        if not text:
+            self.update()
+            return
+        
+        # 支援多種箭頭與分隔符號：->, ➔, →, ⇒, >, 逗號, 分號
+        parts = [p.strip() for p in re.split(r"->|➔|→|⇒|>|[,;，；]", text) if p.strip()]
+        for p in parts:
+            degree_match = re.search(r"(\d+)\s*°?", p)
+            name_clean = re.sub(r"[\(\)0-9°\s]", "", p).strip() or p
+            if degree_match:
+                deg = int(degree_match.group(1)) % 360
+                c = QColor.fromHslF(deg / 360.0, 0.85, 0.50)
+            else:
+                if any(w in p for w in ["藍", "青", "Cyan", "Blue"]):
+                    c = QColor("#38bdf8")
+                elif any(w in p for w in ["綠", "玉", "Green"]):
+                    c = QColor("#34d399")
+                elif any(w in p for w in ["紫", "幽", "Purple", "Violet"]):
+                    c = QColor("#a855f7")
+                elif any(w in p for w in ["金", "黃", "晨曦", "Amber", "Gold", "琥珀", "日光"]):
+                    c = QColor("#fbbf24")
+                elif any(w in p for w in ["紅", "赤", "Red", "Crimson", "洋紅"]):
+                    c = QColor("#f43f5e")
+                elif any(w in p for w in ["白", "光", "White"]):
+                    c = QColor("#e0f2fe")
+                else:
+                    c = QColor("#818cf8")
+            self.colors.append(c)
+            self.color_labels.append(name_clean[:6])
+            
+        self.update()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        try:
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+            w = self.width()
+            h = self.height()
+            
+            if not self.colors:
+                pen = QPen(QColor("#27272a"), 1, Qt.PenStyle.DashLine)
+                painter.setPen(pen)
+                painter.drawRoundedRect(0, 0, w - 1, h - 1, 4, 4)
+                return
+                
+            n = len(self.colors)
+            pad = 6
+            avail_w = w - pad * (n + 1)
+            chip_w = max(55, avail_w // n)
+            
+            font = QFont("Helvetica", 9, QFont.Weight.Bold)
+            painter.setFont(font)
+            
+            cur_x = pad
+            for idx, (col, lbl) in enumerate(zip(self.colors, self.color_labels)):
+                rw = min(chip_w, w - cur_x - pad)
+                if rw <= 12:
+                    break
+                rect = QRect(cur_x, 2, rw, h - 4)
+                
+                grad = QLinearGradient(float(rect.left()), float(rect.top()), float(rect.right()), float(rect.bottom()))
+                grad.setColorAt(0.0, col.lighter(115))
+                grad.setColorAt(1.0, col.darker(115))
+                painter.setBrush(QBrush(grad))
+                painter.setPen(QPen(col.lighter(135), 1))
+                painter.drawRoundedRect(rect, 4, 4)
+                
+                text_col = QColor("#09090b") if col.lightness() > 140 else QColor("#ffffff")
+                painter.setPen(text_col)
+                painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, lbl)
+                
+                cur_x += rw + pad
+        finally:
+            painter.end()
+
+
+# ----------------------------------------------------
 # 🎬 AI 導演通告單可視化組件 (Director Call Sheet Panel)
 # ----------------------------------------------------
 class AIDirectorCallSheetWidget(QFrame):
@@ -80,35 +176,69 @@ class AIDirectorCallSheetWidget(QFrame):
         super().__init__(parent)
         self.setStyleSheet("""
             AIDirectorCallSheetWidget {
-                background-color: #121216;
-                border: 1px solid #3b0764;
+                background-color: #101014;
+                border: 1px solid #4f46e5;
                 border-radius: 8px;
             }
         """)
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setContentsMargins(10, 8, 10, 8)
         layout.setSpacing(6)
 
-        # 頂部標題與狀態
+        # 頂部標題與狀態 (左右兩欄自適應)
         header = QHBoxLayout()
-        self.lbl_title = QLabel("🎬 AI 導演劇本：尚未排片 (點擊下方「AI 導演智能排片」生成)", self)
+        self.lbl_title = QLabel("🎬 AI 導演分鏡面板：尚未排片 (點擊下方「AI 導演智能排片」生成)", self)
         self.lbl_title.setStyleSheet("font-weight: bold; color: #c084fc; font-size: 13px;")
+        header.addWidget(self.lbl_title, stretch=1)
+        
         self.lbl_palette = QLabel("", self)
         self.lbl_palette.setStyleSheet("color: #38bdf8; font-size: 11px; font-weight: bold;")
-        header.addWidget(self.lbl_title)
-        header.addStretch()
-        header.addWidget(self.lbl_palette)
+        self.lbl_palette.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        header.addWidget(self.lbl_palette, stretch=1)
         layout.addLayout(header)
 
+        # 色彩調色盤條 (未排片時隱藏以節省垂直空間)
+        self.palette_bar = ColorPaletteBarWidget(self)
+        self.palette_bar.setVisible(False)
+        layout.addWidget(self.palette_bar)
+
         # 導演構思理念
-        self.lbl_statement = QLabel("", self)
+        self.lbl_statement = QLabel("💡 點擊「✨ 【AI 導演智能排片】」或「🪄 智能剪輯配對」，AI 導演將自動輸出分鏡主題、色彩氛圍與多軌時間軸！", self)
         self.lbl_statement.setWordWrap(True)
-        self.lbl_statement.setStyleSheet("color: #a1a1aa; font-style: italic; font-size: 11px;")
+        self.lbl_statement.setStyleSheet("color: #71717a; font-style: italic; font-size: 11px;")
         layout.addWidget(self.lbl_statement)
 
-        # 分鏡時間軸清單
+        # 專業多軌音視時間軸 (三軌完整高度 125px：波形 40px + 樂段 35px + 模組 35px + 內邊距 15px)
+        self.timeline = MultiTrackTimelineWidget(self)
+        self.timeline.setFixedHeight(125)
+        self.timeline.setVisible(False)
+        layout.addWidget(self.timeline)
+
+        # 折疊式詳細清單控制列
+        toggle_box = QHBoxLayout()
+        self.btn_toggle_shots = QPushButton("📑 展開詳細分鏡文字清單 (0 幕) ▾", self)
+        self.btn_toggle_shots.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                border: none;
+                color: #818cf8;
+                font-size: 11px;
+                text-align: left;
+                padding: 2px;
+            }
+            QPushButton:hover {
+                color: #a5b4fc;
+            }
+        """)
+        self.btn_toggle_shots.clicked.connect(self._toggle_shots_list)
+        toggle_box.addWidget(self.btn_toggle_shots)
+        toggle_box.addStretch()
+        layout.addLayout(toggle_box)
+
+        # 分鏡時間軸清單 (預設收起以保持介面緊湊)
         self.shots_list = QListWidget(self)
-        self.shots_list.setFixedHeight(120)
+        self.shots_list.setFixedHeight(110)
+        self.shots_list.setVisible(False)
         self.shots_list.setStyleSheet("""
             QListWidget {
                 background-color: #09090b;
@@ -121,33 +251,248 @@ class AIDirectorCallSheetWidget(QFrame):
         """)
         layout.addWidget(self.shots_list)
 
+    def _toggle_shots_list(self):
+        is_vis = not self.shots_list.isVisible()
+        self.shots_list.setVisible(is_vis)
+        cnt = self.shots_list.count()
+        self.btn_toggle_shots.setText(f"📑 {'收起' if is_vis else '展開'}詳細分鏡文字清單 (共 {cnt} 幕) {'▴' if is_vis else '▾'}")
+
     def update_call_sheet(self, script_data: dict, storyboard: list):
         """更新 AI 導演的排片內容到介面上"""
+        genre_cluster = script_data.get("genre_cluster", "")
         theme = script_data.get("theme_title", "未命名主題")
         palette = script_data.get("color_palette_mood", "")
         statement = script_data.get("director_statement", "")
+        manifesto = script_data.get("manifesto", "")
+        motif_str = script_data.get("symbolic_motif", "")
         
-        self.lbl_title.setText(f"🎬 AI 導演美學世界觀：{theme}")
-        self.lbl_palette.setText(f"🎨 色彩氛圍：{palette}" if palette else "")
-        self.lbl_statement.setText(f"💡 導演理念：\"{statement}\"" if statement else "")
+        cluster_prefix = f"【{genre_cluster}】" if genre_cluster else ""
+        self.lbl_title.setText(f"🎬 AI 導演美學世界觀：{cluster_prefix}{theme}")
+        self.lbl_palette.setText(f"🎨 色彩調度：{palette}" if palette else "")
+        self.palette_bar.set_palette_text(palette)
+        self.palette_bar.setVisible(bool(palette))
+        
+        display_statement = statement
+        if not display_statement and manifesto:
+            display_statement = f"「{manifesto}」\n母題：{motif_str}"
+        self.lbl_statement.setText(f"💡 導演理念：\n{display_statement}" if display_statement else "")
+        self.timeline.setVisible(True)
         
         self.shots_list.clear()
         shots = script_data.get("shot_list", [])
         
+        timeline_storyboard = []
+        max_t = 0.0
         for idx, shot in enumerate(shots):
-            sec_time_str = ""
-            if idx < len(storyboard):
-                s = storyboard[idx]
-                sec_time_str = f"[{s.get('start', 0):.1f}s - {s.get('end', 0):.1f}s] "
-                
-            sec_name = shot.get("section_name", f"Shot {idx+1}")
-            mod_id = shot.get("assigned_module_id", "Unknown")
+            s_data = storyboard[idx] if idx < len(storyboard) else {}
+            st = s_data.get('start', float(idx * 15))
+            et = s_data.get('end', st + 15.0)
+            max_t = max(max_t, et)
+            sec_name = shot.get("section_name", s_data.get('section', f"Shot {idx+1}"))
+            mod_id = shot.get("assigned_module_id", s_data.get('module_name', "Unknown"))
             framing = shot.get("framing_mode", "fill")
             fx_val = int(shot.get("target_fx_intensity", 0.5) * 100)
             trans = shot.get("transition_style", "luma_wipe")
             
+            timeline_storyboard.append({
+                'start': st,
+                'end': et,
+                'section': sec_name,
+                'assigned_visual': {'name': mod_id},
+                'framing': framing,
+                'transition': trans
+            })
+            
+            sec_time_str = f"[{st:.1f}s - {et:.1f}s] "
             item_text = f"🎞️ {sec_time_str}{sec_name} ➔ 模組: {mod_id}  |  構圖: {framing.upper()}  |  轉場: {trans}  |  後製動態: {fx_val}%"
             self.shots_list.addItem(item_text)
+
+        cnt = len(shots)
+        is_vis = self.shots_list.isVisible()
+        self.btn_toggle_shots.setText(f"📑 {'收起' if is_vis else '展開'}詳細分鏡文字清單 (共 {cnt} 幕) {'▴' if is_vis else '▾'}")
+        
+        if timeline_storyboard:
+            self.timeline.set_audio_data(max(1.0, max_t))
+            self.timeline.set_storyboard(timeline_storyboard)
+
+
+# ----------------------------------------------------
+# ⚙️ 48 軌全域後製特效矩陣管理面板 (FX Matrix Dialog)
+# ----------------------------------------------------
+class FXMatrixDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("⚙️ 68 軌全域後製特效矩陣調度中心 (SOTA FX Matrix Engine)")
+        self.setMinimumSize(780, 520)
+        self.setStyleSheet("""
+            QDialog {
+                background-color: #0d0d11;
+                color: #f4f4f5;
+            }
+            QTabWidget::pane {
+                border: 1px solid #27272a;
+                background-color: #121216;
+                border-radius: 6px;
+            }
+            QTabBar::tab {
+                background: #18181b;
+                color: #a1a1aa;
+                padding: 8px 14px;
+                font-weight: bold;
+                border: 1px solid #27272a;
+                border-bottom: none;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+                margin-right: 2px;
+            }
+            QTabBar::tab:selected {
+                background: #27272a;
+                color: #38bdf8;
+                border-color: #38bdf8;
+            }
+            QCheckBox {
+                color: #e4e4e7;
+                font-size: 12px;
+                padding: 4px;
+            }
+            QCheckBox:hover {
+                color: #38bdf8;
+            }
+            QCheckBox::indicator {
+                width: 16px;
+                height: 16px;
+            }
+            QPushButton {
+                border-radius: 6px;
+                padding: 6px 12px;
+                font-size: 12px;
+                font-weight: bold;
+            }
+        """)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(10)
+
+        # 頂部快捷動作按鈕列
+        top_bar = QHBoxLayout()
+        lbl_hint = QLabel("💡 點擊勾選單一特效或套用預設濾鏡矩陣：", self)
+        lbl_hint.setStyleSheet("color: #a1a1aa; font-size: 12px;")
+        top_bar.addWidget(lbl_hint)
+        top_bar.addStretch()
+
+        btn_select_all = QPushButton("✨ 全部啟用", self)
+        btn_select_all.setStyleSheet("background-color: #1e1b4b; color: #a5b4fc; border: 1px solid #4338ca;")
+        btn_select_all.clicked.connect(self.select_all)
+        top_bar.addWidget(btn_select_all)
+
+        btn_deselect_all = QPushButton("🚫 全部停用", self)
+        btn_deselect_all.setStyleSheet("background-color: #27272a; color: #d4d4d8; border: 1px solid #3f3f46;")
+        btn_deselect_all.clicked.connect(self.deselect_all)
+        top_bar.addWidget(btn_deselect_all)
+
+        btn_random = QPushButton("🎲 隨機精選 (10種)", self)
+        btn_random.setStyleSheet("background-color: #701a75; color: #f472b6; border: 1px solid #a21caf;")
+        btn_random.clicked.connect(self.select_random)
+        top_bar.addWidget(btn_random)
+
+        layout.addLayout(top_bar)
+
+        # 分頁管理
+        self.tabs = QTabWidget(self)
+        layout.addWidget(self.tabs)
+
+        self.tab_basic = QWidget()
+        self.layout_basic = QGridLayout(self.tab_basic)
+        self.layout_basic.setSpacing(10)
+        self.tabs.addTab(self.tab_basic, "🎨 基礎光學幾何 (10)")
+
+        self.tab_physics = QWidget()
+        self.layout_physics = QGridLayout(self.tab_physics)
+        self.layout_physics.setSpacing(10)
+        self.tabs.addTab(self.tab_physics, "⚡ 動態時空物理 (9)")
+
+        self.tab_vj = QWidget()
+        self.layout_vj = QGridLayout(self.tab_vj)
+        self.layout_vj.setSpacing(10)
+        self.tabs.addTab(self.tab_vj, "🎞️ VJ擴充與膠片 (16)")
+
+        self.tab_flagship = QWidget()
+        self.layout_flagship = QGridLayout(self.tab_flagship)
+        self.layout_flagship.setSpacing(10)
+        self.tabs.addTab(self.tab_flagship, "🌌 前沿次世代旗艦 (18)")
+
+        # 底部確定按鈕
+        bottom_bar = QHBoxLayout()
+        self.lbl_count_status = QLabel("已啟用: 0 / 48", self)
+        self.lbl_count_status.setStyleSheet("color: #38bdf8; font-weight: bold;")
+        bottom_bar.addWidget(self.lbl_count_status)
+        bottom_bar.addStretch()
+
+        btn_apply = QPushButton("💾 確定並套用", self)
+        btn_apply.setStyleSheet("background-color: #059669; color: white; padding: 8px 24px;")
+        btn_apply.clicked.connect(self.accept)
+        bottom_bar.addWidget(btn_apply)
+
+        layout.addLayout(bottom_bar)
+        self._all_checkboxes = []
+
+    def register_checkboxes(self, basic_cbs, physics_cbs, vj_cbs, flagship_cbs):
+        """將 main.py 中建立的 checkbox 放置進相應分頁"""
+        self._all_checkboxes = []
+        for idx, cb in enumerate(basic_cbs):
+            r, c = divmod(idx, 2)
+            self.layout_basic.addWidget(cb, r, c)
+            self._all_checkboxes.append(cb)
+            cb.toggled.connect(self.update_count)
+
+        for idx, cb in enumerate(physics_cbs):
+            r, c = divmod(idx, 2)
+            self.layout_physics.addWidget(cb, r, c)
+            self._all_checkboxes.append(cb)
+            cb.toggled.connect(self.update_count)
+
+        for idx, cb in enumerate(vj_cbs):
+            r, c = divmod(idx, 2)
+            self.layout_vj.addWidget(cb, r, c)
+            self._all_checkboxes.append(cb)
+            cb.toggled.connect(self.update_count)
+
+        for idx, cb in enumerate(flagship_cbs):
+            r, c = divmod(idx, 2)
+            self.layout_flagship.addWidget(cb, r, c)
+            self._all_checkboxes.append(cb)
+            cb.toggled.connect(self.update_count)
+
+        self.update_count()
+
+    def update_count(self):
+        enabled = sum(1 for cb in self._all_checkboxes if cb.isChecked())
+        total = len(self._all_checkboxes)
+        self.lbl_count_status.setText(f"已啟用: {enabled} / {total} 種特效")
+
+    def get_enabled_count(self):
+        return sum(1 for cb in self._all_checkboxes if cb.isChecked()), len(self._all_checkboxes)
+
+    def select_all(self):
+        for cb in self._all_checkboxes:
+            cb.setChecked(True)
+        self.update_count()
+
+    def deselect_all(self):
+        for cb in self._all_checkboxes:
+            cb.setChecked(False)
+        self.update_count()
+
+    def select_random(self, k=10):
+        import random
+        for cb in self._all_checkboxes:
+            cb.setChecked(False)
+        picks = random.sample(self._all_checkboxes, min(k, len(self._all_checkboxes)))
+        for cb in picks:
+            cb.setChecked(True)
+        self.update_count()
+
 
 class AIDirectorOrchestrationThread(QThread):
     script_ready = pyqtSignal(dict, dict) # script_data, analysis_data
@@ -166,6 +511,33 @@ class AIDirectorOrchestrationThread(QThread):
             from audio_analyzer import AudioBeatDetector
             detector = AudioBeatDetector()
             analysis = detector.analyze(self.audio_path, self.genre)
+
+            # 若為 Ambient 或 Hard Techno 曲風，強制啟動專屬美學門禁隔離
+            resolved_genre = str(analysis.get("genre") or self.genre).lower()
+            audio_path_lower = str(self.audio_path).lower()
+            if "ambient" in resolved_genre or "drone" in resolved_genre:
+                from ambient_module_compatibility_gate import AmbientModuleCompatibilityGate
+                gate = AmbientModuleCompatibilityGate.get_instance()
+                ambient_approved = []
+                for m in self.available_modules:
+                    mod_k = m.get("_filename_key") or m.get("name")
+                    tier = gate.get_module_tier(mod_k, m)
+                    if tier in ("GREEN", "YELLOW"):
+                        m_copy = dict(m)
+                        m_copy["ambient_tier"] = tier
+                        if tier == "YELLOW":
+                            m_copy["speed_multiplier"] = 0.05
+                        ambient_approved.append(m_copy)
+                if ambient_approved:
+                    self.log_signal.emit(f"🫁 [AI 導演門禁] 已強制鎖定 {len(ambient_approved)} 個 Ambient 認證模組，杜絕高頻干擾！", False)
+                    self.available_modules = ambient_approved
+            elif any(ht in resolved_genre or ht in audio_path_lower for ht in ("hard techno", "hard_techno", "schranz", "industrial techno")):
+                from hard_techno_compatibility_gate import HardTechnoModuleCompatibilityGate
+                ht_gate = HardTechnoModuleCompatibilityGate.get_instance()
+                ht_approved = ht_gate.filter_modules_for_hard_techno(self.available_modules)
+                if ht_approved:
+                    self.log_signal.emit(f"⚡ [Hard Techno 門禁] 已啟動！嚴格隔離花草/軟性模組，精選 {len(ht_approved)} 個硬核工業幾何模組！", False)
+                    self.available_modules = ht_approved
 
             self.log_signal.emit("🧠 正在喚醒本地 AI 導演大腦 (Llama3/DeepSeek) 撰寫全曲分鏡劇本...", False)
             from llm_director import LLMDirectorAgent
@@ -705,21 +1077,42 @@ if (typeof window !== 'undefined') {
   }
   if (typeof window.pmouseX === 'undefined') {
     Object.defineProperty(window, 'pmouseX', {
-      get: function() { return (typeof window.simulatedMouseX !== 'undefined') ? window.simulatedMouseX : 250; },
+      get: function() {
+        if (typeof window.simulatedPMouseX !== 'undefined') return window.simulatedPMouseX;
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.activeInstances && p5.activeInstances[0]) || p5.instance);
+        return (inst && typeof inst.pmouseX === 'number') ? inst.pmouseX : ((typeof window.simulatedMouseX !== 'undefined') ? window.simulatedMouseX - 10 : 240);
+      },
+      set: function(v) { window.simulatedPMouseX = v; },
       configurable: true,
       enumerable: true
     });
   }
   if (typeof window.pmouseY === 'undefined') {
     Object.defineProperty(window, 'pmouseY', {
-      get: function() { return (typeof window.simulatedMouseY !== 'undefined') ? window.simulatedMouseY : 250; },
+      get: function() {
+        if (typeof window.simulatedPMouseY !== 'undefined') return window.simulatedPMouseY;
+        var inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.activeInstances && p5.activeInstances[0]) || p5.instance);
+        return (inst && typeof inst.pmouseY === 'number') ? inst.pmouseY : ((typeof window.simulatedMouseY !== 'undefined') ? window.simulatedMouseY - 10 : 240);
+      },
+      set: function(v) { window.simulatedPMouseY = v; },
       configurable: true,
       enumerable: true
     });
   }
   if (typeof window.mouseIsPressed === 'undefined') {
     Object.defineProperty(window, 'mouseIsPressed', {
-      get: function() { return false; },
+      get: function() {
+        return !!(window.isBeat || (typeof window.is_silent !== 'undefined' ? !window.is_silent : false));
+      },
+      set: function(v) { window.isBeat = !!v; },
+      configurable: true,
+      enumerable: true
+    });
+  }
+  if (typeof window.mouseButton === 'undefined') {
+    Object.defineProperty(window, 'mouseButton', {
+      get: function() { return window.currentMouseButton || 'left'; },
+      set: function(v) { window.currentMouseButton = v; },
       configurable: true,
       enumerable: true
     });
@@ -1621,25 +2014,30 @@ if (typeof p5 !== 'undefined') {
     p5.prototype.textFont = function(font, size) {
       if (arguments.length > 0) {
         if (!font) {
-          console.warn("[P5_COMPAT] textFont received undefined/null font, skipping to prevent crash");
-          return this;
+          console.warn("[P5_COMPAT] textFont received undefined/null font, falling back to default sans-serif font");
+          try {
+            if (this && this._renderer) { this._renderer._applyTextProperties = this._renderer._applyTextProperties || function(){}; }
+            return originalTextFont.call(this, 'sans-serif', size);
+          } catch(e) {
+            return this;
+          }
         }
         if (typeof font === 'object') {
           if (font.hasOwnProperty('font') && !font.font) {
-            console.warn("[P5_COMPAT] textFont: p5.Font.font is not loaded yet, skipping");
-            return this;
+            console.warn("[P5_COMPAT] textFont: p5.Font.font is not loaded yet, falling back to sans-serif");
+            try { return originalTextFont.call(this, 'sans-serif', size); } catch(e) { return this; }
           }
           if (font.font && !font.font.data && !font.font.tables) {
-            console.warn("[P5_COMPAT] textFont: opentype font data is missing, skipping");
-            return this;
+            console.warn("[P5_COMPAT] textFont: opentype font data is missing, falling back to sans-serif");
+            try { return originalTextFont.call(this, 'sans-serif', size); } catch(e) { return this; }
           }
         }
       }
       try {
         return originalTextFont.apply(this, arguments);
       } catch (e) {
-        console.warn("[P5_COMPAT] Ignored textFont error:", e);
-        return this;
+        console.warn("[P5_COMPAT] Ignored textFont error, applying fallback sans-serif:", e);
+        try { return originalTextFont.call(this, 'sans-serif', size); } catch(err) { return this; }
       }
     };
   }
@@ -2453,16 +2851,436 @@ if (typeof p5 !== 'undefined') {
       enumerable: true
     });
   } catch(e) {}
+
+  // 19. p5.js v2.0 生命週期預載適配：在 presetup 階段自動執行 window.preload()
+  // p5.js v2.0 移除了原生 preload() 支援，透過 registerAddon 註冊 presetup 鉤子使所有使用 preload() 的模組與著色器正常載入
+  if (typeof p5 !== 'undefined' && typeof p5.registerAddon === 'function') {
+    p5.registerAddon(function(p5Class, proto, hookObj) {
+      hookObj.presetup = async function() {
+        if (typeof window.preload === 'function') {
+          try {
+            await window.preload();
+          } catch(e) {
+            console.warn('[P5_COMPAT] window.preload() execution error:', e);
+          }
+        }
+      };
+    });
+  }
+
+  // 20. WebGL Shader Null-Object 安全防護護欄（防止未編譯完成或無效的 Shader 引發崩潰，並相容 p5.js v1 與 v2）
+  if (typeof p5 !== 'undefined' && p5.prototype && p5.prototype.shader) {
+    const _origShader = p5.prototype.shader;
+    let _shaderGuardWarnCount = 0;
+    p5.prototype.shader = function(s) {
+      // 判斷 s 是否為有效且就緒的 Shader 物件（排除 null/undefined/mockShader）：
+      // 1. 在 p5.js v2 中具有 ensureCompiledOnContext 函式
+      // 2. 在 p5.js v1 中具有 bindShader 或 init 函式，或為 p5.Shader 實例
+      var isRealShader = s && !s._isMockShader && (
+        typeof s.ensureCompiledOnContext === 'function' ||
+        typeof s.bindShader === 'function' ||
+        typeof s.init === 'function' ||
+        (typeof p5.Shader === 'function' && s instanceof p5.Shader)
+      );
+
+      if (!isRealShader) {
+        if (_shaderGuardWarnCount < 2) {
+          console.warn('[ShaderGuard] Attempted to call shader() with unready or invalid shader object, skipping to prevent crash. (Warning throttled)');
+          _shaderGuardWarnCount++;
+        }
+        return this;
+      }
+      try {
+        return _origShader.apply(this, arguments);
+      } catch(e) {
+        if (_shaderGuardWarnCount < 2) {
+          console.warn('[ShaderGuard] Error applying shader, skipping:', e);
+          _shaderGuardWarnCount++;
+        }
+        return this;
+      }
+    };
+  }
+
+  // 21. Ambient Color Guard（SAVAP 氛圍曲風運行時色彩攔截與動態調色盤重塑 - 支援 RGB/HSB/HSL 與 Canvas 2D 漸層）
+  (function() {
+    var acg = {
+      enabled: false,
+      maxSaturation: 0.30,
+      maxLightness: 0.85,
+      minLightness: 0.08,
+      palette: null,
+      paletteRgb: null,
+      targetHue: null,
+      mode: 'clamp_and_blend',
+      blendRatio: 0.52
+    };
+    window.__AMBIENT_COLOR_GUARD = acg;
+
+    function isAmbActive() {
+      if (acg.enabled || window.isAmbientMode) return true;
+      if (typeof window.currentGenre === 'string') {
+        var g = window.currentGenre.toLowerCase();
+        return g.indexOf('ambient') !== -1 || g.indexOf('drone') !== -1 || g.indexOf('meditative') !== -1 || g.indexOf('chill') !== -1 || g.indexOf('downtempo') !== -1;
+      }
+      return false;
+    }
+
+    function parseColor(args) {
+      if (!args || args.length === 0) return null;
+      var r = 0, g = 0, b = 0, a = 255;
+      if (args.length === 1) {
+        var v = args[0];
+        if (typeof v === 'number') { r = g = b = v; }
+        else if (typeof v === 'string') {
+          v = v.trim();
+          if (v.startsWith('#')) {
+            var hex = v.slice(1);
+            if (hex.length === 3) hex = hex.split('').map(function(c) { return c + c; }).join('');
+            if (hex.length >= 6) {
+              var n = parseInt(hex.slice(0, 6), 16);
+              r = (n >> 16) & 255; g = (n >> 8) & 255; b = n & 255;
+            }
+          } else if (v.startsWith('rgb')) {
+            var m = v.match(/rgba?\\((\\d+)[,\\s]+(\\d+)[,\\s]+(\\d+)(?:[,\\s\\/]+([\\d.]+))?\\)/);
+            if (m) {
+              r = parseInt(m[1], 10); g = parseInt(m[2], 10); b = parseInt(m[3], 10);
+              if (m[4] !== undefined) a = parseFloat(m[4]) <= 1 ? parseFloat(m[4]) * 255 : parseFloat(m[4]);
+            }
+          }
+        } else if (typeof v === 'object' && v && v.levels) {
+          return { r: v.levels[0], g: v.levels[1], b: v.levels[2], a: v.levels[3] };
+        }
+      } else if (args.length === 2 && typeof args[0] === 'number') {
+        r = g = b = args[0]; a = args[1];
+      } else if (args.length >= 3 && typeof args[0] === 'number') {
+        r = args[0]; g = args[1]; b = args[2];
+        if (args.length >= 4 && typeof args[3] === 'number') a = args[3];
+      }
+      return { r: r, g: g, b: b, a: a };
+    }
+
+    function rgb2hsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      var max = Math.max(r, g, b), min = Math.min(r, g, b);
+      var h = 0, s = 0, l = (max + min) / 2;
+      if (max !== min) {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return { h: h * 360, s: s, l: l };
+    }
+
+    function hsl2rgb(h, s, l) {
+      h = (h % 360 + 360) % 360 / 360;
+      if (s === 0) {
+        var val = Math.round(l * 255);
+        return { r: val, g: val, b: val };
+      }
+      function f(p, q, t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      }
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+      return {
+        r: Math.round(f(p, q, h + 1/3) * 255),
+        g: Math.round(f(p, q, h) * 255),
+        b: Math.round(f(p, q, h - 1/3) * 255)
+      };
+    }
+
+    function transformAmbient(r, g, b, a, isBg) {
+      if (!isAmbActive()) return { r: r, g: g, b: b, a: a };
+      var hsl = rgb2hsl(r, g, b);
+      var targetS = Math.min(hsl.s, isBg ? 0.18 : acg.maxSaturation);
+      var targetL = Math.max(acg.minLightness, Math.min(acg.maxLightness, hsl.l));
+      var targetH = hsl.h;
+      if (acg.paletteRgb && acg.paletteRgb.length > 0) {
+        var palLen = acg.paletteRgb.length;
+        var isShadow = Boolean(isBg || targetL < 0.45);
+        var startIdx = isShadow ? 0 : Math.floor(palLen / 2);
+        var endIdx = isShadow ? Math.max(1, Math.ceil(palLen / 2)) : palLen;
+        var best = acg.paletteRgb[startIdx], minD = 999;
+        for (var i = startIdx; i < endIdx; i++) {
+          var d = Math.abs(acg.paletteRgb[i].l - targetL);
+          if (d < minD) { minD = d; best = acg.paletteRgb[i]; }
+        }
+        var ratio = isBg ? 0.68 : (isShadow ? 0.62 : 0.48);
+        r = Math.round(r * (1 - ratio) + best.r * ratio);
+        g = Math.round(g * (1 - ratio) + best.g * ratio);
+        b = Math.round(b * (1 - ratio) + best.b * ratio);
+        var reHsl = rgb2hsl(r, g, b);
+        var clamped = hsl2rgb(reHsl.h, Math.min(reHsl.s, isBg ? 0.18 : acg.maxSaturation), Math.min(acg.maxLightness, reHsl.l));
+        return { r: clamped.r, g: clamped.g, b: clamped.b, a: a };
+      }
+      if (typeof acg.targetHue === 'number') {
+        targetH = targetH * 0.4 + acg.targetHue * 0.6;
+      }
+      var out = hsl2rgb(targetH, targetS, targetL);
+      return { r: out.r, g: out.g, b: out.b, a: a };
+    }
+
+    if (typeof p5 !== 'undefined' && p5.prototype) {
+      var _origCol = p5.prototype.color;
+      var _origF = p5.prototype.fill;
+      var _origS = p5.prototype.stroke;
+      var _origBg = p5.prototype.background;
+
+      function resolveP5AmbientColor(ctx, args, isBg) {
+        if (_origCol) {
+          try {
+            var p5c = _origCol.apply(ctx, args);
+            if (p5c && Array.isArray(p5c.levels) && p5c.levels.length >= 3) {
+              var t = transformAmbient(p5c.levels[0], p5c.levels[1], p5c.levels[2], p5c.levels[3] !== undefined ? p5c.levels[3] : 255, isBg);
+              p5c.levels[0] = t.r;
+              p5c.levels[1] = t.g;
+              p5c.levels[2] = t.b;
+              if (Array.isArray(p5c._array) && p5c._array.length >= 3) {
+                p5c._array[0] = t.r / 255;
+                p5c._array[1] = t.g / 255;
+                p5c._array[2] = t.b / 255;
+              }
+              return { p5c: p5c, t: t };
+            }
+          } catch (e) {}
+        }
+        var c = parseColor(args);
+        if (c) {
+          var t2 = transformAmbient(c.r, c.g, c.b, c.a, isBg);
+          return { p5c: null, t: t2 };
+        }
+        return null;
+      }
+
+      p5.prototype.fill = function() {
+        if (!isAmbActive()) return _origF.apply(this, arguments);
+        var res = resolveP5AmbientColor(this, arguments, false);
+        if (res) {
+          if (res.p5c) return _origF.call(this, res.p5c);
+          return _origF.call(this, res.t.r, res.t.g, res.t.b, res.t.a);
+        }
+        return _origF.apply(this, arguments);
+      };
+      p5.prototype.stroke = function() {
+        if (!isAmbActive()) return _origS.apply(this, arguments);
+        var res = resolveP5AmbientColor(this, arguments, false);
+        if (res) {
+          if (res.p5c) return _origS.call(this, res.p5c);
+          return _origS.call(this, res.t.r, res.t.g, res.t.b, res.t.a);
+        }
+        return _origS.apply(this, arguments);
+      };
+      p5.prototype.background = function() {
+        if (!isAmbActive()) return _origBg.apply(this, arguments);
+        var res = resolveP5AmbientColor(this, arguments, true);
+        if (res) {
+          if (res.p5c) return _origBg.call(this, res.p5c);
+          return _origBg.call(this, res.t.r, res.t.g, res.t.b, res.t.a);
+        }
+        return _origBg.apply(this, arguments);
+      };
+      p5.prototype.color = function() {
+        if (!isAmbActive()) return _origCol.apply(this, arguments);
+        var res = resolveP5AmbientColor(this, arguments, false);
+        if (res) {
+          if (res.p5c) return res.p5c;
+          return _origCol.call(this, res.t.r, res.t.g, res.t.b, res.t.a);
+        }
+        return _origCol.apply(this, arguments);
+      };
+    }
+
+    if (typeof CanvasRenderingContext2D !== 'undefined' && CanvasRenderingContext2D.prototype) {
+      ['fillStyle', 'strokeStyle', 'shadowColor'].forEach(function(prop) {
+        var desc = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, prop);
+        if (desc && desc.set) {
+          var _origSet = desc.set;
+          Object.defineProperty(CanvasRenderingContext2D.prototype, prop, {
+            set: function(val) {
+              if (isAmbActive() && typeof val === 'string') {
+                var p = parseColor([val]);
+                if (p) {
+                  var t = transformAmbient(p.r, p.g, p.b, p.a, false);
+                  val = 'rgba(' + t.r + ',' + t.g + ',' + t.b + ',' + (t.a / 255).toFixed(3) + ')';
+                }
+              }
+              return _origSet.call(this, val);
+            },
+            get: desc.get,
+            configurable: true
+          });
+        }
+      });
+    }
+
+    if (typeof CanvasGradient !== 'undefined' && CanvasGradient.prototype && CanvasGradient.prototype.addColorStop) {
+      var _origStop = CanvasGradient.prototype.addColorStop;
+      CanvasGradient.prototype.addColorStop = function(offset, colStr) {
+        if (isAmbActive() && typeof colStr === 'string') {
+          var p = parseColor([colStr]);
+          if (p) {
+            var t = transformAmbient(p.r, p.g, p.b, p.a, false);
+            colStr = 'rgba(' + t.r + ',' + t.g + ',' + t.b + ',' + (t.a / 255).toFixed(3) + ')';
+          }
+        }
+        return _origStop.call(this, offset, colStr);
+      };
+    }
+
+    window.setAmbientColorOverride = function(opts) {
+      if (!opts) return;
+      if (typeof opts.enabled === 'boolean') acg.enabled = opts.enabled;
+      if (typeof opts.maxSaturation === 'number') acg.maxSaturation = opts.maxSaturation;
+      if (typeof opts.blendRatio === 'number') acg.blendRatio = opts.blendRatio;
+      if (typeof opts.targetHue === 'number') acg.targetHue = opts.targetHue;
+      if (Array.isArray(opts.palette)) {
+        acg.palette = opts.palette;
+        acg.paletteRgb = opts.palette.map(function(hexStr) {
+          var p = parseColor([hexStr]);
+          if (!p) p = { r: 120, g: 140, b: 160, a: 255 };
+          var hsl = rgb2hsl(p.r, p.g, p.b);
+          return { r: p.r, g: p.g, b: p.b, l: hsl.l, s: hsl.s, h: hsl.h };
+        });
+      }
+    };
+  })();
 })();
 """
 
+# ── Ambient 導演系統專屬莫蘭迪/霧化調色盤與記憶體內模組色彩臨時重映射器 ──
+AMBIENT_DIRECTOR_PALETTES = {
+    "nordic_glacier_mist": ["#121820", "#263442", "#4B6275", "#7C93A6", "#B8C7D4"],
+    "morandi_ash_clay": ["#1C1A19", "#3B3735", "#69625E", "#998F89", "#C4BCB6"],
+    "abyssal_bioluminescence": ["#091318", "#132933", "#234959", "#427385", "#7BA3B0"],
+    "tarkovsky_moss_fog": ["#141A16", "#28362C", "#4A6150", "#768F7C", "#A9BDB0"],
+    "turrell_twilight_ether": ["#161321", "#2B2540", "#4F466E", "#7E749E", "#B2AAC9"],
+    "zen_sand_ink": ["#171717", "#333230", "#5E5B56", "#8F8B84", "#C2BEB6"],
+}
+
+
+def remap_module_colors_for_ambient_in_memory(code: str, ambient_palette: list = None) -> str:
+    """
+    在選擇 Ambient 曲風時，於記憶體內臨時改動個別模組寫死的鮮艷 Hex 色碼 (#RRGGBB / #RGB)，
+    依據原本色碼的明度階梯 (Luminance Hierarchy) 對齊至當前分鏡的莫蘭迪低飽和調色盤，
+    絕不改動硬碟上的原始 custom_visuals/*.json 檔案。
+    """
+    if not code or not isinstance(code, str):
+        return code
+
+    import colorsys
+    palette = ambient_palette or AMBIENT_DIRECTOR_PALETTES["nordic_glacier_mist"]
+
+    def _hex_to_rgb_norm(h_str):
+        h_clean = h_str.lstrip("#")
+        if len(h_clean) == 3:
+            h_clean = "".join(c * 2 for c in h_clean)
+        if len(h_clean) >= 6:
+            r = int(h_clean[0:2], 16) / 255.0
+            g = int(h_clean[2:4], 16) / 255.0
+            b = int(h_clean[4:6], 16) / 255.0
+            return r, g, b
+        return 0.5, 0.5, 0.5
+
+    pal_entries = []
+    for p_hex in palette:
+        try:
+            pr, pg, pb = _hex_to_rgb_norm(p_hex)
+            ph, pl, ps = colorsys.rgb_to_hls(pr, pg, pb)
+            pal_entries.append((pr, pg, pb, ph, pl, ps))
+        except Exception:
+            pass
+    if not pal_entries:
+        return code
+
+    def _replace_hex_match(match):
+        quote = match.group(1)
+        hex_body = match.group(2)
+        try:
+            full_hex = "".join(c * 2 for c in hex_body) if len(hex_body) == 3 else hex_body[:6]
+            alpha_suffix = hex_body[6:] if len(hex_body) > 6 else ""
+            r = int(full_hex[0:2], 16) / 255.0
+            g = int(full_hex[2:4], 16) / 255.0
+            b = int(full_hex[4:6], 16) / 255.0
+            h, l, s = colorsys.rgb_to_hls(r, g, b)
+            # 若該色碼原本即為極低飽和度 (s <= 0.24) 且明度適中，僅與調色盤輕度融合
+            best_pal = min(pal_entries, key=lambda item: abs(item[4] - l))
+            blend_w = 0.62 if s > 0.25 else 0.35
+            nr = r * (1.0 - blend_w) + best_pal[0] * blend_w
+            ng = g * (1.0 - blend_w) + best_pal[1] * blend_w
+            nb = b * (1.0 - blend_w) + best_pal[2] * blend_w
+            nh, nl, ns = colorsys.rgb_to_hls(nr, ng, nb)
+            ns_clamped = min(ns, 0.24)
+            nl_clamped = max(0.07, min(0.84, nl))
+            fr, fg, fb = colorsys.hls_to_rgb(nh, nl_clamped, ns_clamped)
+            new_hex = f"{int(round(fr * 255)):02x}{int(round(fg * 255)):02x}{int(round(fb * 255)):02x}{alpha_suffix}"
+            return f"{quote}#{new_hex}{quote}"
+        except Exception:
+            return match.group(0)
+
+    return re.sub(r'([\'"`])#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\1', _replace_hex_match, code)
+
+
 MOCK_P5_JS = """
-// p5.sound Mock/Stub Compatibility Layer
 if (typeof window !== 'undefined') {
+  if (typeof window.getComputedStyle === 'function') {
+    const _origGetComputedStyle = window.getComputedStyle;
+    window.getComputedStyle = function(el, pseudo) {
+      if (!el || !(el instanceof Element || el instanceof Node)) {
+        return {
+          getPropertyValue: function() { return ""; },
+          display: "none",
+          visibility: "hidden",
+          width: "0px",
+          height: "0px"
+        };
+      }
+      try {
+        return _origGetComputedStyle.call(window, el, pseudo);
+      } catch(e) {
+        return {
+          getPropertyValue: function() { return ""; },
+          display: "none",
+          visibility: "hidden",
+          width: "0px",
+          height: "0px"
+        };
+      }
+    };
+  }
   window.P3D = window.P3D || "webgl";
   window.OPENGL = window.OPENGL || "webgl";
   window.P2D = window.P2D || "p2d";
   window.JAVA2D = window.JAVA2D || "p2d";
+  window.mountControl = window.mountControl || function(p5) {
+    if (p5 && p5.prototype) {
+      p5.prototype.PressLoopToggle = p5.prototype.PressLoopToggle || function(){};
+      p5.prototype.ClickLoopToggle = p5.prototype.ClickLoopToggle || function(){};
+      p5.prototype.ClickToggle = p5.prototype.ClickToggle || function(){};
+      p5.prototype.PressToggle = p5.prototype.PressToggle || function(){};
+      p5.prototype.ClickDo = p5.prototype.ClickDo || function(){};
+      p5.prototype.PressDo = p5.prototype.PressDo || function(){};
+    }
+  };
+  window.mountFlex = window.mountFlex || function(p5) {
+    if (p5 && p5.prototype) {
+      p5.prototype.flex = p5.prototype.flex || function(){};
+      p5.prototype.containerBgColor = p5.prototype.containerBgColor || function(){};
+      p5.prototype.parentBgColor = p5.prototype.parentBgColor || function(){};
+    }
+  };
+  window.mountGrid = window.mountGrid || function(){};
+  window.mountUI = window.mountUI || function(){};
   ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'].forEach(function(k) {
     if (typeof window[k] === 'undefined') window[k] = k.toLowerCase();
   });
@@ -4492,32 +5310,57 @@ if (typeof p5 !== 'undefined') {
 
   // Universal Offline / Real-time Frame Parameters & Audio Feature Injection Bridge
   window.setFrameParams = function(t, isBeat, beatEnergy, audioLow, audioMid, audioHigh, moduleActiveTimeSec) {
-    let activeTime = (typeof moduleActiveTimeSec !== 'undefined' && moduleActiveTimeSec !== null) ? moduleActiveTimeSec : t;
+    let speedMult = (typeof window.speedMultiplier !== 'undefined') ? window.speedMultiplier : (window.isHardTechno ? 2.2 : 1.0);
+    let rawTime = (typeof moduleActiveTimeSec !== 'undefined' && moduleActiveTimeSec !== null) ? moduleActiveTimeSec : t;
+    let activeTime = rawTime * speedMult;
     window.custom_time_ms = activeTime * 1000;
-    window.globalTime = t;
+    window.globalTime = t * speedMult;
     window.moduleActiveTime = activeTime;
     window.time = activeTime;
-    window.sub_bass = audioLow;
-    window.bass_ratio = audioLow;
-    window.audioLow = audioLow;
+    let punchLow = (window.isHardTechno && isBeat) ? Math.min(1.0, audioLow * 1.35 + 0.15) : audioLow;
+    window.sub_bass = punchLow;
+    window.bass_ratio = punchLow;
+    window.audioLow = punchLow;
     window.audioMid = audioMid;
     window.audioHigh = audioHigh;
     window.percussive = beatEnergy;
-    window.energy = (audioLow + audioMid + audioHigh) / 3;
+    window.energy = (punchLow + audioMid + audioHigh) / 3;
     window.beatEnergy = beatEnergy;
     window.isBeat = isBeat;
     
     let w = typeof width !== 'undefined' ? width : 1280;
     let h = typeof height !== 'undefined' ? height : 720;
     
-    if (isBeat) {
-      window.simulatedMouseX = Math.random() * w;
-      window.simulatedMouseY = Math.random() * h;
+    // Autonomic Autonomous Seeding & Interactive Sandbox Awakening:
+    if (typeof window.__auto_seed_count === 'undefined') {
+      window.__auto_seed_count = 0;
+    }
+    let needsSeeding = (window.__auto_seed_count < 35);
+    try {
+      if (typeof particles !== 'undefined' && Array.isArray(particles) && particles.length < 25) needsSeeding = true;
+      if (typeof mass !== 'undefined' && Array.isArray(mass) && mass.length < 25) needsSeeding = true;
+      if (typeof quasarMode !== 'undefined' && !quasarMode) { quasarMode = true; needsSeeding = true; }
+    } catch(e) {}
+
+    let shouldSeedNow = needsSeeding || isBeat || (Math.random() < 0.20);
+    if (shouldSeedNow) {
+      window.__auto_seed_count++;
+      let seedX = Math.random() * w;
+      let seedY = Math.random() * h;
+      window.simulatedMouseX = seedX;
+      window.simulatedMouseY = seedY;
+      if (typeof mouseX !== 'undefined') { window.mouseX = seedX; window.mouseY = seedY; }
+      if (typeof mouseButton !== 'undefined') window.mouseButton = 'left';
       if (typeof mousePressed === 'function') { try { mousePressed(); } catch(e) {} }
       if (typeof mouseClicked === 'function') { try { mouseClicked(); } catch(e) {} }
+      if (typeof mouseDragged === 'function') { try { mouseDragged(); } catch(e) {} }
+      if (typeof addNewParticle === 'function') { try { addNewParticle(); } catch(e) {} }
     } else {
-      window.simulatedMouseX = w / 2 + (audioLow - 0.5) * w * 0.6;
-      window.simulatedMouseY = h / 2 + (audioMid - 0.5) * h * 0.6;
+      let wanderX = w * (0.5 + 0.35 * Math.sin(activeTime * 0.7 + (audioLow || 0)));
+      let wanderY = h * (0.5 + 0.35 * Math.cos(activeTime * 0.5 + (audioMid || 0)));
+      window.simulatedMouseX = wanderX;
+      window.simulatedMouseY = wanderY;
+      if (typeof mouseX !== 'undefined') { window.mouseX = wanderX; window.mouseY = wanderY; }
     }
     
     if (typeof draw === 'function') {
@@ -4732,6 +5575,21 @@ class WebBridge(QObject):
 
     @pyqtSlot(str, str, int)
     def report_js_error(self, message, source, lineno):
+        msg_str = str(message)
+        non_fatal_patterns = [
+            "getcomputedstyle",
+            "cannot use import statement outside a module",
+            "mountgrid is not a function",
+            "mountcontrol is not a function",
+            "has already been declared",
+            "unexpected token ':'"
+        ]
+        is_non_fatal = any(pat in msg_str.lower() for pat in non_fatal_patterns) or (msg_str.strip() == "Script error." and lineno <= 0)
+        if is_non_fatal:
+            logger.warning(f"⚠️ [JS WARNING] 在 {source} 第 {lineno} 行發生非致命警告: {message}")
+            if hasattr(self.app, 'log_to_console'):
+                self.app.log_to_console(f"⚠️ [JS 警告] {message} (來源: {source}, 行: {lineno})", is_err=False)
+            return
         logger.error(f"❌ [JS ERROR] 在 {source} 第 {lineno} 行發生錯誤: {message}")
         if hasattr(self.app, 'log_to_console'):
             self.app.log_to_console(f"❌ [JS 錯誤] {message} (來源: {source}, 行: {lineno})", is_err=True)
@@ -5506,25 +6364,20 @@ class ParameterDialog(QDialog):
 
 
 class VisualModuleCardWidget(QWidget):
-    def __init__(self, name, tags, author, license_mode, date_added, thumbnail_path, frequency, storyboard_weight, post_fx_intensity, used_count, on_delete_callback, on_preview_callback, on_star_callback, parent=None, display_name=None, is_starred=False):
+    def __init__(self, name, tags, author, license_mode, date_added, thumbnail_path, frequency, storyboard_weight, post_fx_intensity, used_count, on_delete_callback, on_preview_callback, on_star_callback, parent=None, display_name=None, is_starred=False, ambient_tier=None):
         super().__init__(parent)
         self.module_name = name
         self._frequency = frequency
         self._storyboard_weight = storyboard_weight
         self._post_fx_intensity = post_fx_intensity
-        self.setFixedSize(175, 190)
+        self.setFixedSize(175, 200)
 
+        self.is_checked = False
         # 整體卡片外觀
-        self.setStyleSheet("""
-            VisualModuleCardWidget {
-                background-color: #18181b;
-                border: 1px solid #27272a;
-                border-radius: 10px;
-            }
-        """)
+        self.update_card_style()
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(5, 5, 5, 6)
+        layout.setContentsMargins(6, 6, 6, 8)
         layout.setSpacing(4)
 
         # 授權判定
@@ -5571,6 +6424,7 @@ class VisualModuleCardWidget(QWidget):
             x = (scaled.width() - 160) // 2
             y = (scaled.height() - 120) // 2
             scaled = scaled.copy(x, y, 160, 120)
+        self.img_label = img_label
         img_label.setPixmap(scaled)
         img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -5598,6 +6452,22 @@ class VisualModuleCardWidget(QWidget):
             on_star_callback(name)
         badge_star.mousePressEvent = on_star_click
 
+        # Overlaid Selection Indicator Badge (勾選右上角提示)
+        self.badge_checked = QLabel("✓", img_label)
+        self.badge_checked.setStyleSheet("""
+            QLabel {
+                background-color: #10b981;
+                color: #ffffff;
+                font-size: 11px;
+                font-weight: bold;
+                border-radius: 4px;
+                border: 1px solid #34d399;
+            }
+        """)
+        self.badge_checked.setGeometry(160 - 24, 6, 18, 18)
+        self.badge_checked.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.badge_checked.setVisible(False)
+
         # Overlaid used count badge
         badge_used = QLabel(f"🎬 {used_count}", img_label)
         badge_used.setStyleSheet("""
@@ -5612,7 +6482,7 @@ class VisualModuleCardWidget(QWidget):
             }
         """)
         badge_width = badge_used.fontMetrics().horizontalAdvance(f"🎬 {used_count}") + 12
-        badge_used.setGeometry(160 - badge_width - 6, 6, badge_width, 16)
+        badge_used.setGeometry(160 - badge_width - 28, 6, badge_width, 18)
         badge_used.mousePressEvent = lambda event: on_preview_callback(name)
         
         # Overlaid origin badge (🧬 原創 vs 📥 收編)
@@ -5639,10 +6509,38 @@ class VisualModuleCardWidget(QWidget):
         badge_origin.setAlignment(Qt.AlignmentFlag.AlignCenter)
         badge_origin.mousePressEvent = lambda event: on_preview_callback(name)
 
+        # Overlaid Ambient badge (🌿 原生 vs 🟡 調製)
+        if ambient_tier in ("GREEN", "YELLOW"):
+            if ambient_tier == "GREEN":
+                amb_text = "🌿 Ambient"
+                amb_bg = "rgba(6, 95, 70, 0.9)"
+                amb_color = "#34d399"
+                amb_border = "#10b981"
+            else:
+                amb_text = "🟡 阻尼調製"
+                amb_bg = "rgba(120, 53, 15, 0.9)"
+                amb_color = "#fde047"
+                amb_border = "#eab308"
+            badge_amb = QLabel(amb_text, img_label)
+            badge_amb.setStyleSheet(f"""
+                QLabel {{
+                    background-color: {amb_bg};
+                    color: {amb_color};
+                    font-size: 9px;
+                    font-weight: bold;
+                    border-radius: 3px;
+                    padding: 1px 3px;
+                    border: 1px solid {amb_border};
+                }}
+            """)
+            amb_w = badge_amb.fontMetrics().horizontalAdvance(amb_text) + 8
+            badge_amb.setGeometry(160 - amb_w - 6, 98, amb_w, 16)
+            badge_amb.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            badge_amb.mousePressEvent = lambda event: on_preview_callback(name)
+
         layout.addWidget(img_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         # ── 2. 名稱 + 勾選框 ──
-        # Constrain checkbox text width using QFontMetrics to prevent breaking grid layout columns
         full_text = display_name if display_name else name
         metrics = QFontMetrics(QFont("Outfit", 12, QFont.Weight.Bold))
         elided_text = metrics.elidedText(full_text, Qt.TextElideMode.ElideRight, 138)
@@ -5652,11 +6550,11 @@ class VisualModuleCardWidget(QWidget):
                 color: #f4f4f5;
                 font-weight: bold;
                 font-size: 12px;
-                spacing: 4px;
+                spacing: 6px;
             }
             QCheckBox::indicator {
-                width: 14px;
-                height: 14px;
+                width: 15px;
+                height: 15px;
                 border: 2px solid #52525b;
                 border-radius: 4px;
                 background-color: #27272a;
@@ -5667,12 +6565,13 @@ class VisualModuleCardWidget(QWidget):
             }
         """)
         self.checkbox.setToolTip(full_text)
+        self.checkbox.stateChanged.connect(self._on_check_state_changed)
         layout.addWidget(self.checkbox)
 
-        # ── 3. 底部資訊列：指示器 + 作者/badge + ⚙ + 🗑️ ──
+        # ── 3. 底部資訊列：指示器 + 作者/badge + ⚙ ──
         bottom_box = QHBoxLayout()
         bottom_box.setContentsMargins(2, 0, 2, 0)
-        bottom_box.setSpacing(3)
+        bottom_box.setSpacing(4)
 
         # 微型三色指示器 (頻率/權重/特效)
         def _dot_color(val):
@@ -5682,7 +6581,7 @@ class VisualModuleCardWidget(QWidget):
             else: return "#6366f1"             # 高 → 紫
 
         dots_widget = QWidget(self)
-        dots_widget.setFixedSize(30, 12)
+        dots_widget.setFixedSize(32, 14)
         dots_layout = QHBoxLayout(dots_widget)
         dots_layout.setContentsMargins(0, 0, 0, 0)
         dots_layout.setSpacing(3)
@@ -5711,7 +6610,7 @@ class VisualModuleCardWidget(QWidget):
             bottom_box.addWidget(badge)
         else:
             author_lbl = QLabel(author[:8] if author else "未知", self)
-            author_lbl.setStyleSheet("color: #52525b; font-size: 9px;")
+            author_lbl.setStyleSheet("color: #71717a; font-size: 9px;")
             author_lbl.setToolTip(f"作者: {author}")
             bottom_box.addWidget(author_lbl)
 
@@ -5719,7 +6618,7 @@ class VisualModuleCardWidget(QWidget):
 
         # ⚙ 參數按鈕
         btn_param = QPushButton("參數", self)
-        btn_param.setFixedSize(36, 20)
+        btn_param.setFixedSize(40, 22)
         btn_param.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_param.setToolTip("調整頻率 / 權重 / 特效參數")
         btn_param.setStyleSheet("""
@@ -5763,23 +6662,6 @@ class VisualModuleCardWidget(QWidget):
         btn_param.clicked.connect(open_param_dialog)
         bottom_box.addWidget(btn_param)
 
-        # 🗑️ 刪除按鈕
-        btn_delete = QPushButton("刪除", self)
-        btn_delete.setFixedSize(36, 20)
-        btn_delete.setCursor(Qt.CursorShape.PointingHandCursor)
-        btn_delete.setToolTip("刪除此模組")
-        btn_delete.setStyleSheet("""
-            QPushButton {
-                background-color: #27272a; color: #f87171; border: 1px solid #3f3f46;
-                border-radius: 4px; font-size: 10px; font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #7f1d1d; color: white; border-color: #991b1b;
-            }
-        """)
-        btn_delete.clicked.connect(lambda: on_delete_callback(name))
-        bottom_box.addWidget(btn_delete)
-
         layout.addLayout(bottom_box)
 
         # Tooltip 詳細
@@ -5789,32 +6671,62 @@ class VisualModuleCardWidget(QWidget):
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         def on_card_click(event):
             child = self.childAt(event.pos())
-            if child not in (self.checkbox, badge_star, btn_param, btn_delete) and not isinstance(child, (QCheckBox, QPushButton)):
+            if child not in (self.checkbox, badge_star, btn_param) and not isinstance(child, (QCheckBox, QPushButton)):
                 on_preview_callback(name)
         self.mousePressEvent = on_card_click
 
-    def enterEvent(self, event):
-        self.setStyleSheet("""
-            VisualModuleCardWidget {
-                background-color: #1e1e23;
-                border: 1px solid #10b981;
+    def _on_check_state_changed(self, state):
+        self.is_checked = (state == 2 or (hasattr(state, "value") and state.value == 2))
+        if hasattr(self, 'badge_checked'):
+            self.badge_checked.setVisible(self.is_checked)
+        self.update_card_style()
+
+    def update_card_style(self, is_hover=False):
+        if getattr(self, "is_checked", False):
+            # 選中時：翡翠綠高亮邊框 + 微光陰影
+            bg = "#192621" if is_hover else "#121f1a"
+            border = "#10b981"
+            border_w = "2px"
+        elif is_hover:
+            bg = "#1e1e23"
+            border = "#38bdf8"
+            border_w = "1px"
+        else:
+            bg = "#18181b"
+            border = "#27272a"
+            border_w = "1px"
+
+        self.setStyleSheet(f"""
+            VisualModuleCardWidget {{
+                background-color: {bg};
+                border: {border_w} solid {border};
                 border-radius: 10px;
-            }
+            }}
         """)
+
+    def enterEvent(self, event):
+        self.update_card_style(is_hover=True)
         super().enterEvent(event)
 
     def leaveEvent(self, event):
-        self.setStyleSheet("""
-            VisualModuleCardWidget {
-                background-color: #18181b;
-                border: 1px solid #27272a;
-                border-radius: 10px;
-            }
-        """)
+        self.update_card_style(is_hover=False)
         super().leaveEvent(event)
 
+    def update_thumbnail(self, thumb_path):
+        if not hasattr(self, 'img_label') or not self.img_label:
+            return
+        if thumb_path and os.path.exists(thumb_path):
+            pixmap = QPixmap(thumb_path)
+            if not pixmap.isNull():
+                scaled = pixmap.scaled(160, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation)
+                if scaled.width() > 160 or scaled.height() > 120:
+                    x = (scaled.width() - 160) // 2
+                    y = (scaled.height() - 120) // 2
+                    scaled = scaled.copy(x, y, 160, 120)
+                self.img_label.setPixmap(scaled)
+
 class VisualModuleItemWidget(QWidget):
-    def __init__(self, name, tags, author, license_mode, date_added, frequency, storyboard_weight, post_fx_intensity, on_delete_callback, on_star_callback, parent=None, display_name=None, is_starred=False, on_preview_callback=None):
+    def __init__(self, name, tags, author, license_mode, date_added, frequency, storyboard_weight, post_fx_intensity, on_delete_callback, on_star_callback, parent=None, display_name=None, is_starred=False, on_preview_callback=None, ambient_tier=None):
         super().__init__(parent)
         self.module_name = name
         self._frequency = frequency
@@ -5851,6 +6763,25 @@ class VisualModuleItemWidget(QWidget):
         self.checkbox.setStyleSheet("color: #f4f4f5; font-weight: bold; font-size: 13px;")
         self.checkbox.setFixedWidth(200)
         layout.addWidget(self.checkbox)
+
+        # 1.5 Ambient 徽章
+        if ambient_tier in ("GREEN", "YELLOW"):
+            badge_amb = QLabel("🌿 Ambient 原生" if ambient_tier == "GREEN" else "🟡 阻尼調製", self)
+            bg_col = "rgba(6, 95, 70, 0.9)" if ambient_tier == "GREEN" else "rgba(120, 53, 15, 0.9)"
+            txt_col = "#34d399" if ambient_tier == "GREEN" else "#fde047"
+            brd_col = "#10b981" if ambient_tier == "GREEN" else "#eab308"
+            badge_amb.setStyleSheet(f"""
+                background-color: {bg_col};
+                color: {txt_col};
+                font-size: 10px;
+                font-weight: bold;
+                border-radius: 3px;
+                padding: 1px 4px;
+                border: 1px solid {brd_col};
+            """)
+            badge_amb.setFixedWidth(90)
+            badge_amb.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            layout.addWidget(badge_amb)
         
         tags_str = ", ".join(tags) if tags else "無"
         author_str = author if author else "未知"
@@ -6001,6 +6932,16 @@ class AspectRatioWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(widget)
 
+        # 60FPS 防抖計時器 (Debounce Timer: 100ms)
+        self._debounce_timer = QTimer(self)
+        self._debounce_timer.setSingleShot(True)
+        self._debounce_timer.setInterval(100)
+        self._debounce_timer.timeout.connect(self._on_debounce_update)
+
+    def _on_debounce_update(self):
+        if hasattr(self.widget, 'update'):
+            self.widget.update()
+
     def resizeEvent(self, event):
         w = event.size().width()
         h = event.size().height()
@@ -6013,6 +6954,7 @@ class AspectRatioWidget(QWidget):
             target_w = int(h * self.ratio)
             margin = (w - target_w) // 2
             self.layout().setContentsMargins(margin, 0, margin, 0)
+        self._debounce_timer.start()
         super().resizeEvent(event)
 
 class StandaloneInjectorApp(QMainWindow):
@@ -6194,6 +7136,9 @@ class StandaloneInjectorApp(QMainWindow):
         self.init_code_editor_tab()
         self.ai_incubator = AIIncubatorTab(self)
         self.left_tabs.insertTab(1, self.ai_incubator, "🚀 AI 視覺資產 AI 孵化器")
+        self.custom_visuals_tab = CustomVisualsLibraryTab(main_window=self, parent=self)
+        self.left_tabs.insertTab(2, self.custom_visuals_tab, "📦 視覺模組資產庫 (custom_visuals)")
+        self.custom_visuals_tab.moduleSelected.connect(self.preview_preset)
         self.init_renderer_tab()
         self.pixel_generator = PixelModuleGeneratorTab(self)
         self.left_tabs.addTab(self.pixel_generator, "👾 像素視覺模組生成器")
@@ -6203,6 +7148,12 @@ class StandaloneInjectorApp(QMainWindow):
         self.left_tabs.addTab(self.surreal_collage, "🌌 超現實拼貼引擎")
         self.youtube_uploader = YouTubeUploaderTab(self)
         self.left_tabs.addTab(self.youtube_uploader, "📤 YouTube 自動發布")
+        self.youtube_optimizer = YouTubeVideoOptimizerTab(self)
+        self.left_tabs.addTab(self.youtube_optimizer, "🎯 YouTube 影片優化與批次維護")
+        self.ambient_studio = AmbientDroneStudioTab(self)
+        self.left_tabs.addTab(self.ambient_studio, "🫁 Ambient 沉浸心流工作台")
+        self.ambient_studio.moduleSelected.connect(self._on_ambient_module_selected)
+        self.ambient_studio.macroParametersChanged.connect(self._on_ambient_macro_changed)
 
         # ----------------------------------------------------
         # Right Panel (Sandbox & Console)
@@ -6232,9 +7183,11 @@ class StandaloneInjectorApp(QMainWindow):
         
         self.placeholder_html = """
         <html>
-        <body style="background-color: #0b0b0e; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden;">
-            <div style="color: #a1a1aa; font-family: 'Outfit', 'Inter', sans-serif; font-size: 14px; text-align: center; border: 1px dashed #27272a; padding: 20px; border-radius: 8px; background-color: #121216; width: 80%;">
-                📺 點擊下方【執行即時預覽測試】以啟動沙盒
+        <body style="background-color: #0b0b0e; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+            <div style="color: #a1a1aa; font-size: 13px; text-align: center; border: 1px dashed #3f3f46; padding: 28px 24px; border-radius: 12px; background: rgba(18, 18, 22, 0.7); max-width: 80%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);">
+                <div style="font-size: 32px; margin-bottom: 12px;">🎨</div>
+                <div style="color: #f4f4f5; font-size: 15px; font-weight: bold; margin-bottom: 6px;">16:9 視覺特效即時沙盒</div>
+                <div style="color: #71717a; font-size: 12px; line-height: 1.5;">點選左側任意視覺模組卡片<br>即可立即在此啟動即時動態聲畫演算法預覽</div>
             </div>
         </body>
         </html>
@@ -6246,21 +7199,24 @@ class StandaloneInjectorApp(QMainWindow):
 
         # 沙盒預覽即時控制按鈕
         sandbox_ctrl_layout = QHBoxLayout()
-        sandbox_ctrl_layout.setContentsMargins(0, 5, 0, 5)
+        sandbox_ctrl_layout.setContentsMargins(0, 6, 0, 6)
+        sandbox_ctrl_layout.setSpacing(8)
         
         self.btn_sandbox_stop = QPushButton("🛑 中斷預覽", right_panel)
         self.btn_sandbox_stop.setStyleSheet("""
             QPushButton {
-                background-color: #7f1d1d;
-                border: 1px solid #991b1b;
-                color: #fecaca;
+                background-color: #27272a;
+                border: 1px solid #7f1d1d;
+                color: #f87171;
                 font-weight: bold;
-                padding: 6px 12px;
-                font-size: 12px;
+                padding: 6px 14px;
+                border-radius: 6px;
+                font-size: 11px;
             }
             QPushButton:hover {
                 background-color: #991b1b;
-                border-color: #b91c1c;
+                color: #ffffff;
+                border-color: #ef4444;
             }
         """)
         self.btn_sandbox_stop.clicked.connect(self.stop_sandbox_preview)
@@ -6272,27 +7228,32 @@ class StandaloneInjectorApp(QMainWindow):
                 border: 1px solid #3f3f46;
                 color: #e4e4e7;
                 font-weight: bold;
-                padding: 6px 12px;
-                font-size: 12px;
+                padding: 6px 14px;
+                border-radius: 6px;
+                font-size: 11px;
             }
             QPushButton:hover {
                 background-color: #3f3f46;
                 border-color: #52525b;
             }
         """)
-        self.btn_open_log = QPushButton("📜 開啟診斷日誌", right_panel)
+        self.btn_sandbox_clear.clicked.connect(lambda: self.web_view.setHtml(self.placeholder_html, get_local_base_url()))
+
+        self.btn_open_log = QPushButton("📜 診斷日誌", right_panel)
         self.btn_open_log.setStyleSheet("""
             QPushButton {
-                background-color: #1e1b4b;
-                border: 1px solid #3730a3;
-                color: #c7d2fe;
+                background-color: #18181b;
+                border: 1px solid #27272a;
+                color: #a1a1aa;
                 font-weight: bold;
-                padding: 6px 12px;
-                font-size: 12px;
+                padding: 6px 14px;
+                border-radius: 6px;
+                font-size: 11px;
             }
             QPushButton:hover {
-                background-color: #312e81;
-                border-color: #4338ca;
+                background-color: #27272a;
+                color: #f4f4f5;
+                border-color: #3f3f46;
             }
         """)
         self.btn_open_log.clicked.connect(self.open_debug_log_file)
@@ -6302,19 +7263,40 @@ class StandaloneInjectorApp(QMainWindow):
         sandbox_ctrl_layout.addWidget(self.btn_open_log)
         right_layout.addLayout(sandbox_ctrl_layout)
 
-        console_title = QLabel("📝 輸出終端 (Console Logs & 錯誤監看):", right_panel)
-        console_title.setStyleSheet("font-weight: bold; font-size: 12px; color: #a1a1aa;")
-        right_layout.addWidget(console_title)
+        # 可折疊輸出終端抽屜控制欄
+        console_bar = QHBoxLayout()
+        self.btn_toggle_console = QPushButton("📜 輸出終端 (Console Logs) [正常監控中] ▾", right_panel)
+        self.btn_toggle_console.setStyleSheet("""
+            QPushButton {
+                background-color: #121216;
+                color: #10b981;
+                border: 1px solid #27272a;
+                border-radius: 6px;
+                padding: 6px 12px;
+                font-size: 11px;
+                font-weight: bold;
+                text-align: left;
+            }
+            QPushButton:hover {
+                background-color: #18181b;
+                border-color: #3f3f46;
+            }
+        """)
+        self.btn_toggle_console.clicked.connect(self._toggle_console_drawer)
+        console_bar.addWidget(self.btn_toggle_console)
+        right_layout.addLayout(console_bar)
 
         self.console_log = QTextEdit(right_panel)
         self.console_log.setReadOnly(True)
         self.console_log.setStyleSheet("background-color: #09090b; color: #10b981; border: 1px solid #27272a; border-radius: 8px;")
-        self.console_log.setFont(QFont("Courier New", 11))
-        right_layout.addWidget(self.console_log, stretch=1)
+        self.console_log.setFont(QFont("Courier New", 10))
+        self.console_log.setMaximumHeight(160)
+        self.console_log.setVisible(False)  # 預設折疊收合，讓 16:9 沙盒擁有最大可視劇院空間
+        right_layout.addWidget(self.console_log)
 
         self.main_splitter.addWidget(right_panel)
-        self.main_splitter.setStretchFactor(0, 45)
-        self.main_splitter.setStretchFactor(1, 55)
+        self.main_splitter.setStretchFactor(0, 38)
+        self.main_splitter.setStretchFactor(1, 62)
 
         # Sandbox beat timer
         self.beat_timer = QTimer(self)
@@ -6616,86 +7598,166 @@ class StandaloneInjectorApp(QMainWindow):
     def init_renderer_tab(self):
         tab = QWidget(self)
         tab.setStyleSheet("background-color: #0b0b0e;")
-        layout = QVBoxLayout(tab)
-        layout.setContentsMargins(10, 10, 10, 10)
+        main_tab_layout = QVBoxLayout(tab)
+        main_tab_layout.setContentsMargins(4, 4, 4, 4)
 
-        title = QLabel("🎬 4K 音畫互動 MV 離線渲染器", tab)
-        title.setStyleSheet("font-size: 14px; font-weight: bold; color: #10b981;")
+        # Tab Scroll Area (確保任何螢幕尺寸下皆能自由滾動檢視所有控件與導演通告單)
+        scroll_area = QScrollArea(tab)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setStyleSheet("""
+            QScrollArea { border: none; background-color: #0b0b0e; }
+            QWidget { background-color: #0b0b0e; }
+            QScrollBar:vertical { width: 6px; background: #121215; }
+            QScrollBar::handle:vertical { background: #3f3f46; border-radius: 3px; }
+        """)
+        scroll_content = QWidget()
+        scroll_content.setStyleSheet("background-color: #0b0b0e;")
+        layout = QVBoxLayout(scroll_content)
+        layout.setContentsMargins(6, 6, 6, 6)
+        layout.setSpacing(8)
+        scroll_area.setWidget(scroll_content)
+        main_tab_layout.addWidget(scroll_area)
+
+        title = QLabel("🎬 4K 音畫互動 MV 離線渲染器", scroll_content)
+        title.setStyleSheet("font-size: 15px; font-weight: bold; color: #10b981; margin-bottom: 2px;")
         layout.addWidget(title)
 
-        # Audio Select
+        # ── 1. 音訊來源與聲學遙測面板 (Bento Box: Audio & Acoustic Telemetry) ──
+        audio_panel = QFrame(scroll_content)
+        audio_panel.setStyleSheet("""
+            QFrame {
+                background-color: #121216;
+                border: 1px solid #27272a;
+                border-radius: 8px;
+            }
+        """)
+        audio_panel_layout = QVBoxLayout(audio_panel)
+        audio_panel_layout.setContentsMargins(12, 10, 12, 10)
+        audio_panel_layout.setSpacing(8)
+
+        audio_header_box = QHBoxLayout()
+        audio_header_lbl = QLabel("🎵 音訊來源與聲學分析 (Audio Source & Telemetry):", audio_panel)
+        audio_header_lbl.setStyleSheet("color: #f4f4f5; font-weight: bold; font-size: 12px;")
+        audio_header_box.addWidget(audio_header_lbl)
+        audio_header_box.addStretch()
+
+        self.lbl_genre_badge = QLabel("⚡ 聲學遙測: 待分析 (智慧自動模式)", audio_panel)
+        self.lbl_genre_badge.setStyleSheet("color: #38bdf8; font-size: 11px; font-weight: bold; background: rgba(56, 189, 248, 0.1); padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3);")
+        audio_header_box.addWidget(self.lbl_genre_badge)
+        audio_panel_layout.addLayout(audio_header_box)
+
+        # Audio Select Row (單曲輸入行)
         audio_box = QHBoxLayout()
-        self.audio_input = QLineEdit(tab)
-        self.audio_input.setPlaceholderText("選擇本地音訊檔 (.mp3, .wav) 或貼入 YouTube 網址")
-        btn_browse = QPushButton("瀏覽...", tab)
+        audio_box.setSpacing(8)
+        lbl_single_audio = QLabel("單曲/網址:", audio_panel)
+        lbl_single_audio.setStyleSheet("color: #a1a1aa; font-size: 11px; min-width: 65px;")
+        self.audio_input = QLineEdit(audio_panel)
+        self.audio_input.setPlaceholderText("選擇本地音訊檔 (.mp3, .wav) 或貼入 YouTube 網址...")
+        self.audio_input.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 4px; padding: 5px 8px; font-size: 11px;")
+        btn_browse = QPushButton("📁 瀏覽檔案...", audio_panel)
+        btn_browse.setStyleSheet("""
+            QPushButton {
+                background-color: #27272a; color: #f4f4f5; border: 1px solid #3f3f46;
+                border-radius: 4px; padding: 5px 12px; font-size: 11px; font-weight: bold;
+            }
+            QPushButton:hover { background-color: #3f3f46; border-color: #52525b; }
+        """)
         btn_browse.clicked.connect(self.browse_audio)
-        audio_box.addWidget(self.audio_input)
+        audio_box.addWidget(lbl_single_audio)
+        audio_box.addWidget(self.audio_input, stretch=1)
         audio_box.addWidget(btn_browse)
-        layout.addLayout(audio_box)
+        audio_panel_layout.addLayout(audio_box)
 
-        # Batch Audio Folder Select
+        # Batch Audio Folder Row (批次資料夾行)
         batch_folder_box = QHBoxLayout()
-        self.audio_dir_input = QLineEdit(tab)
-        self.audio_dir_input.setPlaceholderText("選擇本地音訊資料夾（選填，用於批次智能剪輯與渲染）")
-        btn_browse_dir = QPushButton("選擇資料夾...", tab)
+        batch_folder_box.setSpacing(8)
+        lbl_batch_dir = QLabel("批次資料夾:", audio_panel)
+        lbl_batch_dir.setStyleSheet("color: #a1a1aa; font-size: 11px; min-width: 65px;")
+        self.audio_dir_input = QLineEdit(audio_panel)
+        self.audio_dir_input.setPlaceholderText("選填：批次智能剪輯資料夾...")
+        self.audio_dir_input.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 4px; padding: 5px 8px; font-size: 11px;")
+        btn_browse_dir = QPushButton("📂 選擇目錄...", audio_panel)
+        btn_browse_dir.setStyleSheet("""
+            QPushButton {
+                background-color: #27272a; color: #f4f4f5; border: 1px solid #3f3f46;
+                border-radius: 4px; padding: 5px 12px; font-size: 11px; font-weight: bold;
+            }
+            QPushButton:hover { background-color: #3f3f46; border-color: #52525b; }
+        """)
         btn_browse_dir.clicked.connect(self.browse_audio_dir)
-        batch_folder_box.addWidget(self.audio_dir_input)
+        batch_folder_box.addWidget(lbl_batch_dir)
+        batch_folder_box.addWidget(self.audio_dir_input, stretch=1)
         batch_folder_box.addWidget(btn_browse_dir)
-        layout.addLayout(batch_folder_box)
+        audio_panel_layout.addLayout(batch_folder_box)
 
-        # Genre Selection (SOTA 18 大主流與細分音樂風格)
-        genre_box = QHBoxLayout()
-        genre_lbl = QLabel("音樂分析風格:", tab)
-        self.genre_select = QComboBox(tab)
+        # Style Selection Row (風格指定行)
+        genre_row = QHBoxLayout()
+        genre_row.setSpacing(8)
+        genre_lbl = QLabel("風格指定:", audio_panel)
+        genre_lbl.setStyleSheet("color: #a1a1aa; font-size: 11px; min-width: 65px;")
+        self.genre_select = QComboBox(audio_panel)
         self.genre_select.setView(QListView())
         self.genre_select.addItems([
             "Auto (自動偵測)", "Techno", "Dub Techno", "Hard Techno", "Lo-fi", "Ambient",
             "DnB", "EDM", "IDM", "Jazz", "Rock", "POP", "Trance", "Synthwave", "Dubstep",
             "House", "Metal", "Classical", "Downtempo"
         ])
-        genre_box.addWidget(genre_lbl)
-        genre_box.addWidget(self.genre_select)
-
-        self.lbl_genre_badge = QLabel("⚡ 聲學遙測: 待分析 (智慧自動模式)", tab)
-        self.lbl_genre_badge.setStyleSheet("color: #38bdf8; font-size: 11px; font-weight: bold; margin-left: 8px; background: rgba(56, 189, 248, 0.08); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.25);")
-        genre_box.addWidget(self.lbl_genre_badge)
-        genre_box.addStretch()
+        self.genre_select.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 4px; padding: 4px 10px; font-size: 11px;")
         self.genre_select.currentIndexChanged.connect(self._on_genre_selection_changed)
-        layout.addLayout(genre_box)
+        genre_hint = QLabel("💡 演算法將依據此風格調度對應視覺特徵與切鏡節奏", audio_panel)
+        genre_hint.setStyleSheet("color: #71717a; font-size: 11px; font-style: italic;")
+        genre_row.addWidget(genre_lbl)
+        genre_row.addWidget(self.genre_select)
+        genre_row.addWidget(genre_hint)
+        genre_row.addStretch()
+        audio_panel_layout.addLayout(genre_row)
 
-        # Visual selection header & sort/view-mode comboboxes
-        header_box = QHBoxLayout()
-        header_box.setContentsMargins(0, 0, 0, 0)
-        
+        layout.addWidget(audio_panel)
+
+        # ── 2. 視覺模組管理與調度工作區 (Visual Module Sequencing Hub) ──
+        # 標題列 (獨立一行，文字不被擠壓)
+        title_box = QHBoxLayout()
+        title_box.setContentsMargins(0, 4, 0, 2)
         lbl_list_title = QLabel("選擇本影片採用的視覺模組 (可多選，演算法自動分段調度):", tab)
-        header_box.addWidget(lbl_list_title)
+        lbl_list_title.setStyleSheet("font-weight: bold; color: #f4f4f5; font-size: 12px;")
+        title_box.addWidget(lbl_list_title)
         
         self.lbl_visual_count = QLabel("(已收錄: 0)", tab)
-        self.lbl_visual_count.setStyleSheet("color: #a855f7; font-weight: bold; margin-left: 8px;")
-        header_box.addWidget(self.lbl_visual_count)
+        self.lbl_visual_count.setStyleSheet("color: #38bdf8; font-weight: bold; margin-left: 6px; font-size: 12px;")
+        title_box.addWidget(self.lbl_visual_count)
+        title_box.addStretch()
+        layout.addLayout(title_box)
+
+        # 緊湊工具與過濾列 (Toolbar: 搜尋 + 模式 + 排序 + 批次)
+        toolbar_box = QHBoxLayout()
+        toolbar_box.setContentsMargins(0, 0, 0, 4)
+        toolbar_box.setSpacing(8)
         
-        header_box.addStretch()
-        
-        # 🔍 搜尋過濾輸入框 (可搜尋名稱、作者或標籤)
-        lbl_search = QLabel("🔍 搜尋/標籤:", tab)
+        # 搜尋輸入框
+        lbl_search = QLabel("🔍 搜尋:", tab)
+        lbl_search.setStyleSheet("color: #a1a1aa; font-size: 11px;")
         self.search_input = QLineEdit(tab)
-        self.search_input.setPlaceholderText("輸入關鍵字或 Tag...")
-        self.search_input.setFixedWidth(180)
+        self.search_input.setPlaceholderText("關鍵字或標籤...")
+        self.search_input.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 4px; padding: 4px 8px; font-size: 11px;")
         self.search_input.textChanged.connect(self.refresh_presets_list)
-        header_box.addWidget(lbl_search)
-        header_box.addWidget(self.search_input)
+        toolbar_box.addWidget(lbl_search)
+        toolbar_box.addWidget(self.search_input, stretch=2)
         
-        # 檢視模式下拉選單
+        # 檢視模式
         lbl_view_mode = QLabel("模式:", tab)
+        lbl_view_mode.setStyleSheet("color: #a1a1aa; font-size: 11px;")
         self.view_mode_select = QComboBox(tab)
         self.view_mode_select.setView(QListView())
         self.view_mode_select.addItems(["🎨 網格卡片", "📝 表格列表"])
-        self.view_mode_select.setFixedWidth(120)
+        self.view_mode_select.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 4px; padding: 3px 6px; font-size: 11px;")
         self.view_mode_select.currentIndexChanged.connect(self.refresh_presets_list)
-        header_box.addWidget(lbl_view_mode)
-        header_box.addWidget(self.view_mode_select)
+        toolbar_box.addWidget(lbl_view_mode)
+        toolbar_box.addWidget(self.view_mode_select)
         
+        # 排序選單
         lbl_sort = QLabel("排序:", tab)
+        lbl_sort.setStyleSheet("color: #a1a1aa; font-size: 11px;")
         self.sort_select = QComboBox(tab)
         self.sort_select.setView(QListView())
         self.sort_select.addItems([
@@ -6705,103 +7767,126 @@ class StandaloneInjectorApp(QMainWindow):
             "使用次數 (由多到少)", "使用次數 (由少到多)",
             "📅 加入時間 (由新到舊)", "📅 加入時間 (由舊到新)"
         ])
-        self.sort_select.setFixedWidth(150)
+        self.sort_select.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 4px; padding: 3px 6px; font-size: 11px;")
         self.sort_select.currentIndexChanged.connect(self.refresh_presets_list)
-        header_box.addWidget(lbl_sort)
-        header_box.addWidget(self.sort_select)
+        toolbar_box.addWidget(lbl_sort)
+        toolbar_box.addWidget(self.sort_select)
 
-        lbl_batch_filter = QLabel("批次/日期:", tab)
+        # 批次/日期選單
+        lbl_batch_filter = QLabel("批次:", tab)
+        lbl_batch_filter.setStyleSheet("color: #a1a1aa; font-size: 11px;")
         self.batch_date_select = QComboBox(tab)
         self.batch_date_select.setView(QListView())
-        self.batch_date_select.setFixedWidth(160)
+        self.batch_date_select.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 4px; padding: 3px 6px; font-size: 11px;")
         self.batch_date_select.currentIndexChanged.connect(self.refresh_presets_list)
-        header_box.addWidget(lbl_batch_filter)
-        header_box.addWidget(self.batch_date_select)
+        toolbar_box.addWidget(lbl_batch_filter)
+        toolbar_box.addWidget(self.batch_date_select)
 
-        layout.addLayout(header_box)
+        layout.addLayout(toolbar_box)
         
         self.visual_list = QListWidget(tab)
         self.visual_list.setSelectionMode(QListWidget.SelectionMode.MultiSelection)
+        self.visual_list.setMinimumHeight(180)
+        self.visual_list.setMaximumHeight(280)
         self.visual_list.itemClicked.connect(self.on_visual_list_item_clicked)
         self.visual_list.itemDoubleClicked.connect(self.on_visual_list_item_clicked)
         layout.addWidget(self.visual_list)
 
-        # Pagination controls
+        # Pagination controls (標準四鍵導航分頁器)
         pagination_layout = QHBoxLayout()
-        pagination_layout.setContentsMargins(0, 5, 0, 5)
+        pagination_layout.setContentsMargins(0, 4, 0, 4)
+        pagination_layout.setSpacing(6)
         
+        self.btn_first_page = QPushButton("⏮ 第一頁", tab)
+        self.btn_first_page.setFixedWidth(75)
+        self.btn_first_page.setStyleSheet("""
+            QPushButton { background-color: #18181b; color: #a1a1aa; border: 1px solid #27272a; font-size: 11px; padding: 4px 6px; border-radius: 4px; }
+            QPushButton:hover { background-color: #27272a; color: #f4f4f5; }
+        """)
+        self.btn_first_page.clicked.connect(lambda: self.go_to_presets_page(1))
+
         self.btn_prev_page = QPushButton("◀ 上一頁", tab)
-        self.btn_prev_page.setFixedWidth(100)
+        self.btn_prev_page.setFixedWidth(85)
         self.btn_prev_page.setStyleSheet("""
-            QPushButton { background-color: #18181b; color: #f4f4f5; border: 1px solid #27272a; font-size: 11px; padding: 4px 10px; }
+            QPushButton { background-color: #18181b; color: #f4f4f5; border: 1px solid #27272a; font-size: 11px; padding: 4px 10px; border-radius: 4px; }
             QPushButton:hover { background-color: #27272a; border-color: #3f3f46; }
         """)
         self.btn_prev_page.clicked.connect(self.prev_presets_page)
         
         self.lbl_page_info = QLabel("第 1 頁，共 1 頁", tab)
-        self.lbl_page_info.setStyleSheet("color: #a1a1aa; font-weight: bold; font-size: 12px;")
+        self.lbl_page_info.setStyleSheet("color: #38bdf8; font-weight: bold; font-size: 12px;")
         self.lbl_page_info.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         self.btn_next_page = QPushButton("下一頁 ▶", tab)
-        self.btn_next_page.setFixedWidth(100)
+        self.btn_next_page.setFixedWidth(85)
         self.btn_next_page.setStyleSheet("""
-            QPushButton { background-color: #18181b; color: #f4f4f5; border: 1px solid #27272a; font-size: 11px; padding: 4px 10px; }
+            QPushButton { background-color: #18181b; color: #f4f4f5; border: 1px solid #27272a; font-size: 11px; padding: 4px 10px; border-radius: 4px; }
             QPushButton:hover { background-color: #27272a; border-color: #3f3f46; }
         """)
         self.btn_next_page.clicked.connect(self.next_presets_page)
+
+        self.btn_last_page = QPushButton("最後一頁 ⏭", tab)
+        self.btn_last_page.setFixedWidth(85)
+        self.btn_last_page.setStyleSheet("""
+            QPushButton { background-color: #18181b; color: #a1a1aa; border: 1px solid #27272a; font-size: 11px; padding: 4px 6px; border-radius: 4px; }
+            QPushButton:hover { background-color: #27272a; color: #f4f4f5; }
+        """)
+        self.btn_last_page.clicked.connect(lambda: self.go_to_presets_page(getattr(self, "presets_max_pages", 1)))
         
+        pagination_layout.addWidget(self.btn_first_page)
         pagination_layout.addWidget(self.btn_prev_page)
         pagination_layout.addWidget(self.lbl_page_info, stretch=1)
         pagination_layout.addWidget(self.btn_next_page)
+        pagination_layout.addWidget(self.btn_last_page)
         layout.addLayout(pagination_layout)
 
         # Actions row (refresh and clean visual modules)
         action_row = QHBoxLayout()
         
-        btn_refresh = QPushButton("🔄 整理並重新載入視覺清單", tab)
+        btn_refresh = QPushButton("🔄 重新載入清單", tab)
         btn_refresh.setStyleSheet("""
             QPushButton {
-                background-color: #18181b; color: #a1a1aa; border: 1px solid #27272a;
-                border-radius: 6px; padding: 8px; font-size: 12px;
+                background-color: #18181b; color: #a1a1aa; border: 1px solid #3f3f46;
+                border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #27272a; color: #f4f4f5; border-color: #3f3f46;
+                background-color: #27272a; color: #f4f4f5; border-color: #52525b;
             }
         """)
         btn_refresh.clicked.connect(lambda: self.refresh_presets_list(clean_black=True))
         
-        btn_cleanup = QPushButton("🧹 試運行並清理視覺模組庫", tab)
+        btn_cleanup = QPushButton("🧹 檢驗與清理模組庫", tab)
         btn_cleanup.setStyleSheet("""
             QPushButton {
-                background-color: #7c3aed; color: #ffffff; border: 1px solid #7c3aed;
-                border-radius: 6px; padding: 8px; font-size: 12px; font-weight: bold;
+                background-color: #18181b; color: #c4b5fd; border: 1px solid #4338ca;
+                border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #8b5cf6; border-color: #8b5cf6;
+                background-color: #312e81; color: #ffffff; border-color: #6366f1;
             }
         """)
         btn_cleanup.clicked.connect(self.open_module_cleanup_dialog)
         
-        btn_download_deps = QPushButton("📥 下載所有模組本地依賴庫", tab)
+        btn_download_deps = QPushButton("📥 下載離線依賴庫", tab)
         btn_download_deps.setStyleSheet("""
             QPushButton {
-                background-color: #10b981; color: #ffffff; border: 1px solid #10b981;
-                border-radius: 6px; padding: 8px; font-size: 12px; font-weight: bold;
+                background-color: #18181b; color: #6ee7b7; border: 1px solid #065f46;
+                border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #059669; border-color: #059669;
+                background-color: #064e3b; color: #ffffff; border-color: #10b981;
             }
         """)
         btn_download_deps.clicked.connect(self.open_dependency_downloader_dialog)
         
-        btn_clear_stars = QPushButton("☆ 一鍵清除所有最愛", tab)
+        btn_clear_stars = QPushButton("☆ 清除最愛", tab)
         btn_clear_stars.setStyleSheet("""
             QPushButton {
-                background-color: #3f3f46; color: #ffffff; border: 1px solid #3f3f46;
-                border-radius: 6px; padding: 8px; font-size: 12px; font-weight: bold;
+                background-color: #18181b; color: #71717a; border: 1px solid #27272a;
+                border-radius: 6px; padding: 6px 10px; font-size: 11px;
             }
             QPushButton:hover {
-                background-color: #52525b; border-color: #52525b;
+                background-color: #27272a; color: #f4f4f5; border-color: #3f3f46;
             }
         """)
         btn_clear_stars.clicked.connect(self.clear_all_stars)
@@ -6812,403 +7897,632 @@ class StandaloneInjectorApp(QMainWindow):
         action_row.addWidget(btn_clear_stars)
         layout.addLayout(action_row)
 
-        # Export config
+        # ── 3. 輸出規格與運算環境配置 (Export & Compute Specification) ──
+        export_panel = QFrame(scroll_content)
+        export_panel.setStyleSheet("""
+            QFrame {
+                background-color: #121216;
+                border: 1px solid #27272a;
+                border-radius: 8px;
+            }
+        """)
+        export_panel_layout = QVBoxLayout(export_panel)
+        export_panel_layout.setContentsMargins(12, 10, 12, 10)
+        export_panel_layout.setSpacing(8)
+
+        export_header = QLabel("🖥️ 輸出規格與運算配置 (Export & System Profile):", export_panel)
+        export_header.setStyleSheet("color: #f4f4f5; font-weight: bold; font-size: 12px;")
+        export_panel_layout.addWidget(export_header)
+
+        # Config row: 解析度 + FPS + CPU 溫控 + 原生 4K
         config_box = QHBoxLayout()
+        config_box.setSpacing(12)
         
-        res_lbl = QLabel("導出解析度:", tab)
-        self.res_select = QComboBox(tab)
+        res_lbl = QLabel("導出解析度:", export_panel)
+        res_lbl.setStyleSheet("color: #a1a1aa; font-size: 11px;")
+        self.res_select = QComboBox(export_panel)
         self.res_select.setView(QListView())
         self.res_select.addItems(["4K (3840x2160)", "1080p (1920x1080)", "720p (1280x720)"])
+        self.res_select.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 4px; padding: 3px 8px; font-size: 11px;")
         config_box.addWidget(res_lbl)
         config_box.addWidget(self.res_select)
 
-        fps_lbl = QLabel("FPS:", tab)
-        self.fps_select = QComboBox(tab)
+        fps_lbl = QLabel("FPS:", export_panel)
+        fps_lbl.setStyleSheet("color: #a1a1aa; font-size: 11px;")
+        self.fps_select = QComboBox(export_panel)
         self.fps_select.setView(QListView())
         self.fps_select.addItems(["30", "60"])
+        self.fps_select.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 4px; padding: 3px 8px; font-size: 11px;")
         config_box.addWidget(fps_lbl)
         config_box.addWidget(self.fps_select)
 
-        self.native_4k_cb = QCheckBox("原生 4K 畫質 (關閉 1080p 降採樣)", tab)
-        self.native_4k_cb.setChecked(False)
-        self.native_4k_cb.setToolTip("啟用後將關閉內部的 1080p 渲染與後製降採樣限制，使用原生 4K (3840x2160) 進行渲染與 VJ 特效處理，畫面將極度銳利與清晰，但對 GPU 和記憶體效能要求極高。")
-        config_box.addWidget(self.native_4k_cb)
-
-        layout.addLayout(config_box)
-
-        # CPU Performance mode selector
-        cpu_mode_box = QHBoxLayout()
-        cpu_mode_lbl = QLabel("CPU 運作模式:", tab)
-        self.cpu_mode_select = QComboBox(tab)
+        cpu_mode_lbl = QLabel("CPU 模式:", export_panel)
+        cpu_mode_lbl.setStyleSheet("color: #a1a1aa; font-size: 11px;")
+        self.cpu_mode_select = QComboBox(export_panel)
         self.cpu_mode_select.setView(QListView())
-        self.cpu_mode_select.addItems(["🌡️ 控溫模式 (自動降頻防過熱)", "🔥 全力運作 (最大速度，忽略溫控)"])
+        self.cpu_mode_select.addItems(["🌡️ 控溫模式 (防過熱)", "🔥 全力運作 (最大速度)"])
+        self.cpu_mode_select.setStyleSheet("background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 4px; padding: 3px 8px; font-size: 11px;")
         self.cpu_mode_select.setToolTip(
             "控溫模式：每 100 幀偵測 macOS 熱管理狀態，過熱時自動降速冷卻，適合長時間渲染或筆電使用。\n"
             "全力運作：跳過所有溫控檢測，以最大 CPU 速度持續渲染，適合桌機或短片快速輸出。"
         )
-        cpu_mode_box.addWidget(cpu_mode_lbl)
-        cpu_mode_box.addWidget(self.cpu_mode_select)
-        cpu_mode_box.addStretch()
-        layout.addLayout(cpu_mode_box)
+        config_box.addWidget(cpu_mode_lbl)
+        config_box.addWidget(self.cpu_mode_select)
 
-        # Transition slider
-        trans_box = QHBoxLayout()
-        trans_lbl = QLabel("分鏡過渡融合時間 (秒):", tab)
-        self.trans_slider = QSlider(Qt.Orientation.Horizontal, tab)
+        self.native_4k_cb = QCheckBox("原生 4K (關閉降採樣)", export_panel)
+        self.native_4k_cb.setChecked(False)
+        self.native_4k_cb.setStyleSheet("color: #f4f4f5; font-size: 11px; font-weight: bold;")
+        self.native_4k_cb.setToolTip("啟用後將關閉內部的 1080p 渲染與後製降採樣限制，使用原生 4K (3840x2160) 進行渲染與 VJ 特效處理，畫面將極度銳利與清晰，但對 GPU 和記憶體效能要求極高。")
+        config_box.addWidget(self.native_4k_cb)
+        config_box.addStretch()
+
+        export_panel_layout.addLayout(config_box)
+        layout.addWidget(export_panel)
+
+        # 🎛️ 現代化全域特效與動態調度機架 (Smart FX Rack)
+        fx_rack_frame = QFrame(tab)
+        fx_rack_frame.setStyleSheet("""
+            QFrame {
+                background-color: #121216;
+                border: 1px solid #27272a;
+                border-radius: 8px;
+            }
+        """)
+        fx_rack_layout = QVBoxLayout(fx_rack_frame)
+        fx_rack_layout.setContentsMargins(10, 8, 10, 8)
+        fx_rack_layout.setSpacing(8)
+
+        # 機架標題
+        rack_header = QHBoxLayout()
+        rack_title = QLabel("🎛️ 全域後製動態與特效調度機架 (Smart FX Engine):", fx_rack_frame)
+        rack_title.setStyleSheet("color: #f4f4f5; font-weight: bold; font-size: 12px;")
+        rack_header.addWidget(rack_title)
+        rack_header.addStretch()
+        fx_rack_layout.addLayout(rack_header)
+
+        # Row 1: 滑桿控制 (分鏡過渡 + 特效機率)
+        sliders_row = QHBoxLayout()
+        trans_lbl = QLabel("分鏡融合 (秒):", fx_rack_frame)
+        trans_lbl.setStyleSheet("color: #a1a1aa; font-size: 11px;")
+        self.trans_slider = QSlider(Qt.Orientation.Horizontal, fx_rack_frame)
         self.trans_slider.setRange(0, 30)  # 0.0s to 3.0s
         self.trans_slider.setValue(5)      # 0.5s
-        self.trans_val_lbl = QLabel("0.5s", tab)
+        self.trans_val_lbl = QLabel("0.5s", fx_rack_frame)
+        self.trans_val_lbl.setStyleSheet("color: #38bdf8; font-weight: bold; font-size: 11px;")
         self.trans_slider.valueChanged.connect(lambda v: self.trans_val_lbl.setText(f"{v/10.0:.1f}s"))
-        trans_box.addWidget(trans_lbl)
-        trans_box.addWidget(self.trans_slider)
-        trans_box.addWidget(self.trans_val_lbl)
-        layout.addLayout(trans_box)
+        sliders_row.addWidget(trans_lbl)
+        sliders_row.addWidget(self.trans_slider, stretch=2)
+        sliders_row.addWidget(self.trans_val_lbl)
 
-        # Global Post-FX Probability Slider
-        fx_prob_box = QHBoxLayout()
-        fx_prob_lbl = QLabel("全域後製特效出現機率:", tab)
-        self.fx_prob_slider = QSlider(Qt.Orientation.Horizontal, tab)
+        sliders_row.addSpacing(16)
+
+        fx_prob_lbl = QLabel("特效出現機率:", fx_rack_frame)
+        fx_prob_lbl.setStyleSheet("color: #a1a1aa; font-size: 11px;")
+        self.fx_prob_slider = QSlider(Qt.Orientation.Horizontal, fx_rack_frame)
         self.fx_prob_slider.setRange(0, 100)  # 0% to 100%
         self.fx_prob_slider.setValue(25)       # Default: 25%
-        self.fx_prob_val_lbl = QLabel("25%", tab)
+        self.fx_prob_val_lbl = QLabel("25%", fx_rack_frame)
+        self.fx_prob_val_lbl.setStyleSheet("color: #a855f7; font-weight: bold; font-size: 11px;")
         self.fx_prob_slider.valueChanged.connect(lambda v: self.fx_prob_val_lbl.setText(f"{v}%"))
-        fx_prob_box.addWidget(fx_prob_lbl)
-        fx_prob_box.addWidget(self.fx_prob_slider)
-        fx_prob_box.addWidget(self.fx_prob_val_lbl)
-        layout.addLayout(fx_prob_box)
+        sliders_row.addWidget(fx_prob_lbl)
+        sliders_row.addWidget(self.fx_prob_slider, stretch=2)
+        sliders_row.addWidget(self.fx_prob_val_lbl)
+        fx_rack_layout.addLayout(sliders_row)
 
-        # Global Post-FX Type Checkboxes
-        fx_type_lbl = QLabel("全域後製特效種類與自適應調製:", tab)
-        fx_type_lbl.setStyleSheet("color: #d4d4d8; font-weight: bold; margin-top: 4px;")
-        layout.addWidget(fx_type_lbl)
-        
-        # Row 1: Basic Effects
-        fx_type_box_1 = QHBoxLayout()
-        fx_type_box_1.setSpacing(12)
-        
-        self.fx_cb_distortion = QCheckBox("幾何畸變", tab)
+        # 實例化 48 軌全域後製特效矩陣管理面板 (隱式封裝，保留所有屬性存取引用)
+        self.fx_matrix_dialog = FXMatrixDialog(tab)
+
+        # 類別 1: 基礎光影與幾何
+        self.fx_cb_distortion = QCheckBox("幾何畸變", self.fx_matrix_dialog)
         self.fx_cb_distortion.setChecked(True)
-        self.fx_cb_distortion.setToolTip("類別 1: 空間折疊與幾何畸變 — 魚眼、桶狀畸變與極座標轉換，讓畫面隨低音能量或強拍拉伸與扭轉")
+        self.fx_cb_distortion.setToolTip("類別 1: 空間折疊與幾何畸變 — 魚眼、桶狀畸變與極座標轉換")
         
-        self.fx_cb_fluid_noise = QCheckBox("流體噪訊", tab)
+        self.fx_cb_fluid_noise = QCheckBox("流體噪訊", self.fx_matrix_dialog)
         self.fx_cb_fluid_noise.setChecked(True)
-        self.fx_cb_fluid_noise.setToolTip("類別 2: 流體與動態噪訊場 — fBm 分形噪訊領域扭曲 (Domain Warping) 與即時流體漩渦模擬")
+        self.fx_cb_fluid_noise.setToolTip("類別 2: 流體與動態噪訊場 — fBm 分形噪訊領域扭曲與即時流體漩渦")
         
-        self.fx_cb_feedback_dynamics = QCheckBox("時空反饋", tab)
+        self.fx_cb_feedback_dynamics = QCheckBox("時空反饋", self.fx_matrix_dialog)
         self.fx_cb_feedback_dynamics.setChecked(True)
-        self.fx_cb_feedback_dynamics.setToolTip("類別 3: 時空反饋與迭代動力學 — 環形緩衝時間置換狹縫掃描 (Slit-Scan) 與反應擴散 Gray-Scott 細胞增殖反饋")
+        self.fx_cb_feedback_dynamics.setToolTip("類別 3: 時空反饋與迭代動力學 — 環形緩衝時間置換狹縫掃描與 Gray-Scott 細胞增殖")
         
-        self.fx_cb_color_aberration = QCheckBox("光譜色彩", tab)
+        self.fx_cb_color_aberration = QCheckBox("光譜色彩", self.fx_matrix_dialog)
         self.fx_cb_color_aberration.setChecked(True)
-        self.fx_cb_color_aberration.setToolTip("類別 4: 色彩光譜與光學異常 — 多採樣徑向邊緣色散與 Inigo Quilez 餘弦漸層全域色彩循環")
+        self.fx_cb_color_aberration.setToolTip("類別 4: 色彩光譜與光學異常 — 多採樣徑向邊緣色散與 Inigo Quilez 餘弦漸層循環")
         
-        self.fx_cb_glow_illumination = QCheckBox("高階光影", tab)
+        self.fx_cb_glow_illumination = QCheckBox("高階光影", self.fx_matrix_dialog)
         self.fx_cb_glow_illumination.setChecked(True)
-        self.fx_cb_glow_illumination.setToolTip("類別 5: 高階光影與動態發光 — Kawase 降採樣電影級發光 (Bloom) 與螢幕空間放射狀體積光 (God Rays)")
+        self.fx_cb_glow_illumination.setToolTip("類別 5: 高階光影與動態發光 — Kawase 降採樣 Bloom 與體積光 God Rays")
 
-        self.fx_cb_retro_degradation = QCheckBox("訊號退化", tab)
+        self.fx_cb_retro_degradation = QCheckBox("訊號退化", self.fx_matrix_dialog)
         self.fx_cb_retro_degradation.setChecked(True)
-        self.fx_cb_retro_degradation.setToolTip("類別 6: 訊號退化與復古降維 — 45 度旋轉印刷網點半色調與 CRT 掃描線、像素格柵與滾動干擾條")
+        self.fx_cb_retro_degradation.setToolTip("類別 6: 訊號退化與復古降維 — 印刷網點半色調與 CRT 掃描線、像素格柵")
 
-        self.fx_cb_pixel_sort = QCheckBox("像素分選", tab)
+        self.fx_cb_pixel_sort = QCheckBox("像素分選", self.fx_matrix_dialog)
         self.fx_cb_pixel_sort.setChecked(True)
-        self.fx_cb_pixel_sort.setToolTip("類別 7: 矩陣重組與像素分選 — 亮度閥值水平連續像素排序拉絲與數位色塊 Glitch 故障藝術")
+        self.fx_cb_pixel_sort.setToolTip("類別 7: 矩陣重組與像素分選 — 亮度閥值水平連續像素排序拉絲與 Glitch 故障藝術")
 
-        self.fx_cb_kaleidoscope = QCheckBox("鏡像萬花筒", tab)
+        self.fx_cb_kaleidoscope = QCheckBox("鏡像萬花筒", self.fx_matrix_dialog)
         self.fx_cb_kaleidoscope.setChecked(True)
-        self.fx_cb_kaleidoscope.setToolTip("類別 8: 對稱鏡像萬花筒 — 極座標轉換放射狀對稱反射曼陀羅圖案，隨低音能量收縮")
+        self.fx_cb_kaleidoscope.setToolTip("類別 8: 對稱鏡像萬花筒 — 極座標轉換放射狀對稱反射曼陀羅圖案")
 
-        self.fx_cb_ambient_dsp = QCheckBox("空靈聲學", tab)
+        self.fx_cb_ambient_dsp = QCheckBox("空靈聲學", self.fx_matrix_dialog)
         self.fx_cb_ambient_dsp.setChecked(True)
-        self.fx_cb_ambient_dsp.setToolTip("類別 10: 空靈聲學模擬 — 混響視覺尾音(Reverb Tail)、回音分身(Delay Echo)與悶音低通濾波(Low-pass)")
+        self.fx_cb_ambient_dsp.setToolTip("類別 10: 空靈聲學模擬 — 混響視覺尾音、回音分身與低通濾波")
 
-        self.fx_cb_adaptive = QCheckBox("情緒自適應調製", tab)
+        self.fx_cb_adaptive = QCheckBox("情緒自適應調製", self.fx_matrix_dialog)
         self.fx_cb_adaptive.setChecked(True)
-        self.fx_cb_adaptive.setToolTip("聽覺感知情緒調製 — 依據樂曲能量(Arousal)與情感(Valence)動態微調後製特效強度與機率")
-        
-        for cb in [self.fx_cb_distortion, self.fx_cb_fluid_noise, self.fx_cb_feedback_dynamics, self.fx_cb_color_aberration, self.fx_cb_glow_illumination, self.fx_cb_retro_degradation, self.fx_cb_pixel_sort, self.fx_cb_kaleidoscope, self.fx_cb_ambient_dsp, self.fx_cb_adaptive]:
-            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
-            fx_type_box_1.addWidget(cb)
-        fx_type_box_1.addStretch()
-        layout.addLayout(fx_type_box_1)
+        self.fx_cb_adaptive.setToolTip("聽覺感知情緒調製 — 依據樂曲能量與情感動態微調後製強度")
 
-        # Row 2: Advanced Global Channels & Derivative Effects
-        fx_type_box_2 = QHBoxLayout()
-        fx_type_box_2.setSpacing(12)
+        basic_cbs = [
+            self.fx_cb_distortion, self.fx_cb_fluid_noise, self.fx_cb_feedback_dynamics,
+            self.fx_cb_color_aberration, self.fx_cb_glow_illumination, self.fx_cb_retro_degradation,
+            self.fx_cb_pixel_sort, self.fx_cb_kaleidoscope, self.fx_cb_ambient_dsp, self.fx_cb_adaptive
+        ]
 
-        self.fx_cb_data_mosh = QCheckBox("數位撕裂", tab)
+        # 類別 2: 動態物理與時空
+        self.fx_cb_data_mosh = QCheckBox("數位撕裂", self.fx_matrix_dialog)
         self.fx_cb_data_mosh.setChecked(True)
-        self.fx_cb_data_mosh.setToolTip("全域通道 A: 數位撕裂 (Data-Mosh) — 運動向量邊緣像素拉絲錯位與 Glitch 故障撕裂感")
 
-        self.fx_cb_sedimentation = QCheckBox("流沙沉澱", tab)
+        self.fx_cb_sedimentation = QCheckBox("流沙沉澱", self.fx_matrix_dialog)
         self.fx_cb_sedimentation.setChecked(True)
-        self.fx_cb_sedimentation.setToolTip("全域通道 B: 流沙沉澱 (Sedimentation) — 高光邊緣粒子緩慢下沉累積與 Sub-Bass 揚塵模擬")
 
-        self.fx_cb_vector_scan = QCheckBox("雷射等高線", tab)
+        self.fx_cb_vector_scan = QCheckBox("雷射等高線", self.fx_matrix_dialog)
         self.fx_cb_vector_scan.setChecked(True)
-        self.fx_cb_vector_scan.setToolTip("全域通道 C: 雷射等高線 (Vector Scan) — 頻譜自適應邊緣提取與雷射向量示波投影")
 
-        self.fx_cb_temporal_fractal = QCheckBox("時空分形鏡", tab)
+        self.fx_cb_temporal_fractal = QCheckBox("時空分形鏡", self.fx_matrix_dialog)
         self.fx_cb_temporal_fractal.setChecked(True)
-        self.fx_cb_temporal_fractal.setToolTip("全域通道 D: 時空對稱分形鏡 (Temporal Fractal) — 當前影格與歷史延遲幀水平差值翻轉分形")
 
-        self.fx_cb_phase_slit = QCheckBox("相位剪切", tab)
+        self.fx_cb_phase_slit = QCheckBox("相位剪切", self.fx_matrix_dialog)
         self.fx_cb_phase_slit.setChecked(True)
-        self.fx_cb_phase_slit.setToolTip("衍生通道 1: 相位剪切 (Phase Slit-Scan) — 左右聲道相位差引起之非對稱時間延遲與時空左右剪切")
 
-        self.fx_cb_centroid_glitch = QCheckBox("高頻破碎", tab)
+        self.fx_cb_centroid_glitch = QCheckBox("高頻破碎", self.fx_matrix_dialog)
         self.fx_cb_centroid_glitch.setChecked(True)
-        self.fx_cb_centroid_glitch.setToolTip("衍生通道 2: 高頻破碎 (Centroid Glitch) — 頻譜質心共振時橫向切片隨機橫移，共振電晶體質地")
 
-        self.fx_cb_vignette_pulse = QCheckBox("呼吸暗房", tab)
+        self.fx_cb_vignette_pulse = QCheckBox("呼吸暗房", self.fx_matrix_dialog)
         self.fx_cb_vignette_pulse.setChecked(False)
-        self.fx_cb_vignette_pulse.setToolTip("衍生通道 3: 呼吸暗房 (Vignette Pulse) — 正拍預期心理學四周暗角飽和度抽離收縮與砸拍高光釋放")
 
-        self.fx_cb_tension_overlay = QCheckBox("張力互斥", tab)
+        self.fx_cb_tension_overlay = QCheckBox("張力互斥", self.fx_matrix_dialog)
         self.fx_cb_tension_overlay.setChecked(False)
-        self.fx_cb_tension_overlay.setToolTip("衍生通道 4: 張力互斥 (Tension Overlay) — 不協和和弦與畫面產生數學互斥 (Exclusion) 撞色翻轉")
 
-        self.fx_cb_photosensitive_safe = QCheckBox("光敏健康防護", tab)
+        self.fx_cb_photosensitive_safe = QCheckBox("光敏健康防護", self.fx_matrix_dialog)
         self.fx_cb_photosensitive_safe.setChecked(True)
-        self.fx_cb_photosensitive_safe.setToolTip("光敏健康保護與防癲癇機制 — 限制高頻閃爍、劇烈色彩翻轉與全螢幕高光刺激，提供兼顧畫面美學與醫療安全的視覺感受")
-
-        for cb in [self.fx_cb_data_mosh, self.fx_cb_sedimentation, self.fx_cb_vector_scan, self.fx_cb_temporal_fractal, self.fx_cb_phase_slit, self.fx_cb_centroid_glitch, self.fx_cb_vignette_pulse, self.fx_cb_tension_overlay, self.fx_cb_photosensitive_safe]:
-            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
-            fx_type_box_2.addWidget(cb)
-        fx_type_box_2.addStretch()
-        layout.addLayout(fx_type_box_2)
         self.fx_cb_photosensitive_safe.toggled.connect(self.update_photosensitive_safe_preview)
 
-        # Row 3: New VJ Custom Effects (Thermal Vision, Scanline Glitch, Frame Drop, Dynamic Mosaic, Pixel Art, Handheld Camera, Stylized Fade, Zoom Pulse)
-        fx_type_box_3 = QHBoxLayout()
-        fx_type_box_3.setSpacing(12)
-        
-        self.fx_cb_thermal_vision = QCheckBox("熱成像", tab)
+        physics_cbs = [
+            self.fx_cb_data_mosh, self.fx_cb_sedimentation, self.fx_cb_vector_scan,
+            self.fx_cb_temporal_fractal, self.fx_cb_phase_slit, self.fx_cb_centroid_glitch,
+            self.fx_cb_vignette_pulse, self.fx_cb_tension_overlay, self.fx_cb_photosensitive_safe
+        ]
+
+        # 類別 3: VJ 擴充與膠片電影
+        self.fx_cb_thermal_vision = QCheckBox("熱成像", self.fx_matrix_dialog)
         self.fx_cb_thermal_vision.setChecked(True)
-        self.fx_cb_thermal_vision.setToolTip("自訂擴充 1: 熱成像 (Thermal Vision) — 鐵血戰士霓虹邊緣、頻譜自適應冷熱分區與熱浪消融")
-        
-        self.fx_cb_scanline_glitch = QCheckBox("掃描故障", tab)
+
+        self.fx_cb_scanline_glitch = QCheckBox("掃描故障", self.fx_matrix_dialog)
         self.fx_cb_scanline_glitch.setChecked(True)
-        self.fx_cb_scanline_glitch.setToolTip("自訂擴充 2: 掃描故障 (Scanline Glitch) — VHS追軌同步漂移、R/G/B色差抖動與模擬訊號丟失滾動")
-        
-        self.fx_cb_frame_drop = QCheckBox("掉幀特效", tab)
+
+        self.fx_cb_frame_drop = QCheckBox("掉幀特效", self.fx_matrix_dialog)
         self.fx_cb_frame_drop.setChecked(True)
-        self.fx_cb_frame_drop.setToolTip("自訂擴充 3: 掉幀特效 (Frame Drop) — 動態能量定格動畫、BPM量化節奏定格與混響殘影凍結")
-        
-        self.fx_cb_dynamic_mosaic = QCheckBox("動態馬賽克", tab)
+
+        self.fx_cb_dynamic_mosaic = QCheckBox("動態馬賽克", self.fx_matrix_dialog)
         self.fx_cb_dynamic_mosaic.setChecked(True)
-        self.fx_cb_dynamic_mosaic.setToolTip("自訂擴充 4: 動態馬賽克 (Dynamic Mosaic) — 低音爆裂格柵大小調製、旋轉斜切馬賽克與碎裂座標漂移")
-        
-        self.fx_cb_pixel_art = QCheckBox("像素畫", tab)
+
+        self.fx_cb_pixel_art = QCheckBox("像素畫", self.fx_matrix_dialog)
         self.fx_cb_pixel_art.setChecked(True)
-        self.fx_cb_pixel_art.setToolTip("自訂擴充 5: 像素畫 (Pixel Art) — GameBoy復古液晶調色盤、漫畫像素黑線勾邊與賽博朋克霓虹色度限制")
-        
-        self.fx_cb_handheld_camera = QCheckBox("手持相機", tab)
+
+        self.fx_cb_handheld_camera = QCheckBox("手持相機", self.fx_matrix_dialog)
         self.fx_cb_handheld_camera.setChecked(True)
-        self.fx_cb_handheld_camera.setToolTip("自訂擴充 6: 手持相機 (Handheld Camera) — 有機呼吸鏡頭漂移、CCTV/DV錄影框資訊與魚眼廣角極限晃鏡")
-        
-        self.fx_cb_stylized_fade = QCheckBox("藝術淡入出", tab)
+
+        self.fx_cb_stylized_fade = QCheckBox("藝術淡入出", self.fx_matrix_dialog)
         self.fx_cb_stylized_fade.setChecked(True)
-        self.fx_cb_stylized_fade.setToolTip("自訂擴充 7: 藝術淡入淡出 (Stylized Fade) — 噪訊腐蝕沙化溶解、光束快門收縮與垂直流淌融化")
-        
-        self.fx_cb_zoom_pulse = QCheckBox("縮放脈衝", tab)
+
+        self.fx_cb_zoom_pulse = QCheckBox("縮放脈衝", self.fx_matrix_dialog)
         self.fx_cb_zoom_pulse.setChecked(True)
-        self.fx_cb_zoom_pulse.setToolTip("自訂擴充 8: 縮放脈衝 (Zoom Pulse) — 低音砸拍縮放、旋轉縮放無限反饋隧道與R/G/B分通道立體縮放")
 
-        for cb in [self.fx_cb_thermal_vision, self.fx_cb_scanline_glitch, self.fx_cb_frame_drop, self.fx_cb_dynamic_mosaic, self.fx_cb_pixel_art, self.fx_cb_handheld_camera, self.fx_cb_stylized_fade, self.fx_cb_zoom_pulse]:
-            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
-            fx_type_box_3.addWidget(cb)
-        fx_type_box_3.addStretch()
-        layout.addLayout(fx_type_box_3)
-
-        # Row 4: Top Tier Global Post-FX Matrix (Film Burn, Blueprint Edge, Turing Pattern, Point Cloud Depth, Vector Scope, Lowpass Muffle, Infinity Tunnel, Dolly Zoom)
-        fx_type_box_4 = QHBoxLayout()
-        fx_type_box_4.setSpacing(12)
-        
-        self.fx_cb_film_burn = QCheckBox("膠片腐蝕", tab)
+        self.fx_cb_film_burn = QCheckBox("膠片腐蝕", self.fx_matrix_dialog)
         self.fx_cb_film_burn.setChecked(True)
-        self.fx_cb_film_burn.setToolTip("全新維度 1: 膠片燒灼與化學腐蝕 (Film Burn) — 35mm硝酸底片高溫邊緣發黃發紅、硝酸銀顆粒與重拍底片跳齒漏光")
 
-        self.fx_cb_blueprint = QCheckBox("建築藍圖", tab)
+        self.fx_cb_blueprint = QCheckBox("建築藍圖", self.fx_matrix_dialog)
         self.fx_cb_blueprint.setChecked(True)
-        self.fx_cb_blueprint.setToolTip("全新維度 2: 建築藍圖與 CAD 線稿 (Blueprint Edge) — 普魯士藍圖紙、細緻 Canny 邊緣與動態毫米標尺/CAD 坐標 overlay")
 
-        self.fx_cb_turing = QCheckBox("圖靈細胞", tab)
+        self.fx_cb_turing = QCheckBox("圖靈細胞", self.fx_matrix_dialog)
         self.fx_cb_turing.setChecked(False)
-        self.fx_cb_turing.setToolTip("全新維度 3: 圖靈擴散與生物斑紋 (Turing Pattern) — Gray-Scott 化學反應擴散、斑馬紋與珊瑚有機細胞增殖蔓延")
 
-        self.fx_cb_point_cloud = QCheckBox("點雲深度", tab)
+        self.fx_cb_point_cloud = QCheckBox("點雲深度", self.fx_matrix_dialog)
         self.fx_cb_point_cloud.setChecked(True)
-        self.fx_cb_point_cloud.setToolTip("全新維度 4: 點雲立體深度重構 (Point Cloud Depth) — 依據 2D 亮度估算 3D Z-Depth、粒子點雲拉伸與虛擬鏡頭 Pitch/Yaw 旋轉")
 
-        self.fx_cb_vector_scope = QCheckBox("聲相示波", tab)
+        self.fx_cb_vector_scope = QCheckBox("聲相示波", self.fx_matrix_dialog)
         self.fx_cb_vector_scope.setChecked(True)
-        self.fx_cb_vector_scope.setToolTip("全新維度 5: 聲相向量示波鏡 (Vector Scope) — Lissajous 示波器時域波形霓虹圖騰與背景光學折射屈光透鏡")
 
-        self.fx_cb_lowpass_muffle = QCheckBox("悶音景深", tab)
+        self.fx_cb_lowpass_muffle = QCheckBox("悶音景深", self.fx_matrix_dialog)
         self.fx_cb_lowpass_muffle.setChecked(True)
-        self.fx_cb_lowpass_muffle.setToolTip("全新維度 6: 低通悶音景深遮罩 (Low-Pass Muffle) — 隔牆水下沉浸感、多級高斯景深模糊與動態呼吸暗角影視語言")
 
-        self.fx_cb_infinity_tunnel = QCheckBox("無限鏡廊", tab)
+        self.fx_cb_infinity_tunnel = QCheckBox("無限鏡廊", self.fx_matrix_dialog)
         self.fx_cb_infinity_tunnel.setChecked(True)
-        self.fx_cb_infinity_tunnel.setToolTip("全新維度 7: 無限幾何鏡廊 (Infinity Tunnel) — 幾何對數極座標 Log-Polar 投影與飛速向前穿梭之鏡室隧道錯覺")
 
-        self.fx_cb_dolly_zoom = QCheckBox("眩暈推拉", tab)
+        self.fx_cb_dolly_zoom = QCheckBox("眩暈推拉", self.fx_matrix_dialog)
         self.fx_cb_dolly_zoom.setChecked(True)
-        self.fx_cb_dolly_zoom.setToolTip("全新維度 8: 眩暈推拉變焦 (Dolly Zoom) — 希區考克 Vertigo 鏡頭語言、主體保持不變與背景飛速拉遠變大放射狀模糊")
 
-        for cb in [self.fx_cb_film_burn, self.fx_cb_blueprint, self.fx_cb_turing, self.fx_cb_point_cloud, self.fx_cb_vector_scope, self.fx_cb_lowpass_muffle, self.fx_cb_infinity_tunnel, self.fx_cb_dolly_zoom]:
-            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
-            fx_type_box_4.addWidget(cb)
-        fx_type_box_4.addStretch()
-        layout.addLayout(fx_type_box_4)
+        vj_cbs = [
+            self.fx_cb_thermal_vision, self.fx_cb_scanline_glitch, self.fx_cb_frame_drop,
+            self.fx_cb_dynamic_mosaic, self.fx_cb_pixel_art, self.fx_cb_handheld_camera,
+            self.fx_cb_stylized_fade, self.fx_cb_zoom_pulse, self.fx_cb_film_burn,
+            self.fx_cb_blueprint, self.fx_cb_turing, self.fx_cb_point_cloud,
+            self.fx_cb_vector_scope, self.fx_cb_lowpass_muffle, self.fx_cb_infinity_tunnel,
+            self.fx_cb_dolly_zoom
+        ]
 
-        # Row 5: Next-Gen 6 Advanced Global Post-FX
-        fx_type_box_5 = QHBoxLayout()
-        fx_type_box_5.setSpacing(12)
-        
-        self.fx_cb_hologram_glitch = QCheckBox("全息干擾", tab)
+        # 類別 4: 前沿與次世代旗艦
+        self.fx_cb_hologram_glitch = QCheckBox("全息干擾", self.fx_matrix_dialog)
         self.fx_cb_hologram_glitch.setChecked(True)
-        self.fx_cb_hologram_glitch.setToolTip("前沿全域 1: 全息掃描干擾 (Hologram Glitch) — 科幻全息掃描光條、RGB 撕裂與雷射干擾線")
 
-        self.fx_cb_voronoi_shatter = QCheckBox("泰森碎裂", tab)
+        self.fx_cb_voronoi_shatter = QCheckBox("泰森碎裂", self.fx_matrix_dialog)
         self.fx_cb_voronoi_shatter.setChecked(True)
-        self.fx_cb_voronoi_shatter.setToolTip("前沿全域 2: 泰森多邊形碎裂折射 (Voronoi Shatter) — 水晶幾何切片碎裂與低音動態折射")
 
-        self.fx_cb_thermal_infrared = QCheckBox("紅外熱感", tab)
+        self.fx_cb_thermal_infrared = QCheckBox("紅外熱感", self.fx_matrix_dialog)
         self.fx_cb_thermal_infrared.setChecked(True)
-        self.fx_cb_thermal_infrared.setToolTip("前沿全域 3: 軍規紅外熱感視界 (Thermal Infrared) — 賽博紅外熱感光譜與冷熱頻譜過渡")
 
-        self.fx_cb_ascii_cyber_matrix = QCheckBox("矩陣字元", tab)
+        self.fx_cb_ascii_cyber_matrix = QCheckBox("矩陣字元", self.fx_matrix_dialog)
         self.fx_cb_ascii_cyber_matrix.setChecked(True)
-        self.fx_cb_ascii_cyber_matrix.setToolTip("前沿全域 4: 高階動態 Cyber ASCII 碼雨 (ASCII Matrix Rain) — 數位字元矩陣與重拍脈衝高光")
 
-        self.fx_cb_chromatic_radial_zoom = QCheckBox("色差爆發", tab)
+        self.fx_cb_chromatic_radial_zoom = QCheckBox("色差爆發", self.fx_matrix_dialog)
         self.fx_cb_chromatic_radial_zoom.setChecked(True)
-        self.fx_cb_chromatic_radial_zoom.setToolTip("前沿全域 5: 色差徑向爆發衝擊 (Chromatic Radial Zoom) — 重拍中心向外徑向色差與動態 Zoom 衝擊")
 
-        self.fx_cb_synthwave_grid_scan = QCheckBox("賽博網格", tab)
+        self.fx_cb_synthwave_grid_scan = QCheckBox("賽博網格", self.fx_matrix_dialog)
         self.fx_cb_synthwave_grid_scan.setChecked(True)
-        self.fx_cb_synthwave_grid_scan.setToolTip("前沿全域 6: 賽博波形網格掃描 (Synthwave 3D Grid) — 復古網格線條、地平線掃描與波型震蕩")
 
-        for cb in [self.fx_cb_hologram_glitch, self.fx_cb_voronoi_shatter, self.fx_cb_thermal_infrared, self.fx_cb_ascii_cyber_matrix, self.fx_cb_chromatic_radial_zoom, self.fx_cb_synthwave_grid_scan]:
-            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
-            fx_type_box_5.addWidget(cb)
-        fx_type_box_5.addStretch()
-        layout.addLayout(fx_type_box_5)
-
-        # Row 6: Ultra-Cutting-Edge Flagship Global Post-FX
-        fx_type_box_6 = QHBoxLayout()
-        fx_type_box_6.setSpacing(12)
-
-        self.fx_cb_chladni_cymatics = QCheckBox("克拉尼駐波", tab)
+        self.fx_cb_chladni_cymatics = QCheckBox("克拉尼駐波", self.fx_matrix_dialog)
         self.fx_cb_chladni_cymatics.setChecked(True)
-        self.fx_cb_chladni_cymatics.setToolTip("旗艦全域 1: 克拉尼克聲波駐波紋 (Chladni Cymatics) — 聲學幾何共振與幾何節線發光沙紋")
 
-        self.fx_cb_ferrofluid_spikes = QCheckBox("磁流體刺針", tab)
+        self.fx_cb_ferrofluid_spikes = QCheckBox("磁流體刺針", self.fx_matrix_dialog)
         self.fx_cb_ferrofluid_spikes.setChecked(True)
-        self.fx_cb_ferrofluid_spikes.setToolTip("旗艦全域 2: 磁流體刺針湧動 (Ferrofluid Spikes) — 低音重拍爆發金屬磁針與漆黑液體流變")
 
-        self.fx_cb_volumetric_caustics = QCheckBox("體積焦散", tab)
+        self.fx_cb_volumetric_caustics = QCheckBox("體積焦散", self.fx_matrix_dialog)
         self.fx_cb_volumetric_caustics.setChecked(True)
-        self.fx_cb_volumetric_caustics.setToolTip("旗艦全域 3: 體積焦散光網 (Volumetric Caustics) — 水下折射聚焦光網與空靈和弦調色")
 
-        self.fx_cb_clifford_torus = QCheckBox("四維環面", tab)
+        self.fx_cb_clifford_torus = QCheckBox("四維環面", self.fx_matrix_dialog)
         self.fx_cb_clifford_torus.setChecked(True)
-        self.fx_cb_clifford_torus.setToolTip("旗艦全域 4: 四維克利福德環面扭曲 (4D Clifford Torus Warp) — 非歐幾何拓撲超曲面旋轉映射")
 
-        self.fx_cb_holographic_moire = QCheckBox("全息莫爾", tab)
+        self.fx_cb_holographic_moire = QCheckBox("全息莫爾", self.fx_matrix_dialog)
         self.fx_cb_holographic_moire.setChecked(True)
-        self.fx_cb_holographic_moire.setToolTip("旗艦全域 5: 聲學全息莫爾干涉 (Acoustic Holographic Moiré) — 高頻打擊樂微米光柵干涉與彩色虹彩")
 
-        self.fx_cb_lens_defocus = QCheckBox("鏡頭失焦", tab)
+        self.fx_cb_lens_defocus = QCheckBox("鏡頭失焦", self.fx_matrix_dialog)
         self.fx_cb_lens_defocus.setChecked(True)
-        self.fx_cb_lens_defocus.setToolTip("生理光學 1: 鏡頭失焦與光學散景 (Lens Defocus) — 大光圈散景呼吸、移軸徑向景深與電影黑柔焦")
 
-        self.fx_cb_ocular_tremor = QCheckBox("眼球微顫", tab)
+        self.fx_cb_ocular_tremor = QCheckBox("眼球微顫", self.fx_matrix_dialog)
         self.fx_cb_ocular_tremor.setChecked(True)
-        self.fx_cb_ocular_tremor.setToolTip("生理光學 2: 生理性眼球顫動與跳視 (Ocular Tremor) — 40~65Hz 生理微抖、重拍跳視衝擊回彈與前庭眼震")
 
-        for cb in [self.fx_cb_chladni_cymatics, self.fx_cb_ferrofluid_spikes, self.fx_cb_volumetric_caustics, self.fx_cb_clifford_torus, self.fx_cb_holographic_moire, self.fx_cb_lens_defocus, self.fx_cb_ocular_tremor]:
-            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
-            fx_type_box_6.addWidget(cb)
-        fx_type_box_6.addStretch()
-        layout.addLayout(fx_type_box_6)
-
-        # Row 7: Next-Gen Flagship Glitch Matrix (Quantum Decoherence, Latent Hallucination, Tape Head Drag, Huffman Collapse, Spectral Fractal Shear)
-        fx_type_box_7 = QHBoxLayout()
-        fx_type_box_7.setSpacing(12)
-
-        self.fx_cb_quantum_decoherence = QCheckBox("量子退相干", tab)
+        self.fx_cb_quantum_decoherence = QCheckBox("量子退相干", self.fx_matrix_dialog)
         self.fx_cb_quantum_decoherence.setChecked(True)
-        self.fx_cb_quantum_decoherence.setToolTip("次世代故障 1: 量子退相干崩塌 (Quantum Decoherence) — 薛丁格波包干涉、自旋對稱破缺與量子穿隧跳躍")
 
-        self.fx_cb_latent_hallucination = QCheckBox("潛空間幻覺", tab)
+        self.fx_cb_latent_hallucination = QCheckBox("潛空間幻覺", self.fx_matrix_dialog)
         self.fx_cb_latent_hallucination.setChecked(True)
-        self.fx_cb_latent_hallucination.setToolTip("次世代故障 2: 神經潛空間幻覺故障 (Latent Hallucination) — 自注意力Patch錯位、語義流淌與夢境特徵回授")
 
-        self.fx_cb_tape_head_drag = QCheckBox("磁帶咬帶", tab)
+        self.fx_cb_tape_head_drag = QCheckBox("磁帶咬帶", self.fx_matrix_dialog)
         self.fx_cb_tape_head_drag.setChecked(True)
-        self.fx_cb_tape_head_drag.setToolTip("次世代故障 3: 類比磁帶刮擦與咬帶 (Tape Head Drag) — 壓帶輪高斯卡帶、磁頭刮痕與色彩消磁拖影")
 
-        self.fx_cb_huffman_entropy_collapse = QCheckBox("熵編碼崩毀", tab)
+        self.fx_cb_huffman_entropy_collapse = QCheckBox("熵編碼崩毀", self.fx_matrix_dialog)
         self.fx_cb_huffman_entropy_collapse.setChecked(True)
-        self.fx_cb_huffman_entropy_collapse.setToolTip("次世代故障 4: JPEG 宏塊熵編碼崩毀 (Huffman Collapse) — DC 係數雪崩漂移、AC 量子化炸裂與色空間逆轉")
 
-        self.fx_cb_spectral_fractal_shear = QCheckBox("頻譜碎形撕裂", tab)
+        self.fx_cb_spectral_fractal_shear = QCheckBox("頻譜碎形撕裂", self.fx_matrix_dialog)
         self.fx_cb_spectral_fractal_shear.setChecked(True)
-        self.fx_cb_spectral_fractal_shear.setToolTip("次世代故障 5: 時空頻譜碎形撕裂 (Spectral Fractal Shear) — 音頻時域波形幾何撕裂、泛音碎形裂紋與左右對撕")
 
-        for cb in [self.fx_cb_quantum_decoherence, self.fx_cb_latent_hallucination, self.fx_cb_tape_head_drag, self.fx_cb_huffman_entropy_collapse, self.fx_cb_spectral_fractal_shear]:
-            cb.setStyleSheet("QCheckBox { color: #a1a1aa; } QCheckBox::indicator { width: 16px; height: 16px; }")
-            fx_type_box_7.addWidget(cb)
-        fx_type_box_7.addStretch()
-        layout.addLayout(fx_type_box_7)
+        # 🌟 12 大次世代高辨識度幾何/拓撲前沿特效 (SOTA FX Matrix)
+        self.fx_cb_hyper_dimensional_fold = QCheckBox("四維折疊 (HyperFold)", self.fx_matrix_dialog)
+        self.fx_cb_hyper_dimensional_fold.setChecked(True)
+
+        self.fx_cb_reaction_diffusion_growth = QCheckBox("異構擴散 (RD Growth)", self.fx_matrix_dialog)
+        self.fx_cb_reaction_diffusion_growth.setChecked(True)
+
+        self.fx_cb_delaunay_voronoi_mesh = QCheckBox("德勞內網格 (Delaunay)", self.fx_matrix_dialog)
+        self.fx_cb_delaunay_voronoi_mesh.setChecked(True)
+
+        self.fx_cb_slit_scan_time_warp = QCheckBox("時空狹縫 (SlitScan)", self.fx_matrix_dialog)
+        self.fx_cb_slit_scan_time_warp.setChecked(True)
+
+        self.fx_cb_gravitational_lensing = QCheckBox("引力透鏡 (GravLens)", self.fx_matrix_dialog)
+        self.fx_cb_gravitational_lensing.setChecked(True)
+
+        self.fx_cb_acid_curl_fluid = QCheckBox("酸性旋度 (CurlFluid)", self.fx_matrix_dialog)
+        self.fx_cb_acid_curl_fluid.setChecked(True)
+
+        self.fx_cb_strobe_chroma_invert = QCheckBox("反相頻閃 (ChromaStrobe)", self.fx_matrix_dialog)
+        self.fx_cb_strobe_chroma_invert.setChecked(True)
+
+        self.fx_cb_cyber_wireframe_lidar = QCheckBox("光達線框 (LiDAR)", self.fx_matrix_dialog)
+        self.fx_cb_cyber_wireframe_lidar.setChecked(True)
+
+        self.fx_cb_sine_terrain_displacement = QCheckBox("正弦地形 (SineTerrain)", self.fx_matrix_dialog)
+        self.fx_cb_sine_terrain_displacement.setChecked(True)
+
+        self.fx_cb_quantum_tunneling = QCheckBox("量子穿隧 (QTunnel)", self.fx_matrix_dialog)
+        self.fx_cb_quantum_tunneling.setChecked(True)
+
+        self.fx_cb_prismatic_refraction_prism = QCheckBox("多稜鏡折射 (PrismDisp)", self.fx_matrix_dialog)
+        self.fx_cb_prismatic_refraction_prism.setChecked(True)
+
+        self.fx_cb_magnetic_field_lines = QCheckBox("磁力線粉末 (MagLines)", self.fx_matrix_dialog)
+        self.fx_cb_magnetic_field_lines.setChecked(True)
+
+        flagship_cbs = [
+            self.fx_cb_hologram_glitch, self.fx_cb_voronoi_shatter, self.fx_cb_thermal_infrared,
+            self.fx_cb_ascii_cyber_matrix, self.fx_cb_chromatic_radial_zoom, self.fx_cb_synthwave_grid_scan,
+            self.fx_cb_chladni_cymatics, self.fx_cb_ferrofluid_spikes, self.fx_cb_volumetric_caustics,
+            self.fx_cb_clifford_torus, self.fx_cb_holographic_moire, self.fx_cb_lens_defocus,
+            self.fx_cb_ocular_tremor, self.fx_cb_quantum_decoherence, self.fx_cb_latent_hallucination,
+            self.fx_cb_tape_head_drag, self.fx_cb_huffman_entropy_collapse, self.fx_cb_spectral_fractal_shear,
+            self.fx_cb_hyper_dimensional_fold, self.fx_cb_reaction_diffusion_growth, self.fx_cb_delaunay_voronoi_mesh,
+            self.fx_cb_slit_scan_time_warp, self.fx_cb_gravitational_lensing, self.fx_cb_acid_curl_fluid,
+            self.fx_cb_strobe_chroma_invert, self.fx_cb_cyber_wireframe_lidar, self.fx_cb_sine_terrain_displacement,
+            self.fx_cb_quantum_tunneling, self.fx_cb_prismatic_refraction_prism, self.fx_cb_magnetic_field_lines
+        ]
+
+        # 註冊所有 checkbox 到管理面板
+        self.fx_matrix_dialog.register_checkboxes(basic_cbs, physics_cbs, vj_cbs, flagship_cbs)
+
+        # Row 2: 特效風格套件與矩陣開啟按鈕
+        preset_row = QHBoxLayout()
+        preset_lbl = QLabel("風格套件 (Preset):", fx_rack_frame)
+        preset_lbl.setStyleSheet("color: #a1a1aa; font-size: 11px;")
+        
+        self.fx_preset_combo = QComboBox(fx_rack_frame)
+        self.fx_preset_combo.setView(QListView())
+        self.fx_preset_combo.addItems([
+            "⚡ 推薦旗艦全開 (預設)",
+            "🌌 賽博故障風 (Cyber Glitch)",
+            "🧘 極簡禪意風 (Ambient Caustics)",
+            "📼 復古 VHS 膠片 (Retro Film)",
+            "🔊 低頻脈衝震盪 (Bass Pulse)",
+            "🚫 純淨模式 (關閉全域特效)"
+        ])
+        self.fx_preset_combo.setStyleSheet("""
+            QComboBox {
+                background-color: #18181b; color: #f4f4f5; border: 1px solid #3f3f46;
+                border-radius: 4px; padding: 4px 8px; font-size: 11px;
+            }
+        """)
+        self.fx_preset_combo.currentIndexChanged.connect(self._on_fx_preset_selected)
+        preset_row.addWidget(preset_lbl)
+        preset_row.addWidget(self.fx_preset_combo, stretch=1)
+
+        # 矩陣詳細面板呼叫按鈕
+        en_cnt, tot_cnt = self.fx_matrix_dialog.get_enabled_count()
+        self.btn_open_fx_matrix = QPushButton(f"⚙️ 微調 68 軌詳細特效矩陣 ({en_cnt}/{tot_cnt} 啟用) ▾", fx_rack_frame)
+        self.btn_open_fx_matrix.setStyleSheet("""
+            QPushButton {
+                background-color: #27272a;
+                color: #38bdf8;
+                border: 1px solid #38bdf8;
+                border-radius: 4px;
+                padding: 5px 12px;
+                font-size: 11px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #38bdf8;
+                color: #09090b;
+            }
+        """)
+        self.btn_open_fx_matrix.clicked.connect(self._open_fx_matrix_dialog)
+        preset_row.addWidget(self.btn_open_fx_matrix)
+
+        fx_rack_layout.addLayout(preset_row)
+        layout.addWidget(fx_rack_frame)
+
+        # ── 渲染進度與狀態儀表條 (Render Progress & Engine Status Capsule) ──
+        progress_capsule = QFrame(tab)
+        progress_capsule.setStyleSheet("""
+            QFrame {
+                background-color: #121216;
+                border: 1px solid #27272a;
+                border-radius: 8px;
+                padding: 4px;
+            }
+        """)
+        capsule_layout = QVBoxLayout(progress_capsule)
+        capsule_layout.setContentsMargins(10, 8, 10, 8)
+        capsule_layout.setSpacing(6)
 
         # Progress bar
-        self.progress_bar = QProgressBar(tab)
+        self.progress_bar = QProgressBar(progress_capsule)
         self.progress_bar.setValue(0)
-        layout.addWidget(self.progress_bar)
+        self.progress_bar.setFixedHeight(16)
+        self.progress_bar.setStyleSheet("""
+            QProgressBar {
+                background-color: #18181b;
+                border: 1px solid #3f3f46;
+                border-radius: 8px;
+                text-align: center;
+                color: #ffffff;
+                font-size: 10px;
+                font-weight: bold;
+            }
+            QProgressBar::chunk {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #38bdf8);
+                border-radius: 7px;
+            }
+        """)
+        capsule_layout.addWidget(self.progress_bar)
 
-        self.status_lbl = QLabel("準備就緒", tab)
-        self.status_lbl.setStyleSheet("color: #a1a1aa;")
-        layout.addWidget(self.status_lbl)
+        self.status_lbl = QLabel("準備就緒", progress_capsule)
+        self.status_lbl.setStyleSheet("color: #38bdf8; font-size: 11px; font-weight: bold;")
+        capsule_layout.addWidget(self.status_lbl)
+
+        layout.addWidget(progress_capsule)
 
         # 🎬 AI 導演通告單可視化卡片 (Director Call Sheet Panel)
         self.call_sheet_widget = AIDirectorCallSheetWidget(tab)
         layout.addWidget(self.call_sheet_widget)
 
-        # Render buttons layout
-        btn_box = QHBoxLayout()
-        self.btn_ai_director = QPushButton("🎬 【AI 導演智能排片 (LLM Script)】", tab)
-        self.btn_ai_director.setStyleSheet("background-color: #9333ea; color: white; font-size: 13px; padding: 12px; font-weight: bold; border-radius: 6px;")
+        # 現代化專業操作按鈕架構 (分層 CTA，清晰職責)
+        btn_container = QWidget(tab)
+        btn_layout = QVBoxLayout(btn_container)
+        btn_layout.setContentsMargins(0, 4, 0, 0)
+        btn_layout.setSpacing(6)
+
+        # 第一行：AI 導演與智能編排工作流 (AI Creative Orchestration)
+        row_ai_btns = QHBoxLayout()
+        row_ai_btns.setSpacing(8)
+        self.btn_ai_director = QPushButton("✨ 【AI 導演智能排片 (LLM Script)】", tab)
+        self.btn_ai_director.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #7c3aed, stop:1 #8b5cf6);
+                color: #ffffff; font-size: 12px; padding: 11px; font-weight: bold; border-radius: 6px;
+                border: 1px solid #a78bfa;
+            }
+            QPushButton:hover { background: #8b5cf6; }
+        """)
         self.btn_ai_director.clicked.connect(self.start_ai_director_orchestration)
 
         self.btn_smart_edit = QPushButton("🪄 智能剪輯配對並渲染", tab)
-        self.btn_smart_edit.setStyleSheet("background-color: #7c3aed; color: white; font-size: 13px; padding: 12px; font-weight: bold; border-radius: 6px;")
+        self.btn_smart_edit.setStyleSheet("""
+            QPushButton {
+                background-color: #27272a; color: #c4b5fd; font-size: 12px; padding: 11px; font-weight: bold; border-radius: 6px;
+                border: 1px solid #6366f1;
+            }
+            QPushButton:hover { background-color: #3730a3; color: #ffffff; }
+        """)
         self.btn_smart_edit.clicked.connect(self.start_smart_edit_rendering)
 
-        self.btn_batch_smart_edit = QPushButton("🪄 批次智能剪輯配對並渲染", tab)
-        self.btn_batch_smart_edit.setStyleSheet("background-color: #4f46e5; color: white; font-size: 13px; padding: 12px; font-weight: bold; border-radius: 6px;")
+        self.btn_batch_smart_edit = QPushButton("📂 批次智能剪輯配對", tab)
+        self.btn_batch_smart_edit.setStyleSheet("""
+            QPushButton {
+                background-color: #18181b; color: #a1a1aa; border: 1px solid #3f3f46; font-size: 12px; padding: 11px; font-weight: bold; border-radius: 6px;
+            }
+            QPushButton:hover { background-color: #27272a; color: #f4f4f5; border-color: #52525b; }
+        """)
         self.btn_batch_smart_edit.clicked.connect(self.start_batch_smart_edit_rendering)
 
+        row_ai_btns.addWidget(self.btn_ai_director, 3)
+        row_ai_btns.addWidget(self.btn_smart_edit, 2)
+        row_ai_btns.addWidget(self.btn_batch_smart_edit, 2)
+        btn_layout.addLayout(row_ai_btns)
+
+        # 第二行：主渲染核心執行行動 (Master Action CTA)
+        row_master_btns = QHBoxLayout()
+        row_master_btns.setSpacing(8)
         self.btn_render = QPushButton("🚀 一鍵開始渲染 4K MV", tab)
-        self.btn_render.setStyleSheet("background-color: #059669; color: white; font-size: 13px; padding: 12px; font-weight: bold; border-radius: 6px;")
+        self.btn_render.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #059669, stop:1 #10b981);
+                color: white; font-size: 14px; padding: 13px; font-weight: bold; border-radius: 6px;
+                border: 1px solid #34d399;
+            }
+            QPushButton:hover { background: #10b981; }
+            QPushButton:pressed { background: #047857; }
+        """)
         self.btn_render.clicked.connect(self.start_mv_rendering)
         
         self.btn_cancel_render = QPushButton("⏹️ 中止", tab)
-        self.btn_cancel_render.setStyleSheet("background-color: #b91c1c; color: white; font-size: 13px; padding: 12px; border-radius: 6px;")
+        self.btn_cancel_render.setStyleSheet("""
+            QPushButton {
+                background-color: #27272a; color: #f87171; font-size: 13px; padding: 13px; border-radius: 6px; font-weight: bold;
+                border: 1px solid #7f1d1d;
+            }
+            QPushButton:hover { background-color: #991b1b; color: white; border-color: #ef4444; }
+            QPushButton:disabled { background-color: #1c1917; color: #57534e; border-color: #292524; }
+        """)
         self.btn_cancel_render.clicked.connect(self.cancel_mv_rendering)
         self.btn_cancel_render.setEnabled(False)
-        
-        btn_box.addWidget(self.btn_ai_director, 3)
-        btn_box.addWidget(self.btn_smart_edit, 2)
-        btn_box.addWidget(self.btn_batch_smart_edit, 2)
-        btn_box.addWidget(self.btn_render, 2)
-        btn_box.addWidget(self.btn_cancel_render, 1)
-        layout.addLayout(btn_box)
+
+        row_master_btns.addWidget(self.btn_render, 4)
+        row_master_btns.addWidget(self.btn_cancel_render, 1)
+        btn_layout.addLayout(row_master_btns)
+
+        layout.addWidget(btn_container)
 
         self.left_tabs.addTab(tab, "4K 影片離線渲染器")
+
+    def _open_fx_matrix_dialog(self):
+        """開啟 48 軌詳細後製特效矩陣管理面板"""
+        if hasattr(self, "fx_matrix_dialog"):
+            self.fx_matrix_dialog.exec()
+            if hasattr(self, "btn_open_fx_matrix"):
+                en_cnt, tot_cnt = self.fx_matrix_dialog.get_enabled_count()
+                self.btn_open_fx_matrix.setText(f"⚙️ 微調 48 軌詳細特效矩陣 ({en_cnt}/{tot_cnt} 啟用) ▾")
+
+    def _toggle_console_drawer(self):
+        """展開或收起右側輸出終端抽屜"""
+        if hasattr(self, "console_log") and hasattr(self, "btn_toggle_console"):
+            is_vis = not self.console_log.isVisible()
+            self.console_log.setVisible(is_vis)
+            self.btn_toggle_console.setText(f"📜 輸出終端 (Console Logs) [正常監控中] {'▴' if is_vis else '▾'}")
+
+    def _on_fx_preset_selected(self, index: int):
+        """一鍵套用不同後製特效風格預設套件"""
+        if not hasattr(self, "fx_matrix_dialog"):
+            return
+            
+        if index == 0:
+            # 推薦旗艦全開
+            self.fx_matrix_dialog.select_all()
+        elif index == 1:
+            # 賽博故障風
+            self.fx_matrix_dialog.deselect_all()
+            cyber_targets = [
+                getattr(self, "fx_cb_data_mosh", None),
+                getattr(self, "fx_cb_centroid_glitch", None),
+                getattr(self, "fx_cb_scanline_glitch", None),
+                getattr(self, "fx_cb_hologram_glitch", None),
+                getattr(self, "fx_cb_ascii_cyber_matrix", None),
+                getattr(self, "fx_cb_synthwave_grid_scan", None),
+                getattr(self, "fx_cb_quantum_decoherence", None),
+                getattr(self, "fx_cb_tape_head_drag", None),
+                getattr(self, "fx_cb_huffman_entropy_collapse", None),
+                getattr(self, "fx_cb_photosensitive_safe", None)
+            ]
+            for cb in cyber_targets:
+                if cb: cb.setChecked(True)
+        elif index == 2:
+            # 極簡禪意風
+            self.fx_matrix_dialog.deselect_all()
+            ambient_targets = [
+                getattr(self, "fx_cb_fluid_noise", None),
+                getattr(self, "fx_cb_sedimentation", None),
+                getattr(self, "fx_cb_volumetric_caustics", None),
+                getattr(self, "fx_cb_lens_defocus", None),
+                getattr(self, "fx_cb_lowpass_muffle", None),
+                getattr(self, "fx_cb_ambient_dsp", None),
+                getattr(self, "fx_cb_photosensitive_safe", None)
+            ]
+            for cb in ambient_targets:
+                if cb: cb.setChecked(True)
+        elif index == 3:
+            # 復古 VHS 膠片風
+            self.fx_matrix_dialog.deselect_all()
+            film_targets = [
+                getattr(self, "fx_cb_film_burn", None),
+                getattr(self, "fx_cb_scanline_glitch", None),
+                getattr(self, "fx_cb_retro_degradation", None),
+                getattr(self, "fx_cb_tape_head_drag", None),
+                getattr(self, "fx_cb_stylized_fade", None),
+                getattr(self, "fx_cb_handheld_camera", None),
+                getattr(self, "fx_cb_photosensitive_safe", None)
+            ]
+            for cb in film_targets:
+                if cb: cb.setChecked(True)
+        elif index == 4:
+            # 低頻脈衝震盪
+            self.fx_matrix_dialog.deselect_all()
+            pulse_targets = [
+                getattr(self, "fx_cb_zoom_pulse", None),
+                getattr(self, "fx_cb_chladni_cymatics", None),
+                getattr(self, "fx_cb_ferrofluid_spikes", None),
+                getattr(self, "fx_cb_chromatic_radial_zoom", None),
+                getattr(self, "fx_cb_voronoi_shatter", None),
+                getattr(self, "fx_cb_photosensitive_safe", None)
+            ]
+            for cb in pulse_targets:
+                if cb: cb.setChecked(True)
+        elif index == 5:
+            # 純淨模式
+            self.fx_matrix_dialog.deselect_all()
+            safe_cb = getattr(self, "fx_cb_photosensitive_safe", None)
+            if safe_cb: safe_cb.setChecked(True)
+            
+        en_cnt, tot_cnt = self.fx_matrix_dialog.get_enabled_count()
+        if hasattr(self, "btn_open_fx_matrix"):
+            self.btn_open_fx_matrix.setText(f"⚙️ 微調 48 軌詳細特效矩陣 ({en_cnt}/{tot_cnt} 啟用) ▾")
 
     def update_photosensitive_safe_preview(self):
         val = str(self.fx_cb_photosensitive_safe.isChecked()).lower()
@@ -7242,9 +8556,10 @@ class StandaloneInjectorApp(QMainWindow):
                 self.lbl_genre_badge.setText("⚡ 已載入音訊，待觸發分析...")
 
     def _on_genre_selection_changed(self):
+        current_text = self.genre_select.currentText().strip() if hasattr(self, 'genre_select') else ""
+        self.current_genre = current_text
         if not hasattr(self, 'lbl_genre_badge'):
             return
-        current_text = self.genre_select.currentText().strip()
         if "Auto" in current_text:
             self.lbl_genre_badge.setText("⚡ 聲學遙測: 待分析 (智慧自動模式)")
             self.lbl_genre_badge.setStyleSheet("color: #38bdf8; font-size: 11px; font-weight: bold; margin-left: 8px; background: rgba(56, 189, 248, 0.08); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.25);")
@@ -7259,6 +8574,21 @@ class StandaloneInjectorApp(QMainWindow):
                 self.lbl_genre_badge.setStyleSheet("color: #c084fc; font-size: 11px; font-weight: bold; margin-left: 8px; background: rgba(192, 132, 252, 0.12); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(192, 132, 252, 0.35);")
             except Exception:
                 self.lbl_genre_badge.setText(f"🎨 導演手動指定: {current_text}")
+
+        # 🫁 Ambient 門禁聯動過濾
+        if "ambient" in current_text.lower() or "drone" in current_text.lower():
+            if hasattr(self, 'batch_date_select'):
+                idx = self.batch_date_select.findData("ambient_all")
+                if idx >= 0 and self.batch_date_select.currentIndex() != idx:
+                    self.batch_date_select.setCurrentIndex(idx)
+            self.log_to_console("🫁 [Ambient 導演門禁] 已啟動！模組庫與導演排片系統已自動鎖定為 Ambient 專屬心流模組。")
+        else:
+            if hasattr(self, 'batch_date_select'):
+                cur_data = str(self.batch_date_select.currentData() or "")
+                if cur_data.startswith("ambient_"):
+                    idx = self.batch_date_select.findData("all")
+                    if idx >= 0:
+                        self.batch_date_select.setCurrentIndex(idx)
 
     def browse_audio_dir(self):
         dir_path = safe_get_existing_directory(self, "選擇音訊來源資料夾")
@@ -7390,6 +8720,13 @@ class StandaloneInjectorApp(QMainWindow):
                     
                     thumb_path = os.path.join(save_dir, "thumbnails", f"{name}.jpg")
                     
+                    if not hasattr(self, "_ambient_gate") or self._ambient_gate is None:
+                        from ambient_module_compatibility_gate import AmbientModuleCompatibilityGate
+                        self._ambient_gate = AmbientModuleCompatibilityGate.get_instance()
+                    ambient_tier = self._ambient_gate.get_module_tier(name, {
+                        "name": name, "tags": tags, "storyboard_weight": storyboard_weight
+                    })
+
                     presets_data.append({
                         "name": name,
                         "display_name": display_name,
@@ -7404,7 +8741,8 @@ class StandaloneInjectorApp(QMainWindow):
                         "storyboard_weight": storyboard_weight,
                         "post_fx_intensity": post_fx_intensity,
                         "used_count": used_count,
-                        "is_starred": is_starred
+                        "is_starred": is_starred,
+                        "ambient_tier": ambient_tier
                     })
             self.cached_presets = list(presets_data)
 
@@ -7482,7 +8820,19 @@ class StandaloneInjectorApp(QMainWindow):
         # 更新已收錄模組的數量顯示
         total_presets = len(presets_data)
         if hasattr(self, "lbl_visual_count"):
-            self.lbl_visual_count.setText(f"(已收錄: {total_presets})")
+            is_ambient_filter = (
+                (hasattr(self, "batch_date_select") and str(self.batch_date_select.currentData() or "").startswith("ambient_")) or
+                (hasattr(self, "genre_select") and "ambient" in self.genre_select.currentText().lower())
+            )
+            sel_cnt = len(getattr(self, "checked_presets", []))
+            sel_text = f" | 已選取: {sel_cnt}" if sel_cnt > 0 else ""
+            if is_ambient_filter:
+                total_all = len(self.cached_presets or [])
+                self.lbl_visual_count.setText(f"(Ambient 適用: {total_presets} / 總收錄 {total_all}{sel_text})")
+                self.lbl_visual_count.setStyleSheet("color: #34d399; font-weight: bold; margin-left: 6px; font-size: 12px;")
+            else:
+                self.lbl_visual_count.setText(f"(已收錄: {total_presets}{sel_text})")
+                self.lbl_visual_count.setStyleSheet("color: #38bdf8; font-weight: bold; margin-left: 6px; font-size: 12px;")
             
         # Calculate pagination
         import math
@@ -7496,6 +8846,7 @@ class StandaloneInjectorApp(QMainWindow):
         start_idx = (self.presets_current_page - 1) * self.presets_page_size
         end_idx = start_idx + self.presets_page_size
         presets_page_data = presets_data[start_idx:end_idx]
+        self.current_page_preset_names = [d["name"] for d in presets_page_data]
             
         for data in presets_page_data:
             item = QListWidgetItem(self.visual_list)
@@ -7508,7 +8859,8 @@ class StandaloneInjectorApp(QMainWindow):
                     data["thumbnail_path"], data["frequency"], data["storyboard_weight"], data["post_fx_intensity"],
                     data["used_count"],
                     self.delete_preset, self.preview_preset, self.toggle_star_preset, self.visual_list,
-                    display_name=data["display_name"], is_starred=data["is_starred"]
+                    display_name=data["display_name"], is_starred=data["is_starred"],
+                    ambient_tier=data.get("ambient_tier")
                 )
             else:
                 # 表格列表模式
@@ -7517,7 +8869,8 @@ class StandaloneInjectorApp(QMainWindow):
                     data["frequency"], data["storyboard_weight"], data["post_fx_intensity"],
                     self.delete_preset, self.toggle_star_preset, self.visual_list,
                     display_name=data["display_name"], is_starred=data["is_starred"],
-                    on_preview_callback=self.preview_preset
+                    on_preview_callback=self.preview_preset,
+                    ambient_tier=data.get("ambient_tier")
                 )
                 
             item.setSizeHint(widget.sizeHint())
@@ -7548,6 +8901,12 @@ class StandaloneInjectorApp(QMainWindow):
             self.presets_current_page += 1
             self.refresh_presets_list(clean_black=False, keep_page=True)
 
+    def go_to_presets_page(self, page_num: int):
+        target = max(1, min(page_num, getattr(self, "presets_max_pages", 1)))
+        if target != getattr(self, "presets_current_page", 1):
+            self.presets_current_page = target
+            self.refresh_presets_list(clean_black=False, keep_page=True)
+
     def on_preset_checked_toggled(self, name, state):
         # state can be int or Qt.CheckState enum value
         checked = (state == 2 or (hasattr(state, "value") and state.value == 2))
@@ -7555,6 +8914,13 @@ class StandaloneInjectorApp(QMainWindow):
             self.checked_presets.add(name)
         else:
             self.checked_presets.discard(name)
+        
+        # 即時更新標題列的選取計數
+        if hasattr(self, "lbl_visual_count") and hasattr(self, "cached_presets"):
+            total_cnt = len(self.cached_presets or [])
+            sel_cnt = len(self.checked_presets)
+            sel_text = f" | 已選取: {sel_cnt}" if sel_cnt > 0 else ""
+            self.lbl_visual_count.setText(f"(已收錄: {total_cnt}{sel_text})")
 
     def on_visual_list_item_clicked(self, item):
         widget = self.visual_list.itemWidget(item)
@@ -7562,7 +8928,36 @@ class StandaloneInjectorApp(QMainWindow):
             self.preview_preset(widget.module_name)
 
 
-    def get_html_content(self, code, custom_css="", custom_html="", inline_assets=None, for_thumbnail=False, sketch_id=None, scaling_mode="auto", for_rendering=False):
+    def get_html_content(self, code, custom_css="", custom_html="", inline_assets=None, for_thumbnail=False, sketch_id=None, scaling_mode="auto", for_rendering=False, is_ambient=None, ambient_palette=None):
+        import json
+        if is_ambient is None:
+            genre_str = str(getattr(self, "current_genre", "") or "").lower()
+            if hasattr(self, "genre_select") and self.genre_select is not None:
+                try:
+                    genre_str += " " + str(self.genre_select.currentText() or "").lower()
+                except Exception:
+                    pass
+            is_ambient = any(k in genre_str for k in ("ambient", "drone", "meditative", "chill", "downtempo", "atmospheric", "sleep", "new_age"))
+
+        active_amb_palette = ambient_palette or AMBIENT_DIRECTOR_PALETTES["nordic_glacier_mist"]
+        if is_ambient and code:
+            code = remap_module_colors_for_ambient_in_memory(code, active_amb_palette)
+
+        ambient_init_js = ""
+        if is_ambient:
+            pal_json = json.dumps(active_amb_palette)
+            ambient_init_js = f"""
+                window.isAmbientMode = true;
+                window.currentGenre = 'ambient';
+                if (typeof window.setAmbientColorOverride === 'function') {{
+                    window.setAmbientColorOverride({{
+                        enabled: true,
+                        maxSaturation: 0.28,
+                        blendRatio: 0.55,
+                        palette: {pal_json}
+                    }});
+                }}
+            """
         noloop_js = ""
         if for_thumbnail and not for_rendering:
             noloop_js = """
@@ -7658,6 +9053,22 @@ class StandaloneInjectorApp(QMainWindow):
                 })();
             """
         custom_html = self.cache_and_localize_scripts(custom_html or "")
+        ext_head_scripts = ""
+        if custom_html and ("<html" in custom_html.lower() or "<body" in custom_html.lower()):
+            # 1. 抽取 <head> 中的外部依賴腳本 (如 matter.js, three.js 等)，避免只取 body 遺失依賴
+            m_head = re.search(r'<head[^>]*>([\s\S]*?)</head>', custom_html, re.IGNORECASE)
+            if m_head:
+                head_scripts = re.findall(r'<script[^>]*src=[\'"]([^\'"]+)[\'"][^>]*>\s*</script>', m_head.group(1), re.IGNORECASE)
+                for s_src in head_scripts:
+                    # 排除本機 sketch 引用以及預設已有載入的 p5 基礎庫 (含 p5-2.1-b2.js 等 beta 版，防止覆寫 p5.lifecycles)
+                    s_lower = s_src.lower()
+                    if not (s_src.startswith('./') or 'openprocessing_sketch.js' in s_src or 'mysketch' in s_lower or 'sketch' in s_lower or re.search(r'(?:^|/)p5(?:-[0-9a-zA-Z._-]+)?(?:\.min)?\.js', s_src)):
+                        ext_head_scripts += f'<script src="{s_src}"></script>\n'
+
+            # 2. 提取 body 內容並清理對 ./sketch.js, ./main.js, mySketch.js 的本地模組引用 (因為已在主 script_tag 執行)
+            m_body = re.search(r'<body[^>]*>([\s\S]*?)</body>', custom_html, re.IGNORECASE)
+            body_inner = m_body.group(1) if m_body else custom_html
+            custom_html = ext_head_scripts + re.sub(r'<script[^>]*src=[\'"](?:\./)?(?:sketch|main|index|mySketch)\.js[\'"][^>]*>\s*</script>', '', body_inner, flags=re.IGNORECASE).strip()
         if not sketch_id:
             sketch_id = getattr(self, "current_preset_id", None)
             
@@ -7706,32 +9117,190 @@ class StandaloneInjectorApp(QMainWindow):
             """
         # 🛡️ 即時 JS 代碼語法自癒修復矩陣 (Runtime JS Sanitization & Auto-Repair)
         if code:
-            # 1. 自動修復殘留的 Java 2D 陣列宣告語法 (double[][] / float[][])
+            # 0. 剝除純文本與非 JS 編譯語言分頁 (如 OpenProcessing 的 LICENSE, README, NOTES, CREDITS, COFFEESCRIPT 等分頁，防止未轉譯語法引發 SyntaxError)
             code = re.sub(
-                r'\b(?:double|float|int|boolean|color|char|long|short)\s*\[\]\s*\[\]\s*(\w+)\s*=\s*new\s+\w*\[([^\]]+)\]\s*\[([^\]]+)\]\s*;',
-                r'let \1 = Array.from({length: (\2)}, () => new Array(\3).fill(0));',
+                r'//+\s*===+\s*Tab:\s*(?:license|readme|notes|todo|credits|about|documentation|licence|coffeescript|livescript|typescript|litcoffee)[^=\n]*===+[\s\S]*?(?=(?://+\s*===+\s*Tab:)|\Z)',
+                '',
+                code,
+                flags=re.IGNORECASE
+            )
+
+            # 0.02 自癒修復歷史匯入時誤注入字串或 GLSL uniform 內的 simulatedMouseX/Y 三元表達式 (解決 Unexpected identifier 'window' / 'undefined')
+            code = re.sub(
+                r'(["\'])\(window\.simulatedMouseX\s*!==\s*undefined[\s\S]*?:\s*mouseX\)\)\)\1',
+                r'\1mouseX\1',
                 code
             )
             code = re.sub(
-                r'\b(?:double|float|int|boolean|color|char|long|short)\s*\[\]\s*\[\]\s*(\w+)\s*\(',
+                r'(["\'])\(window\.simulatedMouseY\s*!==\s*undefined[\s\S]*?:\s*mouseY\)\)\)\1',
+                r'\1mouseY\1',
+                code
+            )
+            code = re.sub(
+                r'\b(uniform\s+(?:float|vec[234]|int)\s+)\(window\.simulatedMouse([XY])\s*!==\s*undefined[^\n;]*?:\s*mouse\2\)\)\)',
+                r'\1mouse\2',
+                code
+            )
+
+            # 0.05 修復 OpenProcessing 遺留的 /* export default */ 注釋分頁物件字面量語法 (如 // === Tab: Collections.js === /* export default */ { ... })
+            code = re.sub(
+                r'(//+\s*===+\s*Tab:\s*([a-zA-Z0-9_$]+)\.js\s*===+[\s\r\n]*)/\*\s*export\s+default\s*\*/',
+                r'\1var \2 =',
+                code
+            )
+            code = code.replace('/* export default */', 'export default')
+
+            # 0.08 清理對本地分頁腳本的重複 import (如 import Collections from "./Collections.js"，因為分頁代碼已被合併至同一腳本中)
+            code = re.sub(
+                r'^\s*import\s+([a-zA-Z0-9_$]+)\s+from\s*[\'"]\.\/([a-zA-Z0-9_$]+)(?:\.js)?[\'"];?\s*$',
+                r'// inlined import: \1',
+                code,
+                flags=re.MULTILINE
+            )
+
+            # 0.09 自動清理未被包裹之頂層 Raw GLSL 預處理指令 (防止 #version / #ifdef 引發 SyntaxError: Private field must be declared in an enclosing class)
+            code = re.sub(r'^\s*#(?:version|ifdef|ifndef|define|endif|else|extension|precision)\b.*$', lambda m: f'// [Stripped raw GLSL directive]: {m.group(0)}', code, flags=re.MULTILINE)
+
+            # 0.1 自動將非 JS 分頁 (.glsl, .vert, .frag, .txt, .csv, .json) 抽離並收納至 inline_assets (防止 raw shader 指令引發 SyntaxError: Private field '#version' / '#ifdef')
+            if "//" in code and "=== Tab:" in code:
+                try:
+                    if inline_assets is None:
+                        inline_assets = {}
+                    tab_splits = re.split(r'(//+\s*===+\s*Tab:\s*[^\n]+===+)', code)
+                    if len(tab_splits) > 1:
+                        preserved_js_chunks = []
+                        if tab_splits[0].strip():
+                            preserved_js_chunks.append(tab_splits[0])
+                        for t_idx in range(1, len(tab_splits), 2):
+                            t_header = tab_splits[t_idx]
+                            t_body = tab_splits[t_idx+1] if t_idx+1 < len(tab_splits) else ''
+                            t_match = re.search(r'Tab:\s*([^\s=]+)', t_header)
+                            t_name = t_match.group(1).strip() if t_match else ''
+                            t_lower = t_name.lower()
+                            if t_lower.endswith(('.glsl', '.vert', '.frag', '.txt', '.csv', '.json', '.tsv', '.coffee', '.ts', '.ls')):
+                                clean_asset_body = t_body.strip()
+                                inline_assets[t_name] = clean_asset_body
+                                base_t_name = t_name.split('/')[-1]
+                                inline_assets[base_t_name] = clean_asset_body
+                                # 保留 safe_var 宣告與字串常數，若舊腳本中有直接變數引用亦可無縫讀取
+                                safe_var = re.sub(r'[^a-zA-Z0-9_$]', '_', base_t_name)
+                                json_asset_str = json.dumps(clean_asset_body)
+                                preserved_js_chunks.append(f'\n// [Inlined GLSL/Text Asset: {t_name}]\nwindow["{t_name}"] = {json_asset_str};\nwindow["{base_t_name}"] = {json_asset_str};\nvar {safe_var} = {json_asset_str};\n')
+                            else:
+                                preserved_js_chunks.append(t_header + t_body)
+                        code = ''.join(preserved_js_chunks)
+                except Exception as e_tab:
+                    logger.warning(f"Error in tab asset extraction: {e_tab}")
+
+            # 1. 巢狀大括號陣列字面量初始化 (如 color[][] colors = {{...}, {...}}; 或 float[] x = {1, 2};)
+            def _convert_nested_braces(match):
+                decl = match.group(1)
+                body = match.group(2)
+                body_js = body.replace('{', '[').replace('}', ']')
+                return f'var {decl} = [{body_js}];'
+
+            code = re.sub(
+                r'\b(?:double|float|int|boolean|color|char|long|short|String|[A-Z]\w*)(?:\s*\[\s*\])+\s*(\w+)\s*=\s*\{([\s\S]*?)\}\s*;',
+                _convert_nested_braces,
+                code
+            )
+
+            # 2. 自動修復殘留的 Java 1D/2D/3D+ 多維陣列宣告語法 (含 C 風格後置括號如 ball bodies[] = new Array(big);)
+            code = re.sub(
+                r'^\s*(?!return\b|new\b|var\b|let\b|const\b|function\b|class\b)(?:double|float|int|boolean|color|char|long|short|String|[A-Za-z_]\w*)\s+(\w+)\s*(?:\[\s*\])+\s*=',
+                r'var \1 =',
+                code,
+                flags=re.MULTILINE
+            )
+            code = re.sub(
+                r'^\s*(?!return\b|new\b|var\b|let\b|const\b|function\b|class\b)(?:double|float|int|boolean|color|char|long|short|String|[A-Za-z_]\w*)\s+(\w+)\s*(?:\[\s*\])+\s*;',
+                r'var \1;',
+                code,
+                flags=re.MULTILINE
+            )
+            code = re.sub(
+                r'\b(?:double|float|int|boolean|color|char|long|short|String|[A-Z]\w*)\s*(?:\[\s*\])+\s*(\w+)\s*;',
+                r'var \1;',
+                code
+            )
+            code = re.sub(
+                r'\b(?:double|float|int|boolean|color|char|long|short|String|[A-Z]\w*)\s*(?:\[\s*\])+\s*(\w+)\s*=',
+                r'var \1 =',
+                code
+            )
+            code = re.sub(
+                r'\b(?:double|float|int|boolean|color|char|long|short|String|[A-Z]\w*)\s*(?:\[\s*\])+\s*(\w+)\s*\(',
                 r'function \1(',
                 code
             )
             code = re.sub(
-                r'\b(?:double|float|int|boolean|color|char|long|short)\s*\[\]\s*\[\]\s*(\w+)\b',
-                r'\1',
+                r'\b(?:double|float|int|boolean|color|char|long|short|String)\s*(?:\[\s*\])+',
+                r'',
                 code
             )
-            
-            # 3. 自動修復殘留的 Java 泛型 (ArrayList<...>)
+
+            # 3. 自動修復 1D 與多維陣列分配語法:
+            # 處理 new Array(a)[b][c] 或 new Type(a)[b][c]
+            def _repl_chained_array(m):
+                base_size = m.group(1)
+                dims = re.findall(r'\[([^\]]+)\]', m.group(2))
+                all_dims = [base_size] + dims
+                res = f'new Array({all_dims[-1]}).fill(0)'
+                for d in reversed(all_dims[:-1]):
+                    res = f'Array.from({{length: ({d})}}, () => {res})'
+                return res
+
+            code = re.sub(
+                r'new\s+(?:Array|\w+)\s*\(([^)]+)\)((?:\s*\[[^\]]+\])+)',
+                _repl_chained_array,
+                code
+            )
+
+            # 處理 new Type[a] 與 new Type[a][b][c] (解決 TypeError: float[n] is not a constructor)
+            def _repl_java_bracket_array(m):
+                dims = re.findall(r'\[([^\]]+)\]', m.group(1))
+                if len(dims) == 1:
+                    return f'new Array({dims[0]}).fill(0)'
+                res = f'new Array({dims[-1]}).fill(0)'
+                for d in reversed(dims[:-1]):
+                    res = f'Array.from({{length: ({d})}}, () => {res})'
+                return res
+
+            code = re.sub(
+                r'new\s+(?:double|float|int|boolean|color|char|long|short|String|\w+)((?:\s*\[[^\]]+\])+)',
+                _repl_java_bracket_array,
+                code
+            )
+
+            # 4. 自動修復殘留的 Java 泛型與 ArrayList (ArrayList<...>, new ArrayList())
+            code = re.sub(r'\bArrayList\s*<\s*[^>]+>\s*(\w+)\s*=\s*new\s+ArrayList\s*<[^>]+>\s*\(\s*\)\s*;', r'let \1 = [];', code)
+            code = re.sub(r'\b(?:List|ArrayList)\s*<\s*[^>]+>\s*(\w+)\s*;', r'let \1 = [];', code)
             code = re.sub(r'\bArrayList\s*<\s*\w+\s*>\s*(\w+)\s*;', r'let \1 = [];', code)
-            code = re.sub(r'\bnew\s+ArrayList\s*<\s*\w+\s*>\s*\(\s*\)', r'[]', code)
-            code = re.sub(r'\bArrayList\s*<\s*\w+\s*>', r'Array', code)
-            
-            # 4. 頂層 let / const 衝突修復 (防止多分頁或重新載入時發生 Identifier has already been declared)
-            code = re.sub(r'^\s*let\s+([a-zA-Z0-9_$]+)', r'var \1', code, flags=re.MULTILINE)
-            code = re.sub(r'^\s*const\s+([a-zA-Z0-9_$]+)', r'var \1', code, flags=re.MULTILINE)
+            code = re.sub(r'\bnew\s+ArrayList\s*(?:<\s*[^>]*>)?\s*\(\s*\)', r'[]', code)
+            code = re.sub(r'\bArrayList\s*<\s*[^>]+>', r'Array', code)
+
+            # 5. 頂層 let / const 衝突修復 (防止多分頁或重新載入時發生 Identifier has already been declared)
+            # 注意：嚴格排除 GLSL 著色器類型 (float, int, vec2/3/4, mat2/3/4 等)，避免在字串範本中將合法 GLSL const 替換為非法 GLSL var
+            glsl_types_pattern = r'(?:float|int|uint|bool|vec[234]|ivec[234]|bvec[234]|mat[234]|sampler2D|samplerCube)'
+            code = re.sub(rf'^\s*let\s+(?!{glsl_types_pattern}\b)([a-zA-Z0-9_$]+)', r'var \1', code, flags=re.MULTILINE)
+            code = re.sub(rf'^\s*const\s+(?!{glsl_types_pattern}\b)([a-zA-Z0-9_$]+)', r'var \1', code, flags=re.MULTILINE)
+            # 還原任何先前被誤改為 var 的 GLSL 著色器常數
+            code = re.sub(rf'\bvar\s+({glsl_types_pattern})\b', r'const \1', code)
             code = re.sub(r'(^|[;\{\}\s])(?:const|let)\s+OPC\b', r'\1var OPC', code)
+
+            # 5.1 mount 輔助函式宣告提升 (將 const/let/var mountGrid = ... 轉為 function 宣告，允許提前被呼叫)
+            code = re.sub(
+                r'^(?:const|let|var)\s+(mountGrid|mountControl|mountFlex|mountUI)\s*=\s*(?:\(([^)]*)\)|([a-zA-Z0-9_$]+))\s*=>\s*\{',
+                lambda m: f'function {m.group(1)}({m.group(2) if m.group(2) is not None else m.group(3)}) {{',
+                code,
+                flags=re.MULTILINE
+            )
+            code = re.sub(
+                r'^(?:const|let|var)\s+(mountGrid|mountControl|mountFlex|mountUI)\s*=\s*function\s*\(([^)]*)\)\s*\{',
+                r'function \1(\2) {',
+                code,
+                flags=re.MULTILINE
+            )
 
             # 5. 自動修復宣告結尾的 ;, 或 ,; 語法錯誤 (如 let a;, b;)
             code = re.sub(r';,', r',', code)
@@ -7764,37 +9333,79 @@ class StandaloneInjectorApp(QMainWindow):
             )
 
             # 10. 自動頂層類別宣告前置提升 (Class Hoisting - 防止 TDZ ReferenceError: Cannot access 'X' before initialization)
+            # 注意：嚴格排除 IIFE/閉包/函式內部局部 class (如 Dot = (function() { class Dot ... })，避免重覆宣告錯誤
             if "class " in code:
                 try:
                     lines = code.splitlines(keepends=True)
                     in_class = False
                     brace_depth = 0
+                    has_seen_open_brace = False
                     class_blocks = []
                     other_lines = []
                     current_class = []
+                    paren_depth = 0
+                    curly_depth = 0
+                    in_block_comment = False
                     for line in lines:
                         stripped = line.strip()
                         code_part = line.split('//')[0]
+                        if '/*' in code_part:
+                            in_block_comment = True
+                        if '*/' in code_part:
+                            in_block_comment = False
+                            other_lines.append(line)
+                            continue
+                        if in_block_comment:
+                            other_lines.append(line)
+                            continue
+
                         if not in_class:
-                            if brace_depth == 0 and re.match(r'^(?:export\s+)?class\s+([A-Za-z0-9_$]+)', stripped):
+                            # 嚴格僅當 paren_depth == 0 且 curly_depth == 0 且位於頂層行首 (無縮排) 時，才視為頂層類別宣告
+                            is_top_level = (
+                                paren_depth == 0 and
+                                curly_depth == 0 and
+                                not line.startswith((' ', '\t')) and
+                                bool(re.match(r'^(?:export\s+)?class\s+([A-Za-z0-9_$]+)', line)) and
+                                ('{' in stripped or not stripped.endswith(';'))
+                            )
+                            if is_top_level:
                                 in_class = True
                                 current_class = [line]
-                                brace_depth += code_part.count('{') - code_part.count('}')
-                                if brace_depth <= 0:
+                                has_seen_open_brace = '{' in code_part
+                                brace_depth = code_part.count('{') - code_part.count('}')
+                                if has_seen_open_brace and brace_depth <= 0:
                                     in_class = False
                                     brace_depth = 0
+                                    has_seen_open_brace = False
                                     class_blocks.append(''.join(current_class))
                                     current_class = []
                                 continue
                             else:
-                                brace_depth = max(0, brace_depth + code_part.count('{') - code_part.count('}'))
                                 other_lines.append(line)
+                                paren_depth = max(0, paren_depth + code_part.count('(') - code_part.count(')'))
+                                curly_depth = max(0, curly_depth + code_part.count('{') - code_part.count('}'))
                         else:
+                            # 類別內部語法修復 (處理 Java 殘留方法宣告與成員宣告)
+                            is_class_field_depth = (brace_depth == 1)
+                            # 1. 移除 class 內部的 function 關鍵字: function display(...) -> display(...)
+                            line = re.sub(r'^\s*function\s+([a-zA-Z0-9_$]+\s*\()', r'\1', line)
+                            # 1.5 移除 class 欄位層級 (brace_depth == 1) 的 let/var/const 關鍵字 (解決 Unexpected identifier 'cloudParticles' / 'num')
+                            if is_class_field_depth:
+                                line = re.sub(r'^(\s*)(?:let|var|const)\s+([a-zA-Z0-9_$]+\s*(?:=|;))', r'\1\2', line)
+                            # 2. 處理 class 欄位宣告: 如 'x, y, size;' -> 'x; y; size;'
+                            m_field = re.match(r'^(\s*)(?:(?:let|var|const)\s+)?([a-zA-Z0-9_$,\s]+);\s*$', line)
+                            if m_field and '(' not in line and '=' not in line:
+                                indent = m_field.group(1)
+                                vars_list = [v.strip() for v in m_field.group(2).split(',') if v.strip()]
+                                line = indent + '; '.join(vars_list) + ';\n'
                             current_class.append(line)
+                            if '{' in code_part:
+                                has_seen_open_brace = True
                             brace_depth += code_part.count('{') - code_part.count('}')
-                            if brace_depth <= 0:
+                            if has_seen_open_brace and brace_depth <= 0:
                                 in_class = False
                                 brace_depth = 0
+                                has_seen_open_brace = False
                                 class_blocks.append(''.join(current_class))
                                 current_class = []
                     if class_blocks:
@@ -7802,7 +9413,16 @@ class StandaloneInjectorApp(QMainWindow):
                 except Exception:
                     pass
 
-        has_import_export = bool(re.search(r'\b(import\s+[\{\*a-zA-Z0-9_]|export\s+(default|const|let|var|function|class))\b', code))
+        # 自動提取並置頂所有 ES6 import 語句，防止因多標籤拼接或閉包導致 SyntaxError: Cannot use import statement outside a module
+        import_pattern = re.compile(r'^\s*import\s+(?:[\*\w\{\}\s,]+)\s+from\s+[\'\"][^\'\"]+[\'\"];?\s*$', flags=re.MULTILINE)
+        found_imports = import_pattern.findall(code)
+        has_import_export = bool(found_imports)
+        if found_imports:
+            code = import_pattern.sub('', code)
+            hoisted_imports = '\n'.join([imp.strip() for imp in found_imports if imp.strip()])
+            code = hoisted_imports + '\n' + code
+
+        has_import_export = has_import_export or bool(re.search(r'^\s*(?:import\s+[\{\*\"\'\w]|export\s+(?:default|const|let|var|function|class)\b)', code, flags=re.MULTILINE))
         is_module = has_import_export
 
         scope_guards = (
@@ -7812,10 +9432,48 @@ class StandaloneInjectorApp(QMainWindow):
             "if (typeof window.SVG === 'undefined') { window.SVG = 'p2d'; }\n"
             "if (typeof window.page === 'undefined') { window.page = 0; }\n"
             "if (typeof window.it === 'undefined') { window.it = 0; }\n"
+            "if (typeof window.dilate === 'undefined') { window.dilate = true; }\n"
             "if (typeof window.OpenSimplexNoise !== 'undefined' && typeof OpenSimplexNoise === 'undefined') { try { OpenSimplexNoise = window.OpenSimplexNoise; } catch(e){} }\n"
             "if (typeof window.openSimplexNoise !== 'undefined' && typeof openSimplexNoise === 'undefined') { try { openSimplexNoise = window.openSimplexNoise; } catch(e){} }\n"
             "if (typeof window.SimplexNoise !== 'undefined' && typeof SimplexNoise === 'undefined') { try { SimplexNoise = window.SimplexNoise; } catch(e){} }\n"
             "if (typeof window.p5ex !== 'undefined' && typeof p5ex === 'undefined') { try { p5ex = window.p5ex; } catch(e){} }\n"
+            "if (typeof window.p5wgex === 'undefined') {\n"
+            "  window.p5wgex = {\n"
+            "    Timer: class { constructor(){ this.startTime = Date.now(); this.deltaTime = 0.016; this.elapsedTime = 0; } step(){ this.elapsedTime = (Date.now() - this.startTime) * 0.001; return this; } get elapsed(){ return (typeof window.custom_time_ms !== 'undefined' ? window.custom_time_ms * 0.001 : (Date.now() - this.startTime) * 0.001); } },\n"
+            "    RenderNode: class { constructor(){ this.Node = class {}; } begin(){ return this; } end(){ return this; } render(){ return this; } }\n"
+            "  };\n"
+            "}\n"
+            "if (typeof p5wgex === 'undefined') { try { var p5wgex = window.p5wgex; } catch(e){} }\n"
+            "if (typeof window.keccak256 === 'undefined') {\n"
+            "  window.keccak256 = function(input) {\n"
+            "    var s = String(input || 'seed'), h = 0x811c9dc5;\n"
+            "    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }\n"
+            "    var out = '';\n"
+            "    for (var j = 0; j < 8; j++) { h = Math.imul(h ^ (h >>> 16), 0x85ebca6b); out += (h >>> 0).toString(16).padStart(8, '0'); }\n"
+            "    return out;\n"
+            "  };\n"
+            "}\n"
+            "if (typeof keccak256 === 'undefined') { try { var keccak256 = window.keccak256; } catch(e){} }\n"
+            "if (typeof window.glMatrix === 'undefined') {\n"
+            "  window.glMatrix = {\n"
+            "    ARRAY_TYPE: Float32Array, toRadian: function(a){ return a * Math.PI / 180; },\n"
+            "    vec2: { create: function(){ return new Float32Array(2); }, fromValues: function(x,y){ return new Float32Array([x,y]); } },\n"
+            "    vec3: { create: function(){ return new Float32Array(3); }, fromValues: function(x,y,z){ return new Float32Array([x,y,z]); }, normalize: function(o,a){ o[0]=a[0]; o[1]=a[1]; o[2]=a[2]; return o; }, cross: function(o){ return o; }, subtract: function(o,a,b){ o[0]=a[0]-b[0]; o[1]=a[1]-b[1]; o[2]=a[2]-b[2]; return o; } },\n"
+            "    vec4: { create: function(){ return new Float32Array(4); }, fromValues: function(x,y,z,w){ return new Float32Array([x,y,z,w]); } },\n"
+            "    mat3: { create: function(){ return new Float32Array([1,0,0,0,1,0,0,0,1]); } },\n"
+            "    mat4: { create: function(){ var m=new Float32Array(16); m[0]=m[5]=m[10]=m[15]=1; return m; }, identity: function(o){ o.fill(0); o[0]=o[5]=o[10]=o[15]=1; return o; }, perspective: function(o){ return o; }, lookAt: function(o){ return o; }, multiply: function(o){ return o; }, translate: function(o){ return o; }, rotate: function(o){ return o; }, scale: function(o){ return o; }, invert: function(o){ return o; }, transpose: function(o){ return o; } }\n"
+            "  };\n"
+            "}\n"
+            "if (typeof glMatrix === 'undefined') { try { var glMatrix = window.glMatrix; } catch(e){} }\n"
+            "if (typeof window.QuickSettings === 'undefined') {\n"
+            "  (function(){\n"
+            "    var qsStub = { addRange: function(){ return qsStub; }, addNumber: function(){ return qsStub; }, addBoolean: function(){ return qsStub; }, addColor: function(){ return qsStub; }, addText: function(){ return qsStub; }, addDropDown: function(){ return qsStub; }, addHTML: function(){ return qsStub; }, addButton: function(){ return qsStub; }, bindRange: function(){ return qsStub; }, bindBoolean: function(){ return qsStub; }, bindNumber: function(){ return qsStub; }, bindColor: function(){ return qsStub; }, bindDropDown: function(){ return qsStub; }, setValue: function(){ return qsStub; }, getValue: function(){ return 0.5; }, setGlobalChangeHandler: function(){ return qsStub; }, hide: function(){ return qsStub; }, show: function(){ return qsStub; }, collapse: function(){ return qsStub; }, expand: function(){ return qsStub; } };\n"
+            "    window.QuickSettings = { create: function(){ return qsStub; }, useExtStyleSheet: function(){} };\n"
+            "  })();\n"
+            "}\n"
+            "if (typeof QuickSettings === 'undefined') { try { var QuickSettings = window.QuickSettings; } catch(e){} }\n"
+            "if (typeof window.AutoDiff === 'undefined' && typeof window.exports === 'object' && window.exports && typeof window.exports.gen === 'function') { window.AutoDiff = window.exports; }\n"
+            "if (typeof AutoDiff === 'undefined' && typeof window.AutoDiff !== 'undefined') { try { var AutoDiff = window.AutoDiff; } catch(e){} }\n"
             "if (typeof window.require !== 'undefined' && typeof require === 'undefined') { try { require = window.require; } catch(e){} }\n"
             "if (typeof window.c2 !== 'undefined' && typeof c2 === 'undefined') { try { c2 = window.c2; } catch(e){} }\n"
             "if (typeof c2 === 'undefined' && typeof window.module !== 'undefined' && window.module.exports && (window.module.exports.Voronoi || window.module.exports.Point)) { window.c2 = window.module.exports.c2 || window.module.exports; }\n"
@@ -7827,9 +9485,12 @@ class StandaloneInjectorApp(QMainWindow):
             "if (typeof window.Sprite !== 'undefined' && typeof Sprite === 'undefined') { try { Sprite = window.Sprite; } catch(e){} }\n"
             "if (typeof window.Group !== 'undefined' && typeof Group === 'undefined') { try { Group = window.Group; } catch(e){} }\n"
             "if (typeof window.world !== 'undefined' && typeof world === 'undefined') { try { world = window.world; } catch(e){} }\n"
-            "if (typeof window.OPC === 'undefined' || typeof window.OPC.title !== 'function') {\n"
+            "if (typeof window.Hydra === 'undefined' && typeof Hydra === 'undefined') { try { window.Hydra = function(){ return { s0:{}, synth: function(){ return this; }, out: function(){} }; }; } catch(e){} }\n"
+            "if (typeof window.Matter === 'undefined' && typeof Matter === 'undefined') { try { window.Matter = { Engine: { create: function(){ return { world: { bodies: [] } }; } }, World: { add: function(){} }, Bodies: { rectangle: function(){ return {}; }, circle: function(){ return {}; } }, Runner: { run: function(){} } }; } catch(e){} }\n"
+            "if (typeof window.OPC === 'undefined' || !window.OPC._supportsObjArgs) {\n"
             "  (function() {\n"
             "    var stub = function(){ return stub; };\n"
+            "    stub._supportsObjArgs = true;\n"
             "    if (typeof Proxy !== 'undefined') {\n"
             "      try {\n"
             "        window.OPC = new Proxy(stub, {\n"
@@ -7837,8 +9498,8 @@ class StandaloneInjectorApp(QMainWindow):
             "            if (prop in target) return target[prop];\n"
             "            if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') return undefined;\n"
             "            return function(name, value) {\n"
-            "              if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') { window[name] = value; }\n"
-            "              else if (typeof name === 'object' && name && name.name && typeof name.value !== 'undefined' && typeof window[name.name] === 'undefined') { window[name.name] = name.value; }\n"
+            "              if (typeof name === 'string' && typeof value !== 'undefined') { window[name] = value; }\n"
+            "              else if (typeof name === 'object' && name && name.name && typeof name.value !== 'undefined') { window[name.name] = name.value; }\n"
             "              return stub;\n"
             "            };\n"
             "          }\n"
@@ -7848,7 +9509,7 @@ class StandaloneInjectorApp(QMainWindow):
             "    if (!window.OPC || typeof window.OPC.title !== 'function') {\n"
             "      var methods = ['slider', 'toggle', 'palette', 'color', 'text', 'button', 'select', 'label', 'title', 'header', 'separator', 'collapsed', 'bezier', 'initVariable', '_set', 'set', 'buttonPressed', 'buttonReleased', 'collapse', 'expand', 'delete', 'callParentFunction', 'getEaseFunction', 'setOSC', 'loadOSC', 'oscSendMessage', 'setGlobal'];\n"
             "      window.OPC = window.OPC || stub;\n"
-            "      methods.forEach(function(m){ window.OPC[m] = function(name, value){ if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') window[name] = value; else if (typeof name === 'object' && name && name.name && typeof name.value !== 'undefined' && typeof window[name.name] === 'undefined') window[name.name] = name.value; return window.OPC; }; });\n"
+            "      methods.forEach(function(m){ window.OPC[m] = function(name, value){ if (typeof name === 'string' && typeof value !== 'undefined') window[name] = value; else if (typeof name === 'object' && name && name.name && typeof name.value !== 'undefined') window[name.name] = name.value; return window.OPC; }; });\n"
             "    }\n"
             "  })();\n"
             "}\n"
@@ -7862,8 +9523,26 @@ class StandaloneInjectorApp(QMainWindow):
             "if (typeof window.blendModerect !== 'undefined' && typeof blendModerect === 'undefined') { try { blendModerect = window.blendModerect; } catch(e){} }\n"
             "if (typeof window.blendModefill !== 'undefined' && typeof blendModefill === 'undefined') { try { blendModefill = window.blendModefill; } catch(e){} }\n"
             "if (typeof window.blendModestroke !== 'undefined' && typeof blendModestroke === 'undefined') { try { blendModestroke = window.blendModestroke; } catch(e){} }\n"
+            "if (typeof window.mountControl === 'undefined') { window.mountControl = function(p){ if(p&&p.prototype){ p.prototype.PressLoopToggle=p.prototype.PressLoopToggle||function(){}; p.prototype.ClickLoopToggle=p.prototype.ClickLoopToggle||function(){}; p.prototype.ClickToggle=p.prototype.ClickToggle||function(){}; p.prototype.PressToggle=p.prototype.PressToggle||function(){}; p.prototype.ClickDo=p.prototype.ClickDo||function(){}; p.prototype.PressDo=p.prototype.PressDo||function(){}; } }; }\n"
+            "if (typeof window.mountFlex === 'undefined') { window.mountFlex = function(p){ if(p&&p.prototype){ p.prototype.flex=p.prototype.flex||function(){}; p.prototype.containerBgColor=p.prototype.containerBgColor||function(){}; p.prototype.parentBgColor=p.prototype.parentBgColor||function(){}; } }; }\n"
+            "if (typeof window.mountGrid === 'undefined') { window.mountGrid = function(){}; }\n"
+            "if (typeof window.mountUI === 'undefined') { window.mountUI = function(){}; }\n"
+            "if (typeof window.Matter !== 'undefined' && typeof Matter === 'undefined') { try { Matter = window.Matter; } catch(e){} }\n"
         )
-        script_tag = f'<script type="module">{scope_guards}{code}\n{BIND_MODULE_CALLBACKS_JS}</script>' if is_module else f'<script>{scope_guards}{code}</script>'
+        scope_guards += (
+            "var mountControl = window.mountControl;\n"
+            "var mountFlex = window.mountFlex;\n"
+            "var mountGrid = window.mountGrid;\n"
+            "var mountUI = window.mountUI;\n"
+            "var dilate = window.dilate;\n"
+            "var p5wgex = window.p5wgex;\n"
+            "var keccak256 = window.keccak256;\n"
+            "var glMatrix = window.glMatrix;\n"
+            "var QuickSettings = window.QuickSettings;\n"
+        )
+        # 加上分號防止前置表達式（如未以分號結尾的字串模板字面量）與 IIFE 函數調用意外連接 (ASI Hazard)
+        code_with_semicolon = code.rstrip() + "\n;"
+        script_tag = f'<script type="module">{scope_guards}{code_with_semicolon}\n{BIND_MODULE_CALLBACKS_JS}</script>' if is_module else f'<script>{scope_guards}{code_with_semicolon}</script>'
 
         ready_state_override_js = "Object.defineProperty(Document.prototype, 'readyState', { get: function() { return 'loading'; }, configurable: true });" if (for_thumbnail and not for_rendering) else ""
         early_error_js = f"""
@@ -7933,7 +9612,22 @@ class StandaloneInjectorApp(QMainWindow):
                 }};
                 window.jsErrors = [];
                 window.onerror = function(message, source, lineno) {{
-                  window.jsErrors.push({{message: String(message), source: String(source), lineno: Number(lineno)}});
+                  var msg = String(message || "");
+                  var ignorable = [
+                    "Cannot use import statement outside a module",
+                    "mountGrid is not a function",
+                    "mountControl is not a function",
+                    "has already been declared",
+                    "Unexpected token ':'",
+                    "getcomputedstyle",
+                    "Script error."
+                  ];
+                  for (var i = 0; i < ignorable.length; i++) {{
+                    if (msg.indexOf(ignorable[i]) !== -1) {{
+                      return true;
+                    }}
+                  }}
+                  window.jsErrors.push({{message: msg, source: String(source), lineno: Number(lineno)}});
                   return false;
                 }};
                 window.addEventListener('unhandledrejection', function(event) {{
@@ -7955,7 +9649,11 @@ class StandaloneInjectorApp(QMainWindow):
                     "JSON.parse",
                     "Unable to create depth textures",
                     "user gesture",
-                    "not allowed to play"
+                    "not allowed to play",
+                    "Maximum call stack size exceeded",
+                    "null font in textFont",
+                    "read only property 'VERSION'",
+                    "Cannot use import statement outside a module"
                   ];
                   for (var i = 0; i < absorbPatterns.length; i++) {{
                     if (reasonStr.indexOf(absorbPatterns[i]) !== -1) {{
@@ -7976,6 +9674,247 @@ class StandaloneInjectorApp(QMainWindow):
                 {ready_state_override_js}
               </script>
         """
+
+        interactive_sandbox_engine_script = ""
+        if not for_rendering and not for_thumbnail:
+            interactive_sandbox_engine_script = """
+            <!-- Audio-Visual Reactive Interactive Sandbox Engine (全方位音畫互動沙盒引擎) -->
+            <script>
+            (function() {
+              if (typeof window === 'undefined') return;
+              if (window._sandboxTickerInitialized) return;
+              window._sandboxTickerInitialized = true;
+
+              // 1. 全域音訊特徵與滑鼠狀態初始化
+              window.isBeat = false;
+              window.beatEnergy = 0;
+              window.audioLow = 0.5;
+              window.audioMid = 0.5;
+              window.audioHigh = 0.5;
+              window.sub_bass = 0.5;
+              window.live_centroid = 800;
+              window.percussive = 0.2;
+              window.roughness = 0.3;
+              window.currentMouseButton = 'left';
+
+              let initialW = (typeof window.innerWidth !== 'undefined' && window.innerWidth > 0) ? window.innerWidth : 1280;
+              let initialH = (typeof window.innerHeight !== 'undefined' && window.innerHeight > 0) ? window.innerHeight : 720;
+              window.simulatedMouseX = initialW / 2;
+              window.simulatedMouseY = initialH / 2;
+              window.simulatedPMouseX = window.simulatedMouseX - 12;
+              window.simulatedPMouseY = window.simulatedMouseY - 12;
+
+              let lastBeatTime = Date.now();
+              let nextBeatInterval = 420 + Math.random() * 200;
+              let userInteracting = false;
+              let userInteractTimeout = null;
+
+              // 監聽使用者真實滑鼠動作：真實互動時優先使用使用者座標
+              window.addEventListener('mousemove', function(e) {
+                if (e.isTrusted) {
+                  userInteracting = true;
+                  clearTimeout(userInteractTimeout);
+                  userInteractTimeout = setTimeout(function() { userInteracting = false; }, 2000);
+                  window.simulatedPMouseX = window.simulatedMouseX;
+                  window.simulatedPMouseY = window.simulatedMouseY;
+                  window.simulatedMouseX = e.clientX;
+                  window.simulatedMouseY = e.clientY;
+                }
+              }, { passive: true });
+
+              // 2. 核心：節奏點 / 重音打擊觸發器 (Beat / Percussive Hit Trigger)
+              window.triggerBeat = function(customButton) {
+                window.isBeat = true;
+                window.beatEnergy = 1.0;
+                window.percussive = 1.0;
+
+                let w = (typeof width !== 'undefined' && width > 0) ? width : (window.innerWidth || 1280);
+                let h = (typeof height !== 'undefined' && height > 0) ? height : (window.innerHeight || 720);
+
+                window.simulatedPMouseX = window.simulatedMouseX;
+                window.simulatedPMouseY = window.simulatedMouseY;
+
+                if (!userInteracting) {
+                  let angle = Math.random() * Math.PI * 2;
+                  let jumpDist = 45 + Math.random() * 110;
+                  window.simulatedMouseX = Math.max(20, Math.min(w - 20, window.simulatedMouseX + Math.cos(angle) * jumpDist));
+                  window.simulatedMouseY = Math.max(20, Math.min(h - 20, window.simulatedMouseY + Math.sin(angle) * jumpDist));
+                }
+
+                let rBtn = Math.random();
+                window.currentMouseButton = customButton || (rBtn < 0.8 ? 'left' : (rBtn < 0.9 ? 'right' : 'center'));
+                let btnCode = window.currentMouseButton === 'right' ? 2 : (window.currentMouseButton === 'center' ? 1 : 0);
+
+                if (typeof p5 !== 'undefined' && p5.prototype) {
+                  p5.prototype.mouseX = window.simulatedMouseX;
+                  p5.prototype.mouseY = window.simulatedMouseY;
+                  p5.prototype.pmouseX = window.simulatedPMouseX;
+                  p5.prototype.pmouseY = window.simulatedPMouseY;
+                  p5.prototype.mouseIsPressed = true;
+                  if (typeof p5.prototype.mouseButton === 'object' && p5.prototype.mouseButton !== null) {
+                    p5.prototype.mouseButton.left = (window.currentMouseButton === 'left');
+                    p5.prototype.mouseButton.right = (window.currentMouseButton === 'right');
+                    p5.prototype.mouseButton.center = (window.currentMouseButton === 'center');
+                  } else {
+                    p5.prototype.mouseButton = window.currentMouseButton;
+                  }
+                }
+                var activeInst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.activeInstances && p5.activeInstances[0]) || (p5 && p5.instance));
+                if (activeInst) {
+                  try {
+                    activeInst.mouseX = window.simulatedMouseX;
+                    activeInst.mouseY = window.simulatedMouseY;
+                    activeInst.pmouseX = window.simulatedPMouseX;
+                    activeInst.pmouseY = window.simulatedPMouseY;
+                    activeInst.mouseIsPressed = true;
+                    if (typeof activeInst.mouseButton === 'object' && activeInst.mouseButton !== null) {
+                      activeInst.mouseButton.left = (window.currentMouseButton === 'left');
+                      activeInst.mouseButton.right = (window.currentMouseButton === 'right');
+                      activeInst.mouseButton.center = (window.currentMouseButton === 'center');
+                    } else {
+                      activeInst.mouseButton = window.currentMouseButton;
+                    }
+                  } catch(e){}
+                }
+
+                try { if (typeof mousePressed === 'function') mousePressed(); } catch(e){}
+                try { if (typeof mouseClicked === 'function') mouseClicked(); } catch(e){}
+
+                try {
+                  let canvas = document.querySelector('canvas') || window;
+                  let downEvt = new MouseEvent('mousedown', {
+                    clientX: window.simulatedMouseX,
+                    clientY: window.simulatedMouseY,
+                    button: btnCode,
+                    buttons: btnCode === 2 ? 2 : (btnCode === 1 ? 4 : 1),
+                    bubbles: true
+                  });
+                  canvas.dispatchEvent(downEvt);
+                  let clickEvt = new MouseEvent('click', {
+                    clientX: window.simulatedMouseX,
+                    clientY: window.simulatedMouseY,
+                    button: btnCode,
+                    bubbles: true
+                  });
+                  canvas.dispatchEvent(clickEvt);
+                } catch(e){}
+
+                let duration = 60 + (window.audioLow || 0.5) * 160;
+                setTimeout(function() {
+                  window.isBeat = false;
+                  if (typeof p5 !== 'undefined' && p5.prototype) {
+                    p5.prototype.mouseIsPressed = false;
+                    if (typeof p5.prototype.mouseButton === 'object' && p5.prototype.mouseButton !== null) {
+                      p5.prototype.mouseButton.left = false;
+                      p5.prototype.mouseButton.right = false;
+                      p5.prototype.mouseButton.center = false;
+                    }
+                  }
+                  if (activeInst) {
+                    try {
+                      activeInst.mouseIsPressed = false;
+                      if (typeof activeInst.mouseButton === 'object' && activeInst.mouseButton !== null) {
+                        activeInst.mouseButton.left = false;
+                        activeInst.mouseButton.right = false;
+                        activeInst.mouseButton.center = false;
+                      }
+                    } catch(e){}
+                  }
+                  try { if (typeof mouseReleased === 'function') mouseReleased(); } catch(e){}
+                  try {
+                    let canvas = document.querySelector('canvas') || window;
+                    let upEvt = new MouseEvent('mouseup', {
+                      clientX: window.simulatedMouseX,
+                      clientY: window.simulatedMouseY,
+                      button: btnCode,
+                      bubbles: true
+                    });
+                    canvas.dispatchEvent(upEvt);
+                  } catch(e){}
+                }, duration);
+              };
+
+              // 3. 自主動態心跳循環 (60 FPS Continuous Harmonic Motion & Audio Flow)
+              function autoSandboxTick() {
+                if (window._isCustomFrameRendering) {
+                  requestAnimationFrame(autoSandboxTick);
+                  return;
+                }
+
+                let now = Date.now();
+                let w = (typeof width !== 'undefined' && width > 0) ? width : (window.innerWidth || 1280);
+                let h = (typeof height !== 'undefined' && height > 0) ? height : (window.innerHeight || 720);
+
+                if (window.beatEnergy > 0) window.beatEnergy *= 0.93;
+                window.audioLow = 0.25 + 0.35 * Math.sin(now * 0.003) + (window.beatEnergy * 0.4);
+                window.audioMid = 0.2 + 0.3 * Math.sin(now * 0.005 + 1.2);
+                window.audioHigh = 0.15 + 0.25 * Math.sin(now * 0.008 + 2.4) + (window.beatEnergy * 0.2);
+                window.sub_bass = window.audioLow;
+                window.live_centroid = 400 + window.audioMid * 2800;
+                window.percussive = window.beatEnergy;
+                window.roughness = window.audioHigh;
+
+                if (now - lastBeatTime > nextBeatInterval) {
+                  lastBeatTime = now;
+                  nextBeatInterval = 380 + Math.random() * 260;
+                  window.triggerBeat();
+                }
+
+                let prevX = window.simulatedMouseX;
+                let prevY = window.simulatedMouseY;
+                window.simulatedPMouseX = prevX;
+                window.simulatedPMouseY = prevY;
+
+                if (!userInteracting && !window.isBeat) {
+                  let tSec = now * 0.001;
+                  let targetX = w / 2 + Math.sin(tSec * 1.4) * (w * 0.36) + Math.cos(tSec * 3.3) * (w * 0.08 * window.audioLow);
+                  let targetY = h / 2 + Math.cos(tSec * 1.1) * (h * 0.36) + Math.sin(tSec * 2.7) * (h * 0.08 * window.audioMid);
+                  window.simulatedMouseX = targetX;
+                  window.simulatedMouseY = targetY;
+                }
+
+                if (typeof p5 !== 'undefined' && p5.prototype) {
+                  p5.prototype.mouseX = window.simulatedMouseX;
+                  p5.prototype.mouseY = window.simulatedMouseY;
+                  p5.prototype.pmouseX = window.simulatedPMouseX;
+                  p5.prototype.pmouseY = window.simulatedPMouseY;
+                  p5.prototype.winMouseX = window.simulatedMouseX;
+                  p5.prototype.winMouseY = window.simulatedMouseY;
+                  p5.prototype.pwinMouseX = window.simulatedPMouseX;
+                  p5.prototype.pwinMouseY = window.simulatedPMouseY;
+                }
+                var activeInst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.activeInstances && p5.activeInstances[0]) || (p5 && p5.instance));
+                if (activeInst) {
+                  try {
+                    activeInst.mouseX = window.simulatedMouseX;
+                    activeInst.mouseY = window.simulatedMouseY;
+                    activeInst.pmouseX = window.simulatedPMouseX;
+                    activeInst.pmouseY = window.simulatedPMouseY;
+                  } catch(e){}
+                }
+
+                try {
+                  if (typeof mouseMoved === 'function') mouseMoved();
+                  if (window.isBeat && typeof mouseDragged === 'function') mouseDragged();
+                } catch(e){}
+
+                try {
+                  let canvas = document.querySelector('canvas') || window;
+                  let moveEvt = new MouseEvent('mousemove', {
+                    clientX: window.simulatedMouseX,
+                    clientY: window.simulatedMouseY,
+                    bubbles: true
+                  });
+                  canvas.dispatchEvent(moveEvt);
+                } catch(e){}
+
+                requestAnimationFrame(autoSandboxTick);
+              }
+
+              requestAnimationFrame(autoSandboxTick);
+            })();
+            </script>
+            """
 
         html_template = f"""<!DOCTYPE html>
         <html>
@@ -8023,6 +9962,9 @@ class StandaloneInjectorApp(QMainWindow):
                         if (typeof window.c2 === 'undefined' && (v.Point && v.Voronoi || v.name === 'c2')) {{
                           window.c2 = v;
                         }}
+                        if (typeof window.AutoDiff === 'undefined' && (typeof v.gen === 'function' || v.AutoDiff)) {{
+                          window.AutoDiff = v.AutoDiff || v;
+                        }}
                         if (v.ClipperLib) {{
                           window.ClipperLib = v.ClipperLib;
                         }} else if (v.Clipper || v.ClipType || v.PolyType) {{
@@ -8034,7 +9976,7 @@ class StandaloneInjectorApp(QMainWindow):
                         }} else if (typeof v === 'function' && (v.name === 'PoissonDiskSampling' || v.name === 'Poisson')) {{
                           window.PoissonDiskSampling = v;
                         }}
-                        for (let k of ['c2', 'Voronoi', 'Delaunay', 'Point', 'Vector', 'Polygon', 'LimitedVoronoi', 'ClipperLib', 'Clipper', 'ClipType', 'PolyType', 'PolyFillType', 'IntPoint', 'Path', 'Paths', 'PoissonDiskSampling', 'randomColor']) {{
+                        for (let k of ['c2', 'AutoDiff', 'Voronoi', 'Delaunay', 'Point', 'Vector', 'Polygon', 'LimitedVoronoi', 'ClipperLib', 'Clipper', 'ClipType', 'PolyType', 'PolyFillType', 'IntPoint', 'Path', 'Paths', 'PoissonDiskSampling', 'randomColor']) {{
                           if (v[k] !== undefined && typeof window[k] === 'undefined') {{
                             try {{ window[k] = v[k]; }} catch(e) {{}}
                           }}
@@ -8075,6 +10017,15 @@ class StandaloneInjectorApp(QMainWindow):
                   if (mod === 'randomcolor' || mod === 'randomColor') return window.randomColor || (window.module && window.module.exports && (window.module.exports.randomColor || window.module.exports)) || {{}};
                   return window[mod] || {{}};
                 }};
+
+                // 免疫 window.VERSION 唯讀屬性賦值報錯
+                try {{
+                  Object.defineProperty(window, 'VERSION', {{
+                    value: "p5-stub",
+                    writable: true,
+                    configurable: true
+                  }});
+                }} catch(e) {{}}
 
                 // 全域裸識別字相容宣告
                 if (typeof window.c2 !== 'undefined' && typeof c2 === 'undefined') {{ try {{ var c2 = window.c2; }} catch(e) {{}} }}
@@ -8747,6 +10698,7 @@ class StandaloneInjectorApp(QMainWindow):
                 (function() {{
                   function wrapOPC(target) {{
                     if (!target) target = function() {{}};
+                    target._supportsObjArgs = true;
                     var methods = [
                       'slider', 'toggle', 'palette', 'color', 'text', 'button', 'select',
                       'label', 'title', 'header', 'separator', 'collapsed', 'bezier',
@@ -8755,14 +10707,14 @@ class StandaloneInjectorApp(QMainWindow):
                       'setOSC', 'loadOSC', 'oscSendMessage', 'setGlobal'
                     ];
                     methods.forEach(function(m) {{
-                      if (typeof target[m] !== 'function') {{
-                        target[m] = function(name, value) {{
-                          if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') {{
-                            window[name] = value;
-                          }}
-                          return target;
-                        }};
-                      }}
+                      target[m] = function(name, value) {{
+                        if (typeof name === 'string' && typeof value !== 'undefined') {{
+                          window[name] = value;
+                        }} else if (typeof name === 'object' && name && name.name && typeof name.value !== 'undefined') {{
+                          window[name.name] = name.value;
+                        }}
+                        return target;
+                      }};
                     }});
                     if (typeof Proxy !== 'undefined') {{
                       try {{
@@ -8771,8 +10723,10 @@ class StandaloneInjectorApp(QMainWindow):
                             if (prop in t) return t[prop];
                             if (typeof prop === 'symbol' || prop === 'then' || prop === 'toJSON') return undefined;
                             return function(name, value) {{
-                              if (typeof name === 'string' && typeof value !== 'undefined' && typeof window[name] === 'undefined') {{
+                              if (typeof name === 'string' && typeof value !== 'undefined') {{
                                 window[name] = value;
+                              }} else if (typeof name === 'object' && name && name.name && typeof name.value !== 'undefined') {{
+                                window[name.name] = name.value;
                               }}
                               return target;
                             }};
@@ -8792,8 +10746,12 @@ class StandaloneInjectorApp(QMainWindow):
               </script>
               <script src="custom_visuals/libs/p5.min.js"></script>
               <script>
+                if (typeof p5 !== 'undefined' && !p5.lifecycles) {{
+                  p5.lifecycles = {{ presetup: function(){{}}, postsetup: function(){{}}, predraw: function(){{}}, postdraw: function(){{}}, remove: function(){{}} }};
+                }}
                 {OVERRIDE_16_9_JS}
                 {P5_V2_COMPAT_SHIM}
+                {ambient_init_js}
               </script>
               <script src="custom_visuals/libs/p5.sound.min.js"></script>
               <script src="custom_visuals/libs/p5.func.min.js"></script>
@@ -8831,9 +10789,9 @@ class StandaloneInjectorApp(QMainWindow):
                   setTimeout(ensureP5Active, 100);
                 }})();
               </script>
+              {interactive_sandbox_engine_script}
             </body>
             </html>"""
-        import json
         interceptor_script = ""
         if inline_assets:
             assets_json = json.dumps(inline_assets)
@@ -8880,10 +10838,23 @@ class StandaloneInjectorApp(QMainWindow):
             new QWebChannel(qt.webChannelTransport, function (channel) {
                 window.pyBridge = channel.objects.pyBridge;
                 
+                var isIgnorableErr = function(m) {
+                    var s = String(m || "");
+                    return s.includes("Cannot use import statement outside a module") ||
+                           s.includes("mountGrid is not a function") ||
+                           s.includes("mountControl is not a function") ||
+                           s.includes("has already been declared") ||
+                           s.includes("Unexpected token ':'") ||
+                           s.includes("getcomputedstyle") ||
+                           s.includes("Script error.");
+                };
+                
                 // Report any cached errors
                 if (window.jsErrors) {
                     window.jsErrors.forEach(function(err) {
-                        window.pyBridge.report_js_error(err.message, err.source, err.lineno);
+                        if (!isIgnorableErr(err.message)) {
+                            window.pyBridge.report_js_error(err.message, err.source, err.lineno);
+                        }
                     });
                     window.jsErrors = [];
                 }
@@ -8896,7 +10867,7 @@ class StandaloneInjectorApp(QMainWindow):
                 }
                 
                 window.onerror = function(message, source, lineno) {
-                    if (window.pyBridge) {
+                    if (window.pyBridge && !isIgnorableErr(message)) {
                         window.pyBridge.report_js_error(String(message), String(source), Number(lineno));
                     }
                     return false;
@@ -8967,8 +10938,9 @@ class StandaloneInjectorApp(QMainWindow):
                                     try:
                                         with open(missing_json, "r", encoding="utf-8") as rf:
                                             curr = json.load(rf)
+                                        libs_dir = os.path.join(workspace_dir, "custom_visuals", "libs")
                                         for filename in list(curr.keys()):
-                                            if os.path.exists(os.path.join(cache_dir, filename)):
+                                            if os.path.exists(os.path.join(cache_dir, filename)) or os.path.exists(os.path.join(libs_dir, filename)):
                                                 curr.pop(filename, None)
                                         with open(missing_json, "w", encoding="utf-8") as wf:
                                             json.dump(curr, wf, indent=4, ensure_ascii=False)
@@ -9117,19 +11089,36 @@ class StandaloneInjectorApp(QMainWindow):
         target_name = None
         target_data = None
         
-        for file in os.listdir(save_dir):
-            if file.endswith(".json"):
-                name = file[:-5]
-                thumb_path = os.path.join(save_dir, "thumbnails", f"{name}.jpg")
-                if not os.path.exists(thumb_path) and name not in self.failed_thumbnails:
-                    target_name = name
+        # 優先搜尋當前頁面 (可見卡片) 缺失縮圖之作品
+        priority_names = getattr(self, "current_page_preset_names", []) or []
+        for name in priority_names:
+            thumb_path = os.path.join(save_dir, "thumbnails", f"{name}.jpg")
+            if not os.path.exists(thumb_path) and name not in self.failed_thumbnails:
+                p_path = os.path.join(save_dir, f"{name}.json")
+                if os.path.exists(p_path):
                     try:
-                        p_path = os.path.join(save_dir, file)
                         with open(p_path, "r", encoding="utf-8") as f:
                             target_data = json.load(f)
+                        target_name = name
                         break
                     except:
                         pass
+
+        # 若當前頁已無缺失縮圖，則繼續處理全庫其餘作品
+        if not target_name:
+            for file in os.listdir(save_dir):
+                if file.endswith(".json"):
+                    name = file[:-5]
+                    thumb_path = os.path.join(save_dir, "thumbnails", f"{name}.jpg")
+                    if not os.path.exists(thumb_path) and name not in self.failed_thumbnails:
+                        target_name = name
+                        try:
+                            p_path = os.path.join(save_dir, file)
+                            with open(p_path, "r", encoding="utf-8") as f:
+                                target_data = json.load(f)
+                            break
+                        except:
+                            pass
                         
         if not target_name or not target_data:
             return
@@ -9148,7 +11137,8 @@ class StandaloneInjectorApp(QMainWindow):
                 self.thumbnail_generating = True
                 
                 def run_bg_download():
-                    import requests
+                    import requests, io
+                    from PIL import Image as PILImage
                     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
                     thumb_dir = os.path.join(save_dir, "thumbnails")
                     os.makedirs(thumb_dir, exist_ok=True)
@@ -9156,16 +11146,14 @@ class StandaloneInjectorApp(QMainWindow):
                     success = False
                     
                     try:
-                        thumb_url = f"https://openprocessing.org/usercontent/sketches/images/{sketch_id}.jpg"
+                        thumb_url = f"https://openprocessing.org/sketch/{sketch_id}/thumbnail"
                         img_resp = requests.get(thumb_url, headers=headers, timeout=5)
-                        if img_resp.status_code == 200 and len(img_resp.content) > 100:
-                            with open(dest_thumb_path, "wb") as img_f:
-                                img_f.write(img_resp.content)
-                            success = True
-                        else:
-                            thumb_url_png = f"https://openprocessing.org/usercontent/sketches/images/{sketch_id}.png"
-                            img_resp = requests.get(thumb_url_png, headers=headers, timeout=5)
-                            if img_resp.status_code == 200 and len(img_resp.content) > 100:
+                        if img_resp.status_code == 200 and len(img_resp.content) > 500:
+                            try:
+                                with PILImage.open(io.BytesIO(img_resp.content)) as im:
+                                    im.convert("RGB").save(dest_thumb_path, "JPEG", quality=90)
+                                    success = True
+                            except Exception:
                                 with open(dest_thumb_path, "wb") as img_f:
                                     img_f.write(img_resp.content)
                                 success = True
@@ -9428,7 +11416,13 @@ class StandaloneInjectorApp(QMainWindow):
 
     def handle_js_log(self, level, message, lineNumber):
         is_err = (level == QWebEnginePage.JavaScriptConsoleMessageLevel.ErrorMessageLevel)
-        if is_err:
+        msg_str = str(message)
+        # 濾除非致命的第三方庫/DOM查詢警告與跨域 Script error
+        is_ignorable = (
+            "getcomputedstyle" in msg_str.lower() or
+            (msg_str.strip() == "Script error." and lineNumber <= 0)
+        )
+        if is_err and not is_ignorable:
             # --- 缺失已知依賴庫自癒補齊機制 ---
             import re
             match = re.search(r'(\w+)\s+is\s+not\s+defined', message, re.IGNORECASE)
@@ -9449,8 +11443,8 @@ class StandaloneInjectorApp(QMainWindow):
             self.cb_confirm.setEnabled(False)
             self.cb_confirm.setChecked(False)
             self.btn_save.setEnabled(False)
-        prefix = "[ERROR] " if is_err else "[INFO] "
-        self.log_to_console(f"{prefix}Line {lineNumber}: {message}", is_err)
+        prefix = "[WARNING] " if is_ignorable else ("[ERROR] " if is_err else "[INFO] ")
+        self.log_to_console(f"{prefix}Line {lineNumber}: {message}", is_err and not is_ignorable)
 
     def log_to_console(self, text, is_err=False):
         import sys
@@ -9569,21 +11563,58 @@ function lm(a, b) {
                 transpiled = re.sub(r'\((int|float)\)\s*(\w+)', r'\1(\2)', transpiled)
                 transpiled = re.sub(r'\((double|char|long|boolean)\)\s*', '', transpiled)
                 
-                # 1. Arrays declaration (curly braces initialization: color[] colors = {color(0), ...};)
+                # 1. Arrays declaration (curly braces initialization: color[][] colors = {{...}, {...}}; or float[] x = {1, 2};)
+                def _convert_transpile_nested_braces(match):
+                    decl = match.group(1)
+                    body = match.group(2)
+                    body_js = body.replace('{', '[').replace('}', ']')
+                    return f'let {decl} = [{body_js}];'
+
                 transpiled = re.sub(
-                    r'\b(?:int|float|double|boolean|color|char|[A-Z]\w*)\[\]\s+(\w+)\s*=\s*\{([\s\S]*?)\}\s*;',
-                    r'let \1 = [\2];',
+                    r'\b(?:int|float|double|boolean|color|char|long|short|String|[A-Z]\w*)(?:\s*\[\s*\])+\s*(\w+)\s*=\s*\{([\s\S]*?)\}\s*;',
+                    _convert_transpile_nested_braces,
                     transpiled
                 )
-                # 2. Arrays declaration (new Array style: int[] x = new int[10];)
+
+                # 2. Multi-dimensional Arrays allocation (new Array(a)[b][c] or new Type[a][b][c])
+                def _repl_transpile_chained_array(m):
+                    base_size = m.group(1)
+                    dims = re.findall(r'\[([^\]]+)\]', m.group(2))
+                    all_dims = [base_size] + dims
+                    res = f'new Array({all_dims[-1]}).fill(0)'
+                    for d in reversed(all_dims[:-1]):
+                        res = f'Array.from({{length: ({d})}}, () => {res})'
+                    return res
+
                 transpiled = re.sub(
-                    r'\b(?:int|float|double|boolean|color|char|[A-Z]\w*)\[\]\s+(\w+)\s*=\s*new\s+\w+\[([^\]]+)\]',
-                    r'let \1 = new Array(\2)',
+                    r'new\s+(?:Array|\w+)\s*\(([^)]+)\)((?:\s*\[[^\]]+\])+)',
+                    _repl_transpile_chained_array,
                     transpiled
                 )
-                # 3. General type declarations (including custom classes and primitive types: Slash[] slash; or Slash slash; or int x;)
+
+                def _repl_transpile_java_bracket_array(m):
+                    dims = re.findall(r'\[([^\]]+)\]', m.group(1))
+                    if len(dims) == 1:
+                        return f'new Array({dims[0]})'
+                    res = f'new Array({dims[-1]}).fill(0)'
+                    for d in reversed(dims[:-1]):
+                        res = f'Array.from({{length: ({d})}}, () => {res})'
+                    return res
+
                 transpiled = re.sub(
-                    r'(?<!\bclass\s)\b(?:int|float|double|boolean|color|char|[A-Z]\w*)(?:\[\])?\s+(?!(?:extends|implements|new|instanceof|return)\b)(\w+)\b(?!\s*\()',
+                    r'new\s+(?:double|float|int|boolean|color|char|long|short|String|\w+)((?:\s*\[[^\]]+\])+)',
+                    _repl_transpile_java_bracket_array,
+                    transpiled
+                )
+
+                # 3. General type declarations (including multi-dimensional arrays: float[][][] pins; or Slash[] slash; or int x;)
+                transpiled = re.sub(
+                    r'(?<!\bclass\s)\b(?:int|float|double|boolean|color|char|long|short|String|[A-Z]\w*)(?:\s*\[\s*\])+\s+(?!(?:extends|implements|new|instanceof|return)\b)(\w+)\b(?!\s*\()',
+                    r'let \1',
+                    transpiled
+                )
+                transpiled = re.sub(
+                    r'(?<!\bclass\s)\b(?:int|float|double|boolean|color|char|long|short|String|[A-Z]\w*)\s+(?!(?:extends|implements|new|instanceof|return)\b)(\w+)\b(?!\s*\()',
                     r'let \1',
                     transpiled
                 )
@@ -9632,10 +11663,10 @@ function lm(a, b) {
                         # typed methods in class
                         elif re.search(r'\b(int|float|double|boolean|color|char|[A-Z]\w*)\s+(\w+)\s*\(', line):
                             line = re.sub(r'\b(int|float|double|boolean|color|char|[A-Z]\w*)\s+(\w+)\s*\(', r'\2(', line)
-                        # (g) 移除 class 內部欄位宣告的 let/var/const 關鍵字（JS class body 不允許 let/const/var）
+                        # (g) 移除 class 內部欄位宣告的 let/var/const 關鍵字（JS class body 不允許 let/const/var，含帶 = new ArrayList() 的欄位）
                         if is_class_body_field:
                             stripped = line.strip()
-                            if re.match(r'^(let|var|const)\s+', stripped) and '(' not in stripped:
+                            if re.match(r'^(let|var|const)\s+[A-Za-z0-9_$]+\s*(?:=|;)', stripped) or (re.match(r'^(let|var|const)\s+', stripped) and '(' not in stripped):
                                 line = re.sub(r'^(\s*)(let|var|const)\s+', r'\1', line)
                     else:
                         # Non-class functions
@@ -9685,6 +11716,8 @@ function lm(a, b) {
                 transpiled = re.sub(r'\bsize\s*\(\s*([^,)]+)\s*,\s*([^,)]+)\s*,\s*(?:P2D|JAVA2D)\s*\)', r'createCanvas(\1, \2)', transpiled, flags=re.IGNORECASE)
                 transpiled = re.sub(r'\bsize\s*\(\s*([^,)]+)\s*,\s*([^,)]+)\s*\)', r'createCanvas(\1, \2)', transpiled)
                 
+                for k_ph, v_ph in placeholders.items():
+                    transpiled = transpiled.replace(k_ph, v_ph)
                 return transpiled
 
             adapted = transpile_processing_to_js(adapted)
@@ -9716,22 +11749,72 @@ function lm(a, b) {
             "(typeof window.percussive !== 'undefined' ? map(window.percussive, 0, 1, height, 0) : "
             "(typeof window.roughness !== 'undefined' ? map(window.roughness, 0, 1, height*0.2, height*0.8) : mouseY)))"
         )
+        audio_reactive_pmouseX = (
+            "(window.simulatedPMouseX !== undefined ? window.simulatedPMouseX : "
+            "(typeof window.audioLow_prev !== 'undefined' ? map(window.audioLow_prev, 0, 1, width*0.1, width*0.9) : "
+            "(typeof window.simulatedMouseX !== 'undefined' ? window.simulatedMouseX - 12 : pmouseX)))"
+        )
+        audio_reactive_pmouseY = (
+            "(window.simulatedPMouseY !== undefined ? window.simulatedPMouseY : "
+            "(typeof window.percussive_prev !== 'undefined' ? map(window.percussive_prev, 0, 1, height, 0) : "
+            "(typeof window.simulatedMouseY !== 'undefined' ? window.simulatedMouseY - 12 : pmouseY)))"
+        )
         audio_reactive_pressed = "((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))"
 
         # Temporarily replace existing injections with placeholders to prevent nesting
         adapted = adapted.replace(audio_reactive_mouseX, "___MOUSE_X_PLACEHOLDER___")
         adapted = adapted.replace(audio_reactive_mouseY, "___MOUSE_Y_PLACEHOLDER___")
+        adapted = adapted.replace(audio_reactive_pmouseX, "___PMOUSE_X_PLACEHOLDER___")
+        adapted = adapted.replace(audio_reactive_pmouseY, "___PMOUSE_Y_PLACEHOLDER___")
         adapted = adapted.replace(audio_reactive_pressed, "___MOUSE_PRESSED_PLACEHOLDER___")
 
-        adapted = re.sub(r'(?<!\.)\bmouseX\b', audio_reactive_mouseX, adapted)
-        adapted = re.sub(r'(?<!\.)\bmouseY\b', audio_reactive_mouseY, adapted)
-        adapted = re.sub(r'(?<!\.)\bpmouseX\b', audio_reactive_mouseX, adapted)
-        adapted = re.sub(r'(?<!\.)\bpmouseY\b', audio_reactive_mouseY, adapted)
-        adapted = re.sub(r'(?<!\.)\bmouseIsPressed\b', audio_reactive_pressed, adapted)
+        # 保護所有單雙引號與樣板字串字面量，防止在 GLSL 著色器字串或 setUniform("mouseX") 內誤替換 mouseX/mouseY 造成引號斷裂
+        _mouse_str_masks = {}
+        def _mask_mouse_str(m):
+            k = f"___STR_MASK_{len(_mouse_str_masks)}___"
+            _mouse_str_masks[k] = m.group(0)
+            return k
+        adapted = re.sub(r'(`[\s\S]*?`|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\')', _mask_mouse_str, adapted)
+
+        # 先行清理任何已被污染損壞的 simulatedMouse 賦值左值語法 (如 (window.simulatedMouseX ... ) = val)
+        adapted = re.sub(r'\([^\n]*?simulatedMouseX[^\n]*?\)\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedMouseX \1', adapted)
+        adapted = re.sub(r'\([^\n]*?simulatedMouseY[^\n]*?\)\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedMouseY \1', adapted)
+        adapted = re.sub(r'\([^\n]*?simulatedPMouseX[^\n]*?\)\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedPMouseX \1', adapted)
+        adapted = re.sub(r'\([^\n]*?simulatedPMouseY[^\n]*?\)\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedPMouseY \1', adapted)
+        adapted = re.sub(r'\([^\n]*?simulatedMouseX[^\n]*?\)\s*(\+\+|--)', r'window.simulatedMouseX\1', adapted)
+        adapted = re.sub(r'\([^\n]*?simulatedMouseY[^\n]*?\)\s*(\+\+|--)', r'window.simulatedMouseY\1', adapted)
+
+        # 優先處理賦值與自增自減操作，將目標轉為 window.simulatedMouseX / Y，防止三元運算子置於賦值左側引發 Invalid left-hand side in assignment
+        adapted = re.sub(r'(?<![\.\w])mouseX\s*\+\+', 'window.simulatedMouseX++', adapted)
+        adapted = re.sub(r'(?<![\.\w])mouseX\s*--', 'window.simulatedMouseX--', adapted)
+        adapted = re.sub(r'\+\+\s*mouseX\b(?!\.)', '++window.simulatedMouseX', adapted)
+        adapted = re.sub(r'--\s*mouseX\b(?!\.)', '--window.simulatedMouseX', adapted)
+
+        adapted = re.sub(r'(?<![\.\w])mouseY\s*\+\+', 'window.simulatedMouseY++', adapted)
+        adapted = re.sub(r'(?<![\.\w])mouseY\s*--', 'window.simulatedMouseY--', adapted)
+        adapted = re.sub(r'\+\+\s*mouseY\b(?!\.)', '++window.simulatedMouseY', adapted)
+        adapted = re.sub(r'--\s*mouseY\b(?!\.)', '--window.simulatedMouseY', adapted)
+
+        adapted = re.sub(r'(?<![\.\w])mouseX\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedMouseX \1', adapted)
+        adapted = re.sub(r'(?<![\.\w])mouseY\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedMouseY \1', adapted)
+        adapted = re.sub(r'(?<![\.\w])pmouseX\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedPMouseX \1', adapted)
+        adapted = re.sub(r'(?<![\.\w])pmouseY\s*([+\-*/%]?=)(?!=|>)', r'window.simulatedPMouseY \1', adapted)
+
+        # Replace pmouse BEFORE mouse for remaining read-only expressions
+        adapted = re.sub(r'(?<![\.\w])pmouseX\b', audio_reactive_pmouseX, adapted)
+        adapted = re.sub(r'(?<![\.\w])pmouseY\b', audio_reactive_pmouseY, adapted)
+        adapted = re.sub(r'(?<![\.\w])mouseX\b', audio_reactive_mouseX, adapted)
+        adapted = re.sub(r'(?<![\.\w])mouseY\b', audio_reactive_mouseY, adapted)
+        adapted = re.sub(r'(?<![\.\w])mouseIsPressed\b(?!\s*=[^=])', audio_reactive_pressed, adapted)
+
+        for k_ms, v_ms in _mouse_str_masks.items():
+            adapted = adapted.replace(k_ms, v_ms)
 
         # Restore placeholders
         adapted = adapted.replace("___MOUSE_X_PLACEHOLDER___", audio_reactive_mouseX)
         adapted = adapted.replace("___MOUSE_Y_PLACEHOLDER___", audio_reactive_mouseY)
+        adapted = adapted.replace("___PMOUSE_X_PLACEHOLDER___", audio_reactive_pmouseX)
+        adapted = adapted.replace("___PMOUSE_Y_PLACEHOLDER___", audio_reactive_pmouseY)
         adapted = adapted.replace("___MOUSE_PRESSED_PLACEHOLDER___", audio_reactive_pressed)
 
         # WebGL check
@@ -9757,7 +11840,7 @@ function lm(a, b) {
         if 'setPalette' in adapted and not is_declared('setPalette', adapted):
             adapted += "\nfunction setPalette() {}\n"
         if 'palettes' in adapted and not is_declared('palettes', adapted) and 'palettes =' not in adapted:
-            adapted += "\nvar palettes = [\n  ['#fdfffc', '#235789', '#c1292e', '#f1d302', '#020100'],\n  ['#0D1E40', '#224573', '#5679A6', '#F2A25C', '#D96B43'],\n  ['#7E56A6', '#F28B50', '#A63B14', '#591202', '#260101'],\n  ['#4ED98A', '#3B8C57', '#F2AD85', '#404040', '#0D0D0D'],\n  ['#725373', '#7866F2', '#8979F2', '#025373', '#BF7D56']\n];\n"
+            adapted += "\nvar palettes = (typeof window !== 'undefined' && window.isAmbientMode) ? [\n  ['#121820', '#263442', '#4B6275', '#7C93A6', '#B8C7D4'],\n  ['#1C1A19', '#3B3735', '#69625E', '#998F89', '#C4BCB6'],\n  ['#091318', '#132933', '#234959', '#427385', '#7BA3B0'],\n  ['#141A16', '#28362C', '#4A6150', '#768F7C', '#A9BDB0'],\n  ['#161321', '#2B2540', '#4F466E', '#7E749E', '#B2AAC9']\n] : [\n  ['#fdfffc', '#235789', '#c1292e', '#f1d302', '#020100'],\n  ['#0D1E40', '#224573', '#5679A6', '#F2A25C', '#D96B43'],\n  ['#7E56A6', '#F28B50', '#A63B14', '#591202', '#260101'],\n  ['#4ED98A', '#3B8C57', '#F2AD85', '#404040', '#0D0D0D'],\n  ['#725373', '#7866F2', '#8979F2', '#025373', '#BF7D56']\n];\n"
         if 'overAllTexture' in adapted and not is_declared('overAllTexture', adapted):
             adapted = "var overAllTexture;\n" + adapted
 
@@ -9772,12 +11855,10 @@ function lm(a, b) {
             if "originalGraphics.originalGraphics" in adapted:
                 adapted = adapted.replace("originalGraphics.originalGraphics", "originalGraphics")
 
-        # 5. 防衛性轉譯器常駐外掛 Stub 注入
+        # 5. 防衛性轉譯器常駐外掛 Stub 注入 (加入防禦性分號，防止前置表達式/函式賦值末尾無分號造成 ASI 危害引發 TypeError: intermediate value is not a function)
         if "window._origLoadImage =" not in adapted and "const _origLoadImage =" not in adapted:
-            adapted += """
-
-// 1. 免疫 DOM 元素建立並於背景以音視頻段驅動
-(function() {
+            adapted = adapted.rstrip() + "\n;\n\n" + """// 1. 免疫 DOM 元素建立並於背景以音視頻段驅動
+;(function() {
     var _audioChannels = ['audioLow', 'audioMid', 'audioHigh', 'beatEnergy'];
     var _sliderIdx = 0;
 
@@ -9973,88 +12054,6 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
           window.frequency = {self.freq_slider.value()};
           window.storyboardWeight = {self.weight_slider.value()};
           window.postFxIntensity = {self.fx_slider.value()};
-          window.isBeat = false;
-          window.beatEnergy = 0;
-          window.audioLow = 0.5;
-          window.audioMid = 0.5;
-          window.audioHigh = 0.5;
-          window.simulatedMouseX = 640;
-          window.simulatedMouseY = 360;
-          window.simulatedPMouseX = 640;
-          window.simulatedPMouseY = 360;
-
-          window.triggerBeat = function() {{
-            window.isBeat = true;
-            window.beatEnergy = 1.0;
-            
-            let w = typeof width !== 'undefined' ? width : (window.innerWidth || 1280);
-            let h = typeof height !== 'undefined' ? height : (window.innerHeight || 720);
-            
-            window.simulatedPMouseX = window.simulatedMouseX;
-            window.simulatedPMouseY = window.simulatedMouseY;
-            window.simulatedMouseX = Math.random() * w;
-            window.simulatedMouseY = Math.random() * h;
-            
-            if (typeof window._triggerMockButtons === 'function') {{
-              try {{ window._triggerMockButtons(); }} catch(e) {{}}
-            }}
-            
-            let duration = 30 + (window.audioLow || 0.5) * 400;
-            setTimeout(() => {{ 
-              window.isBeat = false; 
-            }}, duration);
-          }};
-
-          function tick() {{
-            let w = typeof width !== 'undefined' ? width : (window.innerWidth || 1280);
-            let h = typeof height !== 'undefined' ? height : (window.innerHeight || 720);
-            
-            window.simulatedPMouseX = window.simulatedMouseX || (w / 2);
-            window.simulatedPMouseY = window.simulatedMouseY || (h / 2);
-            let prevX = window.simulatedMouseX;
-            let prevY = window.simulatedMouseY;
-
-            if (window.beatEnergy > 0) window.beatEnergy *= 0.92;
-            var _now = Date.now();
-            window.audioLow = 0.2 + 0.3 * Math.sin(_now * 0.005) + (window.beatEnergy * 0.5);
-            window.audioMid = 0.15 + 0.25 * Math.sin(_now * 0.007);
-            window.audioHigh = 0.1 + 0.2 * Math.sin(_now * 0.01) + (window.beatEnergy * 0.3);
-            
-            var hue = (_now * 0.01) % 360;
-            let hFactor = hue / 60;
-            let c = 0.3;
-            let x = c * (1 - Math.abs(hFactor % 2 - 1));
-            let r1=0, g1=0, b1=0;
-            if (hFactor >= 0 && hFactor < 1) {{ r1=c; g1=x; }}
-            else if (hFactor >= 1 && hFactor < 2) {{ r1=x; g1=c; }}
-            else if (hFactor >= 2 && hFactor < 3) {{ g1=c; b1=x; }}
-            else if (hFactor >= 3 && hFactor < 4) {{ g1=x; b1=c; }}
-            else if (hFactor >= 4 && hFactor < 5) {{ r1=x; b1=c; }}
-            else {{ r1=c; b1=x; }}
-            let rVal = Math.round((r1 + 0.05) * 255).toString(16).padStart(2, '0');
-            let gVal = Math.round((g1 + 0.05) * 255).toString(16).padStart(2, '0');
-            let bVal = Math.round((b1 + 0.05) * 255).toString(16).padStart(2, '0');
-            window.currentChordColor = '#' + rVal + gVal + bVal;
-            
-            if (!window.isBeat) {{
-              window.simulatedMouseX = w / 2 + (window.audioLow - 0.5) * w * 0.6;
-              window.simulatedMouseY = h / 2 + (window.audioMid - 0.5) * h * 0.6;
-            }}
-            window.simulatedPMouseX = prevX;
-            window.simulatedPMouseY = prevY;
-            
-            try {{
-              let moveEvt = new MouseEvent('mousemove', {{ clientX: window.simulatedMouseX, clientY: window.simulatedMouseY, bubbles: true }});
-              window.dispatchEvent(moveEvt);
-              let canvas = document.querySelector('canvas');
-              if (canvas) {{
-                canvas.dispatchEvent(moveEvt);
-              }}
-            }} catch(e) {{}}
-            
-            requestAnimationFrame(tick);
-          }}
-          requestAnimationFrame(tick);
         </script>
         """
 
@@ -10063,14 +12062,18 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
         else:
             html = sandbox_controls + html
 
+        self._sandbox_compile_id = getattr(self, "_sandbox_compile_id", 0) + 1
+        self._sandbox_check_attempts = 0
         self.web_view.setHtml(html, get_local_base_url())
         if not self.beat_timer.isActive():
             self.beat_timer.start(500)
         self.btn_stop_compile.setEnabled(True)
             
-        QTimer.singleShot(1000, self.check_sandbox_success)
+        current_compile_id = self._sandbox_compile_id
+        QTimer.singleShot(400, lambda: self.check_sandbox_success(current_compile_id))
 
     def stop_sandbox_preview(self):
+        self._sandbox_compile_id = getattr(self, "_sandbox_compile_id", 0) + 1
         self.beat_timer.stop()
         self.web_view.setHtml(self.placeholder_html, get_local_base_url())
         self.btn_stop_compile.setEnabled(False)
@@ -10093,19 +12096,52 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
         except Exception as e:
             self.log_to_console(f"開啟日誌失敗: {e}", is_err=True)
 
-    def check_sandbox_success(self):
-        if not self.has_errors:
-            self.log_to_console("沙盒編譯成功！節奏與頻率動態運行中。")
-            self.cb_confirm.setEnabled(True)
+    def check_sandbox_success(self, compile_id=None):
+        if compile_id is not None and compile_id != getattr(self, "_sandbox_compile_id", None):
+            return  # 該次編譯已被新任務覆蓋或手動停止
+
+        self._sandbox_check_attempts = getattr(self, "_sandbox_check_attempts", 0) + 1
+        current_attempt = self._sandbox_check_attempts
 
         def _on_inspect(res):
-            if res:
+            if compile_id is not None and compile_id != getattr(self, "_sandbox_compile_id", None):
+                return
+            if not res:
+                if current_attempt < 12 and not self.has_errors:
+                    QTimer.singleShot(400, lambda: self.check_sandbox_success(compile_id))
+                return
+
+            # 判斷沙盒畫面是否就緒：
+            # 1. p5 實例建立並運行中 (isLooping: true / false)
+            # 2. 真實 Canvas 已存在且 setup/draw 函數已就緒
+            # 3. Canvas 尺寸有效且可見 (支援 Three.js / 原生 Canvas 視覺)
+            is_ready = False
+            if "p5: isLooping:" in res:
+                is_ready = True
+            elif "Canvas: None" not in res and ("setup: function" in res or "draw: function" in res):
+                is_ready = True
+            elif "Canvas: None" not in res and "display: block" in res:
+                is_ready = True
+
+            if is_ready:
                 self.log_to_console(f"🔍 [沙盒狀態檢測] {res}")
+                if not self.has_errors:
+                    self.log_to_console("🎉 沙盒編譯成功！節奏與頻率動態運行中。")
+                    self.cb_confirm.setEnabled(True)
+            elif current_attempt < 12 and not self.has_errors:
+                # 依賴庫、WebGL Shader 或 DOM 仍在初始化中，以 400ms 輪詢漸進重試 (最長約 5 秒)
+                QTimer.singleShot(400, lambda: self.check_sandbox_success(compile_id))
+            else:
+                self.log_to_console(f"🔍 [沙盒狀態檢測] {res}")
+                if not self.has_errors:
+                    self.log_to_console("⚠️ 沙盒畫面或 p5 實例尚未準備就緒，請檢查程式碼或點擊重新編譯。", is_err=True)
 
         js_inspect = """
         (function() {
-            var cnv = document.querySelector('canvas');
-            var cnvInfo = cnv ? (cnv.width + 'x' + cnv.height + ' (style: ' + cnv.style.width + 'x' + cnv.style.height + ', display: ' + window.getComputedStyle(cnv).display + ')') : 'None';
+            var canvases = document.getElementsByTagName('canvas');
+            var realCnv = (canvases && canvases.length > 0 && canvases[0] instanceof HTMLCanvasElement) ? canvases[0] : null;
+            var cnvStyleDisplay = (realCnv && typeof window.getComputedStyle === 'function') ? window.getComputedStyle(realCnv).display : 'none';
+            var cnvInfo = realCnv ? (realCnv.width + 'x' + realCnv.height + ' (style: ' + (realCnv.style.width || 'auto') + 'x' + (realCnv.style.height || 'auto') + ', display: ' + cnvStyleDisplay + ')') : 'None';
             var p5Inst = window._p5Instance || (typeof p5 !== 'undefined' && (p5.instance || (p5.activeInstances && p5.activeInstances[0])));
             var p5State = p5Inst ? ('isLooping: ' + p5Inst._loop + ', frameCount: ' + p5Inst.frameCount) : 'NoInstance';
             var errs = window.jsErrors && window.jsErrors.length ? (' | Errors: ' + JSON.stringify(window.jsErrors)) : '';
@@ -10268,19 +12304,18 @@ if (typeof p5 !== 'undefined' && p5.prototype) {
             os.makedirs(thumb_dir, exist_ok=True)
             dest_thumb_path = os.path.join(thumb_dir, f"{unique_name}.jpg")
             try:
-                import requests
+                import requests, io
+                from PIL import Image as PILImage
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
                 }
-                thumb_url = f"https://openprocessing.org/usercontent/sketches/images/{sketch_id}.jpg"
+                thumb_url = f"https://openprocessing.org/sketch/{sketch_id}/thumbnail"
                 img_resp = requests.get(thumb_url, headers=headers, timeout=5)
-                if img_resp.status_code == 200:
-                    with open(dest_thumb_path, "wb") as img_f:
-                        img_f.write(img_resp.content)
-                else:
-                    thumb_url_png = f"https://openprocessing.org/usercontent/sketches/images/{sketch_id}.png"
-                    img_resp = requests.get(thumb_url_png, headers=headers, timeout=5)
-                    if img_resp.status_code == 200:
+                if img_resp.status_code == 200 and len(img_resp.content) > 500:
+                    try:
+                        with PILImage.open(io.BytesIO(img_resp.content)) as im:
+                            im.convert("RGB").save(dest_thumb_path, "JPEG", quality=90)
+                    except Exception:
                         with open(dest_thumb_path, "wb") as img_f:
                             img_f.write(img_resp.content)
             except Exception as e:
@@ -10505,6 +12540,8 @@ function draw() {
                         code = data.get("code", "")
                         if not code or len(code) < 30 or "setup" not in code or "draw" not in code:
                             continue
+                        if data.get("needs_qc_repair", False) or "unstable_blackscreen" in data.get("tags", []):
+                            continue
                         key = file[:-5]
                         data["_filename_key"] = key
                         used_in = data.get("used_in_videos", [])
@@ -10523,44 +12560,133 @@ function draw() {
             self.log_to_console("模組庫中沒有可用的視覺模組！", is_err=True)
             return None
             
-        # ── 1. 強制按「我的最愛」優先與真實使用次數嚴格升序排序 ──
+        # ── 1. 家族級歸一化與跨曲目/批次硬性多樣性約束 (AlbumExclusionRing) ──
         import random
-        all_modules.sort(key=lambda x: (
+        from bandit_inventory_selector import extract_base_family
+
+        batch_used_keys = batch_used_keys or {}
+        batch_used_families = {extract_base_family(k) for k, v in batch_used_keys.items() if v > 0}
+
+        # 彙整歷史家族使用頻率（兼容個別 key 與 _family_* 前綴）
+        family_history_counts = {}
+        for k, v in usage_history.items():
+            if isinstance(v, (int, float)) and v > 0:
+                if k.startswith("_family_"):
+                    fam = k.replace("_family_", "").strip().lower()
+                    family_history_counts[fam] = family_history_counts.get(fam, 0) + int(v)
+                else:
+                    fam = extract_base_family(k)
+                    if fam:
+                        family_history_counts[fam] = family_history_counts.get(fam, 0) + int(v)
+
+        # 專輯級與全域家族硬排除約束 (AlbumExclusionRing)：
+        # 對當前批次已選模組或家族施加硬排除 (若庫存充裕)
+        can_hard_exclude = (len(all_modules) > len(batch_used_keys) + 30)
+        filtered_modules = []
+        for m in all_modules:
+            k = m["_filename_key"]
+            fam = extract_base_family(k)
+            if can_hard_exclude:
+                # 1. 本專輯前幾首已選過之具體模組 key 強制排除
+                if batch_used_keys.get(k, 0) > 0:
+                    continue
+                # 2. 本專輯前幾首已選過之家族，若庫存充足全面排除，杜絕同專內換皮
+                if fam and fam in batch_used_families and len(all_modules) - len(batch_used_families) > 50:
+                    continue
+                # 3. 歷史重度高頻家族降權冷卻（歷史使用 >= 4 次且庫存充足時暫時避開，強制探索海量冷門）
+                if fam and family_history_counts.get(fam, 0) >= 4 and len(all_modules) > 300:
+                    continue
+            filtered_modules.append(m)
+
+        effective_modules = filtered_modules if len(filtered_modules) >= 20 else all_modules
+
+        # 🎛️ Hard Techno / Ambient 專屬美學門禁過濾
+        audio_path_cur = str(getattr(self, 'current_audio_path', '') or (analysis.get('audio_path') if isinstance(analysis, dict) else '')).lower()
+        ui_genre_sel = str(self.genre_select.currentText() if hasattr(self, 'genre_select') and self.genre_select is not None else '').lower()
+        ana_genre = str((analysis.get('genre', '') + ' ' + analysis.get('genre_key', '')) if isinstance(analysis, dict) else '').lower()
+        genre_cur = f"{ui_genre_sel} {ana_genre} {str(getattr(self, 'current_genre', '') or '').lower()}".strip()
+        if any(ht in audio_path_cur or ht in genre_cur for ht in ("hard techno", "hard_techno", "schranz", "industrial techno")):
+            from hard_techno_compatibility_gate import HardTechnoModuleCompatibilityGate
+            ht_gate = HardTechnoModuleCompatibilityGate.get_instance()
+            ht_filtered = ht_gate.filter_modules_for_hard_techno(effective_modules)
+            if ht_filtered:
+                effective_modules = ht_filtered
+                self.log_to_console(f"⚡ [Hard Techno 門禁] 成功鎖定 {len(effective_modules)} 個硬核工業/隧道幾何模組，完全隔離軟性資產！")
+        elif any(amb in audio_path_cur or amb in genre_cur for amb in ("ambient", "drone", "meditative", "chill", "downtempo", "atmospheric", "sleep", "new_age", "new age")):
+            try:
+                from ambient_module_compatibility_gate import AmbientModuleCompatibilityGate
+                amb_gate = AmbientModuleCompatibilityGate.get_instance()
+                amb_filtered = amb_gate.filter_modules_for_ambient(effective_modules)
+                if amb_filtered:
+                    effective_modules = amb_filtered
+                    self.log_to_console(f"🌿 [Ambient 美學門禁] 成功篩選 {len(effective_modules)} 個靜謐流體/光場模組，隔離高頻刺眼資產！")
+            except Exception as e:
+                logger.warning(f"Ambient gate filtering in perform_smart_clip_matching failed: {e}")
+
+        # 階梯排序：未星標 > 本批次使用 > 家族歷史使用 > 個別歷史使用 > 隨機攪動
+        effective_modules.sort(key=lambda x: (
             not x.get("is_starred", False),
-            int(x.get("used_count", 0)),
             batch_used_keys.get(x["_filename_key"], 0),
+            family_history_counts.get(extract_base_family(x["_filename_key"]), 0),
+            int(x.get("used_count", 0)),
             random.random()
         ))
 
-        recent_keys = [k for k, v in usage_history.items() if isinstance(v, (int, float)) and v > 1]
+        # 挑選出歷史頻繁出現的家族與個別 key，傳入 LLM/Bandit 進行冷卻禁選
+        recent_keys = [k for k, v in usage_history.items() if isinstance(v, (int, float)) and v >= 1]
+        for k in batch_used_keys:
+            if k not in recent_keys:
+                recent_keys.append(k)
+
         self.log_to_console("🧠 正在呼叫本地 AI 導演大腦 (Llama3/DeepSeek) 構思全曲世界觀與分鏡表...")
         
         from llm_director import LLMDirectorAgent
         llm_agent = LLMDirectorAgent()
-        director_script = llm_agent.generate_director_script(analysis, all_modules, recent_keys)
+        director_script = llm_agent.generate_director_script(analysis, effective_modules, recent_keys)
         self.current_director_script = director_script
 
         if hasattr(self, "call_sheet_widget"):
             self.call_sheet_widget.update_call_sheet(director_script, storyboard)
 
-        selected_keys = set()
+        selected_keys = []
+        selected_families = set()
+        selected_names = set()
+
         for shot in director_script.get("shot_list", []):
             mod_id = shot.get("assigned_module_id")
             if mod_id:
-                selected_keys.add(mod_id)
+                mod_fam = extract_base_family(mod_id)
+                mod_obj = next((m for m in all_modules if m.get("_filename_key") == mod_id or m.get("name") == mod_id), None)
+                mod_name = str(mod_obj.get("name") if mod_obj else mod_id).strip()
+                if mod_id not in selected_keys and (not mod_fam or mod_fam not in selected_families) and (not mod_name or mod_name not in selected_names):
+                    selected_keys.append(mod_id)
+                    if mod_fam:
+                        selected_families.add(mod_fam)
+                    if mod_name:
+                        selected_names.add(mod_name)
 
-        # 若 LLM 選擇之模組數量偏少，以階梯式最低使用次數補充至 4~6 個
+        # 若 LLM 選擇之模組數量偏少，以階梯式最低使用次數補充至 4~6 個（確保家族與名稱絕對互斥）
         if len(selected_keys) < 4 and len(all_modules) >= 4:
             for vis in all_modules:
                 v_key = vis["_filename_key"]
-                if v_key not in selected_keys:
-                    selected_keys.add(v_key)
+                v_fam = extract_base_family(v_key)
+                v_name = str(vis.get("name") or v_key).strip()
+                if v_key not in selected_keys and (not v_fam or v_fam not in selected_families) and (not v_name or v_name not in selected_names):
+                    selected_keys.append(v_key)
+                    if v_fam:
+                        selected_families.add(v_fam)
+                    if v_name:
+                        selected_names.add(v_name)
                     if len(selected_keys) >= 4:
                         break
                     
-        # 更新全域歷史使用計數，確保下次挑選輪替
+        # 更新全域歷史使用計數，確保下次挑選輪替（記錄 key 與家族）
         for k in selected_keys:
             usage_history[k] = (int(usage_history.get(k, 0)) if isinstance(usage_history.get(k), (int, float)) else 0) + 1
+            fam = extract_base_family(k)
+            if fam:
+                fam_key = f"_family_{fam}"
+                usage_history[fam_key] = (int(usage_history.get(fam_key, 0)) if isinstance(usage_history.get(fam_key), (int, float)) else 0) + 1
 
         try:
             with open(history_file, "w", encoding="utf-8") as f:
@@ -10627,6 +12753,26 @@ function draw() {
         recent_keys = [k for k, v in usage_history.items() if isinstance(v, (int, float)) and v > 1]
         genre = self.genre_select.currentText()
 
+        # 🫁 Ambient 門禁守衛審計與毒性隔離
+        if "ambient" in genre.lower() or "drone" in genre.lower():
+            from ambient_module_compatibility_gate import AmbientModuleCompatibilityGate
+            gate = AmbientModuleCompatibilityGate.get_instance()
+            ambient_approved = []
+            for m in all_modules:
+                mod_k = m.get("_filename_key") or m.get("name")
+                tier = gate.get_module_tier(mod_k, m)
+                if tier in ("GREEN", "YELLOW"):
+                    m_copy = dict(m)
+                    m_copy["ambient_tier"] = tier
+                    if tier == "YELLOW":
+                        m_copy["speed_multiplier"] = 0.05
+                    ambient_approved.append(m_copy)
+            if ambient_approved:
+                self.log_to_console(
+                    f"🫁 [AI 導演門禁] 已啟動 Ambient 毒性隔離：從 {len(all_modules)} 個庫存中限定 {len(ambient_approved)} 個 Ambient 認證模組，徹底排除非 Ambient 素材！"
+                )
+                all_modules = ambient_approved
+
         self.director_thread = AIDirectorOrchestrationThread(audio_path, genre, all_modules, recent_keys)
         self.director_thread.log_signal.connect(lambda msg, is_err: self.log_to_console(msg, is_err))
         self.director_thread.script_ready.connect(self._on_director_script_ready)
@@ -10657,6 +12803,21 @@ function draw() {
         theme = script_data.get("theme_title", "")
         self.log_to_console(f"🎬 AI 導演排片完成！已生成主題「{theme}」，精選 {len(chosen_keys)} 組視覺模組！")
         QMessageBox.information(self, "AI 導演劇本已就緒", f"🎉 AI 導演排片完成！\n\n美學世界觀：{theme}\n色彩氛圍：{script_data.get('color_palette_mood', '')}\n\n已將分鏡表同步至上方「AI 導演通告單」並勾選對應視覺模組。點擊「開始渲染」即可直接產出 4K MV！")
+
+    def _on_ambient_module_selected(self, mod_id: str, meta: dict):
+        clean_name = mod_id[:-5] if mod_id.endswith(".json") else mod_id
+        if hasattr(self, "checked_presets"):
+            self.checked_presets.clear()
+            self.checked_presets.add(clean_name)
+        if hasattr(self, "preview_preset"):
+            self.preview_preset(clean_name)
+        self.log_to_console(f"🫁 [Ambient 心流工作台] 已載入並在右側沙盒即時預覽模組: {clean_name}")
+
+    def _on_ambient_macro_changed(self, params: dict):
+        if hasattr(self, "fx_slider") and "optical_translucency" in params:
+            self.fx_slider.setValue(int(params["optical_translucency"] * 100))
+        if hasattr(self, "freq_slider") and "breathing_rate" in params:
+            self.freq_slider.setValue(int(params["breathing_rate"] * 200))
 
     def start_smart_edit_rendering(self):
         audio_path = self.audio_input.text().strip()
@@ -10903,15 +13064,33 @@ function draw() {
                 'tape_head_drag': self.fx_cb_tape_head_drag.isChecked(),
                 'huffman_entropy_collapse': self.fx_cb_huffman_entropy_collapse.isChecked(),
                 'spectral_fractal_shear': self.fx_cb_spectral_fractal_shear.isChecked(),
+                # 🌟 12 大次世代高辨識度幾何/拓撲強特徵特效
+                'hyper_dimensional_fold': getattr(self, 'fx_cb_hyper_dimensional_fold', None) and self.fx_cb_hyper_dimensional_fold.isChecked(),
+                'reaction_diffusion_growth': getattr(self, 'fx_cb_reaction_diffusion_growth', None) and self.fx_cb_reaction_diffusion_growth.isChecked(),
+                'delaunay_voronoi_mesh': getattr(self, 'fx_cb_delaunay_voronoi_mesh', None) and self.fx_cb_delaunay_voronoi_mesh.isChecked(),
+                'slit_scan_time_warp': getattr(self, 'fx_cb_slit_scan_time_warp', None) and self.fx_cb_slit_scan_time_warp.isChecked(),
+                'gravitational_lensing': getattr(self, 'fx_cb_gravitational_lensing', None) and self.fx_cb_gravitational_lensing.isChecked(),
+                'acid_curl_fluid': getattr(self, 'fx_cb_acid_curl_fluid', None) and self.fx_cb_acid_curl_fluid.isChecked(),
+                'strobe_chroma_invert': getattr(self, 'fx_cb_strobe_chroma_invert', None) and self.fx_cb_strobe_chroma_invert.isChecked(),
+                'cyber_wireframe_lidar': getattr(self, 'fx_cb_cyber_wireframe_lidar', None) and self.fx_cb_cyber_wireframe_lidar.isChecked(),
+                'sine_terrain_displacement': getattr(self, 'fx_cb_sine_terrain_displacement', None) and self.fx_cb_sine_terrain_displacement.isChecked(),
+                'quantum_tunneling': getattr(self, 'fx_cb_quantum_tunneling', None) and self.fx_cb_quantum_tunneling.isChecked(),
+                'prismatic_refraction_prism': getattr(self, 'fx_cb_prismatic_refraction_prism', None) and self.fx_cb_prismatic_refraction_prism.isChecked(),
+                'magnetic_field_lines': getattr(self, 'fx_cb_magnetic_field_lines', None) and self.fx_cb_magnetic_field_lines.isChecked(),
                 'bypass_downscale': self.native_4k_cb.isChecked()
             }
             
             # Step 2: Trigger frame-by-frame rendering with show_popups=False and is_batch=True
-            success = self.render_mv_frame_by_frame(
-                audio_path, genre, visuals_data, output_file, w, h, fps, trans_sec, fx_prob, fx_flags,
-                show_popups=False, is_batch=True,
-                used_themes=getattr(self, '_batch_used_themes', None)
-            )
+            try:
+                success = self.render_mv_frame_by_frame(
+                    audio_path, genre, visuals_data, output_file, w, h, fps, trans_sec, fx_prob, fx_flags,
+                    show_popups=False, is_batch=True,
+                    used_themes=getattr(self, '_batch_used_themes', None)
+                )
+            except Exception as e_batch_render:
+                logger.exception(f"批次曲目渲染異常 [{filename}]: {e_batch_render}")
+                self.log_to_console(f"❌ 批次曲目渲染異常 [{filename}]: {e_batch_render}", is_err=True)
+                success = False
             
             if success:
                 success_count += 1
@@ -10955,11 +13134,30 @@ function draw() {
             QMessageBox.warning(self, "錯誤", "請至少選取一個視覺模組！")
             return
             
-        # Load preset details
+        # Load preset details with quarantine auto-exclusion
         visuals_data = []
         save_dir = os.path.join(workspace_dir, "custom_visuals")
+        
+        # 讀取歷史審計與 Gatekeeper 隔離清單，防止已知崩潰模組進入渲染候選池
+        known_quarantine_modules = set()
+        for q_rep in ['audit_quarantine_report_20260925.json', 'audit_quarantine_latest_batches_report.json', 'audit_quarantine_batch_165248_report.json', 'audit_quarantine_batch_20261009_153406_report.json']:
+            q_path = os.path.join(workspace_dir, q_rep)
+            if os.path.exists(q_path):
+                try:
+                    with open(q_path, 'r', encoding='utf-8') as qf:
+                        qd = json.load(qf)
+                        for it in qd.get('quarantined_items', []):
+                            fn = it.get('filename', '')
+                            if fn.endswith('.json'):
+                                known_quarantine_modules.add(fn[:-5])
+                except Exception:
+                    pass
+
         for vp in selected_presets:
             if vp == "modules_index":
+                continue
+            if vp in known_quarantine_modules:
+                self.log_to_console(f"⚠️ [預檢過濾] 模組 [{vp}] 屬於已知崩潰/死鎖隔離清單，自動跳過以保護 4K MV 渲染！")
                 continue
             p_path = os.path.join(save_dir, f"{vp}.json")
             if os.path.exists(p_path):
@@ -11090,6 +13288,19 @@ function draw() {
                 'tape_head_drag': self.fx_cb_tape_head_drag.isChecked(),
                 'huffman_entropy_collapse': self.fx_cb_huffman_entropy_collapse.isChecked(),
                 'spectral_fractal_shear': self.fx_cb_spectral_fractal_shear.isChecked(),
+                # 🌟 12 大次世代高辨識度幾何/拓撲強特徵特效
+                'hyper_dimensional_fold': getattr(self, 'fx_cb_hyper_dimensional_fold', None) and self.fx_cb_hyper_dimensional_fold.isChecked(),
+                'reaction_diffusion_growth': getattr(self, 'fx_cb_reaction_diffusion_growth', None) and self.fx_cb_reaction_diffusion_growth.isChecked(),
+                'delaunay_voronoi_mesh': getattr(self, 'fx_cb_delaunay_voronoi_mesh', None) and self.fx_cb_delaunay_voronoi_mesh.isChecked(),
+                'slit_scan_time_warp': getattr(self, 'fx_cb_slit_scan_time_warp', None) and self.fx_cb_slit_scan_time_warp.isChecked(),
+                'gravitational_lensing': getattr(self, 'fx_cb_gravitational_lensing', None) and self.fx_cb_gravitational_lensing.isChecked(),
+                'acid_curl_fluid': getattr(self, 'fx_cb_acid_curl_fluid', None) and self.fx_cb_acid_curl_fluid.isChecked(),
+                'strobe_chroma_invert': getattr(self, 'fx_cb_strobe_chroma_invert', None) and self.fx_cb_strobe_chroma_invert.isChecked(),
+                'cyber_wireframe_lidar': getattr(self, 'fx_cb_cyber_wireframe_lidar', None) and self.fx_cb_cyber_wireframe_lidar.isChecked(),
+                'sine_terrain_displacement': getattr(self, 'fx_cb_sine_terrain_displacement', None) and self.fx_cb_sine_terrain_displacement.isChecked(),
+                'quantum_tunneling': getattr(self, 'fx_cb_quantum_tunneling', None) and self.fx_cb_quantum_tunneling.isChecked(),
+                'prismatic_refraction_prism': getattr(self, 'fx_cb_prismatic_refraction_prism', None) and self.fx_cb_prismatic_refraction_prism.isChecked(),
+                'magnetic_field_lines': getattr(self, 'fx_cb_magnetic_field_lines', None) and self.fx_cb_magnetic_field_lines.isChecked(),
                 'bypass_downscale': self.native_4k_cb.isChecked()
             }
         
@@ -11161,6 +13372,18 @@ function draw() {
                 'tape_head_drag': True,
                 'huffman_entropy_collapse': True,
                 'spectral_fractal_shear': True,
+                'hyper_dimensional_fold': True,
+                'reaction_diffusion_growth': True,
+                'delaunay_voronoi_mesh': True,
+                'slit_scan_time_warp': True,
+                'gravitational_lensing': True,
+                'acid_curl_fluid': True,
+                'strobe_chroma_invert': True,
+                'cyber_wireframe_lidar': True,
+                'sine_terrain_displacement': True,
+                'quantum_tunneling': True,
+                'prismatic_refraction_prism': True,
+                'magnetic_field_lines': True,
                 'bypass_downscale': getattr(self, 'native_4k_cb', None).isChecked() if getattr(self, 'native_4k_cb', None) is not None else False
             }
         # Step 1: Analyze audio
@@ -11207,27 +13430,68 @@ function draw() {
 
         self.log_to_console(f"音訊分析完畢: {duration:.2f}s, {total_frames} 幀。")
 
+        # 🌿 Ambient 門禁與長鏡頭熔接檢查：曲風為 Ambient 時，自動過濾為相容之視覺模組池 (Green 原生 + Yellow 阻尼調製) 並合併零碎分鏡
+        is_ambient_mode = any(k in str(resolved_genre).lower() for k in ('ambient', 'drone', 'meditative', 'chill', 'downtempo', 'atmospheric', 'sleep', 'new_age', 'new age'))
+        if is_ambient_mode:
+            from ambient_module_compatibility_gate import AmbientModuleCompatibilityGate
+            gate = AmbientModuleCompatibilityGate.get_instance()
+            filtered_visuals = gate.filter_modules_for_ambient(visuals_data, allow_yellow=True)
+            if filtered_visuals:
+                removed_cnt = max(0, len(visuals_data) - len(filtered_visuals))
+                visuals_data = filtered_visuals
+                self.log_to_console(f"🌿 [Ambient 門禁] 已成功鎖定 {len(visuals_data)} 款 Ambient 相容視覺模組投入渲染 (剔除 {removed_cnt} 款不相容模組)。")
+            if storyboard and len(storyboard) > 3:
+                try:
+                    from llm_director import coalesce_ambient_storyboard_sections
+                    orig_sec_cnt = len(storyboard)
+                    storyboard = coalesce_ambient_storyboard_sections(storyboard, min_shot_dur=16.0, max_shot_dur=36.0)
+                    if len(storyboard) != orig_sec_cnt:
+                        self.log_to_console(f"🌿 [Ambient 呼吸長鏡頭熔接] 將 {orig_sec_cnt} 個零碎音訊分鏡熔接為 {len(storyboard)} 個冥想長鏡頭章節 (16s~36s)。")
+                except Exception as e:
+                    logger.warning(f"Ambient storyboard coalescing failed: {e}")
+
         # Smart Dispatcher based on Visual Tags and Storyboard Weights
         def get_candidate_visuals_for_section(section_name, available_visuals, fallback_list):
-            section_tags = {
-                'Intro': ['intro', 'start', 'ambient', 'slow', 'calm', 'surreal', 'atmospheric', 'minimal'],
-                'Verse': ['verse', 'main', 'theme', 'surreal', 'collage', 'pixel', 'retro'],
-                'Build-up': ['buildup', 'build-up', 'transition', 'energy', 'glitch', 'accelerate'],
-                'Drop': ['drop', 'climax', 'fast', 'energetic', 'hard', 'heavy', '3d', 'masterpiece', 'hybrid_1296'],
-                'Chorus': ['chorus', 'climax', 'fast', 'energetic', 'vocal', 'pop', 'main', 'masterpiece', 'puppet'],
-                'Bridge': ['bridge', 'transition', 'slow', 'calm', 'contrast', 'melodic', 'surreal', 'ascii', 'voronoi'],
-                'Outro': ['outro', 'end', 'ambient', 'slow', 'fade', 'decay', 'surreal']
-            }
-            target_weights = {
-                'Intro': 30,
-                'Verse': 50,
-                'Build-up': 70,
-                'Drop': 90,
-                'Chorus': 80,
-                'Bridge': 40,
-                'Outro': 20
-            }
-            target_w = target_weights.get(section_name, 50)
+            if is_ambient_mode:
+                amb_contemplative_tags = ['ambient', 'slow', 'calm', 'fluid', 'nebula', 'particle', 'wave', 'minimal', 'organic', 'atmospheric', 'surreal', 'space']
+                section_tags = {
+                    'Intro': amb_contemplative_tags,
+                    'Verse': amb_contemplative_tags,
+                    'Build-up': amb_contemplative_tags,
+                    'Drop': amb_contemplative_tags,
+                    'Chorus': amb_contemplative_tags,
+                    'Bridge': amb_contemplative_tags,
+                    'Outro': amb_contemplative_tags
+                }
+                target_weights = {
+                    'Intro': 20,
+                    'Verse': 30,
+                    'Build-up': 35,
+                    'Drop': 45,
+                    'Chorus': 40,
+                    'Bridge': 25,
+                    'Outro': 15
+                }
+            else:
+                section_tags = {
+                    'Intro': ['intro', 'start', 'ambient', 'slow', 'calm', 'surreal', 'atmospheric', 'minimal'],
+                    'Verse': ['verse', 'main', 'theme', 'surreal', 'collage', 'pixel', 'retro'],
+                    'Build-up': ['buildup', 'build-up', 'transition', 'energy', 'glitch', 'accelerate'],
+                    'Drop': ['drop', 'climax', 'fast', 'energetic', 'hard', 'heavy', '3d', 'masterpiece', 'hybrid_1296'],
+                    'Chorus': ['chorus', 'climax', 'fast', 'energetic', 'vocal', 'pop', 'main', 'masterpiece', 'puppet'],
+                    'Bridge': ['bridge', 'transition', 'slow', 'calm', 'contrast', 'melodic', 'surreal', 'ascii', 'voronoi'],
+                    'Outro': ['outro', 'end', 'ambient', 'slow', 'fade', 'decay', 'surreal']
+                }
+                target_weights = {
+                    'Intro': 30,
+                    'Verse': 50,
+                    'Build-up': 70,
+                    'Drop': 90,
+                    'Chorus': 80,
+                    'Bridge': 40,
+                    'Outro': 20
+                }
+            target_w = target_weights.get(section_name, 30 if is_ambient_mode else 50)
             target_keywords = section_tags.get(section_name, [])
             candidates = []
             for vis in available_visuals:
@@ -11236,11 +13500,13 @@ function draw() {
                 vis_w = vis.get("storyboard_weight", 50)
                 energy_diff = abs(vis_w - target_w)
                 score = matches * 10.0 - (energy_diff / 1.5)
+                if is_ambient_mode and vis.get("ambient_tier") == "GREEN":
+                    score += 60.0
                 if vis.get("is_starred", False):
                     score += 100.0
                 
-                # Keep if it matches keywords OR is close in weight (energy_diff <= 30) OR is starred
-                if matches > 0 or energy_diff <= 30 or vis.get("is_starred", False):
+                # Keep if it matches keywords OR is close in weight (energy_diff <= 30) OR is starred OR is GREEN in ambient mode
+                if matches > 0 or energy_diff <= 30 or vis.get("is_starred", False) or (is_ambient_mode and vis.get("ambient_tier") == "GREEN"):
                     candidates.append((score, vis))
             
             if candidates:
@@ -11267,10 +13533,20 @@ function draw() {
         
         # 🎬 檢查是否已具備 AI 導演劇本 (LLM Director Script)
         llm_shot_list = getattr(self, "current_director_script", {}).get("shot_list", [])
-        modules_by_key = {m.get("_filename_key") or m.get("name"): m for m in visuals_data}
-        modules_by_name = {m.get("name"): m for m in visuals_data}
+        has_ai_director_script = bool(llm_shot_list)
+        modules_by_key = {}
+        modules_by_name = {}
+        for m in visuals_data:
+            k = m.get("_filename_key") or m.get("name")
+            if k:
+                modules_by_key[k] = m
+                modules_by_key[k.replace(".json", "")] = m
+            if m.get("name"):
+                modules_by_name[m.get("name")] = m
+                modules_by_name[m.get("name").replace(".json", "")] = m
 
         last_assigned_name = None
+        used_in_song_names = set()
         for sec_idx, sec_data in enumerate(storyboard):
             sec_name = sec_data['section']
             assigned_vis = None
@@ -11279,23 +13555,42 @@ function draw() {
 
             # 優先採用 LLM 導演指定的模組與構圖
             cinematic_meta = {}
+            cinedance_optical_meta = None
+            expressive_uniforms = {}
             trans_style = "luma_wipe"
+            ambient_color_policy = None
             if sec_idx < len(llm_shot_list):
                 shot_info = llm_shot_list[sec_idx]
                 mod_id = shot_info.get("assigned_module_id")
-                assigned_vis = modules_by_key.get(mod_id) or modules_by_name.get(mod_id)
+                assigned_vis = (
+                    modules_by_key.get(mod_id) or
+                    modules_by_name.get(mod_id) or
+                    (modules_by_key.get(str(mod_id).replace(".json", "")) if mod_id else None) or
+                    (modules_by_name.get(str(mod_id).replace(".json", "")) if mod_id else None)
+                )
                 fit_mode = shot_info.get("framing_mode", "fill")
                 fx_intensity = shot_info.get("target_fx_intensity", 0.6)
                 trans_style = shot_info.get("transition_style", "luma_wipe")
                 cinematic_meta = shot_info.get("cinematic_meta", {})
+                cinedance_optical_meta = shot_info.get("cinedance_optical_meta")
+                expressive_uniforms = shot_info.get("expressive_uniforms", {})
+                ambient_color_policy = shot_info.get("ambient_color_policy")
+
+            # 單曲內分鏡模組不重複約束 (Intra-Song Uniqueness)：若 LLM 或候選池指派了本曲已使用過的模組，優先替換為本曲尚未出場的候選模組
+            if assigned_vis and assigned_vis.get('name') in used_in_song_names and len(used_in_song_names) < len(sorted_visuals):
+                assigned_vis = None
 
             if not assigned_vis:
                 candidates = candidates_by_sec.get(sec_name, sorted_visuals) or sorted_visuals
-                idx = sec_counters[sec_name] % len(candidates)
-                assigned_vis = candidates[idx]
-                if len(candidates) > 1 and assigned_vis.get('name') == last_assigned_name:
-                    idx = (idx + 1) % len(candidates)
-                    assigned_vis = candidates[idx]
+                unused_candidates = [c for c in candidates if c.get('name') not in used_in_song_names]
+                if not unused_candidates:
+                    unused_candidates = [c for c in sorted_visuals if c.get('name') not in used_in_song_names]
+                active_pool = unused_candidates if unused_candidates else candidates
+                idx = sec_counters[sec_name] % len(active_pool)
+                assigned_vis = active_pool[idx]
+                if len(active_pool) > 1 and assigned_vis.get('name') == last_assigned_name:
+                    idx = (idx + 1) % len(active_pool)
+                    assigned_vis = active_pool[idx]
                 sec_counters[sec_name] += 1
                 
                 import random
@@ -11304,15 +13599,56 @@ function draw() {
                 else:
                     fit_mode = 'fill'
 
+            # 若未從導演清單取得 cinedance_optical_meta，即時透過 CinedanceShotCompiler 編譯光學鏡頭與三點布光參數
+            if not cinedance_optical_meta:
+                try:
+                    from cinedance_compiler import CinedanceShotCompiler
+                    sec_dur = max(1.0, float(sec_data.get('end', 10.0)) - float(sec_data.get('start', 0.0)))
+                    lookat_off = cinematic_meta.get("camera_lookat_offset", [0.0, 0.0]) if isinstance(cinematic_meta, dict) else [0.0, 0.0]
+                    cinedance_optical_meta = CinedanceShotCompiler.compile_cinematic_shot(
+                        section_name=sec_name,
+                        duration=sec_dur,
+                        composite_tension=float(cinematic_meta.get("composite_tension", fx_intensity)) if isinstance(cinematic_meta, dict) else float(fx_intensity),
+                        framing_mode=fit_mode,
+                        camera_lookat_offset=lookat_off,
+                        energy_hint=float(sec_data.get('intensity', 0.5)),
+                        is_shock_counterpoint=(sec_name in ('Drop', 'Chorus') and fit_mode == 'contain')
+                    )
+                except Exception:
+                    cinedance_optical_meta = None
+
+            if is_ambient_mode:
+                pal_keys = list(AMBIENT_DIRECTOR_PALETTES.keys())
+                chosen_pal_name = pal_keys[sec_idx % len(pal_keys)]
+                chosen_pal = AMBIENT_DIRECTOR_PALETTES[chosen_pal_name]
+                if isinstance(ambient_color_policy, dict) and ambient_color_policy.get("palette"):
+                    chosen_pal = ambient_color_policy["palette"]
+                    chosen_pal_name = ambient_color_policy.get("palette_name", chosen_pal_name)
+                else:
+                    ambient_color_policy = {
+                        "enabled": True,
+                        "palette_name": chosen_pal_name,
+                        "palette": chosen_pal,
+                        "max_saturation": 0.26 if sec_name in ("Intro", "Outro", "Bridge") else 0.30,
+                        "chroma_ceiling": 0.068,
+                    }
+                sec_data['ambient_palette'] = chosen_pal
+                sec_data['ambient_color_policy'] = ambient_color_policy
+
             sec_data['fullscreen_fit_mode'] = fit_mode
             sec_data['assigned_visual'] = assigned_vis
             sec_data['director_fx_intensity'] = fx_intensity
             sec_data['transition_style'] = trans_style
             sec_data['cinematic_meta'] = cinematic_meta
+            sec_data['cinedance_meta'] = cinedance_optical_meta
+            sec_data['expressive_uniforms'] = expressive_uniforms
             last_assigned_name = assigned_vis.get('name')
+            if last_assigned_name:
+                used_in_song_names.add(last_assigned_name)
             
             cut_style_tag = f" | 剪輯: {cinematic_meta.get('cut_style', 'standard')}" if cinematic_meta else ""
-            self.log_to_console(f"子分鏡區段 [{sec_data['start']:.2f}s - {sec_data['end']:.2f}s] ({sec_name}) 🎬 導演指派: {assigned_vis['name']} [構圖: {fit_mode.upper()} | 後製: {int(fx_intensity*100)}% | 轉場: {trans_style}{cut_style_tag}]")
+            amb_pal_tag = f" | 莫蘭迪色盤: {sec_data['ambient_color_policy']['palette_name']}" if is_ambient_mode and sec_data.get('ambient_color_policy') else ""
+            self.log_to_console(f"子分鏡區段 [{sec_data['start']:.2f}s - {sec_data['end']:.2f}s] ({sec_name}) 🎬 導演指派: {assigned_vis['name']} [構圖: {fit_mode.upper()} | 後製: {int(fx_intensity*100)}% | 轉場: {trans_style}{cut_style_tag}{amb_pal_tag}]")
 
 
         times = filter_dynamics.get('times', [])
@@ -11321,12 +13657,21 @@ function draw() {
         mid_ratio = filter_dynamics.get('mid_ratio', [])
         fd_silence_fade = filter_dynamics.get('silence_fade', [])
         fd_percussive = filter_dynamics.get('percussive', [])
+        fd_harmonic = filter_dynamics.get('harmonic', [])
         fd_ethereal = filter_dynamics.get('ethereal_index', [])
         fd_sub_bass = filter_dynamics.get('sub_bass_ratio', [])
         fd_roughness = filter_dynamics.get('roughness', [])
         fd_bass_ratio = filter_dynamics.get('bass_ratio', [])
         fd_centroid_norm = filter_dynamics.get('centroid_norm', [])
         fd_stereo_width = filter_dynamics.get('stereo_width', [])
+        fd_hihat_density = filter_dynamics.get('hihat_density', [])
+        fd_hihat_trigger = filter_dynamics.get('hihat_trigger', [])
+        fd_synth_melody = filter_dynamics.get('synth_melody_active', [])
+        fd_drums = filter_dynamics.get('drums', [])
+        fd_vocals = filter_dynamics.get('vocals', [])
+        fd_stem_bass = filter_dynamics.get('stem_bass', [])
+        fd_other = filter_dynamics.get('other', [])
+        fd_oklch_palette = filter_dynamics.get('oklch_palette', {})
         
         # New actual energy keys
         fd_bass_energy = filter_dynamics.get('bass_energy', [])
@@ -11357,36 +13702,87 @@ function draw() {
                 a_high = fd_high_energy[idx] if idx < len(fd_high_energy) else 0.0
                 return min(1.0, a_low * 1.5), min(1.0, a_mid * 1.5), min(1.0, a_high * 1.5)
             else:
-                return min(1.0, lowpass[idx] * 2.0), min(1.0, mid_ratio[idx] * 2.0), min(1.0, highpass[idx] * 2.0)
+                lp_v = lowpass[idx] if idx < len(lowpass) else 0.0
+                mr_v = mid_ratio[idx] if idx < len(mid_ratio) else 0.0
+                hp_v = highpass[idx] if idx < len(highpass) else 0.0
+                return min(1.0, lp_v * 2.0), min(1.0, mr_v * 2.0), min(1.0, hp_v * 2.0)
 
         def get_full_telemetry_at_time(t):
             """Return full audio feature dict for post-processing pipeline."""
+            beat_dur = 60.0 / max(1.0, bpm)
+            beat_ph = (t % beat_dur) / beat_dur
+            antic_val = max(0.0, (beat_ph - 0.85) / 0.15) if beat_ph > 0.85 else 0.0
             if not times:
-                return {'silence_fade': 0.0, 'percussive': 0.0, 'ethereal': 0.0,
-                        'sub_bass': 0.0, 'roughness': 0.0, 'bass_ratio': 0.0,
-                        'chord_name': 'N.C.', 'chord_hue': 0.0, 'chord_saturation': 0.0,
-                        'chord_brightness': 0.1, 'chord_color_hex': '#0a0a0c',
-                        'centroid': 0.2, 'stereo_width': 0.5, 'bpm': bpm}
+                return {
+                    'silence_fade': 0.0, 'percussive': 0.0, 'harmonic': 0.5, 'ethereal': 0.0,
+                    'sub_bass': 0.0, 'bass': 0.0, 'bass_energy': 0.0, 'mid': 0.0, 'high': 0.0,
+                    'roughness': 0.0, 'spectral_roughness': 0.0, 'bass_ratio': 0.0,
+                    'lowpass': 0.5, 'highpass': 0.0,
+                    'hihat_density': 0.0, 'hihat_trigger': False, 'synth_melody_active': False,
+                    'drums': 0.0, 'vocals': 0.0, 'stem_bass': 0.0, 'other': 0.0,
+                    'chord_name': 'N.C.', 'chord_hue': 0.0, 'chord_saturation': 0.0,
+                    'chord_brightness': 0.1, 'chord_color_hex': '#0a0a0c',
+                    'centroid': 0.2, 'spectral_centroid': 0.2, 'stereo_width': 0.5,
+                    'anticipation': antic_val, 'bpm': bpm, 'tempo': bpm,
+                    'oklch_palette': fd_oklch_palette
+                }
             idx = _bisect_mod.bisect_right(times, t) - 1
             idx = max(0, min(idx, len(times) - 1))
+            cent_v = fd_centroid_norm[idx] if idx < len(fd_centroid_norm) else 0.2
+            rough_v = fd_roughness[idx] if idx < len(fd_roughness) else 0.0
+            bass_v = fd_bass_energy[idx] if idx < len(fd_bass_energy) else (fd_bass_ratio[idx] if idx < len(fd_bass_ratio) else 0.0)
+            mid_v = fd_mid_energy[idx] if idx < len(fd_mid_energy) else (mid_ratio[idx] if idx < len(mid_ratio) else 0.0)
+            high_v = fd_high_energy[idx] if idx < len(fd_high_energy) else 0.0
             return {
                 'silence_fade': fd_silence_fade[idx] if idx < len(fd_silence_fade) else 0.0,
                 'percussive': fd_percussive[idx] if idx < len(fd_percussive) else 0.0,
+                'harmonic': fd_harmonic[idx] if idx < len(fd_harmonic) else 0.5,
                 'ethereal': fd_ethereal[idx] if idx < len(fd_ethereal) else 0.0,
                 'sub_bass': fd_sub_bass[idx] if idx < len(fd_sub_bass) else 0.0,
-                'roughness': fd_roughness[idx] if idx < len(fd_roughness) else 0.0,
+                'bass': bass_v,
+                'bass_energy': bass_v,
+                'mid': mid_v,
+                'high': high_v,
+                'roughness': rough_v,
+                'spectral_roughness': rough_v,
                 'bass_ratio': fd_bass_ratio[idx] if idx < len(fd_bass_ratio) else 0.0,
+                'lowpass': lowpass[idx] if idx < len(lowpass) else max(0.0, 1.0 - cent_v),
+                'highpass': highpass[idx] if idx < len(highpass) else 0.0,
+                'hihat_density': fd_hihat_density[idx] if idx < len(fd_hihat_density) else (high_v * 0.8),
+                'hihat_trigger': bool(fd_hihat_trigger[idx]) if idx < len(fd_hihat_trigger) else False,
+                'synth_melody_active': bool(fd_synth_melody[idx]) if idx < len(fd_synth_melody) else False,
+                'drums': fd_drums[idx] if idx < len(fd_drums) else 0.0,
+                'vocals': fd_vocals[idx] if idx < len(fd_vocals) else 0.0,
+                'stem_bass': fd_stem_bass[idx] if idx < len(fd_stem_bass) else bass_v,
+                'other': fd_other[idx] if idx < len(fd_other) else high_v,
                 'chord_name': fd_chord_name[idx] if idx < len(fd_chord_name) else 'N.C.',
                 'chord_hue': fd_chord_hue[idx] if idx < len(fd_chord_hue) else 0.0,
                 'chord_saturation': fd_chord_saturation[idx] if idx < len(fd_chord_saturation) else 0.0,
                 'chord_brightness': fd_chord_brightness[idx] if idx < len(fd_chord_brightness) else 0.1,
                 'chord_color_hex': fd_chord_color_hex[idx] if idx < len(fd_chord_color_hex) else '#0a0a0c',
-                'centroid': fd_centroid_norm[idx] if idx < len(fd_centroid_norm) else 0.2,
+                'centroid': cent_v,
+                'spectral_centroid': cent_v,
                 'stereo_width': fd_stereo_width[idx] if idx < len(fd_stereo_width) else 0.5,
-                'bpm': bpm
+                'anticipation': antic_val,
+                'bpm': bpm,
+                'tempo': bpm,
+                'oklch_palette': fd_oklch_palette
             }
 
         def get_section_at_time(t):
+            for idx_s, sec in enumerate(storyboard):
+                # 支援 J-Cut / L-Cut 時間軸微移 (timeline_nudge_sec)
+                c_meta = sec.get('cinematic_meta', {}) if isinstance(sec.get('cinematic_meta'), dict) else {}
+                nudge = float(c_meta.get('timeline_nudge_sec', 0.0)) if idx_s > 0 else 0.0
+                next_nudge = 0.0
+                if idx_s + 1 < len(storyboard):
+                    next_cm = storyboard[idx_s + 1].get('cinematic_meta', {})
+                    if isinstance(next_cm, dict):
+                        next_nudge = float(next_cm.get('timeline_nudge_sec', 0.0))
+                eff_start = max(0.0, sec['start'] + nudge)
+                eff_end = max(eff_start + 0.1, sec['end'] + next_nudge)
+                if eff_start <= t <= eff_end:
+                    return sec, sec['section']
             for sec in storyboard:
                 if sec['start'] <= t <= sec['end']:
                     return sec, sec['section']
@@ -11400,9 +13796,9 @@ function draw() {
         import resource as _resource_mod  # macOS memory monitoring
 
         # Fix 3: Pre-allocate reusable images (use render_w, render_h to match internal rendering size)
-        _flash_white = Image.new('RGBA', (render_w, render_h), (255, 255, 255, 255))
-        _flash_black = Image.new('RGBA', (render_w, render_h), (0, 0, 0, 255))
-        _black_img = Image.new('RGBA', (render_w, render_h), (0, 0, 0, 255))
+        _flash_white = Image.new('RGB', (render_w, render_h), (255, 255, 255))
+        _flash_black = Image.new('RGB', (render_w, render_h), (0, 0, 0))
+        _black_img = Image.new('RGB', (render_w, render_h), (0, 0, 0))
         _post_fx_enabled = [True]  # Mutable for memory-based auto-disable
         _grain_frame_counter = [0]  # For grain frame skipping
         _cached_grain_img = [None]  # Cache grain between frames
@@ -11412,6 +13808,7 @@ function draw() {
         from post_processor import PostProcessor, apply_advanced_transition
         _post_processor = PostProcessor(seed_string=audio_path, genre=resolved_genre, used_themes=used_themes)
         self._last_post_processor = _post_processor  # 暴露給批次迴圈以追蹤已使用主題
+        is_hard_techno_track = any(ht in str(resolved_genre).lower() or ht in str(audio_path).lower() for ht in ("hard techno", "hard_techno", "schranz", "industrial techno"))
         _post_fx_enabled = [True]  # Mutable for memory-based auto-disable
 
         # 動態計算記憶體安全門檻（根據本機實際實體記憶體配置，例如 32GB 設備設定 22GB 門檻，避免 16GB 過早關閉特效）
@@ -11442,12 +13839,22 @@ function draw() {
             if not _post_fx_enabled[0]:
                 return pil_img  # Fix 7: Skip if disabled by memory watchdog
 
-            # Determine post-FX intensity with dynamic song arc modulation
+            # Determine post-FX intensity with dynamic song arc & DirectorChoreographer modulation
             base_intensity = 0.5
             try:
                 base_intensity = active_vis.get('post_fx_intensity', 50) / 100.0
             except Exception:
                 base_intensity = self.fx_slider.value() / 100.0
+
+            if sec_data and 'director_fx_intensity' in sec_data:
+                dir_fx = float(sec_data.get('director_fx_intensity', base_intensity))
+                base_intensity = 0.55 * base_intensity + 0.45 * dir_fx
+
+            if isinstance(audio_feats, dict) and sec_data:
+                if sec_data.get('cinedance_meta') and 'cinedance_meta' not in audio_feats:
+                    audio_feats['cinedance_meta'] = sec_data.get('cinedance_meta')
+                if sec_data.get('expressive_uniforms') and 'expressive_uniforms' not in audio_feats:
+                    audio_feats['expressive_uniforms'] = sec_data.get('expressive_uniforms')
 
             # Progressive song timeline arc factor (0.7x at start -> 1.15x at end)
             song_progress_ratio = max(0.0, min(1.0, t / max(1.0, duration)))
@@ -11587,6 +13994,10 @@ function draw() {
         module_cache_mgr = ModuleFrameCacheManager()
         from post_processor import SongProceduralFluidEngine
         song_fluid_engine = SongProceduralFluidEngine(audio_path)
+        from aura_fallback_engine import AuraFallbackEngine
+        _detected_album = os.path.basename(os.path.dirname(output_file)) if output_file else "generic"
+        _detected_title = os.path.splitext(os.path.basename(output_file))[0] if output_file else "Aura"
+        aura_fallback_engine = AuraFallbackEngine(seed_string=audio_path, album_name=_detected_album, track_title=_detected_title)
 
         def apply_graceful_fallback(pil_cached_img, t_val, beat_e, a_low_val, chord_c):
             """
@@ -11622,9 +14033,20 @@ function draw() {
         consecutive_black_frames = 0
         fallback_blend_alpha = 0.0
         module_accumulated_time = {}
+        bad_modules_blacklist = {
+            'yourblanket', 'SphereOfInfluence2', 'lesson7', 'Theuncannytrailshader',
+            'CompositeAttractor', 'NotSafe', 'PaintingwithCircleNoise', 'Cloth',
+            'Magicaltrailshader', 'henry', 'Web01', 'WobblySwarmremix', 'test',
+            'SnowCloud', 'StaircaseWaterway', 'BoldBrash', 'Splashquasar', 'op_2142634'
+        }
+        module_anomaly_counts = {}
 
-        def get_html_content(code, custom_css="", custom_html="", inline_assets=None, scaling_mode="auto"):
-            return self.get_html_content(code, custom_css, custom_html, inline_assets, scaling_mode=scaling_mode, for_rendering=True)
+        def get_html_content(code, custom_css="", custom_html="", inline_assets=None, scaling_mode="auto", ambient_palette=None):
+            return self.get_html_content(
+                code, custom_css, custom_html, inline_assets,
+                scaling_mode=scaling_mode, for_rendering=True,
+                is_ambient=is_ambient_mode, ambient_palette=ambient_palette
+            )
 
         def run_js_safely(view, js_code, is_first_frame=False):
             attempts = 5 if is_first_frame else 3
@@ -11851,6 +14273,9 @@ function draw() {
         # Determines how many beats between visual module switches within a section
         def get_rotation_beat_interval(sec_name, energy, genre_str):
             """Return how many beats to wait before rotating to next visual module."""
+            # Ambient/Drone 模式或具備 AI 導演劇本時，維持長鏡頭冥想心流與導演意志，段落內不進行切換
+            if any(k in str(genre_str).lower() for k in ('ambient', 'drone')) or has_ai_director_script:
+                return 999999
             base_intervals = {
                 'Drop': (2, 4),
                 'Chorus': (2, 4),
@@ -11970,13 +14395,15 @@ function draw() {
         # 並執行多次繪圖循環，徹底消滅影片開頭 0~2 秒因 Canvas 著色器編譯未就緒而觸發的保底光球！
         try:
             initial_vis = storyboard[0].get('assigned_visual', sorted_visuals[0]) if storyboard else sorted_visuals[0]
+            initial_amb_pal = storyboard[0].get('ambient_palette') if storyboard else None
             self.log_to_console(f"🎬 正在執行開頭視覺 [{initial_vis['name']}] 的 WebGL/Canvas 深度預熱...")
             viewA.setHtml(get_html_content(
                 initial_vis.get('code', ''),
                 custom_css=initial_vis.get('custom_css', ''),
                 custom_html=initial_vis.get('custom_html', ''),
                 inline_assets=initial_vis.get('inline_assets', {}),
-                scaling_mode=initial_vis.get('scaling_mode', 'auto')
+                scaling_mode=initial_vis.get('scaling_mode', 'auto'),
+                ambient_palette=initial_amb_pal
             ), get_local_base_url())
             
             ev_preroll = QEventLoop()
@@ -11996,6 +14423,21 @@ function draw() {
             # 執行 10 次連續 redraw() 確保 WebGL context 啟用且緩衝區寫入正常
             _preroll_draw_js = """
             (function() {
+                try {
+                    let w = window.innerWidth || 1920;
+                    let h = window.innerHeight || 1080;
+                    if (typeof quasarMode !== 'undefined') quasarMode = true;
+                    for (let s = 0; s < 30; s++) {
+                        let rx = Math.random() * w, ry = Math.random() * h;
+                        window.simulatedMouseX = rx; window.simulatedMouseY = ry;
+                        if (typeof mouseX !== 'undefined') { window.mouseX = rx; window.mouseY = ry; }
+                        if (typeof mouseButton !== 'undefined') window.mouseButton = 'left';
+                        if (typeof mousePressed === 'function') mousePressed();
+                        if (typeof mouseClicked === 'function') mouseClicked();
+                        if (typeof mouseDragged === 'function') mouseDragged();
+                        if (typeof addNewParticle === 'function') addNewParticle();
+                    }
+                } catch(e) {}
                 for (let pi = 0; pi < 10; pi++) {
                     try {
                         if (typeof redraw === 'function') redraw();
@@ -12177,33 +14619,48 @@ function draw() {
                 return base_vis
 
             # === Beat-driven visual rotation within sections ===
-            if is_beat:
-                rotation_beat_counter += 1
-                
-                # A7: Subdivision system — trigger rapid switches on high-energy beats & Hihat rolls
-                if resolved_genre not in ('lo-fi', 'ambient', 'jazz'):
-                    subdiv_audio = get_full_telemetry_at_time(t)
-                    subdiv_bass = subdiv_audio.get('bass_ratio', 0.0)
-                    subdiv_perc = subdiv_audio.get('percussive', 0.0)
-                    hihat_dens = subdiv_audio.get('hihat_density', 0.0)
-                    hihat_trig = subdiv_audio.get('hihat_trigger', False)
+            # 當曲風為 Ambient/Drone 或已啟用 AI 導演劇本時，嚴格鎖定分鏡模組，禁止同段落內高頻拍點輪替
+            if not is_ambient_mode and not has_ai_director_script:
+                if is_beat:
+                    rotation_beat_counter += 1
                     
-                    # Rapid rotation on 16th note Hihat rolls / high percussion density
-                    if hihat_dens > 0.6 or hihat_trig or subdiv_bass > 0.6 or subdiv_perc > 0.5:
-                        # Force rapid rotation interval during intense Hihat bursts
-                        if rotation_beats_until_switch > 1:
-                            rotation_beats_until_switch = 1
-                    elif hihat_dens > 0.3 or subdiv_bass > 0.3 or subdiv_perc > 0.35:
-                        # 8th notes: force rotation every 2 beats
-                        if rotation_beats_until_switch > 2:
-                            rotation_beats_until_switch = 2
+                    # A7: Subdivision system — 僅於 Drop / Chorus 高潮段落且當前模組已建立至少 4 拍視覺記憶後，才依高密度打擊加速切換，防止整首歌每 1~2 拍碎切同質化
+                    if resolved_genre not in ('lo-fi', 'ambient', 'jazz') and 'drone' not in resolved_genre and sec_name in ('Drop', 'Chorus'):
+                        subdiv_audio = get_full_telemetry_at_time(t)
+                        subdiv_bass = subdiv_audio.get('bass_ratio', 0.0)
+                        subdiv_perc = subdiv_audio.get('percussive', 0.0)
+                        hihat_dens = subdiv_audio.get('hihat_density', 0.0)
+                        hihat_trig = subdiv_audio.get('hihat_trigger', False)
+                        
+                        if (hihat_dens > 0.65 or hihat_trig or subdiv_bass > 0.65 or subdiv_perc > 0.55) and rotation_beat_counter >= 4:
+                            if rotation_beats_until_switch > 4:
+                                rotation_beats_until_switch = 4
+                        elif (hihat_dens > 0.40 or subdiv_bass > 0.45 or subdiv_perc > 0.42) and rotation_beat_counter >= 6:
+                            if rotation_beats_until_switch > 6:
+                                rotation_beats_until_switch = 6
             
-            # 🔮 AOT 背景視圖預熱 (Offscreen AOT Pre-warming)
-            # 模式 1: 跨段落邊界 AOT 預熱 (Cross-Section Boundary Preload, 提前 2.5 秒)
-            preload_lead_sec = 2.5
+            # Filter candidates excluding deadlocked / blacklisted modules
+            healthy_sorted = [v for v in sorted_visuals if v['name'] not in bad_modules_blacklist] or sorted_visuals
+            sec_candidates_raw = candidates_by_sec.get(sec_name, sorted_visuals)
+            candidates = [v for v in sec_candidates_raw if v['name'] not in bad_modules_blacklist] or healthy_sorted
+
+            # 🔮 AOT 背景視圖預熱與自適應長溶解對齊 (Offscreen AOT Pre-warming & Adaptive Dissolve Alignment)
+            if is_ambient_mode:
+                amb_base_trans = min(4.2, max(2.2, trans_sec * 2.2))
+                sec_span = max(1.0, float(sec_data.get('end', t + 10.0) - sec_data.get('start', t))) if sec_data else 16.0
+                eff_trans_sec = min(amb_base_trans, max(0.8, sec_span * 0.30))
+            else:
+                eff_trans_sec = trans_sec
+
+            # 模式 1: 跨段落邊界 AOT 預熱 (Cross-Section Boundary Preload, 確保始終大於 eff_trans_sec + 1.5s)
+            preload_lead_sec = max(2.5, eff_trans_sec + 1.5)
             next_sec_data, next_sec_name = get_section_at_time(t + preload_lead_sec)
             if next_sec_name != sec_name and not is_transitioning:
                 next_assigned_vis = next_sec_data.get('assigned_visual', sorted_visuals[0]) if next_sec_data else sorted_visuals[0]
+                if next_assigned_vis['name'] in bad_modules_blacklist:
+                    next_healthy = [v for v in candidates_by_sec.get(next_sec_name, sorted_visuals) if v['name'] not in bad_modules_blacklist]
+                    if next_healthy:
+                        next_assigned_vis = next_healthy[0]
                 target_aot_vis = get_energy_adapted_visual(next_assigned_vis, music_energy, next_sec_name)
                 if loadedB != target_aot_vis['name']:
                     viewB.setHtml(get_html_content(
@@ -12211,14 +14668,15 @@ function draw() {
                         custom_css=target_aot_vis.get('custom_css', ''),
                         custom_html=target_aot_vis.get('custom_html', ''),
                         inline_assets=target_aot_vis.get('inline_assets', {}),
-                        scaling_mode=target_aot_vis.get('scaling_mode', 'auto')
+                        scaling_mode=target_aot_vis.get('scaling_mode', 'auto'),
+                        ambient_palette=next_sec_data.get('ambient_palette') if next_sec_data else None
                     ), get_local_base_url())
                     loadedB = target_aot_vis['name']
                     just_loaded_b = True
             
             # 模式 2: 同段落拍點輪替 AOT 預熱 (Within-Section Rotation Preload, 提前 2 拍)
-            elif is_beat and (rotation_beats_until_switch - rotation_beat_counter) <= 2:
-                candidates_aot = candidates_by_sec.get(sec_name, sorted_visuals)
+            elif is_beat and not is_ambient_mode and not has_ai_director_script and (rotation_beats_until_switch - rotation_beat_counter) <= 2:
+                candidates_aot = candidates
                 if len(candidates_aot) > 1:
                     cur_idx_aot = rotation_visual_idx.get(sec_name, 0)
                     next_predicted_vis = candidates_aot[(cur_idx_aot + 1) % len(candidates_aot)]
@@ -12228,17 +14686,17 @@ function draw() {
                             custom_css=next_predicted_vis.get('custom_css', ''),
                             custom_html=next_predicted_vis.get('custom_html', ''),
                             inline_assets=next_predicted_vis.get('inline_assets', {}),
-                            scaling_mode=next_predicted_vis.get('scaling_mode', 'auto')
+                            scaling_mode=next_predicted_vis.get('scaling_mode', 'auto'),
+                            ambient_palette=sec_data.get('ambient_palette') if sec_data else None
                         ), get_local_base_url())
                         loadedB = next_predicted_vis['name']
                         just_loaded_b = True
             
-            if rotation_beat_counter >= rotation_beats_until_switch:
+            if not is_ambient_mode and not has_ai_director_script and rotation_beat_counter >= rotation_beats_until_switch:
                 rotation_beat_counter = 0
                 rotation_beats_until_switch = get_rotation_beat_interval(sec_name, music_energy, resolved_genre)
                 
                 # Rotate to next candidate visual for this section
-                candidates = candidates_by_sec.get(sec_name, sorted_visuals)
                 if len(candidates) > 1:
                     import random
                     if sec_name not in rotation_visual_idx:
@@ -12259,24 +14717,28 @@ function draw() {
 
             # Determine the base visual: use rotation visual if available, otherwise section-assigned
             base_vis = current_rotation_vis if current_rotation_vis else sec_data.get('assigned_visual', sorted_visuals[0])
+            if base_vis['name'] in bad_modules_blacklist and candidates:
+                base_vis = candidates[0]
             
             # Find active visual (energy override can still trump rotation)
             active_vis = get_energy_adapted_visual(base_vis, music_energy, sec_name)
+            if active_vis['name'] in bad_modules_blacklist and candidates:
+                active_vis = candidates[0]
             
             # Transition check (section boundaries)
             is_transitioning = False
             trans_progress = 0.0
             other_vis = None
             
-            if t - sec_data['start'] < trans_sec and sec_data['start'] > 0:
+            if t - sec_data['start'] < eff_trans_sec and sec_data['start'] > 0:
                 is_transitioning = True
-                trans_progress = (t - sec_data['start']) / trans_sec
+                trans_progress = (t - sec_data['start']) / eff_trans_sec
                 prev_sec_data, prev_sec_name = get_section_at_time(sec_data['start'] - 0.01)
                 other_vis = get_energy_adapted_visual(prev_sec_data.get('assigned_visual', sorted_visuals[0]), music_energy, prev_sec_name)
                 
-            elif sec_data['end'] - t < trans_sec and sec_data['end'] < duration:
+            elif sec_data['end'] - t < eff_trans_sec and sec_data['end'] < duration:
                 is_transitioning = True
-                trans_progress = (sec_data['end'] - t) / trans_sec
+                trans_progress = (sec_data['end'] - t) / eff_trans_sec
                 next_sec_data, next_sec_name = get_section_at_time(sec_data['end'] + 0.01)
                 other_vis = get_energy_adapted_visual(next_sec_data.get('assigned_visual', sorted_visuals[0]), music_energy, next_sec_name)
             
@@ -12293,7 +14755,8 @@ function draw() {
                     custom_css=active_vis.get('custom_css', ''),
                     custom_html=active_vis.get('custom_html', ''),
                     inline_assets=active_vis.get('inline_assets', {}),
-                    scaling_mode=active_vis.get('scaling_mode', 'auto')
+                    scaling_mode=active_vis.get('scaling_mode', 'auto'),
+                    ambient_palette=sec_data.get('ambient_palette') if sec_data else None
                 ), get_local_base_url())
                 
                 ev_finished = [False]
@@ -12329,6 +14792,21 @@ function draw() {
                 # to ensure Canvas has valid pixels before real frame capture.
                 _warmup_js = """
                 (function() {
+                    try {
+                        let w = window.innerWidth || 1920;
+                        let h = window.innerHeight || 1080;
+                        if (typeof quasarMode !== 'undefined') quasarMode = true;
+                        for (let s = 0; s < 25; s++) {
+                            let rx = Math.random() * w, ry = Math.random() * h;
+                            window.simulatedMouseX = rx; window.simulatedMouseY = ry;
+                            if (typeof mouseX !== 'undefined') { window.mouseX = rx; window.mouseY = ry; }
+                            if (typeof mouseButton !== 'undefined') window.mouseButton = 'left';
+                            if (typeof mousePressed === 'function') mousePressed();
+                            if (typeof mouseClicked === 'function') mouseClicked();
+                            if (typeof mouseDragged === 'function') mouseDragged();
+                            if (typeof addNewParticle === 'function') addNewParticle();
+                        }
+                    } catch(e) {}
                     for (let wi = 0; wi < 8; wi++) {
                         try {
                             if (typeof redraw === 'function') redraw();
@@ -12365,7 +14843,8 @@ function draw() {
                     custom_css=other_vis.get('custom_css', ''),
                     custom_html=other_vis.get('custom_html', ''),
                     inline_assets=other_vis.get('inline_assets', {}),
-                    scaling_mode=other_vis.get('scaling_mode', 'auto')
+                    scaling_mode=other_vis.get('scaling_mode', 'auto'),
+                    ambient_palette=sec_data.get('ambient_palette') if sec_data else None
                 ), get_local_base_url())
                 
                 ev_finished_b = [False]
@@ -12397,6 +14876,21 @@ function draw() {
                 # [FIX] GPU Warm-up for ViewB: execute multiple draw() cycles + GPU flush
                 _warmup_js_b = """
                 (function() {
+                    try {
+                        let w = window.innerWidth || 1920;
+                        let h = window.innerHeight || 1080;
+                        if (typeof quasarMode !== 'undefined') quasarMode = true;
+                        for (let s = 0; s < 25; s++) {
+                            let rx = Math.random() * w, ry = Math.random() * h;
+                            window.simulatedMouseX = rx; window.simulatedMouseY = ry;
+                            if (typeof mouseX !== 'undefined') { window.mouseX = rx; window.mouseY = ry; }
+                            if (typeof mouseButton !== 'undefined') window.mouseButton = 'left';
+                            if (typeof mousePressed === 'function') mousePressed();
+                            if (typeof mouseClicked === 'function') mouseClicked();
+                            if (typeof mouseDragged === 'function') mouseDragged();
+                            if (typeof addNewParticle === 'function') addNewParticle();
+                        }
+                    } catch(e) {}
                     for (let wi = 0; wi < 8; wi++) {
                         try {
                             if (typeof redraw === 'function') redraw();
@@ -12449,10 +14943,41 @@ function draw() {
             synth_mel_str = "true" if audio_feats.get('synth_melody_active', False) else "false"
             harm_val = audio_feats.get('harmonic', 0.0)
             perc_val = audio_feats.get('percussive', 0.0)
+            stem_d = audio_feats.get('drums', perc_val)
+            stem_b = audio_feats.get('stem_bass', a_low)
+            stem_v = audio_feats.get('vocals', a_mid)
+            stem_o = audio_feats.get('other', a_high)
+            if sec_data:
+                if sec_data.get('cinedance_meta'):
+                    audio_feats['cinedance_meta'] = sec_data.get('cinedance_meta')
+                if sec_data.get('expressive_uniforms'):
+                    audio_feats['expressive_uniforms'] = sec_data.get('expressive_uniforms')
+                if sec_data.get('ambient_color_policy'):
+                    audio_feats['ambient_color_policy'] = sec_data.get('ambient_color_policy')
+            if is_ambient_mode:
+                audio_feats['force_ambient_color'] = True
+            exp_u = audio_feats.get('expressive_uniforms') or {}
+            u_ten = float(exp_u.get('u_tension', 0.5))
+            u_cha = float(exp_u.get('u_chaos', 0.2))
+            u_sub = float(exp_u.get('u_sublime', 0.3))
+            u_dis = float(exp_u.get('u_dissolution', 0.1))
             
             mod_time_a = module_accumulated_time.get(active_vis['name'], 0.0)
             ps_safe = "true"  # Mandatory photosensitive protection
-            js = f"window.chordHue={chord_hue:.2f};window.stereoWidth={stereo_w:.3f};window.sectionName='{sec_name}';window.sectionProgress={sec_progress:.4f};window.currentChordColor='{chord_hex}';window.photosensitiveSafe={ps_safe};window.hihatTrigger={hihat_trig_str};window.hihatDensity={hihat_dens_val:.4f};window.synthMelodyActive={synth_mel_str};window.harmonicEnergy={harm_val:.4f};window.percussiveEnergy={perc_val:.4f};window.setFrameParams({t}, {str(is_beat).lower()}, {beat_energy:.4f}, {a_low:.4f}, {a_mid:.4f}, {a_high:.4f}, {mod_time_a:.4f})"
+            ht_flag_str = "true" if is_hard_techno_track else "false"
+            amb_flag_str = "true" if is_ambient_mode else "false"
+            amb_override_js = ""
+            if is_ambient_mode:
+                shot_pal = (sec_data.get('ambient_palette') if sec_data else None) or AMBIENT_DIRECTOR_PALETTES["nordic_glacier_mist"]
+                shot_pol = (sec_data.get('ambient_color_policy') if sec_data else None) or {}
+                max_sat_v = float(shot_pol.get("max_saturation", 0.28))
+                amb_override_js = f"if(window.setAmbientColorOverride)window.setAmbientColorOverride({{enabled:true,maxSaturation:{max_sat_v:.3f},palette:{json.dumps(shot_pal)}}});"
+                amb_tier_tag = str(active_vis.get('ambient_tier', 'GREEN')).upper()
+                default_amb_spd = 0.65 if amb_tier_tag == 'GREEN' else 0.22
+                speed_mult_val = float(active_vis.get('ambient_speed_multiplier', default_amb_spd))
+            else:
+                speed_mult_val = 2.2 if is_hard_techno_track else 1.0
+            js = f"window.isHardTechno={ht_flag_str};window.isAmbientMode={amb_flag_str};window.currentGenre='{resolved_genre}';{amb_override_js}window.speedMultiplier={speed_mult_val};window.chordHue={chord_hue:.2f};window.stereoWidth={stereo_w:.3f};window.sectionName='{sec_name}';window.sectionProgress={sec_progress:.4f};window.currentChordColor='{chord_hex}';window.photosensitiveSafe={ps_safe};window.hihatTrigger={hihat_trig_str};window.hihatDensity={hihat_dens_val:.4f};window.synthMelodyActive={synth_mel_str};window.harmonicEnergy={harm_val:.4f};window.percussiveEnergy={perc_val:.4f};window.stemDrums={stem_d:.4f};window.stemBass={stem_b:.4f};window.stemVocals={stem_v:.4f};window.stemOther={stem_o:.4f};window.uTension={u_ten:.4f};window.uChaos={u_cha:.4f};window.uSublime={u_sub:.4f};window.uDissolution={u_dis:.4f};window.setFrameParams({t}, {str(is_beat).lower()}, {beat_energy:.4f}, {a_low:.4f}, {a_mid:.4f}, {a_high:.4f}, {mod_time_a:.4f})"
             
             # Draw A
             if not is_transitioning:
@@ -12507,15 +15032,51 @@ function draw() {
             channel_spread_a = max(ext[1] - ext[0] for ext in stat_a[:3]) if stat_a else 999
             is_solid = (not is_intro_early) and stat_a and (channel_spread_a <= 3) and (rgb_max_a > 15)
 
+            # 檢測象限死鎖 (Quadrant / Partial Screen Deadlock: 例如單象限白塊/純色，其餘象限死黑)
+            is_quadrant_deadlock = False
+            if not is_intro_early:
+                try:
+                    w_a, h_a = pilA.size
+                    q_tl = pilA.crop((0, 0, w_a // 2, h_a // 2)).getextrema()
+                    q_tr = pilA.crop((w_a // 2, 0, w_a, h_a // 2)).getextrema()
+                    q_bl = pilA.crop((0, h_a // 2, w_a // 2, h_a)).getextrema()
+                    q_br = pilA.crop((w_a // 2, h_a // 2, w_a, h_a)).getextrema()
+                    quad_maxes = [max(ext[1] for ext in q[:3]) for q in [q_tl, q_tr, q_bl, q_br]]
+                    quad_mins = [min(ext[0] for ext in q[:3]) for q in [q_tl, q_tr, q_bl, q_br]]
+                    black_quads = sum(1 for qm in quad_maxes if qm < black_thresh)
+                    bright_quads = sum(1 for qm in quad_maxes if qm > 120)
+                    solid_quads = sum(1 for qm, qmi in zip(quad_maxes, quad_mins) if (qm - qmi <= 3 and qm > 15))
+                    if (black_quads >= 2 and bright_quads >= 1) or (black_quads >= 3 and solid_quads >= 1):
+                        is_quadrant_deadlock = True
+                except Exception:
+                    pass
+
+            # 計算樂段跨界幾何變形權重 (Cross-Section Morphing Weight)
+            sec_morph_weight = 0.0
+            sec_prev_name = None
+            if t - sec_data['start'] < trans_sec and sec_data['start'] > 0:
+                sec_morph_weight = max(0.0, min(1.0, 1.0 - (t - sec_data['start']) / trans_sec))
+                _, sec_prev_name = get_section_at_time(sec_data['start'] - 0.01)
+
             def _get_active_fallback():
                 mod_c = module_cache_mgr.get_latest_frame(active_vis['name'])
                 if mod_c is not None:
-                    return apply_graceful_fallback(mod_c, t, beat_energy, a_low, chord_hex)
-                else:
-                    return song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex, audio_feats=audio_feats)
+                    try:
+                        stat_mc = mod_c.getextrema()
+                        max_mc = max(ext[1] for ext in stat_mc[:3]) if stat_mc else 0
+                        if max_mc > 25:
+                            return apply_graceful_fallback(mod_c, t, beat_energy, a_low, chord_hex)
+                    except Exception:
+                        pass
+                return aura_fallback_engine.render(
+                    target_w=render_w, target_h=render_h, t=t,
+                    beat_energy=beat_energy, sub_bass=a_low,
+                    audio_feats=audio_feats, section_name=sec_name, bpm=bpm
+                )
 
             if is_blackout:
                 consecutive_black_frames += 1
+                module_anomaly_counts[active_vis['name']] = module_anomaly_counts.get(active_vis['name'], 0) + 1
                 if consecutive_black_frames == 2 or (consecutive_black_frames > 2 and consecutive_black_frames % 30 == 0):
                     logger.warning(f"⚠️ [BlackScreenGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到全黑影格，啟動保底攔截")
                 fallback_blend_alpha = min(1.0, fallback_blend_alpha + 0.25)
@@ -12529,6 +15090,7 @@ function draw() {
                     pilA = fb_frame
             elif is_whiteout:
                 consecutive_white_frames += 1
+                module_anomaly_counts[active_vis['name']] = module_anomaly_counts.get(active_vis['name'], 0) + 1
                 if consecutive_white_frames == 1 or consecutive_white_frames % 30 == 0:
                     logger.warning(f"⚠️ [WhiteScreenGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到全白異常影格，啟動保底攔截")
                 fallback_blend_alpha = min(1.0, fallback_blend_alpha + 0.25)
@@ -12542,6 +15104,7 @@ function draw() {
                     pilA = fb_frame
             elif is_solid:
                 consecutive_solid_frames += 1
+                module_anomaly_counts[active_vis['name']] = module_anomaly_counts.get(active_vis['name'], 0) + 1
                 if consecutive_solid_frames > 15:
                     if consecutive_solid_frames % 20 == 0:
                         logger.warning(f"⚠️ [SolidColorGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到持續死鎖純色影格 (spread={channel_spread_a})，啟動保底攔截")
@@ -12554,6 +15117,20 @@ function draw() {
                             pilA = fb_frame
                     else:
                         pilA = fb_frame
+            elif is_quadrant_deadlock:
+                consecutive_solid_frames += 1
+                module_anomaly_counts[active_vis['name']] = module_anomaly_counts.get(active_vis['name'], 0) + 1
+                if consecutive_solid_frames == 1 or consecutive_solid_frames % 20 == 0:
+                    logger.warning(f"⚠️ [QuadrantGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 偵測到象限局部異常/死鎖影格，啟動保底攔截")
+                fallback_blend_alpha = min(1.0, fallback_blend_alpha + 0.35)
+                fb_frame = _get_active_fallback()
+                if last_valid_pil_frame is not None and fallback_blend_alpha < 0.95 and last_valid_module_name == active_vis['name']:
+                    try:
+                        pilA = Image.blend(last_valid_pil_frame, fb_frame, fallback_blend_alpha)
+                    except Exception:
+                        pilA = fb_frame
+                else:
+                    pilA = fb_frame
             elif sec_name != 'Outro' and 4 <= rgb_max_a < 16:
                 # Phase 2: 臨界半暗區線性軟混合 (Linear Dark Blending)，消除生硬跳變
                 blend_w = max(0.0, min(1.0, (rgb_max_a - 4.0) / 12.0))
@@ -12579,24 +15156,27 @@ function draw() {
                 last_valid_pil_frame = pilA.copy()
                 last_valid_module_name = active_vis['name']
 
-            # 🚨 異常逃逸機制：若某個模組連續超過 30 幀 (約 1.0 秒) 全黑、全白或純色死鎖，強制切換至同樂段其他模組
-            if (consecutive_black_frames > 30 or consecutive_white_frames > 30 or consecutive_solid_frames > 30):
-                candidates_esc = candidates_by_sec.get(sec_name, sorted_visuals)
-                if len(candidates_esc) > 1:
+            # 🚨 異常逃逸與黑名單懲罰機制：若某個模組累計異常超過 20 幀或連續超過 25 幀，強制列入黑名單並永久隔離逃逸
+            tot_anomalies = module_anomaly_counts.get(active_vis['name'], 0)
+            should_escape = (consecutive_black_frames >= 20 or consecutive_white_frames >= 20 or consecutive_solid_frames >= 20 or tot_anomalies >= 35)
+            if should_escape:
+                bad_modules_blacklist.add(active_vis['name'])
+                self.log_to_console(f"🚫 [模組隔離黑名單] 模組 [{active_vis['name']}] 累計異常達 {tot_anomalies} 幀，已將其列入隔離名單，防止後續分鏡再次調用！")
+                healthy_candidates = [v for v in candidates if v['name'] not in bad_modules_blacklist]
+                if not healthy_candidates:
+                    healthy_candidates = [v for v in sorted_visuals if v['name'] not in bad_modules_blacklist] or sorted_visuals
+                
+                if healthy_candidates:
                     cur_esc_idx = rotation_visual_idx.get(sec_name, 0)
-                    next_esc_idx = (cur_esc_idx + 1) % len(candidates_esc)
+                    next_esc_idx = (cur_esc_idx + 1) % len(healthy_candidates)
                     rotation_visual_idx[sec_name] = next_esc_idx
-                    current_rotation_vis = candidates_esc[next_esc_idx]
-                    self.log_to_console(f"🚨 [異常逃逸] 模組 [{active_vis['name']}] 持續輸出死鎖或純色異常畫面，強制輪換至 [{current_rotation_vis['name']}]！")
+                    current_rotation_vis = healthy_candidates[next_esc_idx]
+                    self.log_to_console(f"🚨 [異常逃逸成功] 成功從死鎖模組 [{active_vis['name']}] 強制輪換至健康模組 [{current_rotation_vis['name']}]！")
                     loadedA = None  # 確保 ViewA 立即觸發新模組重新加載
                     just_loaded_a = True
                     consecutive_black_frames = 0
                     consecutive_white_frames = 0
                     consecutive_solid_frames = 0
-            if False:  # Cleaned legacy branch
-                consecutive_black_frames = 0
-                module_cache_mgr.add_frame(active_vis['name'], pilA)
-                last_valid_pil_frame = pilA.copy()
 
             # ⏳ 累加當前模組在單曲中的總播放秒數 (Module Accumulated Timeline)
             module_accumulated_time[active_vis['name']] = module_accumulated_time.get(active_vis['name'], 0.0) + (1.0 / fps)
@@ -12649,6 +15229,32 @@ function draw() {
                 channel_spread_b = max(ext[1] - ext[0] for ext in stat_b[:3]) if stat_b else 999
                 is_solid_b = stat_b and (channel_spread_b <= 3) and (rgb_max_b > 15)
                 
+                # 檢測 ViewB 象限死鎖
+                is_quadrant_deadlock_b = False
+                try:
+                    w_b, h_b = pilB.size
+                    qb_tl = pilB.crop((0, 0, w_b // 2, h_b // 2)).getextrema()
+                    qb_tr = pilB.crop((w_b // 2, 0, w_b, h_b // 2)).getextrema()
+                    qb_bl = pilB.crop((0, h_b // 2, w_b // 2, h_b)).getextrema()
+                    qb_br = pilB.crop((w_b // 2, h_b // 2, w_b, h_b)).getextrema()
+                    qb_maxes = [max(ext[1] for ext in q[:3]) for q in [qb_tl, qb_tr, qb_bl, qb_br]]
+                    qb_mins = [min(ext[0] for ext in q[:3]) for q in [qb_tl, qb_tr, qb_bl, qb_br]]
+                    black_qb = sum(1 for qm in qb_maxes if qm < black_thresh_b)
+                    bright_qb = sum(1 for qm in qb_maxes if qm > 120)
+                    solid_qb = sum(1 for qm, qmi in zip(qb_maxes, qb_mins) if (qm - qmi <= 3 and qm > 15))
+                    if (black_qb >= 2 and bright_qb >= 1) or (black_qb >= 3 and solid_qb >= 1):
+                        is_quadrant_deadlock_b = True
+                except Exception:
+                    pass
+
+                if is_blackout_b or is_whiteout_b or is_solid_b or is_quadrant_deadlock_b:
+                    module_anomaly_counts[other_vis['name']] = module_anomaly_counts.get(other_vis['name'], 0) + 1
+                    tot_b_anomalies = module_anomaly_counts[other_vis['name']]
+                    if tot_b_anomalies >= 35:
+                        if other_vis['name'] not in bad_modules_blacklist:
+                            bad_modules_blacklist.add(other_vis['name'])
+                            self.log_to_console(f"🚫 [模組隔離黑名單(ViewB)] 模組 [{other_vis['name']}] 在過渡期異常達 {tot_b_anomalies} 幀，已提早列入隔離名單！")
+                
                 def _get_active_fallback_b():
                     mod_c_b = module_cache_mgr.get_latest_frame(other_vis['name'])
                     if mod_c_b is not None:
@@ -12656,9 +15262,13 @@ function draw() {
                     elif pilA is not None:
                         return pilA.copy()
                     else:
-                        return song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex, audio_feats=audio_feats)
+                        return aura_fallback_engine.render(
+                            target_w=render_w, target_h=render_h, t=t,
+                            beat_energy=beat_energy, sub_bass=a_low,
+                            audio_feats=audio_feats, section_name=sec_name, bpm=bpm
+                        )
 
-                if is_blackout_b or is_whiteout_b or is_solid_b:
+                if is_blackout_b or is_whiteout_b or is_solid_b or is_quadrant_deadlock_b:
                     pilB = _get_active_fallback_b()
                 elif sec_name != 'Outro' and 4 <= rgb_max_b < 16:
                     blend_w_b = max(0.0, min(1.0, (rgb_max_b - 4.0) / 12.0))
@@ -12672,30 +15282,51 @@ function draw() {
                 else:
                     module_cache_mgr.add_frame(other_vis['name'], pilB)
 
-                # Determine transition type dynamically based on the section, energy and pattern rotation
+                # Determine transition type dynamically honoring DirectorChoreographer & SaliencyEyeTraceBridge
                 norm_sec = sec_name.lower().strip()
                 trans_rot = int(t * 5.0) + int(audio_seed % 97)
                 pat_options = ['diagonal_tl_br', 'diagonal_tr_bl', 'radial_iris', 'horizontal_shutter', 'diamond_expand', 'vertical_curtain']
                 wipe_pat = pat_options[trans_rot % len(pat_options)]
-                
-                if 'intro' in norm_sec or 'outro' in norm_sec:
-                    chosen_trans = 'luma_wipe' if trans_rot % 2 == 0 else 'solid_color_transition'
-                elif 'verse' in norm_sec:
-                    chosen_trans = 'displacement' if trans_rot % 2 == 0 else 'luma_wipe'
-                elif 'chorus' in norm_sec or 'drop' in norm_sec:
-                    if is_beat or beat_energy > 0.4:
-                        chosen_trans = 'zoom_blur' if trans_rot % 3 != 0 else 'solid_color_transition'
-                    else:
-                        chosen_trans = 'glitch'
-                elif 'build' in norm_sec:
-                    chosen_trans = 'glitch' if trans_rot % 2 == 0 else 'zoom_blur'
-                elif 'bridge' in norm_sec:
-                    chosen_trans = 'slide_push' if trans_rot % 2 == 0 else 'solid_color_transition'
-                else:
-                    chosen_trans = 'displacement'
 
-                # Intensity of the transition is modulated by beat energy
-                trans_intensity = 0.4 + 0.6 * beat_energy
+                dir_trans_raw = str(sec_data.get('transition_style', '') if sec_data else '').lower()
+                dir_trans_map = {
+                    'directional_wipe': 'slide_push' if trans_rot % 2 == 0 else 'luma_wipe',
+                    'zoom_blur': 'zoom_blur',
+                    'luma_matte': 'luma_wipe',
+                    'luma_wipe': 'luma_wipe',
+                    'glitch_displacement_flash': 'glitch',
+                    'strobe_invert': 'glitch' if (is_beat or trans_rot % 2 == 0) else 'solid_color_transition',
+                    'hard_cut': 'solid_color_transition' if trans_rot % 3 == 0 else 'displacement',
+                    'displacement': 'displacement',
+                    'slide_push': 'slide_push',
+                    'glitch': 'glitch'
+                }
+                if is_ambient_mode:
+                    # 🌿 Ambient 轉場狀態機淨化 (Transition State-Machine Purification v2.0)：
+                    # 嚴格封鎖 glitch / zoom_blur / slide_push / solid_color_transition，強制採用柔焦亮度推進溶解 (luma_wipe)
+                    chosen_trans = 'displacement' if dir_trans_raw == 'displacement' else 'luma_wipe'
+                    trans_intensity = 0.25 + 0.20 * beat_energy
+                else:
+                    if dir_trans_raw in dir_trans_map and dir_trans_raw != 'luma_wipe':
+                        chosen_trans = dir_trans_map[dir_trans_raw]
+                    elif 'intro' in norm_sec or 'outro' in norm_sec:
+                        chosen_trans = 'luma_wipe' if trans_rot % 2 == 0 else 'solid_color_transition'
+                    elif 'verse' in norm_sec:
+                        chosen_trans = 'displacement' if trans_rot % 2 == 0 else 'luma_wipe'
+                    elif 'chorus' in norm_sec or 'drop' in norm_sec:
+                        if is_beat or beat_energy > 0.4:
+                            chosen_trans = 'zoom_blur' if trans_rot % 3 != 0 else 'solid_color_transition'
+                        else:
+                            chosen_trans = 'glitch'
+                    elif 'build' in norm_sec:
+                        chosen_trans = 'glitch' if trans_rot % 2 == 0 else 'zoom_blur'
+                    elif 'bridge' in norm_sec:
+                        chosen_trans = 'slide_push' if trans_rot % 2 == 0 else 'solid_color_transition'
+                    else:
+                        chosen_trans = 'displacement'
+
+                    # Intensity of the transition is modulated by beat energy
+                    trans_intensity = 0.4 + 0.6 * beat_energy
 
                 img_to_stream = apply_advanced_transition(
                     pilB, pilA, trans_progress,
@@ -12719,7 +15350,26 @@ function draw() {
             channel_spread_f = max(ext[1] - ext[0] for ext in stat_final[:3]) if stat_final else 999
             is_stream_solid = (not is_intro_early) and stat_final and (channel_spread_f <= 3) and (rgb_max_f > 15) and (consecutive_solid_frames > 15)
 
-            if is_stream_black or is_stream_white or is_stream_solid:
+            # 檢測即將串流影格的象限死鎖
+            is_stream_quadrant_deadlock = False
+            if not is_intro_early:
+                try:
+                    w_f, h_f = img_to_stream.size
+                    qf_tl = img_to_stream.crop((0, 0, w_f // 2, h_f // 2)).getextrema()
+                    qf_tr = img_to_stream.crop((w_f // 2, 0, w_f, h_f // 2)).getextrema()
+                    qf_bl = img_to_stream.crop((0, h_f // 2, w_f // 2, h_f)).getextrema()
+                    qf_br = img_to_stream.crop((w_f // 2, h_f // 2, w_f, h_f)).getextrema()
+                    qf_maxes = [max(ext[1] for ext in q[:3]) for q in [qf_tl, qf_tr, qf_bl, qf_br]]
+                    qf_mins = [min(ext[0] for ext in q[:3]) for q in [qf_tl, qf_tr, qf_bl, qf_br]]
+                    black_qf = sum(1 for qm in qf_maxes if qm < final_thresh)
+                    bright_qf = sum(1 for qm in qf_maxes if qm > 120)
+                    solid_qf = sum(1 for qm, qmi in zip(qf_maxes, qf_mins) if (qm - qmi <= 3 and qm > 15))
+                    if (black_qf >= 2 and bright_qf >= 1) or (black_qf >= 3 and solid_qf >= 1):
+                        is_stream_quadrant_deadlock = True
+                except Exception:
+                    pass
+
+            if is_stream_black or is_stream_white or is_stream_solid or is_stream_quadrant_deadlock:
                 if 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None:
                     # 只有在 last_valid_pil_frame 本身不是純色死鎖時才採用
                     last_stat = last_valid_pil_frame.getextrema()
@@ -12727,9 +15377,17 @@ function draw() {
                     if last_spread > 3:
                         img_to_stream = apply_graceful_fallback(last_valid_pil_frame.copy(), t, beat_energy, a_low, chord_hex)
                     else:
-                        img_to_stream = song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex, audio_feats=audio_feats)
+                        img_to_stream = aura_fallback_engine.render(
+                            target_w=render_w, target_h=render_h, t=t,
+                            beat_energy=beat_energy, sub_bass=a_low,
+                            audio_feats=audio_feats, section_name=sec_name, bpm=bpm
+                        )
                 else:
-                    img_to_stream = song_fluid_engine.render_emergency_frame(render_w, render_h, t, beat_energy, a_low, chord_hex, audio_feats=audio_feats)
+                    img_to_stream = aura_fallback_engine.render(
+                        target_w=render_w, target_h=render_h, t=t,
+                        beat_energy=beat_energy, sub_bass=a_low,
+                        audio_feats=audio_feats, section_name=sec_name, bpm=bpm
+                    )
 
             # Apply post-processing effects chain (flash, grain, throb, etc.)
             img_to_stream = apply_post_processing(img_to_stream, t, is_beat, beat_energy, audio_feats, section_name=sec_name, section_progress=sec_progress)
@@ -12746,13 +15404,92 @@ function draw() {
                 music_energy=music_energy
             )
 
-            # 若 QC 診斷出需要補強熱烈度或響應，動態進行影格修飾
+            # 若 QC 診斷出需要補強熱烈度或響應，動態進行影格修飾與死鎖模組熱置換逃逸
             if qc_boost:
+                if qc_boost.get('ambient_glow_overlay') or qc_boost.get('edge_glow_burst'):
+                    try:
+                        _aura_glow = aura_fallback_engine.render(
+                            target_w=render_w, target_h=render_h, t=t,
+                            beat_energy=max(0.35, beat_energy), sub_bass=a_low,
+                            audio_feats=audio_feats, section_name=sec_name, bpm=bpm
+                        )
+                        if _aura_glow.mode != img_to_stream.mode:
+                            _aura_glow = _aura_glow.convert(img_to_stream.mode)
+                        img_to_stream = ImageChops.screen(img_to_stream, Image.blend(Image.new(img_to_stream.mode, img_to_stream.size, 0), _aura_glow, 0.55 if qc_boost.get('ambient_glow_overlay') else 0.30))
+                    except Exception:
+                        pass
                 if qc_boost.get('contrast_boost'):
                     enh = ImageEnhance.Contrast(img_to_stream)
                     img_to_stream = enh.enhance(qc_boost['contrast_boost'])
+                if qc_boost.get('exposure_boost'):
+                    enh = ImageEnhance.Brightness(img_to_stream)
+                    img_to_stream = enh.enhance(qc_boost['exposure_boost'])
                 if qc_boost.get('force_hold_previous') and 'last_valid_pil_frame' in locals() and last_valid_pil_frame is not None:
                     img_to_stream = last_valid_pil_frame.copy()
+                if qc_boost.get('trigger_hotswap_fallback'):
+                    _bad_name = active_vis.get('name', '') if isinstance(active_vis, dict) else ''
+                    if _bad_name:
+                        module_anomaly_counts[_bad_name] = module_anomaly_counts.get(_bad_name, 0) + 2
+                        if module_anomaly_counts[_bad_name] >= ANOMALY_QUARANTINE_THRESHOLD and _bad_name not in bad_modules_blacklist:
+                            bad_modules_blacklist.add(_bad_name)
+                            logger.warning(f"🚫 [QC Hotswap Escape] 模組「{_bad_name}」因連續欠曝或畫面死鎖已隔離拉黑，立即觸發熱備援切換！")
+                            _healthy_pool = [v for v in candidates_by_sec.get(sec_name, sorted_visuals) if v.get('name') not in bad_modules_blacklist] or [v for v in sorted_visuals if v.get('name') not in bad_modules_blacklist]
+                            if _healthy_pool:
+                                current_rotation_vis = _healthy_pool[i % len(_healthy_pool)]
+                                if sec_data:
+                                    sec_data['assigned_visual'] = current_rotation_vis
+
+            # 🛡️ 後處理/QC 之後的最終黑幀守衛：apply_post_processing 與 force_hold_previous 可能再次產生全黑幀，
+            # 這裡在寫入 FFmpeg 前再次攔截 (起始 35 幀的刻意淡入除外)。
+            if not is_intro_early and sec_name != 'Outro':
+                try:
+                    _post_ext = img_to_stream.getextrema()
+                    _post_black_thr = 8
+                    if _post_ext and all(ext[1] < _post_black_thr for ext in _post_ext[:3]):
+                        if i % 30 == 0:
+                            logger.warning(f"⚠️ [PostQCBlackGuard] Frame {i} (t={t:.2f}s, section={sec_name}) 後處理後仍為全黑，改用保底畫面")
+                        img_to_stream = aura_fallback_engine.render(
+                            target_w=render_w, target_h=render_h, t=t,
+                            beat_energy=beat_energy, sub_bass=a_low,
+                            audio_feats=audio_feats, section_name=sec_name, bpm=bpm
+                        )
+                except Exception as e_post_guard:
+                    logger.warning(f"Post-QC black guard error at frame {i}: {e_post_guard}")
+
+            # ⚡ Hard Techno 專屬高潮重砲頻閃 (Climax Kick Strobe) 與差異化微震顫 (僅於 Drop/Chorus 或極高能量重拍觸發，並依曲目基因分化 3 種頻閃風格)
+            if is_hard_techno_track and is_beat:
+                from PIL import ImageChops
+                _is_drop_climax = any(s in sec_name.lower() for s in ('drop', 'chorus', 'climax'))
+                _strobe_archetype = audio_seed % 3  # 0: 局部高光反轉, 1: 柔化白閃疊加, 2: 冷暖雙色頻閃
+                if (_is_drop_climax and beat_energy > 0.72 and i % 8 == 0) or (beat_energy > 0.88 and i % 16 == 0):
+                    try:
+                        if _strobe_archetype == 0:
+                            if img_to_stream.mode == 'RGBA':
+                                r, g, b, a = img_to_stream.split()
+                                inv_rgb = ImageChops.invert(Image.merge('RGB', (r, g, b)))
+                                blended_rgb = Image.blend(Image.merge('RGB', (r, g, b)), inv_rgb, 0.70)
+                                r_b, g_b, b_b = blended_rgb.split()
+                                img_to_stream = Image.merge('RGBA', (r_b, g_b, b_b, a))
+                            else:
+                                img_to_stream = Image.blend(img_to_stream, ImageChops.invert(img_to_stream), 0.70)
+                        elif _strobe_archetype == 1:
+                            if _flash_white.size != img_to_stream.size or _flash_white.mode != img_to_stream.mode:
+                                flash_col = (255, 255, 255) if img_to_stream.mode == 'RGB' else (255, 255, 255, 255)
+                                _flash_white = Image.new(img_to_stream.mode, img_to_stream.size, flash_col)
+                            img_to_stream = Image.blend(img_to_stream, ImageChops.screen(img_to_stream, _flash_white), 0.55)
+                        else:
+                            enh_c = ImageEnhance.Contrast(img_to_stream)
+                            img_to_stream = enh_c.enhance(1.55)
+                    except Exception as e_strobe:
+                        logger.warning(f"Kick strobe burst error at frame {i}: {e_strobe}")
+                elif _is_drop_climax and beat_energy > 0.65:
+                    try:
+                        import random as _rng_shake
+                        dx = int(_rng_shake.uniform(-1, 1) * 10.0 * beat_energy)
+                        dy = int(_rng_shake.uniform(-1, 1) * 8.0 * beat_energy)
+                        img_to_stream = ImageChops.offset(img_to_stream, dx, dy)
+                    except Exception as e_shake:
+                        logger.warning(f"Screen shake error at frame {i}: {e_shake}")
 
             # Fix 1: Send frame to background writer thread via bounded queue
             # Periodic screenshot saving for visual quality assurance and monitoring
@@ -13022,13 +15759,23 @@ function draw() {
             if not is_batch:
                 self.set_render_buttons_enabled(True)
                 self.btn_cancel_render.setEnabled(False)
-            # Cleanup views
+            # Cleanup views & WebEnginePages (包含 _current_viewA/B 以防中途 watchdog 重建後殘留)
             try:
-                for v in [viewA, viewB]:
+                for v in set([viewA, viewB, _current_viewA[0], _current_viewB[0]]):
                     if v:
+                        try:
+                            v.page().profile().clearHttpCache()
+                        except Exception:
+                            pass
                         v.setParent(None)
+                        page = v.page()
+                        v.setPage(None)
+                        if page:
+                            page.deleteLater()
                         v.close()
                         v.deleteLater()
+                _current_viewA[0] = None
+                _current_viewB[0] = None
             except:
                 pass
             try:
@@ -13038,6 +15785,17 @@ function draw() {
                     _current_clipper[0].deleteLater()
                     _current_clipper[0] = None
             except:
+                pass
+            # 釋放單曲 4K 環形快取與後處理器大型 NumPy 緩衝區，杜絕 45 首批次累積至 16.5GB
+            try:
+                if 'module_cache_mgr' in locals() and module_cache_mgr:
+                    module_cache_mgr.caches.clear()
+                    module_cache_mgr.lru_order.clear()
+                if '_post_processor' in locals() and _post_processor:
+                    for _buf_attr in ('prev_frame', 'prev_gray', 'rd_u', 'rd_v', 'feature_mask', 'slit_buffer'):
+                        if hasattr(_post_processor, _buf_attr):
+                            setattr(_post_processor, _buf_attr, None)
+            except Exception:
                 pass
             # Fix 6: Remove file handler to avoid leaking handlers
             try:
@@ -13252,6 +16010,20 @@ function draw() {
             
             # Format BPM
             bpm_str = f"{bpm:.0f}" if bpm else "N/A"
+
+            # 曲風顯示名稱與標籤 (hard_techno -> Hard Techno)，避免硬編碼 LoFi/Ambient
+            genre_label = (genre or "Ambient").replace("_", " ").strip().title()
+            _gk = (genre or "ambient").lower().replace("_", " ").strip()
+            if "hard" in _gk and "techno" in _gk:
+                _tags = ["HardTechno", "Techno", "Rave", "Underground"]
+            elif "techno" in _gk:
+                _tags = ["Techno", "Rave", "Underground"]
+            elif "ambient" in _gk:
+                _tags = ["Ambient", "Chill"]
+            else:
+                _tags = [self.clean_hashtag(genre_label) or "Music"]
+            genre_tags = " ".join(f"#{t}" for t in _tags)
+            tt_genre_tags = " ".join(f"#{t.lower()}" for t in _tags)
             
             social_path = os.path.splitext(output_file)[0] + "_social.txt"
             
@@ -13261,7 +16033,7 @@ function draw() {
             content.append("======================================================================")
             content.append(f"Track: {song}")
             content.append(f"Artist: {artist}")
-            content.append(f"Genre: {genre.capitalize() if genre else 'Ambient'}")
+            content.append(f"Genre: {genre_label}")
             content.append(f"BPM: {bpm_str}")
             content.append(f"Duration: {duration_str}")
             content.append("======================================================================")
@@ -13278,15 +16050,17 @@ function draw() {
             content.append("")
             content.append("Description:")
             content.append("🎧 立即收聽 / Stream & Download:")
-            content.append(f"👉 YouTube: {youtube_url}")
-            content.append(f"👉 Apple Music: {apple_music_url}")
+            if youtube_url and youtube_url != "unknown":
+                content.append(f"👉 YouTube: {youtube_url}")
+            if apple_music_url and apple_music_url != "unknown":
+                content.append(f"👉 Apple Music: {apple_music_url}")
             content.append("")
             content.append("🎵 【音樂資訊 / Track Info】")
             content.append(f"- 歌曲名稱 (Song Title): {song}")
             content.append(f"- 創作者/藝術家 (Artist): {artist}")
             content.append(f"- 音訊長度 (Duration): {duration_str}")
             content.append(f"- 音軌速度 (Tempo): {bpm_str} BPM")
-            content.append(f"- 音樂類型 (Genre): {genre.capitalize() if genre else 'Ambient'}")
+            content.append(f"- 音樂類型 (Genre): {genre_label}")
             content.append("- 視覺技術 (Visuals): 4K Visual Integration Editor (p5.js / WebGL / Custom Shaders)")
             content.append("")
             
@@ -13344,7 +16118,7 @@ function draw() {
             clean_song = self.clean_hashtag(song)
             
             content.append("Hashtags:")
-            content.append(f"#4KMV #AudioReactive #Visualizer #MusicVideo #VJLoop #LoFi #Ambient #Techno #{clean_artist} #{clean_song}")
+            content.append(f"#4KMV #AudioReactive #Visualizer #MusicVideo #VJLoop {genre_tags} #{clean_artist} #{clean_song}")
             content.append("")
             content.append("======================================================================")
             content.append("")
@@ -13363,7 +16137,7 @@ function draw() {
             content.append("")
             content.append("Full video on channel! / 完整版 MV 請至頻道收看！")
             content.append("")
-            content.append(f"#shorts #music #visualizer #audioreactive #4K #ambient #lofi #techno #vjloop #{clean_artist}")
+            content.append(f"#shorts #music #visualizer #audioreactive #4K {tt_genre_tags} #vjloop #{clean_artist}")
             content.append("")
             content.append("======================================================================")
             content.append("")
@@ -13381,7 +16155,7 @@ function draw() {
             content.append(".")
             content.append(".")
             content.append(".")
-            content.append(f"#AudioReactive #Visualizer #MusicVideo #4KMV #VJLoop #LoFi #Ambient #Techno #GenerativeArt #CreativeCoding #p5js #InstagramMusic #{clean_artist}")
+            content.append(f"#AudioReactive #Visualizer #MusicVideo #4KMV #VJLoop {genre_tags} #GenerativeArt #CreativeCoding #p5js #InstagramMusic #{clean_artist}")
             content.append("")
             content.append("======================================================================")
             content.append("")
@@ -13389,7 +16163,7 @@ function draw() {
             # 4. TIKTOK VIDEO
             content.append("--- [4] TIKTOK VIDEO ---")
             content.append("Caption & Hashtags:")
-            content.append(f"{song} - {artist} 🎧 4K p5.js 音畫互動 Visualizer! 🤯✨ #music #visualizer #audioreactive #4kmv #vj #lofi #ambient #creativecoding #fyp #p5js #{clean_artist}")
+            content.append(f"{song} - {artist} 🎧 4K p5.js 音畫互動 Visualizer! 🤯✨ #music #visualizer #audioreactive #4kmv #vj {tt_genre_tags} #creativecoding #fyp #p5js #{clean_artist}")
             content.append("")
             content.append("======================================================================")
             
@@ -13499,6 +16273,22 @@ function draw() {
             from black_screen_detector import BlackScreenDetectorDialog
             dialog = BlackScreenDetectorDialog(self)
             dialog.exec()
+        elif mode_dlg.mode == "dedup":
+            self.start_dedup_cleanup()
+
+    def start_dedup_cleanup(self):
+        try:
+            from scripts.audit_and_deduplicate_visual_modules import run_audit_and_deduplicate
+            run_audit_and_deduplicate(dry_run=False)
+            self.cached_presets = None
+            self.load_visual_presets()
+            QMessageBox.information(
+                self,
+                "去重完成",
+                "全庫視覺模組清查與去重完成！\n\n已成功排除所有重複模組，並融合影片歷史使用紀錄與星標。\n詳細報告已儲存於 audit_deduplication_report.txt。"
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "去重失敗", f"執行模組去重時發生錯誤: {e}")
 
     def start_manual_cleanup(self):
         progress_path = os.path.join(workspace_dir, "batch_test_progress.json")
@@ -13744,7 +16534,10 @@ function draw() {
         js_objects = []
         for obj in sorted_objects:
             tab_title = obj.get("title", "tab")
-            if tab_title.lower().endswith(('.css', '.html', '.htm', '.txt', '.json', '.glsl', '.vert', '.frag')):
+            lower_title = tab_title.lower().strip()
+            if lower_title.endswith(('.css', '.html', '.htm', '.txt', '.json', '.glsl', '.vert', '.frag')):
+                continue
+            if lower_title in ['license', 'licence', 'readme', 'notes', 'credits', 'about', 'documentation']:
                 continue
             js_objects.append(obj)
 
@@ -15448,8 +18241,8 @@ class CleanupModeDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("選擇試運行與篩選模式")
-        self.resize(500, 290)
-        self.mode = None # 'auto', 'manual', 'black_screen', or None
+        self.resize(500, 360)
+        self.mode = None # 'auto', 'manual', 'black_screen', 'dedup', or None
         
         self.setStyleSheet("""
             QDialog { background-color: #09090b; color: #f4f4f5; }
@@ -15460,6 +18253,7 @@ class CleanupModeDialog(QDialog):
                 text-align: left;
             }
             QPushButton:hover { background-color: #27272a; border-color: #3f3f46; }
+            QPushButton#btn_dedup { border-left: 4px solid #3b82f6; }
             QPushButton#btn_auto { border-left: 4px solid #7c3aed; }
             QPushButton#btn_manual { border-left: 4px solid #10b981; }
             QPushButton#btn_black { border-left: 4px solid #a855f7; }
@@ -15470,6 +18264,11 @@ class CleanupModeDialog(QDialog):
         
         lbl = QLabel("請選擇本機視覺模組庫的試運行與清理模式：", self)
         layout.addWidget(lbl)
+
+        self.btn_dedup = QPushButton("🧬 智能去重與指紋清查\n   (自動比對實質程式碼指紋，安全隔離重複收錄/Fork副本，無損融合使用次數與星標)", self)
+        self.btn_dedup.setObjectName("btn_dedup")
+        self.btn_dedup.clicked.connect(self.select_dedup)
+        layout.addWidget(self.btn_dedup)
         
         self.btn_auto = QPushButton("🤖 自動化快速清理\n   (Headless 靜態與動態審查，自動篩除報錯崩潰模組，自動隱藏控制項/音訊橋接與隱藏無關文字)", self)
         self.btn_auto.setObjectName("btn_auto")
@@ -15490,6 +18289,10 @@ class CleanupModeDialog(QDialog):
         self.btn_cancel.setObjectName("btn_cancel")
         self.btn_cancel.clicked.connect(self.reject)
         layout.addWidget(self.btn_cancel)
+
+    def select_dedup(self):
+        self.mode = "dedup"
+        self.accept()
         
     def select_auto(self):
         self.mode = "auto"

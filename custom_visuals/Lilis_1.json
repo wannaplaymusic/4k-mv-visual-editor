@@ -12,7 +12,8 @@
         "batch_import",
         "openprocessing",
         "audio_reactive",
-        "restored"
+        "restored",
+        "batch_2026-09-25"
     ],
     "frequency": 50,
     "storyboard_weight": 50,

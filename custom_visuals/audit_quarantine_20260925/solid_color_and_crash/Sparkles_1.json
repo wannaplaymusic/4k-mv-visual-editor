@@ -1,0 +1,22 @@
+{
+    "name": "Sparkles",
+    "code": "// === Tab: mySketch ===\nlet g = 0.005;\nlet particles = new Array(700);\n\n////////////////////////////////////////////////////////////////////////////////\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n\tnoStroke();\n\t\n\tfor (i = 0; i < particles.length; i++) {\n\t\tparticles[i] = new Particle();\n\t\t\n\t\tparticles[i].px = random(width);\n\t\tparticles[i].py = random(height);\n\t\t\n\t\tif (i % 2 == 0) particles[i].m =  randomGaussian() * 8;\n\t\telse            particles[i].m = -randomGaussian() * 8;\n\t}\n}\n\n////////////////////////////////////////////////////////////////////////////////\n\nfunction draw() {\n\tbackground(32);\n\t\n\tfor (me = 0; me < particles.length; me++) {\n\t\tparticles[me].resetAcceleration();\n\t\t\n\t\tfor (neighbor = 0; neighbor < particles.length; neighbor++) {\n\t\t\tparticles[me].updatePartialAcceleration(particles[neighbor]);\n\t\t}\n\t}\n\t\n\tfor (i = 0; i < particles.length; i++) {\n\t\tparticles[i].updateVelocityAndPosition();\n\t\t\n\t\tlet opacity = sqrt(particles[i].vx * particles[i].vx + particles[i].vy * particles[i].vy) * 128;\n\t\t\n\t\tif (particles[i].m < 0) fill(255, opacity);\n\t\telse                    fill(255, 0, 153, opacity);\n\t\t\n\t\tlet radius = abs(particles[i].m);\n\t\tellipse(particles[i].px, particles[i].py, radius, radius);\n\t}\n}\n\n////////////////////////////////////////////////////////////////////////////////\n\nfunction mousePressed() {\n\tg *= -1;\n}\n\n\n////////////////////////////////////////////////////////////////////////////////\n////////////////////////////////////////////////////////////////////////////////\n\n\nclass Particle {\n\tpx, py, vx, vy, ax, ay, m;\n\n////////////////////////////////////////////////////////////////////////////////\n\n  function resetAcceleration() {\n\t\tax = 0;\n\t\tay = 0;\n\t}\n\n////////////////////////////////////////////////////////////////////////////////\n\n  function updatePartialAcceleration(neighbor) {\n\t\tif (neighbor != this) {\n\t\t\tdx = px - neighbor.px;\n\t\t\tdy = py - neighbor.py;\n\n\t\t\tlet d = dx*dx + dy*dy;\n\t\t\tif (d < 1) d = 1;\n\n\t\t\tlet common = m * neighbor.m / d;\n\n\t\t\tax += common * dx;\n\t\t\tay += common * dy;\n\t\t}\n\t}\n\n////////////////////////////////////////////////////////////////////////////////\n\n  function updateVelocityAndPosition() {\n\t\tvx = vx * 0.99 + ax * g;\n\t\tvy = vy * 0.99 + ay * g;\n\t\t\n\t\tpx += vx;\n\t\tpy += vy;\n\t\t\n\t\tif ((px < 0 && vx < 0) || (px > width  && vx > 0))   vx = -vx;\n\t\tif ((py < 0 && vy < 0) || (py > height && vy > 0))   vy = -vy;\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "mri",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1349202",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:05:28"
+}

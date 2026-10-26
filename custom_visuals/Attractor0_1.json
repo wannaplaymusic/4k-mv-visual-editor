@@ -1,0 +1,35 @@
+{
+    "name": "Attractor0",
+    "code": "// === Tab: mySketch ===\n// Selection- I found several that may relate to the class like with audio (like mashups) and movement but some had glitches I didn't know how to fix and I thought this was the most understandable. Although it's a good example of the concept of the class discussion on how much does something need to change in order to make it your own, but also like some artists in the critiques for how they can take older work and make it new and form new ideas or concepts which is seen in a lot of art.\n// Aesthetics- (In code below) I loved the original design and I played around with it a little and wanted to keep most things how they are. I wanted to change the background color, but I think the black works a lot better because it makes it look like the lines are moving faster\n\n//変数宣言\nvar num = 1000;\n//配列関数\nvar vx = new Array(num);\nvar vy = new Array(num);\nvar x = new Array(num);\nvar y = new Array(num);\nvar ax = new Array(num);\nvar ay = new Array(num);\n//変数宣言\nvar magnetism = 40.0; // Made the pull from the mouse key and automatic lines connect faster by adding 10 \nvar radius = 1 ;\nvar principle = 0.95; // assigned to a different variable\n\nfunction setup(){\n\t//キャンパスサイズ\n  createCanvas(windowWidth,windowHeight);\n\t//線なし\n  noStroke(); \n\t//色\n  fill(100); // changed the fill to how quickly the outside lines would connect\n\t//座標指定\n  ellipseMode(500); //changed from ellipse mode from radius to a high number in order to make the automatic lines thinner and start as blue then transition to white\n\t// The line above also made it see-through when creating spread out circles and got rid of the starting circles\n\t//背景\n  background(0); // I could change the background from the variety of black to white by imputting numbers 1 to 100\n\t//描画モード\n  blendMode(ADD);\n  \n\t//配列指定した回数繰り返す\n  for(var i =0; i< num; i++){\n    x[i] = random(width);\n    y[i] = random(height);\n    vx[i] = 0;\n    vy[i] = 0;\n    ax[i] = 0;\n    ay[i] = 0;\n  }\n}\n\n\nfunction draw(){ //Can't be changed or the screen turns white and does nothing\n\t//色\n  fill(0,0,0);\n\t//四角形\n  rect(0,0,width,height);\n  // 配列指定した回数繰り返す\n  for(var i=0; i<num; i++){\n    var distance = dist(touchX, touchY, x[i], y[i]);\n    if(distance > 3){ \n      ax[i] = magnetism * (touchX - x[i]) / (distance * distance); \n      ay[i] = magnetism * (touchY - y[i]) / (distance * distance);\n    }\n    vx[i] += ax[i];\n    vy[i] += ay[i];\n    \n    vx[i] = vx[i]*principle; //changed to principle in order to show the variables assigned to it remains the same as long as it's represented to something\n    vy[i] = vy[i]*principle;\n    \n    x[i] += vx[i];\n    y[i] += vy[i];\n    //速さの変化\n    var sokudo = dist(0,0,vx[i],vy[i]);\n\t\t//指定した位置から位置までの移動\n    var r = map(sokudo, 0, 5, 0, 255);\n    var g = map(sokudo, 0,5, 64, 255);\n    var b = map(sokudo, 0,5, 128, 255);\n\t\t//色\n    fill(r, g, b, 32);\n\t\t//円\n    ellipse(x[i],y[i],1,radius); //Added a numeral in place of radius to make a highlighted circle start as soon as it starts if the person chooses to not move their mouse\n  }\n  \n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Tiga_",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible",
+        "batch_2026-10-09"
+    ],
+    "url": "https://openprocessing.org/sketch/1605776",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:51:43",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Pure Immersion Repetition.mp4"
+    ],
+    "used_count": 1,
+    "is_starred": false
+}

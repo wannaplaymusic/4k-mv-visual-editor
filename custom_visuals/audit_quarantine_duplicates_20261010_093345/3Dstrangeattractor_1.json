@@ -1,0 +1,29 @@
+{
+    "name": "3Dstrangeattractor",
+    "code": "// === Tab: mySketch ===\nvar cnt = 0.0;\nvar aa = 0.0;\nvar bb = 0.0;\nvar cc = 0.0;\nvar dd = 0.0;\nvar ee = 0.0;\nvar ff = 0.0;\nvar xr = 0.0;\nvar yr = 0.0;\nvar zr = 0.0;\n\nfunction setup() {\n\tcreateCanvas(800, 600,WEBGL);\n\tbackground(249);\n\tcnt = 0;\t\n\taa = random(-3,3);\n\tbb = random(-3,3);\n\tcc = random(-3,3);\n\tdd = random(-3,3);\n\tee = random(-3,3);\n\tff = random(-3,3);\t\n\txr = random(-1,1);\n\tyr = random(-1,1);\n\tzr = random(-1,1);\n}\n\nfunction draw() {\n\tcnt +=0.1;\n\t\t \n\tvar xm = (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) / width + 0.5;\n\tvar ym = (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) / height + 0.5;\n\n\tvar pA = xm + aa ;\n  var pB = ym - bb ;\n  var pC = ym + cc ;\n  var pD = xm + dd ;\n  var pE = ym + ee ;\n  var pF = ym - ff ;\n\tbackground(249);\n\t\n\trotateX(cnt * PI * xr * 0.03);\n  rotateY(cnt * PI * yr * 0.03);\n  rotateZ(cnt * PI * zr * 0.03);\n\n  var prevX = 0.0;\n  var prevY = 0.0;\n  var prevZ = 0.0;\n\t\n\tvar singularityX = 0.0;\n\tvar singularityY = 0.0;\n\tvar singularityZ = 0.0;\n\t\n\tstroke(60, 8, 60, 128);\n  beginShape(POINTS);\n  for (var i = 0; i < 60000; i++) {\n\t\tvar x = sin(pA * prevY) - cos(pB * prevX);\n    var y = sin(pC * prevZ) - cos(pD * prevY);\n    var z = sin(pE * prevX) - cos(pF * prevZ);\n\t\tvar scale = 6.0 + sin(cnt * PI * 0.05);\n\n    vertex(x * width / scale, y * height / scale, z * height / scale);\n\t\tprevX = x;\n    prevY = y;\n    prevZ = z;\n\t\t\n\t\tif(i == 10000){\n\t\t\tsingularityX = x;\n\t\t\tsingularityY = y;\n\t\t\tsingularityZ = z;\n\t\t}\n\t}\n  endShape(CLOSE);\n\tnoFill();\n\tstroke(250, 200, 250, 10);\n\tpush();\n\ttranslate(singularityX * width / scale, singularityY * height / scale, singularityZ * height / scale);\n\tsphere(1200.3);\n\tpop();\n\t\n\t\n}\n\nfunction mouseClicked() {\n\tchangeVariable();\n}\n\nfunction changeVariable() {\n\taa = random(-3,3);\n\tbb = random(-3,3);\n\tcc = random(-3,3);\n\tdd = random(-3,3);\n\tee = random(-3,3);\n\tff = random(-3,3);\n\txr = random(-1,1);\n\tyr = random(-1,1);\n\tzr = random(-1,1);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "tetsuya yamamoto",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/648189",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:16:24",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

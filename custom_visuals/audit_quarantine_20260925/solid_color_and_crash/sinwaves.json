@@ -1,0 +1,24 @@
+{
+    "name": "sinwaves",
+    "code": "// === Tab: sin waves ===\nvar size = 10;//size inversely proportional to # circles\nvar vel = .004;//speed of first circle\n\nsetup=_=> {\n\tcreateCanvas(windowWidth, windowHeight);\n\tcircles = []\n\tfor(var x = size,y = windowHeight/2;x<windowWidth-size;x+=size*2){\n\t\tcircles.push(new circle(x,y));//array of objects\n\t}\n}\ndraw =_=> {\n\tclear();\n\tfor(var i = 0;i<circles.length;i++){\n\t\tif(((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)) && i<circles.length-3){\n\t\t\tline(circles[i].x,circles[i].y,circles[i+1].x,circles[i+1].y);\n\t\t\tline(circles[i].x,circles[i].y,circles[i+2].x,circles[i+2].y);\n\t\t\tline(circles[i].x,circles[i].y,circles[i+3].x,circles[i+3].y);\n\t\t}\n\t\tcircles[i].create();\n\t\tcircles[i].theta+=circles[i].vel;//increasing theta moves each invdividual circle vertically\n\t}\n}\nclass circle{\n\tconstructor(x,y){\n\t\tthis.x = x;\n\t\tthis.y = y;\n\t\tthis.theta = 0;\n\t\tthis.vel = vel;\n\t\tvel+=.002;//each consecutive circle faster than previous\n\t}\n\tcreate(){//calc y position and draw circle\n\t\tfill(this.x-windowHeight/2+100,this.y-windowHeight/2+100,this.y-windowHeight/2+100);//color gradient\n\t\tthis.y=sin(this.theta)*100+windowHeight/2;\n\t\tellipse(this.x, this.y, size*2, size*2);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Daniel Pickett",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/678518",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:12:11",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

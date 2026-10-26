@@ -287,6 +287,9 @@ class BatchHistoryManager:
         """
         options = [
             {"id": "all", "label": "🌐 全部視覺模組"},
+            {"id": "ambient_all", "label": "🌌 僅 Ambient 粒子/流體 (綠標+黃標)"},
+            {"id": "ambient_green", "label": "🌿 Ambient 原生粒子/流體 (極慢心流)"},
+            {"id": "ambient_yellow", "label": "✨ Ambient 阻尼粒子/流體 (降頻調製)"},
             {"id": "latest_batch", "label": "✨ 最新收編批次"},
             {"id": "legacy_baseline", "label": "🏛️ 以往已完成收錄 (歷史基準)"}
         ]
@@ -308,10 +311,30 @@ class BatchHistoryManager:
 
     def filter_modules_by_selection(self, all_presets_data, filter_id):
         """
-        依據使用者選取的日期/批次篩選器，對全部模組資料進行高精準分流
+        依據使用者選取的日期/批次/Ambient 篩選器，對全部模組資料進行高精準分流
         """
         if not filter_id or filter_id == "all":
             return all_presets_data
+
+        # Ambient 專用門禁過濾分流
+        if filter_id in ("ambient_all", "ambient_green", "ambient_yellow"):
+            try:
+                from ambient_module_compatibility_gate import AmbientModuleCompatibilityGate
+                gate = AmbientModuleCompatibilityGate.get_instance()
+                res = []
+                for p in all_presets_data:
+                    tier = gate.get_module_tier(p.get("name", ""), p)
+                    p["ambient_tier"] = tier
+                    if filter_id == "ambient_all" and tier in ("GREEN", "YELLOW"):
+                        res.append(p)
+                    elif filter_id == "ambient_green" and tier == "GREEN":
+                        res.append(p)
+                    elif filter_id == "ambient_yellow" and tier == "YELLOW":
+                        res.append(p)
+                return res
+            except Exception as e:
+                logger.error(f"Ambient 篩選異常: {e}")
+                return all_presets_data
 
         baseline_files = set(self.history_data.get("legacy_baseline", {}).get("files", []))
         active_batches = [b for b in self.history_data.get("batches", []) if b.get("status") == "active"]

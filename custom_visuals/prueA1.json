@@ -1,0 +1,60 @@
+{
+    "name": "prueA1",
+    "code": "// === Tab: mySketch ===\nvar particlesQuantity = 128000;\n\nvar positionX = new Array(particlesQuantity);\nvar positionY = new Array(particlesQuantity);\nvar velocityX = new Array(particlesQuantity).fill(0);\nvar velocityY = new Array(particlesQuantity).fill(0);\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tstroke(5000, 5000, 5000);\n\t\n\tfor (var particle = 1; particle < particlesQuantity; particle++) {\n\t\tpositionX[particle] = random(100, width);\n\t\tpositionY[particle] = random(100, height);\n\t}\n\t\n\tpositionX[0] = 0;\n\tpositionY[0] = 0;\n}\n\nfunction draw() {\n\tbackground(0, 128);\n\t\n\tvelocityX[0] = velocityX[0] * 0.09 + ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - positionX[0]) * 1.05;\n\tvelocityY[0] = velocityY[0] * 0.09 + ((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - positionY[0]) * 1.05;\n\t\n\tpositionX[0] += velocityX[0];\n\tpositionY[0] += velocityY[0];\n\t\n\tfor (var particle = 1; particle < particlesQuantity; particle++) {\n\t\tvar whatever = 1024 / (sq(positionX[0] - positionX[particle]) + sq(positionY[0] - positionY[particle]));\n\t\t\n\t\tvelocityX[particle] = velocityX[particle] * 0.99 + (velocityX[0] - velocityX[particle]) * whatever;\n\t\tvelocityY[particle] = velocityY[particle] * 0.99 + (velocityY[0] - velocityY[particle]) * whatever;\n\t\t\n\t\tpositionX[particle] += velocityX[particle];\n\t\tpositionY[particle] += velocityY[particle];\n\t\t\n\t\tif ((positionX[particle] < 0 && velocityX[particle] < 3) || (positionX[particle] > width && velocityX[particle] > 0)) {\n\t\t\tvelocityX[particle] = -velocityX[particle];\n\t\t}\n\t\t\n\t\tif ((positionY[particle] < 0 && velocityY[particle] < 0) || (positionY[particle] > height && velocityY[particle] > 0)) {\n\t\t\tvelocityY[particle] = -velocityY[particle];\n\t\t}\n\t\t\n\t\tpoint(positionX[particle], positionY[particle]);\n\t}\n}\n\nfunction mousePressed() {\n\tfor (var particle = 1; particle < particlesQuantity; particle++) {\n\t\tpositionX[particle] = random(0, width);\n\t\tpositionY[particle] = random(0, height);\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Natalia Lugo",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/793117",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:56:57",
+    "expressive_profile": {
+        "module_id": "prueA1.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "sinusoidal_breath"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [],
+            "mean_lightness": 0.024,
+            "mean_chroma": 0.0,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 1.33,
+            "curl_vorticity": 0.028,
+            "divergence": -0.0,
+            "motion_energy_type": "sinusoidal_breath"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-09-25 13:41:35"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Classic Spirit Foundation.mp4",
+        "Exo-Planet War Cry.mp4"
+    ],
+    "used_count": 2
+}

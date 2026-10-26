@@ -1,0 +1,33 @@
+{
+    "name": "GPUparticles",
+    "code": "// === Tab: mySketch ===\nlet N = 30000;\nlet fbWide, fbHigh;\nlet oldPosVel, newPosVel;\nlet updateShdr, drawShdr;\n\nfunction setup() {\n\tlet s = max(windowWidth, windowHeight);\n\tcreateCanvas(s, s, WEBGL);\n\t\n\tupdateShdr = createShader( vsUpdate, fsUpdate );\n\tdrawShdr = createShader( vsDraw, fsDraw );\n\n\tfbWide = 1024;\n  fbHigh = ceil( N / fbWide );\n  let fbOptions = { format: FLOAT,\n\t\t\t\t\t\t\t\t\t  depth: false, antialias: false, density: 1,\n\t\t\t\t\t\t\t\t\t  width: fbWide, height: fbHigh };\n  oldPosVel = createFramebuffer( fbOptions );\n  newPosVel = createFramebuffer( fbOptions );\n\tlet gl = oldPosVel.gl;\n  oldPosVel.loadPixels();\n  for( let i=0; i<N; i++ ) {\n    oldPosVel.pixels[4*i  ] = random( -1, 1 );\n    oldPosVel.pixels[4*i+1] = random( -1, 1 );\n\t\tlet ang = random(TAU);\n\t\tlet spd = 0.005 * random(0.5, 1.0);\n    oldPosVel.pixels[4*i+2] = spd * cos(ang);\n    oldPosVel.pixels[4*i+3] = spd * sin(ang);\n  }\n\tgl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);\n  oldPosVel.updatePixels();\n\tgl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);\n}\n\nfunction windowResized() {\n  let canvasSize = max(windowWidth, windowHeight);\n  resizeCanvas( canvasSize, canvasSize );\n}\n\nfunction draw() {\n\tlet t = frameCount/60.0;\n\t\n\tnewPosVel.begin();\n\tupdateShdr.bindShader();\n\tupdateShdr.setUniform( 'dataOld', oldPosVel );\n\tupdateShdr.setUniform( \"time\", t );\n\tupdateShdr.bindTextures();\n\tvar gl = newPosVel.gl;\n\tgl.drawArrays( gl.TRIANGLES, 0, 3 );  // a single full-screen triangle\n\tupdateShdr.unbindTextures();\n\tupdateShdr.unbindShader();\n\tnewPosVel.end();\n\t\n\tbackground(16);\n\tscale( min(height, width) / 2.0 );\n  gl = this._renderer.GL;\n\tgl.disable( gl.DEPTH_TEST );\n\tgl.enable( gl.BLEND );\n\tgl.blendEquation( gl.MAX );\n\tgl.lineWidth( 2.0 );\n\tdrawShdr.bindShader();\n\tdrawShdr.setUniform( 'dataOld', oldPosVel );\n\tdrawShdr.setUniform( 'dataNew', newPosVel );\n\tdrawShdr.setUniform( 'N', N );\n\tdrawShdr.bindTextures();\n\tgl.drawArrays( gl.LINES, 0, 2*N );\n\tgl.disable( gl.BLEND );\n\tdrawShdr.unbindTextures();\n\tdrawShdr.unbindShader();\n\n\tlet temp = oldPosVel;\n\toldPosVel = newPosVel;\n\tnewPosVel = temp;\n}\n\nlet vsUpdate = `#version 300 es\nprecision highp float;\nprecision highp int;\nvoid main() {\n\tgl_Position = vec4( 4*ivec2(gl_VertexID&1, gl_VertexID&2)-1, 0., 1. );\n}\n`;\n\nlet fsUpdate = `#version 300 es\nprecision highp float;\nuniform sampler2D dataOld;\nuniform float time;\nout vec4 fragColor;\n#define TAU 6.2831853\nvoid main() {\n  //ivec2 res = textureSize( dataOld, 0 );\n  vec4 posvel = texelFetch( dataOld, ivec2(gl_FragCoord.xy), 0);\n\tvec2 pos = posvel.xy;\n\tvec2 vel = posvel.zw;\n\tfloat a = atan( pos.y, pos.x );\n\tfloat r = length( pos );\n\tvel += 0.00015 * sin(TAU*2.*r+3.*(a-0.1*time)) * vec2( sin(a), -cos(a));\n\tfloat spd = length(vel);\n\tif( spd > 0.008 ) vel *= 0.008 * spd;\n\tpos += vel;\n\tif( pos.x < -1. ) { pos.x = -2. - pos.x;   vel.x *= -1.; }\n\tif( pos.x >  1. ) { pos.x =  2. - pos.x;   vel.x *= -1.; }\n\tif( pos.y < -1. ) { pos.y = -2. - pos.y;   vel.y *= -1.; }\n\tif( pos.y >  1. ) { pos.y =  2. - pos.y;   vel.y *= -1.; }\n\tfragColor = vec4( pos, vel );\n}\n`;\n\n\nlet vsDraw = `#version 300 es\nprecision highp float;\nprecision highp int;\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform sampler2D dataOld;\nuniform sampler2D dataNew;\nuniform int N;\nout vec4 vColor;\n\nvec3 hsb2rgb( in vec3 c ) {\n   vec3 rgb = clamp(abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),\n                            6.0)-3.0)-1.0,  0.0,  1.0 );\n   rgb = rgb*rgb*(3.0-2.0*rgb);\n   return c.z * mix( vec3(1.0), rgb, c.y);\n}\n\nvoid main() {\n\tivec2 res = textureSize( dataOld, 0 );\n\tint idx = gl_VertexID/2;\n\tivec2 ij = ivec2( idx%res.x, idx/res.x );\n\tvec2 p0 = texelFetch( dataOld, ij, 0 ).xy;\n\tvec2 p1 = texelFetch( dataNew, ij, 0 ).xy;\n\tvec4 p = vec4( (((gl_VertexID & 1) > 0 ) ? p0 : p1), 0., 1. );\n\tp = uModelViewMatrix * p;\n  gl_Position = uProjectionMatrix * p;\n\tfloat u = float(gl_VertexID/2)/float(N);\n\tvec3 c = hsb2rgb( vec3( u, 0.7, 1. ) );\n\tvColor = vec4( c, 1.0 );\n}\n`;\n\nlet fsDraw = `#version 300 es\nprecision highp float;\nin vec4 vColor;\nout vec4 fragColor;\nvoid main() {\n\tfragColor = vColor;\n}\n`;\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "scudly",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2385772",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:03:25",
+    "used_in_videos": [
+        "Iron Delay Structure.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

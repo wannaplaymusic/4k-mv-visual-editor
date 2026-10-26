@@ -1,0 +1,31 @@
+{
+    "name": "StaircaseWaterway",
+    "code": "// === Tab: mySketch.js ===\n// A fork of tp5_250806_StaircaseWaterway by はぅ君. \n// I extended the code for clarity.\n// I simply thought it looked pretty ~Kyler Smart\n\nlet particles = [];\nlet time        = 0;\nconst W         = 720;\n\nfunction setup() {\n  createCanvas(W, W);\n}\n\nfunction draw() {\n  background(0, 9);\n  filter(BLUR);\n  stroke(255);\n\n  /* ---- particle creation loop ---- */\n  let i = 9;\n  while (i > 0) {\n    i--;                   \n    let index = time % (W * 9);\n    let px    = (time * 99) % W;\n    let obj   = {\n      x : px,\n      y : 0,\n      g : 0,\n      s : 3\n    };\n    \n    particles[index] = obj;\n    time = time + 1;\n  }\n\n  /* ---- particle update & render loop ---- */\n  for (let idx = 0; idx < particles.length; idx++) {\n    let p = particles[idx];\n\n    /* update particle size */\n    p.s = p.s * 0.997;\n    strokeWeight(p.s);\n\n    /* fetch Perlin noise */\n    let Noise = noise(p.x / W, p.y / 9, time / W);\n\n    /* --- horizontal motion --- */\n    if (Noise > 0.4) {\n      /* keep same x */\n      p.x += 0;\n    } else {\n      if (Noise % 0.1 > 0.05) {\n        p.x += 1;\n      } else {\n        p.x += -1;\n      }\n      p.g = 0;\n    }\n\n    /* --- vertical motion --- */\n    if (Noise > 0.4) {\n      p.g += 0.5;\n      p.y += p.g;\n    } else {\n      p.y += 0.5;\n    }\n\n    /* draw particle */\n    point(p.x, p.y);\n  }\n}\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Kyler Smart",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2712603",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:49:12",
+    "used_in_videos": [
+        "Sub Pressure Loop.mp4"
+    ],
+    "used_count": 1
+}

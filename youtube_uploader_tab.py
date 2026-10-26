@@ -24,7 +24,7 @@ from PyQt6.QtWidgets import (
     QTextEdit, QLineEdit, QComboBox, QProgressBar, QCheckBox,
     QGroupBox, QScrollArea, QFrame, QMessageBox, QSizePolicy, QFileDialog,
     QTableWidget, QTableWidgetItem, QHeaderView, QRadioButton, QButtonGroup,
-    QDateTimeEdit, QAbstractItemView
+    QDateTimeEdit, QAbstractItemView, QTabWidget
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QDateTime, QUrl
 from PyQt6.QtGui import QFont, QColor, QDesktopServices
@@ -36,6 +36,7 @@ from youtube_uploader_engine import (
     GOOGLE_API_AVAILABLE
 )
 from youtube_logger import logger, quota_tracker
+from youtube_batch_scheduler import YouTubeBatchSchedulerWidget
 from social_uploader_engine import (
     SocialUploaderEngine,
     SocialMatrixManager,
@@ -361,159 +362,410 @@ class YouTubeUploaderTab(QWidget):
 
     def _init_ui(self):
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(16, 16, 16, 16)
-        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(12, 12, 12, 12)
+        main_layout.setSpacing(10)
 
         # ----------------------------------------------------------------------
-        # Top Header Banner
+        # Top Header Banner: 現代暗黑中樞控制列 (Command Hub Bar)
         # ----------------------------------------------------------------------
         header_frame = QFrame()
         header_frame.setStyleSheet("""
             QFrame {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1a1a2e, stop:1 #16213e);
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #121624, stop:1 #171d30);
                 border-radius: 8px;
-                padding: 10px;
-                border: 1px solid #0f3460;
+                padding: 6px 12px;
+                border: 1px solid #1f293d;
             }
         """)
         header_layout = QHBoxLayout(header_frame)
-        header_layout.setContentsMargins(10, 5, 10, 5)
+        header_layout.setContentsMargins(6, 4, 6, 4)
+        header_layout.setSpacing(10)
 
-        title_lbl = QLabel("📤 全平台 4K MV / 短影音矩陣發布中心 (Multi-Platform Auto-Uploader)")
-        title_lbl.setStyleSheet("font-size: 16px; font-weight: bold; color: #00d2ff;")
+        title_lbl = QLabel("📤 全平台 4K 發布矩陣中心")
+        title_lbl.setStyleSheet("font-size: 15px; font-weight: bold; color: #38bdf8;")
         header_layout.addWidget(title_lbl)
+
         pool_size = len(self.engine.cred_manager.client_secrets_files)
         cap_songs = pool_size * 6
         self.lbl_pool = QLabel(f"⚡ 憑證池: {pool_size} 專案 ({cap_songs} 首/天)")
         self.lbl_pool.setToolTip(f"已啟用 {pool_size} 個 Google Cloud 專案配額輪換，每日支援最多 {cap_songs} 首 MV 發布！")
-        self.lbl_pool.setStyleSheet("font-size: 13px; font-weight: bold; color: #ffd369; background: #0f141d; padding: 4px 10px; border-radius: 4px; border: 1px solid #1a2634;")
+        self.lbl_pool.setStyleSheet("""
+            font-size: 12px; font-weight: 600; color: #fbbf24;
+            background: rgba(251, 191, 36, 0.12);
+            padding: 3px 10px; border-radius: 6px;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        """)
         header_layout.addWidget(self.lbl_pool)
 
-        self.lbl_channel = QLabel("📺 目前頻道: (點擊檢查)")
-        self.lbl_channel.setStyleSheet("font-size: 13px; font-weight: bold; color: #4ecca3; background: #0f141d; padding: 4px 10px; border-radius: 4px; border: 1px solid #1a2634;")
+        self.lbl_channel = QLabel("📺 頻道: (點擊檢查)")
+        self.lbl_channel.setStyleSheet("""
+            font-size: 12px; font-weight: 600; color: #34d399;
+            background: rgba(52, 211, 153, 0.12);
+            padding: 3px 10px; border-radius: 6px;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        """)
         header_layout.addWidget(self.lbl_channel)
 
-        self.btn_check_channel = QPushButton("🔍 檢查頻道")
-        self.btn_check_channel.setStyleSheet("""
+        header_layout.addStretch()
+
+        btn_style_subtle = """
             QPushButton {
-                background: #0f3460;
-                color: white;
-                font-weight: bold;
+                background: #1e2638;
+                color: #e2e8f0;
+                font-size: 12px;
+                font-weight: 500;
                 border-radius: 6px;
-                padding: 6px 12px;
+                padding: 5px 12px;
+                border: 1px solid #2e3b55;
             }
-            QPushButton:hover { background: #164282; }
-        """)
+            QPushButton:hover {
+                background: #2b364f;
+                color: #ffffff;
+                border: 1px solid #3b82f6;
+            }
+        """
+
+        self.btn_check_channel = QPushButton("🔍 檢查頻道")
+        self.btn_check_channel.setStyleSheet(btn_style_subtle)
         self.btn_check_channel.clicked.connect(self._check_current_channel)
         header_layout.addWidget(self.btn_check_channel)
 
         self.btn_switch_channel = QPushButton("🔄 切換頻道")
-        self.btn_switch_channel.setStyleSheet("""
-            QPushButton {
-                background: #533483;
-                color: white;
-                font-weight: bold;
-                border-radius: 6px;
-                padding: 6px 12px;
-            }
-            QPushButton:hover { background: #6c46a8; }
-        """)
+        self.btn_switch_channel.setStyleSheet(btn_style_subtle)
         self.btn_switch_channel.clicked.connect(self._switch_channel)
         header_layout.addWidget(self.btn_switch_channel)
 
-        self.btn_guide = QPushButton("📖 憑證設定指南")
-        self.btn_guide.setStyleSheet("""
-            QPushButton {
-                background: #e94560;
-                color: white;
-                font-weight: bold;
-                border-radius: 6px;
-                padding: 6px 14px;
-            }
-            QPushButton:hover { background: #ff5e78; }
-        """)
+        self.btn_guide = QPushButton("📖 憑證指南")
+        self.btn_guide.setStyleSheet(btn_style_subtle)
         self.btn_guide.clicked.connect(self._open_setup_guide)
         header_layout.addWidget(self.btn_guide)
+
+        self.btn_goto_scheduler = QPushButton("📅 批次修改已上傳")
+        self.btn_goto_scheduler.setStyleSheet("""
+            QPushButton {
+                background: rgba(59, 130, 246, 0.15);
+                color: #60a5fa;
+                font-size: 12px;
+                font-weight: 600;
+                border-radius: 6px;
+                padding: 5px 12px;
+                border: 1px solid rgba(59, 130, 246, 0.4);
+            }
+            QPushButton:hover {
+                background: rgba(59, 130, 246, 0.28);
+                color: #ffffff;
+            }
+        """)
+        self.btn_goto_scheduler.clicked.connect(lambda: self.inner_tabs.setCurrentIndex(1))
+        header_layout.addWidget(self.btn_goto_scheduler)
+
+        self.btn_goto_optimizer = QPushButton("🎯 影片審計與封面")
+        self.btn_goto_optimizer.setStyleSheet("""
+            QPushButton {
+                background: rgba(236, 72, 153, 0.15);
+                color: #f472b6;
+                font-size: 12px;
+                font-weight: 600;
+                border-radius: 6px;
+                padding: 5px 12px;
+                border: 1px solid rgba(236, 72, 153, 0.4);
+            }
+            QPushButton:hover {
+                background: rgba(236, 72, 153, 0.28);
+                color: #ffffff;
+            }
+        """)
+        self.btn_goto_optimizer.clicked.connect(self._goto_optimizer_tab)
+        header_layout.addWidget(self.btn_goto_optimizer)
 
         main_layout.addWidget(header_frame)
 
         # ----------------------------------------------------------------------
-        # Target Platforms & Anti-Bot Configuration
+        # Sub-Tabs: Upload vs Batch Schedule Manager
         # ----------------------------------------------------------------------
-        plat_group = QGroupBox("🌐 目標發布平台矩陣 (Target Distribution Matrix)")
-        plat_layout = QHBoxLayout(plat_group)
+        self.inner_tabs = QTabWidget()
+        self.inner_tabs.setStyleSheet("""
+            QTabWidget::pane {
+                border: 1px solid #1e2638;
+                border-radius: 8px;
+                background: #0b0e14;
+            }
+            QTabBar::tab {
+                background: #11151f;
+                color: #94a3b8;
+                font-size: 12px;
+                font-weight: 600;
+                padding: 8px 18px;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+                border: 1px solid #1e2638;
+                border-bottom: none;
+                margin-right: 4px;
+            }
+            QTabBar::tab:selected {
+                background: #0b0e14;
+                color: #38bdf8;
+                border: 1px solid #2e3b55;
+                border-bottom: 2px solid #38bdf8;
+            }
+            QTabBar::tab:hover:!selected {
+                background: #1a2030;
+                color: #e2e8f0;
+            }
+        """)
 
-        self.chk_plat_yt = QCheckBox("🔴 YouTube (4K MV / Shorts)")
-        self.chk_plat_yt.setChecked(True)
-        self.chk_plat_yt.setStyleSheet("color: #ff5e78; font-weight: bold; font-size: 13px;")
-        plat_layout.addWidget(self.chk_plat_yt)
-
-        self.chk_plat_ig = QCheckBox("📸 Instagram Reels (自動文案 & 標籤)")
-        self.chk_plat_ig.setChecked(False)
-        self.chk_plat_ig.setStyleSheet("color: #e1306c; font-weight: bold; font-size: 13px;")
-        plat_layout.addWidget(self.chk_plat_ig)
-
-        self.chk_plat_tt = QCheckBox("🎵 TikTok (創作者後台自動發布)")
-        self.chk_plat_tt.setChecked(False)
-        self.chk_plat_tt.setStyleSheet("color: #00f2fe; font-weight: bold; font-size: 13px;")
-        plat_layout.addWidget(self.chk_plat_tt)
-
-        plat_layout.addStretch()
-
-        self.chk_social_visible = QCheckBox("🖥️ 可視化瀏覽器 (首次使用請勾選登入)")
-        self.chk_social_visible.setChecked(False)
-        self.chk_social_visible.setToolTip("勾選後將顯示 Chrome 瀏覽器視窗，便於首次手動登入 IG/TikTok 帳號。之後可取消勾選在背景靜默運行。")
-        self.chk_social_visible.setStyleSheet("color: #ffd369; font-weight: bold;")
-        plat_layout.addWidget(self.chk_social_visible)
-
-        lbl_cooldown = QLabel("⏳ 擬人間隔:")
-        lbl_cooldown.setStyleSheet("color: #a8b2d1;")
-        plat_layout.addWidget(lbl_cooldown)
-
-        self.combo_cooldown = QComboBox()
-        self.combo_cooldown.addItem("180 秒 (標準防風控安全推薦)", 180)
-        self.combo_cooldown.addItem("120 秒 (中速)", 120)
-        self.combo_cooldown.addItem("300 秒 (高安全: 5分鐘)", 300)
-        self.combo_cooldown.addItem("30 秒 (極速測試)", 30)
-        plat_layout.addWidget(self.combo_cooldown)
-
-        main_layout.addWidget(plat_group)
+        # Tab 1: Video Upload
+        upload_tab = QWidget()
+        upload_layout = QVBoxLayout(upload_tab)
+        upload_layout.setContentsMargins(10, 10, 10, 10)
+        upload_layout.setSpacing(10)
 
         # ----------------------------------------------------------------------
-        # 1. Directory Selection Group
+        # 1. 待發布影片目錄 (Directory Selection)
         # ----------------------------------------------------------------------
-        dir_group = QGroupBox("📁 1. 待發布影片目錄 (Video Source Directory)")
-        dir_layout = QHBoxLayout(dir_group)
+        dir_frame = QFrame()
+        dir_frame.setStyleSheet("""
+            QFrame {
+                background: #111520;
+                border: 1px solid #1e2538;
+                border-radius: 8px;
+                padding: 4px 8px;
+            }
+        """)
+        dir_layout = QHBoxLayout(dir_frame)
+        dir_layout.setContentsMargins(6, 4, 6, 4)
+        dir_layout.setSpacing(8)
+
+        lbl_dir_icon = QLabel("📁 來源目錄:")
+        lbl_dir_icon.setStyleSheet("font-weight: 600; color: #cbd5e1; font-size: 12px;")
+        dir_layout.addWidget(lbl_dir_icon)
 
         self.dir_input = QLineEdit()
         self.dir_input.setPlaceholderText("請選擇存放 4K 影片與 _social.txt 的目錄...")
-        self.dir_input.setStyleSheet("padding: 6px; font-size: 13px;")
-        dir_layout.addWidget(self.dir_input, 4)
+        self.dir_input.setStyleSheet("""
+            QLineEdit {
+                background: #0a0d13;
+                border: 1px solid #242c3f;
+                border-radius: 6px;
+                color: #f8fafc;
+                font-size: 12px;
+                padding: 5px 10px;
+                min-height: 22px;
+            }
+            QLineEdit:focus {
+                border: 1px solid #38bdf8;
+            }
+        """)
+        dir_layout.addWidget(self.dir_input, 1)
 
-        btn_browse = QPushButton("瀏覽目錄...")
-        btn_browse.setStyleSheet("padding: 6px 12px;")
+        btn_browse = QPushButton("📂 瀏覽目錄...")
+        btn_browse.setStyleSheet("""
+            QPushButton {
+                background: #1e2638;
+                color: #e2e8f0;
+                font-size: 12px;
+                border-radius: 6px;
+                padding: 6px 14px;
+                border: 1px solid #2e3b55;
+            }
+            QPushButton:hover {
+                background: #2b364f;
+                color: #ffffff;
+            }
+        """)
         btn_browse.clicked.connect(self._browse_directory)
-        dir_layout.addWidget(btn_browse, 1)
+        dir_layout.addWidget(btn_browse)
 
         self.btn_rescan = QPushButton("🔄 重新掃描")
-        self.btn_rescan.setStyleSheet("padding: 6px 14px; font-weight: bold; background: #0f3460; color: white;")
+        self.btn_rescan.setStyleSheet("""
+            QPushButton {
+                background: #0284c7;
+                color: #ffffff;
+                font-size: 12px;
+                font-weight: 600;
+                border-radius: 6px;
+                padding: 6px 16px;
+                border: 1px solid #0369a1;
+            }
+            QPushButton:hover {
+                background: #0369a1;
+            }
+        """)
         self.btn_rescan.clicked.connect(self.scan_directory)
-        dir_layout.addWidget(self.btn_rescan, 1)
+        dir_layout.addWidget(self.btn_rescan)
 
-        main_layout.addWidget(dir_group)
+        upload_layout.addWidget(dir_frame)
 
         # ----------------------------------------------------------------------
-        # Middle Control Grid (Playlists + Premiere & Privacy)
+        # 2. Bento-Grid 卡片網格：目標發布平台矩陣 (Target Distribution Matrix)
+        # 4 欄獨立卡片設計，徹底根除文字截斷與排擠！
+        # ----------------------------------------------------------------------
+        plat_grid = QGridLayout()
+        plat_grid.setSpacing(8)
+        plat_grid.setContentsMargins(0, 0, 0, 0)
+
+        tile_base_css = """
+            QFrame {
+                background: #111520;
+                border: 1px solid #1e2638;
+                border-radius: 8px;
+                padding: 8px;
+            }
+        """
+
+        # Tile 1: YouTube
+        tile_yt = QFrame()
+        tile_yt.setStyleSheet(tile_base_css + """
+            QFrame:hover { border: 1px solid rgba(239, 68, 68, 0.4); }
+        """)
+        ly_yt = QVBoxLayout(tile_yt)
+        ly_yt.setContentsMargins(6, 6, 6, 6)
+        ly_yt.setSpacing(3)
+        self.chk_plat_yt = QCheckBox("🔴 YouTube (4K MV)")
+        self.chk_plat_yt.setChecked(True)
+        self.chk_plat_yt.setStyleSheet("color: #f87171; font-weight: bold; font-size: 13px;")
+        ly_yt.addWidget(self.chk_plat_yt)
+        lbl_yt_sub = QLabel("4K 原畫無損 · 首播與播單管理")
+        lbl_yt_sub.setStyleSheet("color: #94a3b8; font-size: 11px;")
+        ly_yt.addWidget(lbl_yt_sub)
+        plat_grid.addWidget(tile_yt, 0, 0)
+
+        # Tile 2: Instagram Reels
+        tile_ig = QFrame()
+        tile_ig.setStyleSheet(tile_base_css + """
+            QFrame:hover { border: 1px solid rgba(236, 72, 153, 0.4); }
+        """)
+        ly_ig = QVBoxLayout(tile_ig)
+        ly_ig.setContentsMargins(6, 6, 6, 6)
+        ly_ig.setSpacing(3)
+        self.chk_plat_ig = QCheckBox("📸 Instagram Reels")
+        self.chk_plat_ig.setChecked(False)
+        self.chk_plat_ig.setStyleSheet("color: #f472b6; font-weight: bold; font-size: 13px;")
+        ly_ig.addWidget(self.chk_plat_ig)
+        lbl_ig_sub = QLabel("自動提取文案與標籤 (自動/手動)")
+        lbl_ig_sub.setStyleSheet("color: #94a3b8; font-size: 11px;")
+        ly_ig.addWidget(lbl_ig_sub)
+        plat_grid.addWidget(tile_ig, 0, 1)
+
+        # Tile 3: TikTok
+        tile_tt = QFrame()
+        tile_tt.setStyleSheet(tile_base_css + """
+            QFrame:hover { border: 1px solid rgba(6, 182, 212, 0.4); }
+        """)
+        ly_tt = QVBoxLayout(tile_tt)
+        ly_tt.setContentsMargins(6, 6, 6, 6)
+        ly_tt.setSpacing(3)
+        self.chk_plat_tt = QCheckBox("🎵 TikTok 創作者後台")
+        self.chk_plat_tt.setChecked(False)
+        self.chk_plat_tt.setStyleSheet("color: #22d3ee; font-weight: bold; font-size: 13px;")
+        ly_tt.addWidget(self.chk_plat_tt)
+        lbl_tt_sub = QLabel("瀏覽器無頭背景自動發布")
+        lbl_tt_sub.setStyleSheet("color: #94a3b8; font-size: 11px;")
+        ly_tt.addWidget(lbl_tt_sub)
+        plat_grid.addWidget(tile_tt, 0, 2)
+
+        # Tile 4: Anti-Bot & Safety
+        tile_safe = QFrame()
+        tile_safe.setStyleSheet(tile_base_css + """
+            QFrame:hover { border: 1px solid rgba(251, 191, 36, 0.4); }
+        """)
+        ly_safe = QVBoxLayout(tile_safe)
+        ly_safe.setContentsMargins(6, 6, 6, 6)
+        ly_safe.setSpacing(3)
+        h_safe_row = QHBoxLayout()
+        self.chk_social_visible = QCheckBox("🖥️ 可視化除錯登入")
+        self.chk_social_visible.setChecked(False)
+        self.chk_social_visible.setToolTip("勾選後將顯示 Chrome 瀏覽器視窗，便於首次手動登入 IG/TikTok 帳號。之後可取消勾選在背景靜默運行。")
+        self.chk_social_visible.setStyleSheet("color: #fbbf24; font-size: 11px; font-weight: 600;")
+        h_safe_row.addWidget(self.chk_social_visible)
+
+        lbl_cd = QLabel("⏳ 間隔:")
+        lbl_cd.setStyleSheet("color: #94a3b8; font-size: 11px;")
+        h_safe_row.addWidget(lbl_cd)
+
+        self.combo_cooldown = QComboBox()
+        self.combo_cooldown.addItem("180 秒 (標準安全)", 180)
+        self.combo_cooldown.addItem("120 秒 (中速)", 120)
+        self.combo_cooldown.addItem("300 秒 (5分鐘高防護)", 300)
+        self.combo_cooldown.addItem("30 秒 (極速測試)", 30)
+        self.combo_cooldown.setStyleSheet("""
+            QComboBox {
+                background: #0a0d13;
+                border: 1px solid #242c3f;
+                border-radius: 4px;
+                color: #e2e8f0;
+                font-size: 11px;
+                padding: 2px 6px;
+                min-height: 20px;
+            }
+        """)
+        h_safe_row.addWidget(self.combo_cooldown)
+        ly_safe.addLayout(h_safe_row)
+
+        lbl_safe_sub = QLabel("智慧防風控 · 擬人隨機微延遲保護")
+        lbl_safe_sub.setStyleSheet("color: #64748b; font-size: 10px;")
+        ly_safe.addWidget(lbl_safe_sub)
+        plat_grid.addWidget(tile_safe, 0, 3)
+
+        upload_layout.addLayout(plat_grid)
+
+        # ----------------------------------------------------------------------
+        # 3. 雙欄 Bento 平衡卡片：播放清單管理 與 發布/首播時間
+        # 徹底修復文字重疊、垂直疊字與底色遮蔽問題！
         # ----------------------------------------------------------------------
         grid_config = QHBoxLayout()
+        grid_config.setSpacing(10)
+
+        common_box_css = """
+            QGroupBox {
+                background: #111520;
+                border: 1px solid #1e2538;
+                border-radius: 8px;
+                margin-top: 10px;
+                padding: 10px;
+                font-size: 12px;
+                font-weight: bold;
+                color: #cbd5e1;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top left;
+                padding: 0 6px;
+                color: #38bdf8;
+            }
+            QComboBox, QLineEdit, QDateTimeEdit {
+                background: #0a0d13;
+                border: 1px solid #242c3f;
+                border-radius: 6px;
+                color: #f8fafc;
+                font-size: 12px;
+                padding: 4px 8px;
+                min-height: 26px;
+            }
+            QComboBox:focus, QLineEdit:focus, QDateTimeEdit:focus {
+                border: 1px solid #38bdf8;
+            }
+            QComboBox::drop-down {
+                border: none;
+                width: 20px;
+            }
+            QRadioButton, QCheckBox {
+                color: #e2e8f0;
+                font-size: 12px;
+                spacing: 6px;
+            }
+        """
 
         # Group A: Playlist Settings
-        playlist_group = QGroupBox("📋 2. 播放清單管理 (Playlist Settings)")
+        playlist_group = QGroupBox("📋 播放清單管理 (Playlist Settings)")
+        playlist_group.setStyleSheet(common_box_css)
         pl_layout = QVBoxLayout(playlist_group)
+        pl_layout.setContentsMargins(8, 12, 8, 8)
+        pl_layout.setSpacing(8)
 
-        self.chk_playlist = QCheckBox("啟用加入播放清單功能")
+        self.chk_playlist = QCheckBox("啟用自動加入播放清單")
         self.chk_playlist.setChecked(True)
-        self.chk_playlist.setStyleSheet("font-weight: bold; color: #4ecca3;")
+        self.chk_playlist.setStyleSheet("font-weight: 600; color: #34d399; font-size: 12px;")
         self.chk_playlist.toggled.connect(self._toggle_playlist_ui)
         pl_layout.addWidget(self.chk_playlist)
 
@@ -521,6 +773,7 @@ class YouTubeUploaderTab(QWidget):
 
         # Option A: Existing Playlist
         h_exist = QHBoxLayout()
+        h_exist.setSpacing(6)
         self.radio_pl_exist = QRadioButton("加入既有清單:")
         self.pl_mode_group.addButton(self.radio_pl_exist)
         h_exist.addWidget(self.radio_pl_exist)
@@ -529,13 +782,25 @@ class YouTubeUploaderTab(QWidget):
         self.combo_playlists.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         h_exist.addWidget(self.combo_playlists, 1)
 
-        self.btn_refresh_pl = QPushButton("🔄 載入清單")
+        self.btn_refresh_pl = QPushButton("🔄 載入")
+        self.btn_refresh_pl.setStyleSheet("""
+            QPushButton {
+                background: #1e2638;
+                color: #cbd5e1;
+                font-size: 11px;
+                border-radius: 4px;
+                padding: 4px 10px;
+                border: 1px solid #2e3b55;
+            }
+            QPushButton:hover { background: #2b364f; color: #ffffff; }
+        """)
         self.btn_refresh_pl.clicked.connect(self._fetch_user_playlists)
         h_exist.addWidget(self.btn_refresh_pl)
         pl_layout.addLayout(h_exist)
 
         # Option B: Create New Playlist
         h_new = QHBoxLayout()
+        h_new.setSpacing(6)
         self.radio_pl_new = QRadioButton("建立全新清單:")
         self.radio_pl_new.setChecked(True)
         self.pl_mode_group.addButton(self.radio_pl_new)
@@ -554,14 +819,18 @@ class YouTubeUploaderTab(QWidget):
         grid_config.addWidget(playlist_group, 1)
 
         # Group B: Premiere & Privacy Schedule
-        premiere_group = QGroupBox("⏰ 3. 發布與首播時間 (Premiere & Release Schedule)")
+        premiere_group = QGroupBox("⏰ 發布與首播排程 (Premiere & Release Schedule)")
+        premiere_group.setStyleSheet(common_box_css)
         pr_layout = QVBoxLayout(premiere_group)
+        pr_layout.setContentsMargins(8, 12, 8, 8)
+        pr_layout.setSpacing(8)
 
         self.release_mode_group = QButtonGroup(self)
 
         # Mode 1: Immediate
         h_imm = QHBoxLayout()
-        self.radio_imm = QRadioButton("立即發布 / 手動發布:")
+        h_imm.setSpacing(6)
+        self.radio_imm = QRadioButton("立即發布 / 手動公開:")
         self.release_mode_group.addButton(self.radio_imm)
         h_imm.addWidget(self.radio_imm)
 
@@ -572,6 +841,7 @@ class YouTubeUploaderTab(QWidget):
 
         # Mode 2: Premiere Scheduled
         h_prem = QHBoxLayout()
+        h_prem.setSpacing(6)
         self.radio_prem = QRadioButton("排程首播 (Premiere):")
         self.radio_prem.setChecked(True)
         self.release_mode_group.addButton(self.radio_prem)
@@ -580,7 +850,6 @@ class YouTubeUploaderTab(QWidget):
         self.dt_premiere = QDateTimeEdit()
         self.dt_premiere.setCalendarPopup(True)
         self.dt_premiere.setDisplayFormat("yyyy-MM-dd HH:mm")
-        # Default to tomorrow at 20:00 local time
         default_dt = datetime.now() + timedelta(days=1)
         default_dt = default_dt.replace(hour=20, minute=0, second=0, microsecond=0)
         self.dt_premiere.setDateTime(QDateTime.fromString(default_dt.strftime("%Y-%m-%d %H:%M"), "yyyy-MM-dd HH:mm"))
@@ -590,14 +859,15 @@ class YouTubeUploaderTab(QWidget):
 
         # Staggered Interval
         h_stagger = QHBoxLayout()
+        h_stagger.setSpacing(6)
         self.chk_stagger = QCheckBox("啟用階梯連載間隔 (每首依序首播)")
         self.chk_stagger.setChecked(True)
-        self.chk_stagger.setStyleSheet("color: #00d2ff;")
+        self.chk_stagger.setStyleSheet("color: #38bdf8; font-weight: 500;")
         self.chk_stagger.toggled.connect(self._recalculate_schedule_table)
         h_stagger.addWidget(self.chk_stagger)
 
         self.combo_stagger = QComboBox()
-        self.combo_stagger.addItem("每 12 小時 (長片首播: 一天兩片)", 43200)
+        self.combo_stagger.addItem("每 12 小時 (長片推薦: 一天兩片)", 43200)
         self.combo_stagger.addItem("每 4 小時 (Shorts首播: 一天四片)", 14400)
         self.combo_stagger.addItem("每 1 天 (24 小時)", 86400)
         self.combo_stagger.addItem("每 6 小時", 21600)
@@ -606,29 +876,45 @@ class YouTubeUploaderTab(QWidget):
         self.combo_stagger.addItem("每 2 天", 172800)
         self.combo_stagger.addItem("每 3 天", 259200)
         self.combo_stagger.currentIndexChanged.connect(self._recalculate_schedule_table)
-        h_stagger.addWidget(self.combo_stagger)
+        h_stagger.addWidget(self.combo_stagger, 1)
         pr_layout.addLayout(h_stagger)
 
         grid_config.addWidget(premiere_group, 1)
-        main_layout.addLayout(grid_config)
+        upload_layout.addLayout(grid_config)
 
         # ----------------------------------------------------------------------
-        # Release Enhancements Pipeline Strip
+        # 4. 智能發布流水線卡片 (Automation Pipeline Strip)
         # ----------------------------------------------------------------------
-        enhance_box = QHBoxLayout()
-        self.chk_thumbnail = QCheckBox("🖼️ 4K 黃金影格自動封面 (Beat-Synced)")
+        enhance_frame = QFrame()
+        enhance_frame.setStyleSheet("""
+            QFrame {
+                background: #111520;
+                border: 1px solid #1e2538;
+                border-radius: 8px;
+                padding: 4px 10px;
+            }
+        """)
+        enhance_box = QHBoxLayout(enhance_frame)
+        enhance_box.setContentsMargins(6, 4, 6, 4)
+        enhance_box.setSpacing(16)
+
+        lbl_pipe_tag = QLabel("🚀 智能流水線:")
+        lbl_pipe_tag.setStyleSheet("color: #cbd5e1; font-weight: bold; font-size: 12px;")
+        enhance_box.addWidget(lbl_pipe_tag)
+
+        self.chk_thumbnail = QCheckBox("🖼️ 4K 黃金影格封面 (Beat-Synced)")
         self.chk_thumbnail.setChecked(True)
-        self.chk_thumbnail.setStyleSheet("color: #00d2ff; font-weight: bold;")
+        self.chk_thumbnail.setStyleSheet("color: #38bdf8; font-weight: 500; font-size: 12px;")
         enhance_box.addWidget(self.chk_thumbnail)
 
-        self.chk_comment = QCheckBox("💬 自動發表置頂導流留言 (Pinned Comment)")
+        self.chk_comment = QCheckBox("💬 自動發表置頂導流留言 (Pinned)")
         self.chk_comment.setChecked(True)
-        self.chk_comment.setStyleSheet("color: #4ecca3; font-weight: bold;")
+        self.chk_comment.setStyleSheet("color: #34d399; font-weight: 500; font-size: 12px;")
         enhance_box.addWidget(self.chk_comment)
 
         self.chk_nav = QCheckBox("🔗 說明欄前後曲目連鎖導覽")
         self.chk_nav.setChecked(True)
-        self.chk_nav.setStyleSheet("color: #ffd369; font-weight: bold;")
+        self.chk_nav.setStyleSheet("color: #fbbf24; font-weight: 500; font-size: 12px;")
         enhance_box.addWidget(self.chk_nav)
 
         enhance_box.addStretch()
@@ -636,29 +922,44 @@ class YouTubeUploaderTab(QWidget):
         self.btn_check_4k = QPushButton("🛡️ 檢查 4K 轉碼哨兵")
         self.btn_check_4k.setStyleSheet("""
             QPushButton {
-                background: #1f4068;
-                color: #e4e4e4;
-                font-weight: bold;
-                border-radius: 4px;
-                padding: 4px 10px;
+                background: #1e2638;
+                color: #e2e8f0;
+                font-size: 11px;
+                font-weight: 600;
+                border-radius: 6px;
+                padding: 5px 12px;
+                border: 1px solid #2e3b55;
             }
-            QPushButton:hover { background: #162447; }
+            QPushButton:hover {
+                background: #2b364f;
+                color: #ffffff;
+                border: 1px solid #38bdf8;
+            }
         """)
         self.btn_check_4k.clicked.connect(self._check_4k_transcode_status)
         enhance_box.addWidget(self.btn_check_4k)
 
-        main_layout.addLayout(enhance_box)
+        upload_layout.addWidget(enhance_frame)
 
         # ----------------------------------------------------------------------
-        # 4. Video Queue Table
+        # 5. 發布佇列表格 (Video Queue Table)
         # ----------------------------------------------------------------------
-        table_group = QGroupBox("🎬 4. 發布佇列 (Video Queue)")
-        table_layout = QVBoxLayout(table_group)
+        table_frame = QFrame()
+        table_frame.setStyleSheet("""
+            QFrame {
+                background: #111520;
+                border: 1px solid #1e2538;
+                border-radius: 8px;
+            }
+        """)
+        table_layout = QVBoxLayout(table_frame)
+        table_layout.setContentsMargins(6, 6, 6, 6)
+        table_layout.setSpacing(6)
 
         self.table = QTableWidget()
         self.table.setColumnCount(7)
         self.table.setHorizontalHeaderLabels([
-            "選取", "檔名", "檔案大小", "YouTube 標題", "預計發布 / 首播時間", "狀態", "連結"
+            "選取", "檔案名稱", "大小", "YouTube 標題", "預計發布 / 首播時間", "平台狀態矩陣", "連結"
         ])
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
@@ -669,16 +970,40 @@ class YouTubeUploaderTab(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeMode.ResizeToContents)
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.cellDoubleClicked.connect(self._on_table_double_clicked)
+        self.table.setStyleSheet("""
+            QTableWidget {
+                background: #0a0d13;
+                alternate-background-color: #10141f;
+                gridline-color: #1a2233;
+                color: #f1f5f9;
+                font-size: 12px;
+                border: none;
+            }
+            QTableWidget::item {
+                padding: 4px;
+            }
+            QHeaderView::section {
+                background: #151a27;
+                color: #94a3b8;
+                font-size: 12px;
+                font-weight: 600;
+                padding: 6px 8px;
+                border: none;
+                border-bottom: 1px solid #242c3f;
+            }
+        """)
+        self.table.setAlternatingRowColors(True)
         table_layout.addWidget(self.table)
 
-        main_layout.addWidget(table_group, 3)
+        upload_layout.addWidget(table_frame, 3)
 
         # ----------------------------------------------------------------------
-        # 5. Progress Bar & Transfer Stats
+        # 6. 進度條與狀態統計
         # ----------------------------------------------------------------------
         prog_layout = QVBoxLayout()
+        prog_layout.setSpacing(4)
         self.lbl_stats = QLabel("準備就緒。共 0 部影片待發布。")
-        self.lbl_stats.setStyleSheet("font-weight: bold; color: #a8b2d1;")
+        self.lbl_stats.setStyleSheet("font-weight: 600; color: #94a3b8; font-size: 12px;")
         prog_layout.addWidget(self.lbl_stats)
 
         self.progress_bar = QProgressBar()
@@ -686,29 +1011,51 @@ class YouTubeUploaderTab(QWidget):
         self.progress_bar.setTextVisible(True)
         self.progress_bar.setStyleSheet("""
             QProgressBar {
-                border: 1px solid #444;
-                border-radius: 4px;
+                border: 1px solid #242c3f;
+                border-radius: 6px;
                 text-align: center;
-                height: 20px;
-                background: #1e1e2f;
+                height: 18px;
+                background: #0a0d13;
+                color: #ffffff;
+                font-size: 11px;
+                font-weight: bold;
             }
             QProgressBar::chunk {
-                background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #4ecca3, stop:1 #00d2ff);
+                background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0284c7, stop:1 #38bdf8);
+                border-radius: 5px;
             }
         """)
         prog_layout.addWidget(self.progress_bar)
-
-        main_layout.addLayout(prog_layout)
+        upload_layout.addLayout(prog_layout)
 
         # ----------------------------------------------------------------------
-        # 6. Action Control Buttons
+        # 7. 控制按鈕與日誌抽屜列 (Action & Console Toolbar)
         # ----------------------------------------------------------------------
         btn_box = QHBoxLayout()
+        btn_box.setSpacing(8)
+
+        btn_action_css = """
+            QPushButton {
+                background: #1e2638;
+                color: #cbd5e1;
+                font-size: 12px;
+                border-radius: 6px;
+                padding: 6px 14px;
+                border: 1px solid #2e3b55;
+            }
+            QPushButton:hover {
+                background: #2b364f;
+                color: #ffffff;
+            }
+        """
+
         self.btn_select_all = QPushButton("☑️ 全選")
+        self.btn_select_all.setStyleSheet(btn_action_css)
         self.btn_select_all.clicked.connect(self._select_all)
         btn_box.addWidget(self.btn_select_all)
 
         self.btn_deselect_all = QPushButton("◻️ 取消全選")
+        self.btn_deselect_all.setStyleSheet(btn_action_css)
         self.btn_deselect_all.clicked.connect(self._deselect_all)
         btn_box.addWidget(self.btn_deselect_all)
 
@@ -716,15 +1063,16 @@ class YouTubeUploaderTab(QWidget):
         self.btn_select_uncompleted.setToolTip("自動篩選：取消勾選已全數發布的影片，僅勾選上次失敗 (❌) 或待傳 (⏳) 的影片並定位")
         self.btn_select_uncompleted.setStyleSheet("""
             QPushButton {
-                background: #1f4068;
-                color: #00d2ff;
-                font-weight: bold;
-                padding: 7px 14px;
-                border-radius: 5px;
-                border: 1px solid #00d2ff;
+                background: rgba(56, 189, 248, 0.12);
+                color: #38bdf8;
+                font-weight: 600;
+                font-size: 12px;
+                padding: 6px 14px;
+                border-radius: 6px;
+                border: 1px solid rgba(56, 189, 248, 0.35);
             }
             QPushButton:hover {
-                background: #162447;
+                background: rgba(56, 189, 248, 0.22);
                 color: #ffffff;
             }
         """)
@@ -733,72 +1081,176 @@ class YouTubeUploaderTab(QWidget):
 
         btn_box.addStretch()
 
+        # 折疊式日誌抽屜切換按鈕
+        self.btn_toggle_log = QPushButton("📋 收起診斷日誌 ▴")
+        self.btn_toggle_log.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+                color: #94a3b8;
+                font-size: 12px;
+                border: none;
+                padding: 6px 10px;
+            }
+            QPushButton:hover {
+                color: #38bdf8;
+            }
+        """)
+        self.btn_toggle_log.clicked.connect(self._toggle_log_drawer)
+        btn_box.addWidget(self.btn_toggle_log)
+
+        self.btn_cancel = QPushButton("🛑 取消發布")
+        self.btn_cancel.setEnabled(False)
+        self.btn_cancel.setStyleSheet("""
+            QPushButton {
+                background: rgba(239, 68, 68, 0.15);
+                color: #f87171;
+                font-weight: 600;
+                font-size: 12px;
+                padding: 7px 16px;
+                border-radius: 6px;
+                border: 1px solid rgba(239, 68, 68, 0.35);
+            }
+            QPushButton:hover {
+                background: rgba(239, 68, 68, 0.28);
+                color: #ffffff;
+            }
+            QPushButton:disabled {
+                background: #1a1e28;
+                color: #475569;
+                border: 1px solid #242c3f;
+            }
+        """)
+        self.btn_cancel.clicked.connect(self.cancel_upload)
+        btn_box.addWidget(self.btn_cancel)
+
         self.btn_start = QPushButton("🚀 開始批次發布與加入清單")
         self.btn_start.setStyleSheet("""
             QPushButton {
-                background: #4ecca3;
-                color: #121212;
-                font-size: 14px;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #059669, stop:1 #10b981);
+                color: #ffffff;
+                font-size: 13px;
                 font-weight: bold;
-                padding: 10px 24px;
+                padding: 8px 24px;
                 border-radius: 6px;
+                border: 1px solid #047857;
             }
-            QPushButton:hover { background: #5df0c1; }
-            QPushButton:disabled { background: #555; color: #888; }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #34d399);
+            }
+            QPushButton:disabled {
+                background: #27272a;
+                color: #71717a;
+                border: 1px solid #3f3f46;
+            }
         """)
         self.btn_start.clicked.connect(self.start_batch_upload)
         btn_box.addWidget(self.btn_start)
 
-        self.btn_cancel = QPushButton("🛑 取消發布")
-        self.btn_cancel.setEnabled(False)
-        self.btn_cancel.setStyleSheet("background: #e94560; color: white; padding: 10px 18px; border-radius: 6px;")
-        self.btn_cancel.clicked.connect(self.cancel_upload)
-        btn_box.addWidget(self.btn_cancel)
-
-        main_layout.addLayout(btn_box)
+        upload_layout.addLayout(btn_box)
 
         # ----------------------------------------------------------------------
-        # 7. Realtime Log Output & Telemetry Bar
+        # 8. 折疊式終端日誌抽屜 (Collapsible Log Drawer)
         # ----------------------------------------------------------------------
+        self.log_container = QFrame()
+        self.log_container.setStyleSheet("""
+            QFrame {
+                background: #080a0f;
+                border: 1px solid #1e2538;
+                border-radius: 8px;
+                padding: 6px;
+            }
+        """)
+        log_inner_layout = QVBoxLayout(self.log_container)
+        log_inner_layout.setContentsMargins(6, 4, 6, 4)
+        log_inner_layout.setSpacing(4)
+
         log_header = QHBoxLayout()
         lbl_log_title = QLabel("📋 即時執行與診斷日誌 (自動循環保存於 logs/youtube_uploader.log)")
-        lbl_log_title.setStyleSheet("font-size: 11px; font-weight: bold; color: #8892b0;")
+        lbl_log_title.setStyleSheet("font-size: 11px; font-weight: 600; color: #64748b;")
         log_header.addWidget(lbl_log_title)
         log_header.addStretch()
 
         btn_quota = QPushButton("📊 今日配額統計")
         btn_quota.setToolTip("查看今日各憑證專案的 YouTube API 配額點數消耗與剩餘額度")
-        btn_quota.setStyleSheet("background: #1f4068; color: #e0e6ed; padding: 4px 10px; border-radius: 4px; font-size: 11px;")
+        btn_quota.setStyleSheet("""
+            QPushButton {
+                background: #151a26;
+                color: #94a3b8;
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                border: 1px solid #242c3f;
+            }
+            QPushButton:hover { color: #f8fafc; border: 1px solid #38bdf8; }
+        """)
         btn_quota.clicked.connect(self._show_quota_analysis)
         log_header.addWidget(btn_quota)
 
         btn_open_log = QPushButton("📁 開啟完整日誌")
         btn_open_log.setToolTip("在外部編輯器中開啟 logs/youtube_uploader.log 查看詳細偵錯紀錄")
-        btn_open_log.setStyleSheet("background: #162447; color: #e0e6ed; padding: 4px 10px; border-radius: 4px; font-size: 11px;")
+        btn_open_log.setStyleSheet("""
+            QPushButton {
+                background: #151a26;
+                color: #94a3b8;
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                border: 1px solid #242c3f;
+            }
+            QPushButton:hover { color: #f8fafc; border: 1px solid #38bdf8; }
+        """)
         btn_open_log.clicked.connect(self._open_log_file)
         log_header.addWidget(btn_open_log)
 
         btn_clear = QPushButton("🧹 清除畫面")
         btn_clear.setToolTip("清除下方日誌顯示區域（不影響硬碟中的 log 檔案）")
-        btn_clear.setStyleSheet("background: #1b1e2b; color: #a0a8b9; padding: 4px 10px; border-radius: 4px; font-size: 11px;")
+        btn_clear.setStyleSheet("""
+            QPushButton {
+                background: #151a26;
+                color: #94a3b8;
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                border: 1px solid #242c3f;
+            }
+            QPushButton:hover { color: #f8fafc; border: 1px solid #38bdf8; }
+        """)
         btn_clear.clicked.connect(self._clear_log_display)
         log_header.addWidget(btn_clear)
 
-        main_layout.addLayout(log_header)
+        log_inner_layout.addLayout(log_header)
 
         self.log_text = QTextEdit()
         self.log_text.setReadOnly(True)
-        self.log_text.setMaximumHeight(140)
+        self.log_text.setFixedHeight(105)
         self.log_text.setStyleSheet("""
             QTextEdit {
-                background: #0f141d;
-                color: #5af78e;
-                font-family: Menlo, Monaco, Consolas, monospace;
+                background: #05070a;
+                color: #34d399;
+                font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
                 font-size: 11px;
-                border: 1px solid #1a2634;
+                border: 1px solid #1a2233;
+                border-radius: 4px;
+                padding: 4px;
             }
         """)
-        main_layout.addWidget(self.log_text)
+        log_inner_layout.addWidget(self.log_text)
+
+        upload_layout.addWidget(self.log_container)
+
+        # Add tabs
+        self.inner_tabs.addTab(upload_tab, "📤 4K 影片發布與多平台矩陣 (Upload)")
+
+        self.scheduler_widget = YouTubeBatchSchedulerWidget(engine=self.engine, parent=self)
+        self.inner_tabs.addTab(self.scheduler_widget, "📅 已上傳影片排程批次修改 (Batch Scheduler)")
+
+        main_layout.addWidget(self.inner_tabs)
+
+    def _toggle_log_drawer(self):
+        """ 切換即時日誌抽屜的展開/收起狀態 """
+        is_vis = not self.log_container.isVisible()
+        self.log_container.setVisible(is_vis)
+        self.btn_toggle_log.setText("📋 收起診斷日誌 ▴" if is_vis else "📋 展開診斷日誌 ▾")
 
     # --------------------------------------------------------------------------
     # UI Event Handlers
@@ -866,6 +1318,13 @@ class YouTubeUploaderTab(QWidget):
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(guide_path)))
         else:
             QMessageBox.information(self, "說明指南", "請參閱專案目錄下的 YOUTUBE_API_SETUP_GUIDE.md 文件！")
+
+    def _goto_optimizer_tab(self):
+        parent_w = self.parent()
+        while parent_w and not hasattr(parent_w, "youtube_optimizer"):
+            parent_w = parent_w.parent()
+        if parent_w and hasattr(parent_w, "left_tabs") and hasattr(parent_w, "youtube_optimizer"):
+            parent_w.left_tabs.setCurrentWidget(parent_w.youtube_optimizer)
 
     def _browse_directory(self):
         d = QFileDialog.getExistingDirectory(self, "選擇影片目錄", self.dir_input.text() or os.path.expanduser("~"))
@@ -1014,11 +1473,11 @@ class YouTubeUploaderTab(QWidget):
             # 4: Premiere / Release Time (will be computed)
             self.table.setItem(r, 4, QTableWidgetItem("-"))
 
-            # 5: Multi-Platform Status Matrix
-            st_yt = "YT:✅" if yt_done else ("YT:❌" if yt_failed else "YT:⏳")
-            st_ig = "IG:✅" if ig_done else ("IG:❌" if ig_failed else "IG:⏳")
-            st_tt = "TT:✅" if tt_done else ("TT:❌" if tt_failed else "TT:⏳")
-            status_str = f"{st_yt} | {st_ig} | {st_tt}"
+            # 5: Multi-Platform Status Matrix Badge
+            st_yt = "🔴✅" if yt_done else ("🔴❌" if yt_failed else "🔴⏳")
+            st_ig = "📸✅" if ig_done else ("📸❌" if ig_failed else "📸⏳")
+            st_tt = "🎵✅" if tt_done else ("🎵❌" if tt_failed else "🎵⏳")
+            status_str = f"{st_yt}   {st_ig}   {st_tt}"
             status_item = QTableWidgetItem(status_str)
             status_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -1034,21 +1493,24 @@ class YouTubeUploaderTab(QWidget):
                 status_item.setToolTip("\n\n".join(tips))
 
             if yt_done and ig_done and tt_done:
-                status_item.setForeground(QColor("#4ecca3"))
+                status_item.setForeground(QColor("#34d399"))
             elif yt_failed or ig_failed or tt_failed:
-                status_item.setForeground(QColor("#ff5e78"))
+                status_item.setForeground(QColor("#f87171"))
             elif yt_done:
-                status_item.setForeground(QColor("#ffd369"))
+                status_item.setForeground(QColor("#38bdf8"))
+            else:
+                status_item.setForeground(QColor("#94a3b8"))
             self.table.setItem(r, 5, status_item)
 
             # 6: Link
             link_item = QTableWidgetItem()
             if item.get("youtube_url"):
                 link_item.setText("觀看 / ⚙️片尾")
-                link_item.setForeground(QColor("#00d2ff"))
+                link_item.setForeground(QColor("#38bdf8"))
                 link_item.setToolTip(f"雙擊開啟 YouTube Studio 片尾畫面設定頁\n{item.get('youtube_url')}")
             else:
                 link_item.setText("-")
+                link_item.setForeground(QColor("#64748b"))
             link_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             self.table.setItem(r, 6, link_item)
 

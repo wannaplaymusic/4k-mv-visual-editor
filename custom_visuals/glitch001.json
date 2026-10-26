@@ -1,0 +1,28 @@
+{
+    "name": "glitch001",
+    "code": "// === Tab: mySketch.js ===\nconst vertexShader = `\nprecision lowp float;\nattribute vec3 aPosition;\nattribute vec2 aTexCoord;\nattribute vec4 aVertexColor;\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nvarying vec2 vTexCoord;\nvarying vec4 vVertexColor;\n\n\nvoid main() {\n  // Apply the camera transform\n  vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * viewModelPosition;  \n  // Pass along data to the fragment shader\n  vTexCoord = aTexCoord;\n  vVertexColor = aVertexColor;\n}`;\n\nconst fragmentShader = `\nprecision lowp float;\n\n#define PI 3.14159265359\n#define PI2 6.28318530718\n\nuniform float u_time;\nuniform vec2 u_resolution;\nuniform sampler2D u_texture;\n\nvarying vec2 vTexCoord;\n\n\nvoid main() {\n  vec2 coord = vTexCoord;\n    coord.y -= 0.001;\n  vec4 color = texture2D(u_texture, coord);\n\n  gl_FragColor = color;\n}`;\n\nlet myShader;\nlet next;\nlet prev;\nlet pair = true;\nlet topLeft\nlet bottomRight;\n\nfunction preload() {\n}\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight, WEBGL);\n  frameRate(30);\n\n  myShader = createShader(vertexShader,fragmentShader);\n\t\n  topLeft = createVector(-windowWidth / 2, -windowHeight / 2);\n  bottomRight = createVector(windowWidth / 2, windowHeight / 2);\n\n  next = createFramebuffer({ format: FLOAT });\n  prev = createFramebuffer({ format: FLOAT });\n\n  next.begin();\n  noStroke();\n\n  for (let i = 0; i < 5000; i++) {\n    fill(200, 200, 0);\n    circle(\n      random(topLeft.x,bottomRight.x),\n      random(topLeft.y, bottomRight.y),\n      5\n    );\n  }\n  next.end();\n}\n\n\nfunction draw() {\n  // Swap prev and next\n  [prev, next] = [next, prev];\n\n  next.begin();\n  clear();\n  \n  shader(myShader);\n  myShader.setUniform(\"u_time\", frameCount);\n  myShader.setUniform(\"u_screen_size\", [windowWidth, windowHeight]);\n  myShader.setUniform(\"u_texture\", prev);\n  noStroke();\n  plane(windowWidth, windowHeight);4\n  \n  next.end();\n  resetShader();\n  \n  background(22);\n  image(next,topLeft.x, topLeft.y);\n\n\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n\t<meta charset=\"utf-8\" />\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.7/lib/p5.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/p5@1.11.7/lib/addons/p5.sound.min.js\"></script>\n\t<script src=\"mySketch.js\"></script>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n</head>\n\n<body>   \n\t\n</body>\n\n</html>\n",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nhtml,\nbody {\n\tmargin: 0;\n\tpadding: 0;\n}\n",
+    "inline_assets": {},
+    "author": "TheBigRoomXXL",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2838520",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:45:44",
+    "used_in_videos": [
+        "Infinite Blue Chamber.mp4",
+        "Asteroid Belt Onslaught.mp4",
+        "Cryo Weapon Marauder.mp4"
+    ],
+    "used_count": 3
+}

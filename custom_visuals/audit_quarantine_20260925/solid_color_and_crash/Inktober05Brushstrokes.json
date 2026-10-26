@@ -1,0 +1,22 @@
+{
+    "name": "Inktober05Brushstrokes",
+    "code": "// === Tab: mySketch ===\n//-- let 05 - Strokes\n//-- Siddhartha, Delft, 5th Oct, 2019\nlet N = 350;\nlet N2 = 200;\n\ndrip2 [] drips = new Array(N);\ndrip2 [] drips2 = new Array(N2);\n\nlet count = 0;\nlet countMax = 150;\ncolor [] colbg = {\"#d90368\", \"#3b3561\", \"#261c15\", \"#f2f5ea\"};\ncolor [] colst = {\"#ffd400\", \"#c84c09\", \"#f05d23\", \"#e00d3e\"};\nlet indx;\n\nfunction setup() {\n  // createCanvas(1000, 1000);\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n  indx = 3;\n  background(\"#000000\");\n    \n  for(i=0; i<N; ++i){\n    drips[i] = new drip2(width/2 + random(-250,250), 50, random(500,800), 1000, 8, 20, colst[indx]);\n  }\n\n  for(i=0; i<N2; ++i){\n    drips2[i] = new drip2(width/2 + random(-100,100), 50, random(500,800), 1000, 8, 20, colbg[indx]);\n  }\n  \n}\n\nfunction draw() {\n  if(count<countMax){\n    for(i=0; i<N; ++i){\n      drips[i].show(count);\n    }\n    for(i=0; i<N2; ++i){\n      drips2[i].show(count);\n    }\n    count++;\n  }\n}\n\nfunction mousePressed() {\n  fill(0);\n  noStroke();\n  rect(0,0,width,height);\n  \n  let R1 = random(50,300);\n  let R2 = random(20,100);  \n  \n  for(i=0; i<N; ++i){\n    drips[i] = new drip2(width/2 + random(-R1, R1), 50, random(500,800), 1000, 8, 20, colst[indx]);\n  }\n\n  for(i=0; i<N2; ++i){\n    drips2[i] = new drip2(width/2 + random(-R2, R2), 50, random(500,800), 1000, 8, 20, colbg[indx]);\n  }\n  \n  count = 0;\n}\n\nclass drip{\n  xc;\n  yc;\n  len;\n  stwt;\n  alpha;\n  steps;\n  jitter;\n  theta;\n  alBase;\n  col;\n  \n  constructor(x, y, l, step, st, al, c) {\n    xc = x;\n    yc = y;\n    len = l;\n    stwt = st;\n    alBase = al;\n    steps = step;\n    let jitter = 10.0;\n    col = c;\n  }\n\n  function show( indx ) {\n    stwt = 1 + 4.0*(countMax - indx)/float(countMax);\n    alpha = alBase + 100*float(indx)/float(countMax);\n    // jitter = 6.0*float(countMax - indx)/countMax;\n    jitter = 6.0*float(indx)/countMax;\n    strokeWeight(stwt);\n    stroke(col, alpha);\n    theta = noise(xc*0.001,yc*0.001);\n    point(xc + random(-jitter, jitter), yc + len*indx/float(countMax) + random(-jitter, jitter)*0.5);\n    // point(xc + cos(theta), yc + sin(theta));\n    // xc += random(-jitter, jitter);\n    // yc = len*indx/float(countMax);\n  }\n}\n\n\nclass drip2{\n  xc;\n  yc;\n  len;\n  stwt;\n  alpha;\n  steps;\n  jitter;\n  theta;\n  alBase;\n  col;\n  \n  constructor(x, y, l, step, st, al, c) {\n    xc = x;\n    yc = y;\n    len = l;\n    stwt = st;\n    alBase = al;\n    steps = step;\n    var jitter = 10.0;\n    col = c;\n  }\n\n  function show( indx ) {\n    stwt = 1 + 15*(countMax - indx)/float(countMax);\n    alpha = alBase + 100*float(indx)/float(countMax);\n    // jitter = 6.0*float(countMax - indx)/countMax;\n    jitter = 1.0 + 6.0*float(indx)/countMax;\n    noStroke();\n    strokeWeight(stwt);\n    fill(col, alpha);\n    theta = noise(xc*0.001,yc*0.001);\n    // point(xc + random(-jitter, jitter), yc + len*indx/float(countMax) + random(-jitter, jitter)*0.5);\n    ellipse(xc + random(-jitter, jitter), yc + len*indx/float(countMax) + random(-jitter, jitter)*0.5, stwt, stwt);\n    // point(xc + cos(theta), yc + sin(theta));\n    // xc += random(-jitter, jitter);\n    // yc = len*indx/float(countMax);\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Brush strokes",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/908953",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:41:21"
+}

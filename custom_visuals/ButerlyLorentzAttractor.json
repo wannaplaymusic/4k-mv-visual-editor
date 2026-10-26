@@ -1,0 +1,32 @@
+{
+    "name": "ButerlyLorentzAttractor",
+    "code": "// === Tab: mySketch ===\nclass Mariposa {\n  constructor(cx, cy, size = 1, lineMode = false) {\n    this.cx = cx;\n    this.cy = cy;\n    this.size = size;\n    this.lineMode = lineMode;\n\n    this.a = 9;\n    this.b = 28;\n    this.c = 2;\n\n    this.timeStep = 0.005;\n    this.numIterations = 5000;\n    this.minDist = 2;\n    this.time = 0;\n\n    this.p1 = createVector(cx, cy);\n    this.p2 = this.randomPoint();\n    this.p3 = this.randomPoint();\n    this.t = 0;\n    this.speed = 0.002 + random(0.0015);\n    this.angle = 0;\n    this.progressEpsilon = 10;\n\n    // control del fade\n    this.opacity = 255;\n    this.fadeSpeed = 10;\n    this.fadingOut = false;\n    this.fadingIn = true;\n\n    // 💡 Variaciones individuales del aleteo\n    this.VelAleteo = random(0.6, 1.8);   // velocidad del batir de alas\n    this.freqAleteo = random(70, 130);   // frecuencia del patrón senoidal\n  }\n\n  randomPoint() {\n    return createVector(random(width), random(height));\n  }\n\n  update() {\n    this.time += this.VelAleteo;\n    this.t += this.speed;\n    if (this.t > 1) this.t = 1;\n\n    const pos = this.bezierPointVec(this.p1, this.p2, this.p3, this.t);\n    this.cx = pos.x;\n    this.cy = pos.y;\n\n    const lookT = min(1, this.t + max(0.01, this.speed * 3));\n    const look = this.bezierPointVec(this.p1, this.p2, this.p3, lookT);\n    this.angle = atan2(look.y - pos.y, look.x - pos.x);\n\n    // Fade in / out\n    if (this.fadingIn) {\n      this.opacity += this.fadeSpeed;\n      if (this.opacity >= 255) {\n        this.opacity = 255;\n        this.fadingIn = false;\n      }\n    } else if (this.fadingOut) {\n      this.opacity -= this.fadeSpeed;\n      if (this.opacity <= 0) {\n        this.opacity = 0;\n        this.fadingOut = false;\n        this.p1 = this.p3.copy();\n        this.p2 = this.randomPoint();\n        this.p3 = this.randomPoint();\n        this.t = 0;\n        this.fadingIn = true;\n      }\n    }\n\n    // Inicia fade-out cerca del final\n    const distToP3 = p5.Vector.dist(pos, this.p3);\n    if (!this.fadingOut && distToP3 < this.progressEpsilon * 5) {\n      this.fadingOut = true;\n    }\n  }\n\n  bezierPointVec(p1, p2, p3, t) {\n    const x = (1 - t) ** 2 * p1.x + 2 * (1 - t) * t * p2.x + t ** 2 * p3.x;\n    const y = (1 - t) ** 2 * p1.y + 2 * (1 - t) * t * p2.y + t ** 2 * p3.y;\n    return createVector(x, y);\n  }\n\n  draw() {\n    push();\n    translate(this.cx, this.cy);\n    rotate(this.angle + PI / 2);\n    scale(this.size);\n    stroke(255, this.opacity);\n    noFill();\n    beginShape();\n\n    var x = 0.1, y = 0.1, z = 0.1;\n    let lastX = NaN, lastY = NaN;\n    const minDistSq = this.minDist * this.minDist;\n\n    for (let i = 0; i < this.numIterations; i++) {\n      // 💫 cada mariposa tiene su propia frecuencia de \"aleteo\"\n      const swirl = sin(this.time * PI / this.freqAleteo + z / 49 + x * x / 400);\n      const sx = (x + y) * (swirl * 2 + 2);\n      const sy = -z * 5;\n\n      if (i === 0) {\n        vertex(sx, sy);\n        lastX = sx;\n        lastY = sy;\n      } else {\n        const dx = sx - lastX;\n        const dy = sy - lastY;\n        if (dx * dx + dy * dy > minDistSq) {\n          vertex(sx, sy);\n          lastX = sx;\n          lastY = sy;\n        }\n      }\n\n      var dx = this.a * (y - x);\n      var dy = x * (this.b - z) - y;\n      const dz = x * y - this.c * z;\n      x += dx * this.timeStep;\n      y += dy * this.timeStep;\n      z += dz * this.timeStep;\n    }\n\n    endShape();\n    pop();\n  }\n}\n\n// --- Sketch principal ---\nlet mariposas = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  noFill();\n  strokeWeight(0.7);\n\n  // 🔹 Crear 4 mariposas con parámetros independientes\n  for (let i = 0; i < 4; i++) {\n    mariposas.push(\n      new Mariposa(\n        random(width),\n        random(height),\n        max(width, height) * 0.001,\n        true\n      )\n    );\n  }\n}\n\nfunction draw() {\n  background(11);\n  for (let m of mariposas) {\n    m.update();\n    m.draw();\n  }\n}\n\nfunction windowResized() {\n  resizeCanvas(windowWidth, windowHeight);\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "GaudiRamone",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2785100",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 15:46:55",
+    "used_in_videos": [
+        "Contemporary Spirit Layers.mp4"
+    ],
+    "used_count": 1,
+    "is_starred": false
+}

@@ -1,0 +1,24 @@
+{
+    "name": "Attractor",
+    "code": "// === Tab: mySketch ===\n\nvar num = 1000;\nvar vx = new Array(num);\nvar vy = new Array(num);\nvar x = new Array(num);\nvar y = new Array(num);\nvar ax = new Array(num);\nvar ay = new Array(num);\n\nvar magnetism = 10.0; //吸引力的力量。。\nvar radius = 1 ; //画圆的半径\nvar gensoku = 0.95; // 减慢粒子运动\n\nfunction setup(){\n  createCanvas(1943,425);\n  noStroke(); \n  fill(0);\n  ellipseMode(RADIUS);\n  background(0);\n  blendMode(ADD);\n  \n  for(var i =0; i< num; i++){\n    x[i] = random(width);\n    y[i] = random(height);\n    vx[i] = 0;\n    vy[i] = 0;\n    ax[i] = 0;\n    ay[i] = 0;\n  }\n}\n\n\nfunction draw(){\n  fill(0,0,0);\n  rect(0,0,width,height);\n  \n  for(var i=0; i<num; i++){\n    var distance = dist(touchX, touchY, x[i], y[i]); //dist(x1,y1,x2,y2) 计算两点之间距离的函数\n   //加速度与距吸引力中心的距离的平方成反比。\n    if(distance > 3){ //如果距离鼠标太近则不要更新加速度\n      ax[i] = magnetism * (touchX - x[i]) / (distance * distance); \n      ay[i] = magnetism * (touchY - y[i]) / (distance * distance);\n    }\n    vx[i] += ax[i]; // 每帧将速度vx增加ax。\n    vy[i] += ay[i]; // 每帧通过ay增加速度vy。\n    \n    vx[i] = vx[i]*gensoku;\n    vy[i] = vy[i]*gensoku;\n    \n    x[i] += vx[i];  // 每帧前进vy像素。\n    y[i] += vy[i];  // 每帧前进vy像素。\n    \n    var sokudo = dist(0,0,vx[i],vy[i]); // 从速度的X和Y分量中查找速度\n    var r = map(sokudo, 0, 5, 0, 255); //根据速度计算颜色\n    var g = map(sokudo, 0,5, 64, 255);\n    var b = map(sokudo, 0,5, 128, 255);\n    fill(r, g, b, 32);\n    ellipse(x[i],y[i],radius,radius);\n  }\n  \n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "ZouLei",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/812603",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:53:52",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

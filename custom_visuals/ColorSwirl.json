@@ -1,28 +1,29 @@
 {
-  "name": "ColorSwirl",
-  "code": "// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"psychedelic\".\n\nvar palette = ['#B41CB9AA', '#FE6410AA', '#F4CD28AA', '#5EAF33AA', '#A01F1EAA', '#011369AA'];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n}\n\nfunction draw() {\n\tlet divider = 25 + sin(frameCount / 300) * 20;\n\tbackground(0, 40);\n\tnoStroke();\n\ttranslate(width / 2, height / 2);\n\tfor (let j = 0; j < 24; j++) {\n\t\tlet r = map(j, 0, 24, 0, width)\n\t\trotate((0.5 - noise(j / divider, frameCount / 600)) * (TAU / j) * sin(frameCount / 200));\n\t\tfor (let i = 0; i < 120; i++) {\n\t\t\tlet a = i * TAU / 120;\n\t\t\tif (i % 10 == 0) continue;\n\t\t\tfill(palette[(j+i) % palette.length]);\n\t\t\tpush();\n\t\t\tscale(0.5 + sin(j / 4 + frameCount / 60) / 24);\n\t\t\tbeginShape();\n\t\t\tvertex(r * cos(a), r * sin(a));\n\t\t\tvertex((r + width / 30) * cos(a), (r + width / 30) * sin(a));\n\t\t\tvertex((r + width / 30) * cos(a + TAU / 120), (r + width / 30) * sin(a + TAU / 120));\n\t\t\tvertex(r * cos(a + TAU / 120), r * sin(a + TAU / 120));\n\t\t\tendShape();\n\t\t\tpop();\n\t\t}\n\t}\n}",
-  "frequency": 50,
-  "storyboard_weight": 50,
-  "post_fx_intensity": 50,
-  "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
-  "custom_css": "",
-  "inline_assets": {},
-  "author": "Ivan Rudnicki",
-  "license": "CC BY-NC-SA",
-  "tags": [
-    "batch_import",
-    "audio_reactive"
-  ],
-  "url": "https://openprocessing.org/@u110137/2897243",
-  "date_added": "2026-07-06 21:23:30",
-  "scaling_mode": "auto",
-  "used_in_videos": [
-    "Mental Drift.mp4",
-    "Prime Anchor.mp4",
-    "Blue Hour Resonance.mp4",
-    "Monolithic Interval.mp4",
-    "Vacuum Memory.mp4",
-    "Ultimate Core Patterns.mp4"
-  ],
-  "used_count": 6
+    "name": "ColorSwirl",
+    "code": "// === Tab: mySketch ===\n// For the #WCCChallenge, theme: \"psychedelic\".\n\nvar palette = ['#B41CB9AA', '#FE6410AA', '#F4CD28AA', '#5EAF33AA', '#A01F1EAA', '#011369AA'];\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n}\n\nfunction draw() {\n\tlet divider = 25 + sin(frameCount / 300) * 20;\n\tbackground(0, 40);\n\tnoStroke();\n\ttranslate(width / 2, height / 2);\n\tfor (let j = 0; j < 24; j++) {\n\t\tlet r = map(j, 0, 24, 0, width)\n\t\trotate((0.5 - noise(j / divider, frameCount / 600)) * (TAU / j) * sin(frameCount / 200));\n\t\tfor (let i = 0; i < 120; i++) {\n\t\t\tlet a = i * TAU / 120;\n\t\t\tif (i % 10 == 0) continue;\n\t\t\tfill(palette[(j+i) % palette.length]);\n\t\t\tpush();\n\t\t\tscale(0.5 + sin(j / 4 + frameCount / 60) / 24);\n\t\t\tbeginShape();\n\t\t\tvertex(r * cos(a), r * sin(a));\n\t\t\tvertex((r + width / 30) * cos(a), (r + width / 30) * sin(a));\n\t\t\tvertex((r + width / 30) * cos(a + TAU / 120), (r + width / 30) * sin(a + TAU / 120));\n\t\t\tvertex(r * cos(a + TAU / 120), r * sin(a + TAU / 120));\n\t\t\tendShape();\n\t\t\tpop();\n\t\t}\n\t}\n}",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "<script src=\"https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js\"></script>\n",
+    "custom_css": "",
+    "inline_assets": {},
+    "author": "Ivan Rudnicki",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "audio_reactive"
+    ],
+    "url": "https://openprocessing.org/@u110137/2897243",
+    "date_added": "2026-07-06 21:23:30",
+    "scaling_mode": "auto",
+    "used_in_videos": [
+        "Mental Drift.mp4",
+        "Prime Anchor.mp4",
+        "Blue Hour Resonance.mp4",
+        "Monolithic Interval.mp4",
+        "Vacuum Memory.mp4",
+        "Ultimate Core Patterns.mp4",
+        "Meteor Blade Berserk.mp4"
+    ],
+    "used_count": 7
 }

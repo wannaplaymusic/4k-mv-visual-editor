@@ -1,0 +1,27 @@
+{
+    "name": "DayandNight",
+    "code": "// === Tab: mySketch ===\n//made by twitter.com/mattywillo_\n//for twitter.com/clarabellum's #codesketchtober prompt: day and night\n\nlet t = 0, res, sh;\n\nfunction draw() {\n  t += 0.0001*deltaTime;\n  sh.setUniform(\"t\", t%1);\n  sh.setUniform(\"l\", t|0);\n  shader(sh);\n  rect(0,0,0);\n}\n\nlet src = [`\nattribute vec3 aPosition;\nvarying vec2 uv;\nvoid main() {\n  gl_Position = vec4(aPosition*2.-1., 1.0);\n  uv = vec2(aPosition.x, 1.-aPosition.y)*2.-1.;\n}\n`,`\nprecision highp float;\n#define PI `+Math.PI+`\nvarying vec2 uv;\nuniform float t,l;\n\nmat2 rot(float a) {\n  return mat2(cos(a), -sin(a), sin(a), cos(a));\n}\n\nfloat map(vec3 p) {\n  p.xy *= p.z*mix(1.,2.,(mod(l,2.)==0.)?t:1.-t);\n  p.xz *= rot(p.y*mix(.2,.8,sin(t*PI*2.)*.5+.5)) * rot(t*PI*4.);\n  p.z -= 5.;\n  return length(p)-.5 + sin(p.x)*sin(p.y)*sin(p.z*.5*sin(t*PI*2.)*.5+.5)*.75;\n}\n\nvec3 norm(vec3 p) {\n  vec2 e = vec2(0.00001, 0.);\n  return normalize(map(p) - vec3(map(p - e.xyy), map(p - e.yxy), map(p - e.yyx)));\n}\n\nvoid main() {\n  vec3 n = norm(vec3(uv,0)+vec3(0,0,1)*map(vec3(uv,0)));\n  gl_FragColor = vec4(vec3(.22,0.,.6)*n.x + vec3(1.,.33,0.)*(mix(n.x,n.y,sin(smoothstep(0.,1.,t)*PI*2.)*.5+.5)) + vec3(1.,.75,0.)*mix(n.z,n.y,sin(smoothstep(0.,1.,t)*PI*2.)*.5+.5), 1);\n}`];\n\nfunction setup() {\n  res = Math.min(1112, 834);\n  colorMode(RGB, 1, 1, 1, 1);\n  createCanvas(1112, 834, WEBGL);\n\n  sh = new p5.Shader(undefined, ...src);\n}\n\nfunction windowResized() {\n  res = min(1112, 844);\n  resizeCanvas(1112, 834);\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  // prevents mouse press from registering twice\n  if (millis() - lapse > 400){\n  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1291755",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:04:14",
+    "used_in_videos": [
+        "Dark Energy Chieftain.mp4",
+        "Pulsar War Machine.mp4"
+    ],
+    "used_count": 2
+}

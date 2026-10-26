@@ -1,0 +1,24 @@
+{
+    "name": "DrunkArtistSimulator",
+    "code": "// === Tab: mySketch ===\nvar scale;\nvar mPwr;\nvar decay;\nvar cents;\n\n\nvar particlesQuantity = 100;\n\nvar positionX = new Array(particlesQuantity);\nvar positionY = new Array(particlesQuantity);\nvar velocityX = new Array(particlesQuantity).fill(0);\nvar velocityY = new Array(particlesQuantity).fill(0);\nvar mass = new Array(particlesQuantity);\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tvar m = [width/2, height/2]\n\tcents = [new center(m[0],m[1],width, height), new center(m[0],m[1],width, height), new center(m[0],m[1],width, height)];\n\tnoStroke();\n\tfill(255, 255, 255, 6);\n\tscale = createSlider(0, 600, 300, 10);\n  scale.position(10, 10);\n  scale.style('width', '80px');\n\tdecay = createSlider(0, 600, 100, 10);\n  decay.position(10, 30);\n  decay.style('width', '80px');\n\tmPwr = createSlider(0, 600, 400, 10);\n  mPwr.position(10, 50);\n  mPwr.style('width', '80px');\n\t\n\tfor (var particle = 0; particle < particlesQuantity; particle++) {\n\t\tpositionX[particle] = width/2;\n\t\tpositionY[particle] = height/2;\n\t\tmass[particle] = random(.1, 2);\n\t}\n\tmaxi = (sqrt(pow(width, 2)) + pow(height, 2));\n}\n\nfunction draw() {\n\t//background(255, 255, 255, 1);\n\tfill(255*noise(frameCount/500+230), 255*noise(frameCount/600+734), 255*noise(frameCount/433));\n\tstroke(255*noise(frameCount/500+180), 255*noise(frameCount/600+784), 255*noise(frameCount/383), 3);\n\tfor (var particle = 0; particle < particlesQuantity; particle++) {\n\t\tvelocityX[particle] = 0\n\t\tvelocityY[particle] = 0\n\t\tfor (var p2 = 0; p2 < particlesQuantity; p2++) {\n\t\t\tv = createVector(positionX[particle]-positionX[p2], positionY[particle]-positionY[p2]);\n\t\t\tif (v.mag()<scale.value()+decay.value()){\n\t\t\t\tnewMag = (v.mag()-scale.value())*.0003*mass[p2];\n\t\t\t} else {\n\t\t\t\tnewMag = (constrain((decay.value()*2+scale.value())-v.mag(), 0, 200))*.0003*mass[p2];\n\t\t\t}\n\t\t\tv.rotate(random(-.1, .1))\n\t\t\tv.setMag(newMag)\n\t\t\tvelocityX[particle] -= v.x;\n\t\t\tvelocityY[particle] -= v.y;\n\t\t}\n\t\t\n\t\tfor (i=0; i<cents.length; i++){\n\t\t\tvar c = cents[i];\n\t\t\tv = createVector(positionX[particle]-c.pos.x, positionY[particle]-c.pos.y);\n\t\t\tnewMag = (constrain(mPwr.value()-v.mag(), 0, 200))*.03;\n\t\t\tv.setMag(newMag)\n\t\t\tvelocityX[particle] -= v.x;\n\t\t\tvelocityY[particle] -= v.y;\n\t\t}\n\t\t\n\t\tpositionX[particle] += velocityX[particle];\n\t\tpositionY[particle] += velocityY[particle];\n\n\t\t\n\t\tif ((positionX[particle] < 0 && velocityX[particle] < 0) || (positionX[particle] > width && velocityX[particle] > 0)) {\n\t\t\t\n\t\t\tvelocityX[particle] = -velocityX[particle];\n\t\t}\n\t\t\n\t\tif ((positionY[particle] < 0 && velocityY[particle] < 0) || (positionY[particle] > height && velocityY[particle] > 0)) {\n\t\t\t\n\t\t\tvelocityY[particle] = -velocityY[particle];\n\t\t}\n\t\t\n\t\trect(positionX[particle], positionY[particle], velocityX[particle]*10, velocityY[particle]*10);\n\t}\n\t\n\tfor (i=0; i<cents.length; i++){\n\t\t\tcents[i].move();\n\t\t}\n}\n\nclass center{\n\t\n\tconstructor(x, y, w, h){\n\t\tthis.pos = createVector(x, y);\n\t\tthis.speed = 6;\n\t\tthis.life = random(80000, 1000000);\n\t\tthis.w = w;\n\t\tthis.h = h;\n\t\tthis.n = createVector(random(-10,10), random(-10, 10))\n\t\tthis.n.setMag(this.speed)\n\t}\n\t\n\tmove(){\n\t\t\n\t\tthis.pos.add(this.n)\n\t\tif(this.pos.x>this.w||this.pos.x<0||this.pos.y>height||this.pos.y<0){\n\t\t\t//this.pos = createVector(constrain(this.pos.x, 0, this.w), constrain(this.pos.y, 0, this.y))\n\t\t\tthis.n.rotate(PI)\n\t\t}else{\n\t\t\tthis.n.rotate(.1*(noise(frameCount/100 + this.life)-.5))\t\n\t\t}\n\t}\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Gabe",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/735466",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:04:45",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

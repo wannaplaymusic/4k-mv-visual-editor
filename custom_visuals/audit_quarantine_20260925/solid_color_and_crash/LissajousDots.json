@@ -1,0 +1,24 @@
+{
+    "name": "LissajousDots",
+    "code": "// === Tab: mySketch ===\n// work: Lissajous dots [interactive]\n// author: k0ch\n// date: 2019-09-02\n\n// Math usage:\n// - Lissajous curve\n// - Linear interpolation\n\nlet points = [];\n\n//example coef values\nlet sin_coef = 0.002;\nlet cos_coef = 0.002;\nlet diff_coef = 20;\nlet size_coef = 200;\n\nconst points_num = 200;\n\nfunction preload() {\n  dot = loadImage(\"https://openprocessing.org/sketch/788798/files/dots.png\");\n  halo = loadImage(\"https://openprocessing.org/sketch/788798/files/dotg.png\");\t\n}\n\nfunction setup() {\n\t//initialize environment\n\tcreateCanvas(windowWidth, screen.availHeight);\n\tbackground(0);\n\t\n\t//initialize points\n\tfor (let i = 0; i < points_num; i++) {\n\t\tpoints[i] = [0,0]\n  }\n\t\n\t//initialize coefficients\n\tsin_coef = random(0.0001, 0.009);\n  cos_coef = random(0.0001, 0.009);\n\tdiff_coef = random(15, 30);\n\tsize_coef = random(200, 300);\n}\n\nfunction draw() {\n\tscale(1.5);\n\ttranslate(-160, -120);\n\t//center of image\n\tcx = width/2;\n\tcy = height/2;\n\t\n\t//time\n  t = millis();\n  \n\t//reset draw\n\tbackground(0);\n  \n\t// draw halo\n  for (let i = 0; i < points_num; i++)\n  {\n    points[i][0] = lerp(points[i][0], size_coef * sin((t+i*diff_coef)*sin_coef), 0.05);\n    points[i][1] = lerp(points[i][1], size_coef * cos((t+i*diff_coef)*cos_coef), 0.05); \n    image(halo, cx - 25 + points[i][0], cy - 25 + points[i][1]);\n  }\n  \n\t// draw points\n  for (let i = 0; i < points_num; i++)\n  {\n    image(dot, cx + points[i][0], cy + points[i][1]);\n  }\n}\n\nfunction mousePressed() {\n\tif ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) < width / 2){\n    sin_coef = random(0.0001, 0.009);\n    cos_coef = random(0.0001, 0.009);\n\t  diff_coef = random(15, 30);\n\t  size_coef = random(200, 300);\n\t}else{\n\t\tsave('pix.jpg');\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/788798",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:57:06",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -17,10 +17,12 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
+        "Deep Sleep.mp4",
         "Road Lines.mp4",
-        "Deep Sleep.mp4"
+        "Inner Sight.mp4",
+        "Warm Chord Swells.mp4"
     ]
 }

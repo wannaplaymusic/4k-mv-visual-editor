@@ -1,0 +1,29 @@
+{
+    "name": "Attractor0",
+    "code": "// === Tab: mySketch ===\n\nlet num = 1000;\nlet points = new Array(num).fill(0).map(e=> {\nreturn {\n  vx:0,\n  vy:0,\n  ax:0,\n  ay:0,\n  x:0,\n  y:0,\n}\n})\nlet settings = {\nmag:10,\nradius:1,\ndamp:0.95\n}\n\nfunction setup(){\n  createCanvas(windowWidth,windowHeight);\n  noStroke(); \n  fill(0);\n  ellipseMode(RADIUS);\n  background(0);\n  blendMode(ADD);\n  \n  for(let i =0; i< num; i++){\n    points[i].x= random(width);\n    points[i].y= random(height);\n  }\n\tconsole.log(points)\n  fill(0,0,0);\n  rect(0,0,width,height);\n  \n}\n\n\nfunction draw(){\n\n  // go through the points\n  for(let i=0; i<num; i++){\n\t\t\n    let pt = points[i]\n    if (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) {\n\t\tlet distance = dist(touchX, touchY, pt.x, pt.y); \n    if(distance > 3){ \n      pt.ax = settings.mag* (touchX - pt.x) / (distance * distance); \n      pt.ay = settings.mag * (touchY - pt.y) / (distance * distance);\n    }\n   \n\t\t}\n\t\t pt.vx+= pt.ax \n    pt.vy+= pt.ay \n    pt.vx = pt.vx*settings.damp;\n    pt.vy = pt.vy*settings.damp;\n    pt.x += pt.vx;  \n    pt.y += pt.vy;  \n    let absSpeed = dist(0,0,pt.vx,pt.vy); \n    let r = map(absSpeed, 0, 5, 128, 255); \n    let g = map(absSpeed, 0,5, 64, 255);\n    let b = map(absSpeed, 0,5, 128, 255);\n    fill(r, g, b, 32);\n    ellipse(pt.x,pt.y,settings.radius,settings.radius);\n  }\n  \n\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u252843",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1048454",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 18:00:53",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

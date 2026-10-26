@@ -1,0 +1,28 @@
+{
+    "name": "Genuary2412",
+    "code": "// === Tab: mySketch ===\n// x, y, vx, vy, c, dispersed?\nconst num = 1000\nconst ax = new Float32Array(num)\nconst ay = new Float32Array(num)\nconst avx = new Float32Array(num)\nconst avy = new Float32Array(num)\nconst ac = new Uint8Array(num * 3)\nconst ad = new Uint8Array(num)\n\nconst dispersionX = 100\nconst dispersionWidth = 100\n\nfunction drawLines() {\n\tstroke(255)\n\tstrokeWeight(5)\n\tline(dispersionX, 0, dispersionX, height)\n\tline(dispersionX + dispersionWidth, 0, dispersionX + dispersionWidth, height)\n\n\tstrokeWeight(1)\n}\n\nfunction setup() {\n\tcreateCanvas(640, 300)\n\tbackground(30)\n\n\tcolorMode(HSB)\n\tfor (let i = 0; i < num; i++) {\n\t\tax[i] = 0\n\t\tay[i] = height/2 + random(-1, 1)\n\t\tavx[i] = 1\n\t\tavy[i] = 0\n\t\tad[i] = 0\n\n\t\t// random color that doesn't mix red and blue\n\t\tlet hue = parseInt(random(0, 240))\n\t\tlet c = color(hue, 100, 100)\n\n\t\tac[i * 3] = red(c)\n\t\tac[i * 3 + 1] = green(c)\n\t\tac[i * 3 + 2] = blue(c)\n\t\t\n\t\tdrawLines()\n\t}\n\t\n\tcolorMode(RGB)\n}\n\nfunction draw() {\n\n\tfor (let i = 0; i < num; i++) {\n\t\tax[i] += avx[i]\n\t\tay[i] += avy[i]\n\n\t\tif (ax[i] > width) {\n\t\t\tax[i] = 0\n\t\t\tay[i] = height/2 + random(-1, 1)\n\t\t\tad[i] = 0\n\t\t}\n\n\t\tstroke(ac[i * 3], ac[i * 3 + 1], ac[i * 3 + 2], 50)\n\n\t\tpoint(ax[i], ay[i])\n\n\t\tif (ad[i] === 0 && ax[i] > dispersionX) {\n\t\t\tconst gd = (ac[i * 3 + 2] / 255) * 0.3\n\t\t\t\n\t\t\tlet rd = (ac[i * 3] / 255) * -0.3\n\t\t\trd -= gd * rd\n\t\t\t\n\t\t\tlet bd = (ac[i * 3 + 2] / 255) * 0.3\n\t\t\tbd += gd * bd\n\t\t\t\n\t\t\tavy[i] = rd + bd \n\t\t\tad[i] = 1\n\t\t}\n\t\tif (ad[i] === 1 && ax[i] > dispersionX + dispersionWidth) {\n\t\t\tavy[i] = 0\n\t\t\tad[i] = 2\n\t\t}\n\t}\n\t\n\tdrawLines()\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Tarwin Stroh-Spijer",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2135777",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:20:48",
+    "used_in_videos": [
+        "Chamber 17.mp4"
+    ],
+    "used_count": 1,
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

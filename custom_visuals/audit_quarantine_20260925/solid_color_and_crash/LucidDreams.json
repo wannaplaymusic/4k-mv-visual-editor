@@ -1,0 +1,24 @@
+{
+    "name": "LucidDreams",
+    "code": "// === Tab: mySketch ===\nlet NB_PARTICLES = 10000;\nlet MAX_PARTICLE_SPEED = 3;\n\nlet noiseZ;\nlet noiseSpeedZ, stepNoiseXY;\nlet TP = TWO_PI;\nmyVector tabParticles[];//array of particles\nlet c1, c2;\n\nfunction setup()\n{\n  createCanvas(1024, 768);\n  background(0);\n  colorMode(HSB, 255);\n  initialize();\n}\n\nfunction initialize()\n{\n  //c1 = random(180, 255);\n  //c2 = random(255 - c1);\n  noiseZ = random(123456);\n  noiseSpeedZ = random(.005, .015) * (random(1) < .5 ? 1 : -1);\n  stepNoiseXY = random(.001, .01);\n  tabParticles = new Array(NB_PARTICLES);\n  for (i = 0; i < NB_PARTICLES; i++) {\n    tabParticles[i] = new myVector();\n  }\n  background(0);\n\tstrokeWeight(4);\n}\n\nfunction draw()\n{ \n\tc1 = random(180, 255);\n  fill(0, 89);\n  noStroke(); \n  rect(0, 0, width, height);\n  \n  noiseZ += noiseSpeedZ;\n  for (i = 0; i < NB_PARTICLES; i++){\n    tabParticles[i].update();\n  }\n}\n\nfunction mousePressed() {\n  save('pix.jpg');\n}\n\nfunction keyPressed() {\n  for (i = 0; i < NB_PARTICLES; i++) {\n    tabParticles[i] = new myVector();\n  }\n}\n\nclass myVector {\n  x, y;\n  myColor;\n\n  constructor() {\n    initPart();\n  }\n\n  function initPart(){\n    x = random(width);\n    y = random(height);\n\n    let n = noise(x * stepNoiseXY, y * stepNoiseXY, noiseZ);\n    myColor = color(c1, 255, 255);\n  }\n\n  function update(){\n    var n = (noise(x*stepNoiseXY, y*stepNoiseXY, noiseZ));\n    n = map(n, .1, .9, 0, TP);\n\n    x += n*cos(n * TP) * MAX_PARTICLE_SPEED;\n    y += n*sin((1-n) * TP) * MAX_PARTICLE_SPEED;\n\n    if ((x < 0) || (x > width) || \n      (y < 0) || (y > height)) {\n      initPart();\n    }\n    stroke(myColor, 160);\n    point(x, y);\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/783197",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:56:31",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,31 @@
+{
+    "name": "ParticleGenerator2",
+    "code": "// === Tab: ixtamParticles.js ===\nlet inc = 0.1;\nlet scl = 22;\nlet cols, rows;\nlet zoff = 0;\nlet fr;\nlet particles = [];\nlet flowfield;\n\nfunction setup() {\n  createCanvas(1000, 1000);\n  colorMode(RGB, 30, 99, 111, 1);\n  cols = floor(width / scl);\n  rows = floor(height / scl);\n  fr = createP('');\n  flowfield = new Array(cols * rows);\n  for (let i = 0; i < 2000; i++) {\n    particles[i] = new Particle();\n  }\n  background(0);\n}\n\nfunction draw() {\n  let yoff = 0;\n  for (let y = 0; y < rows; y++) {\n    let xoff = 0;\n    for (let x = 0; x < cols; x++) {\n      let index = x + y * cols;\n      let angle = noise(xoff, yoff, zoff) * TWO_PI * 2;\n      let v = p5.Vector.fromAngle(angle);\n      v.setMag(0.1);\n      flowfield[index] = v;\n      xoff += inc;\n      stroke(0, 0.001);\n      push();\n      translate(x * scl, y * scl);\n      rotate(v.heading());\n      line(0, 0, scl, 0);\n      pop();\n    }\n    yoff += inc;\n    zoff += 0.05;\n  }\n  for (let i = 0; i < particles.length; i++) {\n    particles[i].follow(flowfield);\n    particles[i].update();\n    particles[i].edges();\n    particles[i].show();\n  }\n  fr.html(floor(frameRate()));\n}\n\nclass Particle {\n  constructor() {\n    this.pos = createVector(random(width), random(height));\n    this.vel = createVector(0, 0);\n    this.acc = createVector(0, 0);\n    this.maxspeed = 0.5;\n    this.h = 222;\n  }\n\n  update() {\n    this.vel.add(this.acc);\n    this.vel.limit(this.maxspeed);\n    this.pos.add(this.vel);\n    this.acc.mult(0);\n  }\n\n  follow(vectors) {\n    let x = floor(this.pos.x / scl);\n    let y = floor(this.pos.y / scl);\n    var index = x + y * cols;\n    let force = vectors[index];\n    this.applyForce(force);\n  }\n\n  applyForce(force) {\n    this.acc.add(force);\n  }\n\n  show() {\n    stroke(this.h, 22, 55, 55);\n    this.h = this.h + 1;\n    if (this.h > 120) {\n      this.h = 0.1;\n    }\n    point(this.pos.x, this.pos.y);\n  }\n\n  edges() {\n    if (this.pos.x > width) {\n      this.pos.x = 0;\n    }\n    if (this.pos.x < 0) {\n      this.pos.x = width;\n    }\n    if (this.pos.y > height) {\n      this.pos.y = 0;\n    }\n    if (this.pos.y < 0) {\n      this.pos.y = height;\n    }\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "ixtam",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1910668",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:36:12",
+    "used_in_videos": [
+        "Nocturnal Infrastructure.mp4"
+    ],
+    "used_count": 1
+}

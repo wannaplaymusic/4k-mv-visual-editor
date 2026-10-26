@@ -1,0 +1,24 @@
+{
+    "name": "AncientCliffsidePaths",
+    "code": "// === Tab: mySketch ===\n//Credit to the original sketch creator Antrague (https://openprocessing.org/user/68165/) and previous individuals that forked this \n//(Richard Bourne https://openprocessing.org/user/162823/) and clustah (https://openprocessing.org/user/92042/?view=sketches)\n\nlet particles1 = []; //1. pole castic\nlet num = 10000; //pocet castic\nlet counter=0\n\nfunction setup() \n{\n\tcreateCanvas(16/9*windowHeight, windowHeight);\n\tbackground(0);\n\tfor(let i=0;i<num;i++)\n\t{\n    particles1.push(createVector(random(width), random(height))) \n\t\t\t//randomne rozmistime castice po obrazovce\n\t}\n}\n\nfunction draw() \n{\n\tif(counter<28) \n\t{\n\t\tcounter++\n\t\tcolorMode(HSB);\n\t\t// blendMode(ADD);\n\t\tif(counter<10) stroke(\"green\")\n\t\telse stroke (60+counter,30,counter+40, 50);\n\t\tfor(let i=0;i<num;i++)\n\t\t{\n\t\t\tlet p = particles1[i];\n\t\t\tif(counter>10) point(p.x+random(-3,10), p.y);\n\t\t\telse if(counter<10) point(p.x+random(-3,10), p.y+random(50));\n\t\t\tp.x+=(noise(p.x/200,p.y/200,300000000)-0.54)*2;\n\t\t\tp.y+=(noise(p.x/200,p.y/200,30000)-0.5)*20;\n  \t}\n\t}\n}\n\nfunction keyPressed(){\n  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Joe DeNavas (DD89)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2690063",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:49:53",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

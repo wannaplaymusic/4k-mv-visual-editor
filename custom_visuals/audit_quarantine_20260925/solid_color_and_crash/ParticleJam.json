@@ -1,0 +1,24 @@
+{
+    "name": "ParticleJam",
+    "code": "// === Tab: ParticleJam ===\nvar particles = [];\n\nfunction setup() {\n  createCanvas(1112, 834);\n  background(51);  \n  colorMode(HSB, 255);\n\t\n  for(var i = 0; i < 25; i++){\n  \tparticles[i] = new Particle();\n  }\n} \n\nfunction draw() {\n  \n  for(var i = 0; i < particles.length; i++){\n    particles[i].update();\n    particles[i].show();\n  }\n}\n\nfunction mousePressed(){\n  save('pix.jpg');\n}\n\n\n// === Tab: Particle ===\nfunction Particle() {\n  \n  this.pos = createVector(random(width), random(height));\n  this.vel = createVector(random(5) + 1, random(5) + 1);\n  this.r = 1;\n  this.rcount = 0;\n  this.rthresh = random(300) + 50;\n  this.phase = 0;\n  this.maxr = random(400) + 20;\n  \n  this.dice = random(1);\n  if(this.dice < 0.5){\n  \tthis.vel.x = this.vel.x * -1;\n  } \n  this.dice = random(1);\n  if(this.dice < 0.5){\n  \tthis.vel.y = this.vel.y * -1;\n  }\n   \n  this.current = color(random(255), 255, random(150, 255));\n  this.next = color(random(255), 255, random(150, 255));\n  this.lerped = color(random(255), 255, random(150, 255));\n  this.counter = 0;\n  \n  this.update = function() {\n    \n    if(this.pos.x < 0 || this.pos.x > width){\n      this.vel.x = this.vel.x * -1;\n    }\n    \n    if(this.pos.y < 0 || this.pos.y > height){\n      this.vel.y = this.vel.y * -1;\n    }\n    \n    this.pos = this.pos.add(this.vel);\n  }\n  \n  this.show = function() {\n\tnoStroke();\n    \n    if(this.counter > 1){\n      this.counter = 0;\n      this.current = this.next;\n      this.next = color(random(255), 255, random(150, 255));\n    }\n    \n    this.lerped = lerpColor(this.current, this.next, this.counter);\n    this.counter += 0.01;\n    stroke(this.lerped);\n    noFill();\n    \n    if(this.rcount > this.rthresh){\n    \tthis.rcount = 0;\n    }\n    this.phase = this.rcount / this.rthresh;\n   \tthis.r = sin(this.phase * TWO_PI) * this.maxr;   \n    \n    this.rcount += 1;\n    \n    ellipse(this.pos.x, this.pos.y, this.r, this.r);\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/806225",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:53:59",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

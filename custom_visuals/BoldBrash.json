@@ -1,0 +1,28 @@
+{
+    "name": "BoldBrash",
+    "code": "// === Tab: mySketch ===\nlet p = [];\nlet n;\nlet img;\n\nfunction setup() {\n\tcreateCanvas(600, 750);\n\tbackground(255);\n\t\n\timg = loadImage('https://openprocessing.org/sketch/925079/files/pintura.png');\n\tn = 500;\n\t\n\tfor(let i = 0; i < n; i++) {\n\t\tp.push(new Pincel());\n\t}\n}\n\nfunction draw() {\n\tfor(let i = 0; i < n; i++) {\n\t\tp[i].display();\n\t\tp[i].move();\n\t\tp[i].checkEdges();\n\t}\n}\n\nclass Pincel {\n\tconstructor() {\n\t\tthis.pos = createVector(width/2, height/2);\n\t\tthis.vel = createVector();\n\t\tthis.acel = createVector();\n\t}\n\t\n\tmove() {\n\t\tthis.acel = p5.Vector.random2D();\n\t\tthis.acel.mult(0.02);\n\t\tthis.vel.add(this.acel);\n\t\tthis.vel.limit(5);\n\t\tthis.pos.add(this.vel);\n\t}\n\t\n\tdisplay() {\n\t\tlet c = img.get(this.pos.x, this.pos.y);\n\t\tnoFill();\n\t\tstroke(c);\n\t\tstrokeWeight(3);\n\t\trectMode(CENTER);\n\t\trect(this.pos.x, this.pos.y, 10, 10);\n\t}\n\t\n\tcheckEdges() {\n\t\tif(this.pos.x < 0 || this.pos.x > width)\n\t\t\tthis.vel.x *= -1;\n\t\t\n\t\tif(this.pos.y < 0 || this.pos.y > height)\n\t\t\tthis.vel.y *= -1;\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "raf_rgb",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/925079",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:39:32",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_WHITE_SCREEN (All Frames Mean=255.00)",
+    "used_in_videos": [
+        "Blackout Interval.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,22 @@
+{
+    "name": "ShadertoyWater",
+    "code": "// === Tab: mySketch ===\nvar gl, gpu;\n\nfunction setup() {\n\tcreateCanvas(1122, 434, WEBGL);\n\tgl = this.canvas.getContext('webgl');\n\tgl.disable(gl.DEPTH_TEST);\n\tgpu = createShader(vert, frag); //shaders are loaded\n\tshader(gpu); //shaders are applied\t\n}\n\nfunction draw() {\n\tgpu.setUniform(\"iResolution\", [width, height]); //pass some values to the shader\n\tgpu.setUniform(\"iTime\", millis() * .002);\n\t// print(millis())\n\tshader(gpu);\n\tbox(width, height);\n}\n\nfunction windowResized() {\n\tresizeCanvas(width, height);\n}\n\n// save jpg\nlet lapse = 0;    // mouse timer\nfunction mousePressed(){\n  if (millis() - lapse > 200){\n    save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n    lapse = millis();\n  } \n}\n\nvar frag = `\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform vec2 iResolution;\nuniform float iTime;\n\n#define TAU 6.28318530718\n#define MAX_ITER 5\nvoid main(void) {\n\tfloat time = iTime * .5+23.0;\n    // uv should be the 0-1 uv of texture...\n\tvec2 uv = gl_FragCoord.xy / iResolution.xy;\n    \n#ifdef SHOW_TILING\n\tvec2 p = mod(uv*TAU*2.0, TAU)-250.0;\n#else\n    vec2 p = mod(uv*TAU, TAU)-250.0;\n#endif\n\tvec2 i = vec2(p);\n\tfloat c = 1.0;\n\tfloat inten = .005;\n\n\tfor (int n = 0; n < MAX_ITER; n++) \n\t{\n\t\tfloat t = time * (1.0 - (3.5 / float(n+1)));\n\t\ti = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));\n\t\tc += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),p.y / (cos(i.y+t)/inten)));\n\t}\n\tc /= float(MAX_ITER);\n\tc = 1.17-pow(c, 1.4);\n\tvec3 colour = vec3(pow(abs(c), 3.0));\n    colour = clamp(colour + vec3(0.0, 0.35, 0.5), 0.0, 1.0);\n\n\t#ifdef SHOW_TILING\n\t// Flash tile borders...\n\tvec2 pixel = 2.0 / iResolution.xy;\n\tuv *= 2.0;\n\tfloat f = floor(mod(iTime*.5, 2.0)); \t// Flash value.\n\tvec2 first = step(pixel, uv) * f;\t\t   \t// Rule out first screen pixels and flash.\n\tuv  = step(fract(uv), pixel);\t\t\t\t// Add one line of pixels per tile.\n\tcolour = mix(colour, vec3(1.0, 1.0, 0.0), (uv.x + uv.y) * first.x * first.y); // Yellow line\n\t#endif\n    \n\tgl_FragColor = vec4(colour, 1.0);\n}\n`\nvar vert = `\n#ifdef GL_ES\nprecision highp float;\n#endif\n#extension GL_OES_standard_derivatives : enable\nattribute vec3 aPosition;\nattribute vec3 aNormal;\nattribute vec2 aTexCoord;\nattribute vec4 aVertexColor;\n\nvarying vec3 var_vertPos;\nvarying vec4 var_vertCol;\nvarying vec3 var_vertNormal;\nvarying vec2 var_vertTexCoord;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\n\nvoid main() {\n\tgl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 2.0);\n\tvar_vertPos      = aPosition;\n\tvar_vertCol      = aVertexColor;\n\tvar_vertNormal   = aNormal;\n\tvar_vertTexCoord = aTexCoord;\n}\n`\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u362208",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/1859645",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-08 23:08:16"
+}

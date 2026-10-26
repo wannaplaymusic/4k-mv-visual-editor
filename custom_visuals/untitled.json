@@ -1,0 +1,28 @@
+{
+    "name": "untitled",
+    "code": "// === Tab: mySketch ===\n//For the #wccChallenge on theme of 'Don't touch'.\n//The hands are mine, photographed by me.\n//The stop-motion frames are moving through an array via simplex noise (perlin's effect was not smooth enough)\n//and setting off the other effects above frame 17.\n\n//I retitled it several times before leaving it untitled. I think because any title seemed\n//to give it too specific a meaning.\n\n\n\n\nlet h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15, h16, h17, h18, h19, h20, h21\nlet hand=[]\nlet simplex\nlet streamers=[]\n\nfunction preload(){\nh1=loadImage('https://openprocessing.org/sketch/2292631/files/7585.jpeg');\nh2=loadImage('https://openprocessing.org/sketch/2292631/files/7586.jpeg');\nh3=loadImage('https://openprocessing.org/sketch/2292631/files/7587.jpeg');\nh4=loadImage('https://openprocessing.org/sketch/2292631/files/7588.jpeg');\nh5=loadImage('https://openprocessing.org/sketch/2292631/files/7589.jpeg');\nh6=loadImage('https://openprocessing.org/sketch/2292631/files/7590.jpeg');\nh7=loadImage('https://openprocessing.org/sketch/2292631/files/7591.jpeg');\nh8=loadImage('https://openprocessing.org/sketch/2292631/files/7592.jpeg');\nh9=loadImage('https://openprocessing.org/sketch/2292631/files/7593.jpeg');\nh10=loadImage('https://openprocessing.org/sketch/2292631/files/7594.jpeg');\nh11=loadImage('https://openprocessing.org/sketch/2292631/files/7595.jpeg');\nh12=loadImage('https://openprocessing.org/sketch/2292631/files/7596.jpeg');\nh13=loadImage('https://openprocessing.org/sketch/2292631/files/7597.jpeg');\nh14=loadImage('https://openprocessing.org/sketch/2292631/files/7598.jpeg');\nh15=loadImage('https://openprocessing.org/sketch/2292631/files/7599.jpeg');\nh16=loadImage('https://openprocessing.org/sketch/2292631/files/7600.jpeg');\nh17=loadImage('https://openprocessing.org/sketch/2292631/files/7601.jpeg');\nh18=loadImage('https://openprocessing.org/sketch/2292631/files/7602.jpeg');\nh19=loadImage('https://openprocessing.org/sketch/2292631/files/7603.jpeg');\nh20=loadImage('https://openprocessing.org/sketch/2292631/files/7604.jpeg');\nh21=loadImage('https://openprocessing.org/sketch/2292631/files/7605.jpeg');\n\t\n\n}\n\nfunction setup() {\n\tcreateCanvas(1100, 650);\n\t\n\t\n\tsimplex= new OpenSimplexNoise(Date.now())\n\tbackground(255);\n\thand.push(h1, h1, h2,h2,  h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15, h16, h17, h18, h19, h20, h21, h21, h21, h21);\t\n\n}\n\nfunction draw() {\n\tbackground(255);\n\n\tlet hframe= floor(map(simplex.noise2D(frameCount/70, 21), -1, 1, 0, hand.length))\n \n\tlet pic= hand[hframe]\n\tpush()\n\ttranslate(0, 100)\n\tscale(0.5, 0.5)\n\timage(pic, 0, 0)\npop()\n\tpush()\n\ttranslate(width, 100)\n\tscale(-0.5,0.5) \n\timage(pic, 0, 0)\n\tpop()\n\tstroke(20)\n\tif(hframe>17){\n\t\tfor(let i=0; i<3; i++){\n\t\t\tfor (let i = 0; i < 800; i++) {\n\t\tstrokeWeight(random(3))\n\t\tpush()\n\t\ttranslate(randomGaussian(width / 2, 50), randomGaussian(150, 50))\n\t\tline(-5, 0, +5, 0)\n\t\tline(0, -5, 0, 5)\n\t\tpop()\n\t}\n\tstreamers.push(new streamer())\t\n\t\t}\n\t}\n\t\n\t\n\tfor(let i=0; i<streamers.length; i++){\n\t\n\tstreamers[i].stream();\n\tstreamers[i].show();\n\tstreamers[i].shutup();\n\t}\n}\n\n\nclass streamer{\n\tconstructor(){\n\t\tthis.length=1\n\t\tthis.rot= random(TWO_PI)\n\t\tthis.dist=50\n\t\tthis.theta=random(10000)\n\t\tthis.targetLength=random(30, 150)\n\t}\n\t\n\tshutup(){\n\t\tif(this.dist-this.length>250){\n\t\t\tlet index = streamers.indexOf(this);\n      streamers.splice(index, 1);\n\t\t}\n\t}\n\t\n\tstream(){\n\t\tif(this.length<this.targetLength){\n\t\t\tthis.length+=1\n\t\t}\n\t\tthis.dist+=2\n\t\tthis.theta+=0.2\n\t}\n\tshow(){\n\t\tlet alpha\n\t\tlet alphaWobble= noise(this.theta)\n\t\tstrokeCap(SQUARE)\n\t\tif(alphaWobble>0.3){\n\t\talpha=255\n\t\t} else{\n\t\talpha=0\n\t\t}\n\t\tlet sw= map(sin(this.theta), -1, 1, 0.1, 3)\n\t\tstrokeWeight(sw)\n\t\tstroke(255, alpha)\n\t\tpush()\n\t\ttranslate(width/2, 150)\n\t\trotate(this.rot);\n\t\tline(this.dist, 0, this.dist - this.length, 0)\n\t\tpop()\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "haito",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2292631",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:11:07",
+    "used_in_videos": [
+        "Ultimate Driving Immersion.mp4",
+        "Sub Pressure Loop.mp4"
+    ],
+    "used_count": 2,
+    "is_starred": false
+}

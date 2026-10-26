@@ -1,0 +1,26 @@
+{
+    "name": "SunsetafterRain",
+    "code": "// === Tab: mySketch ===\n\nlet colors=['#3e3e4b','#8c1c00','#ed5f00','#faf8a5','#681f01']\nlet drips=[]\nlet fall=0\nlet theFont\n\nfunction preload(){\ntheFont=loadFont('https://openprocessing.org/sketch/1956501/files/EBGaramond-VariableFont_wght.ttf')\n}\n\nfunction setup() {\n\tcreateCanvas(windowHeight, windowHeight);\n\tbackground('#E0DBD7');\n\tbackground(255)\n  pixelDensity(1)\n\t\n\tloadPixels()\n\tfor(let x=0; x<width; x++){\n\t\tfor(let y=0; y<height; y+=floor(random(1, 4))){\n\tvar index = (x + y * width)*4;\n\t\tlet avalue= map(noise(x/100, y/100), 0, 1, 0, 255)\n\t  pixels[index+0]= 0;\n    pixels[index+1]= 0;\n    pixels[index+2]= 0;\n    pixels[index+3]= avalue;\t\t\n\t\t}\n\t}\nupdatePixels()\n\tlet space= width/20\n\ttextSize(width/30)\n\ttextFont(theFont)\n\tpush()\n\ttranslate(width/8, height/3)\n\tnoStroke()\n\tfill(50)\n\t\n\t\n\tpop()\n\t\n\n}\n\nfunction draw() {\n\t\n\tif(fall<height){\n\t\tif(frameRate<40){\n\tfall+=1\n\t} else{\n\tfall+=0.2\t\n\t}\n\t}\n\tif(frameCount%2==0){\n\tlet x= random(width)\n\tlet y= random(-20, fall)\n\t\n\t\n\tlet c=colors[floor(map(y, -20, height, 0, 5))]\n\t\n\t\n\tlet xr=random(0, 100)\n\tlet yr=random(0, 100)\n\tlet xVel=random(-0.2, 0.2)\n\tlet yVel= random(random(3.2, 5))\n\tlet v= createVector(xVel, yVel)\n\tlet amount= floor(random(1, 22))\n\tfor(let i=0; i<amount; i++){\n\tdrips.push(new drip(x+randomGaussian(0, xr), y+randomGaussian(0, yr), color(c), v))\n\t}\n\t}\n\tfor(let d of drips){\n\t\td.droop();\n\t\td.dry();\n\t}\n\t\n//uncomment the following lines if you want things to start getting weird\n\t\n\t// let g=get()\n\t// push()\n\t// clear()\n\t// image(g, -width*0.0001, -height*0.0001, width*1.0002, height*1.0001)\n\t// pop()\n\t\n}\n\n\n\nclass drip {\n\tconstructor(x, y, c, v){\n\t\tthis.pos= createVector(x, y);\n\t\tthis.acc= createVector(0, 0);\n\t\tthis.vel= v\n\t\tthis.color=c;\n\t\tthis.stroke=c\n\t\tthis.alpha=50\n\n\t\tthis.size=random(3, 10)\n\t\tif(frameCount<100){\n\t\tthis.sizeVel=random(0.45, 5)\t\n\t\t} else{\n\t\tthis.sizeVel=random(0.3, 0.5)\n\t\t}\n\t\tthis.sizeD= this.size*2\n\t\tthis.sizeAcc=-this.sizeVel/100\n\t\tthis.sNoise=random(1000)\n\t\tthis.timer=0\n\t\tthis.r= this.vel.heading()\n\t}\n\t\n\t droop(){\n\t\t this.sNoise+=0.01\n\t\t this.timer+=1\n\t\t if(this.vel.y>0.1){\n\t\t\tthis.acc=createVector(0, -0.01)\n\t\t } else{\n\t\t\t this.acc=createVector(0, 0)\n\t\t\t this.vel=createVector(0, 0)\n\t\t }\n\t\t\n\tthis.vel.add(this.acc);\n\tthis.pos.add(this.vel);\n\t\tthis.alpha-=0.1\n\tthis.stroke.setAlpha(this.alpha/2)\n\tthis.color.setAlpha(this.alpha)\n\tfill(this.color)\n\tstroke(this.stroke)\nif(this.size<this.sizeD){\n\tthis.size+=this.sizeVel\n}\n\tlet sOff= map(noise(frameCount/100, this.sNoise), 0, 1, -this.size/3, this.size/3)\n\tpush()\n\t\t translate(this.pos.x, this.pos.y)\n\t\t rotate(this.r-PI/2)\n\tarc(0, 0, this.size+sOff, this.size+sOff, 0, PI)\n\t\tpop()\n\t }\t \n\t \n\tdry(){\n\t\tif(this.timer>100){\n\t\t\t let index = drips.indexOf(this);\n      drips.splice(index, 1);\n\t\t\t\n\t\t}\n\t\t\n\t}\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Kevin Lee",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1956501",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:33:38",
+    "used_in_videos": [
+        "Contemporary Core Universe.mp4"
+    ],
+    "used_count": 1
+}

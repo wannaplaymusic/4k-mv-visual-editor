@@ -1,0 +1,24 @@
+{
+    "name": "120dots",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n  createCanvas(805, 805);\n}\n\nfunction draw() {\n  background(0);\n  \n  // S\n  strokeWeight(2);\n  stroke(88);\n  noFill();\n  rect(15, 15, 380, 380);\n  rect(410, 15, 380, 380);\n  rect(15, 410, 380, 380);\n  rect(410, 410, 380, 380);\n  \n  // let int s = millis();\n  \n  // G\n  strokeWeight(4);\n  fill(255, 255, 255, 255);\n  stroke(255, 255, 255, 100);\n\n  for(f = 0; f<120; f++)\n  {\n      // 1\n      ellipse(206 + 150 * cos((s-f*97.7)*0.000375), 206 + 100 * sin((s-f*220)*0.0005), 5, 5);\n      // 2\n      ellipse(599 + 150 * sin((s+f*250)*0.0011), 206 - 100 * cos((s+f*200)*0.0015), 5, 5);\n      // 3\n      ellipse(206 + 150 * sin((s+f*200)*0.0011), 599 - 100 * cos((s+f*250)*0.0015), 5, 5);\n      // 4\n      ellipse(599 + 150 * cos((s-f*220)*0.000375), 599 + 100 * sin((s-f*220)*0.0005), 5, 5);\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "k0ch",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/747187",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:59:43",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,24 @@
+{
+    "name": "OP08basedon1763183byAReuland",
+    "code": "// === Tab: mySketch ===\nlet simplex\nlet theta=0\nlet xNoise, yNoise\nlet xMove\nlet yMove\nlet scaler=1\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n\t simplex = new OpenSimplexNoise(Date.now());\n\txNoise= new noiseLoop(2, 2, 888)\n\tyNoise= new noiseLoop(3, 7, 333)\n\txMove=random(22)\n\tyMove=random(8)\n\t\n}\n\nfunction draw() {\n\tif(scaler>0){\nfill(0, 100)\n\tstroke(255)\n\tpush()\n\txMove+=0.12\n\tyMove+=0.07\n\txmover= map(simplex.noise2D(xMove, frameCount/333), -9, 3, -width/11, width/33)\n\tymover= map(simplex.noise2D(yMove, frameCount/222), -9, 3, -height/3, height/33)\n\ttranslate(width/2+xmover, height/2+ ymover)\n\tbeginShape()\n\tscale(scaler)\n\tfor(let i=0; i<=TAU; i+=TAU/100){\n\t\tlet x= cos(i)*xNoise.value(i)\n\t\tlet y= sin(i)*yNoise.value(i)\n\t\tcurveVertex(x, y)\n\t}\n\tendShape(CLOSE)\n\tpop()\nscaler-=0.00001\n\t}\n}\n\nclass noiseLoop{\n\n\tconstructor(diameter, min, max){\n\t\tthis.diameter=diameter\n\t\tthis.min=min\n\t\tthis.max=max\n\t}\n\tvalue(theta){\n\t\tlet xoff=map(cos(theta), -1, 1, 0, this.diameter)\n\t\tlet yoff=map(sin(theta), -1, 1, 0, this.diameter)\n\t\tlet r= simplex.noise3D(xoff, yoff, frameCount/100)\n\t\treturn map(r, -1, 1, this.min, this.max)\n\t\t\n\t}\n\t\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "zigel",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2349561",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:19:59",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

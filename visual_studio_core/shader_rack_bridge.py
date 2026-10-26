@@ -60,6 +60,14 @@ class ShaderRackBridge:
             "default_intensity": 0.85,
             "category": "atmospheric",
             "desc": "大氣層電離色帶在背景中柔和飄盪"
+        },
+        {
+            "id": "screen_space_fluid",
+            "name": "螢幕空間水銀流體 (SSFR Fluid)",
+            "file": "screen_space_fluid.frag",
+            "default_intensity": 0.90,
+            "category": "fluid",
+            "desc": "雙邊保邊深度平滑與法線重建，粒子融合成高反射水銀金屬流體"
         }
     ]
 

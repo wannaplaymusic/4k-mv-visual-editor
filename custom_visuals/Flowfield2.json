@@ -12,15 +12,22 @@
         "batch_import",
         "openprocessing",
         "audio_reactive",
-        "restored"
+        "restored",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
     ],
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 4,
     "is_starred": false,
     "used_in_videos": [
+        "Static Latitude.mp4",
         "Echo Control Sector.mp4",
-        "Static Latitude.mp4"
+        "Hypnotic Core Drift.mp4",
+        "Output Level.mp4"
     ]
 }

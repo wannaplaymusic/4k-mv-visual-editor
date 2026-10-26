@@ -1,0 +1,24 @@
+{
+    "name": "SphereOfInfluence",
+    "code": "// === Tab: mySketch ===\n//let Of Influence\n//Instagram - @fuzzylogic.io\n//Tumblr - @fuzzylogic-io\n//Twitter - @fuzzylogic_io\n//Reddit - @fuzzylogic-io\n//let of https://openprocessing.org/sketch/729004\n\nlet mainradius = 300; //大きさ\nlet Yangle = 0;　//回転\nlet speed = 0.01; //回転スピード\nlet offset = 10;　//水平、垂直で値を設定\nlet ring = 2.75; //遊動リング\n\nfunction setup() {\n\tcreateCanvas(500, 500, WEBGL); //サイズを指定、立体に\n\tframeRate(40); //フレームレートを指定\n}\n\nfunction draw() {\n\tif (keyPressed) {　//キーボードを押したら\n\t\tif (key == CODED) {　//コード化されたキーが押された\n\t\t\tif (keyCode == UP) { //↑を押すと\n\t\t\t\tring += 1; //リングがプラスされる\n\t\t\t}\n\t\t\tif (keyCode == DOWN) { //↓を押すと\n\t\t\t\tif (ring > 1) { //リングが1以上の時\n\t\t\t\t\tring -= 1; //リングがマイナスされる\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\tbackground(0); //背景が黒\n\ttranslate(250, 250); //ディスプレイウィンドウの中心座標を変える\n\trotateY(Yangle);\n\trotateX(-90);\n\trotateZ(-10);\n\tfor (y = -mainradius / 2; y < mainradius / 2; y += round(ring)) {\n\t\tstrokeWeight(ring * sin(y + offset)); //線の太さ\n\t\tlet t = 0;\n\t\twhile (t < TWO_PI) { //円の円周と直径の比の2倍の値がtより大きい時（繰り返し）\n\t\t\tlet radius = sqrt(pow((mainradius - 40) / 2, 2) - pow(y, 2)); //平方根の設定？\n\t\t\tlet x = radius * cos(t); //\n\t\t\tlet z = radius * sin(t);\n\t\t\tstroke(map(sin(y + offset), -1, 1, 0, 255)); //線の色と場所？\n\t\t\tpoint(x, y, z);\n\t\t\tt += 0.1;\n\t\t}\n\t}\n\tYangle += speed; \n\toffset += 0.1; //回転中心の移動量の設定\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u333055",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-05"
+    ],
+    "url": "https://openprocessing.org/sketch/1605643",
+    "batch_id": "batch_20261005_141539",
+    "batch_date": "2026-10-05",
+    "date_added": "2026-10-05 16:51:33",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

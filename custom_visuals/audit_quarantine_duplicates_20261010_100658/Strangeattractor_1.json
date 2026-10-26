@@ -1,0 +1,31 @@
+{
+    "name": "Strangeattractor",
+    "code": "// === Tab: mySketch ===\nlet N = 500000;\nlet fbWide, fbHigh;\nlet oldPos, newPos;\nlet updateShdr, drawShdr;\nlet b = 0.19;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight, WEBGL);\n    smooth();\n\t\n\tupdateShdr = createShader( vsUpdate, fsUpdate );\n\tdrawShdr = createShader( vsDraw, fsDraw );\n\n\tfbWide = 1024;\n  fbHigh = ceil( N / fbWide );\n  let fbOptions = { format: FLOAT,\n\t\t\t\t\t\t\t\t\t  depth: false, antialias: false, density: 1,\n\t\t\t\t\t\t\t\t\t  width: fbWide, height: fbHigh };\n  oldPos = createFramebuffer( fbOptions );\n  newPos = createFramebuffer( fbOptions );\n  oldPos.loadPixels();\n  for( let i=0; i<N; i++ ) {\n    oldPos.pixels[4*i  ] = random( -1, 1 );\n    oldPos.pixels[4*i+1] = random( -1, 1 );\n    oldPos.pixels[4*i+2] = 2.0*i/N-1;\n    oldPos.pixels[4*i+3] = 1.0;\n  }\n  oldPos.updatePixels();\n}\n\nfunction windowResized() {\n  let canvasSize = max(windowWidth, windowHeight);\n  resizeCanvas( canvasSize, canvasSize );\n}\n\nfunction draw() {\n\tlet t = frameCount/60.0;\n\tb = 0.14 + 0.06 * sin(TAU*t/37.018);\n\t\n\tnewPos.begin();\n\tupdateShdr.bindShader();\n\tupdateShdr.setUniform( \"b\", b );\n\tupdateShdr.setUniform( 'data', oldPos );\n\tupdateShdr.bindTextures();\n\tlet gl = newPos.gl;\n\tgl.drawArrays( gl.TRIANGLES, 0, 3 );  // a single full-screen triangle\n\tupdateShdr.unbindTextures();\n\tupdateShdr.unbindShader();\n\tnewPos.end();\n\t\n\tcamera( 0, 0, -3,  0, 0.1, 0,  0, 1, 0 );\n\tperspective( PI/3, 1.0*width/height, 1, 10 );\n\trotateX( 0.5 );\n\trotateY( TAU*0.05*t );\n\n\tbackground(0);\n  gl = this._renderer.GL;\n\tgl.disable( gl.DEPTH_TEST );\n\tgl.enable( gl.BLEND );\n\tgl.blendEquation( gl.MAX );\n\tgl.lineWidth( 1.2 );\n\tdrawShdr.bindShader();\n\tdrawShdr.setUniform( 'dataA', oldPos );\n\tdrawShdr.setUniform( 'dataB', newPos );\n\tdrawShdr.setUniform( 'N', N );\n\tdrawShdr.setUniform( \"b\", b );\n\tdrawShdr.bindTextures();\n\tgl.drawArrays( gl.LINES, 0, 2*N );\n\tgl.disable( gl.BLEND );\n\tdrawShdr.unbindTextures();\n\tdrawShdr.unbindShader();\n\n\tlet temp = oldPos;\n\toldPos = newPos;\n\tnewPos = temp;\n}\n\nlet vsUpdate = `#version 300 es\nprecision highp float;\nprecision highp int;\nvoid main() {\n\tgl_Position = vec4( 4*ivec2(gl_VertexID&1, gl_VertexID&2)-1, 0., 1. );\n}\n`;\n\nlet fsUpdate = `#version 300 es\nprecision highp float;\nuniform sampler2D data;\nuniform float b;\nout vec4 fragColor;\nvoid main() {\n  ivec2 res = textureSize( data, 0 );\n  vec3 pos = texelFetch( data, ivec2(gl_FragCoord.xy), 0).xyz;\n\tfor( int i=0; i<12; i++) {\n\t\tpos += 1./128. * (sin( pos.yzx ) - b * pos);\n\t}\n\tfragColor = vec4( pos, 1. );\n}\n`;\n\n\nlet vsDraw = `#version 300 es\nprecision highp float;\nprecision highp int;\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform sampler2D dataA;\nuniform sampler2D dataB;\nuniform int N;\nuniform float b;\nout vec4 vColor;\n\n\nvec3 hsb2rgb( in vec3 c ) {\n   vec3 rgb = clamp(abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),\n                            6.0)-3.0)-1.0,  0.0,  1.0 );\n   rgb = rgb*rgb*(3.0-2.0*rgb);\n   return c.z * mix( vec3(1.0), rgb, c.y);\n}\nfloat rand(int seed) {\n    return fract(sin(float(seed)*12.9898) * 43758.5453);\n}\n\n\nvoid main() {\n\tivec2 res = textureSize( dataA, 0 );\n\tint idx = gl_VertexID/2;\n\tivec2 ij = ivec2( idx%res.x, idx/res.x );\n\tvec4 p0 = texelFetch( dataA, ij, 0 );\n\tvec4 p1 = texelFetch( dataB, ij, 0 );\n\tvec4 p = ( (gl_VertexID & 1) > 0 ) ? p0 : p1;\n\tp.xyz *= 1.6 * b;\n\tp = uModelViewMatrix * p;\n  gl_Position = uProjectionMatrix * p;\n\tfloat u = float(gl_VertexID)/float(N);\n\tvec3 c = hsb2rgb( vec3( u, 1.0, pow(clamp((4.5+p.z)/2.5, 0., 1.), 1.) ) );\n\tvColor = vec4( c, 1.0 );\n}\n`;\n\nlet fsDraw = `#version 300 es\nprecision highp float;\nin vec4 vColor;\nout vec4 fragColor;\n\nvoid main() {\n    float alpha = smoothstep(0.0, 5.0, gl_FragCoord.z); // 远处更透明\n    fragColor = vec4(vColor.rgb * (1.0 + alpha * 0.5), 1.0 - alpha * 0.3); // 提升远处亮度并降低透明度\n}\n`;\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "lzy",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2615507",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:54:02",
+    "used_in_videos": [
+        "Compressed Void.mp4"
+    ],
+    "used_count": 1
+}

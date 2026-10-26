@@ -1,0 +1,27 @@
+{
+    "name": "wavy",
+    "code": "// === Tab: mySketch ===\n// if you've gotten this far, you might as well change a few variables below to see what happens...\n\n\nint num = 24; // how many rows and columns\nfloat s = 3; // size of the dots\nfloat reflex = 0.3; // how fast ir reacts when clicked. Range: [0, 1[\nfloat aperture = 64; // how much it blurs\n\ncolor bg = color(223, 8, 47); // background\ncolor fg1 = color(153, 217, 140);// foreground\ncolor fg2 = color(43, 147, 72);\n\n\n\nvoid setup() {\n  //size(800, 800); \n\n  // all 3D is fake :)\n\n  fullScreen();\n  noStroke();\n  frameRate(25);\n\n  aa = new float[8];\n  bb = new float[aa.length];\n  reset();\n}\n\nvoid mouseClicked() {\n  reset();\n}\n\n\nfloat t = 0; // keeps the time\n\nfloat[] aa; // great naming conventions, I know...\nfloat[] bb;\nfloat transition = 0;\n\n\n// if you're feeling adventurous/you-know-what-you're-doing, please mess with the code below :)\n\nvoid reset() {\n  for (int i = 0; i<bb.length; i++) {\n    float v = random(1, 8);\n    bb[i] = aa[i];\n    aa[i] = random(2)<1?v:-v;\n  }\n  transition = 1;\n}\nvoid draw() {\n  t+=0.0008; // enables time traveling\n\n  background(255);\n\n  transition*=(1-reflex);\n\n\n  for (float v = 0; v<num; v++) {\n    for (float u = 0; u<num; u++) {\n      float h = 42\n        *sin((aa[0]*u-aa[1]*v)/num+4.2*aa[4]*t+aa[6])\n        *cos((aa[2]*v+aa[3]*u )/num+aa[5]*t+aa[7]);\n\n      float h2 = 42\n        *sin((bb[0]*u-bb[1]*v)/num+4.2*bb[4]*t+bb[6])\n        *cos((bb[2]*v+bb[3]*u )/num+bb[5]*t+bb[7]);\n      h = lerp(h, h2, transition);\n\n      float u1 = u/num*2-1;\n      float v1 = v/num*2-1;\n\n      float u2 = cos(t)*u1 + sin(t)*v1;\n      float v2 = sin(t)*u1 - cos(t)*v1; // transformation after transformation, I'm not entirely sure what's going on here anymore. #dontTouchItItWorks\n\n      let u3 = u2/2+0.5;\n      let v3 = v2/2+0.5;\n\n      let x = u3*max(width, height);\n      let y = v3*max(width, height);\n\n      let a = x-y;\n      let b = x+y;\n\n      pushMatrix();\n      translate(0, 0);\n      translate(width/2, 0);\n      let dist = 1.5-b/2/height-h/500;\n      scale(atan(1/dist)*3.4);  // a little math, but mostly magic\n      translate(-width/2, -height/3.5);\n\n      let blur = (1-dist)*aperture;\n      fill(lerpColor(fg1, fg2, constrain(map(blur, -aperture/3, aperture/2, 0, 1), 0, 1)), // blend the colors\n        min(s*255/max(sq(blur/2)*2, 1), 128)); // add transparency\n\n      translate(0, -h); // creates the waves\n      ellipse(a/4+width/2, b/42+height/2, max(abs(blur), s), max(abs(blur), s));\n      popMatrix();\n    }\n  }\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u488833",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-09"
+    ],
+    "url": "https://openprocessing.org/sketch/2473389",
+    "batch_id": "batch_20261009_153406",
+    "batch_date": "2026-10-09",
+    "date_added": "2026-10-09 16:07:10",
+    "used_in_videos": [
+        "Fusion Blade Berserk.mp4",
+        "Nebula Storm Troopers.mp4"
+    ],
+    "used_count": 2
+}

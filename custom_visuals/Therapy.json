@@ -1,0 +1,31 @@
+{
+    "name": "Therapy",
+    "code": "// === Tab: mySketch ===\nvar data, traits, voice;\nvar hu;\nlet particles = [];\nlet osc, envelope, fft, word, rhy,animal;\n\nlet scaleArray = [62, 64, 65, 67, 69, 71, 72, 75, 77, 88];\nlet note = 0;\n\n\nfunction preload() \n{\n  data = loadJSON('https://openprocessing.org/sketch/1845132/files/personality.json');\n}\n\n\nfunction setup() \n{\n   createCanvas(1112, 834);\n\t colorMode(HSB);\n\t hu = random(360);\n   background(hu, 30, 100);\n   traits = data['personality']\n   textFont('Georgia');   \n\t voice = new p5.Speech(floor(random(22)));\n\t voice.interrupt = true;\n\n  osc = new p5.SinOsc();\n\n  // Instantiate the envelope\n  envelope = new p5.Env();\n\n  // set attackTime, decayTime, sustainRatio, releaseTime\n  envelope.setADSR(0.001, 0.5, 0.1, 0.5);\n\n  // set attackLevel, releaseLevel\n  envelope.setRange(1, 0);\n  rectMode(CENTER);\n  cursor(CROSS);\n\ttextSize(width/35)\n  current = 'CLICK TO START';\n  text(current,width/2-textWidth(current)/2,height/2);\n}\n\nfunction mouseClicked()\n{\n  clear();\n\t hu = random(360);\n   background(hu, 30, 100);\n  \n\tcurrent = traits[int(random(traits.length))]\n\t\n\tvoice.setVoice(int(random(28)));\n  \n\tvoice.speak(current);\n  \n  textSize(width/35)\n\n  text(current,width/2-textWidth(current)/2,height/2);\n\n  particles.push(new Particle(random(width),random(height),current))\n\n}\n\n\nfunction draw() {\n    for(let particle of particles){\n      \n    particle.edges();\n      \n\n    var wind = createVector(5,0);\n\n    if(((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))){\n      particle.applyForce(wind);\n    }\n\n    particle.update();\n\n    particle.display();\n\n    }\n  \n  \n}\n\n\nclass Particle {\n  constructor(x, y, txt){\n    this.pos = createVector(x, y);\n    this.vel = createVector(0.7,0.7);\n    this.vel.mult(12);\n\t\tthis.txt = txt;\n\t\tthis.currentTime = second();\n\t\t\n\t\tthis.timeExisted = 0;\n    \n    this.r = textWidth(this.txt)/2;\n    this.acc = createVector(0, 0);\n    \n  }\n  \n  applyForce(force) {\n    this.acc.add(force);\n    \n    \n  }\n  \n  update(){\n    this.vel.add(this.acc);\n    this.pos.add(this.vel);\n    \n    this.acc.set(0, 0);\n\t\t\n\t\tthis.timeExisted = second();\n\t\t\n\t\t\n\t\t\n\t\tif(abs(this.currentTime-this.timeExisted)>5){\n\t\t\tparticles.shift();\n\t\t\tclear();\n\t    hu = random(360);\n      background(hu, 30, 100);\n\t\t}\n    \n  }\n  \n  display(){\n\t\ttextAlign(CENTER);\n    \n    if(this.pos.y>=height-this.r-10){\n      \n      \n      strokeWeight(0.75);\n      stroke(0);\n      \n     \n      text(this.txt, this.pos.x, this.pos.y);\n  \n      \n      \n    }else {\n    \n    fill(22);\n    stroke(222);\n    strokeWeight(3);\n\t\t\n\t\ttext(this.txt, this.pos.x, this.pos.y);\n   \n    \n    }\n  }\n  \n  \n  \n  edges(){\n    \n      \n    if(this.pos.y>=height - this.r-10){\n      this.pos.y = height-this.r-10;\n      \n       mus();\n      \n       \n      \n      this.vel.y *= -1;\n      \n    }\n    else if (this.pos.x >= width-this.r){\n      mus();\n      this.pos.x = width-this.r;\n      this.vel.x *= -1;\n      } else if (this.pos.x <=this.r){\n        mus();\n        this.pos.x = this.r;\n        this.vel.x *= -1;\n      } else if (this.pos.y<= this.r){\n        mus();\n        this.pos.y = this.r;\n        this.vel.y *= -1;\n      } \n  }\n}\n\n\nfunction mus(){\n\t let midiValue = scaleArray[note];\n    let freqValue = midiToFreq(midiValue*random(0.5,0.9));\n    osc.freq(freqValue);\n    osc.start();\n\n    envelope.play(osc, 0, 0.1);\n    note = (note + 1) % scaleArray.length;  \n}\n\nfunction keyPressed(){\n  save(\"img_\" + month() + '-' + day() + '_' + hour() + '-' + minute() + '-' + second() + \".jpg\");\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1845132",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:42:05",
+    "used_in_videos": [
+        "Highway Cruise Atmosphere.mp4"
+    ],
+    "used_count": 1
+}

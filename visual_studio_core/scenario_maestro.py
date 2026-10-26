@@ -39,7 +39,7 @@ class ScenarioMaestro:
         {"id": "synthwave", "name": "Synthwave / Cyberpunk", "bpm": 120, "palette": ["#ff007f", "#00f0ff", "#7928ca", "#0b0c10"]},
         {"id": "melodic_techno", "name": "Melodic Techno", "bpm": 126, "palette": ["#0ea5e9", "#6366f1", "#1e1b4b", "#030712"]},
         {"id": "drum_and_bass", "name": "Drum & Bass / Jungle", "bpm": 174, "palette": ["#f59e0b", "#ef4444", "#84cc16", "#18181b"]},
-        {"id": "ambient_drone", "name": "Ambient / Meditative", "bpm": 70, "palette": ["#a78bfa", "#38bdf8", "#34d399", "#0f172a"]},
+        {"id": "ambient_drone", "name": "Ambient / Meditative", "bpm": 70, "palette": ["#7c8c9e", "#5a6b7c", "#3d4b58", "#0d1117"]},
         {"id": "lofi_hiphop", "name": "Lo-Fi Hip Hop", "bpm": 85, "palette": ["#f97316", "#eab308", "#854d0e", "#1c1917"]},
         {"id": "industrial_glitch", "name": "Industrial / Glitch", "bpm": 135, "palette": ["#e11d48", "#ffffff", "#475569", "#000000"]}
     ]
@@ -54,40 +54,123 @@ class ScenarioMaestro:
         },
         {
             "id": "curl_noise_fluid",
-            "name": "Curl Noise 渦流場",
+            "name": "超弦星塵渦流場 (Cosmic String)",
             "category": "fluid",
-            "desc": "無散度流體力學粒子運動，絲滑如液態絲綢",
-            "recommended_shaders": ["reaction_diffusion", "analog_saturation_grain"]
+            "desc": "3D Simplex Curl Noise + 4D 纖維，無散度超弦絲綢流動",
+            "recommended_shaders": ["volumetric_godrays", "analog_saturation_grain"]
         },
         {
-            "id": "gyroid_surface",
-            "name": "Gyroid 三週期極小曲面",
-            "category": "geometry",
-            "desc": "自然界肥皂泡膜連通極小曲面拓撲",
-            "recommended_shaders": ["ssfr_fluid_render", "caustic_refraction_flow"]
+            "id": "ferrofluid_mercury",
+            "name": "液態水銀熔球 (Ferrofluid Mercury)",
+            "category": "fluid",
+            "desc": "Screen-Space 雙邊平滑水銀融球，高反射鏡面金屬焦散",
+            "recommended_shaders": ["screen_space_fluid", "caustic_refraction_flow"]
         },
         {
             "id": "chladni_plate",
-            "name": "Chladni 聲學共振板",
+            "name": "Chladni 聲學駐波砂 (Acoustic Sand)",
             "category": "optics",
-            "desc": "金屬板在音頻共振下的幾何沙粒節線圖案",
+            "desc": "雙曲駐波節線幾何引力槽，低頻乾脆震顫聚散",
             "recommended_shaders": ["acoustic_chladni", "matrix_glitch_mosaic"]
         },
         {
             "id": "physarum_slime",
-            "name": "Physarum 黏菌網絡",
+            "name": "生物螢光黏菌網絡 (Physarum Glow)",
             "category": "bio",
-            "desc": "生物自組織覓食路徑網絡，具備強烈有機生命感",
+            "desc": "化學引誘素擴散網絡，具備脈衝泵送與呼吸微光",
             "recommended_shaders": ["bioluminescence_marine", "drone_spectral_fog"]
         },
         {
             "id": "voronoi_crystalline",
-            "name": "Voronoi 幾何晶體動態",
+            "name": "賽博矩陣碎晶 (Quantum Voronoi)",
             "category": "geometry",
-            "desc": "空間最近鄰多面體切分，重音爆發時晶體碎裂",
+            "desc": "離散泰森多面體斷裂力學，重音衝擊碎裂折射",
             "recommended_shaders": ["voronoi_crystalline", "anamorphic_lens_flare"]
+        },
+        {
+            "id": "black_hole_accretion",
+            "name": "黑洞等離子吸積盤 (Plasma Accretion)",
+            "category": "chaos",
+            "desc": "時空引力透鏡差動自轉，事件視界吸收與都卜勒頻移",
+            "recommended_shaders": ["gravitational_lensing", "volumetric_godrays"]
+        },
+        {
+            "id": "viscous_magma",
+            "name": "黏稠熔岩熱對流 (Viscous Magma)",
+            "category": "fluid",
+            "desc": "Rayleigh-Bénard 雙流體對流胞，暗紅硬殼與發光裂紋",
+            "recommended_shaders": ["reaction_diffusion", "analog_saturation_grain"]
+        },
+        {
+            "id": "schrodinger_wave",
+            "name": "量子概率波包 (Schrödinger Cloud)",
+            "category": "geometry",
+            "desc": "複數波函數相位干涉雲霧，相長干涉爆發量子閃斑",
+            "recommended_shaders": ["holographic_interference", "drone_spectral_fog"]
         }
     ]
+
+    DIRECTOR_SONG_SECTIONS = {
+        "intro": {
+            "name": "前奏 (Intro) - 空靈懸浮",
+            "phase_mode": 0,
+            "vorticity": 0.8,
+            "inflow_gravity": 0.2,
+            "viscosity": 0.1,
+            "emissive_gain": 0.6,
+            "macro_tension": 0.2,
+            "desc": "稀疏星塵微光漂浮，低黏度與冷色調，空間留白"
+        },
+        "buildup": {
+            "name": "遞進蓄力 (Build-up) - 奇點匯聚",
+            "phase_mode": 0,
+            "vorticity": 3.0,
+            "inflow_gravity": 2.5,
+            "viscosity": 0.3,
+            "emissive_gain": 1.5,
+            "macro_tension": 0.7,
+            "desc": "引力奇點強烈吸引，粒子旋渦加速收緊，張力暴增"
+        },
+        "drop": {
+            "name": "副歌爆發 (Drop/Chorus) - 水銀相變炸裂",
+            "phase_mode": 1,
+            "vorticity": 4.5,
+            "inflow_gravity": -3.5,
+            "viscosity": 0.85,
+            "emissive_gain": 2.8,
+            "macro_tension": 1.0,
+            "desc": "相變為水銀金屬流體瞬間向外炸裂，高光溢出全面釋放"
+        },
+        "bridge": {
+            "name": "橋段轉折 (Bridge) - 慢速非牛頓流變",
+            "phase_mode": 6,
+            "vorticity": 1.2,
+            "inflow_gravity": 0.0,
+            "viscosity": 0.95,
+            "emissive_gain": 0.9,
+            "macro_tension": 0.4,
+            "desc": "時間膨脹子彈時間，高黏度凝膠對流，暗部層次呼吸"
+        },
+        "outro": {
+            "name": "尾奏 (Outro) - 熵增消解",
+            "phase_mode": 7,
+            "vorticity": 0.5,
+            "inflow_gravity": -0.8,
+            "viscosity": 0.05,
+            "emissive_gain": 0.4,
+            "macro_tension": 0.1,
+            "desc": "量子微光散逸蒸發，平滑漸隱，防止黑屏突兀"
+        }
+    }
+
+    @classmethod
+    def get_director_particle_profile(cls, section: str, tension: float = 0.5) -> dict:
+        """根據曲式段落與張力輸出調度參數包"""
+        sec_cfg = cls.DIRECTOR_SONG_SECTIONS.get(section, cls.DIRECTOR_SONG_SECTIONS["intro"]).copy()
+        sec_cfg["vorticity"] *= (0.5 + tension * 0.8)
+        sec_cfg["emissive_gain"] *= (0.7 + tension * 0.6)
+        sec_cfg["macro_tension"] = tension
+        return sec_cfg
 
     def __init__(self, workspace_dir: str = None):
         self.config = load_ai_config()
@@ -99,6 +182,11 @@ class ScenarioMaestro:
         self.metaphor_alchemist = MaestroMetaphorAlchemist
         self.vision_decompiler = MaestroVisionDecompiler
         self.ambient_muse = MaestroAmbientMuse()
+        self.genre_palette_overrides = {}
+
+    def override_genre_palette(self, genre_id: str, new_palette: list):
+        """動態覆寫特定曲風的調色盤配置"""
+        self.genre_palette_overrides[str(genre_id).lower()] = new_palette
 
     def spin_inspiration_slot(self, acoustic_meta: dict = None) -> dict:
         """
@@ -176,7 +264,8 @@ class ScenarioMaestro:
                     break
         else:
             for g in self.GENRES:
-                if g["id"] in user_prompt_lower or g["name"].lower() in user_prompt_lower:
+                genre_terms = [g["id"].lower()] + [p.strip().lower() for p in g["name"].split("/")]
+                if any(t in user_prompt_lower for t in genre_terms if len(t) >= 3):
                     matched_genre = g
                     break
 
@@ -194,7 +283,7 @@ class ScenarioMaestro:
             "topology_id": matched_topo["id"],
             "genre": matched_genre["name"],
             "bpm": matched_genre["bpm"],
-            "palette": matched_genre["palette"],
+            "palette": self.genre_palette_overrides.get(matched_genre["id"], matched_genre["palette"]),
             "metaphor": metaphor_meta,
             "va_meta": va_meta,
             "steer_mods": steer_mods,

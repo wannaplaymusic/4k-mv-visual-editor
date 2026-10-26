@@ -1,0 +1,24 @@
+{
+    "name": "PerlinNoise",
+    "code": "// === Tab: mySketch ===\n// A fork/conversion of Perlin noise drawing from Processing to P5.js \n// original by Anna Fedchenko // https://www.openprocessing.org/sketch/688380\n\nvar nums = 150; //originally 150\nvar num_clust =10; //originally 10\nvar noiseScale = 300; \nvar posx= [];\nvar posy= [];\nvar particles = [];\nvar theta;\nvar r = [];\nvar dispR = 0.5;\nvar pCount = 0;\n\nfunction setup(){\n\t\n\t//fullScreen();\n    createCanvas(1000,1000);\n\tbackground(color('#C477BA'));\n  \n    theta = float(-PI/2.0);\n\t\n\t// init clusters\n\tfor(var i = 0; i < num_clust; i++)  \n\t{\n\t\tposx[i]= int(random(width));\n\t\tposy[i]= int(random(height));\n\t\tr[i] = int(random(50,120));\n\t} //for\n\t\n  // init particles\n\tfor(var j = 0; j < num_clust; j++){\n        particles[j] = [];\n\t\tfor(i = 0; i < nums; i++){ \n            var x = posx[j] + r[j] * sin(theta);\n            var y = posy[j] + r[j] * cos(theta);\n\t\t\tparticles[j][i] = new Particle(x,y);\n\t\t\ttheta += float(TWO_PI/nums);\n\t\t} //for\n\t} //for\n\t\n\tfor(j=0; j < num_clust; j++){\n\t\tfor (i = 1; i < 120; i++) { //originally 120\n\t\t\t\tnoStroke();\n                fill(lerpColor(color('#D8B1D8'),color('#000000'),i/120.0)); //orig 120\n\t\t\t\tellipse(posx[j],posy[j], 2*r[j]-(i), 2*r[j]-(i));\n\t\t} //for\n\t} //for\n} // setup\n\nfunction draw(){\n\tfor(var j=0; j<num_clust;j++){\n\t\tfor(var i = 0; i < nums; i++){\n\t\t\tparticles[j][i].move(); \n\t\t\tparticles[j][i].display(dispR);\n\t\t} //for\n\t} //for   \n} //draw\n\nclass Particle{\n\tconstructor(x,y){\n        this.alpha = 100;\n\t\tthis.c = color(0,this.alpha);\n\t\tthis.speed = 0.4;\n\t\tthis.dir = new createVector(0, 0);\n\t\tthis.pos = new createVector(x, y);\n\t}  // constructor\n\t\n\tmove(){\n\t\tthis.angle = noise(this.pos.x/noiseScale, this.pos.y/noiseScale)*TWO_PI;\n\t\tthis.dir.x = sin(this.angle);\n\t\tthis.dir.y = cos(this.angle);\n\t\tthis.dir.mult(this.speed);\n\t\tthis.pos.add(this.dir);\n\t} //move\n\t\n\tdisplay(r){ \n\t\tfill(this.c, this.alpha);\n\t\tellipse(this.pos.x, this.pos.y, r, r);\n\t} //display\n  \n} //particle\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "daveking63",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/691674",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:10:53",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

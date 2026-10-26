@@ -12,16 +12,20 @@
         "batch_import",
         "openprocessing",
         "audio_reactive",
-        "restored"
+        "restored",
+        "batch_2026-10-08"
     ],
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 3,
+    "used_count": 6,
     "is_starred": false,
     "used_in_videos": [
-        "Submerged Echoes.mp4",
         "Elevated View.mp4",
-        "Route Marker.mp4"
+        "Route Marker.mp4",
+        "Submerged Echoes.mp4",
+        "Low Light Territory.mp4",
+        "Muffled Kick Void.mp4",
+        "Pure Being.mp4"
     ]
 }

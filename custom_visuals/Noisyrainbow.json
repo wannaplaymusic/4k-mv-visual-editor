@@ -1,0 +1,31 @@
+{
+    "name": "Noisyrainbow",
+    "code": "// === Tab: mySketch ===\n/*\nNoisy rainbow\n\nControls:\n\t- Move the mouse along the lines to interact with it.\n\nAuthor:\n  Jason Labbe\n\nSite:\n  jasonlabbe3d.com\n*/\n\nvar steps = 5;\nvar restSize = 3;\n\nvar allParticles = [];\nvar t;\nvar globalHue = 0;\n\n\nfunction Particle(x, y) {\n  this.pos = new p5.Vector(x, y);\n  this.vel = new p5.Vector(0, 0);\n  this.acc = new p5.Vector(0, 0);\n  \n  this.target = new p5.Vector(x, y);\n  this.h = globalHue;\n  \n  globalHue += 1;\n  if (globalHue > 255) {\n    globalHue = 0;\n  }\n  \n  this.move = function() {\n    // Shift particle to the left.\n    this.pos.x -= 1;\n    this.target.x -= 1;\n    \n    var d = dist((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), this.pos.x, this.pos.y);\n    \n    // Resolve collision with mouse.\n    if (d < 200) {\n      var mousePos = new p5.Vector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n      \n      const vec = new p5.Vector(this.pos.x, this.pos.y);\n      vec.sub(mousePos);\n      vec.normalize();\n      vec.mult(0.6);\n      this.acc.add(vec);\n    }\n    \n    // Seek its original position.\n    var seek = new p5.Vector(this.target.x, this.target.y);\n    seek.sub(this.pos);\n    seek.normalize();\n    \n    var targetDist = dist(this.pos.x, this.pos.y, this.target.x, this.target.y);\n    if (targetDist < 5) {\n      // When it gets close enough, decrease the multiplier so it can settle!\n      seek.mult(0.5*map(targetDist, 5, 0, 1, 0));\n    } else {\n      seek.mult(0.5);\n    }\n    \n    this.acc.add(seek);\n    \n    // Add some drag.\n    this.vel.mult(0.95);\n    \n    // Move it.\n    this.vel.add(this.acc);\n    this.pos.add(this.vel);\n    this.acc.mult(0);\n  }\n}\n\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  \n  colorMode(HSB, 255);\n  \n  textAlign(CENTER);\n  textSize(16);\n  \n  t = width;\n  \n  // Spawn particles along the screen's width.\n  for (var x = 0; x < width; x += steps) {\n    var y = height/4+noise(x*0.005)*500;\n    allParticles.push(new Particle(x, y));\n  }\n} \n\n\nfunction draw() {\n  background(50);\n  \n  noFill();\n  \n  for (var i = 0; i < allParticles.length-1; i++) {\n    allParticles[i].move();\n    \n    // Draw lines.\n    if (i > 1) {\n      var d = dist(allParticles[i].pos.x, allParticles[i].pos.y, \n                   allParticles[i].target.x, allParticles[i].target.y);\n      \n      // The further away it's from its target, the more it's saturated and bigger.\n      stroke(allParticles[i].h, d*10, 255);\n      strokeWeight(constrain(d*0.1, 1, 7));\n      \n      beginShape();\n      curveVertex(allParticles[i-2].pos.x, allParticles[i-2].pos.y);\n      curveVertex(allParticles[i-1].pos.x, allParticles[i-1].pos.y);\n      curveVertex(allParticles[i].pos.x, allParticles[i].pos.y);\n      curveVertex(allParticles[i+1].pos.x, allParticles[i+1].pos.y);\n      endShape();\n    }\n    \n    // Delete the particle if it's out of bounds.\n    if (allParticles[i].pos.x < -50) {\n      allParticles.splice(i, 1);\n    }\n  }\n  \n  // Spawn a new particle.\n  if (t % steps == 0) {\n    var y = height/4+noise(t*0.005)*500;\n    allParticles.push(new Particle(width, y));\n  }\n  t += 1;\n  \n  noStroke();\n  fill(255);\n  text(\"Move the mouse on the lines\", width/2, 100);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "om0x",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1394402",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:03:58",
+    "used_in_videos": [
+        "Monotone Current.mp4"
+    ],
+    "used_count": 1
+}

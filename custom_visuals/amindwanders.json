@@ -1,0 +1,31 @@
+{
+    "name": "amindwanders",
+    "code": "// === Tab: mySketch ===\nlet colors = [\"#c0bd9b\", \"#a08b8d\", \"#c69322\", \"#005e84\", \"#42a5e4\", \"#4ad3c8\", \"#02c287\"]\n\nlet particles = []\nlet frameWidth, simplex\nlet fc1 = 0\nlet fc2 = 0\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tlet bgIndex = floor(random(4))\n\tbackground(colors[bgIndex])\n\n\tsimplex = new openSimplexNoise(Date.now())\n\tlet m = max(windowWidth, windowHeight)\n\tframeWidth = m * 0.02\n\twhile (fc1 == fc2) {\n\t\tfc1 = random(colors);\n\t\tfc2 = random(colors);\n\t}\n}\n\nfunction draw() {\n\tblendMode(OVERLAY)\n\tif (frameCount < 2500) {\n\n\t\tparticles.push(new particle(random(width * 0.44, width * 0.55), height))\n\t\tfor (let p of particles) {\n\t\t\tp.move()\n\t\t\tp.show()\n\t\t\tp.end()\n\t\t}\n\t\tpush()\n\t\tblendMode(BLEND)\n\t\tnoFill()\n\t\tlet stroker = map(frameCount, 0, 2500, 0, 1)\n\t\tlet s = color(spectral.mix(fc1, fc2, stroker))\n\t\tstroke(s)\n\t\tstrokeWeight(0.01)\n\t\trectMode(CENTER)\n\t\tlet framing = map(frameCount, 0, 2500, 0, frameWidth)\n\n\n\t\tbeginShape()\n\t\tfor (let x = framing / 2; x <= width - framing / 2; x += 5) {\n\t\t\tlet yoff = simplex.noise2D(x / 10, frameCount / 5) * framing\n\t\t\tvertex(x, framing / 2 + yoff)\n\t\t}\n\t\tfor (let y = framing / 2; y <= width - framing / 2; y += 5) {\n\t\t\tlet xoff = simplex.noise2D(y / 10, frameCount / 5) * framing\n\t\t\tvertex(width - framing / 2 + xoff, y)\n\t\t}\n\n\t\tfor (let x = width - framing / 2; x >= framing / 2; x -= 5) {\n\t\t\tvar yoff = simplex.noise2D(1 + x / 10, frameCount / 5) * framing\n\t\t\tvertex(x, height - framing / 2 + yoff)\n\t\t}\n\n\t\tfor (let y = width - framing / 2; y >= framing / 2; y -= 5) {\n\t\t\tvar xoff = simplex.noise2D(1 + y / 10, frameCount / 5) * framing\n\t\t\tvertex(framing / 2 + xoff, y)\n\t\t}\n\n\n\t\tendShape(CLOSE)\n\n\n\t\tpop()\n\t}\n}\n\nclass particle {\n\tconstructor(x, y) {\n\t\tthis.pos = createVector(x, y)\n\t\tthis.vel = createVector(random(-0.1, 0.1), -2)\n\t\tlet ny = map(noise(x / 50, frameCount / 50), 0, 1, 0, 0.01)\n\t\tthis.acc = createVector(random(-0.01, 0.01), ny)\n\t\tthis.color = colorMixer(this.pos.x, colors)\n\t}\n\n\tmove() {\n\n\t\tthis.vel.add(this.acc);\n\t\tthis.vel.rotate(sin(frameCount / 100) * 0.1)\n\t\tthis.pos.add(this.vel);\n\n\t}\n\n\tshow() {\n\t\tnoStroke()\n\t\tfill(this.color)\n\t\tellipse(this.pos.x, this.pos.y, 1)\n\t\tellipse(this.pos.x, height - this.pos.y, 1)\n\n\t}\n\n\tend() {\n\t\tif (this.y > height + 10) {\n\t\t\tlet index = indexOf(this)\n\t\t\tparticles.splice(index, 1)\n\t\t}\n\t}\n}\n\nfunction colorMixer(x, colorArray) {\n\n\tlet c = map(noise(x / 50, frameCount / 100), 0, 1, 0, colorArray.length)\n\tlet c1 = floor(c) % colorArray.length\n\tlet c2 = floor(c + 1) % colorArray.length\n\n\tlet color1 = colorArray[c1]\n\tlet color2 = colorArray[c2]\n\tlet mix = fract(c)\n\tlet coloring = color(spectral.mix(color1, color2, mix))\n\n\treturn coloring\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Aaron Reuland (a_ soluble_fish)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2282985",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:09:53",
+    "used_in_videos": [
+        "Deep Channel Pulse.mp4"
+    ],
+    "used_count": 1
+}

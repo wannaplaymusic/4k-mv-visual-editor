@@ -1,0 +1,22 @@
+{
+    "name": "Autumn",
+    "code": "// === Tab: mySketch ===\nlet N =50;\nparticle[] p=new particle [N] ;\nlet dt =0.5;\nlet thres = 200;\ncolor [] cols = {\"#ff7605\",\"#ff6105\",\"#ff1205\",\"#ffea05\"};\n\t\t\t\t\t\t\t\t \nfunction setup(){\n\tcreateCanvas(1024, 768);\n  background(0);\n  \n  for(i=0; i<N;++i){ \n    p[i] = new particle();\n    p[i].move();\n  }\n}\n\nfunction draw(){\n  fill(255);\n  stroke(255);\n  strokeWeight(2);\n      \n  for(i=0; i<N;++i){\n    p[i].show();\n    p[i].move();\n    p[i].periodic();\n  }\n  connect ();    \n}\n\nclass particle{\n  loc;\n  Vel;\n  theta ;\n  rad;\n  col;\n  dtval;\n \n  constructor(){\n    loc= new PVector ( random(width) ,random(height));\n    Vel = new PVector ( random(-1,1) ,random(-1,1));\n    theta = random (TWO_PI);\n    rad= random ( 2,10);\n    col= cols[int(random(cols.length))];\n    dtval = random (0,0.5)*0.1;\n  }\n\t\n  function show(){\n    fill(col);\n    stroke (255,1);\n    ellipse( loc.x , loc.y, 1, 1);\n  }\n\t\n  function move() {\n    loc.x += Vel.x*dt;\n    loc.y += Vel.y*dt;\n    Vel.x = cos(theta)*rad;\n    Vel.y = sin(theta)*rad;\n    theta += random (-1,1)*0.2; \n  }\n\t\n  function periodic(){\n    loc.x = ( loc.x + width ) % width;\n    loc.y = ( loc.y + height )% height;\n  }\n}\n\nfunction connect(){\n  stroke (255,20);\n  for ( i =0; i<N;++i){\n    for ( j=0; j<N;++j){\n      if (  pow ( p[i].loc.x-p[j].loc.x,2) + pow(p[i].loc.y-p[j].loc.y,2)< pow(thres,2) ){\n        fill(p[i].col);\n        stroke( p[i].col, 75 ) ;\n        line ( p[i].loc.x,p[i].loc.y,p[j].loc.x,p[j].loc.y);\n      }\n    }\n  }\n}\n\n  \n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Ryan Seo",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1053373",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:28:07"
+}

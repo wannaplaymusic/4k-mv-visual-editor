@@ -1,0 +1,24 @@
+{
+    "name": "soundcheck",
+    "code": "// === Tab: mySketch ===\n\"use strict\";\nvar song;\nvar analyzer;\n\nfunction preload() {\n\t\t// my soundcloud dev key, if downloaded replace it with your local soundfile, otherwise change the order of phrasing scripts in the index.html\n    song = loadSound(\"http://api.soundcloud.com/tracks/311099101/stream?client_id=2ATWFW93Vr3z8KnA1ZnROAny9gLc05xK\");\n}\n\nconst P = new p5.Shader(this._renderer,\n    // vert\n    `attribute vec3 aPosition;\nvarying vec2 vuv;\n\nvoid main() {\n        \ngl_Position = vec4(vuv = 2. * aPosition.xy - 1., 0, 1);\n}`,\n    // frag\n    `precision highp float;\nvarying vec2 vuv;\nuniform float time, asp;\nuniform sampler2D uSampler;\n\nvoid main()\n{\n    if (abs(vuv.y) > .95) discard;\n    \n\t\tfloat snd = texture2D(uSampler, vec2(0)).r;\n    \n\t\tvec3 ro = vec3(4. * vec2(vuv.x * asp, vuv.y), -1.);\n    vec3 tro = ro;\n    \n\t\t#define random(st)(fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * .5453123))\n    tro.z *= ro.z * 5. + 2. / random(vec2(ro.x, ro.y)); \n\n\t\t#define R(p, a) p = (cos(a) * p + sin(a) * vec2(p.y, -p.x))\n\t\tR(ro.xz, 2. * time);\n    R(ro.yz, time);\n\n    lowp vec3 col = vec3(0);\n    col = vec3(.102, 0.201, 0.25) * reflect(-vec3(.5, 1, .5), min(vec3(length(max(snd * ro, 0.) - ro)) - 2., vec3(fract(tro * snd)))) + .02;\n    \n\t\tgl_FragColor.rgb = col;\n    gl_FragColor.a = 1.;\n}`);\n\nfunction setup() {\n    createCanvas(windowWidth, windowHeight, WEBGL);\n\n    song.loop();\n    analyzer = new p5.Amplitude()\n    analyzer.setInput(song);\n\n    setAttributes({\n        alpha: !1,\n        depth: !1,\n        stencil: !1,\n        antialias: !1,\n        premultipliedAlpha: !1,\n        presereDrawingBuffer: !1,\n        failIfMajorPerformanceCaveat: !1\n    });\n\n    background(255);\n    shader(P);\n\t\n    const wnin = Math.max(windowWidth, windowHeight);\n    const wnax = Math.max(windowWidth, windowHeight);\n    P.setUniform(\"asp\", wnax * 1.0001 / wnin);\n};\n\nfunction draw() {\n\n    const img = createImage(1, 1);\n    img.loadPixels();\n    img.pixels[0] = (analyzer.getLevel() * 254) | 0; //cast int\n    img.pixels[3] = 255; //alpha\n    img.updatePixels();\n\n    P.setUniform(\"uSampler\", img);\n    P.setUniform(\"time\", millis() * .001); //performance.now() \n\t\n    rect(0, 0, 0, 0);\n};\n\n// ^;.;^\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "u80663",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/670861",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:51:52",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,24 @@
+{
+    "name": "AnotherChaosParticlesExperiment",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n\tfill('red');\n\tcells = [];\n\tfor(i=-30;i<=30;i++)\n\tfor(j=-30;j<=30;j++) {\n\t\tcells.push({\n\t\t\tx:i,\n\t\t\ty:j,\n\t\t\tz:0\n\t\t})\n\t}\n}\n\nfunction draw()\n{\n\tclear()\n\tfor (o of cells) {\n\t\tcircle(width/2+o.x*4, height/2+o.y*4, 4, 4)\n\t\to.x += sin(o.z/99)*o.y/39\n\t\to.y += sin(o.z/99)*o.x/39\n\t\to.z += (o.x*o.y)/999\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "⼖?≷??",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/730526",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:06:10",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

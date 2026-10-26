@@ -17,12 +17,14 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 3,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
         "Late Bound.mp4",
         "Driving Meditation.mp4",
-        "Metro Ghost.mp4"
+        "Metro Ghost.mp4",
+        "Negative Space.mp4",
+        "Soft Collapse of Time.mp4"
     ],
     "needs_qc_repair": true,
     "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"

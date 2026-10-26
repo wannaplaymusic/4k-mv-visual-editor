@@ -1,0 +1,27 @@
+{
+    "name": "Ripplesm",
+    "code": "// === Tab: mySketch ===\nconst gridSize = 55;\nconst dotSpacing = 8;\nconst influenceRadius = 50;\nconst maxDistortion = 15;\n\nlet dots = [];  \n\nfunction setup() {\n  createCanvas(600, 600);\n  background(200);\n  stroke(256);\n\n  const offset = (width - gridSize * dotSpacing) / 2;\n\n  // initialize dots\n  for (let i = 0; i < gridSize; i++) {\n    dots[i] = [];\n    for (let j = 0; j < gridSize; j++) {\n      dots[i][j] = new Dot(i * dotSpacing + offset, j * dotSpacing + offset);\n    }\n  }\n}\n\nfunction draw() {\n  fill(0);\n  rect(0, 0, width, height);\n\n  const mousePosition = createVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\n  for (let i = 0; i < gridSize; i++) {\n    for (let j = 0; j < gridSize; j++) {\n      dots[i][j].update(mousePosition);\n    }\n  }\n}\n\nclass Dot {\n  constructor(x, y) {\n    this.position = createVector(x, y);\n    this.originalPosition = this.position.copy();\n    this.velocity = createVector(0, 0);\n    this.color = color(random(50, 255), random(50, 255), random(50, 255)); // colore casuale\n  }\n\n  update(mousePos) {\n    let vecToMouse = this.originalPosition.copy();\n    vecToMouse.sub(mousePos);\n\n    const distanceToMouse = vecToMouse.mag();\n    const phase = map(distanceToMouse, 0, influenceRadius, 0, PI);\n\n    vecToMouse.normalize();\n    vecToMouse.mult(maxDistortion * sin(phase));\n\n    let strokeWidth;\n    if (distanceToMouse < influenceRadius) {\n      strokeWidth = 1 + 10 * abs(cos(phase / 2));\n    } else {\n      strokeWidth = map(min(distanceToMouse, width), 0, width, 5, 0.1);\n    }\n\n    const targetPosition = createVector(\n      this.originalPosition.x + vecToMouse.x,\n      this.originalPosition.y + vecToMouse.y\n    );\n\n    let attractionVector = this.position.copy();\n    attractionVector.sub(targetPosition);\n\n    const attractionStrength = map(\n      mousePos.dist(this.position),\n      0,\n      2 * width,\n      0.1,\n      0.01\n    );\n    attractionVector.mult(-attractionStrength);\n\n    this.velocity.add(attractionVector);\n    this.velocity.mult(0.87);\n\n    this.position.add(this.velocity);\n\n    stroke(this.color); // usa il colore casuale fisso\n    strokeWeight(strokeWidth);\n    point(this.position.x, this.position.y);\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Mia Mocchi",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2848544",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 10:45:47",
+    "used_in_videos": [
+        "Reflected in Water.mp4",
+        "Meteor Blade Berserk.mp4"
+    ],
+    "used_count": 2
+}

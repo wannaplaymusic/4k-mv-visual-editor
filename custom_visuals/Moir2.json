@@ -17,11 +17,13 @@
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 3,
+    "used_count": 5,
     "is_starred": false,
     "used_in_videos": [
+        "Route Marker.mp4",
         "Muffled Kick Void.mp4",
         "Night Shift.mp4",
-        "Route Marker.mp4"
+        "Constant Pace.mp4",
+        "Bare Reality.mp4"
     ]
 }

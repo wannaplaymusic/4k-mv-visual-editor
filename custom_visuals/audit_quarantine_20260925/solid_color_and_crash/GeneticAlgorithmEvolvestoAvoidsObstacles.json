@@ -1,0 +1,24 @@
+{
+    "name": "GeneticAlgorithmEvolvestoAvoidsObstacles",
+    "code": "// === Tab: mySketch ===\nfunction setup() {\n\tcreateCanvas(700, 500);\n\tbackground(111);\n\tangleMode(DEGREES)\n\tdudes = [];\n\tfor (i = 250; i--;) {\n\t\tdudes.push({\n\t\t\tx: 50,\n\t\t\ty: height / 2,\n\t\t\tpAngle: 90,\n\t\t\tpColor: round(random(0, 360)),\n\t\t\tpA: random(0, TWO_PI),\n\t\t\tpB: random(-TWO_PI, TWO_PI) / 4,\n\t\t\tpC: random(0, TWO_PI),\n\t\t\tpShift: random(0, 8),\n\t\t\tpFC: 0,\n\t\t\tscore: 0\n\t\t});\n\t}\n\tbestDude = dudes[0];\n\tnoStroke()\n\tresets = 0\n}\n\nfunction draw() {\n\tnoStroke()\n\tfill(\"#0001\");\n\txSum = 0;\n\trect(0, 20, width, height);\n\tfor (dude of dudes) {\n\t\tfill(`hsl(${dude.pColor},99%,50%)`);\n\t\tcircle(dude.x, dude.y, 7);\n\t\tdude.x += sin(dude.pB * dude.pA+dude.pShift) + dude.pShift + sin(dude.pAngle + dude.pFC * dude.pB) * dude.pB\n\t\tdude.y += sin(dude.y/dude.pShift) + cos(dude.pAngle + dude.pFC * dude.pB + sin(dude.pB*dude.pA + dude.x/dude.pShift) * dude.pC)\n\t\tdude.pB\n\t\tdude.pFC += 1\n\t\tfill(`hsl(${360-dude.pColor},99%,50%)`);\n\t\trect(300, 0, 20, 200)\n\t\trect(300, 300, 20, 200)\n\t\trect(400, 200, 20, 100)\n\t\tif (dude.x > 300 && dude.x < 320) {\n\t\t\tif (dude.y < 200 || dude.y > 300) {\n\t\t\t\tdude.x = 300;\n\t\t\t}\n\t\t}\n\t\tif (dude.x > 400 && dude.x < 420) {\n\t\t\tif (dude.y > 200 && dude.y < 300) {\n\t\t\t\tdude.x = 400\n\t\t\t}\n\t\t}\n\t\txSum += dude.x \n\t}\n\tif (frameCount % 777 == 0) {\n\t\tfor (i of dudes) {\n\t\t\tif (i.score > bestDude.score) bestDude = i;\n\t\t}\n\t\tfor (i of dudes) {\n\t\t\ti.x = 50;\n\t\t\ti.y = height / 2;\n\t\t\ti.score = 0;\n\t\t\ti.pAngle = 90\n\t\t\ti.pFC = 0\n\t\t\ti.pShift = (bestDude.pShift + i.pShift) / 2 + random(-1, 1) / 9\n\t\t\ti.pA = (bestDude.pA + i.pA) / 2 + random(-1, 1) / 9\n\t\t\ti.pB = (bestDude.pB + i.pB) / 2 + random(-1, 1) / 9\n\t\t\ti.pC = (bestDude.pC + i.pC) / 2 + random(-1, 1) / 9\n\t\t\ti.pColor = round((bestDude.pColor + i.pColor) / 2)\n\t\t}\n\t\tresets ++;\n\t}\n\tfill(`hsl(${(resets*40)%360},99%,50%)`)\n\trect(100+xSum/dudes.length/3, resets*2, 7, 30)\n\tfill(\"#000\")\n\tstroke(\"#0a0\")\n\trect(0,0,100,100)\n\tfor(d in dudes) {\n\t\tfill(\"#00f\")\n\t\tif(dudes[d].x<width-60) rect(dudes[d].x/width*100, d*100/dudes.length, 10, 100/dudes.length)\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "⼖?≷??",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/735073",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:05:05",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

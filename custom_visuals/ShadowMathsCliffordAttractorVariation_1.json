@@ -12,16 +12,22 @@
         "batch_import",
         "openprocessing",
         "audio_reactive",
-        "restored"
+        "restored",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
     ],
     "frequency": 50,
     "storyboard_weight": 50,
     "post_fx_intensity": 50,
-    "used_count": 2,
+    "used_count": 3,
     "is_starred": false,
     "used_in_videos": [
+        "Ghostly Echo.mp4",
         "Distant Industrial Rain.mp4",
-        "Ghostly Echo.mp4"
+        "Parking Garage.mp4"
     ],
     "needs_qc_repair": true,
     "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"

@@ -1,0 +1,28 @@
+{
+    "name": "SphereOfNoise",
+    "code": "// === Tab: mySketch ===\nlet mainradius = 300;\nlet Yangle = 0;\nlet speed = 0.01;\nlet offset = 10;\nlet ring = 2.75;\nlet noiseScale = 0.05; // 噪音的缩放比例\nlet noiseStrength = 0; // 噪音强度\n\nfunction setup() {\n  createCanvas(500, 500, WEBGL);\n  frameRate(40);\n}\n\nfunction draw() {\n  if (keyPressed) {\n    if (key == CODED) {\n      if (keyCode == UP) {\n        ring += 1;\n      }\n      if (keyCode == DOWN) {\n        if (ring > 1) {\n          ring -= 1;\n        }\n      }\n    }\n  }\n\n  background(0);\n  translate(width / 2, height / 2);\n  rotateY(Yangle);\n  rotateX(-90);\n  rotateZ(-10);\n\n  for (y = -mainradius / 2; y < mainradius / 2; y += round(ring)) {\n    //strokeWeight(ring * sin(y + offset));\n\t\tstrokeWeight(2);\n    let t = 0;\n    while (t < TWO_PI) {\n      let radius = sqrt(pow((mainradius - 40) / 2, 2) - pow(y, 2));\n      let x = radius * cos(t);\n      let z = radius * sin(t);\n\n      // 计算噪音值\n      let noiseValue = noise(x * noiseScale, y * noiseScale, z * noiseScale + offset);\n\n      // 只将噪音效果应用到 x 和 z 坐标\n      x += noiseValue * noiseStrength * noise(x);\n      z += noiseValue * noiseStrength;\n\n      // 获取点在屏幕上的位置\n      let screenXPos = screenX(x, y, z);\n      let screenYPos = screenY(x, y, z);\n\n      // 计算点到屏幕中心的距离\n      let distToCenter = dist(screenXPos, screenYPos, width / 2, height / 2);\n\n      // 根据距离计算透明度，距离越远透明度越低\n      let alpha = map(distToCenter, 0, radius * 1.2, 0, 100);\n\n      // 设置颜色和透明度\n      stroke(255, alpha);\n      point(x, y, z);\n      t += 0.1;\n    }\n  }\n\n  Yangle += speed;\n  offset += 0.1; // 继续增加 offset 以产生流动效果\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Nicolas",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2323200",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:21:08",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)",
+    "used_in_videos": [
+        "Blackout Interval.mp4"
+    ],
+    "used_count": 1
+}

@@ -1,0 +1,22 @@
+{
+    "name": "thornybranches",
+    "code": "// === Tab: mySketch ===\n// Some color palette options to choose from\nlet myPalettes = [\n\t[\"#eabfcb\", \"#c191a1\", \"#a4508b\", \"#5f0a87\", \"#2f004f\"],\n\t[\"#c3dfe0\", \"#bcd979\", \"#9dad6f\", \"#7d6d61\", \"#5e574d\"],\n\t[\"#4464ad\", \"#a4b0f5\", \"#f58f29\", \"#7d4600\", \"#466995\"]\n];\nOPC.slider ('initial_size', 50, 20, 200, 1)\nOPC.slider ('speed', 1, 0.1,5,0.1)\nOPC.slider ('curliness', 1, 0.1, 5, 0.1)\nOPC.slider ('avg_reduction', 0.5, 0.2, 2.0, 0.1)\nOPC.palette('palette', myPalettes);\nOPC.toggle ('auto_spawn', false);\nOPC.button ('Clear', 'clear')\n\nconst batch_size = 20;\n\nfunction criaPart (x, y) {\n  let pos = createVector(x,y);\n  let dir = createVector(speed,0);\n  dir.rotate(random(radians(360)));\n  return {pos, dir, r:initial_size, inc: random(avg_reduction*0.5,avg_reduction*2), \n          cor: random(palette)};\n}\n\nfunction movePart (part) {\n  part.pos.add(part.dir);\n  part.r = part.r - part.inc\n  part.dir.rotate(radians(random(-10,10)*curliness))\n  return part.pos.x >= 0 && \n         part.pos.x < width &&\n         part.pos.y >= 0 && \n         part.pos.y < height && part.r > 1\n}\n\nfunction desenhaPart (part) {\n  fill (part.cor)\n  circle (part.pos.x, part.pos.y, part.r)\n}\n\nlet p = [];\n\nfunction setup() {\n  createCanvas(windowWidth, windowHeight);\n  stroke(0,50)\n   background(220);\n}\n\nfunction mousePressed() {\n  if (mouseButton == CENTER) {\n    p = [];\n    background(220)\n  }\n  else \n    p.push (criaPart((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))))\n}\n\nfunction mouseDragged() {\n  if (mouseButton == LEFT) p.push (criaPart((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))),(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))))\n}\n\nfunction draw() {\n  //background (0,20)\n\tfor (let i = 0; i < 10; i++) {  let q = []\n  for (let part of p) {\n    desenhaPart(part)\n    if (movePart(part)) q.push (part)\n  }\n  p = q;\n}\t\n\tif (auto_spawn && p.length == 0) {\n\t\tcreate_batch();\n\t}\n}\n\nfunction create_batch() {\n\tlet sz = height * 0.4;\n\tlet center = createVector(width/2, height/2)\n\tfor (let i = 0; i < batch_size; i++) {\n\t\tlet v = createVector(random(sz),0);\n\t\tv.rotate(random(TWO_PI))\n\t\tv.x *= width/height;\n\t\tlet q = center.copy().add(v);\n\t\tp.push (criaPart(q.x,q.y))\n\t}\n}\n\nfunction buttonPressed(variableName) {\n\tif (variableName == 'Clear') {\n\t\tp = [];\n\t\tbackground(220)\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "CLAUDIO ESPERANÇA",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2398334",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:18:00"
+}

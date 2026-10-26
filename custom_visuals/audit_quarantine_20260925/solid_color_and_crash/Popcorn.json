@@ -1,0 +1,22 @@
+{
+    "name": "Popcorn",
+    "code": "// === Tab: mySketch ===\n// sin, cos, ellipse, generative, monochrome\n// let click to redraw.\n// let on let Pickover's let attractor.\n// let drawing let from let Henstridge: www.altix.ovh/fac/Popcorn.java\n// http://paulbourke.net/fractals/popcorn/\n// http://www.iquilezles.org/www/articles/popcorns/popcorns.html\n// https://element90.wordpress.com/2012/01/10/pickover-popcorn/\n\n\nlet p;\nlet f1, f2, f3, f4;\nlet hu = 0;\n\nfunction setup() {\n  createCanvas(1112, 834);\n\tcolorMode(HSB, 255);\n  p = new PopCorn();\n  f1 = new SinOrCos();\n  f2 = new SinOrCos();\n  f3 = new SinOrCos();\n  f4 = new SinOrCos();\n\tf5 = new SinOrCos();\n\tf6 = new SinOrCos();\n\thu = random(255);\n  noStroke();\n  background(hu, 50, 255);\n}\n\nfunction draw() {\n  p.run();\n}\n\n\nclass PopCorn {\n  dots = 50, res = 4, j, i, count;\n  t = 3, b = -3, l = -3.0, r = 3.0;\n  x, y, xnew, ynew;\n  mult = 1.5, h = .085;\n  howMany = 1000;\n\n  function run() {\n    j += res;\n    for (i = 0; i <= width; i += res) {\n      x = float(i) / width * (r - l) + l;\n      y = float(j) / height * (b - t) + t;\n      for (k = 0; k < dots; k++) {\n        xnew = x - h * f1.calc(y + f2.calc(PI * mult * y));\n        ynew = y - h * f3.calc(x + f4.calc(PI * x));\n        x = xnew; \n        y = ynew;\n        fill(hu, 255, 50);\n        ellipse((x - l)/(r - l) * width, (y - t)/(b - t) * height, .5, .5);\n        count++;\n      }\n    }\n    if (j >= howMany) {\n      noLoop();\n      //fill(100);\n      //text(count, 30, height-30);\n    }\n  }\n}\n\nfunction mousePressed() {\n  background(\"#EAEDFF\");\n  p.mult = random(1, 5);\n  p.h = random(.05, .2);\n  p.j = 0;\n  p.count = 0;\n  p.howMany = random(height/5, height);\n  f1 = new SinOrCos();\n  f2 = new SinOrCos();\n  f3 = new SinOrCos();\n  f4 = new SinOrCos();\n\tf5 = new SinOrCos();\n\tf6 = new SinOrCos();\n  loop();\n}\n\nclass SinOrCos {\n  let which = int(random(0, 2));\n  calc(rad) {\n    if (which == 0) return sin(rad);\n    else return cos(rad);\n  }\n\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Richard Bourne",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1602027",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:53:38"
+}

@@ -1,0 +1,22 @@
+{
+    "name": "Weboflines",
+    "code": "// === Tab: sketch349982 ===\nlet p = new Array(200);\nlet limit = 100;\n\nfunction setup() {\n\tfor (i = 0; i < p.length; i++) {\n\t\tp[i] = new Pa();\n\t}\n\tcreateCanvas(900, 900);\n\tbackground(255);\n\n\tnoFill();\n\tstroke(0);\n\tstrokeWeight(1);\n}\n\nfunction draw() {\n\tfill(255, 10);\n\tnoStroke();\n\trect(0, 0, width, height);\n\tfor (i = 0; i < p.length; i++) {\n\t\tp[i].show(i);\n\t}\n}\n\nclass Pa {\n\tx, y, vx, vy;\n\tconstructor() {\n\t\tx = random(width);\n\t\ty = random(height);\n\n\t\tlet a = random(TWO_PI);\n\t\tvx = cos(a) * 5;\n\t\tvy = sin(a) * 5;\n\t}\n\n\tfunction show(index) {\n\t\tx += vx;\n\t\ty += vy;\n\t\tfor (i = index + 1; i < p.length; i++) {\n\t\t\tlet d = dist(x, y, p[i].x, p[i].y);\n\t\t\tif (d < limit) {\n\t\t\t\tstroke(0, map(d, limit / 2, limit, 255, 0));\n\t\t\t\tline(x, y, p[i].x, p[i].y);\n\t\t\t}\n\t\t}\n\t\tx = lm(x, width);\n\t\ty = lm(y, width);\n\t}\n}\nfunction lm(a, b) {\n\tif (a < 0) {\n\t\treturn a + b;\n\t}\n\tif (a > b) {\n\t\treturn a - b;\n\t}\n\treturn a;\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "diegorv",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1459661",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:59:43"
+}

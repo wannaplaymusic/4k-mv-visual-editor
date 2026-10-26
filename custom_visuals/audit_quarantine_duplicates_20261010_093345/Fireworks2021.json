@@ -1,0 +1,24 @@
+{
+    "name": "Fireworks2021",
+    "code": "// === Tab: mySketch ===\nlet firework = [];\nlet colors = ['#111d5e', '#c70039', '#f37121', '#c0e218'];\nlet g;\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\t\n\t\n}\n\nfunction draw() {\n\tfill(0, 10);\n\trect(0, 0, width, height);\n\t\n\tg = createVector(0, 0.01);\n\t\n\tif(firework.length > 0) {\n\t\tfor(let i = 0; i < firework.length; i++) {\n\t\t\tfirework[i].show();\n\t\t\tfirework[i].move();\n\t\t\tfirework[i].applyForce(g);\n\t\t\t\n\t\t\tif(firework[i].vel.y > 0) firework[i].boom();\n\t\t\tif(firework[i].isDead()) firework.splice(i, 1);\n\t\t}\n\t}\n}\n\nfunction mousePressed() {\n\tfor(let i = 0; i < 100; i++) {\n\t\tfirework.push(new Ball((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))), 5, colors[i%colors.length]));\n\t}\n}\n\nclass Ball {\n\tconstructor(x, y, s_, c_) {\n\t\tthis.pos = createVector(x, y);\n\t\tthis.vel = createVector(0, -1);\n\t\tthis.acel = createVector(0, -1);\n\t\tthis.s = s_;\n\t\tthis.c = c_;\n\t\tthis.aux = true;\n\t\tthis.a = 255;\n\t}\n\t\n\tshow() {\n\t\tnoStroke();\n\t\tfill(this.c);\n\t\tellipse(this.pos.x, this.pos.y, this.s, this.s);\n\t\t\n\t\tif(!this.aux) this.a -= random(2, 4);\n\t}\n\t\n\tmove() {\n\t\tthis.vel.add(this.acel);\n\t\tthis.vel.limit(5);\n\t\tthis.pos.add(this.vel);\n\t\tthis.acel.mult(0);\n\t}\n\t\n\tapplyForce(f) {\n\t\tthis.acel.add(f);\n\t}\n\t\n\tboom() {\n\t\tif(this.aux) {\n\t\t\tthis.acel = p5.Vector.random2D();\n\t\t\tthis.acel.normalize();\n\t\t\tthis.acel.mult(random(2));\n\t\t\tthis.aux = false;\n\t\t}\n\t}\n\t\n\tisDead() {\n\t\tif(this.a < 10) return true;\n\t\telse return false;\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Tricia Hughes",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/1968785",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:32:31",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

@@ -1,0 +1,29 @@
+{
+    "name": "112D_Smoke_Sysyem",
+    "code": "// === Tab: mySketch ===\nlet sTex;\nlet smokeManager;\nlet smokeManager2;\nlet dice;\n\nfunction preload() {\n\tsTex = loadImage(\"https://openprocessing.org/sketch/1777538/files/smoke.png\");\n}\n\nfunction setup() {\n\tcreateCanvas(windowWidth, windowHeight);\n\tbackground(0);\n\tdice = random(20,100);\n\tsmokeManager = new smokeGenerator();\n\tsmokeManager2 = new smokeGenerator();\n}\n\nfunction draw() {\n\tbackground(0);\n\t\n\tif(smokeManager.getSize() < dice && frameCount % 2 == 0) {\n\t\tdice = random(40,80);\n\t\tsmokeManager.create(sTex, {x:width*0.5,y:height*0.5}, {x:random(-1.1,1.1),y:random(-5,-4)});\n\t\tsmokeManager2.create(sTex, {x:width*0.5,y:height*0.5}, {x:random(-1.1,1.1),y:random(4,5)});\n\t}\n\tsmokeManager.draw();\n\tsmokeManager2.draw();\n}\n\nfunction mousePressed() {\n\tsmokeManager.create(sTex, {x:width*0.5,y:height*0.5}, {x:1,y:-1}, 100, height*0.5);\n}\n\n// === Tab: tab2 ===\nclass Smoke {\n\tconstructor(tex, pos = {\n\t\tx: 0,\n\t\ty: 0\n\t}, dir = {\n\t\tx: 1,\n\t\ty: 1\n\t}) {\n\t\tthis.current_time = 0.0;\n\t\tthis.duration = 2.0; // seconds\n\t\tthis.target_scale = random(0.8, 1.1);\n\t\tthis.ratio = 0;\n\t\tthis.texture = tex;\n\t\tthis.pos = pos;\n\t\tthis.dir = dir;\n\t\tthis.angle = random(-PI, PI);\n\t\tthis.birthT = millis();\n\t\timageMode(CENTER);\n\t}\n\n\tdone() {\n\t\treturn this.ratio > 1.0;\n\t}\n\n\tdraw() {\n\t\tif (!this.done()) {\n\t\t\tthis.current_time = (millis() - this.birthT) / 1000;\n\t\t\tthis.ratio = this.current_time / this.duration;\n\t\t\tlet t_scale = this.smoothStop(this.ratio, 2);\n\t\t\tlet t_angle = this.smoothStop(this.ratio, 3);\n\t\t\tlet t_opacity = (1.0 - this.ratio) * 255;\n\t\t\tthis.pos.x += this.smoothStop(this.ratio, 9) * this.dir.x;\n\t\t\tthis.pos.y += this.smoothStop(this.ratio, 9) * this.dir.y;\n\t\t\tpush();\n\t\t\ttranslate(this.pos.x, this.pos.y);\n\t\t\trotate(t_angle);\n\t\t\tscale(t_scale * this.target_scale);\n\t\t\ttint(255, t_opacity);\n\t\t\timage(this.texture, 0, 0);\n\t\t\tpop();\n\t\t}\n\t}\n\n\tflip(x) {\n\t\treturn 1 - x;\n\t}\n\n\tdumbPow(x, p) {\n\t\tlet res = 1.0;\n\t\tfor (let i = p; i--;) {\n\t\t\tres *= x;\n\t\t}\n\n\t\treturn res;\n\t}\n\n\tsmoothStop(t, power) {\n\t\treturn this.flip(this.dumbPow(this.flip(t), power));\n\t}\n}\n\n// === Tab: tab3 ===\nclass smokeGenerator {\n\n\tconstructor() {\n\t\tthis.particles = [];\n\t}\n\t\n\tgetSize() {\n\t\treturn this.particles.length;\n\t}\n\tcreate(tex, pos, vel) {\n\t\tlet obj = new Smoke(\n\t\t\ttex, {\n\t\t\t\tx: pos.x,\n\t\t\t\ty: pos.y\n\t\t\t}, {\n\t\t\t\tx: vel.x,\n\t\t\t\ty: vel.y\n\t\t\t}\n\t\t);\n\t\tthis.particles.push(obj);\n\t}\n\n\tdraw() {\n\t\tconst iMax = this.particles.length;\n\t\tlet i = 0;\n\t\tfor (;i < iMax; i++) {\n\t\t\tthis.particles[i].draw();\n\t\t}\n\t\t\n\t\tthis.removeDeadParticles();\n\t\t\n\t}\n\t\n\tremoveDeadParticles() {\n\t\tvar i = 0;\n\t\tvar iMax = this.particles.length;\n\t\t//var dead = this.particles.some();\n\t\tfor(; i < iMax; i++) {\n\t\t\tif(this.particles[i].done()) {\n\t\t\t\tthis.particles.splice(i,1);\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t\t//this.particles.some(this.isDeadOrAlive);\n\t}\n\t\n\tisDeadOrAlive(obj,index,array) {\n\t\tif(obj.done()) {\n\t\t\tarray.splice(index,1);\n\t\t}\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "alptugan",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/1777538",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:44:35",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

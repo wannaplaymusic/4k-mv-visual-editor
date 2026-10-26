@@ -1,0 +1,22 @@
+{
+    "name": "Thehappiestofmemories",
+    "code": "// === Tab: mySketch ===\n//Music by <a href=\"https://pixabay.com/users/lexin_music-28841948/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=115667\">Aleksey Chistilin</a> from <a href=\"https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=115667\">Pixabay</a>\n//Attribution: KomaTebe\n\nlet f=0;\nlet W=900;\nlet counter=0\nfunction preload() \n{\n\tsoundFormats('mp3', \"wav\");//load music\n  song = loadSound('https://openprocessing.org/sketch/2131201/files/spaceMusic.mp3');\n}\n\nsetup=_=>\n{\n\tcreateCanvas(1300, 700);\n\tpixelDensity(.45)\n\tsong.play()\n  amp = new p5.Amplitude();\n\tsong.loop()\n}\ndraw=_=>\n{\n\tvar vol = amp.getLevel();\n  volumeLevel = round(map(vol, 0, 0.3,1, 50));\n\tframeRate(volumeLevel)\n\tcounter++\n  let r=W;\n  background(volumeLevel/4);\n  translate(1300/2,700/2);\n  rotate(f/W);\n  if(r>0)\n\t{\n    for(z=255; z>=0; z-=2)\n\t\t{\n\t\t\tfor(n=0;n<2;n++) //stars\n\t\t\t\t{\n\t\t\t\t\tfill(255)\n\t\t\t\t\tstroke(255)\n\t\t\t\t\tcircle(random(-1300,1300),random(-700,700),random(1))\n\t\t\t\t}\n      \tfor(i=0;i<TAU;i+=PI/32)\n\t\t\t\t{\n\t\t\t\t\tlet n=noise(i,tan(i)/90000,(f+z)/100);\n\t\t\t\t\tpush();\n\t\t\t\t\trotate(i);\n\t\t\t\t\tstrokeWeight( (volumeLevel/8.5) - random(3) )\n\t\t\t\t\tstroke(W-z);\n\t\t\t\t\tpoint(0,z*n);\n\t\t\t\t\tstroke(i+W,77);\n\t\t\t\t\tpoint(z-n*W,i*12);\t\n\t\t\t\t\tpop();\n\t\t\t\t\tr--;\n      \t}\n     }\n   }\n  f-=2;\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Joe DeNavas (DD89)",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/2131201",
+    "batch_id": "batch_20260925_165248",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 17:29:32"
+}

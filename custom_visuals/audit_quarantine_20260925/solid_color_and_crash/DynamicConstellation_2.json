@@ -1,0 +1,22 @@
+{
+    "name": "DynamicConstellation",
+    "code": "// === Tab: mySketch ===\nArrayList<Circle> circles = new ArrayList<Circle>();\nlet c;\nfunction setup() {\n\tcreateCanvas(screen.width, screen.height);\n}\n\nfunction draw() {\n\tbackground(0); \n\tfor (i = 0; i < circles.size(); ++i) {\n\t\tfor (k = 0; k < circles.size(); ++k) {\n\t\t\tif (i!=k) {\n\t\t\t\tlet f = circles.get(k).attract(circles.get(i));\n\t\t\t\tcircles.get(i).applyForce(f);\n\t\t\t\tcircles.get(i).link(circles.get(k));\n\t\t\t}\n\t\t} \n\t\tcircles.get(i).update();\n\t\tcircles.get(i).display();\n\t\tcircles.get(i).checkEdges();\n\t}\n}\n\nfunction mouseClicked(){\n\tc = new Circle();\n\tcircles.add(c);\n}\n\nfunction mouseDragged(){\n\tc = new Circle();\n\tcircles.add(c);\n}\n\nclass Circle{\n\tlocation,velocity,acceleration;\n\tG,mass,size;\n\n\tconstructor(){\n\t\tlocation = new PVector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n\t\tvelocity = new PVector(0,0);\n\t\tacceleration = new PVector(0,0);\n\t\tG = 0.6;\n\t\tmass = random(2,5);\n\t\tsize = mass;\n\t}\n\n\tfunction applyForce(force){\n\t\tvar f = force.get();\n\t\tf.div(mass);\n\t\tacceleration.add(f);\n\t}\n\n\tfunction update(){\n\t\tvelocity.add(acceleration);\n\t\tlocation.add(velocity);\n\t\tacceleration.mult(0);\n\t}\n\n\tfunction display(){\n\t\tnoStroke();\n\t\tfill(255);\n\t\tellipse(location.x, location.y,size,size);\n\t}\n\n\tfunction link(c){\n\t\tstroke(255, 75);\n\t\tlet dist = PVector.sub(c.location,location);\n\t\tif (dist.mag()<150) {\n\t\t\tline(location.x, location.y, c.location.x, c.location.y);\n\t\t}\n\t}\n\n\tattract(c){\n\t\tlet force = PVector.sub(location,c.location);\n\t\tlet distance = force.mag();\n\t\tdistance = constrain(distance, 20, 25);\n\t\tforce.normalize();\n\t\tlet strength = (G*mass*c.mass)/(distance*distance);\n\t\tforce.mult(strength);\n\t\treturn force;\n\t}\n\n\tfunction checkEdges(){\n\t\tif (location.x < size/2) {\n\t\t\tlocation.x = size/2;\n\t\t\tvelocity.x *= -1;\n\t\t} else if (location.x > width-size/2){\n\t\t\tlocation.x = width-size/2;\n\t\t\tvelocity.x *= -1;\n\t\t}\n\n\t\tif (location.y < size/2) {\n\t\t\tlocation.y = size/2;\n\t\t\tvelocity.y *= -1;\n\t\t} else if (location.y > height-size/2){\n\t\t\tlocation.y = height-size/2;\n\t\t\tvelocity.y *= -1;\n\t\t}\n\t}\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Ash He",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/953208",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 12:35:21"
+}

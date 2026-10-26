@@ -1,0 +1,24 @@
+{
+  "name": "Particlesandbox",
+  "code": "// === Tab: sketch.js ===\n/*\nParticle sandbox\n\nControls:\n\t- Move the mouse around the interact with the particles.\n\t- Mouse click to reset the scene.\n\t- Hold middle mouse click to attract.\n\nAuthor:\n  Jason Labbe\n\nSite:\n  jasonlabbe3d.com\n*/\n\nvar bobCount = 3000;\nvar bobs = [];\nvar globalHue;\n\n\nfunction setup() {\n\tcreateCanvas(1024, 768);\n\tcolorMode(HSB, 255);\n\treset();\n}\n\n\nfunction draw() {\n\tbackground(10);\n\tfor (let i = 0; i < bobs.length; i++) {\n\t\tlet b = bobs[i];\n\t\tb.move();\n\t\t\n\t\tstroke(b.hue, b.bright, 255);\n\t\t\n\t\t// Exaggerate vector from lastPos to pos.\n\t\tlet newPos = b.pos.copy();\n\t\tnewPos.sub(b.lastPos);\n\t\tnewPos.mult(15);\n\t\tnewPos.add(b.pos);\n\t\t\n\t\tline(newPos.x, newPos.y, b.pos.x, b.pos.y);\n\t}\n}\n\n\nfunction mouseClicked() {\n\treset();\n}\n\n\nfunction reset() {\n\tglobalHue = random(255);\n\t\n\tbobs.splice(0, bobs.length);\n\t\n\tfor (let i = 0; i < bobCount; i++) {\n\t\tbobs.push(new Bob(random(width), random(height)));\n\t}\n\t\n\t// Make sure mouse doesn't immediately effect particles.\n\twindow.simulatedMouseX = -9999;\n\twindow.simulatedMouseY = -9999;\n\t\n\tbackground(10);\n}\n\n// === Tab: bob.js ===\nfunction Bob(x, y) {\n  \n\tthis.lastPos = new p5.Vector(x, y);\n  this.pos = new p5.Vector(x, y);\n  this.vel = new p5.Vector(0, 0);\n\tthis.vel.mult(random(0.1));\n  this.acc = new p5.Vector(0, 0);\n  this.drag = random(0.98, 0.99);\n\tthis.hue = (globalHue + random(-40, 40)) % 255;\n\tthis.bright = random(255);\n\t\n  this.move = function() {\n\t\tthis.lastPos.x = this.pos.x;\n\t\tthis.lastPos.y = this.pos.y;\n\t\t\n\t\t// Add some air drag so it can eventually settle.\n\t\tthis.vel.mult(this.drag);\n\n    // Push it away from the mouse.\n    let mouseDist = dist(this.pos.x, this.pos.y, (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))));\n    let mouseThresh = 300;\n    \n\t\tlet mult = 0.001;\n\t\tif (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed)) && mouseButton == CENTER) {\n\t\t\tmult *= -1;\n\t\t}\n\t\t\n    if (mouseDist < mouseThresh) {\n      let push = new p5.Vector(this.pos.x, this.pos.y);\n      push.sub(new p5.Vector((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))), (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))));\n      push.normalize();\n      push.mult((mouseThresh - mouseDist) * mult);\n      this.acc.add(push);\n    }\n\t\t\n\t\t// Move it.\n\t\tthis.vel.add(this.acc);\n\t\tthis.vel.limit(6);\n\t\tthis.pos.add(this.vel);\n\t\tthis.acc.mult(0);\n\t\t\n\t\t// Keep in bounds.\n\t\tif (this.pos.x < 0) {\n\t\t\tthis.pos.x = width;\n\t\t\tthis.lastPos.x = width;\n\t\t} else if (this.pos.x > width) {\n\t\t\tthis.pos.x = 0;\n\t\t\tthis.lastPos.x = 0;\n\t\t}\n\t\t\n\t\tif (this.pos.y < 0) {\n\t\t\tthis.pos.y = height;\n\t\t\tthis.lastPos.y = height;\n\t\t} else if (this.pos.y > height) {\n\t\t\tthis.pos.y = 0;\n\t\t\tthis.lastPos.y = 0;\n\t\t}\n\t}\n\t\n}\n\n",
+  "frequency": 50,
+  "storyboard_weight": 50,
+  "post_fx_intensity": 50,
+  "custom_html": "",
+  "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+  "inline_assets": {},
+  "author": "Richard Bourne",
+  "license": "CC BY-NC-SA",
+  "tags": [
+    "batch_import",
+    "openprocessing",
+    "audio_reactive",
+    "batch_2026-09-25"
+  ],
+  "url": "https://openprocessing.org/sketch/740846",
+  "batch_id": "batch_20260925_103420",
+  "batch_date": "2026-09-25",
+  "date_added": "2026-09-25 13:01:36",
+  "needs_qc_repair": true,
+  "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

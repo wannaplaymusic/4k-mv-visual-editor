@@ -1,0 +1,24 @@
+{
+    "name": "LifeCyclesofStardust",
+    "code": "// === Tab: mySketch ===\nlet NUM=320;\nlet A = new Array(NUM);\nlet RANGE=50;\nlet COMPRESS = 0.985;\nlet WEIGHT = 8;\n\nclass Attract {\n  x, y;\n\n  constructor() {\n    x=random(-width/2, width/2);\n    y=random(-height/2, height/2);\n  }\n\n  function update() {\n    point(x, y);\n\n    let vx=0;\n    let vy=0;\n    for (let a of A) {\n      vx+=(dist(x-RANGE, y, a.x, a.y)<RANGE)? -1 : (dist(x+RANGE, y, a.x, a.y)<RANGE) ? 1:0; \n      vy+=(dist(x, y-RANGE, a.x, a.y)<RANGE)? -1 : (dist(x, y+RANGE, a.x, a.y)<RANGE) ? 1:0;\n    }\n\n    let f = sin(radians(frameCount));\n    x+=vx*f;\n    y+=vy*f;\n    x*=COMPRESS;\n    y*=COMPRESS;\n  }\n}\n\nfunction setup() {\n  createCanvas(640, 640);\n  for (i=0; i<NUM; i++) {\n    A[i]=new Attract();\n  }\n  stroke(255);\n  strokeWeight(WEIGHT);\n}\n\nfunction draw() {\n  background(0);\n  translate(width/2, height/2);  \n  for (let a of A) {\n    a.update();\n  }\n}\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "Naoki Tsutae",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25"
+    ],
+    "url": "https://openprocessing.org/sketch/677682",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 13:12:19",
+    "needs_qc_repair": true,
+    "qc_reject_reason": "PERSISTENT_BLACK_SCREEN (All Frames Mean=0.00)"
+}

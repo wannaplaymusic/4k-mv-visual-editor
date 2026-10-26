@@ -1,0 +1,31 @@
+{
+    "name": "SandPhysics",
+    "code": "// === Tab: Main ===\n/** Another falling sand game, but this time with integrated physics */\n/** Things to do:\n  - add elements\n  - horizontal velocity\n*/\n\n// elements\nvar EMPTY = 0, SAND = 200;\n\n// physics options:\nvar gravity = 0.1;\n\nvar gridWidth = 150, gridHeight = 125;\nvar grid = [], prev = [];\n\nvar brushSize = 5;\n\nfunction setup() {\n  createCanvas(gridWidth * 4, gridHeight * 4);\n  for (let i = 0; i < gridWidth * gridHeight; i++) grid[i] = createVector(0, 0, EMPTY);\n  fill(255, 255, 0);\n  noStroke();\n}\n\nfunction draw() {\n  background(0);\n  \n  grid[grid.length / 2] = createVector(0, 0, SAND);\n  \n  loadCells();\n  for (let i = grid.length - 1; i >= 0; --i) {\n    const x = i % gridWidth, y = floor(i / gridWidth);\n    if (dist((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) - 2, (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) - 2, x * 4, y * 4) <= sqrt(sq(4) * 2) / 2 * brushSize) \n      if (((window.isBeat || false) || (typeof window.is_silent !== 'undefined' ? !window.is_silent : mouseIsPressed))) grid[i] = createVector(0, 0, SAND);\n    \n    if (prev[i].z == SAND) {\n      grid[i].y += gravity;\n      for (let yStep = 1; yStep < ceil(grid[i].y) + 1; yStep++) {\n        if (swapIfAble(i, i + gridWidth * (ceil(grid[i].y / yStep)))) {}\n      } if (grid[i].z == SAND) { \n        grid[i] = createVector(0, 0, SAND);\n        if (random(1) > 0.5) {\n          if (swapIfAble(i, i + gridWidth + 1)) {\n          } else if (swapIfAble(i, i + gridWidth - 1)) {}\n        } else if (swapIfAble(i, i + gridWidth - 1)) {\n        } else if (swapIfAble(i, i + gridWidth + 1)) {}\n      }\n      \n      square(x * 4, y * 4, 4);\n    }\n  }\n}\n\nfunction loadCells() {\n  for (let i = 0; i < grid.length; i++) {\n    prev[i] = grid[i];\n  }\n}\n\nfunction swapIfAble(i, j) {\n  const cell2_prev = prev[j];\n  const x1 = i % gridWidth, x2 = j % gridWidth;\n  const diff = x1 - (x2 - x1);\n  if (diff > -2 && diff < gridWidth + 1 && j < grid.length && grid[i].z > cell2_prev.z) {\n    \n    grid[j] = prev[i];\n    grid[i] = cell2_prev;\n    \n    return true;\n  } return false;\n}\n\nfunction keyPressed() {\n  brushSize += keyIsDown(187) - keyIsDown(189);\n  brushSize = constrain(brushSize, 1, 100)\n  \n  // console.log(keyCode);\n}\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\ninput, button, select, textarea, label, form {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n",
+    "inline_assets": {},
+    "author": "RQmentative",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-09-25",
+        "particle",
+        "particles",
+        "ambient_particle",
+        "ambient",
+        "ambient_compatible"
+    ],
+    "url": "https://openprocessing.org/sketch/2277736",
+    "batch_id": "batch_20260925_103420",
+    "batch_date": "2026-09-25",
+    "date_added": "2026-09-25 11:12:04",
+    "used_in_videos": [
+        "Arctic Delay Lines.mp4"
+    ],
+    "used_count": 1
+}

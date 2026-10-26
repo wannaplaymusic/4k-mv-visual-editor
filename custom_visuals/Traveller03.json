@@ -1,0 +1,63 @@
+{
+    "name": "Traveller03",
+    "code": "// === Tab: traveller02 ===\nlet x0, y0, x1, y1;\nlet col;\nlet newcol, rendermode=2;\nlet img;\nlet dir;\nlet movement=true;\nlet initmoveplace;\n\nfunction setup() {\n  createCanvas(1024, 768);\n  colorMode(HSB, 360, 255, 255);\n  noStroke();\n\tcol=color(random(360), 255, 255, 10);\n  ellipseMode(CENTER);\n  frameRate(200);\n  x1=x0=width/2;\n  y1=y0=height/2;\n  dir= createVector(0, 0);\n  background(0, 255, 0);\n  loadPixels();\n  fill(col);\n  ellipse(x0, y0, 5, 5); \n  updatePixels();\n  blendMode(DIFFERENCE);\n}\nfunction draw() {  \n  if (movement==true && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) == (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX))) && (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY))) == (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))) {\n    movement=false;\n    if ((window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))>8 && (window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)))<width-9)x0=(window.simulatedMouseX !== undefined ? window.simulatedMouseX : (typeof sub_bass !== 'undefined' ? map(sub_bass, 0, 1, width*0.1, width*0.9) : (typeof live_centroid !== 'undefined' ? map(live_centroid, 100, 4000, 0, width) : mouseX)));\n    if ((window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))>8 && (window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)))<height-9)y0=(window.simulatedMouseY !== undefined ? window.simulatedMouseY : (typeof percussive !== 'undefined' ? map(percussive, 0, 1, height, 0) : (typeof roughness !== 'undefined' ? map(roughness, 0, 1, height*0.2, height*0.8) : mouseY)));\n    col=pixels[int(x0)+int(y0)*width];\n  }\n  if (frameCount%2==1) {\n    img=get();\n    img.loadPixels();\n  }\n  //if (frameCount%100==1)filter(BLUR);//\n  for (let i=9; i<width-9; i+=2) {\n    for (let j=9; j<height-9; j+=2) {\n      let aim= createVector(x0-i, y0-j);\n      let dst=aim.mag();\n      aim.normalize();\n      switch(rendermode) {\n      case 0:\n        aim.mult(1+dst/100);\n        pixels[round(i-random(-2+dst/800, 2-dst/800))+round(j-random(-2+dst/800, 2-dst/800))*width]=img.pixels[round(i+aim.x)+round(j+aim.y)*width];\n        break;\n      case 1:\n        aim.mult(1+dst/100);\n        pixels[round(i-random(-1-dst/200, 1+dst/200))+round(j-random(-1-dst/200, 1+dst/200))*width]=img.pixels[round(i+aim.x-random(-2, 2))+round(j+aim.y-random(-2, 2))*width];\n        break;\n      case 2:\n        aim.mult(1+dst/100);\n        aim.x*=(random(1, 2));\n        aim.y*=random(1, 2);\n        pixels[round(i-random(-2, 2))+round(j-random(-2, 2))*width]=img.pixels[round(i+aim.x)+round(j+aim.y)*width];\n        break;\n      }\n    }\n  }\n  updatePixels();\n  //col=color((hue(col)+random(-8, 8)+360)%360, (saturation(col)+random(-20, 20)+255)%255, (brightness(col)+random(-20, 20)+255)%255, random(100));\n  fill(col);\n  ellipse(x0, y0, 3, 3);\n}\nfunction mouseMoved() {\n  movement=true;\n}\nfunction mouseReleased() {\n  rendermode++;\n  rendermode%=3;\n}\n\n\n\n\n",
+    "frequency": 50,
+    "storyboard_weight": 50,
+    "post_fx_intensity": 50,
+    "custom_html": "",
+    "custom_css": "\n/* === 4K MV Pure Canvas - 全域控制項與 UI 面板極限無痕隱藏 === */\n.dg, .lil-gui, .qs_main, .opc-control, #opc-control-panel, .control-panel, .gui-container,\n.tp-dfwv, .tp-rotv, .tweakpane, [class*='tp-'], [class*='tweakpane'],\n[class*='gui'], [id*='gui'], [class*='control'], [id*='control'],\n[class*='instruction'], [id*='instruction'], [class*='info'], [id*='info'],\n[class*='fps'], [id*='fps'], [class*='overlay'], [id*='overlay'],\n[class*='panel'], [id*='panel'], [class*='toolbar'], [id*='toolbar'],\n.p5-control, .ui-container, #ui, #controls, .hud, [class*='hud'],\ninput, button, select, textarea, label, form, nav, header {\n  display: none !important;\n  visibility: hidden !important;\n  opacity: 0 !important;\n  pointer-events: none !important;\n  width: 0 !important;\n  height: 0 !important;\n  position: absolute !important;\n  left: -9999px !important;\n  top: -9999px !important;\n}\n",
+    "inline_assets": {},
+    "author": "bourneidentity",
+    "license": "CC BY-NC-SA",
+    "tags": [
+        "batch_import",
+        "openprocessing",
+        "audio_reactive",
+        "batch_2026-10-08"
+    ],
+    "url": "https://openprocessing.org/sketch/742330",
+    "batch_id": "batch_20261008_210320",
+    "batch_date": "2026-10-08",
+    "date_added": "2026-10-09 00:50:59",
+    "expressive_profile": {
+        "module_id": "Traveller03.json",
+        "primary_psychological_state": "alienation_void",
+        "secondary_psychological_states": [
+            "sterile_neutral",
+            "static_crystalline"
+        ],
+        "symbolic_metaphors": [
+            "宇宙深淵",
+            "存在的孤寂",
+            "冷色虛空"
+        ],
+        "narrative_function": "genesis_anchor",
+        "jungian_archetype": "the_void",
+        "color_profile": {
+            "dominant_oklch_hues": [
+                135.0,
+                15.0
+            ],
+            "mean_lightness": 0.002,
+            "mean_chroma": 0.028,
+            "contrast_level": "monochrome_stark",
+            "emotional_temperature": "sterile_neutral"
+        },
+        "dynamics": {
+            "mean_velocity": 0.07,
+            "curl_vorticity": 0.005,
+            "divergence": 0.0,
+            "motion_energy_type": "static_crystalline"
+        },
+        "hydration_level": 1,
+        "confidence_score": 0.75,
+        "analyzed_engine": "heuristic_fallback",
+        "updated_at": "2026-10-09 01:00:20"
+    },
+    "is_new_semantic_ingested": true,
+    "used_in_videos": [
+        "Soft Collapse.mp4",
+        "Stellar Horde Invasion.mp4"
+    ],
+    "used_count": 2
+}
